@@ -1,0 +1,81 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+
+	<!--  Bongos CastBar - Puts the casting bar in a movable bar -->
+	<Script file="bar.lua"/>
+	
+	<StatusBar name="BongosCastingBarTemplate" drawLayer="BORDER" topLevel="true" hidden="true" virtual="true">
+		<Size x="195" y="18"/>
+		
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture setAllPoints="true">
+					<Color r="0" g="0" b="0" a="0.5"/>
+				</Texture>		
+			</Layer>
+
+			<Layer level="ARTWORK">
+				<FontString name="$parentText" inherits="GameFontHighlight">
+					<Anchors>
+						<Anchor point="CENTER">
+							<Offset x="0" y="1"/>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				
+				<FontString name="$parentTime" font="GameFontHighlight">
+					<Anchors>
+						<Anchor point="RIGHT">
+							<Offset x="0" y="1"/>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				
+				<Texture name="$parentBorder" file="Interface\CastingBar\UI-CastingBar-Border-Small">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset x="-34" y="28"/>
+						</Anchor>
+						<Anchor point="BOTTOMRIGHT">
+							<Offset x="34" y="-26"/>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+
+			<Layer level="OVERLAY">
+				<Texture name="$parentSpark" file="Interface\CastingBar\UI-CastingBar-Spark" alphaMode="ADD">
+					<Size x="36" y="36"/>
+	
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</Texture>
+		
+				<Texture name="$parentFlash" file="Interface\CastingBar\UI-CastingBar-Flash-Small" alphaMode="ADD">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset x="-34" y="28"/>
+						</Anchor>
+						<Anchor point="BOTTOMRIGHT">
+							<Offset x="34" y="-26"/>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+
+		<Scripts>
+			<OnLoad>
+				CastingBarFrame_OnLoad("player", true);
+			</OnLoad>
+			<OnEvent>
+				CastingBarFrame_OnEvent(event, arg1);
+			</OnEvent>
+		</Scripts>
+
+		<BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
+		<BarColor r="1.0" g="0.7" b="0.0"/>
+	</StatusBar>
+</Ui>
