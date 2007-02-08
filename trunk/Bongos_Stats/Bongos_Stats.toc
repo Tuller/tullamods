@@ -1,0 +1,7 @@
+## Interface: 20003
+## Title: Bongos_Stats
+## Notes: A movable FPS, memory, and latency display
+## Author: Tuller
+## Dependencies: Bongos
+localization.lua
+bar.lua
