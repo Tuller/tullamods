@@ -1,0 +1,194 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+
+	<Script file="actionBarGlobal.lua"/>
+
+	<!-- Global Actionbar Settings Panel -->
+	<Frame name="BongosOptionsActionBar" inherits="BongosOptionsPanel" virtual="true">
+		<Frames>
+			<CheckButton name="$parentLockButtons" inherits="GooeyCheckButton" text="BONGOS_OPTIONS_ACTIONBAR_LOCK_BUTTONS">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset x="4" y="6"/>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						BActionConfig.SetButtonsLocked(this:GetChecked())
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+<!--
+			<CheckButton name="$parentRightClickSelfCast" inherits="GooeyCheckButton" text="BONGOS_OPTIONS_ACTIONBAR_RIGHTCLICK_SELFCAST">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentLockButtons" relativePoint="BOTTOMLEFT">
+						<Offset x="0" y="4"/>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if this:GetChecked() then
+							BActionConfig.SetUnit(2, "player")
+						else
+							BActionConfig.SetUnit(2, nil)
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			
+			<CheckButton name="$parentMiddleClickFocusCast" inherits="GooeyCheckButton" text="BONGOS_OPTIONS_ACTIONBAR_MIDDLECLICK_FOCUSCAST">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentRightClickSelfCast" relativePoint="BOTTOMLEFT">
+						<Offset x="0" y="4"/>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if this:GetChecked() then
+							BActionConfig.SetUnit(3, "focus")
+						else
+							BActionConfig.SetUnit(3, nil)
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+-->		
+			<CheckButton name="$parentRange" inherits="GooeyCheckButton" text="BONGOS_OPTIONS_ACTIONBAR_RANGE_COLORING">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentLockButtons" relativePoint="BOTTOMLEFT">
+						<Offset x="0" y="4"/>
+					</Anchor>
+				</Anchors>
+
+				<Frames>
+					<Button name="$parentColor" inherits="GooeyColorPicker">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parentText" relativePoint="RIGHT">
+								<Offset x="6" y="0"/>
+							</Anchor>
+						</Anchors>
+
+						<Scripts>
+							<OnClick>
+								BOptionsRangeColor_OnClick()
+							</OnClick>
+						</Scripts>
+					</Button>
+				</Frames>
+
+				<Scripts>
+					<OnClick>
+						BActionConfig.SetColorOutOfRange(this:GetChecked())
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+
+			<CheckButton name="$parentShowGrid" inherits="GooeyCheckButton" text="BONGOS_OPTIONS_ACTIONBAR_SHOW_EMPTY">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentRange" relativePoint="BOTTOMLEFT">
+						<Offset x="0" y="4"/>
+					</Anchor>
+				</Anchors>
+				
+				<Scripts>
+					<OnClick>
+						BActionConfig.SetShowGrid(this:GetChecked())
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+
+			<CheckButton name="$parentTooltips" inherits="GooeyCheckButton" text="BONGOS_OPTIONS_ACTIONBAR_SHOW_TOOLTIPS">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentShowGrid" relativePoint="BOTTOMLEFT">
+						<Offset x="0" y="4"/>
+					</Anchor>
+				</Anchors>
+				
+				<Scripts>
+					<OnClick>
+						BActionConfig.SetTooltips(this:GetChecked())
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+
+			<CheckButton name="$parentMacroText" inherits="GooeyCheckButton" text="BONGOS_OPTIONS_ACTIONBAR_SHOW_MACROS">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentTooltips" relativePoint="BOTTOMLEFT">
+						<Offset x="0" y="4"/>
+					</Anchor>
+				</Anchors>
+				
+				<Scripts>
+					<OnClick>
+						BActionConfig.SetMacroText(this:GetChecked())
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+
+			<CheckButton name="$parentHotkeysText" inherits="GooeyCheckButton" text="BONGOS_OPTIONS_ACTIONBAR_SHOW_HOTKEYS">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentMacroText" relativePoint="BOTTOMLEFT">
+						<Offset x="0" y="4"/>
+					</Anchor>
+				</Anchors>
+				
+				<Scripts>
+					<OnClick>
+						BActionConfig.SetHotkeys(this:GetChecked())
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			
+			<Frame name="$parentQuickMove" inherits="GooeyDropDown">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentHotkeysText" relativePoint="BOTTOMLEFT">
+						<Offset x="-16" y="-4"/>
+					</Anchor>
+				</Anchors>
+
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName() .. "Label"):SetText(BONGOS_OPTIONS_ACTIONBAR_QUICK_MOVE)
+					</OnLoad>
+					<OnShow>
+						BOptionsQuickMove_OnShow()
+					</OnShow>
+				</Scripts>
+			</Frame>
+			
+			<Slider name="$parentNumActionBars" inherits="BongosOptionsSlider" minValue = "1" maxValue="16" valuestep="1">
+				<Anchors>
+					<Anchor point="BOTTOM">
+						<Offset x="0" y="20"/>
+					</Anchor>
+				</Anchors>
+
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName() .. "Text"):SetText("Action Bars")
+						getglobal(this:GetName() .. "Low"):SetText(1)
+						getglobal(this:GetName() .. "High"):SetText(120)
+						
+						this.vals = {1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 24, 30, 40, 60, 120}
+					</OnLoad>
+					<OnValueChanged>
+						local numBars = this.vals[this:GetValue()]
+						if not this:GetParent().onShow then
+							BActionBar.SetNumber(numBars)
+						end
+						getglobal(this:GetName() .. "ValText"):SetText(numBars)
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				BOptionsActionBarGlobal_OnLoad()
+			</OnLoad>
+			<OnShow>
+				BOptionsActionBarGlobal_OnShow()
+			</OnShow>
+		</Scripts>
+	</Frame>
+</Ui>
