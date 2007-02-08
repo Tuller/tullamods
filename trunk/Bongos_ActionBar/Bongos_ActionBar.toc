@@ -1,0 +1,25 @@
+## Interface: 20003
+## Title: Bongos_ActionBar
+## Notes: A main actionbar replacement
+## Author: Tuller
+## Version: 7.1.13
+## Dependencies: Bongos
+## SavedVariablesPerCharacter: BActionDB
+lib\TPool.lua
+localization.lua
+core\utility.lua
+core\unreg.lua
+core\keyBound.lua
+core\spellBound.lua
+core\settings.lua
+bagBar\bar.lua
+classBar\button.lua
+classBar\bar.lua
+keyBar\bar.lua
+menuBar\bar.lua
+petBar\button.lua
+petBar\bar.lua
+actionBar\states.lua
+actionBar\button.lua
+actionBar\bar.lua
+actionBar\events.lua
