@@ -1,0 +1,1 @@
+SAGE_PLAYER_SHOW_EXPERIENCE = "Show Experience Bar"
