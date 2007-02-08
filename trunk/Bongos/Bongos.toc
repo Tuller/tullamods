@@ -1,0 +1,20 @@
+## Interface: 20003
+## Title: Bongos
+## Notes: Movable bar framework
+## Author: Tuller
+## Version: 7.1.13
+## SavedVariablesPerCharacter: BongosDB
+## SavedVariables: BongosProfiles
+lib\TLib.lua
+lib\BVent.lua
+lib\FlyPaper.lua
+lib\Seeq.lua
+lib\Gooey.xml
+localization.lua
+profile.lua
+dragFrame.lua
+BBar.lua
+Bongos.lua
+slash.lua
+minimap.xml
+menu.xml
