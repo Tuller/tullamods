@@ -1,0 +1,206 @@
+7.1.22
+* Fixed an error when a party pet leaves or joins the party
+
+7.1.19
+* Fixed a bug causing it to not be possible to always show statusbar text
+
+7.1.15
+* Altered saved variables and profiles code to fix problems people were having with settings not properly loading
+* Implemented a new buff layout algorithm
+
+6.12.23
+	Fixed some bugs causing Sage_Comm to not work properly
+	Fixed a bug with an initial load of Sage on the PTR/TBC
+	Fixed a bug causing healthbars to color based on debuffed even if the setting is disabled
+	Fixed a bug casuing raid target icons to not update
+	
+	Adjusted frame sizes to be mostly static due to 2.0 issues
+	Altered statusbar text to not condense
+	Added back in party pets
+	Adjusted the clickable portion of frames to not includ the buff and debuff portions of the frames
+
+6.12.20
+	Fixed an error when setting the update delay of the target of target frame.
+	
+6.12.17
+	Made Sage compliant with 2.0 code
+	
+6.10.27
+	Fixed a bug causing an error when joining a prexisting raid with a partymember that already has a pet
+	Fixed an error when trying to check show only curable debuffs on the target of target frame
+	Fixed a bug causing the player's pet frame to not always show up
+	Set Skewed as the default texture
+
+6.10.22
+	Fixed a bug causing party frames to not be hidden by default, and thus interfere with clicking
+	Fixed a bug causing partypet frames to not properly inherit the opacity of their parent frames
+	Fixed a bug causing settings from opacity and scale sliders to not save
+	Fixed a bug causing party pet bars to try to be created before the rest of the party bar exists
+	Fixed a bug causing the opacity level of the experience bar to not be inherited from the player frame
+
+6.10.21
+	Fixed an error when attempting to set the mode for displaying manabar text
+	Fixed an error when attempting to set the minimum width of all frames in the options menu
+	The show combo text option for the pet frame is now properly named
+	TOC numbers are now properly set, so now its really updated for 1.12 :)
+	Hid the combo point display option for characters without combo points
+	Removed the duplicate Smooth option for bar textures
+	
+6.10.20
+	Updated for 1.12 (finally)
+	Rewrote Sage again. Delete all Sage addons before installing.
+	All Sage addons now have seperate files for their saved settings
+	The player frame will now update upon the event PLAYER_ENTERING_WORLD.
+	Removed the limit on the amount of debuffs and buffs that can be shown
+	Clicking a debuff icon for a friendly unit will attempt to remove a debuff of that type from the unit
+		I expect this functionality to be removed in WoW 2.0
+	Added profiles support
+	Added DruidBar support
+	Added MobHealth3 support
+	Added statusbar textures from AceUnitFrames (I think)
+	Sage_Party - Added combat status display for party members
+
+6.7.28
+	Fixed a bug preventing coloring health when debuffed to be turned on/off
+	Fixed an error when the experience bar is turned off.
+	Shrunk the party pet slightly.
+	
+6.7.24
+	Fixed a redscreen error when using a Rogue or Druid
+	Made it possible to hook the SageFrame functions.
+	The target of target frame should now work properly again.
+	
+6.7.23
+	Removed and renamed files.  Delete Sage before installing.
+	Sage is now dynamically generated, instead of dynamically loaded.
+	Altered the way frames are moved.  It is now possible to position frames that have not been loaded.
+
+	Variables are now saved to SageSets, instead of Sage.
+	Sage now uses standard fonts, and will inherit things like ClearFont
+	It is now possible to stick frames to each other.
+	It is now possible to write a Sage Unitframe without altering the core of Sage.
+	Party and Pet debuffs should now resize automatically.
+	Reversed the positioning of the Target Frame's buffs and debuffs.
+	Added the ability to alter Sage's bar texture via the options menu.  Added textures from oUF
+	Added the ability to outline names and bartext.
+	Added the ability to turn off healthbar debuff coloring.
+	Added support for Telos MobHealth.
+	Extended MobInfo2 support to other units.
+
+	Sage now has the following set of slash commands:
+		/sg or /sage - Displays the options menu, if available.
+		/sg help - Displays list of commands
+		/sg lock - Locks the position all frames
+		/sg unlock - Unlocks the positions all frames
+		/sg scale <unit> <scale> - Sets the scale of the given frame.  100 is normal size.
+		/sg setalpha <unit> <opacity> - Sets the opacity of the given frame.  0 is translucent, 1 is opaque.
+		/sg stickyframes <on | off> - Enable/disable frames sticking when placed near each other.
+		/sg text <on | off> - Enable/disable always showing text.
+		/sg percents <on | off> - Enable/disable showing health percentages.
+		/sg settexture <name> - Set what texture to use for statusbars.  <name> should be a texture located in the textures directory, or blizz.
+		/sg dynamicwidth <on | off> - Enable/disable frames automatically adjusting in width.
+		/sg setwidth <unit> <width> - Sets the minimum width of the given frame.
+		/sg doubleclicktarget <on | off> - Enable/disable double clicking a unit to target its target.
+		/sg outlineNames <on | off> - Enable/disable adding an outline around names, levels, and percentages.
+		/sg outlineBarText <on | off> - Enable/disable adding an outline around statusbar text.
+
+6.6.21b:
+	Fixed a redscreen bug with healthbar coloring on party pets.
+	Removed healthbar coloring for unclassified debuffs.
+
+6.6.21:
+	Fixed an issue causing raid targets to not properly update.
+	Fixed an issue with tooltips for buffs and debuffs when selecting to show only castable/curable ones.
+	Fixed an issue causing the combat status for a player to not update properly.
+	Fixed an issue with invalid values being passed to the target health bar with MobInfo installed.
+
+6.6.18:
+	When in a raid, the level portion of the player frame will switch to the number of what group you are in.
+	Raid targets should work on Sage frames.
+	Debuff borders will now signify the type of debuff a player has:
+		darkgreen = poison
+		lightblue = magic
+		purple = cursed
+		brown = diseased
+		red = other
+	Healthbars for friendly units now change colors if debuffed.  The colors are the same as given above.
+
+5136b:
+	Fixed a bug causing the party frame to show up in the raid when not set to do so.
+
+5136:
+	Fixed a bug causing the tagged status of a target to not update properly.
+	Fixed a bug causing the rest status of the player to not update.
+	Fixed a bug causing frames to not properly load their positions and scale.
+	Fixed a bug causing the pet frame to not properly update its combat display.
+	Fixed a bug causing the party pet frame to not always show up.
+
+	Darkened the name color for a flagged enemy player.
+	Removed the hiding of the level display for players of level 1.
+	Removed some level estimation code.
+
+	The experience bar can now act as the reputation bar, if watching a faction.
+	Sage now supports MobInfo2.  The health estimation code that was used previously has been removed.
+
+	Altered Sage_Options with new commands.
+
+	Added the following commands:
+		/sg setwidth <frame> <width> - sets the minimum width of <frame>
+		/sg dynamicwidth <enable | disable> - enable/disables frames resizing to fit the name of its unit
+		/sg quickmove <alt | control | shift | disable> - set the key, that when held down, moves a frame.
+		/sg doubleclickTarget <enable | disable> - Enable/disable doubleclicking a unit selecting that unit's target.
+		
+4226:
+	Fixed a bug causing the experience bar to not remember if it was disabled or not.
+	Fixed a bug causing red screens when changing health or mana text styles.
+	Fixed a bug causing errors on a completely new install.	
+		
+4216:
+	Fixed a bug with coloring the party frames via class for non english versions of WoW.
+	Fixed a a few bugs with turning on and off the experience bars.
+	Fixed a bug causing party members to be shown as offline when recruited to the party (hopefully).
+	Fixed a bug causing the target of target frame to not work properly.
+
+	Added the ability to switch between a numeric and the default display for combo points.		
+		
+4186:
+	Using "party" should now work properly in the slash commands.
+		party1, party2, party3, party4, partypet1, partypet2, partypet3, partypet4 all probably work as well :)
+	Fixed an issue with the experience bar loading on first load.
+	Fixed an issue with the text on the experience bar not properly loading.
+	Scaling the target of target frame should now scale the target of target frame instead of the target frame.
+
+4176:
+	Most addons have had files renamed.  Delete Sage before installing.
+	Sage is no longer dependent on Infield.  You can delete Infield if no mods are dependent on it.
+	Rewrote the core portions of Sage.
+	Altered the overall look and feel of Sage.
+	You can now move a frame by holding shift, then clicking on the frame even when locked.
+	Improved combat indicators and made them available to all frames.
+
+	The options menu is now a seperate, dynamically loaded addon - Sage Options
+
+	Merged Sage_Exp with Sage_Player.
+	Added a target of target frame - Sage TargetOfTarget
+	Added different styles for displaying health
+	Added slash commands to Sage, to see them all type /sg help.
+	Scale and opacity are now adjustable on a per frame basis.
+
+121905:
+	Added an opacity slider
+	Fixed a bug where scaling, but not moving a frame would result in its position not being remembered.	
+
+121805:
+	Curse Release
+	Added double click = target of target to all frames.
+	
+Sage23:
+	Frames resize when updating percent display
+	Mana bars are bigger
+	Names now actually update
+
+Known Bugs:
+
+TODO:
+	Cast bars
+	Documentation

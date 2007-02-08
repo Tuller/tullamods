@@ -1,0 +1,26 @@
+## Interface: 20003
+## Title: Sage
+## Notes: Unitframe components
+## Author: Tuller
+## Version: 7.1.19
+## SavedVariablesPerCharacter: SageDB
+## SavedVariables: SageProfiles
+lib\TLib.lua
+lib\BVent.lua
+lib\FlyPaper.lua
+lib\SeeQ.lua
+localization.lua
+profile.lua
+Sage.lua
+fonts.lua
+dragFrame.lua
+frame.lua
+statusBar.lua
+health.lua
+mana.lua
+info.lua
+combatText.lua
+buff.lua
+debuff.lua
+click.lua
+slash.lua
