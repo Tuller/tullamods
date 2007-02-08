@@ -1,0 +1,63 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+	
+	<Script file="general.lua"/>
+	
+	<!-- General options panel -->
+	<Frame name="SageOptionsGeneral" inherits="SageOptionsPanel" virtual="true">
+		<Frames>
+			<CheckButton name="$parentLock" inherits="GooeyCheckButton" text="SAGE_OPTIONS_LOCK">
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						Sage.SetLock(this:GetChecked())
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			
+			<CheckButton name="$parentSticky" inherits="GooeyCheckButton" text="SAGE_OPTIONS_STICKY">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentLock" relativePoint="BOTTOM"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						Sage.SetSticky(this:GetChecked())
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			
+			<Slider name="$parentAlpha" inherits="SageOptionsOpacitySlider">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT">
+						<Offset x="4" y="24"/>
+					</Anchor>
+				</Anchors>
+			</Slider>
+			
+			<Slider name="$parentScale" inherits="SageOptionsScaleSlider">
+				<Anchors>
+					<Anchor point="BOTTOM" relativeTo="$parentAlpha" relativePoint="BOTTOM">
+						<Offset x="0" y="40"/>
+					</Anchor>
+				</Anchors>
+			</Slider>
+			
+			<Slider name="$parentWidth" inherits="SageOptionsWidthSlider">
+				<Anchors>
+					<Anchor point="BOTTOM" relativeTo="$parentScale" relativePoint="BOTTOM">
+						<Offset x="0" y="40"/>
+					</Anchor>
+				</Anchors>
+			</Slider>
+		</Frames>
+		
+		<Scripts>
+			<OnShow>
+				SOptionsGeneral_OnShow()
+			</OnShow>
+		</Scripts>
+	</Frame>
+</Ui>
