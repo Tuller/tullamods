@@ -1,0 +1,8 @@
+## Interface: 20003
+## Title: Sage_Comm
+## Notes: Party communications library
+## Author: Tuller
+## Version: 7.1.14
+lib\TLib.lua
+lib\BVent.lua
+comm.lua
