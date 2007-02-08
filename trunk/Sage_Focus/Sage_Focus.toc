@@ -1,0 +1,8 @@
+## Interface: 20003
+## Title: Sage_Focus
+## Notes: A focus frame
+## Author: Tuller
+## Dependencies: Sage
+localization.lua
+focus.lua
+menu.lua
