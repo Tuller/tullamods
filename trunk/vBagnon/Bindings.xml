@@ -1,0 +1,8 @@
+<Bindings>
+	<Binding name="BAGNON_TOGGLE" description="BINDING_NAME_BAGNON_TOGGLE" header="BAGNON">
+		Bagnon_ToggleInventory()
+	</Binding>
+	<Binding name="BANKNON_TOGGLE" description="BINDING_NAME_BANKNON_TOGGLE">
+		Bagnon_ToggleBank()
+	</Binding>
+</Bindings>
