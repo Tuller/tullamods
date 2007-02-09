@@ -5,7 +5,7 @@
 --]]
 
 local function LinkifyName(head, text, tail)
-	if not(tonumber(text) or head == "|h" or tail == "|h" or text:find('%d%s')) then
+	if not(head == "|h" or tail == "|h" or text:find('%d+%s?')) then
 		local list = Ludwig_GetItemsNamedLike(text)
 		if list and next(list) then 
 			return Ludwig_GetHyperLink(list[1])
