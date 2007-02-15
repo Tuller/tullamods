@@ -18,6 +18,7 @@ frame.lua
 statusBar.lua
 health.lua
 mana.lua
+castBar.lua
 info.lua
 combatText.lua
 buff.lua
