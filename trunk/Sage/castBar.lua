@@ -21,7 +21,7 @@ function SageCast.Create(parent, id)
 	bar.text:SetPoint('CENTER', bar)
 	bar.text:SetFontObject(SageBarFontSmall)
 	
-	bar.icon = bar:CreateTexture(nil, "ARTWORK")
+	bar.icon = bar:CreateTexture(nil, "OVERLAY")
 	bar.icon:SetTexCoord(0.06, 0.94, 0.06, 0.94)
 	bar.icon:SetWidth(14); bar.icon:SetHeight(14)
 	bar.icon:SetPoint('LEFT')
@@ -58,12 +58,17 @@ function SageCast:OnSpellStart()
 	if not(name) or isTradeSkill then self:Hide() return end
 	
 	local target = self.id .. "target"
-	if UnitExists(target) and UnitCanAssist(self.id, target) then
-		self:SetStatusBarColor(0, 1, 1)
-		self.bg:SetVertexColor(0, 0.6, 0.6, 0.4)
+	if UnitExists(target) then
+		if UnitCanAssist(self.id,  target) then
+			self:SetStatusBarColor(0, 1, 1)
+			self.bg:SetVertexColor(0, 0.6, 0.6, 0.4)
+		else
+			self:SetStatusBarColor(1, 0, 1)
+			self.bg:SetVertexColor(0.6, 0, 0.6, 0.4)
+		end
 	else
-		self:SetStatusBarColor(1, 0, 1)
-		self.bg:SetVertexColor(0.6, 0, 0.6, 0.4)
+		self:SetStatusBarColor(1, 1, 0)
+		self.bg:SetVertexColor(0.6, 0.6, 0, 0.4)
 	end
 
 --	self:SetStatusBarColor(1, 0.7, 0)
@@ -112,12 +117,17 @@ function SageCast:OnChannelStart()
 	if not(name) or isTradeSkill then self:Hide() return end
 
 	local target = self.id .. "target"
-	if UnitExists(target) and UnitCanAssist(self.id,  target) then
-		self:SetStatusBarColor(0, 1, 1)
-		self.bg:SetVertexColor(0, 0.6, 0.6, 0.4)
+	if UnitExists(target) then
+		if UnitCanAssist(self.id,  target) then
+			self:SetStatusBarColor(0, 1, 1)
+			self.bg:SetVertexColor(0, 0.6, 0.6, 0.4)
+		else
+			self:SetStatusBarColor(1, 0, 1)
+			self.bg:SetVertexColor(0.6, 0, 0.6, 0.4)
+		end
 	else
-		self:SetStatusBarColor(1, 0, 1)
-		self.bg:SetVertexColor(0.6, 0, 0.6, 0.4)
+		self:SetStatusBarColor(1, 1, 0)
+		self.bg:SetVertexColor(0.6, 0.6, 0, 0.4)
 	end
 
 --	self:SetStatusBarColor(0, 1, 0)
