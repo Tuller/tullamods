@@ -56,9 +56,18 @@ SageCast.UpdateTexture = SageStatusBar.UpdateTexture
 function SageCast:OnSpellStart()
 	local name, nameSubtext, text, texture, startTime, endTime, isTradeSkill = UnitCastingInfo(self.id)
 	if not(name) or isTradeSkill then self:Hide() return end
+	
+	local target = self.id .. "target"
+	if UnitExists(target) and UnitCanAssist(self.id, target) then
+		self:SetStatusBarColor(0, 1, 1)
+		self.bg:SetVertexColor(0, 0.6, 0.6, 0.4)
+	else
+		self:SetStatusBarColor(1, 0, 1)
+		self.bg:SetVertexColor(0.6, 0, 0.6, 0.4)
+	end
 
-	self:SetStatusBarColor(1, 0.7, 0)
-	self.bg:SetVertexColor(0.6, 0.42, 0, 0.4)
+--	self:SetStatusBarColor(1, 0.7, 0)
+--	self.bg:SetVertexColor(0.6, 0.42, 0, 0.4)
 	self.startTime = startTime / 1000
 	self.maxValue = endTime / 1000
 
@@ -102,8 +111,17 @@ function SageCast:OnChannelStart()
 	local name, nameSubtext, text, texture, startTime, endTime, isTradeSkill = UnitChannelInfo(self.id)
 	if not(name) or isTradeSkill then self:Hide() return end
 
-	self:SetStatusBarColor(0, 1, 0)
-	self.bg:SetVertexColor(0, 0.6, 0, 0.4)
+	local target = self.id .. "target"
+	if UnitExists(target) and UnitCanAssist(self.id,  target) then
+		self:SetStatusBarColor(0, 1, 1)
+		self.bg:SetVertexColor(0, 0.6, 0.6, 0.4)
+	else
+		self:SetStatusBarColor(1, 0, 1)
+		self.bg:SetVertexColor(0.6, 0, 0.6, 0.4)
+	end
+
+--	self:SetStatusBarColor(0, 1, 0)
+--	self.bg:SetVertexColor(0, 0.6, 0, 0.4)
 	self.startTime = startTime / 1000
 	self.endTime = endTime / 1000
 	self.duration = self.endTime - self.startTime

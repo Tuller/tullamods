@@ -2,7 +2,7 @@
 ## Title: Sage
 ## Notes: Unitframe components
 ## Author: Tuller
-## Version: 7.1.19
+## Version: 7.2.15
 ## SavedVariablesPerCharacter: SageDB
 ## SavedVariables: SageProfiles
 lib\TLib.lua
