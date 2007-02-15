@@ -152,6 +152,7 @@ local function UpdateAll(self)
 	self.mana:Update()
 	self.buff:Update()
 	self.debuff:Update()
+	self.cast:Update()
 end
 
 
@@ -252,6 +253,10 @@ local function AddBars(self)
 	
 	self.click:SetPoint('TOPLEFT', self.info)
 	self.click:SetPoint('BOTTOMRIGHT', self.npc)
+	
+	self.cast = SageCast.Create(self)
+	self.cast:SetPoint('TOPLEFT', self.bottomContainer, 'BOTTOMLEFT')
+	self.cast:SetPoint('BOTTOMRIGHT', self.bottomContainer, 'BOTTOMRIGHT', 0, -12)
 
 	self:SetHeight(BUFF_SIZE_SMALL + 13 + 12 + 20 + 20)
 end
