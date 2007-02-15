@@ -206,8 +206,12 @@ local function OnCreate(self)
 	
 	self.click:SetPoint('TOPLEFT', self.info)
 	self.click:SetPoint('BOTTOMRIGHT', self.mana)
+	
+	self.cast = SageCast.Create(self)
+	self.cast:SetPoint('TOPLEFT', self.buff, 'BOTTOMLEFT')
+	self.cast:SetPoint('BOTTOMRIGHT', self.buff, 'BOTTOMRIGHT', 0, -12)
 
-	self:SetHeight(BUFF_SIZE + 20 + 20 + 12)
+	self:SetHeight(BUFF_SIZE + 20 + 20 + 12 + 12)
 	UpdatePet(self)
 
 	frames[self.id] = self
