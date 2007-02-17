@@ -1,4 +1,4 @@
-## Interface: 20005
+## Interface: 20008
 ## Title: Bagnon_Forever
 ## Notes: Allows the viewing of the bank from anywhere, and also the inventory of your other characters.
 ## Author: Tuller
