@@ -47,11 +47,21 @@ local function SetAlpha(frame, alpha)
 	frame:SetAlpha(alpha)
 end
 
+--returns the adjusted x and y coordinates for a frame at the given scale
+local function GetRelativeCoords(frame, scale)
+	local ratio = frame:GetScale() / scale
+	return frame:GetLeft() * ratio, frame:GetTop() * ratio
+end
+
 --scale
 local function SetScale(frame, scale)
 	frame.sets.scale = scale
+	
+	local x, y = GetRelativeCoords(frame, scale)
 
-	Infield.Scale(frame, scale)
+	frame:SetScale(scale)
+	frame:ClearAllPoints()
+	frame:SetPoint('TOPLEFT', UIParent, 'BOTTOMLEFT', x, y)
 	frame:SavePosition()
 end
 
