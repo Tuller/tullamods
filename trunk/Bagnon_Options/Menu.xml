@@ -1,0 +1,158 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+	
+	<Script file="Menu.lua"/>
+	
+	<Frame name="BagnonOptionsEventButton" virtual="true">
+		<Layers>
+			<Layer level="ARTWORK">		
+				<FontString name="$parentTitle" inherits="GameFontNormalSmall" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="LEFT"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>	
+
+		<Frames>
+			<CheckButton name="$parentBank" inherits="GooeyCheckButton">
+				<Anchors>
+					<Anchor point="RIGHT"/>
+				</Anchors>
+
+				<Scripts>
+					<OnClick>
+						this:GetParent().Click(this:GetChecked(), true)
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+
+			<CheckButton name="$parentBags" inherits="GooeyCheckButton">
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentBank" relativePoint="LEFT">
+						<Offset x="-6" y="0"/>
+					</Anchor>
+				</Anchors>
+
+				<Scripts>
+					<OnClick>
+						this:GetParent().Click(this:GetChecked())
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+		</Frames>
+	</Frame>
+	
+	<!-- Bagnon Options Menu -->
+	<Frame name="BagnonOptions" inherits="GooeyFrame" movable="true" enableMouse="true" parent="UIParent">
+		<Size x="254" y="382"/>
+		
+		<Anchors>
+			<Anchor point="LEFT"/>
+		</Anchors>
+
+		<Layers>
+			<Layer level ="BACKGROUND">
+				<Texture file="Interface\ChatFrame\ChatFrameBackground">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset x="4" y="-4"/>
+						</Anchor>
+						<Anchor point="BOTTOMRIGHT">
+							<Offset x="-4" y="4"/>
+						</Anchor>
+					</Anchors>
+					<Gradient orientation="VERTICAL">
+						<MinColor r="0" g="0" b="0.1"/>
+						<MaxColor r="0.2" g="0.2" b="0.3"/>
+					</Gradient>
+				</Texture>
+			</Layer>
+			
+			<Layer level="ARTWORK">
+				<FontString name="$parentTitle" font="GameFontHighlightLarge" text="BAGNON_MAINOPTIONS_TITLE">
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset x="0" y="-10"/>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		
+		<Frames>
+			<Button name="$parentCloseButton" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT">
+						<Offset x="-2" y="-2"/>
+					</Anchor>
+				</Anchors>
+			</Button>
+			
+			<!-- General Options Checkboxes -->
+			<CheckButton name="$parentTooltips" inherits="BagnonCheckButton" text="BAGNON_MAINOPTIONS_SHOW_TOOLTIPS">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset x="6" y="-32"/>
+					</Anchor>
+				</Anchors>
+
+				<Scripts>
+					<OnClick>
+						BagnonOptions_ShowTooltips(this:GetChecked());
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			
+			<CheckButton name="$parentQuality" inherits="BagnonCheckButton" text="BAGNON_MAINOPTIONS_SHOW_BORDERS">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentTooltips" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+
+				<Scripts>
+					<OnClick>
+						BagnonOptions_ShowQualityBorders(this:GetChecked());
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			
+			<CheckButton name="$parentReplaceBags" inherits="BagnonCheckButton" text="BAGNON_MAINOPTIONS_REPLACE_BAGS">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentQuality" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+
+				<Scripts>
+					<OnClick>
+						BagnonOptions_ReplaceBags(this:GetChecked());
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			
+			<CheckButton name="$parentReplaceBank" inherits="BagnonCheckButton" text="BAGNON_MAINOPTIONS_REPLACE_BANK">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentReplaceBags" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+
+				<Scripts>
+					<OnClick>
+						BagnonOptions_ReplaceBank(this:GetChecked());
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+		</Frames>
+		
+		<Scripts>
+			<OnLoad>
+				BagnonOptions_OnLoad()
+			</OnLoad>
+			<OnShow>
+				BagnonOptions_OnShow()
+			</OnShow>
+			<OnMouseDown>
+				this:StartMoving()
+			</OnMouseDown>
+			<OnMouseUp>
+				this:StopMovingOrSizing()
+			</OnMouseUp>
+		</Scripts>
+	</Frame>
+</Ui>
