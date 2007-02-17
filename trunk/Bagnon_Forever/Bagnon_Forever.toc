@@ -1,0 +1,15 @@
+## Interface: 20005
+## Title: Bagnon_Forever
+## Notes: Allows the viewing of the bank from anywhere, and also the inventory of your other characters.
+## Author: Tuller
+## Version: 7.2.17
+## Dependencies: Bagnon
+## SavedVariables: BagnonForeverData
+localization.lua
+localization.de.lua
+localization.fr.lua
+localization.cn.lua
+database\database.lua
+database\ui.xml
+tooltips.lua
+foreverStore.lua
