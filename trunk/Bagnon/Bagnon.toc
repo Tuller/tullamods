@@ -1,5 +1,5 @@
 ## Title: Bagnon
-## Interface: 20005
+## Interface: 20008
 ## Author: Tuller
 ## Notes: An all in one inventory and bank display
 ## SavedVariablesPerCharacter: BagnonSets
