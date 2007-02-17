@@ -1,6 +1,6 @@
-## Interface: 20005
+## Interface: 20008
 ## Title: Bagnon_Options
-## Notes: A configuration menu for vBagnon
+## Notes: A configuration menu for Bagnon
 ## Author: Tuller
 ## Dependencies: Bagnon
 ## LoadOnDemand: 1
