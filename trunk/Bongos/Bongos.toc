@@ -1,4 +1,4 @@
-## Interface: 20003
+## Interface: 20006
 ## Title: Bongos
 ## Notes: Movable bar framework
 ## Author: Tuller
