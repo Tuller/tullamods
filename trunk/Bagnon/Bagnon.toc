@@ -1,0 +1,28 @@
+## Title: Bagnon
+## Interface: 20005
+## Author: Tuller
+## Notes: An all in one inventory and bank display
+## SavedVariablesPerCharacter: BagnonSets
+## Version: 7.2.17
+lib\TLib.lua
+lib\TPool.lua
+lib\BVent.lua
+lib\Gooey.xml
+localization.lua
+trans\localization.de.lua
+trans\localization.fr.lua
+trans\localization.cn.lua
+core\BagnonLib.lua
+core\item.lua
+core\bag.lua
+core\bagFrame.lua
+core\money.lua
+core\purchase.lua
+core\category.lua
+core\frame.lua
+menu\menu.xml
+settings.lua
+inventory.lua
+bank.lua
+hooks.lua
+events.lua
