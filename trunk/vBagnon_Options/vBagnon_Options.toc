@@ -1,0 +1,12 @@
+## Interface: 20000
+## Title: vBagnon_Options
+## Notes: A configuration menu for vBagnon
+## Author: Tuller
+## Dependencies: vBagnon
+## LoadOnDemand: 1
+localization.lua
+localization.es.lua
+localization.fr.lua
+localization.de.lua
+localization.cn.lua
+Menu.xml
