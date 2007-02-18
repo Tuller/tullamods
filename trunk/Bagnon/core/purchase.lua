@@ -37,7 +37,7 @@ local function PurchaseFrame_Create(lastCreated)
 
 	local frame = CreateFrame('Frame', 'BagnonPurchase' .. lastCreated)
 	setmetatable(frame, Purchase_mt)
-	
+
 	frame:SetWidth(164); frame:SetHeight(22)
 
 	local purchaseButton = CreateFrame('Button', name .. 'Purchase', frame, 'UIPanelButtonTemplate')
@@ -45,7 +45,7 @@ local function PurchaseFrame_Create(lastCreated)
 	purchaseButton:SetPoint('LEFT', frame)
 	purchaseButton:SetScript('OnClick', BuySlot)
 	purchaseButton:SetText(BANKSLOTPURCHASE)
-	
+
 	local costFrame = CreateFrame('Frame', name .. 'Cost', frame, 'SmallMoneyFrameTemplate')
 	costFrame:SetPoint('LEFT', purchaseButton, 'RIGHT', 2, 0)
 
@@ -64,45 +64,28 @@ end
 function BagnonPurchase.New(parent)
 	local frame = TPool.Get('BagnonPurchase', PurchaseFrame_Create)
 	BagnonLib.Attach(frame, parent)
-	
+
 	frame:UpdateSlotCost()
 	frame:UpdateVisibility()
 	parent.sizeChanged = true
-	
+
 	used[frame] = true
 	return frame
-end
-
-function BagnonPurchase:Release()
-	used[frame] = nil
-	TPool.Release(self, 'BagnonPurchase')
 end
 
 
 --[[ Update Functions ]]--
 
-function BagnonPurchase:UpdateVisibility(update)
-	local parent = self:GetParent()
-
-	local wasVisible = self:IsShown()
-	local full = select(2, GetNumBankSlots())
-	local cached = not(BagnonLib.AtBank() and parent:GetPlayer() == UnitName('player'))
-	local bagsShown = parent:GetBagFrame():BagsShown()
-	local layout
-	
+function BagnonPurchase:UpdateVisibility()
 	--hide if slots cannot be purchased, or if viewing a cached bank, or if told to do so, show otherwise
-	if full or cached or not bagsShown then
-		self:Hide()
-		layout = wasVisible
-	else
+	if self:ShouldShow() then
 		self:Show()
-		layout = not wasVisible
+	else
+		self:Hide()
 	end
 
-	if layout and update then
-		parent.sizeChanged = true
-		parent:Layout()
-	end
+	self:GetParent().sizeChanged = true
+	self:GetParent():Layout()
 end
 
 function BagnonPurchase:UpdateSlotCost()
@@ -118,6 +101,15 @@ function BagnonPurchase:UpdateSlotCost()
 	MoneyFrame_Update(name, cost)
 end
 
+function BagnonPurchase:ShouldShow()
+	local parent = self:GetParent()
+	local full = select(2, GetNumBankSlots())
+	local atBank = BagnonLib.AtBank()
+	local cached = parent:GetPlayer() ~= UnitName('player')
+	local bagsShown = parent:GetBagFrame():BagsShown()
+
+	return atBank and bagsShown and not(cached or full)
+end
 
 --[[ Events ]]--
 
@@ -131,7 +123,7 @@ BVent:AddAction('PLAYERBANKBAGSLOTS_CHANGED', ForAll_UpdateSlotCost)
 
 local function ForAll_UpdateVisibility()
 	for frame in pairs(used) do
-		frame:UpdateVisibility(true)
+		frame:UpdateVisibility()
 	end
 end
 BVent:AddAction('BANKFRAME_OPENED', ForAll_UpdateVisibility)

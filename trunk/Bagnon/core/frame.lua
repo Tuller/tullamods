@@ -328,6 +328,8 @@ function BagnonFrame:Layout(cols, space)
 
 	if not(self:IsShown() and (self.sizeChanged or self.cols ~= cols or self.space ~= space)) then return end
 	self.sizeChanged = nil
+	
+	BagnonMsg('Layout!')
 
 	cols = cols or self.cols or DEFAULT_COLS
 	space = space or self.space or DEFAULT_SPACING
@@ -348,7 +350,7 @@ function BagnonFrame:Layout(cols, space)
 	width  = itemFrame:GetWidth()
 
 	local purchaseFrame = self:GetPurchaseFrame()
-	if purchaseFrame and purchaseFrame:IsShown() then
+	if purchaseFrame and purchaseFrame:ShouldShow() then
 		purchaseFrame:SetPoint('TOPLEFT', self, 'TOPLEFT', borderSize/2 - 3, -height)
 
 		height = height + purchaseFrame:GetHeight() + 8

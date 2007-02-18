@@ -94,7 +94,9 @@ function BagnonCat:RemoveAllItems()
 		self.count = self.count - 1
 	end
 
-	self:GetParent().sizeChanged = (self.count ~= count)
+	if self.count ~= count then
+		self:GetParent().sizeChanged = true
+	end
 end
 
 
@@ -109,7 +111,9 @@ function BagnonCat:AddBag(bag)
 		self:AddItem(bag, slot)
 	end
 
-	self:GetParent().sizeChanged = (self.count ~= count)
+	if self.count ~= count then
+		self:GetParent().sizeChanged = true
+	end
 end
 
 function BagnonCat:RemoveBag(bag)
@@ -122,7 +126,9 @@ function BagnonCat:RemoveBag(bag)
 		end
 	end
 
-	self:GetParent().sizeChanged = (self.count ~= count)
+	if self.count ~= count then
+		self:GetParent().sizeChanged = true
+	end
 end
 
 function BagnonCat:UpdateBag(bag)
@@ -144,7 +150,9 @@ function BagnonCat:UpdateItem(bag, slot, link)
 		self:RemoveItem(bag, slot)
 	end
 
-	self:GetParent().sizeChanged = (self.count ~= count)
+	if self.count ~= count then
+		self:GetParent().sizeChanged = true
+	end
 end
 
 function BagnonCat:UpdateAllItems()
@@ -159,7 +167,9 @@ function BagnonCat:UpdateAllItems()
 		end
 	end
 
-	self:GetParent().sizeChanged = (self.count ~= count)
+	if self.count ~= count then
+		self:GetParent().sizeChanged = true
+	end
 end
 
 function BagnonCat:UpdateLock(bag, slot, locked)

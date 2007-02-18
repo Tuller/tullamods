@@ -153,7 +153,7 @@ end
 
 local function CreateMenu()
 	local menu = CreateFrame('Button', MENU_NAME, UIParent, 'GooeyPopup')
-	menu:SetWidth(230); menu:SetHeight(316)
+	menu:SetWidth(230); menu:SetHeight(346)
 	
 	menu:RegisterForClicks('LeftButtonDown', 'LeftButtonUp', 'RightButtonUp')
 	menu:SetScript('OnClick', function() this:Hide() end)
