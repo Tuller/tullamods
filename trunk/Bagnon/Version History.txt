@@ -1,4 +1,7 @@
-vBagnon Version History, in the format YY.MM.DD
+Bagnon Version History, in the format YY.MM.DD
+
+7.2.17
+	Reimplemented classic Bagnon
 
 6.12.11
 	Theoretically fixed the GetPlayer() issue
