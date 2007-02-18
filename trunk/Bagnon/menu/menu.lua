@@ -67,11 +67,7 @@ end
 
 --lock position
 local function SetLock(frame, checked)
-	if checked then
-		frame.sets.locked = 1
-	else
-		frame.sets.locked = nil
-	end
+	frame:Lock(checked)
 end
 
 --set toplevel
@@ -157,7 +153,7 @@ end
 
 local function CreateMenu()
 	local menu = CreateFrame('Button', MENU_NAME, UIParent, 'GooeyPopup')
-	menu:SetWidth(230); menu:SetHeight(346)
+	menu:SetWidth(230); menu:SetHeight(316)
 	
 	menu:RegisterForClicks('LeftButtonDown', 'LeftButtonUp', 'RightButtonUp')
 	menu:SetScript('OnClick', function() this:Hide() end)
@@ -270,14 +266,15 @@ function BagnonMenu_Show(frame)
 	local sets = frame.sets
 
 	--Set values
-	getglobal(MENU_NAME .. 'Lock'):SetChecked(sets.locked)
+	getglobal(MENU_NAME .. 'Lock'):SetChecked(frame:IsLocked())
 	getglobal(MENU_NAME .. 'TopLevel'):SetChecked(sets.topLevel)
 
 	local r, g, b, a = frame:GetBackgroundColor()
 	getglobal(MENU_NAME .. 'BGColorNormalTexture'):SetVertexColor(r, g, b, a)
 
-	getglobal(MENU_NAME .. 'Columns'):SetValue(frame.cols)
-	getglobal(MENU_NAME .. 'Spacing'):SetValue(frame.space)
+	local cols, spacing = frame:GetLayout()
+	getglobal(MENU_NAME .. 'Columns'):SetValue(cols)
+	getglobal(MENU_NAME .. 'Spacing'):SetValue(spacing)
 	getglobal(MENU_NAME .. 'Scale'):SetValue(frame:GetScale() * 100)
 	getglobal(MENU_NAME .. 'Opacity'):SetValue(frame:GetAlpha() * 100)
 	getglobal(MENU_NAME .. 'Level'):SetValue(GetFrameLevel(sets.strata))
