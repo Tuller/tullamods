@@ -1,4 +1,4 @@
-<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
 	
 	<Script file="Menu.lua"/>
 	
@@ -43,7 +43,7 @@
 	</Frame>
 	
 	<!-- Bagnon Options Menu -->
-	<Frame name="BagnonOptions" inherits="GooeyFrame" movable="true" enableMouse="true" parent="UIParent">
+	<Frame name="BagnonOptions" inherits="GooeyFrame" enableMouse="true" clampedToScreen="true" movable="true" toplevel="true" frameStrata="DIALOG" parent="UIParent">
 		<Size x="254" y="382"/>
 		
 		<Anchors>
@@ -51,23 +51,6 @@
 		</Anchors>
 
 		<Layers>
-			<Layer level ="BACKGROUND">
-				<Texture file="Interface\ChatFrame\ChatFrameBackground">
-					<Anchors>
-						<Anchor point="TOPLEFT">
-							<Offset x="4" y="-4"/>
-						</Anchor>
-						<Anchor point="BOTTOMRIGHT">
-							<Offset x="-4" y="4"/>
-						</Anchor>
-					</Anchors>
-					<Gradient orientation="VERTICAL">
-						<MinColor r="0" g="0" b="0.1"/>
-						<MaxColor r="0.2" g="0.2" b="0.3"/>
-					</Gradient>
-				</Texture>
-			</Layer>
-			
 			<Layer level="ARTWORK">
 				<FontString name="$parentTitle" font="GameFontHighlightLarge" text="BAGNON_MAINOPTIONS_TITLE">
 					<Anchors>
@@ -89,7 +72,7 @@
 			</Button>
 			
 			<!-- General Options Checkboxes -->
-			<CheckButton name="$parentTooltips" inherits="BagnonCheckButton" text="BAGNON_MAINOPTIONS_SHOW_TOOLTIPS">
+			<CheckButton name="$parentTooltips" inherits="GooeyCheckButton" text="BAGNON_MAINOPTIONS_SHOW_TOOLTIPS">
 				<Anchors>
 					<Anchor point="TOPLEFT">
 						<Offset x="6" y="-32"/>
@@ -103,7 +86,7 @@
 				</Scripts>
 			</CheckButton>
 			
-			<CheckButton name="$parentQuality" inherits="BagnonCheckButton" text="BAGNON_MAINOPTIONS_SHOW_BORDERS">
+			<CheckButton name="$parentQuality" inherits="GooeyCheckButton" text="BAGNON_MAINOPTIONS_SHOW_BORDERS">
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="$parentTooltips" relativePoint="BOTTOMLEFT"/>
 				</Anchors>
@@ -115,7 +98,7 @@
 				</Scripts>
 			</CheckButton>
 			
-			<CheckButton name="$parentReplaceBags" inherits="BagnonCheckButton" text="BAGNON_MAINOPTIONS_REPLACE_BAGS">
+			<CheckButton name="$parentReplaceBags" inherits="GooeyCheckButton" text="BAGNON_MAINOPTIONS_REPLACE_BAGS">
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="$parentQuality" relativePoint="BOTTOMLEFT"/>
 				</Anchors>
@@ -126,8 +109,8 @@
 					</OnClick>
 				</Scripts>
 			</CheckButton>
-			
-			<CheckButton name="$parentReplaceBank" inherits="BagnonCheckButton" text="BAGNON_MAINOPTIONS_REPLACE_BANK">
+<!--			
+			<CheckButton name="$parentReplaceBank" inherits="GooeyCheckButton" text="BAGNON_MAINOPTIONS_REPLACE_BANK">
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="$parentReplaceBags" relativePoint="BOTTOMLEFT"/>
 				</Anchors>
@@ -138,6 +121,7 @@
 					</OnClick>
 				</Scripts>
 			</CheckButton>
+-->
 		</Frames>
 		
 		<Scripts>

@@ -102,7 +102,8 @@ local function CreateEventList(parent)
 	local show = parent:CreateFontString('ARTWORK')
 	show:SetFontObject('GameFontHighlight')
 	show:SetText(BAGNON_MAINOPTIONS_SHOW)
-	show:SetPoint('TOPLEFT', parent:GetName() .. 'ReplaceBank', 'BOTTOMLEFT', 6, -8)
+	--show:SetPoint('TOPLEFT', parent:GetName() .. 'ReplaceBank', 'BOTTOMLEFT', 6, -8)
+	show:SetPoint('TOPLEFT', parent:GetName() .. 'ReplaceBags', 'BOTTOMLEFT', 6, -8)
 	
 	local bank = parent:CreateFontString('ARTWORK')
 	bank:SetFontObject('GameFontHighlight')
@@ -143,7 +144,7 @@ function BagnonOptions_ReplaceBags(enable)
 		playerSets.replaceBags = nil
 	end
 end
-
+--[[
 function BagnonOptions_ReplaceBank(enable)
 	if enable then
 		playerSets.replaceBank = 1
@@ -151,7 +152,7 @@ function BagnonOptions_ReplaceBank(enable)
 		playerSets.replaceBank = nil
 	end
 end
-
+--]]
 function BagnonOptions_ShowTooltips(enable)
 	if enable then
 		playerSets.showTooltips = 1
@@ -167,9 +168,7 @@ function BagnonOptions_ShowQualityBorders(enable)
 		playerSets.qualityBorders = nil
 	end
 	
-	for _, frame in BagnonFrame.GetVisible() do
-		frame:UpdateBorders()
-	end
+	BagnonFrame.ForAllVisible('UpdateAllItems')
 end
 
 --[[ OnX Functions ]]--
@@ -191,7 +190,7 @@ function BagnonOptions_OnShow()
 	getglobal(frameName .. "Tooltips"):SetChecked(playerSets.showTooltips)
 	getglobal(frameName .. "Quality"):SetChecked(playerSets.qualityBorders)
 	getglobal(frameName .. "ReplaceBags"):SetChecked(playerSets.replaceBags)
-	getglobal(frameName .. "ReplaceBank"):SetChecked(playerSets.replaceBank)
+--	getglobal(frameName .. "ReplaceBank"):SetChecked(playerSets.replaceBank)
 
 	getglobal(frameName .. "1Bags"):SetChecked(playerSets.showBagsAtBank)
 	--getglobal(frameName .. "ShowBagnon2"):SetChecked(BagnonSets.showBagsAtVendor)
