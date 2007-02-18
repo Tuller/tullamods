@@ -1,0 +1,38 @@
+## Title: vBagnon
+## Interface: 20000
+## Author: Tuller
+## Notes: Never lose your bacon again
+## SavedVariables: BagnonSets
+## Version: 6.12.12
+lib\TLib.lua
+lib\TPool.lua
+lib\BEvent.lua
+lib\Infield.lua
+lib\SpecialEvents-Bags-Bagnon.lua
+localization.lua
+trans\localization.de.lua
+trans\localization.fr.lua
+trans\localization.cn.lua
+core\utility.lua
+core\rules.lua
+core\item.lua
+core\category.lua
+core\bag.lua
+core\bagFrame.lua
+core\money.lua
+core\purchase.lua
+core\tab.lua
+core\tabList.lua
+core\frame.lua
+menu\menu.xml
+menu\catMenu.xml
+menu\catAdder.xml
+spot\spot.lua
+basicRules.lua
+inventoryFrame.lua
+bankFrame.lua
+searchFrame.lua
+settings.lua
+hooks.lua
+events.lua
+slash.lua
