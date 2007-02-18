@@ -176,7 +176,6 @@ function BagnonCat:UpdateCooldown(bag, slot)
 	end
 end
 
-
 --[[ Layout ]]--
 
 function BagnonCat:Layout()

@@ -8,92 +8,114 @@
 local function FrameOpened(id, auto)
 	local sets = BagnonLib.GetSets()
 	
-	if BagnonLib.IsInventoryBag(id) then
-		return sets.replaceBags and Bagnon_ShowInventory(auto)
-	end
-	return sets.replaceBank and Bagnon_ShowBank(auto)
+	return (sets.replaceBags and Bagnon_HasBag(id) and Bagnon_ShowInventory(auto)) or
+	   (Banknon_HasBag(id) and Bagnon_ShowBank(auto))
 end
 
 local function FrameClosed(id, auto)
 	local sets = BagnonLib.GetSets()
 	
-	if BagnonLib.IsInventoryBag(id) then
-		return sets.replaceBags and Bagnon_HideInventory(auto)
-	end
-	return sets.replaceBank and Bagnon_HideBank(auto)
+	return (sets.replaceBags and Bagnon_HasBag(id) and Bagnon_HideInventory(auto)) or
+		   (Banknon_HasBag(id) and Bagnon_HideBank(auto))
 end
 
 local function FrameToggled(id, auto)
 	local sets = BagnonLib.GetSets()
-	
-	if BagnonLib.IsInventoryBag(id) then
-		return sets.replaceBags and Bagnon_ToggleInventory(auto)
-	end
-	return sets.replaceBank and Bagnon_ToggleBank(auto)
+
+	return (sets.replaceBags and Bagnon_HasBag(id) and Bagnon_ToggleInventory(auto)) or
+	   (Banknon_HasBag(id) and Bagnon_ToggleBank(auto))
 end
 
 
 --[[ The Hooks ]]--
 
-local bOpenBag = OpenBag
-OpenBag = function(id)
-	if not FrameOpened(id, true) then
-		bOpenBag(id)
+local oToggleBag = ToggleBag
+ToggleBag = function(id)
+	if IsOptionFrameOpen() then return end
+	
+	if not FrameToggled(id) then
+		oToggleBag(id)
 	end
 end
 
-local bCloseBag = CloseBag
+local oToggleBackpack = ToggleBackpack
+oToggleBackpack = function()
+	if IsOptionFrameOpen() then return end
+	
+	if not FrameToggled(0) then
+		oToggleBackpack()
+	end
+end
+
+local oOpenBag = OpenBag
+OpenBag = function(id)
+	if not CanOpenPanels() then
+		if UnitIsDead('player') then
+			NotWhileDeadError()
+		end
+		return
+	end
+	
+	if not FrameOpened(id, true) then
+		oOpenBag(id)
+	end
+end
+
+local oCloseBag = CloseBag
 CloseBag = function(id)
 	if not FrameClosed(id, true) then
-		bCloseBag(id)
+		oCloseBag(id)
 	end
 end
 
-local bToggleBag = ToggleBag
-ToggleBag = function(id)
-	if not FrameToggled(id) then
-		bToggleBag(id)
+local oOpenBackpack = OpenBackpack
+OpenBackpack = function()
+	if not CanOpenPanels() then
+		if UnitIsDead("player") then
+			NotWhileDeadError()
+		end
+		return
+	end
+
+	if not FrameOpened(0, true) then
+		oOpenBackpack()
 	end
 end
 
-local bOpenAllBags = OpenAllBags
+local oCloseBackpack = CloseBackpack
+CloseBackpack = function()
+	if not FrameClosed(0, true) then
+		oCloseBackpack()
+	end
+end
+
+local oToggleKeyRing = ToggleKeyRing
+ToggleKeyRing = function()
+	if IsOptionFrameOpen() then return end
+	
+	if not FrameToggled(KEYRING_CONTAINER) then
+		oToggleKeyRing()
+	end
+end
+
+local oOpenAllBags = OpenAllBags
 OpenAllBags = function(forceOpen)
-	if not( (forceOpen and FrameOpened(0)) or FrameToggled(0) ) then
-		bOpenAllBags(forceOpen)
+	if BagnonLib.GetSets().replaceBags then
+		if forceOpen then
+			Bagnon_ShowInventory()
+		else
+			Bagnon_ToggleInventory()
+		end
+	else
+		oOpenAllBags(forceOpen)
 	end
 end
 
 local bCloseAllBags = CloseAllBags
 CloseAllBags = function()
-	if not FrameClosed(0) then
+	if BagnonLib.GetSets().replaceBags then
+		Bagnon_HideInventory()
+	else
 		bCloseAllBags()
-	end
-end
-
-local bOpenBackpack = OpenBackpack
-OpenBackpack = function()
-	if not FrameOpened(0, true) then
-		bOpenBackpack()
-	end
-end
-
-local bCloseBackpack = CloseBackpack
-CloseBackpack = function()
-	if not FrameClosed(0, true) then
-		bCloseBackpack()
-	end
-end
-
-local bToggleBackpack = ToggleBackpack
-ToggleBackpack = function()
-	if not FrameToggled(0) then
-		bToggleBackpack()
-	end
-end
-
-local bToggleKeyring = ToggleKeyRing
-ToggleKeyRing = function()
-	if not FrameToggled(-2) then
-		bToggleKeyring()
 	end
 end

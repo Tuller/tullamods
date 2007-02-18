@@ -57,3 +57,12 @@ function Bagnon_ToggleInventory(auto)
 		return Bagnon_ShowInventory(auto)
 	end
 end
+
+function Bagnon_HasBag(id)
+	local bags = BagnonLib.GetSets().inventory.bags
+	for _, bag in pairs(bags) do
+		if bag == id then
+			return true
+		end
+	end
+end

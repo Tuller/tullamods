@@ -65,3 +65,12 @@ function Bagnon_ToggleBank(auto)
 		end
 	end
 end
+
+function Banknon_HasBag(id)
+	local bags = BagnonLib.GetSets().bank.bags
+	for _, bag in pairs(bags) do
+		if bag == id then
+			return true
+		end
+	end
+end
