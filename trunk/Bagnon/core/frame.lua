@@ -55,6 +55,14 @@ end
 
 local function OnHide()
 	visible[this] = nil
+
+	if BagnonMenu.frame == this then
+		BagnonMenu:Hide()
+	end
+	
+	if BagnonSpot.frame == this then
+		BagnonSpot:Hide()
+	end
 end
 
 local function Frame_Create(id)
@@ -328,8 +336,6 @@ function BagnonFrame:Layout(cols, space)
 
 	if not(self:IsShown() and (self.sizeChanged or self.cols ~= cols or self.space ~= space)) then return end
 	self.sizeChanged = nil
-	
-	BagnonMsg('Layout!')
 
 	cols = cols or self.cols or DEFAULT_COLS
 	space = space or self.space or DEFAULT_SPACING
