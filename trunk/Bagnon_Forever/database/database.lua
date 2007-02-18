@@ -8,10 +8,10 @@
 	Nothing under this block of code should be loaded if BagnonDB already exists.
 --]]
 if BagnonDB then
-	error("Already using " .. (BagnonDB.addon or "another addon") .. " to view cached data.")
+	error(format("Already using %s to view cached data", BagnonDB.addon or "<Unknown Addon"))
 	return
 else
-	BagnonDB = {addon = 'vBagnon_Forever'}
+	BagnonDB = {addon = 'Bagnon_Forever'}
 end
 
 --local globals

@@ -1,4 +1,4 @@
-<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
 	
 	<Script file="ui.lua"/>
 	
@@ -52,28 +52,27 @@
 
 		<Scripts>
 			<OnClick>
-				BagnonDBUI_ChangePlayer(this:GetParent().frame, this:GetText());
-				this:GetParent():Hide();
+				local parent = this:GetParent()
+				parent.frame:SetPlayer(this:GetText())
+				parent:Hide();
 			</OnClick>
 		</Scripts>
 	</CheckButton>
 	
 	<!-- the dropdown list of character names that we have data about -->
-	<Frame name="BagnonDBUICharacterList" inherits="BagnonPopupFrame">
-	<!--
+	<Frame name="BagnonDBUICharacterList" inherits="GooeyPopup">
 		<Scripts>
 			<OnLoad>
 				this:RegisterEvent("BANKFRAME_OPENED");
 			</OnLoad>
 			<OnEvent>
 				if Banknon then
-					BagnonDBUI_ChangePlayer(Banknon, UnitName("player"));
+					Banknon:SetPlayer(UnitName("player"));
 				end
 			</OnEvent>
 			<OnHide>
 				this:SetParent(UIParent);
 			</OnHide>
 		</Scripts>
-	-->
 	</Frame>
 </Ui>

@@ -22,8 +22,8 @@ local function CreatePlayerButton(id, parent)
 	return button
 end
 
-function BagnonDBUI_ShowCharacterList(parentFrame)
-	BagnonDBUICharacterList.frame = parentFrame
+function BagnonDBUI_ShowCharacterList(frame)
+	BagnonDBUICharacterList.frame = frame
 	
 	local width = 0; local index = 0
 	for player in BagnonDB.GetPlayers() do
@@ -35,7 +35,7 @@ function BagnonDBUI_ShowCharacterList(parentFrame)
 			width = button:GetTextWidth() + 40
 		end
 
-		if parentFrame.player == player then
+		if frame:GetPlayer() == player then
 			button:SetChecked(true)
 			button:Show()
 		else
@@ -53,6 +53,6 @@ function BagnonDBUI_ShowCharacterList(parentFrame)
 	BagnonDBUICharacterList:SetHeight(12 + index * 19)
 	BagnonDBUICharacterList:SetWidth(width)
 	BagnonDBUICharacterList:ClearAllPoints()
-	BagnonDBUICharacterList:SetPoint("TOPLEFT", parentFrame:GetName() .. "DropDown", "BOTTOMLEFT", 0, 4)
+	BagnonDBUICharacterList:SetPoint("TOPLEFT", frame:GetName() .. 'DropDown', "BOTTOMLEFT", 0, 4)
 	BagnonDBUICharacterList:Show()
 end
