@@ -1,5 +1,5 @@
 --[[
-	vBagnon\item.lua
+	item.lua
 		An item button
 --]]
 
@@ -325,7 +325,7 @@ function BagnonItem:Unfade(highlight)
 		self:SetAlpha(1)
 	end
 
-	if highlight and not GetContainerItemInfo(self:GetBag(), self:GetID()) then
+	if highlight and not BagnonDB.GetItemData(self:GetPlayer(), self:GetBag(), self:GetID()) then
 		self:LockHighlight()
 	else
 		self:UnlockHighlight()

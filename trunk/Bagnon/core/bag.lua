@@ -25,7 +25,7 @@ local function OnDrag()  this:OnDrag()  end
 
 local function Bag_Create(id)
 	local name = format("BagnonBag%s", id)
-	local bag = CreateFrame('CheckButton', name)
+	local bag = CreateFrame('Button', name)
 	setmetatable(bag, Frame_mt)
 
 	bag:SetWidth(SIZE)

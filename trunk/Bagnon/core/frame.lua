@@ -611,16 +611,6 @@ end
 	Inventory Events
 --]]
 
---[[
-BVent:AddAction('BANKFRAME_OPENED', function()
-	BagnonFrame.ForAllVisibleNonCached('UpdateBank')
-end)
-
-BVent:AddAction('BANKFRAME_CLOSED', function()
-	BagnonFrame.ForAllVisibleNonCached('UpdateBank')
-end)
---]]
-
 BVent:AddAction('BAGNON_SLOT_UPDATE', function(action, event, ...)
 	BagnonFrame.ForAllVisibleNonCached('UpdateItem', ...)
 end)

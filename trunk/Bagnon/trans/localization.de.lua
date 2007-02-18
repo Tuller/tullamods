@@ -89,6 +89,8 @@ BAGNON_SPOT_TOOLTIP = "<Doppelklick> zum Suchen."
 
 --[[ Rules ]]--
 
+--[[
+
 BAGNON_RULE_ALL = 'Alles'
 BAGNON_RULE_ITEMS = 'Gegenstände'
 BAGNON_RULE_EMPTY = 'Leer'
@@ -113,7 +115,7 @@ BAGNON_SUBTYPE['Parts'] = 'Parts'
 BAGNON_SUBTYPE['Explosives'] = 'Explosives'
 BAGNON_SUBTYPE['Gems'] = 'Gems'
 
---[[ Strings ]]--
-
 BAGNON_STRING_BANDAGE = 'verband'
 BAGNON_STRING_POISON = 'gift'
+
+]]--
