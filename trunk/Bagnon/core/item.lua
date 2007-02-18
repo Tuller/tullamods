@@ -9,6 +9,7 @@ BagnonItem.SIZE = 37
 local Item_mt = {__index = BagnonItem}
 local UPDATE_DELAY = 0.3
 
+local bagSearch, linkSearch, nameSearch
 
 --[[ Dummy Bag, this is set as the button's parent, in order to preserve compatiblity with normal bag slot functions and other mods ]]--
 
@@ -138,28 +139,42 @@ function BagnonItem:Update()
 end
 
 --spot highlighting
---[[
 function BagnonItem:UpdateSearch()
-	if BagnonSpot then
-		local search = BagnonSpot.search
-		if search then
-			local link = BagnonLib.GetItemLink(self:GetBag(), self:GetID(), self:GetPlayer())
-			if link then
-				local name = GetItemInfo(link):lower()
-				if name:find(search) then
-					self:Unfade(true)
-				else
-					self:Fade()
-				end
-			else
-				self:Unfade()
-			end
-		else
-			self:Unfade()
+	if bagSearch then
+		if self:GetParent():GetID() ~= bagSearch then
+			self:Fade()
+			return
 		end
 	end
+	
+	if linkSearch or nameSearch then
+		local link = BagnonLib.GetItemLink(self:GetBag(), self:GetID(), self:GetPlayer())
+
+		if linkSearch and not(link and link == linkSearch) then
+			self:Fade()
+			return
+		end
+		
+		if nameSearch then
+			if link then
+				local name = GetItemInfo(link):lower()
+				if not name:find(nameSearch) then
+					self:Fade()
+					return
+				end
+			else
+				self:Fade()
+				return
+			end
+		end	
+	end
+	
+	if linkSearch or nameSearch or bagSearch then
+		self:Unfade(true)
+	else
+		self:Unfade()
+	end
 end
---]]
 
 function BagnonItem:UpdateBorder()
 	local border = getglobal(self:GetName() .. 'Border')
@@ -335,4 +350,22 @@ function BagnonItem:GetBag()
 	if bag then
 		return bag:GetID()
 	end
+end
+
+
+--[[ Searching ]]--
+
+function BagnonItem.SetBagSearch(bag)
+	bagSearch = tonumber(bag)
+	BagnonFrame.ForAllVisible('UpdateSearch')
+end
+
+function BagnonItem.SetLinkSearch(link)
+	linkSearch = link
+	BagnonFrame.ForAllVisible('UpdateSearch')
+end
+
+function BagnonItem.SetNameSearch(name)
+	nameSearch = name
+	BagnonFrame.ForAllVisible('UpdateSearch')
 end

@@ -13,6 +13,7 @@ trans\localization.de.lua
 trans\localization.fr.lua
 trans\localization.cn.lua
 core\BagnonLib.lua
+core\spot.lua
 core\item.lua
 core\bag.lua
 core\money.lua

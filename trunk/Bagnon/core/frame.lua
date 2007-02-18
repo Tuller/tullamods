@@ -295,6 +295,10 @@ end
 
 --[[ spot searching ]]--
 
+function BagnonFrame:UpdateSearch()
+	self:GetItemFrame():UpdateSearch()
+end
+
 function BagnonFrame:HighlightBag(bag, enable)
 	return
 end

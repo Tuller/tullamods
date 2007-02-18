@@ -186,6 +186,12 @@ function BagnonCat:UpdateCooldown(bag, slot)
 	end
 end
 
+function BagnonCat:UpdateSearch()
+	for _,item in pairs(self.items) do
+		item:UpdateSearch()
+	end
+end
+
 --[[ Layout ]]--
 
 function BagnonCat:Layout()

@@ -256,8 +256,6 @@ function BagnonBag:OnEnter()
 	local player = frame:GetPlayer()
 	local bagID = self:GetID()
 
-	frame:HighlightBag(bagID, true)
-
 	BagnonLib.AnchorTooltip(self)
 
 	--mainmenubag specific code
@@ -289,11 +287,11 @@ function BagnonBag:OnEnter()
 		end
 	end
 	GameTooltip:Show()
+	
+	BagnonItem.SetBagSearch(bagID)
 end
 
 function BagnonBag:OnLeave()
-	local frame = self:GetParent():GetParent()
-	frame:HighlightBag(self:GetID(), nil)
-
 	GameTooltip:Hide()
+	BagnonItem.SetBagSearch(nil)
 end
