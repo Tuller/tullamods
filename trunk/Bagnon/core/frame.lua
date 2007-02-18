@@ -56,11 +56,11 @@ end
 local function OnHide()
 	visible[this] = nil
 
-	if BagnonMenu.frame == this then
+	if BagnonMenu and BagnonMenu.frame == this then
 		BagnonMenu:Hide()
 	end
 	
-	if BagnonSpot.frame == this then
+	if BagnonSpot and BagnonSpot.frame == this then
 		BagnonSpot:Hide()
 	end
 end
