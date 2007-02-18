@@ -44,7 +44,7 @@
 	
 	<!-- Bagnon Options Menu -->
 	<Frame name="BagnonOptions" inherits="GooeyFrame" enableMouse="true" clampedToScreen="true" movable="true" toplevel="true" frameStrata="DIALOG" parent="UIParent">
-		<Size x="254" y="382"/>
+		<Size x="254" y="346"/>
 		
 		<Anchors>
 			<Anchor point="LEFT"/>
