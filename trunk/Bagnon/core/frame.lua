@@ -77,9 +77,18 @@ local function Frame_Create(id)
 
 	local close = CreateFrame('Button', name .. 'Close', frame, 'UIPanelCloseButton')
 	close:SetPoint('TOPRIGHT', frame, 'TOPRIGHT', 6 - frame.borderSize/2, 6 - frame.borderSize/2)
+	
+	if BagnonDB then
+		local playerDropdown = CreateFrame('Button', name .. 'DropDown', frame, 'BagnonDBUIDropDownButton')
+		playerDropdown:SetPoint('TOPLEFT', frame, 'TOPLEFT', frame.borderSize/2 -2, -6)
+	end
 
 	local title = CreateFrame('Button', name .. 'Title', frame)
-	title:SetPoint('TOPLEFT', frame, 'TOPLEFT', 6 + frame.borderSize/2, -10)
+	if BagnonDB then
+		title:SetPoint('TOPLEFT', frame, 'TOPLEFT', 26 + frame.borderSize/2, -10)
+	else
+		title:SetPoint('TOPLEFT', frame, 'TOPLEFT', 6 + frame.borderSize/2, -10)
+	end
 	title:SetPoint('BOTTOMRIGHT', frame, 'TOPRIGHT', -26, -16 - frame.borderSize/2)
 	frame.paddingY = 16
 
@@ -299,18 +308,6 @@ function BagnonFrame:UpdateSearch()
 	self:GetItemFrame():UpdateSearch()
 end
 
-function BagnonFrame:HighlightBag(bag, enable)
-	return
-end
-
-function BagnonFrame:HighlightName(name, enable)
-	return
-end
-
-function BagnonFrame:HighlightLink(link, enable)
-	return
-end
-
 
 --[[ cached data viewing ]]--
 
@@ -321,6 +318,16 @@ function BagnonFrame:SetPlayer(player)
 	self:UpdateAllItems()
 	self:UpdateTitle()
 	self:UpdateMoneyFrame()
+	
+	local bagFrame = self:GetBagFrame()
+	if bagFrame then
+		bagFrame:Update()
+	end
+	
+	local purchaseFrame = self:GetPurchaseFrame()
+	if purchaseFrame then
+		purchaseFrame:UpdateVisibility()
+	end
 end
 
 function BagnonFrame:GetPlayer()
