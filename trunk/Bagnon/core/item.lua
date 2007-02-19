@@ -30,8 +30,8 @@ end
 local function OnUpdate()
 	if not this.isLink and GameTooltip:IsOwned(this) then
 		if not this.elapsed or this.elapsed < 0 then
-			local enable = select(3, GetContainerItemCooldown(this:GetBag(), this:GetID()))
-			if enable == 1 then
+			local start, duration, enable = GetContainerItemCooldown(this:GetBag(), this:GetID())
+			if (start > 0 and duration > 0 and enable == 1) then
 				this:OnEnter()
 			end
 			this.elapsed = UPDATE_DELAY
@@ -135,6 +135,11 @@ function BagnonItem:Update()
 		self:UpdateLinkBorder(quality)
 	else
 		self:UpdateBorder()
+	end
+	
+	if GameTooltip:IsOwned(self) then
+		self.elapsed = nil
+		self:OnEnter()
 	end
 end
 
@@ -291,7 +296,11 @@ function BagnonItem:OnEnter()
 			BagnonLib.AnchorTooltip(self)
 			GameTooltip:SetInventoryItem('player', BankButtonIDToInvSlotID(slot))
 		else
+			--hack to prevent a ContainerFrameItemButton_OnEnter issue
+			local prethis = this
+			this = self
 			ContainerFrameItemButton_OnEnter(self)
+			this = prethis
 		end
 	end
 end
