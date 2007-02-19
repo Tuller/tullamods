@@ -34,58 +34,65 @@ function BagnonForever_HyperlinkToShortLink(hyperLink)
 	end
 end
 
+
 --[[  Storage Functions ]]--
 
 --saves data about a specific item the current player has
-local function SaveItemData(bagID, itemSlot)
-	local texture, count = GetContainerItemInfo(bagID, itemSlot)
-	local data
+local function SaveItemData(bag, slot)
+	local texture, count = GetContainerItemInfo(bag, slot)
+	local data = BagnonForeverData[currentRealm][currentPlayer][bag]
 	
 	if texture then
-		data = BagnonForever_HyperlinkToShortLink(GetContainerItemLink(bagID, itemSlot))
+		local link = BagnonForever_HyperlinkToShortLink(GetContainerItemLink(bag, slot))
 		if count > 1 then
-			data = data .. "," .. count
+			data[slot] = format('%s,%s', link, count)
+		else
+			data[slot] = link
 		end
+	else
+		data[slot] = nil
 	end
-
-	BagnonForeverData[currentRealm][currentPlayer][bagID][itemSlot] = data
 end
 
 --saves all the data about the current player's bag
-local function SaveBagData(bagID)
+local function SaveBagData(bag)
 	--don't save bank data unless you're at the bank
-	if BagnonLib.IsBankBag(bagID) and not BagnonLib.AtBank() then return end
+	if BagnonLib.IsBankBag(bag) and not BagnonLib.AtBank() then return end
 	
 	local size
-	if bagID == KEYRING_CONTAINER then
+	if bag == KEYRING_CONTAINER then
 		size = GetKeyRingSize()
 	else
-		size = GetContainerNumSlots(bagID)
+		size = GetContainerNumSlots(bag)
 	end
 	
+	local data = BagnonForeverData[currentRealm][currentPlayer]
+	
 	if size > 0 then
+		if not data[bag] then
+			data[bag]  = {}
+		end
+	
 		local link, count
 		
-		if bagID > 0 then
-			link = BagnonForever_HyperlinkToShortLink(GetInventoryItemLink('player', BagnonLib.GetInvSlot(bagID)))
-		end
-		
-		count = GetInventoryItemCount('player', BagnonLib.GetInvSlot(bagID))
+		if bag > 0 then
+			link = BagnonForever_HyperlinkToShortLink(GetInventoryItemLink('player', BagnonLib.GetInvSlot(bag)))
+		end	
+		count = GetInventoryItemCount('player', BagnonLib.GetInvSlot(bag))
 		
 		--save bag size
-		BagnonForeverData[currentRealm][currentPlayer][bagID] = {}
-		BagnonForeverData[currentRealm][currentPlayer][bagID].s = size .. "," .. count .. ","
-		
 		if link then
-			BagnonForeverData[currentRealm][currentPlayer][bagID].s = BagnonForeverData[currentRealm][currentPlayer][bagID].s .. link
+			data[bag].s = format('%s,%s,%s', size, count, link)
+		else
+			data[bag].s = format('%s,%s,', size, count)
 		end
 
 		--save all item info
 		for index = 1, size, 1 do
-			SaveItemData(bagID, index)
+			SaveItemData(bag, index)
 		end
-	else
-		BagnonForeverData[currentRealm][currentPlayer][bagID] = nil
+	elseif data[bag] then
+		data[bag] = nil
 	end
 end
 
@@ -96,19 +103,34 @@ end
 --save all bank data about the current player
 local function SaveBankData()
 	SaveBagData(-1)
-	for bagID = 5, 11, 1 do
-		SaveBagData(bagID)
+	for bag = 5, 11, 1 do
+		SaveBagData(bag)
 	end
 end
 
---save all inventory data about the current player
-local function SaveAllData()
-	--you know, this should probably be a constant
-	for i = -2, 11, 1 do
-		SaveBagData(i)
+local function SaveEquipmentData()
+	local data = BagnonForeverData[currentRealm][currentPlayer]['e']
+	if not data then
+		BagnonForeverData[currentRealm][currentPlayer]['e'] = {}
+		data = BagnonForeverData[currentRealm][currentPlayer]['e']
 	end
-	SavePlayerMoney()
+
+	for i = 0, 19 do
+		local link = GetInventoryItemLink('player', i)  
+		if link then
+			link = BagnonForever_HyperlinkToShortLink(link)
+			local count = GetInventoryItemCount('player', i)
+			if count > 1 then
+				data[i] = format('%s,%s', link, count)
+			else
+				data[i] = link
+			end
+		else
+			data[i] = nil
+		end
+	end
 end
+
 
 --[[ Removal Functions ]]--
 
@@ -119,12 +141,14 @@ function BagnonForever_RemovePlayer(player, realm)
 	end
 end
 
+
 --[[ Startup Functions ]]--
 
 local function UpdateVersion(current)
 	BagnonForeverData.version = current	
-	BagnonMsg(format(BAGNON_FOREVER_UPDATED, version))
+	BagnonMsg(format(BAGNON_FOREVER_UPDATED, current))
 end
+
 
 --[[
 	BagnonForever's settings are set to default under the following conditions
@@ -147,7 +171,6 @@ local function LoadVariables()
 	
 	if not BagnonForeverData[currentRealm][currentPlayer] then
 		BagnonForeverData[currentRealm][currentPlayer] = {}
-		SaveAllData()
 	end
 	
 	if BagnonForeverData.version ~= current then
@@ -155,8 +178,19 @@ local function LoadVariables()
 	end
 end
 
+BVent:AddAction('UNIT_INVENTORY_CHANGED', function()
+	if arg1 == 'player' then
+		SaveEquipmentData()
+	end
+end)
+
 BVent:AddAction('BAG_UPDATE', function() SaveBagData(arg1) end)
 BVent:AddAction('BANKFRAME_CLOSED', SaveBankData)
 BVent:AddAction('BANKFRAME_OPENED', SaveBankData)
 BVent:AddAction('PLAYER_MONEY', SavePlayerMoney)
-BVent:AddAction('PLAYER_LOGIN', function() LoadVariables(); SavePlayerMoney(); SaveBagData(0) end)
+BVent:AddAction('PLAYER_LOGIN', function()
+	LoadVariables()
+	SavePlayerMoney()
+	SaveBagData(0)
+	SaveEquipmentData() 
+end)

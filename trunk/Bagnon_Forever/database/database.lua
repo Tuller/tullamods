@@ -8,7 +8,7 @@
 	Nothing under this block of code should be loaded if BagnonDB already exists.
 --]]
 if BagnonDB then
-	error(format("Already using %s to view cached data", BagnonDB.addon or "<Unknown Addon"))
+	error(format('Already using %s to view cached data', BagnonDB.addon or '<Unknown Addon'))
 	return
 else
 	BagnonDB = {addon = 'Bagnon_Forever'}
@@ -32,34 +32,6 @@ local currentRealm = GetRealmName() --what currentRealm we're on
 --]]
 function BagnonDB.GetPlayers()
 	return pairs(BagnonForeverData[currentRealm])
-end
-
-
---[[ 
-	BagnonDB.GetBags(player)	
-		returns:
-			iterator of all bagsIDs for the given player
-		usage:  
-			for bagID, data in BagnonDB.GetBags("playerName")
---]]
-function BagnonDB.GetBags(player)
-	if player and BagnonForeverData[currentRealm][player] then
-		return ipairs(BagnonForeverData[currentRealm][player])
-	end
-end
-
-
---[[ 
-	BagnonDB.GetItems(player, bagID)	
-		returns:
-			iterator of all itemSlots with stuff in the given bag
-		usage:  
-			for bagID, data in BagnonDB.GetBags("playerName", bagID)
---]]
-function BagnonDB.GetItems(player, bagID)
-	if player and bagID and BagnonForeverData[currentRealm][player] and BagnonForeverData[currentRealm][player][bagID] then
-		return ipairs(BagnonForeverData[currentRealm][player][bagID])
-	end
 end
 
 
