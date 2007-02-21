@@ -8,9 +8,12 @@ local lastMoney = 0
 --[[ Local Functions ]]--
 
 local function LinkToID(link)
+	if tonumber(link) then
+		return link
+	end
+
 	if link then
-		local _, _, id = string.find(link, "(%d+):")
-		return id
+		return link:match("(%d+):")
 	end
 end
 
@@ -34,83 +37,68 @@ local function AddMoneyToTooltip(frame, id, count)
     end
 end
 
+local function pHook(action, method)
+	return function(...)
+		action(...)
+		method(...)
+	end
+end
+
+
 --[[  Function Hooks ]]--
 
-local Blizz_GameTooltip_SetBagItem = GameTooltip.SetBagItem;
-GameTooltip.SetBagItem = function(self, bag, slot)
-	Blizz_GameTooltip_SetBagItem(self, bag, slot)
-	
+GameTooltip.SetBagItem = pHook(GameTooltip.SetBagItem, function(self, bag, slot)
 	local id = LinkToID(GetContainerItemLink(bag, slot))	
-	local _, count = GetContainerItemInfo(bag, slot)
+	local count = select(2, GetContainerItemInfo(bag, slot))
+
 	AddMoneyToTooltip(GameTooltip, id, count)
-end
+end)
 
-local Bliz_GameTooltip_SetLootItem = GameTooltip.SetLootItem;
-GameTooltip.SetLootItem = function(self, slot)
-	Bliz_GameTooltip_SetLootItem(self, slot)
-	
+GameTooltip.SetLootItem = pHook(GameTooltip.SetLootItem, function(self, slot)
 	local id = LinkToID(GetLootSlotLink(slot))
-	local _, _, count = GetLootSlotInfo(slot)
+	local count = select(3, GetLootSlotInfo(slot))
+
 	AddMoneyToTooltip(self, id, count)
-end
+end)
 
-local Bliz_SetHyperlink = GameTooltip.SetHyperlink;
-GameTooltip.SetHyperlink = function(self, link, count)
-	Bliz_SetHyperlink(self, link, count)
-	
-	if link then	
-		AddMoneyToTooltip(self, LinkToID(link) or link)
-	end
-end
+GameTooltip.SetHyperlink = pHook(GameTooltip.SetHyperlink, function(self, link)
+	AddMoneyToTooltip(self, LinkToID(link))
+end)
 
-local Bliz_ItemRefTooltip_SetHyperlink = ItemRefTooltip.SetHyperlink;
-ItemRefTooltip.SetHyperlink = function(self, link, count)
-	Bliz_ItemRefTooltip_SetHyperlink(self, link, count)
-	
-	if link then	
-		AddMoneyToTooltip(self, LinkToID(link) or link)
-	end
-end
-
-local Bliz_GameTooltip_SetLootRollItem = GameTooltip.SetLootRollItem;
-GameTooltip.SetLootRollItem = function(self, rollID) 
-	Bliz_GameTooltip_SetLootRollItem(self, rollID)
-	
-	local id = LinkToID(GetLootRollItemLink(rollID))
-	local _, _, count = GetLootRollItemInfo(rollID)
+GameTooltip.SetLootRollItem = pHook(GameTooltip.SetLootRollItem, function(self, id) 
+	local id = LinkToID(GetLootRollItemLink(id))
+	local count = select(3, GetLootRollItemInfo(id))
 	AddMoneyToTooltip(self, id, count)
-end
+end)
 
-local Bliz_GameTooltip_SetAuctionItem = GameTooltip.SetAuctionItem;
-GameTooltip.SetAuctionItem = function(self, type, index)
-	Bliz_GameTooltip_SetAuctionItem(self, type, index)
-	
+GameTooltip.SetAuctionItem = pHook(GameTooltip.SetAuctionItem , function(self, type, index)
 	local id = LinkToID(GetAuctionItemLink(type, index))
-	local _, _, count = GetAuctionItemInfo(type, index)
+	local count = select(3, GetAuctionItemInfo(type, index))
 	AddMoneyToTooltip(self, id, count)
-end
+end)
+
 
 --[[ Event Handler ]]--
 
-CreateFrame("GameTooltip", "LudwigSellValue", nil, "GameTooltipTemplate")
-
-LudwigSellValue:SetScript("OnEvent", function()
+local sellValue = CreateFrame("GameTooltip", nil, nil, "GameTooltipTemplate")
+sellValue:SetScript("OnEvent", function()
 	for bag = 0, NUM_BAG_FRAMES do
 		for slot = 1, GetContainerNumSlots(bag) do
 			local id = LinkToID(GetContainerItemLink(bag, slot))
-			local _, count = GetContainerItemInfo(bag, slot)
-			
+
 			if id and id ~= "" then
+				local count = select(2, GetContainerItemInfo(bag, slot))
+
 				lastMoney = 0
-				LudwigSellValue:SetBagItem(bag, slot)
+				this:SetBagItem(bag, slot)
 				SaveCost(id, lastMoney, count)
 			end
 		end
 	end
 end)
-LudwigSellValue:RegisterEvent("MERCHANT_SHOW")
+sellValue:RegisterEvent("MERCHANT_SHOW")
 
-LudwigSellValue:SetScript("OnTooltipAddMoney", function()
+sellValue:SetScript("OnTooltipAddMoney", function()
 	if not InRepairMode() then
 		lastMoney = arg1
 	end
