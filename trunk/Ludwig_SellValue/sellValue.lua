@@ -68,19 +68,21 @@ end)
 GameTooltip.SetLootRollItem = pHook(GameTooltip.SetLootRollItem, function(self, id) 
 	local id = LinkToID(GetLootRollItemLink(id))
 	local count = select(3, GetLootRollItemInfo(id))
+
 	AddMoneyToTooltip(self, id, count)
 end)
 
 GameTooltip.SetAuctionItem = pHook(GameTooltip.SetAuctionItem , function(self, type, index)
 	local id = LinkToID(GetAuctionItemLink(type, index))
 	local count = select(3, GetAuctionItemInfo(type, index))
+
 	AddMoneyToTooltip(self, id, count)
 end)
 
 
 --[[ Event Handler ]]--
 
-local sellValue = CreateFrame("GameTooltip", nil, nil, "GameTooltipTemplate")
+local sellValue = CreateFrame("GameTooltip", "LudwigSellvalueTip", nil, "GameTooltipTemplate")
 sellValue:SetScript("OnEvent", function()
 	for bag = 0, NUM_BAG_FRAMES do
 		for slot = 1, GetContainerNumSlots(bag) do
