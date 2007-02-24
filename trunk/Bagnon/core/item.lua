@@ -9,7 +9,8 @@ BagnonItem.SIZE = 37
 local Item_mt = {__index = BagnonItem}
 local UPDATE_DELAY = 0.3
 
-local bagSearch, linkSearch, nameSearch
+local bagSearch, linkSearch, nameSearch, ruleSearch
+
 
 --[[ Dummy Bag, this is set as the button's parent, in order to preserve compatiblity with normal bag slot functions and other mods ]]--
 
@@ -174,7 +175,12 @@ function BagnonItem:UpdateSearch()
 		end	
 	end
 	
-	if linkSearch or nameSearch or bagSearch then
+	if ruleSearch and not ruleSearch(self) then
+		self:Fade()
+		return
+	end
+	
+	if linkSearch or nameSearch or bagSearch or ruleSearch then
 		self:Unfade(true)
 	else
 		self:Unfade()
@@ -334,7 +340,7 @@ function BagnonItem:Unfade(highlight)
 		self:SetAlpha(1)
 	end
 
-	if highlight and not BagnonDB.GetItemData(self:GetPlayer(), self:GetBag(), self:GetID()) then
+	if highlight and not BagnonLib.GetItemLink(self:GetBag(), self:GetID(), self:GetPlayer()) then
 		self:LockHighlight()
 	else
 		self:UnlockHighlight()
@@ -376,5 +382,10 @@ end
 
 function BagnonItem.SetNameSearch(name)
 	nameSearch = name
+	BagnonFrame.ForAllVisible('UpdateSearch')
+end
+
+function BagnonItem.SetRuleSearch(rule)
+	ruleSearch = rule
 	BagnonFrame.ForAllVisible('UpdateSearch')
 end

@@ -245,26 +245,22 @@ function BagnonLib.GetInvSlot(bag)
 end
 
 function BagnonLib.GetBagSize(bag, player)
-	if (player or currentPlayer) ~= currentPlayer then
+	if BagnonLib.IsCachedBag(bag, player) then
 		if BagnonDB then
 			return BagnonDB.GetBagData(player, bag) or 0
 		end
-		return 0
-	end
-
-	if BagnonLib.IsBankBag(bag) and not BagnonLib.AtBank() then
-		if BagnonDB then
-			return BagnonDB.GetBagData(player, bag) or 0
+	else
+		if bag == KEYRING_CONTAINER then
+			return GetKeyRingSize()
+		else
+			return GetContainerNumSlots(bag)
 		end
-		return 0
-	elseif bag == KEYRING_CONTAINER then
-		return GetKeyRingSize()
 	end
-	return GetContainerNumSlots(bag)
+	return 0
 end
 
 function BagnonLib.GetBagLink(bag, player)
-	if player and player ~= currentPlayer then
+	if BagnonLib.IsCachedBag(bag, player) then
 		if BagnonDB then
 			return select(2, BagnonDB.GetBagData(player, bag))
 		end
@@ -275,7 +271,9 @@ end
 
 function BagnonLib.GetItemLink(bag, slot, player)
 	if BagnonLib.IsCachedBag(bag, player) then
-		return (BagnonDB.GetItemData(player, bag, slot))
+		if BagnonDB then
+			return (BagnonDB.GetItemData(player, bag, slot))
+		end
 	else
 		return GetContainerItemLink(bag, slot)
 	end
@@ -283,9 +281,11 @@ end
 
 function BagnonLib.GetItemCount(bag, slot, player)
 	if BagnonLib.IsCachedBag(bag, player) then
-		local link, count = BagnonDB.GetItemData(player, bag, slot)
-		if link then
-			return count or 1
+		if BagnonDB then
+			local link, count = BagnonDB.GetItemData(player, bag, slot)
+			if link then
+				return count or 1
+			end
 		end
 		return 0
 	else
@@ -298,9 +298,7 @@ end
 
 --returns true if the given bag is cached AND we have a way of reading data for it
 function BagnonLib.IsCachedBag(bag, player)
-	if BagnonDB then
-		return currentPlayer ~= (player or currentPlayer) or (not atBank and BagnonLib.IsBankBag(bag))
-	end
+	return currentPlayer ~= (player or currentPlayer) or (not atBank and BagnonLib.IsBankBag(bag))
 end
 
 function BagnonLib.IsInventoryBag(bag)
@@ -314,7 +312,7 @@ end
 --returns if the given bag is an ammo bag/soul bag
 function BagnonLib.IsAmmoBag(bag, player)
 	--bankslots, the main bag, and the keyring cannot be ammo slots
-	if bag <= 0 then return end
+	if bag <= 0 then return nil end
 
 	local link = BagnonLib.GetBagLink(bag, player)
 	if link then
@@ -326,7 +324,7 @@ end
 --returns if the given bag is a profession bag (herb bag, engineering bag, etc)
 function BagnonLib.IsProfessionBag(bag, player)
 	--bankslots, the main bag, and the keyring cannot be profession bags
-	if bag <= 0 then return end
+	if bag <= 0 then return nil end
 
 	local link = BagnonLib.GetBagLink(bag, player)
 	if link then
