@@ -63,6 +63,10 @@ local function OnHide()
 	if BagnonSpot and BagnonSpot.frame == this then
 		BagnonSpot:Hide()
 	end
+	
+	if BagnonDBUICharacterList and BagnonDBUICharacterList.frame == this then
+		BagnonDBUICharacterList:Hide()
+	end
 end
 
 local function Frame_Create(id)

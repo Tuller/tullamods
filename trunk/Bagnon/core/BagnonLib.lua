@@ -29,37 +29,6 @@ local slots = {}
 local size = {}
 local atBank = nil
 
-
---[[ Debugging ]]--
-
---[[
-BVent:AddAction('BAGNON_SLOT_ADDED', function(action, event, arg1, arg2, arg3)
-	BagnonMsg(format('%s %s %s %s %s', 'add', arg1, arg2, (arg3 or 'empty'), arg4 or 0))
-end)
-
-BVent:AddAction('BAGNON_SLOT_UPDATE', function(action, event, arg1, arg2, arg3)
-	BagnonMsg(format('%s %s %s %s %s', 'upd', arg1, arg2, (arg3 or 'empty'), arg4 or 0))
-end)
-
-BVent:AddAction('BAGNON_SLOT_UPDATE_LOCK', function(action, event, arg1, arg2, arg3)
-	local msg
-	if arg3 then
-		msg = 'locked'
-	else
-		msg = 'unlocked'
-	end
-	BagnonMsg(format('%s %s %s %s', 'lck', arg1, arg2, msg))
-end)
-
-BVent:AddAction('BAGNON_SLOT_UPDATE_COOLDOWN', function(action, event, arg1, arg2, arg3)
-	BagnonMsg(format('%s %s %s %s', 'cdn', arg1, arg2, arg3))
-end)
-
-BVent:AddAction('BAGNON_SLOT_REMOVED', function(action, event, arg1, arg2)
-	BagnonMsg(format('%s %s %s', 'del', arg1, arg2))
-end)
---]]
-
 --[[ Update Functions ]]--
 
 --item slots
