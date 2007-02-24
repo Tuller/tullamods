@@ -28,24 +28,24 @@
 	
 	<!-- a player name checkbox -->
 	<CheckButton name="BagnonDBUINameBox" virtual="true">
-		<Size x="140" y="24"/>
+		<Size x="140" y="20"/>
 		
 		<ButtonText>
 			<Anchors>
 				<Anchor point="LEFT">
-					<Offset x="24" y="0"/>
+					<Offset x="16" y="0"/>
 				</Anchor>
 			</Anchors>
 		</ButtonText>
 
-		<NormalFont font = "GameFontNormalLarge"/>
-		<HighlightFont font="GameFontHighlightLarge"/>
+		<NormalFont font = "GameFontNormal"/>
+		<HighlightFont font="GameFontHighlight"/>
 		
 		<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check">
 			<Anchors>
 				<Anchor point="TOPLEFT"/>
 				<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMLEFT">
-					<Offset x="24" y="0"/>
+					<Offset x="16" y="0"/>
 				</Anchor>
 			</Anchors>
 		</CheckedTexture>
