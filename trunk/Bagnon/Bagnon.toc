@@ -1,9 +1,9 @@
 ## Title: Bagnon
-## Interface: 20008
+## Interface: 20003
 ## Author: Tuller
 ## Notes: An all in one inventory and bank display
 ## SavedVariablesPerCharacter: BagnonSets
-## Version: 7.2.17
+## Version: 7.2.27
 lib\TLib.lua
 lib\TPool.lua
 lib\BVent.lua

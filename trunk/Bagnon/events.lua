@@ -130,14 +130,20 @@ end)
 --[[ Mail ]]--
 
 BVent:AddAction('MAIL_SHOW', function()
+	if playerSets.showBagsAtMail then
+		Bagnon_ShowInventory(true)
+	end
+	
 	if playerSets.showBankAtMail then
 		Bagnon_ShowBank(true)
 	end
 end)
 
 BVent:AddAction('MAIL_CLOSED', function()
-	Bagnon_HideInventory(true)
-
+	if playerSets.showBagsAtMail then
+		Bagnon_HideInventory(true)
+	end
+	
 	if playerSets.showBankAtMail then
 		Bagnon_HideBank(true)
 	end
@@ -147,12 +153,20 @@ end)
 --[[ Merchant ]]--
 
 BVent:AddAction('MERCHANT_SHOW', function()
+	if playerSets.showBagsAtVendor then
+		Bagnon_ShowInventory(true)
+	end
+	
 	if playerSets.showBankAtVendor then
 		Bagnon_ShowBank(true)
 	end
 end)
 
 BVent:AddAction('MERCHANT_CLOSED', function()
+	if playerSets.showBagsAtVendor then
+		Bagnon_HideInventory(true)
+	end
+	
 	if playerSets.showBankAtVendor then
 		Bagnon_HideBank(true)
 	end

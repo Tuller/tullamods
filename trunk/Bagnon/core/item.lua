@@ -144,7 +144,6 @@ function BagnonItem:Update()
 	end
 end
 
---spot highlighting
 function BagnonItem:UpdateSearch()
 	if bagSearch then
 		if self:GetParent():GetID() ~= bagSearch then

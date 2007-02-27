@@ -18,11 +18,12 @@ local function LoadDefaults(current)
 		},
 
 		replaceBags = 1,
-		replaceBank = 1,
 
 		showTooltips = 1,
 		showForeverTooltips = 1,
 
+		showBagsAtMail = 1,
+		showBagsAtVendor = 1,
 		showBagsAtBank = 1,
 		showBagsAtAH = 1,
 		showBankAtBank = 1,
@@ -36,6 +37,9 @@ end
 
 local function UpdateSettings(version)
 	BagnonSets.version = version
+	BagnonSets.showBagsAtMail = 1
+	BagnonSets.showBagsAtVendor = 1
+	BagnonSets.replaceBank = nil
 
 	BagnonMsg(format(BAGNON_UPDATED, version))
 end
