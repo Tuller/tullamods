@@ -1,19 +1,19 @@
-local playerSets
+local sets
 
 local function CreateEventList(parent)
 	local events = {
 		[BAGNON_MAINOPTIONS_SHOW_BANK] = function(enable, bank)
 			if bank then
 				if enable then
-					playerSets.showBankAtBank = 1
+					sets.showBankAtBank = 1
 				else
-					playerSets.showBankAtBank = nil
+					sets.showBankAtBank = nil
 				end
 			else
 				if enable then
-					playerSets.showBagsAtBank= 1
+					sets.showBagsAtBank= 1
 				else
-					playerSets.showBagsAtBank = nil
+					sets.showBagsAtBank = nil
 				end
 			end
 		end,
@@ -21,15 +21,15 @@ local function CreateEventList(parent)
 		[BAGNON_MAINOPTIONS_SHOW_VENDOR] = function(enable, bank)
 			if bank then
 				if enable then
-					playerSets.showBankAtVendor= 1
+					sets.showBankAtVendor= 1
 				else
-					playerSets.showBankAtVendor = nil
+					sets.showBankAtVendor = nil
 				end
 			else
 				if enable then
-					playerSets.showBagsAtVendor= 1
+					sets.showBagsAtVendor= 1
 				else
-					playerSets.showBagsAtVendor = nil
+					sets.showBagsAtVendor = nil
 				end
 			end
 		end,
@@ -37,15 +37,15 @@ local function CreateEventList(parent)
 		[BAGNON_MAINOPTIONS_SHOW_AH] = function(enable, bank)
 			if bank then
 				if enable then
-					playerSets.showBankAtAH= 1
+					sets.showBankAtAH= 1
 				else
-					playerSets.showBankAtAH = nil
+					sets.showBankAtAH = nil
 				end
 			else
 				if enable then
-					playerSets.showBagsAtAH= 1
+					sets.showBagsAtAH= 1
 				else
-					playerSets.showBagsAtAH = nil
+					sets.showBagsAtAH = nil
 				end
 			end
 		end,
@@ -53,15 +53,15 @@ local function CreateEventList(parent)
 		[BAGNON_MAINOPTIONS_SHOW_MAILBOX] = function(enable, bank)
 			if bank then
 				if enable then
-					playerSets.showBankAtMail = 1
+					sets.showBankAtMail = 1
 				else
-					playerSets.showBankAtMail = nil
+					sets.showBankAtMail = nil
 				end
 			else
 				if enable then
-					playerSets.showBagsAtMail = 1
+					sets.showBagsAtMail = 1
 				else
-					playerSets.showBagsAtMail = nil
+					sets.showBagsAtMail = nil
 				end
 			end
 		end,
@@ -69,15 +69,15 @@ local function CreateEventList(parent)
 		[BAGNON_MAINOPTIONS_SHOW_TRADING] = function(enable, bank)
 			if bank then
 				if enable then
-					playerSets.showBankAtTrade= 1
+					sets.showBankAtTrade= 1
 				else
-					playerSets.showBankAtTrade = nil
+					sets.showBankAtTrade = nil
 				end
 			else
 				if enable then
-					playerSets.showBagsAtTrade= 1
+					sets.showBagsAtTrade= 1
 				else
-					playerSets.showBagsAtTrade = nil
+					sets.showBagsAtTrade = nil
 				end
 			end
 		end,
@@ -85,15 +85,15 @@ local function CreateEventList(parent)
 		[BAGNON_MAINOPTIONS_SHOW_CRAFTING] = function(enable, bank)
 			if bank then
 				if enable then
-					playerSets.showBankAtCraft = 1
+					sets.showBankAtCraft = 1
 				else
-					playerSets.showBankAtCraft = nil
+					sets.showBankAtCraft = nil
 				end
 			else
 				if enable then
-					playerSets.showBagsAtCraft= 1
+					sets.showBagsAtCraft= 1
 				else
-					playerSets.showBagsAtCraft = nil
+					sets.showBagsAtCraft = nil
 				end
 			end
 		end
@@ -102,7 +102,6 @@ local function CreateEventList(parent)
 	local show = parent:CreateFontString('ARTWORK')
 	show:SetFontObject('GameFontHighlight')
 	show:SetText(BAGNON_MAINOPTIONS_SHOW)
-	--show:SetPoint('TOPLEFT', parent:GetName() .. 'ReplaceBank', 'BOTTOMLEFT', 6, -8)
 	show:SetPoint('TOPLEFT', parent:GetName() .. 'ReplaceBags', 'BOTTOMLEFT', 6, -8)
 	
 	local bank = parent:CreateFontString('ARTWORK')
@@ -139,70 +138,56 @@ end
 
 function BagnonOptions_ReplaceBags(enable)
 	if enable then
-		playerSets.replaceBags = 1
+		sets.replaceBags = 1
 	else
-		playerSets.replaceBags = nil
+		sets.replaceBags = nil
 	end
 end
---[[
-function BagnonOptions_ReplaceBank(enable)
-	if enable then
-		playerSets.replaceBank = 1
-	else
-		playerSets.replaceBank = nil
-	end
-end
---]]
+
 function BagnonOptions_ShowTooltips(enable)
 	if enable then
-		playerSets.showTooltips = 1
+		sets.showTooltips = 1
 	else
-		playerSets.showTooltips = nil
+		sets.showTooltips = nil
 	end
 end
 
 function BagnonOptions_ShowQualityBorders(enable)
 	if enable then
-		playerSets.qualityBorders = 1
+		sets.qualityBorders = 1
 	else
-		playerSets.qualityBorders = nil
+		sets.qualityBorders = nil
 	end
 	
 	BagnonFrame.ForAllVisible('UpdateAllItems')
 end
 
+
 --[[ OnX Functions ]]--
 
 function BagnonOptions_OnLoad()
-	playerSets = BagnonLib.GetSets()
+	sets = BagnonLib.GetSets()
 	CreateEventList(this)
-	
-	getglobal(this:GetName() .. "2Bags"):SetChecked(true)
-	getglobal(this:GetName() .. "2Bags"):Disable()
-	
-	getglobal(this:GetName() .. "4Bags"):SetChecked(true)
-	getglobal(this:GetName() .. "4Bags"):Disable()
 end
 
 function BagnonOptions_OnShow()
-	local frameName = this:GetName()
+	local name = this:GetName()
 
-	getglobal(frameName .. "Tooltips"):SetChecked(playerSets.showTooltips)
-	getglobal(frameName .. "Quality"):SetChecked(playerSets.qualityBorders)
-	getglobal(frameName .. "ReplaceBags"):SetChecked(playerSets.replaceBags)
---	getglobal(frameName .. "ReplaceBank"):SetChecked(playerSets.replaceBank)
+	getglobal(name .. "Tooltips"):SetChecked(sets.showTooltips)
+	getglobal(name .. "Quality"):SetChecked(sets.qualityBorders)
+	getglobal(name .. "ReplaceBags"):SetChecked(sets.replaceBags)
 
-	getglobal(frameName .. "1Bags"):SetChecked(playerSets.showBagsAtBank)
-	--getglobal(frameName .. "ShowBagnon2"):SetChecked(BagnonSets.showBagsAtVendor)
-	getglobal(frameName .. "3Bags"):SetChecked(playerSets.showBagsAtAH)
-	--getglobal(frameName .. "ShowBagnon4"):SetChecked(BagnonSets.showBagsAtMail)
-	getglobal(frameName .. "5Bags"):SetChecked(playerSets.showBagsAtTrade)
-	getglobal(frameName .. "6Bags"):SetChecked(playerSets.showBagsAtCraft)
+	getglobal(name .. "1Bags"):SetChecked(sets.showBagsAtBank)
+	getglobal(name .. "2Bags"):SetChecked(sets.showBagsAtVendor)
+	getglobal(name .. "3Bags"):SetChecked(sets.showBagsAtAH)
+	getglobal(name .. "4Bags"):SetChecked(sets.showBagsAtMail)
+	getglobal(name .. "5Bags"):SetChecked(sets.showBagsAtTrade)
+	getglobal(name .. "6Bags"):SetChecked(sets.showBagsAtCraft)
 
-	getglobal(frameName .. "1Bank"):SetChecked(playerSets.showBankAtBank)
-	getglobal(frameName .. "2Bank"):SetChecked(playerSets.showBankAtVendor)
-	getglobal(frameName .. "3Bank"):SetChecked(playerSets.showBankAtAH)
-	getglobal(frameName .. "4Bank"):SetChecked(playerSets.showBankAtMail)
-	getglobal(frameName .. "5Bank"):SetChecked(playerSets.showBankAtTrade)
-	getglobal(frameName .. "6Bank"):SetChecked(playerSets.showBankAtCraft)
+	getglobal(name .. "1Bank"):SetChecked(sets.showBankAtBank)
+	getglobal(name .. "2Bank"):SetChecked(sets.showBankAtVendor)
+	getglobal(name .. "3Bank"):SetChecked(sets.showBankAtAH)
+	getglobal(name .. "4Bank"):SetChecked(sets.showBankAtMail)
+	getglobal(name .. "5Bank"):SetChecked(sets.showBankAtTrade)
+	getglobal(name .. "6Bank"):SetChecked(sets.showBankAtCraft)
 end

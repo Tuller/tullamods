@@ -44,7 +44,7 @@
 	
 	<!-- Bagnon Options Menu -->
 	<Frame name="BagnonOptions" inherits="GooeyFrame" enableMouse="true" clampedToScreen="true" movable="true" toplevel="true" frameStrata="DIALOG" parent="UIParent">
-		<Size x="254" y="346"/>
+		<Size x="254" y="352"/>
 		
 		<Anchors>
 			<Anchor point="LEFT"/>
@@ -109,19 +109,6 @@
 					</OnClick>
 				</Scripts>
 			</CheckButton>
-<!--			
-			<CheckButton name="$parentReplaceBank" inherits="GooeyCheckButton" text="BAGNON_MAINOPTIONS_REPLACE_BANK">
-				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="$parentReplaceBags" relativePoint="BOTTOMLEFT"/>
-				</Anchors>
-
-				<Scripts>
-					<OnClick>
-						BagnonOptions_ReplaceBank(this:GetChecked());
-					</OnClick>
-				</Scripts>
-			</CheckButton>
--->
 		</Frames>
 		
 		<Scripts>
