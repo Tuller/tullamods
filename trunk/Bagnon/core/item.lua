@@ -9,7 +9,7 @@ BagnonItem.SIZE = 37
 local Item_mt = {__index = BagnonItem}
 local UPDATE_DELAY = 0.3
 
-local bagSearch, linkSearch, nameSearch, ruleSearch
+local bagSearch, nameSearch, typeSearch, qualitySearch
 
 
 --[[ Dummy Bag, this is set as the button's parent, in order to preserve compatiblity with normal bag slot functions and other mods ]]--
@@ -142,6 +142,10 @@ function BagnonItem:Update()
 		self.elapsed = nil
 		self:OnEnter()
 	end
+	
+	if bagSearch or nameSearch or typeSearch or qualitySearch then
+		self:UpdateSearch()
+	end
 end
 
 function BagnonItem:UpdateSearch()
@@ -152,34 +156,32 @@ function BagnonItem:UpdateSearch()
 		end
 	end
 	
-	if linkSearch or nameSearch then
+	if nameSearch or typeSearch or qualitySearch then	
 		local link = BagnonLib.GetItemLink(self:GetBag(), self:GetID(), self:GetPlayer())
-
-		if linkSearch and not(link and link == linkSearch) then
-			self:Fade()
-			return
-		end
-		
-		if nameSearch then
-			if link then
-				local name = GetItemInfo(link):lower()
-				if not name:find(nameSearch) then
-					self:Fade()
-					return
-				end
-			else
+		if link then
+			local name, _, quality, itemLevel, minLevel, type, subType = GetItemInfo(link)
+			
+			if qualitySearch and qualitySearch ~= quality then
 				self:Fade()
 				return
 			end
-		end	
+
+			if typeSearch and typeSearch ~= type:lower() then
+				self:Fade()
+				return
+			end
+			
+			if nameSearch and not name:lower():find(nameSearch) then
+				self:Fade()
+				return
+			end	
+		else
+			self:Fade()
+			return
+		end
 	end
-	
-	if ruleSearch and not ruleSearch(self) then
-		self:Fade()
-		return
-	end
-	
-	if linkSearch or nameSearch or bagSearch or ruleSearch then
+
+	if nameSearch or typeSearch or bagSearch then
 		self:Unfade(true)
 	else
 		self:Unfade()
@@ -369,13 +371,21 @@ end
 
 --[[ Searching ]]--
 
+function BagnonItem.ClearSearch()
+	nameSearch = nil
+	typeSearch = nil
+	qualitySearch = nil
+	
+	BagnonFrame.ForAllVisible('UpdateSearch')
+end
+
 function BagnonItem.SetBagSearch(bag)
 	bagSearch = tonumber(bag)
 	BagnonFrame.ForAllVisible('UpdateSearch')
 end
 
-function BagnonItem.SetLinkSearch(link)
-	linkSearch = link
+function BagnonItem.SetQualitySearch(quality)
+	qualitySearch = quality
 	BagnonFrame.ForAllVisible('UpdateSearch')
 end
 
@@ -384,7 +394,7 @@ function BagnonItem.SetNameSearch(name)
 	BagnonFrame.ForAllVisible('UpdateSearch')
 end
 
-function BagnonItem.SetRuleSearch(rule)
-	ruleSearch = rule
+function BagnonItem.SetTypeSearch(type)
+	typeSearch = type
 	BagnonFrame.ForAllVisible('UpdateSearch')
 end

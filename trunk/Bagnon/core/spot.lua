@@ -3,20 +3,35 @@
 		Scripts for Bagnon_Spot, which provides filtering functionality for Bagnon
 --]]
 
-local function UpdateVisibleFrames()
-	for _, frame in BagnonFrame.GetVisible() do
-		frame:UpdateSearch()
-	end
+local function ParseType(s)
+	BagnonItem.SetTypeSearch(s)
+	return ''
+end
+
+local function ParseQuality(q)
+	BagnonItem.SetQualitySearch(tonumber(q))
+	return ''
 end
 
 local function ClearSearch()
 	BagnonSpot:SetText('')
-	BagnonItem.SetNameSearch(nil)
+	BagnonItem.ClearSearch()
 end
 
 local function Search(text)
+	BagnonItem.SetTypeSearch(nil)
+	
 	if text and text ~= '' then
-		BagnonItem.SetNameSearch(text:lower())
+		text = text:lower()
+		text = text:gsub('%s*t:([%s%w]+)', ParseType)
+		text = text:gsub('%s*q:(%d)', ParseQuality)
+		
+		local name = text
+		if name and name ~= '' then
+			BagnonItem.SetNameSearch(name)
+		else
+			BagnonItem.SetNameSearch(nil)
+		end
 	else
 		BagnonItem.SetNameSearch(nil)
 	end
