@@ -9,7 +9,7 @@ local currentPlayer = UnitName('player')
 
 local function LinkToID(link)
 	if link then
-		return tonumber(link:match('(%d+):'))
+		return tonumber(link) or tonumber(link:match("(%d+):"))
 	end
 end
 
@@ -58,7 +58,6 @@ GameTooltip.SetBagItem = pHook(GameTooltip.SetBagItem, function(self, bag, slot)
 	AddOwners(self, LinkToID(GetContainerItemLink(bag, slot)))
 end)
 
---loot item (items you see when looting a corpse)
 GameTooltip.SetLootItem = pHook(GameTooltip.SetLootItem, function(self, slot)
 	AddOwners(self, LinkToID(GetLootSlotLink(slot)))
 end)
@@ -71,12 +70,6 @@ GameTooltip.SetLootRollItem = pHook(GameTooltip.SetLootRollItem, function(self, 
 	AddOwners(self, LinkToID(GetLootRollItemLink(rollID)))
 end)
 
---items you see at the AH
 GameTooltip.SetAuctionItem = pHook(GameTooltip.SetAuctionItem, function(self, type, index)
 	AddOwners(self, LinkToID(GetAuctionItemLink(type, index)))
-end)
-
---items you see when shift clicking,
-SetItemRef = pHook(SetItemRef, function(link, text, button)
-	AddOwners(ItemRefTooltip, LinkToID(link))
 end)
