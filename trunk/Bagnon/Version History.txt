@@ -1,5 +1,11 @@
 Bagnon Version History, in the format YY.MM.DD
 
+7.2.27
+	Altered the file structure of Bagnon_Forever.  Delete before installing
+	Shrunk the size of the dropdown list for character selection
+	Its now possible to disable the automatic showing of your inventory at the mail or a vendor
+	Fixed a bug preventing Bagnon from automatically opening when the main bag is hidden
+
 7.2.17
 	Reimplemented classic Bagnon
 
