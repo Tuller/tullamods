@@ -159,22 +159,23 @@ function BagnonItem:UpdateSearch()
 	if nameSearch or typeSearch or qualitySearch then	
 		local link = BagnonLib.GetItemLink(self:GetBag(), self:GetID(), self:GetPlayer())
 		if link then
-			local name, _, quality, itemLevel, minLevel, type, subType = GetItemInfo(link)
+			local name, _, quality, itemLevel, minLevel, type, subType, _, equipLoc = GetItemInfo(link)
 			
 			if qualitySearch and qualitySearch ~= quality then
 				self:Fade()
 				return
 			end
-
-			if typeSearch and typeSearch ~= type:lower() then
-				self:Fade()
-				return
-			end
 			
-			if nameSearch and not name:lower():find(nameSearch) then
-				self:Fade()
-				return
-			end	
+			if nameSearch and nameSearch ~= type:lower() then
+				if not(subType) or nameSearch ~= subType:lower() then
+					if not(getglobal(equipLoc)) or nameSearch ~= getglobal(equipLoc):lower() then
+						if not name:lower():find(nameSearch) then
+							self:Fade()
+							return
+						end
+					end
+				end
+			end
 		else
 			self:Fade()
 			return

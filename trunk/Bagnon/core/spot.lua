@@ -23,8 +23,8 @@ local function Search(text)
 	
 	if text and text ~= '' then
 		text = text:lower()
-		text = text:gsub('%s*t:([%s%w]+)', ParseType)
-		text = text:gsub('%s*q:(%d)', ParseQuality)
+--		text = text:gsub('%s*t:([%s%w]+)', ParseType)
+		text = text:gsub('%s*q:(%d+)', ParseQuality)
 		
 		local name = text
 		if name and name ~= '' then
