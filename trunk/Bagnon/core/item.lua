@@ -9,7 +9,7 @@ BagnonItem.SIZE = 37
 local Item_mt = {__index = BagnonItem}
 local UPDATE_DELAY = 0.3
 
-local bagSearch, nameSearch, typeSearch, qualitySearch
+local bagSearch, nameSearch, qualitySearch
 
 
 --[[ Dummy Bag, this is set as the button's parent, in order to preserve compatiblity with normal bag slot functions and other mods ]]--
@@ -104,6 +104,10 @@ end
 
 --[[ Update Functions ]]--
 
+-- BagnonItem.bagSearch
+-- BagnonItem.nameSearch
+-- BagnonItem.qualitySearch
+
 -- Update the texture, lock status, and other information about an item
 function BagnonItem:Update()
 	local _, texture, count, locked, readable, quality
@@ -143,7 +147,7 @@ function BagnonItem:Update()
 		self:OnEnter()
 	end
 	
-	if bagSearch or nameSearch or typeSearch or qualitySearch then
+	if BagnonItem.Searching() then
 		self:UpdateSearch()
 	end
 end
@@ -156,7 +160,7 @@ function BagnonItem:UpdateSearch()
 		end
 	end
 	
-	if nameSearch or typeSearch or qualitySearch then	
+	if nameSearch or qualitySearch then	
 		local link = BagnonLib.GetItemLink(self:GetBag(), self:GetID(), self:GetPlayer())
 		if link then
 			local name, _, quality, itemLevel, minLevel, type, subType, _, equipLoc = GetItemInfo(link)
@@ -182,7 +186,7 @@ function BagnonItem:UpdateSearch()
 		end
 	end
 
-	if nameSearch or typeSearch or bagSearch then
+	if nameSearch or qualitySearch or bagSearch then
 		self:Unfade(true)
 	else
 		self:Unfade()
@@ -372,11 +376,14 @@ end
 
 --[[ Searching ]]--
 
+function BagnonItem.Searching()
+	return (nameSearch or qualitySearch or bagSearch)
+end
+
 function BagnonItem.ClearSearch()
 	nameSearch = nil
-	typeSearch = nil
 	qualitySearch = nil
-	
+
 	BagnonFrame.ForAllVisible('UpdateSearch')
 end
 
@@ -386,16 +393,11 @@ function BagnonItem.SetBagSearch(bag)
 end
 
 function BagnonItem.SetQualitySearch(quality)
-	qualitySearch = quality
+	qualitySearch = tonumber(quality)
 	BagnonFrame.ForAllVisible('UpdateSearch')
 end
 
 function BagnonItem.SetNameSearch(name)
 	nameSearch = name
-	BagnonFrame.ForAllVisible('UpdateSearch')
-end
-
-function BagnonItem.SetTypeSearch(type)
-	typeSearch = type
 	BagnonFrame.ForAllVisible('UpdateSearch')
 end

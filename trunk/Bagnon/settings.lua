@@ -47,7 +47,7 @@ end
 BVent:AddAction('PLAYER_LOGIN', function()
 	local version = GetAddOnMetadata('Bagnon', 'Version')
 
-	if not BagnonSets then
+	if not(BagnonSets and BagnonSets.inventory and BagnonSets.bank) then
 		LoadDefaults(version)
 	end
 

@@ -9,7 +9,7 @@ local function ParseType(s)
 end
 
 local function ParseQuality(q)
-	BagnonItem.SetQualitySearch(tonumber(q))
+	BagnonItem.SetQualitySearch(q)
 	return ''
 end
 
@@ -19,13 +19,10 @@ local function ClearSearch()
 end
 
 local function Search(text)
-	BagnonItem.SetTypeSearch(nil)
-	
 	if text and text ~= '' then
 		text = text:lower()
---		text = text:gsub('%s*t:([%s%w]+)', ParseType)
 		text = text:gsub('%s*q:(%d+)', ParseQuality)
-		
+
 		local name = text
 		if name and name ~= '' then
 			BagnonItem.SetNameSearch(name)
@@ -42,7 +39,7 @@ local function CreateSearchFrame()
 	search:SetAutoFocus(false)
 	search:SetTextInsets(8, 8, 0, 0)
 	search:SetFontObject('ChatFontNormal')
-	
+
 	search:SetScript('OnShow', function() this:SetFocus() end)
 	search:SetScript('OnHide', function() ClearSearch() end)
 	search:SetScript('OnEscapePressed', function() this:Hide() end)
@@ -55,17 +52,14 @@ end
 function BagnonSpot_Show(frame)
 	if not BagnonSpot then
 		CreateSearchFrame()
-	end	
+	end
+
 	BagnonSpot.frame = frame
-	
+
 	BagnonSpot:ClearAllPoints()
 	BagnonSpot:SetPoint("TOPLEFT", frame:GetName() .. "Title", "TOPLEFT", -8, 6)
 	BagnonSpot:SetPoint("BOTTOMRIGHT", frame:GetName() .. "Title", "BOTTOMRIGHT", -4, -6)
-	
+
 	ClearSearch()
 	BagnonSpot:Show()
-end
-
-function BagnonSpot_Searching()
-	return BagnonSpot and BagnonSpot.search
 end
