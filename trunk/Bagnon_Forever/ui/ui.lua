@@ -25,14 +25,15 @@ end
 function BagnonDBUI_ShowCharacterList(frame)
 	BagnonDBUICharacterList.frame = frame
 	
-	local width = 0; local index = 0
+	local width = 0
+	local index = 0
 	for player in BagnonDB.GetPlayers() do
 		index = index + 1
 		
 		local button = getglobal("BagnonDBUICharacterList" .. index) or CreatePlayerButton(index, BagnonDBUICharacterList)
 		button:SetText(player)
-		if button:GetTextWidth() + 26 > width then
-			width = button:GetTextWidth() + 26
+		if button:GetTextWidth() + 34 > width then
+			width = button:GetTextWidth() + 34
 		end
 
 		if frame:GetPlayer() == player then
@@ -50,7 +51,7 @@ function BagnonDBUI_ShowCharacterList(frame)
 	end
 		
 	--resize and position the frame
-	BagnonDBUICharacterList:SetHeight(10 + index * 16)
+	BagnonDBUICharacterList:SetHeight(16 + index * (BagnonDBUICharacterList1:GetHeight() - 6))
 	BagnonDBUICharacterList:SetWidth(width)
 	BagnonDBUICharacterList:ClearAllPoints()
 	BagnonDBUICharacterList:SetPoint("TOPLEFT", frame:GetName() .. 'DropDown', "BOTTOMLEFT", 0, 4)
