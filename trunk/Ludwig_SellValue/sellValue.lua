@@ -5,15 +5,19 @@
 
 local lastMoney = 0
 
+
 --[[ Local Functions ]]--
 
-local function LinkToID(link)
-	if tonumber(link) then
-		return link
+local function pHook(action, method)
+	return function(...)
+		action(...)
+		method(...)
 	end
+end
 
+local function LinkToID(link)
 	if link then
-		return link:match("(%d+):")
+		return tonumber(link) or tonumber(link:match("(%d+):"))
 	end
 end
 
@@ -29,26 +33,19 @@ end
 local function AddMoneyToTooltip(frame, id, count)
     if frame and id and count and Ludwig_SellValues and not MerchantFrame:IsVisible() then
 		local price = Ludwig_SellValues[id]
-		if price and price ~= 0 then
-			frame:AddLine(SELLVALUE_COST, 1.0, 1.0,	0)
+		if price then
+			frame:AddLine(SELLVALUE_COST, 1, 1,	0)
 			SetTooltipMoney(frame, price * count)
 			frame:Show()
 		end
     end
 end
 
-local function pHook(action, method)
-	return function(...)
-		action(...)
-		method(...)
-	end
-end
-
 
 --[[  Function Hooks ]]--
 
 GameTooltip.SetBagItem = pHook(GameTooltip.SetBagItem, function(self, bag, slot)
-	local id = LinkToID(GetContainerItemLink(bag, slot))	
+	local id = LinkToID(GetContainerItemLink(bag, slot))
 	local count = select(2, GetContainerItemInfo(bag, slot))
 
 	AddMoneyToTooltip(GameTooltip, id, count)
@@ -65,7 +62,7 @@ GameTooltip.SetHyperlink = pHook(GameTooltip.SetHyperlink, function(self, link)
 	AddMoneyToTooltip(self, LinkToID(link))
 end)
 
-GameTooltip.SetLootRollItem = pHook(GameTooltip.SetLootRollItem, function(self, id) 
+GameTooltip.SetLootRollItem = pHook(GameTooltip.SetLootRollItem, function(self, id)
 	local id = LinkToID(GetLootRollItemLink(id))
 	local count = select(3, GetLootRollItemInfo(id))
 
@@ -79,18 +76,26 @@ GameTooltip.SetAuctionItem = pHook(GameTooltip.SetAuctionItem , function(self, t
 	AddMoneyToTooltip(self, id, count)
 end)
 
+GameTooltip.SetQuestItem = pHook(GameTooltip.SetQuestItem, function(self, type, id)
+	AddMoneyToTooltip(self, LinkToID(GetQuestItemLink(type, id)), 1)
+end)
 
---[[ Event Handler ]]--
+GameTooltip.SetTradeSkillItem = pHook(GameTooltip.SetTradeSkillItem, function(self, type, id)
+	if not id then
+		AddMoneyToTooltip(self, LinkToID(GetTradeSkillItemLink(type)), 1)
+	end
+end)
 
-local sellValue = CreateFrame("GameTooltip", "LudwigSellvalueTip", nil, "GameTooltipTemplate")
+
+--[[ Tooltip Scanner ]]--
+
+local sellValue = CreateFrame("GameTooltip", "LudwigSVTooltip", nil, "GameTooltipTemplate")
 sellValue:SetScript("OnEvent", function()
 	for bag = 0, NUM_BAG_FRAMES do
 		for slot = 1, GetContainerNumSlots(bag) do
 			local id = LinkToID(GetContainerItemLink(bag, slot))
-
-			if id and id ~= "" then
+			if id then
 				local count = select(2, GetContainerItemInfo(bag, slot))
-
 				lastMoney = 0
 				this:SetBagItem(bag, slot)
 				SaveCost(id, lastMoney, count)
