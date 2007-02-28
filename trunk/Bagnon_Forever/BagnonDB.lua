@@ -18,10 +18,7 @@ end
 local currentPlayer = UnitName('player') --the name of the current player that's logged on
 local currentRealm = GetRealmName() --what currentRealm we're on
 
---[[ 
-	Access  Functions 
---]]
-
+--[[ Access  Functions ]]--
 
 --[[ 
 	BagnonDB.GetPlayers()	
@@ -135,9 +132,10 @@ end
 --[[
 	Returns how many of the specific item id the given player has in the given bag
 --]]
-function BagnonDB.GetItemTotal(id, player, bagID)
+function BagnonDB.GetItemTotal(link, player, bagID)
 	local count = 0
 	local playerData = BagnonForeverData[currentRealm][player]
+	local link = link:match('item:(%d+)')
 
 	if playerData then
 		local bagData = playerData[bagID]
@@ -145,16 +143,8 @@ function BagnonDB.GetItemTotal(id, player, bagID)
 			for itemSlot in pairs(bagData) do
 				if tonumber(itemSlot) then
 					local itemLink, itemCount = BagnonDB.GetItemData(player, bagID, itemSlot)
-
-					if itemLink then
-						local itemID = tonumber(itemLink)
-						if not itemID then
-							itemID = tonumber(itemLink:match('(%d+):'))
-						end
-
-						if tonumber(id) == itemID then
-							count = count + (itemCount or 1)
-						end
+					if itemLink and itemLink:match('item:(%d+)') == link then
+						count = count + (itemCount or 1)
 					end
 				end
 			end

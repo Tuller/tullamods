@@ -7,15 +7,9 @@ local currentPlayer = UnitName('player')
 
 --[[ Local Functions ]]--
 
-local function LinkToID(link)
-	if link then
-		return tonumber(link) or tonumber(link:match("(%d+):"))
-	end
-end
-
 local function AddOwners(frame, id)
 	if not(frame and id and BagnonLib.GetSets().showTooltips) then return end
-	
+
 	for player in BagnonDB.GetPlayers() do
 		local invCount = BagnonDB.GetItemTotal(id, player, -2)
 		for bagID = 0, 4 do
@@ -26,7 +20,7 @@ local function AddOwners(frame, id)
 		for bagID = 5, 11 do
 			bankCount = bankCount + BagnonDB.GetItemTotal(id, player, bagID)
 		end
-		
+
 		local equipCount = BagnonDB.GetItemTotal(id, player, 'e')
 		if (invCount + bankCount + equipCount) > 0 then
 			local tooltipString = player .. ':'
@@ -52,24 +46,37 @@ local function pHook(action, method)
 	end
 end
 
+
 --[[  Function Hooks ]]--
 
 GameTooltip.SetBagItem = pHook(GameTooltip.SetBagItem, function(self, bag, slot)
-	AddOwners(self, LinkToID(GetContainerItemLink(bag, slot)))
+	AddOwners(self, GetContainerItemLink(bag, slot))
 end)
 
 GameTooltip.SetLootItem = pHook(GameTooltip.SetLootItem, function(self, slot)
-	AddOwners(self, LinkToID(GetLootSlotLink(slot)))
+	AddOwners(self, GetLootSlotLink(slot))
 end)
 
 GameTooltip.SetHyperlink = pHook(GameTooltip.SetHyperlink, function(self, link)
-	AddOwners(self, LinkToID(link))
+	AddOwners(self, link)
 end)
 
 GameTooltip.SetLootRollItem = pHook(GameTooltip.SetLootRollItem, function(self, rollID)
-	AddOwners(self, LinkToID(GetLootRollItemLink(rollID)))
+	AddOwners(self, GetLootRollItemLink(rollID))
 end)
 
 GameTooltip.SetAuctionItem = pHook(GameTooltip.SetAuctionItem, function(self, type, index)
-	AddOwners(self, LinkToID(GetAuctionItemLink(type, index)))
+	AddOwners(self, GetAuctionItemLink(type, index))
+end)
+
+GameTooltip.SetQuestItem = pHook(GameTooltip.SetQuestItem, function(self, type, id)
+	AddOwners(self, GetQuestItemLink(type, id))
+end)
+
+GameTooltip.SetTradeSkillItem = pHook(GameTooltip.SetTradeSkillItem, function(self, type, id)
+	if not id then
+		AddOwners(self, GetTradeSkillItemLink(type))
+	else
+		AddOwners(self, GetTradeSkillReagentItemLink(type, id))
+	end
 end)
