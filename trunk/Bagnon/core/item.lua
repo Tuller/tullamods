@@ -10,6 +10,7 @@ local Item_mt = {__index = BagnonItem}
 local UPDATE_DELAY = 0.3
 
 local bagSearch, nameSearch, qualitySearch
+local MAX_ITEMS_PER_BAG = 36
 
 
 --[[ Dummy Bag, this is set as the button's parent, in order to preserve compatiblity with normal bag slot functions and other mods ]]--
@@ -60,13 +61,23 @@ local function PostClick()
 	this:PostClick(arg1)
 end
 
+local function TakeItem(bag, slot)
+	local item = getglobal(format('ContainerFrame%dItem%d', bag, slot)) 
+	if item then
+		item:SetParent(nil); item:SetID(0); item:Show()
+		return item
+	end
+end
+
 local function Item_Create(id)
-	local name = format('BagnonItem%d', id)
-	local item = CreateFrame('Button', name, nil, 'ContainerFrameItemButtonTemplate')
+	local bag = ceil(id / MAX_ITEMS_PER_BAG)
+	local slot = mod(id - 1, MAX_ITEMS_PER_BAG) + 1
+
+	local item = TakeItem(bag, slot) or CreateFrame('Button', name, nil, 'ContainerFrameItemButtonTemplate')
 	setmetatable(item, Item_mt)
 	item:ClearAllPoints()
 
-	local border = item:CreateTexture(name .. 'Border', 'OVERLAY')
+	local border = item:CreateTexture(item:GetName() .. 'Border', 'OVERLAY')
 	border:SetWidth(67); border:SetHeight(67)
 	border:SetPoint('CENTER', item)
 	border:SetTexture('Interface\\Buttons\\UI-ActionButton-Border')
