@@ -3,11 +3,9 @@
 		A frame for purchasing bank bag slots
 --]]
 
-local used = {}
-
 BagnonPurchase = CreateFrame('Frame')
 local Purchase_mt = {__index = BagnonPurchase}
-
+local lastCreated = 0
 
 --[[ Local Functions ]]--
 
@@ -32,28 +30,31 @@ local function BuySlot()
 	StaticPopup_Show('CONFIRM_BUY_BANK_SLOT_BANKNON')
 end
 
-local function PurchaseFrame_Create(lastCreated)
-	local name = 'BagnonPurchase' .. lastCreated
-
-	local frame = CreateFrame('Frame', 'BagnonPurchase' .. lastCreated)
+local function PurchaseFrame_Create()
+	local name = format('BagnonPurchase%s', lastCreated)
+	local frame = CreateFrame('Frame', name)
 	setmetatable(frame, Purchase_mt)
 
 	frame:SetWidth(164); frame:SetHeight(22)
 
-	local purchaseButton = CreateFrame('Button', name .. 'Purchase', frame, 'UIPanelButtonTemplate')
-	purchaseButton:SetWidth(124); purchaseButton:SetHeight(22)
-	purchaseButton:SetPoint('LEFT', frame)
-	purchaseButton:SetScript('OnClick', BuySlot)
-	purchaseButton:SetText(BANKSLOTPURCHASE)
+	local button = CreateFrame('Button', name .. 'Purchase', frame, 'UIPanelButtonTemplate')
+	button:SetWidth(124); button:SetHeight(22)
+	button:SetPoint('LEFT', frame)
+	button:SetScript('OnClick', BuySlot)
+	button:SetText(BANKSLOTPURCHASE)
 
-	local costFrame = CreateFrame('Frame', name .. 'Cost', frame, 'SmallMoneyFrameTemplate')
-	costFrame:SetPoint('LEFT', purchaseButton, 'RIGHT', 2, 0)
+	local cost = CreateFrame('Frame', name .. 'Cost', frame, 'SmallMoneyFrameTemplate')
+	cost:SetPoint('LEFT', button, 'RIGHT', 2, 0)
 
 	--super hack extreme, need to settype which for some reason takes this as an arg
 	local oldthis = this
-	this = costFrame
+	this = cost
 	MoneyFrame_SetType('STATIC')
 	this = oldthis
+	
+	frame:SetScript('OnEvent', function() frame:UpdateSlotCost() end)
+	
+	lastCreated = lastCreated + 1
 
 	return frame
 end
@@ -62,35 +63,37 @@ end
 --[[ Constructor/Destructor ]]--
 
 function BagnonPurchase.New(parent)
-	local frame = TPool.Get('BagnonPurchase', PurchaseFrame_Create)
-	BagnonLib.Attach(frame, parent)
+	local frame = PurchaseFrame_Create()
+	BagnonUtil:Attach(frame, parent)
 
 	frame:UpdateSlotCost()
-	frame:UpdateVisibility()
-	parent.sizeChanged = true
+	frame:RegisterEvent('PLAYER_MONEY')
+	frame:RegisterEvent('PLAYERBANKBAGSLOTS_CHANGED')
 
-	used[frame] = true
 	return frame
 end
 
 
 --[[ Update Functions ]]--
 
-function BagnonPurchase:UpdateVisibility()
+function BagnonPurchase:UpdateShown()
+	local frame = self:GetParent():GetParent()
+	local bagFrame = self:GetParent()
+	local full = select(2, GetNumBankSlots())
+	local atBank = BagnonUtil:AtBank()
+	local cached = frame:GetPlayer() ~= UnitName('player')
+
 	--hide if slots cannot be purchased, or if viewing a cached bank, or if told to do so, show otherwise
-	if self:ShouldShow() then
+	if atBank and bagFrame.shown and not(cached or full) then
 		self:Show()
 	else
 		self:Hide()
 	end
-
-	self:GetParent().sizeChanged = true
-	self:GetParent():Layout()
 end
 
 function BagnonPurchase:UpdateSlotCost()
 	local name = self:GetName() .. 'Cost'
-	local costFrame = getglobal(costFrameName)
+	local costFrame = getglobal(name)
 	local cost = GetBankSlotCost(GetNumBankSlots())
 
 	if GetMoney() >= cost then
@@ -100,31 +103,3 @@ function BagnonPurchase:UpdateSlotCost()
 	end
 	MoneyFrame_Update(name, cost)
 end
-
-function BagnonPurchase:ShouldShow()
-	local parent = self:GetParent()
-	local full = select(2, GetNumBankSlots())
-	local atBank = BagnonLib.AtBank()
-	local cached = parent:GetPlayer() ~= UnitName('player')
-	local bagsShown = parent:GetBagFrame():BagsShown()
-
-	return atBank and bagsShown and not(cached or full)
-end
-
---[[ Events ]]--
-
-local function ForAll_UpdateSlotCost()
-	for frame in pairs(used) do
-		frame:UpdateSlotCost()
-	end
-end
-BVent:AddAction('PLAYER_MONEY', ForAll_UpdateSlotCost)
-BVent:AddAction('PLAYERBANKBAGSLOTS_CHANGED', ForAll_UpdateSlotCost)
-
-local function ForAll_UpdateVisibility()
-	for frame in pairs(used) do
-		frame:UpdateVisibility()
-	end
-end
-BVent:AddAction('BANKFRAME_OPENED', ForAll_UpdateVisibility)
-BVent:AddAction('BANKFRAME_CLOSED', ForAll_UpdateVisibility)

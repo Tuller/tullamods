@@ -7,17 +7,17 @@ BagnonMoney = CreateFrame('Button')
 local Money_mt = {__index = BagnonMoney}
 
 local currentPlayer = UnitName('player')
-
+local lastCreated = 0
 
 --[[ Constructor ]]--
 
-local function OnShow()  this:OnShow() end
+local function OnShow()  this:OnShow() 					end
 local function OnClick() this:GetParent():OnClick(arg1) end
-local function OnEnter() this:GetParent():OnEnter() end
-local function OnLeave() this:GetParent():OnLeave() end
+local function OnEnter() this:GetParent():OnEnter() 	end
+local function OnLeave() this:GetParent():OnLeave() 	end
 
-local function MoneyFrame_Create(lastCreated)
-	local frame = CreateFrame('Frame', 'BagnonMoney' .. lastCreated, nil, 'SmallMoneyFrameTemplate')
+local function MoneyFrame_Create()
+	local frame = CreateFrame('Frame', format('BagnonMoney%s', lastCreated), nil, 'SmallMoneyFrameTemplate')
 	setmetatable(frame, Money_mt)
 	frame:SetScript('OnShow', OnShow)
 
@@ -27,25 +27,20 @@ local function MoneyFrame_Create(lastCreated)
 	clickFrame:SetScript('OnClick', OnClick)
 	clickFrame:SetScript('OnEnter', OnEnter)
 	clickFrame:SetScript('OnLeave', OnLeave)
+	
+	lastCreated = lastCreated + 1
 
 	return frame
 end
 
-
---[[ Constructor/'Destructor' ]]--
-
 function BagnonMoney.New(parent)
-	local frame = TPool.Get('BagnonMoneyFrame', MoneyFrame_Create)
+	local frame = MoneyFrame_Create()
+	BagnonUtil:Attach(frame, parent)
+
 	frame:Update()
-	BagnonLib.Attach(frame, parent)
 	
 	return frame
 end
-
-function BagnonMoney:Release()
-	TPool.Release(self, 'BagnonMoneyFrame')
-end
-
 
 --[[ Update ]]--
 
@@ -56,11 +51,10 @@ function BagnonMoney:Update()
 		if player == currentPlayer or not BagnonDB then
 			MoneyFrame_Update(self:GetName(), GetMoney())
 		else
-			MoneyFrame_Update(self:GetName(), BagnonDB.GetMoney(player))
+			MoneyFrame_Update(self:GetName(), BagnonDB:GetMoney(player))
 		end
 	end
 end
-
 
 --[[ Frame Events ]]--
 
@@ -81,13 +75,13 @@ end
 
 --Alters the tooltip of bagnon moneyframes to show total gold across all characters on the current realm
 function BagnonMoney:OnEnter()
-	if BagnonDB and BagnonLib.GetSets().showTooltips then
+	if BagnonDB and BagnonUtil:ShowingTooltips() then
 		GameTooltip:SetOwner(self, 'ANCHOR_TOPRIGHT')
 		GameTooltip:SetText(format(BAGNON_FOREVER_MONEY_ON_REALM, GetRealmName()))
 
 		local money = 0
-		for player in BagnonDB.GetPlayers() do
-			money = money + BagnonDB.GetMoney(player)
+		for player in BagnonDB:GetPlayers() do
+			money = money + BagnonDB:GetMoney(player)
 		end
 
 		SetTooltipMoney(GameTooltip, money)

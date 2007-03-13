@@ -1,65 +1,104 @@
 --[[
 	spot.lua
-		Scripts for Bagnon_Spot, which provides filtering functionality for Bagnon
+		Searching functionality for Bagnon
 --]]
 
-local function ParseType(s)
-	BagnonItem.SetTypeSearch(s)
-	return ''
+BagnonSpot = {}
+
+local function SearchBox_Create()
+	local frame = CreateFrame('EditBox', nil, UIParent, 'GooeyPopup')
+	frame:SetAutoFocus(false)
+	frame:SetTextInsets(8, 8, 0, 0)
+	frame:SetFontObject('ChatFontNormal')
+
+	frame:SetScript('OnShow', function() this:SetFocus(); this:HighlightText() end)
+	frame:SetScript('OnTextChanged', function() BagnonSpot:SetTextSearch(this:GetText()) end)
+	frame:SetScript('OnEscapePressed', function() BagnonSpot:Hide() end)
+	
+	return frame
 end
 
-local function ParseQuality(q)
-	BagnonItem.SetQualitySearch(q)
-	return ''
-end
-
-local function ClearSearch()
-	BagnonSpot:SetText('')
-	BagnonItem.ClearSearch()
-end
-
-local function Search(text)
-	if text and text ~= '' then
-		text = text:lower()
-		text = text:gsub('%s*q:(%d+)', ParseQuality)
-
-		local name = text
-		if name and name ~= '' then
-			BagnonItem.SetNameSearch(name)
-		else
-			BagnonItem.SetNameSearch(nil)
-		end
+--shows the search box
+function BagnonSpot:Show(anchor)
+	if self:GetAnchor() == anchor then
+		self:Hide()
 	else
-		BagnonItem.SetNameSearch(nil)
+		if not self.frame then
+			self.frame = SearchBox_Create()
+		end
+
+		self.frame.anchor = anchor
+		self.frame:Show()
+		self.frame:SetPoint("TOPLEFT", anchor:GetName() .. "Title", "TOPLEFT", -8, 6)
+		self.frame:SetPoint("BOTTOMRIGHT", anchor:GetName() .. "Title", "BOTTOMRIGHT", -4, -6)
+		self:SetTextSearch(self.frame:GetText())
 	end
 end
 
-local function CreateSearchFrame()
-	local search = CreateFrame('EditBox', 'BagnonSpot', UIParent, 'GooeyPopup')
-	search:SetAutoFocus(false)
-	search:SetTextInsets(8, 8, 0, 0)
-	search:SetFontObject('ChatFontNormal')
-
-	search:SetScript('OnShow', function() this:SetFocus() end)
-	search:SetScript('OnHide', function() ClearSearch() end)
-	search:SetScript('OnEscapePressed', function() this:Hide() end)
-	search:SetScript('OnEditFocusLost', function() this:HighlightText() end)
-	search:SetScript('OnTextChanged', function() Search(this:GetText()) end)
+--hides the search box
+function BagnonSpot:Hide()
+	if self.frame and self.frame:IsShown() then
+		self.frame.anchor = nil
+		self.frame:Hide()
+		self:ClearTextSearch()
+	end
 end
 
---[[ Usable Functions ]]--
-
-function BagnonSpot_Show(frame)
-	if not BagnonSpot then
-		CreateSearchFrame()
+--sets the text search to the given text
+function BagnonSpot:SetTextSearch(text)
+	if text and text ~= '' then
+		self.textSearch = text:lower()
+	else
+		self.textSearch = nil
 	end
+	self:UpdateFrames()
+end
 
-	BagnonSpot.frame = frame
+function BagnonSpot:SetBagSearch(bag)
+	self.bagSearch = bag
+	self:UpdateFrames()
+end
 
-	BagnonSpot:ClearAllPoints()
-	BagnonSpot:SetPoint("TOPLEFT", frame:GetName() .. "Title", "TOPLEFT", -8, 6)
-	BagnonSpot:SetPoint("BOTTOMRIGHT", frame:GetName() .. "Title", "BOTTOMRIGHT", -4, -6)
+--clears all searches
+function BagnonSpot:ClearTextSearch()
+	self.textSearch = nil
+	self:UpdateFrames()
+end
 
-	ClearSearch()
-	BagnonSpot:Show()
+function BagnonSpot:ClearAllSearches()
+	self.textSearch = nil
+	self.bagSearch = nil
+	self:UpdateFrames()
+end
+
+--updates all highlighting for frames
+function BagnonSpot:UpdateFrames()	
+	local bags = Bagnon:GetInventory()
+	if bags and bags:IsShown() then
+		bags:UpdateSearch()
+	end
+	
+	local bank = Bagnon:GetBank()
+	if bank and bank:IsShown() then
+		bank:UpdateSearch()
+	end
+end
+
+
+--[[ Access ]]--
+
+function BagnonSpot:Searching()
+	return (self.textSearch or self.bagSearch)
+end
+
+--returns the text of what we're searching for
+function BagnonSpot:GetSearch()
+	return self.textSearch, self.bagSearch
+end
+
+--returns what frame the edit box is anchored to, if any
+function BagnonSpot:GetAnchor()
+	if self.frame then
+		return self.frame.anchor
+	end
 end

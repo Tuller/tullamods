@@ -11,9 +11,8 @@ local Frame_mt = {__index = BagnonBag}
 local SIZE = 32
 local NORMAL_TEXTURE_SIZE = 64 * (SIZE / 37)
 local KEY_WIDTH = 18 * (SIZE / 37)
-local KEYRING_ICON = 'Interface\\Buttons\\UI-Button-KeyRing'
-local BACKPACK_ICON = 'Interface\\Buttons\\Button-Backpack-Up'
-
+local util = BagnonUtil
+local lastCreated = 0
 
 --[[ Bag Constructor ]]--
 
@@ -23,8 +22,22 @@ local function OnShow()  this:OnShow()  end
 local function OnClick() this:OnClick() end
 local function OnDrag()  this:OnDrag()  end
 
+local function LoadScripts(bag)
+	bag:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+	bag:RegisterForDrag("LeftButton")
+
+	bag:SetScript('OnShow', OnShow)
+	bag:SetScript('OnEnter', OnEnter)
+	bag:SetScript('OnLeave', OnLeave)
+	bag:SetScript('OnClick', OnClick)
+	bag:SetScript('OnDragStart', OnDrag)
+	bag:SetScript('OnReceiveDrag', OnClick)
+
+	lastCreated = lastCreated + 1
+end
+
 local function Bag_Create(id)
-	local name = format("BagnonBag%s", id)
+	local name = format("BagnonBag%s", lastCreated)
 	local bag = CreateFrame('Button', name)
 	setmetatable(bag, Frame_mt)
 
@@ -33,6 +46,9 @@ local function Bag_Create(id)
 
 	local icon = bag:CreateTexture(name .. "IconTexture", "BORDER")
 	icon:SetAllPoints(bag)
+	if id == 0 or id == -1 then
+		icon:SetTexture("Interface\\Buttons\\Button-Backpack-Up")
+	end
 
 	local count = bag:CreateFontString(name .. "Count", "BORDER")
 	count:SetFontObject("NumberFontNormal")
@@ -56,15 +72,38 @@ local function Bag_Create(id)
 	highlightTexture:SetAllPoints(bag)
 	bag:SetHighlightTexture(highlightTexture)
 
-	bag:RegisterForClicks("LeftButtonUp", "RightButtonUp")
-	bag:RegisterForDrag("LeftButton")
+	LoadScripts(bag)
 
-	bag:SetScript('OnShow', OnShow)
-	bag:SetScript('OnEnter', OnEnter)
-	bag:SetScript('OnLeave', OnLeave)
-	bag:SetScript('OnClick', OnClick)
-	bag:SetScript('OnDragStart', OnDrag)
-	bag:SetScript('OnReceiveDrag', OnClick)
+	return bag
+end
+
+local function Bag_CreateKey()
+	local name = format("BagnonBag%s", lastCreated)
+	local bag = CreateFrame('Button', name)
+	setmetatable(bag, Frame_mt)
+
+	bag:SetWidth(KEY_WIDTH)
+	bag:SetHeight(SIZE)
+
+	local normalTexture = bag:CreateTexture(name .. "NormalTexture")
+	normalTexture:SetTexture("Interface\\Buttons\\UI-Button-KeyRing")
+	normalTexture:SetAllPoints(bag)
+	normalTexture:SetTexCoord(0, 0.5625, 0, 0.609375)
+	bag:SetNormalTexture(normalTexture)
+
+	local pushedTexture = bag:CreateTexture()
+	pushedTexture:SetTexture("Interface\\Buttons\\UI-Button-KeyRing-Down")
+	pushedTexture:SetAllPoints(bag)
+	pushedTexture:SetTexCoord(0, 0.5625, 0, 0.609375)
+	bag:SetPushedTexture(pushedTexture)
+
+	local highlightTexture = bag:CreateTexture()
+	highlightTexture:SetTexture("Interface\\Buttons\\UI-Button-KeyRing-Highlight")
+	highlightTexture:SetAllPoints(bag)
+	highlightTexture:SetTexCoord(0, 0.5625, 0, 0.609375)
+	bag:SetHighlightTexture(highlightTexture)
+
+	LoadScripts(bag)
 
 	return bag
 end
@@ -73,35 +112,18 @@ end
 --[[ Constructor/Destructor  ]]--
 
 function BagnonBag.New(parent, id)
-	local bag = TPool.Get('BagnonBag', Bag_Create)
+	local bag
+	if id == KEYRING_CONTAINER then
+		bag = Bag_CreateKey()
+	else
+		bag = Bag_Create(id)
+	end
 	bag:SetID(id)
-	BagnonLib.Attach(bag, parent)
 
-	local name = bag:GetName()
-	if id <= 0 then
-		if id == 0 or id == -1 then
-			getglobal(name .. 'IconTexture'):SetTexture(BACKPACK_ICON)
-		elseif id == -2 then
-			getglobal(name .. 'IconTexture'):SetTexture(KEYRING_ICON)
-			getglobal(name .. 'IconTexture'):SetTexCoord(0, 0.5625, 0, 0.609375)
-			bag:GetNormalTexture():SetWidth(KEY_WIDTH)
-			bag:SetWidth(KEY_WIDTH)
-		end
-		bag:SetCount(0)
-	end
-
-	if id ~= -2 then
-		getglobal(name .. 'IconTexture'):SetTexCoord(0, 1, 0, 1)
-		bag:GetNormalTexture():SetWidth(NORMAL_TEXTURE_SIZE)
-		bag:SetWidth(SIZE)
-	end
+	util:Attach(bag, parent)
 	bag:Update()
 
 	return bag
-end
-
-function BagnonBag:Release()
-	TPool.Release(self, 'BagnonBag')
 end
 
 
@@ -135,12 +157,12 @@ function BagnonBag:Update()
 end
 
 function BagnonBag:UpdateLock()
-	local locked = IsInventoryItemLocked(BagnonLib.GetInvSlot(self:GetID()))
+	local locked = IsInventoryItemLocked(util:GetInvSlot(self:GetID()))
 	SetItemButtonDesaturated(self, locked)
 end
 
 function BagnonBag:UpdateCursor()
-	local invID = BagnonLib.GetInvSlot(self:GetID())
+	local invID = util:GetInvSlot(self:GetID())
 	if CursorCanGoInSlot(invID) then
 		self:LockHighlight()
 	else
@@ -157,25 +179,27 @@ function BagnonBag:UpdateTexture()
 
 	local player = parent:GetPlayer()
 
-	if BagnonLib.IsCachedBag(bagID, player) then
-		local link, count = select(2, BagnonDB.GetBagData(player, self:GetID()))
-		if link then
-			local texture = select(10, GetItemInfo(link))
-			SetItemButtonTexture(self, texture)
+	if util:IsCachedBag(bagID, player) then
+		if BagnonDB then
+			local link, count = select(2, BagnonDB:GetBagData(self:GetID(), player))
+			if link then
+				local texture = select(10, GetItemInfo(link))
+				SetItemButtonTexture(self, texture)
 
-			if texture then
-				self.hasItem = true
+				if texture then
+					self.hasItem = true
+				end
+			else
+				SetItemButtonTexture(self, nil)
+				self.hasItem = nil
 			end
-		else
-			SetItemButtonTexture(self, nil)
-			self.hasItem = nil
-		end
 
-		if count then
-			self:SetCount(count)
+			if count then
+				self:SetCount(count)
+			end
 		end
 	else
-		local texture = GetInventoryItemTexture("player", BagnonLib.GetInvSlot(self:GetID()))
+		local texture = GetInventoryItemTexture("player", util:GetInvSlot(self:GetID()))
 		if texture then
 			SetItemButtonTexture(self, texture)
 			self.hasItem = true
@@ -183,7 +207,7 @@ function BagnonBag:UpdateTexture()
 			SetItemButtonTexture(self, nil)
 			self.hasItem = nil
 		end
-		self:SetCount(GetInventoryItemCount("player", BagnonLib.GetInvSlot(self:GetID())))
+		self:SetCount(GetInventoryItemCount("player", util:GetInvSlot(self:GetID())))
 	end
 end
 
@@ -220,7 +244,7 @@ function BagnonBag:OnClick()
 	local player = parent:GetPlayer()
 	local bagID = self:GetID()
 
-	if not(BagnonLib.IsCachedBag(bagID, player)) and CursorHasItem() then
+	if not(util:IsCachedBag(bagID, player)) and CursorHasItem() then
 		if bagID == KEYRING_CONTAINER then
 			PutKeyInKeyRing()
 		elseif bagID == 0 then
@@ -229,7 +253,7 @@ function BagnonBag:OnClick()
 			PutItemInBag(ContainerIDToInventoryID(bagID))
 		end
 	else
-		parent:ShowBag(bagID, not parent:BagIsVisible(bagID))
+		parent:ShowBag(bagID, not parent:ShowingBag(bagID))
 	end
 end
 
@@ -238,9 +262,9 @@ function BagnonBag:OnDrag()
 	local player = parent:GetPlayer()
 	local bagID = self:GetID()
 
-	if not(BagnonLib.IsCachedBag(bagID, player) or bagID <= 0) then
+	if not(util:IsCachedBag(bagID, player) or bagID <= 0) then
 		PlaySound("BAGMENUBUTTONPRESS")
-		PickupBagFromSlot(BagnonLib.GetInvSlot(bagID))
+		PickupBagFromSlot(util:GetInvSlot(bagID))
 	end
 end
 
@@ -256,10 +280,10 @@ function BagnonBag:OnEnter()
 	local player = frame:GetPlayer()
 	local bagID = self:GetID()
 
-	BagnonLib.AnchorTooltip(self)
+	util:AnchorTooltip(self)
 
 	--mainmenubag specific code
-	local cached = BagnonLib.IsCachedBag(bagID, player)
+	local cached = util:IsCachedBag(bagID, player)
 	if bagID == 0 then
 		GameTooltip:SetText(TEXT(BACKPACK_TOOLTIP), 1, 1, 1)
 	elseif bagID == -1 then
@@ -269,29 +293,28 @@ function BagnonBag:OnEnter()
 		GameTooltip:SetText(KEYRING, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
 	--cached bags
 	elseif cached then
-		local link = select(2, BagnonDB.GetBagData(frame:GetPlayer(), bagID))
+		local link = select(2, BagnonDB:GetBagData(bagID, frame:GetPlayer()))
 		if link then
 			GameTooltip:SetHyperlink(link)
 		else
 			GameTooltip:SetText(TEXT(EQUIP_CONTAINER), 1, 1, 1)
 		end
-	elseif not GameTooltip:SetInventoryItem('player', BagnonLib.GetInvSlot(bagID)) then
+	elseif not GameTooltip:SetInventoryItem('player', util:GetInvSlot(bagID)) then
 		GameTooltip:SetText(TEXT(EQUIP_CONTAINER), 1, 1, 1)
 	end
 
-	if BagnonLib.GetSets().showTooltips then
-		if frame:BagIsVisible(bagID) then
+	if util:ShowingTooltips() then
+		if frame:ShowingBag(bagID) then
 			GameTooltip:AddLine(BAGNON_BAGS_HIDE)
 		else
 			GameTooltip:AddLine(BAGNON_BAGS_SHOW)
 		end
 	end
 	GameTooltip:Show()
-	
-	BagnonItem.SetBagSearch(bagID)
+	BagnonSpot:SetBagSearch(bagID)
 end
 
 function BagnonBag:OnLeave()
 	GameTooltip:Hide()
-	BagnonItem.SetBagSearch(nil)
+	BagnonSpot:SetBagSearch(nil)
 end

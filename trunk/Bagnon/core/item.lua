@@ -6,21 +6,26 @@
 BagnonItem = CreateFrame('Button')
 BagnonItem.SIZE = 37
 
+local util = BagnonUtil
+
 local Item_mt = {__index = BagnonItem}
 local UPDATE_DELAY = 0.3
 
 local bagSearch, nameSearch, qualitySearch
 local MAX_ITEMS_PER_BAG = 36
 
+local unused = {}
+local lastCreated = 1
 
---[[ Dummy Bag, this is set as the button's parent, in order to preserve compatiblity with normal bag slot functions and other mods ]]--
+
+--[[ this is set as the button's parent, in order to preserve compatiblity with normal bag slot functions and other mods ]]--
 
 local function DummyBag_Get(parent, bag)
 	local bagFrame = getglobal(parent:GetName() .. bag)
 	if not bagFrame then
 		bagFrame = CreateFrame('Frame', parent:GetName() .. bag, parent)
 		bagFrame:SetID(bag)
-		BagnonLib.Attach(bagFrame, parent)
+		util:Attach(bagFrame, parent)
 	end
 
 	return bagFrame
@@ -61,19 +66,20 @@ local function PostClick()
 	this:PostClick(arg1)
 end
 
-local function TakeItem(bag, slot)
-	local item = getglobal(format('ContainerFrame%dItem%d', bag, slot)) 
+
+--[[ Item Creation ]]--
+
+--creates an entierly new item slot, if no blizzard slots are available
+local function Item_Create()
+	local bag = ceil(lastCreated / MAX_ITEMS_PER_BAG)
+	local slot = mod(lastCreated - 1, MAX_ITEMS_PER_BAG) + 1
+
+	local item = getglobal(format('ContainerFrame%dItem%d', bag, slot))
 	if item then
 		item:SetParent(nil); item:SetID(0); item:Show()
-		return item
+	else
+		item = CreateFrame('Button', format('BagnonItem%s', lastCreated), nil, 'ContainerFrameItemButtonTemplate')
 	end
-end
-
-local function Item_Create(id)
-	local bag = ceil(id / MAX_ITEMS_PER_BAG)
-	local slot = mod(id - 1, MAX_ITEMS_PER_BAG) + 1
-
-	local item = TakeItem(bag, slot) or CreateFrame('Button', name, nil, 'ContainerFrameItemButtonTemplate')
 	setmetatable(item, Item_mt)
 	item:ClearAllPoints()
 
@@ -92,32 +98,53 @@ local function Item_Create(id)
 	item:SetScript('OnHide', OnHide)
 	item:SetScript('PostClick', PostClick)
 
+	lastCreated = lastCreated + 1
+
 	return item
+end
+
+--takes an item from the pool of unused items, or creates a new one
+local function Item_Get()
+	local item = next(unused)
+	if item then
+		unused[item] = nil
+		item:Show()
+		return item
+	end
+	return Item_Create()
+end
+
+--places the item in the pool of unused items
+local function Item_Release(item)
+	item:ClearAllPoints()
+	if item:IsMovable() then
+		item:SetUserPlaced(false)
+	end
+	item:SetParent(nil)
+	item:Hide()
+
+	unused[item] = true
 end
 
 
 --[[ Object Methods ]]--
 
 function BagnonItem.Get(parent, bag, slot)
-	local item = TPool.Get('BagnonItem', Item_Create)
-	BagnonLib.Attach(item, DummyBag_Get(parent, bag))
+	local item = Item_Get()
+	util:Attach(item, DummyBag_Get(parent, bag))
 	item:SetID(slot)
-	
+
 	return item
 end
 
 function BagnonItem:Release()
 	self.hasItem = nil
 	self.isLink = nil
-	TPool.Release(self, 'BagnonItem')
+	Item_Release(self)
 end
 
 
 --[[ Update Functions ]]--
-
--- BagnonItem.bagSearch
--- BagnonItem.nameSearch
--- BagnonItem.qualitySearch
 
 -- Update the texture, lock status, and other information about an item
 function BagnonItem:Update()
@@ -126,8 +153,8 @@ function BagnonItem:Update()
 	local bag = self:GetBag()
 	local player = self:GetPlayer()
 
-	if BagnonLib.IsCachedBag(bag, player) then
-		count, texture, quality = select(2, BagnonDB.GetItemData(player, bag, slot))
+	if util:IsCachedBag(bag, player) then
+		count, texture, quality = select(2, BagnonDB:GetItemData(bag, slot, player))
 		self.isLink = true
 	else
 		texture, count, locked, _, readable = GetContainerItemInfo(bag, slot)
@@ -152,39 +179,36 @@ function BagnonItem:Update()
 	else
 		self:UpdateBorder()
 	end
-	
+
 	if GameTooltip:IsOwned(self) then
 		self.elapsed = nil
 		self:OnEnter()
 	end
-	
-	if BagnonItem.Searching() then
+
+	if BagnonSpot:Searching() then
 		self:UpdateSearch()
 	end
 end
 
 function BagnonItem:UpdateSearch()
+	local textSearch, bagSearch = BagnonSpot:GetSearch()
+
 	if bagSearch then
 		if self:GetParent():GetID() ~= bagSearch then
 			self:Fade()
 			return
 		end
 	end
-	
-	if nameSearch or qualitySearch then	
-		local link = BagnonLib.GetItemLink(self:GetBag(), self:GetID(), self:GetPlayer())
+
+	if textSearch then
+		local link = util:GetItemLink(self:GetBag(), self:GetID(), self:GetPlayer())
 		if link then
 			local name, _, quality, itemLevel, minLevel, type, subType, _, equipLoc = GetItemInfo(link)
-			
-			if qualitySearch and qualitySearch ~= quality then
-				self:Fade()
-				return
-			end
-			
-			if nameSearch and nameSearch ~= type:lower() then
-				if not(subType) or nameSearch ~= subType:lower() then
-					if not(getglobal(equipLoc)) or nameSearch ~= getglobal(equipLoc):lower() then
-						if not name:lower():find(nameSearch) then
+
+			if textSearch and textSearch ~= type:lower() then
+				if not(subType) or textSearch ~= subType:lower() then
+					if not(getglobal(equipLoc)) or textSearch ~= getglobal(equipLoc):lower() then
+						if not name:lower():find(textSearch) then
 							self:Fade()
 							return
 						end
@@ -197,7 +221,7 @@ function BagnonItem:UpdateSearch()
 		end
 	end
 
-	if nameSearch or qualitySearch or bagSearch then
+	if textSearch or bagSearch then
 		self:Unfade(true)
 	else
 		self:Unfade()
@@ -208,7 +232,7 @@ function BagnonItem:UpdateBorder()
 	local border = getglobal(self:GetName() .. 'Border')
 	local link = GetContainerItemLink(self:GetBag() , self:GetID())
 
-	if BagnonLib.GetSets().qualityBorders and link then
+	if util:GetSets().qualityBorders and link then
 		local hex = link:match('|cff([%l%d]+)|H')
 		local r = tonumber(strsub(hex, 1, 2), 16)/256
 		local g = tonumber(strsub(hex, 3, 4), 16)/256
@@ -231,9 +255,9 @@ function BagnonItem:UpdateLinkBorder(quality)
 	local player = self:GetPlayer()
 	local border = getglobal(self:GetName() .. 'Border')
 
-	if BagnonLib.GetSets().qualityBorders and self.hasItem then
+	if util:GetSets().qualityBorders and self.hasItem then
 		if not quality then
-			quality = select(3, GetItemInfo((BagnonDB.GetItemData(player, bag, slot))))
+			quality = select(3, GetItemInfo((BagnonDB:GetItemData(bag, slot, player))))
 		end
 
 		if quality > 1 then
@@ -255,9 +279,9 @@ function BagnonItem:UpdateSlotBorder()
 
 	if bag == KEYRING_CONTAINER then
 		normalTexture:SetVertexColor(1, 0.7, 0)
-	elseif BagnonLib.IsAmmoBag(bag, player) then
+	elseif util:IsAmmoBag(bag, player) then
 		normalTexture:SetVertexColor(1, 1, 0)
-	elseif BagnonLib.IsProfessionBag(bag , player) then
+	elseif util:IsProfessionBag(bag , player) then
 		normalTexture:SetVertexColor(0, 1, 0)
 	else
 		normalTexture:SetVertexColor(1, 1, 1)
@@ -265,6 +289,7 @@ function BagnonItem:UpdateSlotBorder()
 end
 
 function BagnonItem:UpdateLock(locked)
+	local locked = select(3, GetContainerItemInfo(self:GetBag(), self:GetID()))
 	SetItemButtonDesaturated(self, locked)
 end
 
@@ -288,9 +313,9 @@ function BagnonItem:PostClick(mouseButton)
 			if this.hasItem then
 				if mouseButton == 'LeftButton' then
 					if IsControlKeyDown() then
-						DressUpItemLink((BagnonDB.GetItemData(self:GetPlayer(), self:GetBag(), self:GetID())))
+						DressUpItemLink((BagnonDB:GetItemData(self:GetBag(), self:GetID(), self:GetPlayer())))
 					elseif IsShiftKeyDown() then
-						ChatFrameEditBox:Insert(BagnonDB.GetItemData(self:GetPlayer(), self:GetBag(), self:GetID()))
+						ChatFrameEditBox:Insert(BagnonDB:GetItemData(self:GetBag(), self:GetID(), self:GetPlayer()))
 					end
 				end
 			end
@@ -309,15 +334,20 @@ function BagnonItem:OnEnter()
 	if self.isLink then
 		if self.hasItem then
 			local player = self:GetPlayer()
-			local link, count = BagnonDB.GetItemData(player, bag, slot)
+			local link, count = BagnonDB:GetItemData(bag, slot, player)
 
-			BagnonLib.AnchorTooltip(self)
+			util:AnchorTooltip(self)
 			GameTooltip:SetHyperlink(link, count)
 		end
 	else
 		if bag == -1 then
-			BagnonLib.AnchorTooltip(self)
-			GameTooltip:SetInventoryItem('player', BankButtonIDToInvSlotID(slot))
+			--this  is done instead of setting bank item because it allows me to hook tooltips properly, without screwing up some stuff
+			local link = GetInventoryItemLink('player', BankButtonIDToInvSlotID(slot))
+			if link then
+				local count = GetInventoryItemCount('player', BankButtonIDToInvSlotID(slot))
+				util:AnchorTooltip(self)
+				GameTooltip:SetHyperlink(link, count)
+			end
 		else
 			--hack to prevent a ContainerFrameItemButton_OnEnter issue
 			local prethis = this
@@ -357,7 +387,7 @@ function BagnonItem:Unfade(highlight)
 		self:SetAlpha(1)
 	end
 
-	if highlight and not BagnonLib.GetItemLink(self:GetBag(), self:GetID(), self:GetPlayer()) then
+	if highlight and not util:GetItemLink(self:GetBag(), self:GetID(), self:GetPlayer()) then
 		self:LockHighlight()
 	else
 		self:UnlockHighlight()
@@ -367,12 +397,9 @@ end
 function BagnonItem:GetPlayer()
 	local bag = self:GetParent()
 	if bag then
-		local container = bag:GetParent()
-		if container then
-			local frame = container:GetParent()
-			if frame then
-				return frame:GetPlayer()
-			end
+		local frame = bag:GetParent()
+		if frame then
+			return frame:GetPlayer()
 		end
 	end
 end
@@ -382,33 +409,4 @@ function BagnonItem:GetBag()
 	if bag then
 		return bag:GetID()
 	end
-end
-
-
---[[ Searching ]]--
-
-function BagnonItem.Searching()
-	return (nameSearch or qualitySearch or bagSearch)
-end
-
-function BagnonItem.ClearSearch()
-	nameSearch = nil
-	qualitySearch = nil
-
-	BagnonFrame.ForAllVisible('UpdateSearch')
-end
-
-function BagnonItem.SetBagSearch(bag)
-	bagSearch = tonumber(bag)
-	BagnonFrame.ForAllVisible('UpdateSearch')
-end
-
-function BagnonItem.SetQualitySearch(quality)
-	qualitySearch = tonumber(quality)
-	BagnonFrame.ForAllVisible('UpdateSearch')
-end
-
-function BagnonItem.SetNameSearch(name)
-	nameSearch = name
-	BagnonFrame.ForAllVisible('UpdateSearch')
 end

@@ -5,219 +5,185 @@
 BagnonBagFrame = CreateFrame('Frame')
 local Frame_mt = {__index = BagnonBagFrame}
 
-local HEIGHT_SHOWN = 52
-local HEIGHT_HIDDEN = 16
-local visible = {}
-
-
---[[ Toggle Button ]]--
+local lastCreated = 0
 
 local function Toggle_OnClick()
-	local parent = this:GetParent()
-	if parent.shown then
-		this:SetText(BAGNON_SHOWBAGS)
-	else
-		this:SetText(BAGNON_HIDEBAGS)
-	end
-	parent:ShowBags(not parent.shown)
-	
-	local purchaseFrame = parent:GetParent():GetPurchaseFrame()
-	if purchaseFrame then
-		purchaseFrame:UpdateVisibility()
-	end
-	
-	parent:GetParent().sizeChanged = true
-	parent:GetParent():Layout()
+	this:GetParent():ShowBags(not this:GetParent().shown, true)
 end
 
-local function Toggle_Create(parent)
+local function Toggle_New(parent, shown)
 	local toggle = CreateFrame('Button', nil, parent)
+	toggle:SetPoint('BOTTOMLEFT', parent)
 
 	local text = toggle:CreateFontString()
 	text:SetPoint('BOTTOMLEFT', toggle)
 	text:SetJustifyH('LEFT')
 	text:SetFontObject('GameFontNormal')
+
 	toggle:SetFontString(text)
 	toggle:SetHighlightTextColor(1, 1, 1)
 	toggle:SetTextColor(1, 0.82, 0)
-
 	toggle:RegisterForClicks('LeftButtonUp', 'RightButtonUp')
 	toggle:SetScript('OnClick', Toggle_OnClick)
-
 	toggle:SetPoint('TOPLEFT', parent, 'BOTTOMLEFT', 0, 18)
 	toggle:SetPoint('BOTTOMRIGHT', parent, 'BOTTOMRIGHT', 0, 4)
 
 	return toggle
 end
 
+local function BagFrame_OnEvent()
+	if this.shown then
+		if event == 'BAG_UPDATE' or event == 'PLAYERBANKSLOTS_CHANGED' or event == 'PLAYERBANKBAGSLOTS_CHANGED' then
+			this:Update()
+		elseif event == 'ITEM_LOCK_CHANGED' then
+			this:UpdateLock()
+		elseif event == 'CURSOR_UPDATE' then
+			this:UpdateCursor()
+		elseif event == 'BANKFRAME_OPENED' or event == 'BANKFRAME_CLOSED' then
+			this:UpdatePurchase()
+		end
+	end
+end
 
---[[ Constructor ]]--
-
-local function OnShow() this:OnShow() end
-local function OnHide() this:OnHide() end
-
-local function BagFrame_Create(id)
-	local frame = CreateFrame('Frame', format('BagnonBagFrame%s', id))
+local function BagFrame_Create()
+	local frame = CreateFrame('Frame', format('BagnonBag%s', lastCreated))
 	setmetatable(frame, Frame_mt)
+	frame.bags = {}
+	frame:SetScript('OnEvent', BagFrame_OnEvent)
 
-	frame.frames = {}
-	frame.toggle = Toggle_Create(frame)
-
-	frame:SetScript('OnShow', OnShow)
-	frame:SetScript('OnHide', OnHide)
+	lastCreated = lastCreated + 1
 
 	return frame
 end
 
 
---[[ Constructor/Destructor ]]--
+--[[ Usable Functions ]]--
 
-function BagnonBagFrame.New(parent, show)
-	local frame = TPool.Get('BagnonBagFrame', BagFrame_Create)
-	BagnonLib.Attach(frame, parent)
+function BagnonBagFrame.New(parent, bags, isBank, shown)
+	local frame = BagFrame_Create()
+	BagnonUtil:Attach(frame, parent)
+
+	frame.toggle = Toggle_New(frame, shown)
+
+	for i, bagID in ipairs(bags) do
+		frame.bags[i] = BagnonBag.New(frame, bagID)
+	end
+
+	if isBank then
+		frame.purchase = BagnonPurchase.New(frame)
+		frame.purchase:SetPoint('TOPLEFT', frame, 'TOPLEFT', -2, 2)
+		frame:RegisterEvent('BANKFRAME_OPENED')
+		frame:RegisterEvent('BANKFRAME_CLOSED')
+	end
+
+	frame:RegisterEvent('BAG_UPDATE')
+	frame:RegisterEvent('PLAYERBANKSLOTS_CHANGED')
+	frame:RegisterEvent('PLAYERBANKBAGSLOTS_CHANGED')
+	frame:RegisterEvent('ITEM_LOCK_CHANGED')
+	frame:RegisterEvent('CURSOR_UPDATE')
+
+	frame:ShowBags(shown)
+
+	return frame
+end
+
+function BagnonBagFrame:Layout()
+	local width = self:GetToggleWidth()
+	local height = 18
+
+	if self.shown then
+		if self.purchase and self.purchase:IsShown() then
+			height = height + self.purchase:GetHeight() + 4
+		end
+
+		local bagWidth = 0
+		for i, bag in ipairs(self.bags) do
+			bag:Show()
+			bag:ClearAllPoints()
+			if i > 1 then
+				bag:SetPoint('BOTTOMLEFT', self.bags[i-1], 'BOTTOMRIGHT', 2, 0)
+			else
+				height = height + bag:GetHeight()
+
+				if self.purchase and self.purchase:IsShown() then
+					bag:SetPoint('TOPLEFT', self.purchase, 'BOTTOMLEFT', 2, -4)
+				else
+					bag:SetPoint('TOPLEFT', self, 'TOPLEFT', 2, 0)
+				end
+			end
+			bagWidth = bagWidth + bag:GetWidth() + 2
+		end
+
+		if self.purchase then
+			width = max(bagWidth, width, self.purchase:GetWidth())
+		else
+			width = max(bagWidth, width)
+		end
+	else
+		if self.purchase then
+			self.purchase:Hide()
+		end
+		for _,bag in ipairs(self.bags) do
+			bag:Hide()
+		end
+	end
+
+	self:SetWidth(width)
+	self:SetHeight(height)
+end
+
+function BagnonBagFrame:UpdatePurchase()
+	if self.purchase then
+		local wasShown = self.purchase:IsShown()
+		self.purchase:UpdateShown()
+		self:Layout()
+		self:GetParent():Layout()
+	end
+end
+
+function BagnonBagFrame:ShowBags(show, updateParent)
+	self.shown = show
+	
+	if self.purchase then
+		self.purchase:UpdateShown()
+	end
 
 	if show then
-		frame.toggle:SetText(BAGNON_HIDEBAGS)
+		self.toggle:SetText(BAGNON_HIDEBAGS)
 	else
-		frame.toggle:SetText(BAGNON_SHOWBAGS)
+		self.toggle:SetText(BAGNON_SHOWBAGS)
 	end
-	frame:ShowBags(show)
 
-	return frame
-end
-
-function BagnonBagFrame:Release()
-	self:RemoveAllBags()
-	TPool.Release(self, 'BagnonBagFrame')
-end
-
-
---[[ Show/Hide Bags ]]--
-
-function BagnonBagFrame:ShowBags(enable)
-	if enable then
-		self.shown = true
-		self:GetParent().showBags = true
-		self:Update()
-	else
-		self.shown = nil
-		self:GetParent().showBags = nil
-		self:RemoveAllBags()
-	end
-	
 	self:Layout()
+
+	if updateParent then
+		self:GetParent():Layout()
+	end
 end
-
-function BagnonBagFrame:BagsShown()
-	return self.shown
-end
-
-
---[[ Updating ]]--
 
 function BagnonBagFrame:Update()
-	for _,bag in pairs(self.frames) do
+	self:UpdateBags()
+	self:UpdatePurchase()
+end
+
+function BagnonBagFrame:UpdateBags()
+	for _, bag in pairs(self.bags) do
 		bag:Update()
 	end
 end
 
 function BagnonBagFrame:UpdateLock()
-	for _,bag in pairs(self.frames) do
+	for _, bag in pairs(self.bags) do
 		bag:UpdateLock()
 	end
 end
 
 function BagnonBagFrame:UpdateCursor()
-	for _,bag in pairs(self.frames) do
+	for _, bag in pairs(self.bags) do
 		bag:UpdateCursor()
 	end
 end
 
-function BagnonBagFrame:RemoveAllBags()
-	for i, bag in pairs(self.frames) do
-		self.frames[i] = nil
-		bag:Release()
-	end
-end
-
-
---[[ Layout Functions ]]--
-
-function BagnonBagFrame:NewBag(id)
-	self.frames[id] = BagnonBag.New(self, id)
-	return self.frames[id]
-end
-
-function BagnonBagFrame:Layout()
-	local width = 0
-	if self.shown then
-		local prev
-		local bags = self:GetParent():GetBags()
-		for _,id in pairs(bags) do
-			local bag = self.frames[id] or self:NewBag(id)
-			bag:ClearAllPoints()
-
-			if prev then
-				bag:SetPoint('BOTTOMLEFT', prev, 'BOTTOMRIGHT', 2, 0)
-			else
-				bag:SetPoint('TOPLEFT', self, 'TOPLEFT', 0, 2)
-			end
-
-			width = width + bag:GetWidth() + 2
-			prev = bag
-		end
-		self:SetHeight(HEIGHT_SHOWN)
-	else
-		self:SetHeight(HEIGHT_HIDDEN)
-	end
-	self:SetWidth(max(width, self:GetTitleWidth()))
-end
-
-function BagnonBagFrame:GetTitleWidth()
+function BagnonBagFrame:GetToggleWidth()
 	return self.toggle:GetTextWidth()
 end
-
-
---[[ Frame Events ]]--
-
-function BagnonBagFrame:OnShow()
-	visible[self] = true
-	if self.shown then
-		self:Update()
-	end
-end
-
-function BagnonBagFrame:OnHide()
-	visible[self] = nil
-end
-
-
---[[ Events ]]--
-
-local function UpdateVisibleBags()
-	for frame in pairs(visible) do
-		if frame.shown then
-			frame:Update()
-		end
-	end
-end
-BVent:AddAction('BANKFRAME_OPENED', UpdateVisibleBags)
-BVent:AddAction('BAG_UPDATE', UpdateVisibleBags)
-BVent:AddAction('PLAYERBANKSLOTS_CHANGED', UpdateVisibleBags)
-BVent:AddAction('PLAYERBANKBAGSLOTS_CHANGED', UpdateVisibleBags)
-
-BVent:AddAction('ITEM_LOCK_CHANGED', function()
-	for frame in pairs(visible) do
-		if frame.shown then
-			frame:UpdateLock()
-		end
-	end
-end)
-
-BVent:AddAction('CURSOR_UPDATE', function()
-	for frame in pairs(visible) do
-		if frame.shown then
-			frame:UpdateCursor()
-		end
-	end
-end)

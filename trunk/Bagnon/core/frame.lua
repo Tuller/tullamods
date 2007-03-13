@@ -1,6 +1,9 @@
 ﻿--[[
 	BagnonFrame
 		A container frame for categories, tabs, bags, money, and purchasing bags
+
+	Each frame contains its own list of slots, index by what bag and what slot it is in
+	The index, bag slot 0 is used to store size information about each bag.
 --]]
 
 BagnonFrame = CreateFrame('Frame')
@@ -9,117 +12,108 @@ local Frame_mt = {__index = BagnonFrame}
 local DEFAULT_COLS = 8
 local DEFAULT_SPACING = 1
 local DEFAULT_STRATA = 'HIGH'
+local ITEM_SIZE = BagnonItem.SIZE
 
 local currentPlayer = UnitName('player')
-local visible = {}
-local used = {}
-local backdrop = {
-  bgFile = 'Interface\\ChatFrame\\ChatFrameBackground',
-  edgeFile = 'Interface\\Tooltips\\UI-Tooltip-Border',
-  edgeSize = 16,
-  tile = true, tileSize = 16,
-  insets = {left = 4, right = 4, top = 4, bottom = 4}
-}
+local lastCreated = 0
+local util = BagnonUtil
 
 
 --[[ utility functions ]]--
+
+local function ToIndex(bag, slot)
+	if bag < 0 then
+		return bag * 100 - slot
+	else
+		return bag * 100 + slot
+	end
+end
 
 local function NormalSort(a, b)
 	return a ~= -2 and (b == -2 or a < b)
 end
 
-local function ReverseSort(a, b)
-	return a ~= 2 and not(b == -2 or a < b)
-end
-
-
---[[ Frame Events ]]--
-
-local function OnClick() this:GetParent():OnClick(arg1) end
-local function OnDoubleClick() this:GetParent():OnDoubleClick(arg1) end
-local function OnMouseDown() this:GetParent():OnMouseDown() end
-local function OnMouseUp() this:GetParent():OnMouseUp() end
-
-local function OnEnter()
-	this:GetParent():OnEnter(this)
-end
-
-local function OnLeave()
-	this:GetParent():OnLeave(this)
-end
-
-local function OnShow()
-	visible[this] = true
-	this:UpdateAllItems()
-end
-
-local function OnHide()
-	visible[this] = nil
-
-	if BagnonMenu and BagnonMenu.frame == this then
+local function HideAttachedMenus(frame)
+	if BagnonMenu and BagnonMenu.frame == frame then
 		BagnonMenu:Hide()
 	end
 	
-	if BagnonSpot and BagnonSpot.frame == this then
+	if BagnonSpot:GetAnchor() == frame then
 		BagnonSpot:Hide()
 	end
-	
-	if BagnonDBUICharacterList and BagnonDBUICharacterList.frame == this then
+
+	if BagnonDBUICharacterList and BagnonDBUICharacterList.frame == frame then
 		BagnonDBUICharacterList:Hide()
 	end
 end
 
-local function Frame_Create(id)
-	local name = format('Bagnon%d', id)
-	local frame = CreateFrame('Frame', name, UIParent)
-	setmetatable(frame, Frame_mt)
 
-	frame:SetClampedToScreen(true)
-	frame:SetMovable(true)
-	frame:SetBackdrop(backdrop)
-	frame.borderSize = 16
+--[[ stuff for creating a new frame ]]--
 
-	local close = CreateFrame('Button', name .. 'Close', frame, 'UIPanelCloseButton')
-	close:SetPoint('TOPRIGHT', frame, 'TOPRIGHT', 6 - frame.borderSize/2, 6 - frame.borderSize/2)
-	
-	if BagnonDB then
-		local playerDropdown = CreateFrame('Button', name .. 'DropDown', frame, 'BagnonDBUIDropDownButton')
-		playerDropdown:SetPoint('TOPLEFT', frame, 'TOPLEFT', frame.borderSize/2 -2, -6)
-	end
+local function CreateTitle(parent)
+	local title = CreateFrame('Button', parent:GetName() .. 'Title', parent)
 
-	local title = CreateFrame('Button', name .. 'Title', frame)
-	if BagnonDB then
-		title:SetPoint('TOPLEFT', frame, 'TOPLEFT', 26 + frame.borderSize/2, -10)
-	else
-		title:SetPoint('TOPLEFT', frame, 'TOPLEFT', 6 + frame.borderSize/2, -10)
-	end
-	title:SetPoint('BOTTOMRIGHT', frame, 'TOPRIGHT', -26, -16 - frame.borderSize/2)
-	frame.paddingY = 16
-
-	local titleText = title:CreateFontString()
-	titleText:SetAllPoints(title)
-	titleText:SetJustifyH('LEFT')
-	titleText:SetFontObject('GameFontNormal')
-	title:SetFontString(titleText)
+	local text = title:CreateFontString()
+	text:SetAllPoints(title)
+	text:SetJustifyH('LEFT')
+	text:SetFontObject('GameFontNormal')
+	title:SetFontString(text)
 
 	title:SetHighlightTextColor(1, 1, 1)
 	title:SetTextColor(1, 0.82, 0)
 	title:RegisterForClicks('LeftButtonUp', 'LeftButtonDown', 'RightButtonUp', 'RightButtonDown')
 
-	title:SetScript('OnClick', OnClick)
-	title:SetScript('OnDoubleClick', OnDoubleClick)
-	title:SetScript('OnEnter', OnEnter)
-	title:SetScript('OnLeave', OnLeave)
-	title:SetScript('OnMouseUp', OnMouseUp)
-	title:SetScript('OnMouseDown', OnMouseDown)
+	title:SetScript('OnClick', function() this:GetParent():OnClick(arg1) end)
+	title:SetScript('OnDoubleClick', function() this:GetParent():OnDoubleClick(arg1) end)
+	title:SetScript('OnEnter', function() this:GetParent():OnEnter(this) end)
+	title:SetScript('OnLeave', function() this:GetParent():OnLeave(this) end)
+	title:SetScript('OnMouseUp', function() this:GetParent():OnMouseUp() end)
+	title:SetScript('OnMouseDown', function() this:GetParent():OnMouseDown() end)
+
+	return title
+end
+
+local function Frame_Create()
+	local name = format('BagnonFrame%d', lastCreated)
+	local frame = CreateFrame('Frame', name, UIParent)
+	setmetatable(frame, Frame_mt)
+
+	frame.slots = {}
+
+	frame:SetClampedToScreen(true)
+	frame:SetMovable(true)
+	frame:SetBackdrop({
+	  bgFile = 'Interface\\ChatFrame\\ChatFrameBackground',
+	  edgeFile = 'Interface\\Tooltips\\UI-Tooltip-Border',
+	  edgeSize = 16,
+	  tile = true, tileSize = 16,
+	  insets = {left = 4, right = 4, top = 4, bottom = 4}
+	})
+	frame.borderSize = 16
+
+	local close = CreateFrame('Button', name .. 'Close', frame, 'UIPanelCloseButton')
+	close:SetPoint('TOPRIGHT', frame, 'TOPRIGHT', 6 - frame.borderSize/2, 6 - frame.borderSize/2)
+
+	if BagnonDB then
+		local playerDropdown = CreateFrame('Button', name .. 'DropDown', frame, 'BagnonDBUIDropDownButton')
+		playerDropdown:SetPoint('TOPLEFT', frame, 'TOPLEFT', frame.borderSize/2 -2, -6)
+	end
+
+	local title = CreateTitle(frame)
+	if BagnonDB then
+		title:SetPoint('TOPLEFT', frame, 'TOPLEFT', 26 + frame.borderSize/2, -10)
+	else
+		title:SetPoint('TOPLEFT', frame, 'TOPLEFT', 6 + frame.borderSize/2, -10)
+	end
+	title:SetPoint('BOTTOMRIGHT', frame, 'TOPRIGHT', -24, -16 - frame.borderSize/2)
+	frame.paddingY = 24
 
 	frame:Hide()
 
+	lastCreated = lastCreated + 1
+
 	return frame
 end
-
-
---[[ Frame Constructor ]]--
 
 local function LoadSettings(frame, sets)
 	frame.sets  = sets
@@ -139,40 +133,47 @@ local function LoadSettings(frame, sets)
 end
 
 local function PlaceAndUpdate(frame)
-	used[frame] = true
-	visible[frame] = true
-
 	if not frame:IsUserPlaced() then
 		frame:SetPoint('CENTER', UIParent)
 	end
 
 	table.sort(frame:GetVisibleBags(), NormalSort)
-	frame:UpdateTitle()
-
-	frame:UpdateAllItems()
-	frame:Show()
+	if not frame:IsShown() then
+		frame:Show()
+	else
+		frame:Regenerate()
+	end
 end
 
+
+--[[ usable functions ]]--
+
 function BagnonFrame.New(name, sets, bags, isBank)
-	local frame = TPool.Get('BagnonFrame', Frame_Create)
+	local frame = Frame_Create()
 	frame:SetParent(UIParent)
 
 	LoadSettings(frame, sets)
 
-	frame.shownBags = sets.bags
 	frame.showBags = sets.showBags
+	frame.shownBags = sets.bags
 	frame.bags = bags
+	frame.isBank = isBank
 
-	frame:SetTitle(name)
+	frame.bagFrame = BagnonBagFrame.New(frame, bags, isBank, sets.showBags)
+	frame.moneyFrame = BagnonMoney.New(frame)
 
-	frame:AddItemFrame()
-	frame:AddMoneyFrame()
-	frame:AddBagFrame()
+	frame:SetTitleText(name)
+
+	frame:SetScript('OnShow', function() frame:OnShow() end)
+	frame:SetScript('OnHide', function() frame:OnHide() end)
+	frame:SetScript('OnEvent', function() frame:OnEvent() end)
+
+	frame:RegisterEvent('BAG_UPDATE')
+	frame:RegisterEvent('ITEM_LOCK_CHANGED')
+	frame:RegisterEvent('BAG_UPDATE_COOLDOWN')
 	if isBank then
-		frame:AddPurchaseFrame()
+		frame:RegisterEvent('PLAYERBANKSLOTS_CHANGED')
 	end
-	frame:SetScript('OnShow', OnShow)
-	frame:SetScript('OnHide', OnHide)
 
 	PlaceAndUpdate(frame)
 
@@ -180,7 +181,21 @@ function BagnonFrame.New(name, sets, bags, isBank)
 end
 
 
---[[ Frame Events ]]--
+--[[ frame events ]]--
+
+function BagnonFrame:OnEvent()
+	if self:IsShown() and not self:IsCached() then
+		if event == 'BAG_UPDATE' then
+			self:OnBagUpdate(arg1)
+		elseif event == 'ITEM_LOCK_CHANGED' then
+			self:UpdateLockedSlots()
+		elseif event == 'BAG_UPDATE_COOLDOWN' then
+			self:UpdateSlotsOnCooldown()
+		elseif event == 'PLAYERBANKSLOTS_CHANGED' then
+			self:OnBagUpdate(-1)
+		end
+	end
+end
 
 function BagnonFrame:OnClick(button)
 	if button == 'RightButton' then
@@ -190,7 +205,7 @@ end
 
 function BagnonFrame:OnDoubleClick(button)
 	if button == 'LeftButton' then
-		BagnonSpot_Show(self)
+		BagnonSpot:Show(self)
 	end
 end
 
@@ -206,10 +221,10 @@ function BagnonFrame:OnMouseUp()
 end
 
 function BagnonFrame:OnEnter(title)
-	if BagnonLib.GetSets().showTooltips then
-		BagnonLib.AnchorTooltip(title)
+	if util:ShowingTooltips() then
+		util:AnchorTooltip(title)
 
-		GameTooltip:SetText(self:GetTitle(), 1, 1, 1)
+		GameTooltip:SetText(self:GetTitleText(), 1, 1, 1)
 		GameTooltip:AddLine(BAGNON_TITLE_SHOW_MENU)
 		GameTooltip:AddLine(BAGNON_SPOT_TOOLTIP)
 		GameTooltip:Show()
@@ -220,37 +235,39 @@ function BagnonFrame:OnLeave()
 	GameTooltip:Hide()
 end
 
+function BagnonFrame:OnShow()
+	self:Regenerate()
+end
 
---[[
-	Update Functions
----]]
+function BagnonFrame:OnHide()
+	HideAttachedMenus(self)
+end
 
 
 --[[ bag updating ]]--
 
 function BagnonFrame:ShowBag(bag, enable)
 	if enable then
-		if not self:BagIsVisible(bag) then
+		if not self:ShowingBag(bag) then
 			local bags = self:GetVisibleBags()
 			table.insert(bags, bag)
 			table.sort(bags, NormalSort)
 
-			self:GetItemFrame():AddBag(bag)
+			self:AddBag(bag, true)
 		end
 	else
-		local index = self:BagIsVisible(bag)
+		local index = self:ShowingBag(bag)
 		if index then
 			local bags = self:GetVisibleBags()
 			table.remove(bags, index)
 			table.sort(bags, NormalSort)
 
-			self:GetItemFrame():RemoveBag(bag)
+			self:RemoveBag(bag)
 		end
 	end
-	self:Layout()
 end
 
-function BagnonFrame:BagIsVisible(bag)
+function BagnonFrame:ShowingBag(bag)
 	for i, visibleBag in pairs(self:GetVisibleBags()) do
 		if visibleBag == bag then
 			return i
@@ -269,47 +286,130 @@ end
 
 --[[ item updating ]]--
 
-function BagnonFrame:UpdateLock(bag, slot, locked)
-	if self:BagIsVisible(bag) then
-		self:GetItemFrame():UpdateLock(bag, slot, locked)
-	end
+function BagnonFrame:AddItem(bag, slot)
+	local item = BagnonItem.Get(self, bag, slot)
+	self.slots[ToIndex(bag, slot)] = item
+	item:Update()
 end
-
-function BagnonFrame:UpdateCooldown(bag, slot)
-	if self:BagIsVisible(bag) then
-		self:GetItemFrame():UpdateCooldown(bag, slot)
-	end
-end
-
-function BagnonFrame:UpdateItem(bag, slot, texture)
-	if self:BagIsVisible(bag) then
-		self:GetItemFrame():UpdateItem(bag, slot, texture)
-		self:Layout()
-	end
-end
-
-function BagnonFrame:UpdateAllItems()
-	self:GetItemFrame():UpdateAllItems()
-	self:Layout()
-end
-
-
---[[ item removal ]]--
 
 function BagnonFrame:RemoveItem(bag, slot)
-	self:GetItemFrame():RemoveItem(bag, slot)
+	local item = self.slots[ToIndex(bag, slot)]
+	self.slots[ToIndex(bag, slot)] = nil
+	item:Release()
+end
+
+
+--[[ Frame Updating ]]--
+
+--add any added slots, removed any removed slots, update the rest of the slots held by the bag
+function BagnonFrame:Regenerate()
+	self.bagFrame:Update()
+
+	local sizeChanged = false
+	local slots = self.slots
+	
+	for _, bag in ipairs(self.shownBags) do
+		local prevSize = slots[bag*100] or 0
+		local size = util:GetBagSize(bag, self:GetPlayer())
+		slots[bag * 100] = size
+
+		for slot = 1, min(prevSize, size) do
+			local item = self.slots[ToIndex(bag, slot)]
+			item:Update()
+		end
+
+		if size > prevSize then
+			for slot = prevSize + 1, size do
+				self:AddItem(bag, slot)
+			end
+			sizeChanged = true
+		elseif size < prevSize then
+			for slot = size + 1, prevSize do
+				self:RemoveItem(bag, slot)
+			end
+			sizeChanged = true
+		end
+	end
+
+	if sizeChanged then self:Layout() end
+end
+
+--add any added slots, removed any removed slots, update all the slots of the bag being updated
+function BagnonFrame:OnBagUpdate(updatedBag)
+	local sizeChanged = false
+	local slots = self.slots
+
+	for _, bag in ipairs(self.shownBags) do
+		local prevSize = slots[bag*100] or 0
+		local size = util:GetBagSize(bag, self:GetPlayer())
+		slots[bag * 100] = size
+
+		if bag == updatedBag then
+			for slot = 1, min(prevSize, size) do
+				local item = self.slots[ToIndex(bag, slot)]
+				item:Update()
+			end
+		end
+
+		if size > prevSize then
+			for slot = prevSize + 1, size do
+				self:AddItem(bag, slot)
+			end
+			sizeChanged = true
+		elseif size < prevSize then
+			for slot = size + 1, prevSize do
+				self:RemoveItem(bag, slot)
+			end
+			sizeChanged = true
+		end
+	end
+
+	if sizeChanged then self:Layout() end
+end
+
+function BagnonFrame:AddBag(bag)
+	local prevSize = self.slots[bag * 100] or 0
+	local size = util:GetBagSize(bag, self:GetPlayer())
+	self.slots[bag * 100] = size
+
+	for slot = 1, size do
+		self:AddItem(bag, slot)
+	end
 	self:Layout()
 end
 
-function BagnonFrame:RemoveAllItems()
-	self:GetItemFrame():RemoveAllItems()
+function BagnonFrame:RemoveBag(bag)
+	for slot = 1, util:GetBagSize(bag, self:GetPlayer()) do
+		self:RemoveItem(bag, slot)
+	end
+	self:Layout()
+end
+
+function BagnonFrame:UpdateLockedSlots()
+	for _, item in pairs(self.slots) do
+		if not tonumber(item) then
+			item:UpdateLock()
+		end
+	end
+end
+
+function BagnonFrame:UpdateSlotsOnCooldown()
+	for _, item in pairs(self.slots) do
+		if not tonumber(item) then
+			item:UpdateCooldown()
+		end
+	end
 end
 
 
 --[[ spot searching ]]--
 
 function BagnonFrame:UpdateSearch()
-	self:GetItemFrame():UpdateSearch()
+	for _, item in pairs(self.slots) do
+		if not tonumber(item) then
+			item:UpdateSearch()
+		end
+	end
 end
 
 
@@ -318,40 +418,24 @@ end
 function BagnonFrame:SetPlayer(player)
 	self.player = player
 
-	self:RemoveAllItems()
-	self:UpdateAllItems()
-	self:UpdateTitle()
-	self:UpdateMoneyFrame()
-	
-	local bagFrame = self:GetBagFrame()
-	if bagFrame then
-		bagFrame:Update()
-	end
-	
-	local purchaseFrame = self:GetPurchaseFrame()
-	if purchaseFrame then
-		purchaseFrame:UpdateVisibility()
-	end
+	self:UpdateTitleText()
+	self.bagFrame:Update()
+	self.moneyFrame:Update()
+	self:Regenerate()
 end
 
 function BagnonFrame:GetPlayer()
 	return self.player or currentPlayer
 end
 
+function BagnonFrame:IsCached()
+	return (self:GetPlayer() ~= currentPlayer) or (self.isBank and not util:AtBank())
+end
 
---[[
-	Layout Functions
---]]
+
+--[[ layout ]]--
 
 function BagnonFrame:Layout(cols, space)
-	cols = cols or self.cols or DEFAULT_COLS
-	space = space or self.space or DEFAULT_SPACING
-	self.cols = self.cols or DEFAULT_COLS
-	self.space = self.space or DEFAULT_SPACING
-
-	if not(self:IsShown() and (self.sizeChanged or self.cols ~= cols or self.space ~= space)) then return end
-	self.sizeChanged = nil
-
 	cols = cols or self.cols or DEFAULT_COLS
 	space = space or self.space or DEFAULT_SPACING
 	self.cols = cols
@@ -359,54 +443,48 @@ function BagnonFrame:Layout(cols, space)
 
 	local borderSize = self.borderSize or 0
 	local paddingY = self.paddingY or 0
-	local height = 0
-	local width = 0
 
-	local itemFrame = self:GetItemFrame()
-	itemFrame:Layout()
-	itemFrame:ClearAllPoints()
-	itemFrame:SetPoint('TOPLEFT', self, 'TOPLEFT', borderSize/2, -(paddingY + borderSize/2))
+	local width, height = self:LayoutItems(cols, space, borderSize/2, borderSize/2 + paddingY)
 
-	height = itemFrame:GetHeight() + paddingY + borderSize
-	width  = itemFrame:GetWidth()
+	local bags = self.bagFrame
+	local money = self.moneyFrame
 
-	local purchaseFrame = self:GetPurchaseFrame()
-	if purchaseFrame and purchaseFrame:ShouldShow() then
-		purchaseFrame:SetPoint('TOPLEFT', self, 'TOPLEFT', borderSize/2 - 3, -height)
+	bags:SetPoint('BOTTOMLEFT', self, 'BOTTOMLEFT', borderSize/2, borderSize/2)
+	money:SetPoint('BOTTOMRIGHT', self, 'BOTTOMRIGHT', borderSize/2 - 2, borderSize/2)
 
-		height = height + purchaseFrame:GetHeight() + 8
-		width = max(width, purchaseFrame:GetWidth())
+	height = height + max(bags:GetHeight(), money:GetHeight())
+	if bags.shown then
+		height = height + 8
 	end
-
-	local moneyFrame = self:GetMoneyFrame()
-	local bagFrame = self:GetBagFrame()
-
-	if bagFrame and moneyFrame then
-		height = height + max(bagFrame:GetHeight(), moneyFrame:GetHeight()) + 4
-		width = max(width, moneyFrame:GetWidth() + bagFrame:GetTitleWidth(), bagFrame:GetWidth())
-	elseif bagFrame then
-		height = height + bagFrame:GetHeight() + 4
-		width = max(width, bagFrame:GetWidth())
-	elseif moneyFrame then
-		height = height + moneyFrame:GetHeight() + 4
-		width = max(width, moneyFrame:GetWidth())
-	end
-
-	if bagFrame then
-		bagFrame:ClearAllPoints()
-		bagFrame:SetPoint('BOTTOMLEFT', self, 'BOTTOMLEFT', borderSize/2, borderSize/2 - 4)
-	end
-
-	if moneyFrame then
-		moneyFrame:ClearAllPoints()
-		moneyFrame:SetPoint('BOTTOMRIGHT', self, 'BOTTOMRIGHT', 10 - borderSize/2, borderSize/2)
-	end
+	width = max(width, money:GetWidth() + bags:GetToggleWidth() - 4, bags:GetWidth())
 
 	width = max(width + borderSize, 48)
-	height = max(height, 48)
+	height = max(height + borderSize + paddingY, 48)
 
-	self:SetHeight(height)
-	self:SetWidth(width)
+	self:SetHeight(height); self:SetWidth(width)
+end
+
+function BagnonFrame:LayoutItems(cols, space, offX, offY)
+	if not next(self.slots) then return 0, 0 end
+
+	local itemSize = ITEM_SIZE + space
+	local slots = self.slots
+	local player = self:GetPlayer()
+
+	local i = 0
+	for _,bag in ipairs(self.shownBags) do
+		for slot = 1, util:GetBagSize(bag, player) do
+			local item = slots[ToIndex(bag, slot)]
+			if item then
+				i = i + 1
+				local row = mod(i - 1, cols)
+				local col = ceil(i / cols) - 1
+				item:SetPoint('TOPLEFT', self, 'TOPLEFT', itemSize * row + offX, -(itemSize * col + offY))
+			end
+		end
+	end
+
+	return itemSize * min(cols, i) - space, itemSize * ceil(i / cols) - space
 end
 
 function BagnonFrame:GetLayout()
@@ -427,7 +505,6 @@ end
 function BagnonFrame:IsLocked()
 	return self.sets.lock
 end
-
 
 function BagnonFrame:Reposition()
 	local x, y, scale, parentScale = self:GetPosition()
@@ -478,163 +555,17 @@ function BagnonFrame:GetBackgroundColor()
 end
 
 
+--[[ title ]]--
 
---[[
-	Subframes
---]]
-
-
---[[ Item Frame ]]--
-
-function BagnonFrame:AddItemFrame()
-	if not self.itemFrame then
-		self.itemFrame = BagnonCat.New(self)
-	end
+function BagnonFrame:SetTitleText(text)
+	self.titleText = text
+	self:UpdateTitleText()
 end
 
-function BagnonFrame:GetItemFrame()
-	return self.itemFrame
+function BagnonFrame:UpdateTitleText()
+	getglobal(self:GetName() .. 'Title'):SetText(self:GetTitleText())
 end
 
-
---[[ Title Frame ]]--
-
-function BagnonFrame:SetTitle(name)
-	self.name = name
-	self:UpdateTitle()
+function BagnonFrame:GetTitleText()
+	return format(self.titleText or self:GetName(), self:GetPlayer())
 end
-
-function BagnonFrame:UpdateTitle()
-	getglobal(self:GetName() .. 'Title'):SetText(self:GetTitle())
-end
-
-function BagnonFrame:GetTitle()
-	return format(self.name or self:GetName(), self:GetPlayer())
-end
-
-
---[[ Bag Frame ]]--
-
-function BagnonFrame:AddBagFrame()
-	if not self.bagFrame then
-		self.bagFrame = BagnonBagFrame.New(self, self:IsBagFrameShown())
-	end
-end
-
-function BagnonFrame:UpdateBagFrame()
-	if self.bagFrame then
-		self.bagFrame:ShowBags(self.showBags)
-	end
-end
-
-function BagnonFrame:GetBagFrame()
-	return self.bagFrame
-end
-
-function BagnonFrame:IsBagFrameShown()
-	return self.showBags
-end
-
-
---[[ Purchase Frame ]]--
-
-function BagnonFrame:AddPurchaseFrame()
-	if not self.purchaseFrame then
-		self.purchaseFrame = BagnonPurchase.New(self)
-	end
-end
-
-function BagnonFrame:GetPurchaseFrame()
-	return self.purchaseFrame
-end
-
-
---[[ Money Frame ]]--
-
-function BagnonFrame:AddMoneyFrame()
-	if not self.moneyFrame then
-		self.moneyFrame = BagnonMoney.New(self)
-	end
-end
-
-function BagnonFrame:UpdateMoneyFrame()
-	if self.moneyFrame then
-		self.moneyFrame:Update()
-	end
-end
-
-function BagnonFrame:GetMoneyFrame()
-	return self.moneyFrame
-end
-
-
---[[ Utility Functions ]]--
-
-function BagnonFrame.ForAll(action, ...)
-	if type(action) == 'string' then
-		for frame in pairs(used) do
-			frame[action](frame, ...)
-		end
-	else
-		for frame in pairs(used) do
-			action(frame, ...)
-		end
-	end
-end
-
-function BagnonFrame.ForAllVisible(action, ...)
-	if type(action) == 'string' then
-		for frame in pairs(visible) do
-			frame[action](frame, ...)
-		end
-	else
-		for frame in pairs(visible) do
-			action(frame, ...)
-		end
-	end
-end
-
-function BagnonFrame.ForAllVisibleNonCached(action, ...)
-	if type(action) == 'string' then
-		for frame in pairs(visible) do
-			if frame:GetPlayer() == currentPlayer then
-				frame[action](frame, ...)
-			end
-		end
-	else
-		for frame in pairs(visible) do
-			if frame:GetPlayer() == currentPlayer then
-				action(frame, ...)
-			end
-		end
-	end
-end
-
-
---[[
-	Inventory Events
---]]
-
-BVent:AddAction('BANKFRAME_CLOSED', function()
-	BagnonFrame.ForAllVisible('UpdateAllItems')
-end)
-
-BVent:AddAction('BAGNON_SLOT_UPDATE', function(action, event, ...)
-	BagnonFrame.ForAllVisibleNonCached('UpdateItem', ...)
-end)
-
-BVent:AddAction('BAGNON_SLOT_ADDED', function(action, event, ...)
-	BagnonFrame.ForAllVisibleNonCached('UpdateItem', ...)
-end)
-
-BVent:AddAction('BAGNON_SLOT_UPDATE_LOCK', function(action, event, ...)
-	BagnonFrame.ForAllVisibleNonCached('UpdateLock', ...)
-end)
-
-BVent:AddAction('BAGNON_SLOT_UPDATE_COOLDOWN', function(action, event, ...)
-	BagnonFrame.ForAllVisibleNonCached('UpdateCooldown', ...)
-end)
-
-BVent:AddAction('BAGNON_SLOT_REMOVED', function(action, event, ...)
-	BagnonFrame.ForAllVisibleNonCached('RemoveItem', ...)
-end)
