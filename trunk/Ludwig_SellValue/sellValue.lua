@@ -17,7 +17,7 @@ end
 
 local function LinkToID(link)
 	if link then
-		return tonumber(link) or tonumber(link:match("(%d+):"))
+		return tonumber(link) or tonumber(link:match("item:(%d+)") or tonumber(select(2, GetItemInfo(link)):match("item:(%d+)")))
 	end
 end
 
@@ -31,7 +31,7 @@ local function SaveCost(id, totalCost, count)
 end
 
 local function AddMoneyToTooltip(frame, id, count)
-    if frame and id and count and Ludwig_SellValues and not MerchantFrame:IsVisible() then
+    if id and count and Ludwig_SellValues and not MerchantFrame:IsVisible() then
 		local price = Ludwig_SellValues[id]
 		if price then
 			frame:AddLine(SELLVALUE_COST, 1, 1,	0)
@@ -41,48 +41,65 @@ local function AddMoneyToTooltip(frame, id, count)
     end
 end
 
-
 --[[  Function Hooks ]]--
 
-GameTooltip.SetBagItem = pHook(GameTooltip.SetBagItem, function(self, bag, slot)
-	local id = LinkToID(GetContainerItemLink(bag, slot))
-	local count = select(2, GetContainerItemInfo(bag, slot))
+local function IsValidTooltip(frame)
+	return (frame == GameTooltip) and frame:IsVisible()
+end
 
-	AddMoneyToTooltip(GameTooltip, id, count)
+GameTooltip.SetBagItem = pHook(GameTooltip.SetBagItem, function(self, bag, slot)
+	if IsValidTooltip(self) then
+		local id = LinkToID(GetContainerItemLink(bag, slot))
+		local count = select(2, GetContainerItemInfo(bag, slot))
+
+		AddMoneyToTooltip(GameTooltip, id, count)
+	end
 end)
 
 GameTooltip.SetLootItem = pHook(GameTooltip.SetLootItem, function(self, slot)
-	local id = LinkToID(GetLootSlotLink(slot))
-	local count = select(3, GetLootSlotInfo(slot))
+	if IsValidTooltip(self) then
+		local id = LinkToID(GetLootSlotLink(slot))
+		local count = select(3, GetLootSlotInfo(slot))
 
-	AddMoneyToTooltip(self, id, count)
+		AddMoneyToTooltip(self, id, count)
+	end
 end)
 
 GameTooltip.SetHyperlink = pHook(GameTooltip.SetHyperlink, function(self, link)
-	AddMoneyToTooltip(self, LinkToID(link))
+	if IsValidTooltip(self) then
+		AddMoneyToTooltip(self, LinkToID(link))
+	end
 end)
 
 GameTooltip.SetLootRollItem = pHook(GameTooltip.SetLootRollItem, function(self, id)
-	local id = LinkToID(GetLootRollItemLink(id))
-	local count = select(3, GetLootRollItemInfo(id))
+	if IsValidTooltip(self) then
+		local id = LinkToID(GetLootRollItemLink(id))
+		local count = select(3, GetLootRollItemInfo(id))
 
-	AddMoneyToTooltip(self, id, count)
+		AddMoneyToTooltip(self, id, count)
+	end
 end)
 
 GameTooltip.SetAuctionItem = pHook(GameTooltip.SetAuctionItem , function(self, type, index)
-	local id = LinkToID(GetAuctionItemLink(type, index))
-	local count = select(3, GetAuctionItemInfo(type, index))
+	if IsValidTooltip(self) then
+		local id = LinkToID(GetAuctionItemLink(type, index))
+		local count = select(3, GetAuctionItemInfo(type, index))
 
-	AddMoneyToTooltip(self, id, count)
+		AddMoneyToTooltip(self, id, count)
+	end
 end)
 
 GameTooltip.SetQuestItem = pHook(GameTooltip.SetQuestItem, function(self, type, id)
-	AddMoneyToTooltip(self, LinkToID(GetQuestItemLink(type, id)), 1)
+	if IsValidTooltip(self) then
+		AddMoneyToTooltip(self, LinkToID(GetQuestItemLink(type, id)), 1)
+	end
 end)
 
 GameTooltip.SetTradeSkillItem = pHook(GameTooltip.SetTradeSkillItem, function(self, type, id)
-	if not id then
-		AddMoneyToTooltip(self, LinkToID(GetTradeSkillItemLink(type)), 1)
+	if IsValidTooltip(self) then
+		if not id then
+			AddMoneyToTooltip(self, LinkToID(GetTradeSkillItemLink(type)), 1)
+		end
 	end
 end)
 
