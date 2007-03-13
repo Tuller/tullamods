@@ -159,14 +159,22 @@ function BagnonOptions_ShowQualityBorders(enable)
 		sets.qualityBorders = nil
 	end
 	
-	BagnonFrame.ForAllVisible('UpdateAllItems')
+	local bags = Bagnon:GetInventory()
+	if bags and bags:IsShown() then
+		bags:Regenerate()
+	end
+	
+	local bank = Bagnon:GetBank()
+	if bank and bank:IsShown() then
+		bank:Regenerate()
+	end
 end
 
 
 --[[ OnX Functions ]]--
 
 function BagnonOptions_OnLoad()
-	sets = BagnonLib.GetSets()
+	sets = BagnonUtil:GetSets()
 	CreateEventList(this)
 end
 
