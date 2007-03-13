@@ -27,7 +27,7 @@ function BagnonDBUI_ShowCharacterList(frame)
 	
 	local width = 0
 	local index = 0
-	for player in BagnonDB.GetPlayers() do
+	for player in BagnonDB:GetPlayers() do
 		index = index + 1
 		
 		local button = getglobal("BagnonDBUICharacterList" .. index) or CreatePlayerButton(index, BagnonDBUICharacterList)

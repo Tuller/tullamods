@@ -3,37 +3,34 @@
 		Originally based on SellValueLite, this addon allows viewing of sellvalues
 --]]
 
-local currentPlayer = UnitName('player')
-
---[[ Local Functions ]]--
-
 local function AddOwners(frame, id)
-	if not(frame and id and BagnonLib.GetSets().showTooltips) then return end
+	if not(frame and id and BagnonUtil:ShowingTooltips()) then return end
 
-	for player in BagnonDB.GetPlayers() do
-		local invCount = BagnonDB.GetItemTotal(id, player, -2)
-		for bagID = 0, 4 do
-			invCount = invCount + BagnonDB.GetItemTotal(id, player, bagID)
+	for player in BagnonDB:GetPlayers() do
+		local invCount = BagnonDB:GetItemCount(id, -2, player)
+		for bag = 0, 4 do
+			invCount = invCount + BagnonDB:GetItemCount(id, bag, player)
 		end
 
-		local bankCount = BagnonDB.GetItemTotal(id, player, -1)
-		for bagID = 5, 11 do
-			bankCount = bankCount + BagnonDB.GetItemTotal(id, player, bagID)
+		local bankCount = BagnonDB:GetItemCount(id, -1, player)
+		for bag = 5, 11 do
+			bankCount = bankCount + BagnonDB:GetItemCount(id, bag, player)
 		end
 
-		local equipCount = BagnonDB.GetItemTotal(id, player, 'e')
+		local equipCount = BagnonDB:GetItemCount(id, 'e', player)
+		
 		if (invCount + bankCount + equipCount) > 0 then
-			local tooltipString = player .. ':'
+			local line = player .. ':'
 			if invCount > 0 then
-				tooltipString = tooltipString .. format(' (%s Bags)', invCount)
+				line = line .. format(' %s Bags', invCount)
 			end
 			if bankCount > 0 then
-				tooltipString = tooltipString .. format(' (%s Bank)', bankCount)
+				line = line .. format(' %s Bank', bankCount)
 			end
 			if equipCount > 0 then
-				tooltipString = tooltipString .. format(' (Equipped)', bankCount)
+				line = line .. format(' Equipped')
 			end
-			frame:AddLine(tooltipString, 0, 0.8, 1)
+			frame:AddLine(line, 0, 0.8, 1)
 		end
 	end
 	frame:Show()

@@ -2,14 +2,13 @@
 ## Title: Bagnon_Forever
 ## Notes: Allows the viewing of the bank from anywhere, and also the inventory of your other characters.
 ## Author: Tuller
-## Version: 7.2.17
+## Version: 7.3.12
 ## Dependencies: Bagnon
-## SavedVariables: BagnonForeverData
+## SavedVariables: BagnonForeverDB
 localization.lua
 trans\localization.de.lua
 trans\localization.fr.lua
 trans\localization.cn.lua
 ui\ui.xml
 ui\tooltips.lua
-BagnonDB.lua
-foreverStore.lua
+db.lua
