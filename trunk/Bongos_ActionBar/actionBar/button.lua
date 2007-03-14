@@ -321,8 +321,8 @@ end
 
 function BActionButton:UpdateTooltip()
 	if BActionConfig.TooltipsShown() then
-		if GetCVar("UberTooltips") == 1 then
-			GameTooltip_SetDefaultAnchor(GameTooltip, self)
+		if GetCVar("UberTooltips") == "1" then
+			GameTooltip_SetDefaultAnchor(GameTooltip, UIParent)
 		else
 			GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 		end
