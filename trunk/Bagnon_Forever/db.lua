@@ -29,15 +29,6 @@ end
 	Startup Functions
 --]]
 
-function BagnonDB:Enable()
-	self:RegisterEvent('BANKFRAME_OPENED')
-	self:RegisterEvent('PLAYER_LOGIN')
-	self:RegisterEvent('PLAYER_MONEY')
-	self:RegisterEvent('BAG_UPDATE')
-	self:RegisterEvent('PLAYERBANKSLOTS_CHANGED')
-	self:RegisterEvent('UNIT_INVENTORY_CHANGED')
-end
-
 function BagnonDB:Initialize()
 	local cVersion = GetAddOnMetadata('Bagnon_Forever', 'Version')
 	if not(BagnonForeverDB and BagnonForeverDB.version) then
@@ -65,6 +56,19 @@ end
 function BagnonDB:UpdateVersion(cVersion)
 	self.db.version = cVersion
 	self:Print(format('Updated to v%s', self.db.version))
+end
+
+function BagnonDB:Enable()
+	self:RegisterEvent('BANKFRAME_OPENED')
+	self:RegisterEvent('PLAYER_MONEY')
+	self:RegisterEvent('BAG_UPDATE')
+	self:RegisterEvent('PLAYERBANKSLOTS_CHANGED')
+	self:RegisterEvent('UNIT_INVENTORY_CHANGED')
+	
+	self:SaveMoney()
+	self:SaveBagAll(0)
+	self:SaveBagAll(-2)
+	self:SaveEquipment()
 end
 
 --[[ 
@@ -326,13 +330,6 @@ end
 
 
 --[[  Events ]]--
-
-function BagnonDB:PLAYER_LOGIN()
-	self:SaveMoney()
-	self:SaveBagAll(0)
-	self:SaveBagAll(-2)
-	self:SaveEquipment()
-end
 
 function BagnonDB:PLAYER_MONEY()
 	self:SaveMoney()
