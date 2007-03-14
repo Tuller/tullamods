@@ -3,30 +3,11 @@
 		Handles settings management, and bank and inventory viewing
 --]]
 
-Bagnon = DongleStub("Dongle-Beta0"):New("Bagnon")
+Bagnon = DongleStub("Dongle-Beta1"):New("Bagnon")
 Bagnon.atBank = false
 
 
 --[[ Startup and settings management ]]--
-
-function Bagnon:Enable()
-	BankFrame:UnregisterEvent('BANKFRAME_OPENED')
-	
-	self:RegisterEvent('BANKFRAME_OPENED')
-	self:RegisterEvent('BANKFRAME_CLOSED')
-	self:RegisterEvent('TRADE_SHOW')
-	self:RegisterEvent('TRADE_CLOSED')
-	self:RegisterEvent('TRADE_SKILL_SHOW')
-	self:RegisterEvent('TRADE_SKILL_CLOSE')
-	self:RegisterEvent('AUCTION_HOUSE_SHOW')
-	self:RegisterEvent('AUCTION_HOUSE_CLOSED')
-	self:RegisterEvent('MAIL_SHOW')
-	self:RegisterEvent('MAIL_CLOSED')
-	self:RegisterEvent('MERCHANT_SHOW')
-	self:RegisterEvent('MERCHANT_CLOSED')
-	
-	self:RegisterSlashCommands()
-end
 
 function Bagnon:Initialize()
 	local cVersion = GetAddOnMetadata('Bagnon', 'Version')
@@ -73,6 +54,25 @@ end
 function Bagnon:UpdateSettings(cVersion)
 	BagnonSets.version = cVersion
 	self:Print(format('Updated to v%s', cVersion))
+end
+
+function Bagnon:Enable()
+	BankFrame:UnregisterEvent('BANKFRAME_OPENED')
+	
+	self:RegisterEvent('BANKFRAME_OPENED')
+	self:RegisterEvent('BANKFRAME_CLOSED')
+	self:RegisterEvent('TRADE_SHOW')
+	self:RegisterEvent('TRADE_CLOSED')
+	self:RegisterEvent('TRADE_SKILL_SHOW')
+	self:RegisterEvent('TRADE_SKILL_CLOSE')
+	self:RegisterEvent('AUCTION_HOUSE_SHOW')
+	self:RegisterEvent('AUCTION_HOUSE_CLOSED')
+	self:RegisterEvent('MAIL_SHOW')
+	self:RegisterEvent('MAIL_CLOSED')
+	self:RegisterEvent('MERCHANT_SHOW')
+	self:RegisterEvent('MERCHANT_CLOSED')
+	
+	self:RegisterSlashCommands()
 end
 
 
