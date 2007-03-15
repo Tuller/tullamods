@@ -32,7 +32,7 @@ end
 --[[ Frame Events ]]--
 
 local function OnUpdate()
-	if not this.isLink and GameTooltip:IsOwned(this) then
+	if not this.cached and GameTooltip:IsOwned(this) then
 		if not this.elapsed or this.elapsed < 0 then
 			local start, duration, enable = GetContainerItemCooldown(this:GetBag(), this:GetID())
 			if (start > 0 and duration > 0 and enable == 1) then
@@ -301,7 +301,7 @@ function BagnonItem:OnEnter()
 	local bag = self:GetBag()
 	local slot = self:GetID()
 
-	if self.isLink then
+	if self.cached then
 		if self.hasItem then
 			local player = self:GetPlayer()
 			local link, count = BagnonDB:GetItemData(bag, slot, player)
