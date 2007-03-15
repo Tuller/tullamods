@@ -3,7 +3,6 @@
 ## Notes: Allows the viewing of the bank from anywhere, and also the inventory of your other characters.
 ## Author: Tuller
 ## Version: 7.3.12
-## Dependencies: Bagnon
 ## SavedVariables: BagnonForeverDB
 localization.lua
 trans\localization.de.lua

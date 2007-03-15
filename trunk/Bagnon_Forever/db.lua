@@ -4,7 +4,11 @@
 --]]
 
 if not BagnonDB then
-	BagnonDB = Bagnon:NewModule("Bagnon-DB")
+	if Bagnon then
+		BagnonDB = Bagnon:NewModule("Bagnon-DB")
+	elseif vBagnon then
+		BagnonDB = vBagnon:NewModule("Bagnon-DB")
+	end
 	BagnonDB.addon = "Bagnon_Forever"
 else
 	error(format('Already using %s to view cached data', BagnonDB.addon or '<Unknown>'))
