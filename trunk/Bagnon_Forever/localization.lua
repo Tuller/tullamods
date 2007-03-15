@@ -4,38 +4,13 @@
 --]]
 
 --[[
-	English - Default Language
+	English 
 		Any gaps in the translations are filled by English words.
 --]]
 
+BAGNON_FOREVER_LOCALS = {}
 
---[[ Slash Commands ]]--
-
-BAGNON_FOREVER_COMMAND_DELETE_CHARACTER = "delete"
-
-
---[[ Messages from the slash commands ]]--
-
---/bgn help
-BAGNON_FOREVER_HELP_DELETE_CHARACTER = "/bgn " .. BAGNON_FOREVER_COMMAND_DELETE_CHARACTER ..
-	" <character> <realm> - Removes the given character's inventory and bank data."
-
---/bgn delete <character> <realm>
-BAGNON_FOREVER_CHARACTER_DELETED = "Removed inventory data about %s of %s."
-
-
---[[ System Messages ]]--
-
---Bagnon Forever version update
-BAGNON_FOREVER_UPDATED = "Bagnon Forever data updated to v%s"
-
-BAGNON_FOREVER_HAS = "has"
-BAGNON_FOREVER_BAGS = "(Bags)"
-BAGNON_FOREVER_BANK = "(Bank)"
-BAGNON_FOREVER_EQUIP = "(Equipped)"
-
-
---[[ Tooltips ]]--
-
---Total gold on realm
-BAGNON_FOREVER_MONEY_ON_REALM = "Total On %s"
+local L = BAGNON_FOREVER_LOCALS
+L.Bags = " %s Bags"
+L.Bank = " %s Bank"
+L.Equipped = " Equipped"

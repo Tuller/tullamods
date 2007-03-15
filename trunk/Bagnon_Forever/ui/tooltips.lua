@@ -3,6 +3,8 @@
 		Adds ownership information to visible tooltips.
 --]]
 
+local L = BAGNON_FOREVER_LOCALS
+
 local function AddOwners(frame, id)
 	if not(id and BagnonUtil:ShowingTooltips()) then return end
 
@@ -22,13 +24,13 @@ local function AddOwners(frame, id)
 		if (invCount + bankCount + equipCount) > 0 then
 			local line = player .. ':'
 			if invCount > 0 then
-				line = line .. format(' %s Bags', invCount)
+				line = line .. format(L.Bags, invCount)
 			end
 			if bankCount > 0 then
-				line = line .. format(' %s Bank', bankCount)
+				line = line .. format(L.Bank, bankCount)
 			end
 			if equipCount > 0 then
-				line = line .. format(' Equipped')
+				line = line .. L.Equipped
 			end
 			frame:AddLine(line, 0, 0.8, 1)
 		end
@@ -38,13 +40,13 @@ end
 
 local function pHook(action, method)
 	return function(...)
-		action(...)
 		method(...)
+		return action(...)
 	end
 end
 
 
---[[  Function Hooks ]]--
+--[[ Hooks ]]--
 
 local function IsValidTooltip(frame)
 	return (frame == GameTooltip or frame == ItemRefTooltip) and frame:IsVisible()
