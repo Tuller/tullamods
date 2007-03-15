@@ -241,6 +241,10 @@ end
 
 function BagnonFrame:OnHide()
 	HideAttachedMenus(self)
+
+	if self:GetPlayer() ~= currentPlayer then
+		self:SetPlayer(currentPlayer)
+	end
 end
 
 
@@ -421,7 +425,9 @@ function BagnonFrame:SetPlayer(player)
 	self:UpdateTitleText()
 	self.bagFrame:Update()
 	self.moneyFrame:Update()
-	self:Regenerate()
+	if self:IsShown() then
+		self:Regenerate()
+	end
 end
 
 function BagnonFrame:GetPlayer()
