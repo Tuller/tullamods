@@ -25,8 +25,9 @@ local function Toggle_New(parent, shown)
 	toggle:SetTextColor(1, 0.82, 0)
 	toggle:RegisterForClicks('LeftButtonUp', 'RightButtonUp')
 	toggle:SetScript('OnClick', Toggle_OnClick)
-	toggle:SetPoint('TOPLEFT', parent, 'BOTTOMLEFT', 0, 18)
-	toggle:SetPoint('BOTTOMRIGHT', parent, 'BOTTOMRIGHT', 0, 4)
+	toggle:SetPoint('BOTTOMLEFT', parent)
+	toggle:SetHeight(18)
+	toggle:SetWidth(18)
 
 	return toggle
 end
@@ -150,8 +151,10 @@ function BagnonBagFrame:ShowBags(show, updateParent)
 
 	if show then
 		self.toggle:SetText(BAGNON_HIDEBAGS)
+		self.toggle:SetWidth(self.toggle:GetTextWidth())
 	else
 		self.toggle:SetText(BAGNON_SHOWBAGS)
+		self.toggle:SetWidth(self.toggle:GetTextWidth())
 	end
 
 	self:Layout()

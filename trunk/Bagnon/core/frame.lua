@@ -462,7 +462,7 @@ function BagnonFrame:Layout(cols, space)
 	if bags.shown then
 		height = height + 8
 	end
-	width = max(width, money:GetWidth() + bags:GetToggleWidth() - 4, bags:GetWidth())
+	width = max(width, (money:GetWidth() + bags:GetToggleWidth() - 8), bags:GetWidth())
 
 	width = max(width + borderSize, 48)
 	height = max(height + borderSize + paddingY, 48)
