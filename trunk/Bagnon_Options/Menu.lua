@@ -2,7 +2,7 @@
 	Menu.lua
 		Scripts for creating the main options menu for Bagnon
 --]]
-
+local BUTTON_SIZE = 32
 local L = BAGNON_OPTIONS_LOCALS
 
 --[[
@@ -18,14 +18,18 @@ local function Toggle_OnClick()
 	if this:GetChecked() then
 		Bagnon.sets[this.var] = 1
 	else
-		Bagnon.sets[this.var]
+		Bagnon.sets[this.var] = nil
+	end
+
+	if button.PostClick then
+		button:PostClick()
 	end
 end
 
-local function Toggle_Create(parent, title, var, PostClick)
+local function Toggle_Create(parent, title, var, PostClick, tip)
 	local button = CreateFrame('CheckButton', nil, parent, 'GooeyCheckButton')
-	button:SetScript('OnShow', ToggleButton_OnShow)
-	button:SetScript('OnClick', ToggleButton_OnClick)
+	button:SetScript('OnShow', Toggle_OnShow)
+	button:SetScript('OnClick', Toggle_OnClick)
 	if PostClick then
 		button:SetScript('PostClick', PostClick)
 	end
@@ -43,7 +47,7 @@ end
 	Its used to determine under what events the bags/bank should automatically show
 --]]
 
-local function EventButton_Create(parent, isBank, type)
+local function EventButton_Create(parent, type, isBank)
 	local button = CreateFrame('CheckButton', nil, parent, 'GooeyCheckButton')
 	button:SetScript('OnShow', Toggle_OnShow)
 	button:SetScript('OnClick', Toggle_OnClick)
@@ -62,8 +66,8 @@ local function EventFrame_Create(parent, text, type)
 	local frame = CreateFrame('Frame', nil, parent)
 	frame.type = type
 	
-	local bags = EventButton_Create(frame)
-	local bank = EventButton_Create(frame, true)
+	local bags = EventButton_Create(frame, type)
+	local bank = EventButton_Create(frame, type, true)
 	bank:SetPoint('RIGHT', frame)
 	bags:SetPoint('RIGHT', bank, 'LEFT', -6, 0)
 	
@@ -82,8 +86,7 @@ end
 local function CreateToggleFrames(parent)
 	local frames = {}
 	
-	table.insert(frames, Toggle_Create(frame, L.ShowTooltips, 'showTooltips'))
-	table.insert(frames, Toggle_Create(frame, L.ShowTooltips, 'qualityBorders', function() 
+	table.insert(frames, Toggle_Create(parent, L.ShowBorders, 'showBorders', function() 
 		local bags = Bagnon:GetInventory()
 		if bags and bags:IsShown() then
 			bags:Regenerate()
@@ -95,9 +98,13 @@ local function CreateToggleFrames(parent)
 		end
 	end))
 	
-	table.insert(frames, Toggle_Create(frame, L.ReplaceBags, 'replaceBags'))
-	table.insert(frames, Toggle_Create(frame, L.ReplaceBank, 'replaceBank'))
-	table.insert(frames, Toggle_Create(frame, L.ReuseFrames, 'reuseFrames'), function() ReloadUI() end)
+	if BagnonDB then
+		table.insert(frames, Toggle_Create(parent, L.ShowOwners, 'showOwners'))
+	end
+	
+	table.insert(frames, Toggle_Create(parent, L.ReplaceBags, 'replaceBags'))
+	table.insert(frames, Toggle_Create(parent, L.ReplaceBank, 'replaceBank'))
+	table.insert(frames, Toggle_Create(parent, L.ReuseFrames, 'reuseFrames', function() ReloadUI() end))
 	
 	return frames
 end
@@ -123,7 +130,7 @@ local function CreateOptionsMenu(name)
 	frame:SetClampedToScreen(true)
 
 	frame:SetWidth(254)
-	frame:SetHeight(352)
+	frame:SetHeight(416)
 	frame:SetPoint("LEFT", UIParent)
 	local titleRegion = frame:CreateTitleRegion()
 	titleRegion:SetAllPoints(frame)
@@ -158,17 +165,17 @@ local function CreateOptionsMenu(name)
 	
 	local bags = frame:CreateFontString('ARTWORK')
 	bags:SetFontObject('GameFontHighlight')
-	bags:SetText(L.Bag)
+	bags:SetText(L.Bags)
 	bags:SetPoint('RIGHT', bank, 'LEFT', -12, 0)
 	
 	--create and layout  all the event checkboxes
 	local eFrames = CreateEventFrames(frame)
 	eFrames[1]:SetPoint('TOPLEFT', show, 'BOTTOMLEFT', 0, -4)
-	eFrames[1]:SetPoint('BOTTOMRIGHT', bank, 'BOTTOMRIGHT', 2, -36)
+	eFrames[1]:SetPoint('BOTTOMRIGHT', bank, 'BOTTOMRIGHT', 2, -(32 + 4))
 	
 	for i = 2, #eFrames do
 		eFrames[i]:SetPoint('TOPLEFT', eFrames[i-1], 'BOTTOMLEFT')
-		eFrames[i]:SetPoint('BOTTOMRIGHT', eFrames[i-1],, 'BOTTOMRIGHT', 0, -32)
+		eFrames[i]:SetPoint('BOTTOMRIGHT', eFrames[i-1], 'BOTTOMRIGHT', 0, -32)
 	end
 end
-CreateOptionsMenu('BagnonOptionsFrame')
+CreateOptionsMenu('BagnonOptions')
