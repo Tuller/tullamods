@@ -78,10 +78,8 @@ end
 
 --[[ Inventory Frame Display ]]--
 
-local INVENTORY_BAGS = {0, 1, 2, 3, 4, -2}
-
 function Bagnon:CreateInventory()
-	local bags = BagnonFrame.New(BAGNON_INVENTORY_TITLE, self.sets.inventory, INVENTORY_BAGS)
+	local bags = BagnonFrame.New(BAGNON_INVENTORY_TITLE, self.sets.inventory, {0, 1, 2, 3, 4, -2})
 	table.insert(UISpecialFrames, bags:GetName())
 
 	local OnShow = bags:GetScript('OnShow')
@@ -150,10 +148,8 @@ end
 
 --[[ Bank Frame Display ]]--
 
-local BANK_BAGS = {-1, 5, 6, 7, 8, 9, 10, 11}
-
 function Bagnon:CreateBank()
-	local bank = BagnonFrame.New(BAGNON_BANK_TITLE, self.sets.bank, BANK_BAGS, true)
+	local bank = BagnonFrame.New(BAGNON_BANK_TITLE, self.sets.bank, {-1, 5, 6, 7, 8, 9, 10, 11}, true)
 	table.insert(UISpecialFrames, bank:GetName())
 
 	local OnShow = bank:GetScript('OnShow')

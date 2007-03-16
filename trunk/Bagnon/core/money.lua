@@ -11,10 +11,10 @@ local lastCreated = 0
 
 --[[ Constructor ]]--
 
-local function OnShow()  this:OnShow() 					end
+local function OnShow() this:OnShow() end
 local function OnClick() this:GetParent():OnClick(arg1) end
-local function OnEnter() this:GetParent():OnEnter() 	end
-local function OnLeave() this:GetParent():OnLeave() 	end
+local function OnEnter() this:GetParent():OnEnter() end
+local function OnLeave() this:GetParent():OnLeave() end
 
 local function MoneyFrame_Create()
 	local frame = CreateFrame('Frame', format('BagnonMoney%s', lastCreated), nil, 'SmallMoneyFrameTemplate')
@@ -76,8 +76,8 @@ end
 --Alters the tooltip of bagnon moneyframes to show total gold across all characters on the current realm
 function BagnonMoney:OnEnter()
 	if BagnonDB and BagnonUtil:ShowingTooltips() then
-		GameTooltip:SetOwner(self, 'ANCHOR_TOPRIGHT')
-		GameTooltip:SetText(format(BAGNON_FOREVER_MONEY_ON_REALM, GetRealmName()))
+		GameTooltip:SetOwner(self, "ANCHOR_TOPRIGHT")
+		GameTooltip:SetText(format("Total on %s", GetRealmName()))
 
 		local money = 0
 		for player in BagnonDB:GetPlayers() do
