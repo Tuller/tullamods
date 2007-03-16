@@ -6,7 +6,7 @@
 local L = BAGNON_FOREVER_LOCALS
 
 local function AddOwners(frame, id)
-	if not(id and BagnonUtil:ShowingTooltips()) then return end
+	if not(id and BagnonUtil:ShowingOwners()) then return end
 
 	for player in BagnonDB:GetPlayers() do
 		local invCount = BagnonDB:GetItemCount(id, -2, player)
