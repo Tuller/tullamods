@@ -3,19 +3,25 @@
 --]]
 
 if ( GetLocale() == "frFR" ) then
-	--General Options Menu
-	BAGNON_MAINOPTIONS_TITLE = "Bagnon Options";
-	BAGNON_MAINOPTIONS_SHOW = "Montrer";
+	local L = BAGNON_OPTIONS_LOCALS
 
-	BAGNON_MAINOPTIONS_SHOW_BANK = "A la Banque";
-	BAGNON_MAINOPTIONS_SHOW_VENDOR = "Chez un Vendeur";
-	BAGNON_MAINOPTIONS_SHOW_AH = "A l\'hotel des ventes";
-	BAGNON_MAINOPTIONS_SHOW_MAILBOX = "A la Boite au Lettre";
-	BAGNON_MAINOPTIONS_SHOW_TRADING = "Quand échange";
-	BAGNON_MAINOPTIONS_SHOW_CRAFTING = "Quand M\195\169tier";
+	L.Title = "Bagnon Options"
 
-	BAGNON_MAINOPTIONS_SHOW_TOOLTIPS = "Afficher les bulles d'aide";
-	BAGNON_MAINOPTIONS_SHOW_BORDERS = "Colorer le bord selon la qualit\195\169 de l\'objet";
-	
-	return;
+	L.ShowOwners = "Show Item Owners"
+	L.ShowBorders = "Colorer le bord selon la qualit\195\169 de l\'objet"
+
+	L.ReplaceBags = "Replace Bags"
+	L.ReplaceBank = "Replace Bank"
+	L.ReuseFrames = "Reuse Blizzard Frames"
+
+	L.Show = "Montrer"
+	L.Bags = "Bags"
+	L.Bank = "Banque"
+
+	L.AtBank = "A la Banque"
+	L.AtVendor = "Chez un Vendeur"
+	L.AtAH = "A l\'hotel des ventes"
+	L.AtMail = "A la Boite au Lettre"
+	L.AtTrade = "Quand échange"
+	L.AtCraft = "Quand M\195\169tier"
 end

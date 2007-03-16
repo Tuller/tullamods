@@ -9,19 +9,15 @@
 --]]
 
 if ( GetLocale() == "zhCN" ) then
+	local L = BAGNON_OPTIONS_LOCALS
+	L.Title = "Bagnon 设置";
+	L.Show = "显示";
 
-	--General Options Menu
-	BAGNON_MAINOPTIONS_TITLE = "Bagnon 设置";
-	BAGNON_MAINOPTIONS_SHOW = "显示";
-
-	BAGNON_MAINOPTIONS_SHOW_BANK = "在银行时";
-	BAGNON_MAINOPTIONS_SHOW_VENDOR = "与商贩对话时";
-	BAGNON_MAINOPTIONS_SHOW_AH = "在拍卖行时";
-	BAGNON_MAINOPTIONS_SHOW_MAILBOX = "打开邮箱时";
-	BAGNON_MAINOPTIONS_SHOW_TRADING = "交易时";
-	BAGNON_MAINOPTIONS_SHOW_CRAFTING = "制作物品时";
-
-	BAGNON_MAINOPTIONS_SHOW_TOOLTIPS = "显示提示";
-	BAGNON_MAINOPTIONS_SHOW_FOREVERTOOLTIPS = "显示详细信息";
-	BAGNON_MAINOPTIONS_SHOW_BORDERS = "显示物品质量框";
+	L.AtBank = "在银行时";
+	L.AtVendor = "与商贩对话时";
+	L.AtAH = "在拍卖行时";
+	L.AtMail = "打开邮箱时";
+	L.AtTrade = "交易时";
+	L.AtCraft = "制作物品时";
+	L.ShowBorders = "显示物品质量框";
 end

@@ -1,201 +1,174 @@
-local sets
+--[[
+	Menu.lua
+		Scripts for creating the main options menu for Bagnon
+--]]
 
-local function CreateEventList(parent)
-	local events = {
-		[BAGNON_MAINOPTIONS_SHOW_BANK] = function(enable, bank)
-			if bank then
-				if enable then
-					sets.showBankAtBank = 1
-				else
-					sets.showBankAtBank = nil
-				end
-			else
-				if enable then
-					sets.showBagsAtBank= 1
-				else
-					sets.showBagsAtBank = nil
-				end
-			end
-		end,
+local L = BAGNON_OPTIONS_LOCALS
 
-		[BAGNON_MAINOPTIONS_SHOW_VENDOR] = function(enable, bank)
-			if bank then
-				if enable then
-					sets.showBankAtVendor= 1
-				else
-					sets.showBankAtVendor = nil
-				end
-			else
-				if enable then
-					sets.showBagsAtVendor= 1
-				else
-					sets.showBagsAtVendor = nil
-				end
-			end
-		end,
+--[[
+	A toggle is simply a checkbox that sets a saved variable,
+	it may perform an action after being checked
+--]]
 
-		[BAGNON_MAINOPTIONS_SHOW_AH] = function(enable, bank)
-			if bank then
-				if enable then
-					sets.showBankAtAH= 1
-				else
-					sets.showBankAtAH = nil
-				end
-			else
-				if enable then
-					sets.showBagsAtAH= 1
-				else
-					sets.showBagsAtAH = nil
-				end
-			end
-		end,
+local function Toggle_OnShow()
+	this:SetChecked(Bagnon.sets[this.var])
+end
 
-		[BAGNON_MAINOPTIONS_SHOW_MAILBOX] = function(enable, bank)
-			if bank then
-				if enable then
-					sets.showBankAtMail = 1
-				else
-					sets.showBankAtMail = nil
-				end
-			else
-				if enable then
-					sets.showBagsAtMail = 1
-				else
-					sets.showBagsAtMail = nil
-				end
-			end
-		end,
+local function Toggle_OnClick()
+	if this:GetChecked() then
+		Bagnon.sets[this.var] = 1
+	else
+		Bagnon.sets[this.var]
+	end
+end
 
-		[BAGNON_MAINOPTIONS_SHOW_TRADING] = function(enable, bank)
-			if bank then
-				if enable then
-					sets.showBankAtTrade= 1
-				else
-					sets.showBankAtTrade = nil
-				end
-			else
-				if enable then
-					sets.showBagsAtTrade= 1
-				else
-					sets.showBagsAtTrade = nil
-				end
-			end
-		end,
+local function Toggle_Create(parent, title, var, PostClick)
+	local button = CreateFrame('CheckButton', nil, parent, 'GooeyCheckButton')
+	button:SetScript('OnShow', ToggleButton_OnShow)
+	button:SetScript('OnClick', ToggleButton_OnClick)
+	if PostClick then
+		button:SetScript('PostClick', PostClick)
+	end
 
-		[BAGNON_MAINOPTIONS_SHOW_CRAFTING] = function(enable, bank)
-			if bank then
-				if enable then
-					sets.showBankAtCraft = 1
-				else
-					sets.showBankAtCraft = nil
-				end
-			else
-				if enable then
-					sets.showBagsAtCraft= 1
-				else
-					sets.showBagsAtCraft = nil
-				end
-			end
+	button.var = var
+	button:SetText(title)
+	button:SetChecked(Bagnon.sets[var])
+
+	return button
+end
+
+
+--[[ 
+	An event button has an event, and then a checkbox for the bag and bank frame attached to it 
+	Its used to determine under what events the bags/bank should automatically show
+--]]
+
+local function EventButton_Create(parent, isBank, type)
+	local button = CreateFrame('CheckButton', nil, parent, 'GooeyCheckButton')
+	button:SetScript('OnShow', Toggle_OnShow)
+	button:SetScript('OnClick', Toggle_OnClick)
+	
+	if isBank then
+		button.var = format('showBankAt%s', type)
+	else
+		button.var = format('showBagsAt%s', type)
+	end
+	button:SetChecked(Bagnon.sets[button.var])
+
+	return button
+end
+
+local function EventFrame_Create(parent, text, type)
+	local frame = CreateFrame('Frame', nil, parent)
+	frame.type = type
+	
+	local bags = EventButton_Create(frame)
+	local bank = EventButton_Create(frame, true)
+	bank:SetPoint('RIGHT', frame)
+	bags:SetPoint('RIGHT', bank, 'LEFT', -6, 0)
+	
+	local title = frame:CreateFontString('ARTWORK')
+	title:SetJustifyH('LEFT')
+	title:SetPoint('LEFT', frame)
+	title:SetFontObject('GameFontNormalSmall')
+	title:SetText(text)
+
+	return frame
+end
+
+
+--[[ Frame Constructor ]]--
+
+local function CreateToggleFrames(parent)
+	local frames = {}
+	
+	table.insert(frames, Toggle_Create(frame, L.ShowTooltips, 'showTooltips'))
+	table.insert(frames, Toggle_Create(frame, L.ShowTooltips, 'qualityBorders', function() 
+		local bags = Bagnon:GetInventory()
+		if bags and bags:IsShown() then
+			bags:Regenerate()
 		end
-	}
+		
+		local bank = Bagnon:GetBank()
+		if bank and bank:IsShown() then
+			bank:Regenerate()
+		end
+	end))
 	
-	local show = parent:CreateFontString('ARTWORK')
+	table.insert(frames, Toggle_Create(frame, L.ReplaceBags, 'replaceBags'))
+	table.insert(frames, Toggle_Create(frame, L.ReplaceBank, 'replaceBank'))
+	table.insert(frames, Toggle_Create(frame, L.ReuseFrames, 'reuseFrames'), function() ReloadUI() end)
+	
+	return frames
+end
+
+local function CreateEventFrames(parent)
+	local frames = {}
+	table.insert(frames, EventFrame_Create(parent, L.AtBank, 'Bank'))
+	table.insert(frames, EventFrame_Create(parent, L.AtVendor, 'Vendor'))
+	table.insert(frames, EventFrame_Create(parent, L.AtAH, 'AH'))
+	table.insert(frames, EventFrame_Create(parent, L.AtMail, 'Mail'))
+	table.insert(frames, EventFrame_Create(parent, L.AtTrade, 'Trade'))
+	table.insert(frames, EventFrame_Create(parent, L.AtCraft, 'Craft'))
+	return frames
+end
+
+local function CreateOptionsMenu(name)
+	local frame = CreateFrame('Frame', name, UIParent, 'GooeyFrame')	
+	frame:EnableMouse(true)
+
+	frame:SetFrameStrata("DIALOG")
+	frame:SetMovable(true)
+	frame:SetToplevel(true)
+	frame:SetClampedToScreen(true)
+
+	frame:SetWidth(254)
+	frame:SetHeight(352)
+	frame:SetPoint("LEFT", UIParent)
+	local titleRegion = frame:CreateTitleRegion()
+	titleRegion:SetAllPoints(frame)
+	
+	--title
+	local title = frame:CreateFontString('ARTWORK')
+	title:SetFontObject('GameFontHighlightLarge')
+	title:SetText(L.Title)
+	title:SetPoint('TOP', frame, 'TOP', 0, -10)
+	
+	--close button
+	local close = CreateFrame('Button', name .. 'Close', frame, 'UIPanelCloseButton')
+	close:SetPoint('TOPRIGHT', frame, 'TOPRIGHT', -2, -2)
+	
+	--create and layout all the toggle checkbuttons
+	local toggles = CreateToggleFrames(frame)
+	toggles[1]:SetPoint('TOPLEFT', frame, 'TOPLEFT', 6, -32)
+	for i = 2, #toggles do
+		toggles[i]:SetPoint('TOPLEFT', toggles[i-1], 'BOTTOMLEFT')
+	end
+	
+	--Create the Show Bags Bank divider
+	local show = frame:CreateFontString('ARTWORK')
 	show:SetFontObject('GameFontHighlight')
-	show:SetText(BAGNON_MAINOPTIONS_SHOW)
-	show:SetPoint('TOPLEFT', parent:GetName() .. 'ReplaceBags', 'BOTTOMLEFT', 6, -8)
+	show:SetText(L.Show)
+	show:SetPoint('TOPLEFT', toggles[#toggles], 'BOTTOMLEFT', 6, -8)
 	
-	local bank = parent:CreateFontString('ARTWORK')
+	local bank = frame:CreateFontString('ARTWORK')
 	bank:SetFontObject('GameFontHighlight')
-	bank:SetText(BAGNON_MAINOPTIONS_BANK)
-	bank:SetPoint('RIGHT', show, 'LEFT', parent:GetWidth() - 24, 0)
+	bank:SetText(L.Bank)
+	bank:SetPoint('RIGHT', show, 'LEFT', frame:GetWidth() - 24, 0)
 	
-	local bags = parent:CreateFontString('ARTWORK')
+	local bags = frame:CreateFontString('ARTWORK')
 	bags:SetFontObject('GameFontHighlight')
-	bags:SetText(BAGNON_MAINOPTIONS_BAGS)
+	bags:SetText(L.Bag)
 	bags:SetPoint('RIGHT', bank, 'LEFT', -12, 0)
 	
-	local prev; local i = 0
-	for name, action in pairs(events) do
-		i = i + 1
-
-		local button = CreateFrame('Frame', parent:GetName() .. i, parent, 'BagnonOptionsEventButton')
-		button.Click = action
-		
-		getglobal(button:GetName() .. 'Title'):SetText(name)
-
-		if prev then
-			button:SetPoint('TOPLEFT', prev, 'BOTTOMLEFT')
-			button:SetPoint('BOTTOMRIGHT', prev, 'BOTTOMRIGHT', 0, -32)
-		else
-			button:SetPoint('TOPLEFT', show, 'BOTTOMLEFT', 0, -4)
-			button:SetPoint('BOTTOMRIGHT', bank, 'BOTTOMRIGHT', 2, -36)
-		end
-		prev = button
-	end
-end
-
---[[ Config Functions ]]
-
-function BagnonOptions_ReplaceBags(enable)
-	if enable then
-		sets.replaceBags = 1
-	else
-		sets.replaceBags = nil
-	end
-end
-
-function BagnonOptions_ShowTooltips(enable)
-	if enable then
-		sets.showTooltips = 1
-	else
-		sets.showTooltips = nil
-	end
-end
-
-function BagnonOptions_ShowQualityBorders(enable)
-	if enable then
-		sets.qualityBorders = 1
-	else
-		sets.qualityBorders = nil
-	end
+	--create and layout  all the event checkboxes
+	local eFrames = CreateEventFrames(frame)
+	eFrames[1]:SetPoint('TOPLEFT', show, 'BOTTOMLEFT', 0, -4)
+	eFrames[1]:SetPoint('BOTTOMRIGHT', bank, 'BOTTOMRIGHT', 2, -36)
 	
-	local bags = Bagnon:GetInventory()
-	if bags and bags:IsShown() then
-		bags:Regenerate()
-	end
-	
-	local bank = Bagnon:GetBank()
-	if bank and bank:IsShown() then
-		bank:Regenerate()
+	for i = 2, #eFrames do
+		eFrames[i]:SetPoint('TOPLEFT', eFrames[i-1], 'BOTTOMLEFT')
+		eFrames[i]:SetPoint('BOTTOMRIGHT', eFrames[i-1],, 'BOTTOMRIGHT', 0, -32)
 	end
 end
-
-
---[[ OnX Functions ]]--
-
-function BagnonOptions_OnLoad()
-	sets = BagnonUtil:GetSets()
-	CreateEventList(this)
-end
-
-function BagnonOptions_OnShow()
-	local name = this:GetName()
-
-	getglobal(name .. "Tooltips"):SetChecked(sets.showTooltips)
-	getglobal(name .. "Quality"):SetChecked(sets.qualityBorders)
-	getglobal(name .. "ReplaceBags"):SetChecked(sets.replaceBags)
-
-	getglobal(name .. "1Bags"):SetChecked(sets.showBagsAtBank)
-	getglobal(name .. "2Bags"):SetChecked(sets.showBagsAtVendor)
-	getglobal(name .. "3Bags"):SetChecked(sets.showBagsAtAH)
-	getglobal(name .. "4Bags"):SetChecked(sets.showBagsAtMail)
-	getglobal(name .. "5Bags"):SetChecked(sets.showBagsAtTrade)
-	getglobal(name .. "6Bags"):SetChecked(sets.showBagsAtCraft)
-
-	getglobal(name .. "1Bank"):SetChecked(sets.showBankAtBank)
-	getglobal(name .. "2Bank"):SetChecked(sets.showBankAtVendor)
-	getglobal(name .. "3Bank"):SetChecked(sets.showBankAtAH)
-	getglobal(name .. "4Bank"):SetChecked(sets.showBankAtMail)
-	getglobal(name .. "5Bank"):SetChecked(sets.showBankAtTrade)
-	getglobal(name .. "6Bank"):SetChecked(sets.showBankAtCraft)
-end
+CreateOptionsMenu('BagnonOptionsFrame')

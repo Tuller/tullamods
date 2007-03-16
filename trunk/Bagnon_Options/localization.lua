@@ -6,22 +6,25 @@
 	English - Default Language
 --]]
 
---General Options Menu
-BAGNON_MAINOPTIONS_TITLE = "Bagnon Options"
-BAGNON_MAINOPTIONS_SHOW = "Show"
+BAGNON_OPTIONS_LOCALS = {}
+local L = BAGNON_OPTIONS_LOCALS
 
-BAGNON_MAINOPTIONS_SHOW_BANK = "At Bank"
-BAGNON_MAINOPTIONS_SHOW_VENDOR = "At Vendor"
-BAGNON_MAINOPTIONS_SHOW_AH = "At Auction"
-BAGNON_MAINOPTIONS_SHOW_MAILBOX = "At Mailbox"
-BAGNON_MAINOPTIONS_SHOW_TRADING = "When Trading"
-BAGNON_MAINOPTIONS_SHOW_CRAFTING = "When Crafting"
+L.Title = "Bagnon Options"
 
-BAGNON_MAINOPTIONS_SHOW_TOOLTIPS = "Show Tooltips"
-BAGNON_MAINOPTIONS_SHOW_BORDERS = "Show Quality Borders"
+L.ShowOwners = "Show Item Owners"
+L.ShowBorders = "Color By Quality"
 
-BAGNON_MAINOPTIONS_REPLACE_BAGS = "Replace Bags"
-BAGNON_MAINOPTIONS_REPLACE_BANK = "Replace Bank"
+L.ReplaceBags = "Replace Bags"
+L.ReplaceBank = "Replace Bank"
+L.ReuseFrames = "Reuse Blizzard Frames"
 
-BAGNON_MAINOPTIONS_BAGS = 'Bags'
-BAGNON_MAINOPTIONS_BANK = 'Bank'
+L.Show = "Show"
+L.Bags = "Bags"
+L.Bank = "Bank"
+
+L.AtBank = "When Checking The Bank"
+L.AtVendor = "When Selling Items"
+L.AtAH = "When At The AH"
+L.AtMail = "When Mailing Items"
+L.AtTrade = "When Trading"
+L.AtCraft = "When Crafting"

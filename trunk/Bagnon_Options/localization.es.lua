@@ -2,21 +2,26 @@
 	Bagnon Main Options Localization file
 --]]
 
-if ( GetLocale() == "esES" ) then
-	--General Options Menu
-	BAGNON_MAINOPTIONS_TITLE = "Opciones de Bagnon";
-	BAGNON_MAINOPTIONS_SHOW = "Mostrar";
+if GetLocale() == "esES" then
+	local L = BAGNON_OPTIONS_LOCALS
 
-	BAGNON_MAINOPTIONS_SHOW_BANK = "En el Banco";
-	BAGNON_MAINOPTIONS_SHOW_VENDOR = "En los Vendedores";
-	BAGNON_MAINOPTIONS_SHOW_AH = "En Casa de Subastas";
-	BAGNON_MAINOPTIONS_SHOW_MAILBOX = "En el Correo";
-	BAGNON_MAINOPTIONS_SHOW_TRADING = "Comerciando";
-	BAGNON_MAINOPTIONS_SHOW_CRAFTING = "Fabricando";
+	L.Title = "Opciones de Bagnon"
 
-	BAGNON_MAINOPTIONS_SHOW_TOOLTIPS = "Mostrar ayudas";
-	BAGNON_MAINOPTIONS_SHOW_FOREVERTOOLTIPS = "Mostrar ayuda detallada";
-	BAGNON_MAINOPTIONS_SHOW_BORDERS = "Resaltar calidad de objetos";
-	
-	return;
+	L.ShowOwners = "Show Item Owners"
+	L.ShowBorders = "Resaltar calidad de objetos"
+
+	L.ReplaceBags = "Replace Bags"
+	L.ReplaceBank = "Replace Bank"
+	L.ReuseFrames = "Reuse Blizzard Frames"
+
+	L.Show = "Mostrar"
+	L.Bags = "Bolsos"
+	L.Bank = "Banco"
+
+	L.AtBank = "En el Banco"
+	L.AtVendor = "En los Vendedores"
+	L.AtAH = "En Casa de Subastas"
+	L.AtMail = "En el Correo"
+	L.AtTrade = "Comerciando"
+	L.AtCraft = "Fabricando"
 end
