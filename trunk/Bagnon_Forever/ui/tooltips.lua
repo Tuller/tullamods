@@ -40,8 +40,9 @@ end
 
 local function pHook(action, method)
 	return function(...)
+		local ret = action(...)
 		method(...)
-		return action(...)
+		return ret
 	end
 end
 
