@@ -49,7 +49,7 @@ L.TipGoldOnRealm = "Total on %s"
 --menu text
 L.FrameSettings = "Frame Settings"
 L.Lock = "Lock Position"
-L.Toplevel = "Toplevel"
+L.Toplevel = "Always On Top"
 L.BackgroundColor = "Background"
 L.FrameLevel = "Frame Level"
 L.Opacity = "Opacity"

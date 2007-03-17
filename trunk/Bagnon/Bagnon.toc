@@ -3,13 +3,14 @@
 ## Author: Tuller
 ## Notes: Single window displays for the inventory and bank
 ## SavedVariablesPerCharacter: BagnonSets
-## Version: 0.4
+## Version: 0.5
 lib\Gooey.xml
 lib\Dongle.lua
 localization.lua
 trans\localization.de.lua
 trans\localization.fr.lua
 trans\localization.cn.lua
+trans\localization.es.lua
 core\utility.lua
 core\item.lua
 core\bag.lua

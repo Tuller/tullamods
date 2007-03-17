@@ -3,8 +3,6 @@
 		Functions for the Bagnon right click options menu
 --]]
 
-BagnonMenu = {}
-
 local STRATAS = {'LOW', 'MEDIUM', 'HIGH'}
 local MENU_NAME = 'BagnonMenu'
 local L = BAGNON_LOCALS
@@ -53,7 +51,7 @@ local function Slider_Create(parent, suffix, minVal, maxVal, step, title, OnChan
 	slider:SetWidth(216); slider:SetHeight(18)
 	slider.OnChange = OnChange
 	slider.isPercent = isPercent
-	self.values = values
+	slider.values = values
 	
 	slider:SetValueStep(step)
 	slider:SetMinMaxValues(minVal, maxVal)
@@ -62,67 +60,13 @@ local function Slider_Create(parent, suffix, minVal, maxVal, step, title, OnChan
 	getglobal(name .. 'Text'):SetText(title)
 	if values then
 		getglobal(name .. 'Low'):SetText(values[minVal])
-		getglobal(name .. 'Low'):SetText(values[maxVal])
+		getglobal(name .. 'High'):SetText(values[maxVal])
 	else
 		getglobal(name .. 'Low'):SetText(minVal)
 		getglobal(name .. 'High'):SetText(maxVal)
 	end
 
 	return slider
-end
-
-
---[[ Config Functions ]]--
-
-local function SetFrameStrata(frame, strata)
-	frame.sets.strata = strata
-	frame:SetFrameStrata(strata)
-end
-
-local function SetFrameColumns(frame, cols)
-	frame:Layout(cols)
-end
-
-local function SetFrameSpacing(frame, space)
-	frame:Layout(frame.cols, space)
-end
-
---transparency
-local function SetFrameAlpha(frame, alpha)
-	if not alpha or alpha == 1 then
-		frame.sets.alpha = nil
-	else
-		frame.sets.alpha = alpha
-	end
-	frame:SetAlpha(alpha)
-end
-
---scale
-local function SetFrameScale(frame, scale)
-	frame.sets.scale = scale
-	
-	local x, y = GetRelativeCoords(frame, scale)
-
-	frame:SetScale(scale)
-	frame:ClearAllPoints()
-	frame:SetPoint('TOPLEFT', UIParent, 'BOTTOMLEFT', x, y)
-	frame:SavePosition()
-end
-
---lock position
-local function SetFrameLock(frame, enable)
-	frame:Lock(enable)
-end
-
---set toplevel
-local function SetToplevel(frame, enable)
-	if enable then
-		frame.sets.topLevel = 1
-		frame:SetToplevel(true)
-	else
-		frame.sets.topLevel = nil
-		frame:SetToplevel(false)
-	end
 end
 
 
@@ -170,7 +114,6 @@ local function BGColor_CancelChanges()
 	getglobal(MENU_NAME .. 'BGColorNormalTexture'):SetVertexColor(prevValues.r, prevValues.g, prevValues.b, prevValues.opacity)
 end
 
---set the background of the frame between opaque/transparent
 local function BGColor_OnClick(frame)
 	if ColorPickerFrame:IsShown() then
 		ColorPickerFrame:Hide()
@@ -195,11 +138,63 @@ local function BGColor_OnClick(frame)
 end
 
 
---[[ Show the Menu ]]--
+--[[ Config Functions ]]--
+
+local function SetFrameStrata(frame, strata)
+	frame.sets.strata = strata
+	frame:SetFrameStrata(strata)
+end
+
+local function SetFrameColumns(frame, cols)
+	frame:Layout(cols)
+end
+
+local function SetFrameSpacing(frame, space)
+	frame:Layout(frame.cols, space)
+end
+
+local function SetFrameAlpha(frame, alpha)
+	if not alpha or alpha == 1 then
+		frame.sets.alpha = nil
+	else
+		frame.sets.alpha = alpha
+	end
+	frame:SetAlpha(alpha)
+end
+
+local function SetFrameScale(frame, scale)
+	frame.sets.scale = scale
+	
+	local x, y = GetRelativeCoords(frame, scale)
+
+	frame:SetScale(scale)
+	frame:ClearAllPoints()
+	frame:SetPoint('TOPLEFT', UIParent, 'BOTTOMLEFT', x, y)
+	frame:SavePosition()
+end
+
+local function SetFrameLock(frame, enable)
+	frame:Lock(enable)
+end
+
+local function SetToplevel(frame, enable)
+	if enable then
+		frame.sets.topLevel = 1
+		frame:SetToplevel(true)
+	else
+		frame.sets.topLevel = nil
+		frame:SetToplevel(false)
+	end
+end
+
+
+--[[ Menu Constructor ]]--
 
 local function CreateMenu(name)
-	local menu = CreateFrame('Frame', name, UIParent, 'GooeyPopup')
+	local menu = CreateFrame('Button', name, UIParent, 'GooeyPopup')
 	menu:SetWidth(230); menu:SetHeight(346)
+	menu:SetScript("OnClick", function() this.anchor = nil; this:Hide() end)
+	menu:RegisterForClicks("anyUp")
 	
 	local title = menu:CreateFontString(name .. 'Title', 'ARTWORK')
 	title:SetFontObject('GameFontHighlightLarge')
@@ -212,21 +207,21 @@ local function CreateMenu(name)
 	--checkbuttons
 	local lock = CreateFrame('CheckButton', name .. 'Lock', menu, 'GooeyCheckButton')
 	lock:SetPoint('TOPLEFT', menu, 'TOPLEFT', 6, -30)
-	lock:SetScript('OnClick', function() menu.frame:Lock(this:GetChecked()) end)
+	lock:SetScript('OnClick', function() menu.anchor:Lock(this:GetChecked()) end)
 	lock:SetText(L.Lock)
 	
 	local topLevel = CreateFrame('CheckButton', name .. 'TopLevel', menu, 'GooeyCheckButton')
 	topLevel:SetPoint('TOPLEFT', lock, 'BOTTOMLEFT')
-	topLevel:SetScript('OnClick', function() SetToplevel(menu.frame, this:GetChecked()) end)
+	topLevel:SetScript('OnClick', function() SetToplevel(menu.anchor, this:GetChecked()) end)
 	topLevel:SetText(L.Toplevel)
 	
 	local colorPicker = CreateFrame('Button', name .. 'BGColor', menu, 'GooeyColorPicker')
-	colorPicker:SetPoint('TOPLEFT', topLevelButton, 'BOTTOMLEFT', 4, 2)
-	colorPicker:SetScript('OnClick', function() BGColor_OnClick(menu.frame) end)
+	colorPicker:SetPoint('TOPLEFT', topLevel, 'BOTTOMLEFT', 4, 2)
+	colorPicker:SetScript('OnClick', function() BGColor_OnClick(menu.anchor) end)
 	colorPicker:SetText(L.BackgroundColor)
 
 	--sliders
-	local strata = Slider_Create(menu, 'Level', 1, 3, 1, L.FrameLevel, SetFrameStrata, STRATAS)
+	local strata = Slider_Create(menu, 'Level', 1, 3, 1, L.FrameLevel, SetFrameStrata, nil, STRATAS)
 	strata:SetPoint('BOTTOM', menu, 'BOTTOM', 0, 20)
 	
 	local alpha = Slider_Create(menu, 'Opacity', 0, 100, 1, L.Opacity, SetFrameAlpha, true)
@@ -247,6 +242,8 @@ end
 
 --[[ Show Menu ]]--
 
+BagnonMenu = {}
+
 function BagnonMenu:Show(frame)
 	if self.frame and self.frame.anchor == frame then
 		return 
@@ -262,25 +259,25 @@ function BagnonMenu:Show(frame)
 	local sets = frame.sets
 
 	--Set values
-	getglobal(name .. 'Lock'):SetChecked(frame:IsLocked())
-	getglobal(name .. 'TopLevel'):SetChecked(sets.topLevel)
+	getglobal(MENU_NAME .. 'Lock'):SetChecked(frame:IsLocked())
+	getglobal(MENU_NAME .. 'TopLevel'):SetChecked(sets.topLevel)
 
 	local r, g, b, a = frame:GetBackgroundColor()
-	getglobal(name .. 'BGColorNormalTexture'):SetVertexColor(r, g, b, a)
+	getglobal(MENU_NAME .. 'BGColorNormalTexture'):SetVertexColor(r, g, b, a)
 
 	local cols, spacing = frame:GetLayout()
-	getglobal(name .. 'Cols'):SetValue(cols)
-	getglobal(name .. 'Spacing'):SetValue(spacing)
-	getglobal(name .. 'Scale'):SetValue(frame:GetScale() * 100)
-	getglobal(name .. 'Opacity'):SetValue(frame:GetAlpha() * 100)
-	getglobal(name .. 'Level'):SetValue(ToIndex(frame:GetFrameStrata(), STRATAS))
+	getglobal(MENU_NAME .. 'Cols'):SetValue(cols)
+	getglobal(MENU_NAME .. 'Spacing'):SetValue(spacing)
+	getglobal(MENU_NAME .. 'Scale'):SetValue(frame:GetScale() * 100)
+	getglobal(MENU_NAME .. 'Opacity'):SetValue(frame:GetAlpha() * 100)
+	getglobal(MENU_NAME .. 'Level'):SetValue(ToIndex(frame:GetFrameStrata(), STRATAS))
 
 	--place the frame at the player's cursor
 	local x, y = GetCursorPosition()
 	x = x / UIParent:GetScale()
 	y = y / UIParent:GetScale()
 
-	menu:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", x - 36, y + 48)
+	menu:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", x - 32, y + 48)
 	menu:Show()
 	
 	menu.onShow = nil

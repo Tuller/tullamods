@@ -327,7 +327,9 @@ local function ShowAtEvent(event, showBlizBank)
 	
 	if Bagnon.sets[format('showBankAt%s', event)] then
 		Bagnon:ShowBank(true)
-	elseif showBlizBank then
+	end
+	
+	if showBlizBank then
 		ShowBlizBank()
 	end
 end
@@ -344,7 +346,7 @@ end
 
 function Bagnon:BANKFRAME_OPENED()
 	self.atBank = true
-	ShowAtEvent('Bank', true)
+	ShowAtEvent('Bank', not BagnonUtil:ReplacingBank())
 end
 
 function Bagnon:BANKFRAME_CLOSED()
