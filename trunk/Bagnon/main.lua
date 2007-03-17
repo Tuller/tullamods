@@ -1,11 +1,10 @@
 --[[
-	Bagnon2
+	Bagnon
 		Handles settings management, and bank and inventory viewing
 --]]
 
 Bagnon = DongleStub("Dongle-Beta1"):New("Bagnon")
-Bagnon.atBank = false
-
+local L = BAGNON_LOCALS
 
 --[[ Startup and settings management ]]--
 
@@ -24,25 +23,26 @@ function Bagnon:Initialize()
 
 		replaceBags = 1,
 		replaceBank = 1,
-		showTooltips = 1,
+
+		showOwners = 1,
+		showBorders = 1,
 		showBagsAtMail = 1,
 		showBagsAtVendor = 1,
 		showBagsAtBank = 1,
 		showBagsAtAH = 1,
 		showBankAtBank = 1,
-		qualityBorders = 1,
 		version = cVersion,
 	}
 	
 	if not BagnonSets or not BagnonSets.version then
 		BagnonSets = defaults
-		self:Print('New user detected, default settings loaded.')
+		self:Print(L.NewUser)
 	else
 		local cMajor, cMinor = cVersion:match('(%d+)%.(%d+)')
 		local major, minor = BagnonSets.version:match('(%d+)%.(%d+)')
 		
 		if major ~= cMajor then
-			self:Print('Upgrading from an incompatible version, defaults loaded.')
+			self:Print(L.UpdatedIncompatible)
 			BagnonSets = defaults
 		elseif minor ~= cMinor then
 			self:UpdateSettings(cVersion)
@@ -53,7 +53,7 @@ end
 
 function Bagnon:UpdateSettings(cVersion)
 	BagnonSets.version = cVersion
-	self:Print(format('Updated to v%s', cVersion))
+	self:Print(format(L.Updated, cVersion))
 end
 
 function Bagnon:Enable()
@@ -79,7 +79,7 @@ end
 --[[ Inventory Frame Display ]]--
 
 function Bagnon:CreateInventory()
-	local bags = BagnonFrame.New(BAGNON_INVENTORY_TITLE, self.sets.inventory, {0, 1, 2, 3, 4, -2})
+	local bags = BagnonFrame.New(L.TitleBags, self.sets.inventory, {0, 1, 2, 3, 4, -2})
 	table.insert(UISpecialFrames, bags:GetName())
 
 	local OnShow = bags:GetScript('OnShow')
@@ -149,7 +149,7 @@ end
 --[[ Bank Frame Display ]]--
 
 function Bagnon:CreateBank()
-	local bank = BagnonFrame.New(BAGNON_BANK_TITLE, self.sets.bank, {-1, 5, 6, 7, 8, 9, 10, 11}, true)
+	local bank = BagnonFrame.New(L.TitleBank, self.sets.bank, {-1, 5, 6, 7, 8, 9, 10, 11}, true)
 	table.insert(UISpecialFrames, bank:GetName())
 
 	local OnShow = bank:GetScript('OnShow')
@@ -190,7 +190,7 @@ function Bagnon:ShowBank(auto)
 			bank.manOpened = not auto
 		end
 	else
-		UIErrorFrame:AddMessage("No cached data available, cannot open the bank")
+		UIErrorsFrame:AddMessage(L.ErrorNoSavedBank)
 	end
 end
 
@@ -230,42 +230,36 @@ end
 --]]
 
 local function FrameOpened(id, auto)
-	local sets = self.sets
-	
-	if sets.replaceBags and Bagnon:InventoryHasBag(id) then
+	if BagnonUtil:ReplacingBags() and Bagnon:InventoryHasBag(id) then
 		Bagnon:ShowInventory(auto)
 		return true
 	end
 	
-	if sets.replaceBank and Bagnon:BankHasBag(id) then
+	if BagnonUtil:ReplacingBank()  and Bagnon:BankHasBag(id) then
 		Bagnon:ShowBank(auto)
 		return true
 	end
 end
 
 local function FrameClosed(id, auto)
-	local sets = self.sets
-
-	if sets.replaceBags and Bagnon:InventoryHasBag(id) then
+	if BagnonUtil:ReplacingBags() and Bagnon:InventoryHasBag(id) then
 		Bagnon:HideInventory(auto)
 		return true
 	end
 	
-	if sets.replaceBank and Bagnon:BankHasBag(id) then
+	if BagnonUtil:ReplacingBank() and Bagnon:BankHasBag(id) then
 		Bagnon:HideBank(auto)
 		return true
 	end
 end
 
 local function FrameToggled(id, auto)
-	local sets = Bagnon.sets
-
-	if sets.replaceBags and Bagnon:InventoryHasBag(id) then
+	if BagnonUtil:ReplacingBags() and Bagnon:InventoryHasBag(id) then
 		Bagnon:ToggleInventory(auto)
 		return true
 	end
 	
-	if sets.replaceBank and Bagnon:BankHasBag(id) then
+	if BagnonUtil:ReplacingBank()  and Bagnon:BankHasBag(id) then
 		Bagnon:ToggleBank(auto)
 		return true
 	end
@@ -273,7 +267,7 @@ end
 
 local oOpenBackpack = OpenBackpack
 OpenBackpack = function()
-	if not Bagnon.sets.replaceBags then
+	if not BagnonUtil:ReplacingBags() then
 		oOpenBackpack()
 	end
 end
@@ -289,7 +283,7 @@ end
 
 local oOpenAllBags = OpenAllBags
 OpenAllBags = function(force)
-	if Bagnon.sets.replaceBags then
+	if BagnonUtil:ReplacingBags() then
 		if force then
 			Bagnon:ShowInventory()
 		else
@@ -302,7 +296,7 @@ end
 
 local bCloseAllBags = CloseAllBags
 CloseAllBags = function()
-	if Bagnon.sets.replaceBags then
+	if BagnonUtil:ReplacingBags() then
 		Bagnon:HideInventory()
 	else
 		bCloseAllBags()
@@ -399,23 +393,25 @@ function Bagnon:MERCHANT_CLOSED()
 end
 
 
---[[ 
-	Slash Commands
---]]
+--[[  Slash Commands ]]--
 
 function Bagnon:RegisterSlashCommands()
-	local slash = self:InitializeSlashCommand("Commands", "BAGNON", "bagnon", "bgn")
-	slash:RegisterSlashHandler("menu - Shows the options menu", "menu", "ShowMenu")
-	slash:RegisterSlashHandler("bags - Toggles the inventory frame", "bags", "ToggleInventory")
-	slash:RegisterSlashHandler("bank - Toggles the bank frame", "bank", "ToggleBank")
+	local slash = self:InitializeSlashCommand(L.Commands, "BAGNON", "bagnon", "bgn")
+	slash:RegisterSlashHandler(format("menu: %s", L.ShowMenuDesc), "menu", "ShowMenu")
+	slash:RegisterSlashHandler(format("bags: %s", L.ShowBagsDesc), "bags", "ToggleInventory")
+	slash:RegisterSlashHandler(format("bank: %s", L.ShowBankDesc), "bank", "ToggleBank")
 	self.slash = slash
 end
 
 function Bagnon:ShowMenu()
 	local enabled = select(4, GetAddOnInfo("Bagnon_Options"))
 	if enabled then
-		if IsAddOnLoaded("Bagnon_Options") then
-			BagnonOptions:Show()
+		if BagnonOptions then
+			if BagnonOptions:IsShown() then
+				BagnonOptions:Hide()
+			else
+				BagnonOptions:Show()
+			end
 		else
 			LoadAddOn("Bagnon_Options")
 		end

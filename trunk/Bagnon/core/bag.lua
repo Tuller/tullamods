@@ -7,6 +7,7 @@
 
 BagnonBag = CreateFrame('Button')
 local Frame_mt = {__index = BagnonBag}
+local L = BAGNON_LOCALS
 
 local SIZE = 32
 local NORMAL_TEXTURE_SIZE = 64 * (SIZE / 37)
@@ -303,12 +304,10 @@ function BagnonBag:OnEnter()
 		GameTooltip:SetText(TEXT(EQUIP_CONTAINER), 1, 1, 1)
 	end
 
-	if util:ShowingTooltips() then
-		if frame:ShowingBag(bagID) then
-			GameTooltip:AddLine(BAGNON_BAGS_HIDE)
-		else
-			GameTooltip:AddLine(BAGNON_BAGS_SHOW)
-		end
+	if frame:ShowingBag(bagID) then
+		GameTooltip:AddLine(L.TipHideBag)
+	else
+		GameTooltip:AddLine(L.TipShowBag)
 	end
 	GameTooltip:Show()
 	BagnonSpot:SetBagSearch(bagID)

@@ -4,6 +4,7 @@
 
 BagnonBagFrame = CreateFrame('Frame')
 local Frame_mt = {__index = BagnonBagFrame}
+local L = BAGNON_LOCALS
 
 local lastCreated = 0
 
@@ -150,10 +151,10 @@ function BagnonBagFrame:ShowBags(show, updateParent)
 	end
 
 	if show then
-		self.toggle:SetText(BAGNON_HIDEBAGS)
+		self.toggle:SetText(L.HideBags)
 		self.toggle:SetWidth(self.toggle:GetTextWidth())
 	else
-		self.toggle:SetText(BAGNON_SHOWBAGS)
+		self.toggle:SetText(L.ShowBags)
 		self.toggle:SetWidth(self.toggle:GetTextWidth())
 	end
 

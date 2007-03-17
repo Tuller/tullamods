@@ -68,24 +68,29 @@ end
 
 --creates an entierly new item slot, if no blizzard slots are available
 local function Item_Create()
-	local bag = ceil(lastCreated / MAX_ITEMS_PER_BAG)
-	local slot = mod(lastCreated - 1, MAX_ITEMS_PER_BAG) + 1
+	local item
 
-	local item = getglobal(format('ContainerFrame%dItem%d', bag, slot))
-	if item then
-		item:SetParent(nil); item:SetID(0); item:Show()
-	else
-		item = CreateFrame('Button', format('BagnonItem%s', lastCreated), nil, 'ContainerFrameItemButtonTemplate')
+	if BagnonUtil:ReusingFrames() then
+		local bag = ceil(lastCreated / MAX_ITEMS_PER_BAG)
+		local slot = mod(lastCreated - 1, MAX_ITEMS_PER_BAG) + 1
+		item = getglobal(format('ContainerFrame%dItem%d', bag, slot))
+		if item then
+			item:SetParent(nil)
+			item:SetID(0)
+		end
 	end
-	setmetatable(item, Item_mt)
+	item = item or CreateFrame('Button', format('BagnonItem%s', lastCreated), nil, 'ContainerFrameItemButtonTemplate')
 	item:ClearAllPoints()
+	item:Show()
+	setmetatable(item, Item_mt)
 
-	local border = item:CreateTexture(item:GetName() .. 'Border', 'OVERLAY')
+	local border = item:CreateTexture(nil, 'OVERLAY')
 	border:SetWidth(67); border:SetHeight(67)
 	border:SetPoint('CENTER', item)
 	border:SetTexture('Interface\\Buttons\\UI-ActionButton-Border')
 	border:SetBlendMode('ADD')
 	border:Hide()
+	item.border = border
 
 	item:UnregisterAllEvents()
 	item:SetScript('OnEvent', nil)
@@ -199,7 +204,7 @@ function BagnonItem:UpdateSearch()
 				local name, _, quality, itemLevel, minLevel, type, subType, _, equipLoc = GetItemInfo(link)
 
 				if text and text ~= type:lower() then
-					if not(subType) or text ~= subType:lower() then
+					if not(subType and subType:lower():find(text)) then
 						if not(getglobal(equipLoc)) or text ~= getglobal(equipLoc):lower() then
 							if not name:lower():find(text) then
 								self:Fade()
@@ -220,14 +225,12 @@ function BagnonItem:UpdateSearch()
 end
 
 function BagnonItem:UpdateBorder(quality)
-	local slot = self:GetID()
-	local bag = self:GetBag()
-	local player = self:GetPlayer()
-	local border = getglobal(self:GetName() .. 'Border')
+	local border = self.border
+	local link = self.hasItem
 
-	if BagnonUtil:GetSets().qualityBorders and self.hasItem then
+	if BagnonUtil:ShowingBorders() and link then
 		if not quality then
-			quality = select(3, GetItemInfo(self.hasItem))
+			quality = select(3, GetItemInfo(link))
 		end
 
 		if quality > 1 then

@@ -1,79 +1,51 @@
 --[[
-	Bagnon Localization file
-	
-	TODO:
-		Add some frame strings and other things
-		I could probably Babelfish the translation, but most likely it would insult someone's 
-			mother or something.
+	Bagnon Localization file: French Language
+		Credit goes to namAtsar
 --]]
-
---[[ French    by   namAtsar ]]--
 
 if GetLocale() ~= "frFR" then return end
 
---[[ Keybindings ]]--
+local L = BAGNON_LOCALS
 
+--bindings
 BINDING_HEADER_BAGNON = "Bagnon";
 BINDING_NAME_BAGNON_TOGGLE = "Afficher Bagnon";
 BINDING_NAME_BANKNON_TOGGLE = "Afficher Banknon";
 
+--system messages
+L.NewUser = "Charg\195\169"
+L.Updated = "Configs \195\160 jour v%s"
+L.UpdatedIncompatible = "Updating from an incompatible version, defaults loaded"
 
---[[ Slash Commands ]]--
+--errors
+L.ErrorNoSavedBank = "Cannot open the bank, no saved information available"
 
-BAGNON_COMMAND_HELP = "help";
-BAGNON_COMMAND_SHOWBAGS = "bags";
-BAGNON_COMMAND_SHOWBANK = "bank";
-BAGNON_COMMAND_REVERSE = "reverse";
+--slash commands
+L.Commands = "Commandes:"
+L.ShowMenuDesc = "Show the options menu"
+L.ShowBagsDesc = "Toggle the inventory frame"
+L.ShowBankDesc = "Toggle the bank frame"
 
+--frame text
+L.TitleBags = "Sac de %s"
+L.TitleBank = "Banque de %s"
+L.ShowBags = "Montrer Sacs"
+L.HideBags = "Cacher Sacs"
 
---[[ Messages from the slash commands ]]--
+--tooltips
+L.TipShowMenu = "<Clic-Droit> pour ouvrir le menu de Config"
+L.TipShowSearch = "<Double-Click> to Search"
+L.TipShowBag = "<Clic> pour montrer"
+L.TipHideBag = "<Clic> pour cacher"
+L.TipGoldOnRealm = "Total on %s"
 
---/bgn help
-BAGNON_HELP_TITLE = "Bagnon commandes:";
-BAGNON_HELP_SHOWBAGS = "/bgn " .. BAGNON_COMMAND_SHOWBAGS .. " - Montrer/Cacher Bagnon.";
-BAGNON_HELP_SHOWBANK = "/bgn " .. BAGNON_COMMAND_SHOWBANK .. " - Montrer/Cacher Banknon.";
-BAGNON_HELP_HELP = "/bgn " .. BAGNON_COMMAND_HELP .. " - Afficher slash commandes.";
-
-
---[[ System Messages ]]--
-
-BAGNON_INITIALIZED = "Bagnon charg\195\169.  Taper /bagnon ou /bgn pour les commandes";
-BAGNON_UPDATED = "Bagnon  Configs \195\160 jour v%s.  Taper /bagnon ou /bgn pour les commandes";
-
-
---[[ UI Text ]]--
-
---Titles
-
---These should probably read Inventory of <player> and Bank of <player> in other versions I guess
-BAGNON_INVENTORY_TITLE = "Sac de %s";
-BAGNON_BANK_TITLE = "Banque de %s";
-
---Bag Button
-BAGNON_SHOWBAGS = "Montrer Sacs";
-BAGNON_HIDEBAGS = "Cacher Sacs";
-
---General Options Menu
-BAGNON_MAINOPTIONS_TITLE = "Bagnon Options";
-BAGNON_MAINOPTIONS_SHOW = "Montrer";
-
---Right Click Menu
-BAGNON_OPTIONS_TITLE = "Config de %s";
-BAGNON_OPTIONS_LOCK = "Verrouiller Position";
-BAGNON_OPTIONS_BACKGROUND = "Fond";
-BAGNON_OPTIONS_REVERSE = "Inverser l\'ordre dans le Sac";
-BAGNON_OPTIONS_COLUMNS = "Colonne";
-BAGNON_OPTIONS_SPACING = "Espace";
-BAGNON_OPTIONS_SCALE = "Echelle";
-BAGNON_OPTIONS_OPACITY = "Opacit\195\169";
-BAGNON_OPTIONS_STRATA = "Couche";
-BAGNON_OPTIONS_STAY_ON_SCREEN = "Rester \195\160 l\'Ecran";
-
---[[ Tooltips ]]--
-
---Title tooltip
-BAGNON_TITLE_TOOLTIP = "<Clic-Droit> pour ouvrir le  menu de Config.";
-
---Bag Tooltips
-BAGNON_BAGS_HIDE = "<Clic> pour cacher.";
-BAGNON_BAGS_SHOW = "<Clic> pour montrer.";
+--menu text
+L.FrameSettings = "Frame Settings"
+L.Lock = "Verrouiller Position"
+L.Toplevel = "Toplevel"
+L.BackgroundColor = "Fond"
+L.FrameLevel = "Couche"
+L.Opacity = "Opacit\195\169"
+L.Scale = "Echelle"
+L.Spacing = "Espace"
+L.Cols = "Colonne"

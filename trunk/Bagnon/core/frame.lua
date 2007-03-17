@@ -8,6 +8,7 @@
 
 BagnonFrame = CreateFrame('Frame')
 local Frame_mt = {__index = BagnonFrame}
+local L = BAGNON_LOCALS
 
 local DEFAULT_COLS = 8
 local DEFAULT_SPACING = 1
@@ -34,7 +35,7 @@ local function NormalSort(a, b)
 end
 
 local function HideAttachedMenus(frame)
-	if BagnonMenu and BagnonMenu.frame == frame then
+	if BagnonMenu:GetAnchor() == frame then
 		BagnonMenu:Hide()
 	end
 	
@@ -199,7 +200,7 @@ end
 
 function BagnonFrame:OnClick(button)
 	if button == 'RightButton' then
-		BagnonMenu_Show(self)
+		BagnonMenu:Show(self)
 	end
 end
 
@@ -221,14 +222,12 @@ function BagnonFrame:OnMouseUp()
 end
 
 function BagnonFrame:OnEnter(title)
-	if util:ShowingTooltips() then
-		util:AnchorTooltip(title)
+	util:AnchorTooltip(title)
 
-		GameTooltip:SetText(self:GetTitleText(), 1, 1, 1)
-		GameTooltip:AddLine(BAGNON_TITLE_SHOW_MENU)
-		GameTooltip:AddLine(BAGNON_SPOT_TOOLTIP)
-		GameTooltip:Show()
-	end
+	GameTooltip:SetText(self:GetTitleText(), 1, 1, 1)
+	GameTooltip:AddLine(L.TipShowMenu)
+	GameTooltip:AddLine(L.TipShowSearch)
+	GameTooltip:Show()
 end
 
 function BagnonFrame:OnLeave()

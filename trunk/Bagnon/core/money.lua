@@ -75,9 +75,9 @@ end
 
 --Alters the tooltip of bagnon moneyframes to show total gold across all characters on the current realm
 function BagnonMoney:OnEnter()
-	if BagnonDB and BagnonUtil:ShowingTooltips() then
+	if BagnonDB then
 		GameTooltip:SetOwner(self, "ANCHOR_TOPRIGHT")
-		GameTooltip:SetText(format("Total on %s", GetRealmName()))
+		GameTooltip:SetText(format(BAGNON_LOCALS.TipGoldOnRealm, GetRealmName()))
 
 		local money = 0
 		for player in BagnonDB:GetPlayers() do

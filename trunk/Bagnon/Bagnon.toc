@@ -18,5 +18,5 @@ core\money.lua
 core\purchase.lua
 core\frame.lua
 core\spot.lua
-menu\menu.xml
+core\menu.lua
 main.lua

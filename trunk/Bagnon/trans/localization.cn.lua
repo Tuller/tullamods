@@ -1,80 +1,54 @@
-﻿--[[ THIS FILE IS ENCODED IN UTF-8 ]]--
+﻿--[[
+	THIS FILE IS ENCODED IN UTF-8
 
---[[
-	Bagnon Localization file
-
-	TODO:
-		Add some frame strings and other things
-		I could probably Babelfish the translation, but most likely it would insult someone's
-			mother or something.
+	Bagnon Localization file: Chinese 
+		Credit goes to Diablohu
 --]]
 
---[[
-	Chinese    by   Diablohu
---]]
 
 if GetLocale() ~= "zhCN" then return end
 
---[[ Keybindings ]]--
+local L = BAGNON_LOCALS
 
+--bindings
 BINDING_HEADER_BAGNON = "Bagnon"
 BINDING_NAME_BAGNON_TOGGLE = "开关Bagnon"
 BINDING_NAME_BANKNON_TOGGLE = "开关Banknon"
 
---[[ Messages from the slash commands ]]--
+--system messages
+L.NewUser = "New user detected, default settings loaded"
+L.Updated = "Updated to v%s"
+L.UpdatedIncompatible = "Updating from an incompatible version, defaults loaded"
 
---/bgn help
-BAGNON_HELP_TITLE = "Bagnon 指令："
-BAGNON_HELP_SHOWBAGS = "/bgn " .. BAGNON_COMMAND_SHOWBAGS .. " - 显示/隐藏 Bagnon"
-BAGNON_HELP_SHOWBANK = "/bgn " .. BAGNON_COMMAND_SHOWBANK .. " - 显示/隐藏 Banknon"
-BAGNON_HELP_HELP = "/bgn " .. BAGNON_COMMAND_HELP .. " - 显示其它指令"
+--errors
+L.ErrorNoSavedBank = "Cannot open the bank, no saved information available"
 
---/bgn debug
-BAGNON_DEBUG_ENABLED = "Debug 模式开启。"
+--slash commands
+L.Commands = "Commands:"
+L.ShowMenuDesc = "Shows the options menu"
+L.ShowBagsDesc = "Toggles the inventory frame"
+L.ShowBankDesc = "Toggles the bank frame"
 
---/bgn nodebug
-BAGNON_DEBUG_DISABLED = "Debug 模式关闭。"
+--frame text
+L.TitleBank = "%s的银行"
+L.TitleBags = "%s的背包"
+L.ShowBags = "显示包裹"
+L.HideBags = "隐藏包裹"
 
---[[ System Messages ]]--
+--tooltips
+L.TipShowMenu = "<右键点击>打开设置菜单"
+L.TipShowSearch = "<双击>进行搜索"
+L.TipShowBag = "<单击>显示"
+L.TipHideBag = "<单击>隐藏"
+L.TipGoldOnRealm = "Total on %s"
 
-BAGNON_INITIALIZED = "Bagnon 已加载。输入 /bagnon 或 /bgn 查询指令"
-BAGNON_UPDATED = "Bagnon 已更新至 v%s 。输入 /bagnon 或 /bgn 查询指令"
-
---[[ UI Text ]]--
-
---Titles
-
---These should probably read Inventory of <player> and Bank of <player> in other versions I guess
-BAGNON_INVENTORY_TITLE = "%s的背包"
-BAGNON_BANK_TITLE = "%s的银行"
-
---Bag Button
-BAGNON_SHOWBAGS = "显示包裹"
-BAGNON_HIDEBAGS = "隐藏包裹"
-
---General Options Menu
-BAGNON_MAINOPTIONS_TITLE = "Bagnon 设置"
-BAGNON_MAINOPTIONS_SHOW = "显示"
-
---Right Click Menu
-BAGNON_OPTIONS_TITLE = "%s 设置"
-BAGNON_OPTIONS_LOCK = "锁定位置"
-BAGNON_OPTIONS_BACKGROUND = "背景颜色"
-BAGNON_OPTIONS_REVERSE = "反向排列"
-BAGNON_OPTIONS_COLUMNS = "列数"
-BAGNON_OPTIONS_SPACING = "间距"
-BAGNON_OPTIONS_SCALE = "缩放"
-BAGNON_OPTIONS_OPACITY = "透明度"
-BAGNON_OPTIONS_STRATA = "层"
-BAGNON_OPTIONS_STAY_ON_SCREEN = "保持显示"
-
---[[ Tooltips ]]--
-
---Title tooltip
-BAGNON_TITLE_SHOW_MENU = "<右键点击>打开设置菜单"
-
---Bag Tooltips
-BAGNON_BAGS_HIDE = "<Shift-单击>隐藏"
-BAGNON_BAGS_SHOW = "<Shift-单击>显示"
-
-BAGNON_SPOT_TOOLTIP = "<双击>进行搜索"
+--menu text
+L.FrameSettings = "Frame Settings"
+L.Lock = "锁定位置"
+L.Toplevel = "Toplevel"
+L.BackgroundColor = "背景颜色"
+L.FrameLevel = "层"
+L.Opacity = "透明度"
+L.Scale = "缩放"
+L.Spacing = "间距"
+L.Cols = "列数"

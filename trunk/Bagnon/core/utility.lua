@@ -4,6 +4,7 @@
 --]]
 
 BagnonUtil = {}
+local L = BAGNON_LOCALS
 
 --[[ Usable Functions ]]--
 
@@ -96,7 +97,7 @@ function BagnonUtil:IsAmmoBag(bag, player)
 	local link = self:GetBagLink(bag, player)
 	if link then
 		local type, subType = select(6, GetItemInfo(link))
-		return (type == BAGNON_TYPE['Quiver'] or subType == BAGNON_SUBTYPE['Soul Bag'])
+		return (type == L.TypeQuiver or subType == L.SubTypeSoulBag)
 	end
 end
 
@@ -108,7 +109,7 @@ function BagnonUtil:IsProfessionBag(bag, player)
 	local link = self:GetBagLink(bag, player)
 	if link then
 		local type, subType = select(6, GetItemInfo(link))
-		return type == BAGNON_TYPE['Container'] and not (subType == BAGNON_SUBTYPE['Bag'] or subType == BAGNON_SUBTYPE['Soul Bag'])
+		return type == L.TypeContainer and not(subType == L.SubTypeBag or subType == L.SubTypeSoulBag)
 	end
 end
 
@@ -143,6 +144,22 @@ function BagnonUtil:GetSets()
 	return Bagnon.sets
 end
 
-function BagnonUtil:ShowingTooltips()
-	return Bagnon.sets.showTooltips
+function BagnonUtil:ShowingOwners()
+	return Bagnon.sets.showOwners
+end
+
+function BagnonUtil:ShowingBorders()
+	return Bagnon.sets.showBorders
+end
+
+function BagnonUtil:ReusingFrames()
+	return Bagnon.sets.reuseFrames
+end
+
+function BagnonUtil:ReplacingBags()
+	return Bagnon.sets.replaceBags
+end
+
+function BagnonUtil:ReplacingBank()
+	return Bagnon.sets.replaceBank
 end
