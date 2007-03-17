@@ -2,10 +2,6 @@
 	Bagnon Main Options Localization file
 --]]
 
---[[
-	English - Default Language
---]]
-
 BAGNON_OPTIONS_LOCALS = {}
 local L = BAGNON_OPTIONS_LOCALS
 
