@@ -202,7 +202,8 @@ end
 local function CreateMenu(name)
 	local menu = CreateFrame('Button', name, UIParent, 'GooeyPopup')
 	menu:SetWidth(230); menu:SetHeight(378)
-	menu:SetScript("OnClick", function() this.anchor = nil; this:Hide() end)
+	menu:SetScript("OnHide", function() this.anchor = nil; end)
+	menu:SetScript("OnClick", function() this:Hide() end)
 	menu:RegisterForClicks("anyUp")
 	
 	local title = menu:CreateFontString(name .. 'Title', 'ARTWORK')

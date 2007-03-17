@@ -176,6 +176,7 @@ function BagnonItem:Update()
 
 	self:UpdateSlotBorder()
 	self:UpdateBorder(quality)
+	self:UpdateCooldown()
 
 	if GameTooltip:IsOwned(self) then
 		self.elapsed = nil

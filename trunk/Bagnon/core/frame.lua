@@ -402,9 +402,12 @@ function BagnonFrame:UpdateLockedSlots()
 end
 
 function BagnonFrame:UpdateSlotsOnCooldown()
-	for _, item in pairs(self.slots) do
-		if not tonumber(item) then
-			item:UpdateCooldown()
+	for bag = 0, 4 do
+		for slot = 1, util:GetBagSize(bag) do
+			local item = self.slots[ToIndex(bag,slot)]
+			if item then
+				item:UpdateCooldown()
+			end
 		end
 	end
 end
