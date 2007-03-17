@@ -1,6 +1,6 @@
 ## Interface: 20003
-## Title: Bagnon_Forever
-## Notes: Allows the viewing of the bank from anywhere, and also the inventory of your other characters.
+## Title: Bagnon Forever
+## Notes: Stores inventory information about your characters
 ## Author: Tuller
 ## Version: 7.3.12
 ## Dependencies: Bagnon
