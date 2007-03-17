@@ -187,12 +187,21 @@ local function SetToplevel(frame, enable)
 	end
 end
 
+local function SetReverseSort(frame, enable)
+	if enable then
+		frame.sets.reverseSort = 1
+	else
+		frame.sets.reverseSort = nil
+	end
+	frame:SortBags()
+	frame:Layout()
+end
 
 --[[ Menu Constructor ]]--
 
 local function CreateMenu(name)
 	local menu = CreateFrame('Button', name, UIParent, 'GooeyPopup')
-	menu:SetWidth(230); menu:SetHeight(346)
+	menu:SetWidth(230); menu:SetHeight(378)
 	menu:SetScript("OnClick", function() this.anchor = nil; this:Hide() end)
 	menu:RegisterForClicks("anyUp")
 	
@@ -210,8 +219,13 @@ local function CreateMenu(name)
 	lock:SetScript('OnClick', function() menu.anchor:Lock(this:GetChecked()) end)
 	lock:SetText(L.Lock)
 	
+	local reverse = CreateFrame('CheckButton', name .. 'Reverse', menu, 'GooeyCheckButton')
+	reverse:SetPoint('TOPLEFT', lock, 'BOTTOMLEFT')
+	reverse:SetScript('OnClick', function() SetReverseSort(menu.anchor, this:GetChecked()) end)
+	reverse:SetText(L.ReverseSort)
+	
 	local topLevel = CreateFrame('CheckButton', name .. 'TopLevel', menu, 'GooeyCheckButton')
-	topLevel:SetPoint('TOPLEFT', lock, 'BOTTOMLEFT')
+	topLevel:SetPoint('TOPLEFT', reverse, 'BOTTOMLEFT')
 	topLevel:SetScript('OnClick', function() SetToplevel(menu.anchor, this:GetChecked()) end)
 	topLevel:SetText(L.Toplevel)
 	
@@ -261,6 +275,7 @@ function BagnonMenu:Show(frame)
 	--Set values
 	getglobal(MENU_NAME .. 'Lock'):SetChecked(frame:IsLocked())
 	getglobal(MENU_NAME .. 'TopLevel'):SetChecked(sets.topLevel)
+	getglobal(MENU_NAME .. 'Reverse'):SetChecked(sets.reverseSort)
 
 	local r, g, b, a = frame:GetBackgroundColor()
 	getglobal(MENU_NAME .. 'BGColorNormalTexture'):SetVertexColor(r, g, b, a)

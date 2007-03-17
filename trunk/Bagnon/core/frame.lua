@@ -34,6 +34,10 @@ local function NormalSort(a, b)
 	return a ~= -2 and (b == -2 or a < b)
 end
 
+local function ReverseSort(a, b)
+	return a ~= -2 and (b == -2 or a > b)
+end
+
 local function HideAttachedMenus(frame)
 	if BagnonMenu:GetAnchor() == frame then
 		BagnonMenu:Hide()
@@ -138,7 +142,8 @@ local function PlaceAndUpdate(frame)
 		frame:SetPoint('CENTER', UIParent)
 	end
 
-	table.sort(frame:GetVisibleBags(), NormalSort)
+	frame:SortBags()
+
 	if not frame:IsShown() then
 		frame:Show()
 	else
@@ -254,7 +259,7 @@ function BagnonFrame:ShowBag(bag, enable)
 		if not self:ShowingBag(bag) then
 			local bags = self:GetVisibleBags()
 			table.insert(bags, bag)
-			table.sort(bags, NormalSort)
+			self:SortBags()
 
 			self:AddBag(bag, true)
 		end
@@ -263,7 +268,7 @@ function BagnonFrame:ShowBag(bag, enable)
 		if index then
 			local bags = self:GetVisibleBags()
 			table.remove(bags, index)
-			table.sort(bags, NormalSort)
+			self:SortBags()
 
 			self:RemoveBag(bag)
 		end
@@ -573,4 +578,14 @@ end
 
 function BagnonFrame:GetTitleText()
 	return format(self.titleText or self:GetName(), self:GetPlayer())
+end
+
+--[[ Sorting ]]--
+
+function BagnonFrame:SortBags()
+	if self.sets.reverseSort then
+		table.sort(self.sets.bags, ReverseSort)
+	else
+		table.sort(self.sets.bags, NormalSort)
+	end
 end
