@@ -3,10 +3,72 @@
 		Originally based on SellValueLite, this addon allows viewing of sellvalues
 --]]
 
+local base36 = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'}
+local maxBase = 10 + #base36
 local lastMoney = 0
 
+local function ToBase(num, base)
+	local newNum = ''
+	while num > 0 do
+		local remain = mod(num, base)
+		num = floor(num / base)
+		if remain > 9 then
+			newNum = base36[remain-9] .. newNum
+		else
+			newNum = remain .. newNum
+		end
+	end
+	return newNum
+end
+
+local cache = {}
+setmetatable(cache, {__index = function(t, i)
+	if LudwigSV then
+		local c = LudwigSV:match(i .. ',(%w+);')
+		if c then t[i] = c end
+		return c
+	end
+end})
 
 --[[ Local Functions ]]--
+
+local function LinkToID(link)
+	if link then
+		return tonumber(link) or tonumber(link:match('item:(%d+)') or tonumber(select(2, GetItemInfo(link)):match('item:(%d+)')))
+	end
+end
+
+local function SaveCost(id, cost)
+	local id = ToBase(id, maxBase)
+	local cost = ToBase(cost, maxBase)
+
+	if cost ~= cache[id] then 
+		LudwigSVCache[id] = cost
+	end
+end
+
+local function GetCost(id)
+	local id = ToBase(id, maxBase)
+	local cost = LudwigSVCache[id] or cache[id]
+
+	if cost then
+		return tonumber(cost, maxBase)
+	end
+end
+
+
+--[[  Function Hooks ]]--
+
+local function AddMoneyToTooltip(frame, id, count)
+    if id and not MerchantFrame:IsVisible() then
+		local cost = GetCost(id)
+		if cost then
+			frame:AddLine(SELLVALUE_COST, 1, 1,	0)
+			SetTooltipMoney(frame, cost * (count or 1))
+			frame:Show()
+		end
+    end
+end
 
 local function pHook(action, method)
 	return function(...)
@@ -15,36 +77,8 @@ local function pHook(action, method)
 	end
 end
 
-local function LinkToID(link)
-	if link then
-		return tonumber(link) or tonumber(link:match("item:(%d+)") or tonumber(select(2, GetItemInfo(link)):match("item:(%d+)")))
-	end
-end
-
-local function SaveCost(id, totalCost, count)
-	if count and count > 0 and totalCost and totalCost > 0 then
-		if not Ludwig_SellValues then
-			Ludwig_SellValues = {}
-		end
-		Ludwig_SellValues[id] = totalCost / count
-	end
-end
-
-local function AddMoneyToTooltip(frame, id, count)
-    if id and count and Ludwig_SellValues and not MerchantFrame:IsVisible() then
-		local price = Ludwig_SellValues[id]
-		if price then
-			frame:AddLine(SELLVALUE_COST, 1, 1,	0)
-			SetTooltipMoney(frame, price * count)
-			frame:Show()
-		end
-    end
-end
-
---[[  Function Hooks ]]--
-
 local function IsValidTooltip(frame)
-	return (frame == GameTooltip) and frame:IsVisible()
+	return frame == GameTooltip and frame:IsShown()
 end
 
 GameTooltip.SetBagItem = pHook(GameTooltip.SetBagItem, function(self, bag, slot)
@@ -106,24 +140,89 @@ end)
 
 --[[ Tooltip Scanner ]]--
 
-local sellValue = CreateFrame("GameTooltip", "LudwigSVTooltip", nil, "GameTooltipTemplate")
-sellValue:SetScript("OnEvent", function()
+local function SavePrices(tip)
 	for bag = 0, NUM_BAG_FRAMES do
 		for slot = 1, GetContainerNumSlots(bag) do
 			local id = LinkToID(GetContainerItemLink(bag, slot))
 			if id then
 				local count = select(2, GetContainerItemInfo(bag, slot))
 				lastMoney = 0
-				this:SetBagItem(bag, slot)
-				SaveCost(id, lastMoney, count)
+				tip:SetBagItem(bag, slot)
+
+				if lastMoney and lastMoney > 0 then
+					SaveCost(id, lastMoney/count)
+				end
 			end
 		end
 	end
-end)
-sellValue:RegisterEvent("MERCHANT_SHOW")
+end
 
-sellValue:SetScript("OnTooltipAddMoney", function()
-	if not InRepairMode() then
-		lastMoney = arg1
+-- local function ConvertData(t)
+	-- for id, cost in pairs(t) do
+		-- if cost > 0 then
+			-- local cost = ToBase(tonumber(cost), maxBase)
+			-- local id = ToBase(tonumber(id), maxBase)
+			-- local prevCost = cache[id]
+			-- if prevCost then
+				-- if prevCost ~= cost then
+					-- LudwigSV:gsub(format('%s,%s;', id, prevCost), format('%s,%s;', id, cost))
+				-- end
+			-- else
+				-- LudwigSV = (LudwigSV or '') .. format('%s,%s;', id, cost)
+			-- end
+		-- end
+	-- end
+-- end
+
+-- local function LoadData()
+	-- if not LudwigSVCache then
+		-- LudwigSVCache = {}
+	-- end
+		
+	-- if not LudwigSV then
+		-- if LudwigSV_Defaults then
+			-- ConvertData(LudwigSV_Defaults)
+		-- end
+
+		-- if Ludwig_SellValues then
+			-- ConvertData(Ludwig_SellValues)
+		-- end
+		
+		-- if ColaLight and ColaLight.db.account.SellValues then
+			-- ConvertData(ColaLight.db.account.SellValues)
+		-- end
+	-- end
+-- end
+
+function LudwigSV_Compress()
+	for id, cost in pairs(LudwigSVCache) do
+		local prevCost = cache[id]
+		if prevCost then
+			if prevCost ~= cost then
+				LudwigSV:gsub(format('%s,%s;', id, prevCost), format('%s,%s;', id, cost))
+			end
+		else
+			LudwigSV = (LudwigSV or '') .. format('%s,%s;', id, cost)
+		end
+		LudwigSVCache[id] = nil
+	end
+end
+
+
+--[[ Events ]]--
+
+local f = CreateFrame('GameTooltip', 'LudwigSVTooltip', nil, 'GameTooltipTemplate')
+f:SetScript('OnTooltipAddMoney', function() if not InRepairMode() then lastMoney = arg1 end end)
+
+f:SetScript('OnEvent', function()
+	if event == 'MERCHANT_SHOW' then
+		SavePrices(this)
+	elseif event == 'ADDON_LOADED' and arg1 == 'Ludwig_SellValue' then
+		this:UnregisterEvent('ADDON_LOADED')
+		if LudwigSV_LoadDefaults then
+			LudwigSV_LoadDefaults()
+		end
 	end
 end)
+f:RegisterEvent('MERCHANT_SHOW')
+f:RegisterEvent('ADDON_LOADED')
