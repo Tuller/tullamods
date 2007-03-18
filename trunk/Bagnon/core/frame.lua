@@ -122,8 +122,6 @@ end
 
 local function LoadSettings(frame, sets)
 	frame.sets  = sets
-	frame.cols  = sets.cols
-	frame.space = sets.space
 
 	local r,g,b,a = frame:GetBackgroundColor()
 	frame:SetBackdropColor(r, g, b, a)
@@ -449,10 +447,10 @@ end
 --[[ layout ]]--
 
 function BagnonFrame:Layout(cols, space)
-	cols = cols or self.cols or DEFAULT_COLS
-	space = space or self.space or DEFAULT_SPACING
-	self.cols = cols
-	self.space = space
+	cols = cols or self.sets.cols or DEFAULT_COLS
+	space = space or self.sets.space or DEFAULT_SPACING
+	self.sets.cols = cols
+	self.sets.space = space
 
 	local borderSize = self.borderSize or 0
 	local paddingY = self.paddingY or 0
@@ -501,7 +499,7 @@ function BagnonFrame:LayoutItems(cols, space, offX, offY)
 end
 
 function BagnonFrame:GetLayout()
-	return self.cols, self.space
+	return self.sets.cols, self.sets.space
 end
 
 

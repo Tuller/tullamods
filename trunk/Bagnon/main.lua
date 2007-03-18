@@ -23,6 +23,7 @@ function Bagnon:Initialize()
 
 		replaceBags = 1,
 		replaceBank = 1,
+		reuseFrames = 1,
 
 		showOwners = 1,
 		showBorders = 1,
@@ -31,6 +32,7 @@ function Bagnon:Initialize()
 		showBagsAtBank = 1,
 		showBagsAtAH = 1,
 		showBankAtBank = 1,
+		
 		version = cVersion,
 	}
 	
@@ -259,7 +261,7 @@ local function FrameToggled(id, auto)
 		return true
 	end
 	
-	if BagnonUtil:ReplacingBank()  and Bagnon:BankHasBag(id) then
+	if BagnonUtil:ReplacingBank() and Bagnon:BankHasBag(id) then
 		Bagnon:ToggleBank(auto)
 		return true
 	end
