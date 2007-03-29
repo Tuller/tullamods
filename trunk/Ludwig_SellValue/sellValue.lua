@@ -56,12 +56,26 @@ local function GetCost(id)
 	end
 end
 
+function GetSellValue(link)
+	assert(link, "Usage: GetSellValue(itemID|\"name\"|\"itemLink\")")
+
+	local id = tonumber(link)
+	if id then
+		return GetCost(id)
+	else
+		link = select(2, GetItemInfo(link))
+		if link then
+			return GetCost(LinkToID(link))
+		end
+	end
+end
+
 
 --[[  Function Hooks ]]--
 
 local function AddMoneyToTooltip(frame, id, count)
     if id and not MerchantFrame:IsVisible() then
-		local cost = GetCost(id)
+		local cost = GetSellValue(id, count)
 		if cost then
 			frame:AddLine(SELLVALUE_COST, 1, 1,	0)
 			SetTooltipMoney(frame, cost * (count or 1))
@@ -86,7 +100,7 @@ GameTooltip.SetBagItem = pHook(GameTooltip.SetBagItem, function(self, bag, slot)
 		local id = LinkToID(GetContainerItemLink(bag, slot))
 		local count = select(2, GetContainerItemInfo(bag, slot))
 
-		AddMoneyToTooltip(GameTooltip, id, count)
+		AddMoneyToTooltip(GameTooltip, GetContainerItemLink(bag, slot), count)
 	end
 end)
 
@@ -156,43 +170,6 @@ local function SavePrices(tip)
 		end
 	end
 end
-
--- local function ConvertData(t)
-	-- for id, cost in pairs(t) do
-		-- if cost > 0 then
-			-- local cost = ToBase(tonumber(cost), maxBase)
-			-- local id = ToBase(tonumber(id), maxBase)
-			-- local prevCost = cache[id]
-			-- if prevCost then
-				-- if prevCost ~= cost then
-					-- LudwigSV:gsub(format('%s,%s;', id, prevCost), format('%s,%s;', id, cost))
-				-- end
-			-- else
-				-- LudwigSV = (LudwigSV or '') .. format('%s,%s;', id, cost)
-			-- end
-		-- end
-	-- end
--- end
-
--- local function LoadData()
-	-- if not LudwigSVCache then
-		-- LudwigSVCache = {}
-	-- end
-		
-	-- if not LudwigSV then
-		-- if LudwigSV_Defaults then
-			-- ConvertData(LudwigSV_Defaults)
-		-- end
-
-		-- if Ludwig_SellValues then
-			-- ConvertData(Ludwig_SellValues)
-		-- end
-		
-		-- if ColaLight and ColaLight.db.account.SellValues then
-			-- ConvertData(ColaLight.db.account.SellValues)
-		-- end
-	-- end
--- end
 
 function LudwigSV_Compress()
 	for id, cost in pairs(LudwigSVCache) do
