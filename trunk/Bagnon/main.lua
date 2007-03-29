@@ -305,6 +305,14 @@ CloseAllBags = function()
 	end
 end
 
+local bToggleKeyRing = ToggleKeyRing
+ToggleKeyRing = function()
+	if BagnonUtil:ReplacingBags() and Bagnon:InventoryHasBag(KEYRING_CONTAINER) then
+		Bagnon:ToggleInventory()
+		return true
+	end
+end
+
 
 --[[ 
 	Automatic Frame Display 
