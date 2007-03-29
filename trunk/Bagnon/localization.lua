@@ -26,6 +26,7 @@ L.UpdatedIncompatible = "Updating from an incompatible version, defaults loaded"
 
 --errors
 L.ErrorNoSavedBank = "Cannot open the bank, no saved information available"
+L.vBagnonLoaded = format("vBagnon and Bagnon are incompatible. Click %s to disable vBagnon and reload your UI", TEXT(ACCEPT))
 
 --slash commands
 L.Commands = "Commands:"

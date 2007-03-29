@@ -8,7 +8,7 @@ local L = BAGNON_LOCALS
 
 --[[ Startup and settings management ]]--
 
-function Bagnon:Initialize()
+function Bagnon:Initialize()	
 	local cVersion = GetAddOnMetadata('Bagnon', 'Version')
 	local defaults = {
 		inventory = {
@@ -42,7 +42,7 @@ function Bagnon:Initialize()
 	else
 		local cMajor, cMinor = cVersion:match('(%d+)%.(%d+)')
 		local major, minor = BagnonSets.version:match('(%d+)%.(%d+)')
-		
+
 		if major ~= cMajor then
 			self:Print(L.UpdatedIncompatible)
 			BagnonSets = defaults
@@ -59,22 +59,35 @@ function Bagnon:UpdateSettings(cVersion)
 end
 
 function Bagnon:Enable()
-	BankFrame:UnregisterEvent('BANKFRAME_OPENED')
-	
-	self:RegisterEvent('BANKFRAME_OPENED')
-	self:RegisterEvent('BANKFRAME_CLOSED')
-	self:RegisterEvent('TRADE_SHOW')
-	self:RegisterEvent('TRADE_CLOSED')
-	self:RegisterEvent('TRADE_SKILL_SHOW')
-	self:RegisterEvent('TRADE_SKILL_CLOSE')
-	self:RegisterEvent('AUCTION_HOUSE_SHOW')
-	self:RegisterEvent('AUCTION_HOUSE_CLOSED')
-	self:RegisterEvent('MAIL_SHOW')
-	self:RegisterEvent('MAIL_CLOSED')
-	self:RegisterEvent('MERCHANT_SHOW')
-	self:RegisterEvent('MERCHANT_CLOSED')
-	
-	self:RegisterSlashCommands()
+	if IsAddOnLoaded("vBagnon") then
+		StaticPopupDialogs["DISABLE_VBAGNON"] = {
+			text = L.vBagnonLoaded,
+			button1 = TEXT(ACCEPT),
+
+			OnAccept = function() DisableAddOn("vBagnon"); ReloadUI() end,
+
+			timeout = 0,
+		}
+		StaticPopup_Show("DISABLE_VBAGNON")
+	else
+		BankFrame:UnregisterEvent('BANKFRAME_OPENED')
+		
+		self:RegisterEvent('BANKFRAME_OPENED')
+		self:RegisterEvent('BANKFRAME_CLOSED')
+		self:RegisterEvent('TRADE_SHOW')
+		self:RegisterEvent('TRADE_CLOSED')
+		self:RegisterEvent('TRADE_SKILL_SHOW')
+		self:RegisterEvent('TRADE_SKILL_CLOSE')
+		self:RegisterEvent('AUCTION_HOUSE_SHOW')
+		self:RegisterEvent('AUCTION_HOUSE_CLOSED')
+		self:RegisterEvent('MAIL_SHOW')
+		self:RegisterEvent('MAIL_CLOSED')
+		self:RegisterEvent('MERCHANT_SHOW')
+		self:RegisterEvent('MERCHANT_CLOSED')
+
+		self:RegisterSlashCommands()
+		self:HookBagClicks()
+	end
 end
 
 
@@ -267,52 +280,53 @@ local function FrameToggled(id, auto)
 	end
 end
 
-local oOpenBackpack = OpenBackpack
-OpenBackpack = function()
-	if not BagnonUtil:ReplacingBags() then
-		oOpenBackpack()
-	end
-end
-
-local oToggleBag = ToggleBag
-ToggleBag = function(id)
-	if IsOptionFrameOpen() then return end
-	
-	if not FrameToggled(id) then
-		oToggleBag(id)
-	end
-end
-
-local oOpenAllBags = OpenAllBags
-OpenAllBags = function(force)
-	if BagnonUtil:ReplacingBags() then
-		if force then
-			Bagnon:ShowInventory()
-		else
-			Bagnon:ToggleInventory()
+function Bagnon:HookBagClicks()
+	local oOpenBackpack = OpenBackpack
+	OpenBackpack = function()
+		if not BagnonUtil:ReplacingBags() then
+			oOpenBackpack()
 		end
-	else
-		oOpenAllBags(force)
+	end
+
+	local oToggleBag = ToggleBag
+	ToggleBag = function(id)
+		if IsOptionFrameOpen() then return end
+		
+		if not FrameToggled(id) then
+			oToggleBag(id)
+		end
+	end
+
+	local oOpenAllBags = OpenAllBags
+	OpenAllBags = function(force)
+		if BagnonUtil:ReplacingBags() then
+			if force then
+				Bagnon:ShowInventory()
+			else
+				Bagnon:ToggleInventory()
+			end
+		else
+			oOpenAllBags(force)
+		end
+	end
+
+	local bCloseAllBags = CloseAllBags
+	CloseAllBags = function()
+		if BagnonUtil:ReplacingBags() then
+			Bagnon:HideInventory()
+		else
+			bCloseAllBags()
+		end
+	end
+
+	local bToggleKeyRing = ToggleKeyRing
+	ToggleKeyRing = function()
+		if BagnonUtil:ReplacingBags() and Bagnon:InventoryHasBag(KEYRING_CONTAINER) then
+			Bagnon:ToggleInventory()
+			return true
+		end
 	end
 end
-
-local bCloseAllBags = CloseAllBags
-CloseAllBags = function()
-	if BagnonUtil:ReplacingBags() then
-		Bagnon:HideInventory()
-	else
-		bCloseAllBags()
-	end
-end
-
-local bToggleKeyRing = ToggleKeyRing
-ToggleKeyRing = function()
-	if BagnonUtil:ReplacingBags() and Bagnon:InventoryHasBag(KEYRING_CONTAINER) then
-		Bagnon:ToggleInventory()
-		return true
-	end
-end
-
 
 --[[ 
 	Automatic Frame Display 

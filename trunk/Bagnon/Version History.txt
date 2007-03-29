@@ -1,4 +1,8 @@
-cBagnon Version History
+Bagnon Version History
+
+1.1
+	Clicking on the keyring button will now properly show the inventory window
+	Added a check to disable vBagnon if Bagnon is running
 
 1.0
 	Initial release
