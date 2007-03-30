@@ -1,0 +1,7 @@
+## Interface: 20003
+## Title: Kost
+## Author: Tuller
+## Notes: Lets you view sellvalue data about items from anywhere
+## SavedVariables: KostDB, KostDB_ShortFormat
+sellValueDB.lua
+tooltips.lua
