@@ -2,6 +2,6 @@
 ## Title: Ludwig_SellValue
 ## Author: Tuller
 ## Notes: Stores the sellvalue data of items
-## SavedVariables: LudwigSV, LudwigSVCache
-defaults.lua
-sellValue.lua
+## SavedVariables: LudwigSV, LudwigSV_ShortFormat
+sellValueDB.lua
+tooltips.lua
