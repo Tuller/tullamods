@@ -212,7 +212,7 @@ end
 --returns a full hyperlink for the item
 --format for a link is |cff<color>|Hitem:<id>:0:0:0|h[<name>]|h|r
 function Ludwig_GetHyperLink(id)
-	return select(2, GetItemInfo(id))
+	return (select(2, GetItemInfo(id)))
 end
 
 function Ludwig_GetTexture(id)
