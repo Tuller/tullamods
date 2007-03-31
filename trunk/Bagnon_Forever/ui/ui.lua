@@ -14,6 +14,8 @@ local minWidth = 120
 --create a player button, which is used to switch between characters
 local function CreatePlayerButton(id, parent)
 	local button = CreateFrame("CheckButton", parent:GetName() .. id, parent, "BagnonDBUINameBox")
+	button:RegisterForClicks("anyUp")
+
 	if id == 1 then
 		button:SetPoint("TOPLEFT", parent, "TOPLEFT", 6, -4)
 	else

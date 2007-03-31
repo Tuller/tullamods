@@ -323,8 +323,8 @@ end
 
 --removes all saved data about the given player
 function BagnonDB:RemovePlayer(player, realm)
-	if self.db[realm] then
-		self.db[realm][player] = nil
+	if self.db[realm or currentRealm] then
+		self.db[realm or currentRealm][player] = nil
 	end
 end
 
