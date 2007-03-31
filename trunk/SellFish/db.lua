@@ -120,12 +120,12 @@ function SellFish:LoadDefaults(current)
 	SellFishDB = {short = 1, version = current}
 	
 	if CompletePrices then
-		msg("Converting PriceMaster data")
+--		msg("Converting PriceMaster data")
 		self:ConvertPriceMaster(CompletePrices)
 	end
 
 	if ColaLight and ColaLight.db.account.SellValues then
-		msg("Converting ColaLight data")
+--		msg("Converting ColaLight data")
 		self:ConvertColaLight(ColaLight.db.account.SellValues)
 	end
 	
