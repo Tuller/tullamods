@@ -250,7 +250,7 @@ local function FrameOpened(id, auto)
 		return true
 	end
 	
-	if BagnonUtil:ReplacingBank()  and Bagnon:BankHasBag(id) then
+	if BagnonUtil:ReplacingBank() and Bagnon:BankHasBag(id) then
 		Bagnon:ShowBank(auto)
 		return true
 	end
@@ -321,9 +321,8 @@ function Bagnon:HookBagClicks()
 
 	local bToggleKeyRing = ToggleKeyRing
 	ToggleKeyRing = function()
-		if BagnonUtil:ReplacingBags() and Bagnon:InventoryHasBag(KEYRING_CONTAINER) then
-			Bagnon:ToggleInventory()
-			return true
+		if not FrameToggled(KEYRING_CONTAINER) then
+			bToggleKeyRing()
 		end
 	end
 end

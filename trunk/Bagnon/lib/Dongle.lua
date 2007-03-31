@@ -119,11 +119,9 @@ end
 ---------------------------------------------------------------------------]]
 
 local major = "Dongle-Beta1"
-local minor = tonumber(string.match("$Revision: 252 $", "(%d+)") or 1)
+local minor = tonumber(string.match("$Revision: 264 $", "(%d+)") or 1)
 
 assert(DongleStub, string.format("Dongle requires DongleStub.", major))
-assert(DongleStub and DongleStub:GetVersion() == "DongleStub-Beta0",
-	string.format("Dongle requires DongleStub-Beta0.  You are using an older version.", major))
 
 if not DongleStub:IsNewerVersion(major, minor) then return end
 
@@ -156,6 +154,7 @@ local L = {
 	["ADDMESSAGE_REQUIRED"] = "The frame you specify must have an 'AddMessage' method.",
 	["ALREADY_REGISTERED"] = "A Dongle with the name '%s' is already registered.",
 	["BAD_ARGUMENT"] = "bad argument #%d to '%s' (%s expected, got %s)",
+	["BAD_ARGUMENT_DB"] = "bad argument #%d to '%s' (DongleDB expected)",
 	["CANNOT_DELETE_ACTIVE_PROFILE"] = "You cannot delete your active profile.  Change profiles, then attempt to delete.",
 	["DELETE_NONEXISTANT_PROFILE"] = "You cannot delete a non-existant profile.",
 	["MUST_CALLFROM_DBOBJECT"] = "You must call '%s' from a Dongle database object.",
@@ -166,8 +165,20 @@ local L = {
 	["SAME_SOURCE_DEST"] = "Source/Destination profile cannot be the same profile.",
 	["EVENT_REGISTER_SPECIAL"] = "You cannot register for the '%s' event.  Use the '%s' method instead.",
 	["Unknown"] = "Unknown",
+	["INJECTDB_USAGE"] = "Usage: DongleCmd:InjectDBCommands(db, ['copy', 'delete', 'list', 'reset', 'set'])",
+	["DBSLASH_PROFILE_COPY_DESC"] = "profile copy <name> - Copies profile <name> into your current profile.",
+	["DBSLASH_PROFILE_COPY_PATTERN"] = "^profile copy (.+)$",
+	["DBSLASH_PROFILE_DELETE_DESC"] = "profile delete <name> - Deletes the profile <name>.",
+	["DBSLASH_PROFILE_DELETE_PATTERN"] = "^profile delete (.+)$",
+	["DBSLASH_PROFILE_LIST_DESC"] = "profile list - Lists all valid profiles.",
+	["DBSLASH_PROFILE_LIST_PATTERN"] = "^profile list$",
+	["DBSLASH_PROFILE_RESET_DESC"] = "profile reset - Resets the current profile.",
+	["DBSLASH_PROFILE_RESET_PATTERN"] = "^profile reset$",
+	["DBSLASH_PROFILE_SET_DESC"] = "profile set <name> - Sets the current profile to <name>.",
+	["DBSLASH_PROFILE_SET_PATTERN"] = "^profile set (.+)$",
+	["DBSLASH_PROFILE_LIST_OUT"] = "Profile List:",
 }
-		
+
 --[[-------------------------------------------------------------------------
   Utility functions for Dongle use
 ---------------------------------------------------------------------------]]
@@ -298,7 +309,7 @@ function Dongle:RegisterEvent(event, func)
 	assert(3, reg, string.format(L["MUST_CALLFROM_REGISTERED"], "RegisterEvent"))
 	argcheck(event, 2, "string")
 	argcheck(func, 3, "string", "function", "nil")
-	
+
 	local special = (self ~= Dongle) and specialEvents[event]
 	if special then
 		error(string.format(L["EVENT_REGISTER_SPECIAL"], event, special), 3)
@@ -518,12 +529,56 @@ end
 local dbMethods = {
 	"RegisterDefaults", "SetProfile", "GetProfiles", "DeleteProfile", "CopyProfile",
 	"ResetProfile", "ResetDB",
-	"RegisterNamespace"
+	"RegisterNamespace",
 }
+
+local function copyTable(src)
+	local dest = {}
+	for k,v in pairs(src) do
+		if type(k) == "table" then
+			k = copyTable(k)
+		end
+		if type(v) == "table" then
+			v = copyTable(v)
+		end
+		dest[k] = v
+	end
+	return dest
+end
 
 local function copyDefaults(dest, src, force)
 	for k,v in pairs(src) do
-		if type(v) == "table" then
+		if k == "*" then
+			if type(v) == "table" then
+				-- Values are tables, need some magic here
+				local mt = {
+					__cache = {},
+					__index = function(t,k)
+						local mt = getmetatable(dest)
+						local cache = rawget(mt, "__cache")
+						local tbl = rawget(cache, k)
+						if not tbl then
+							local parent = t
+							local parentkey = k
+							tbl = copyTable(v)
+							rawset(cache, k, tbl)
+							local mt = getmetatable(tbl)
+							local newindex = function(t,k,v)
+								rawset(parent, parentkey, t)
+								rawset(t, k, v)
+							end
+							rawset(mt, "__newindex", newindex)
+						end
+						return tbl
+					end,
+				}
+				setmetatable(dest, mt)
+			else
+				-- Values are not tables, so this is just a simple return
+				local mt = {__index = function() return v end}
+				setmetatable(dest, mt)
+			end
+		elseif type(v) == "table" then
 			if not dest[k] then dest[k] = {} end
 			copyDefaults(dest[k], v, force)
 		else
@@ -533,11 +588,23 @@ local function copyDefaults(dest, src, force)
 		end
 	end
 end
-	
+
 local function removeDefaults(db, defaults)
 	if not db then return end
 	for k,v in pairs(defaults) do
-		if type(v) == "table" and db[k] then
+		if k == "*" and type(v) == "table" then
+			-- check for any defaults that have been changed
+			local mt = getmetatable(db)
+			local cache = rawget(mt, "__cache")
+
+			for cacheKey,cacheValue in pairs(cache) do
+				removeDefaults(cacheValue, v)
+				if next(cacheValue) ~= nil then
+					-- Something's changed
+					rawset(db, cacheKey, cacheValue)
+				end
+			end
+		elseif type(v) == "table" and db[k] then
 			removeDefaults(db[k], v)
 			if not next(db[k]) then
 				db[k] = nil
@@ -552,14 +619,14 @@ end
 
 local function initSection(db, section, svstore, key, defaults)
 	local sv = rawget(db, "sv")
-	
+
 	local tableCreated
 	if not sv[svstore] then sv[svstore] = {} end
-	if not sv[svstore][key] then 
-		sv[svstore][key] = {} 
+	if not sv[svstore][key] then
+		sv[svstore][key] = {}
 		tableCreated = true
 	end
-		
+
 	local tbl = sv[svstore][key]
 
 	if defaults then
@@ -590,11 +657,11 @@ local dbmt = {
 					copyDefaults(sv.global, defaults)
 				end
 				rawset(t, section, sv.global)
-			else							
+			else
 				initSection(t, section, section, key, defaults)
 			end
 		end
-		
+
 		return rawget(t, section)
 	end
 }
@@ -660,7 +727,7 @@ local function initdb(parent, name, defaults, defaultProfile, olddb)
 	db.parent = parent
 
 	databases[db] = true
-	
+
 	return db
 end
 
@@ -685,7 +752,7 @@ function Dongle.RegisterDefaults(db, defaults)
 			copyDefaults(db[section], defaults[section])
 		end
 	end
-	
+
 	db.defaults = defaults
 end
 
@@ -722,10 +789,10 @@ function Dongle.SetProfile(db, name)
 		-- Remove the defaults from the old profile
 		removeDefaults(old, defaults)
 	end
-	
+
 	db.profile = nil
 	db.keys["profile"] = name
-	
+
 	Dongle:TriggerMessage("DONGLE_PROFILE_CHANGED", db, db.parent, db.sv_name, db.keys.profile)
 end
 
@@ -749,7 +816,7 @@ function Dongle.DeleteProfile(db, name)
 	if db.keys.profile == name then
 		error(L["CANNOT_DELETE_ACTIVE_PROFILE"], 2)
 	end
-	
+
 	assert(type(db.sv.profiles[name]) == "table", L["DELETE_NONEXISTANT_PROFILE"])
 
 	db.sv.profiles[name] = nil
@@ -778,7 +845,7 @@ function Dongle.ResetProfile(db)
 	for k,v in pairs(profile) do
 		profile[k] = nil
 	end
-	
+
 	local defaults = db.defaults and db.defaults.profile
 	if defaults then
 		copyDefaults(profile, defaults)
@@ -797,7 +864,7 @@ function Dongle.ResetDB(db, defaultProfile)
 	end
 
 	local parent = db.parent
-	
+
 	initdb(parent, db.sv_name, db.defaults, defaultProfile, db)
 	Dongle:TriggerMessage("DONGLE_DATABASE_RESET", db, parent, db.sv_name, db.keys.profile)
 	Dongle:TriggerMessage("DONGLE_PROFILE_CHANGED", db, db.parent, db.sv_name, db.keys.profile)
@@ -806,15 +873,15 @@ end
 
 function Dongle.RegisterNamespace(db, name, defaults)
 	assert(3, databases[db], string.format(L["MUST_CALLFROM_DBOBJECT"], "RegisterNamespace"))
-	argcheck(name, 2, "string")
-    argcheck(defaults, 3, "table", "nil")
+    argcheck(name, 2, "string")
+	argcheck(defaults, 3, "nil", "string")
 
 	local sv = db.sv
 	if not sv.namespaces then sv.namespaces = {} end
-	if not sv.namespaces[name] then 
+	if not sv.namespaces[name] then
 		sv.namespaces[name] = {}
 	end
-	
+
 	local newDB = initdb(db, sv.namespaces[name], defaults, db.keys.profile)
 	if not db.children then db.children = {} end
 	table.insert(db.children, newDB)
@@ -826,18 +893,19 @@ end
 ---------------------------------------------------------------------------]]
 
 local slashCmdMethods = {
+	"InjectDBCommands",
 	"RegisterSlashHandler",
 	"PrintUsage",
 }
 
 local function OnSlashCommand(cmd, cmd_line)
 	if cmd.patterns then
-		for pattern, tbl in pairs(cmd.patterns) do
+		for idx,tbl in pairs(cmd.patterns) do
+			local pattern = tbl.pattern
 			if string.match(cmd_line, pattern) then
 				local handler = tbl.handler
-				if type(handler) == "string" then
+				if type(tbl.handler) == "string" then
 					local obj
-					
 					-- Look in the command object before we look at the parent object
 					if cmd[handler] then obj = cmd end
 					if cmd.parent[handler] then obj = cmd.parent end
@@ -896,10 +964,12 @@ function Dongle.RegisterSlashHandler(cmd, desc, pattern, handler)
 	if not cmd.patterns then
 		cmd.patterns = {}
 	end
-	cmd.patterns[pattern] = {
+
+	table.insert(cmd.patterns, {
 		["desc"] = desc,
 		["handler"] = handler,
-	}
+		["pattern"] = pattern,
+	})
 end
 
 function Dongle.PrintUsage(cmd)
@@ -907,16 +977,64 @@ function Dongle.PrintUsage(cmd)
 
 	local usage = cmd.desc.."\n".."/"..table.concat(cmd.slashes, ", /")..":\n"
 	if cmd.patterns then
-		local descs = {}
-		for pattern,tbl in pairs(cmd.patterns) do
-			table.insert(descs, tbl.desc)
-		end
-		table.sort(descs)
-		for _,desc in pairs(descs) do
-			usage = usage.." - "..desc.."\n"
+		for idx,tbl in ipairs(cmd.patterns) do
+			usage = usage.." - "..tbl.desc.."\n"
 		end
 	end
 	cmd.parent:Print(usage)
+end
+
+local dbcommands = {
+	["copy"] = {
+		L["DBSLASH_PROFILE_COPY_DESC"],
+		L["DBSLASH_PROFILE_COPY_PATTERN"],
+		"CopyProfile",
+	},
+	["delete"] = {
+		L["DBSLASH_PROFILE_DELETE_DESC"],
+		L["DBSLASH_PROFILE_DELETE_PATTERN"],
+		"DeleteProfile",
+	},
+	["list"] = {
+		L["DBSLASH_PROFILE_LIST_DESC"],
+		L["DBSLASH_PROFILE_LIST_PATTERN"],
+	},
+	["reset"] = {
+		L["DBSLASH_PROFILE_RESET_DESC"],
+		L["DBSLASH_PROFILE_RESET_PATTERN"],
+		"ResetProfile",
+	},
+	["set"] = {
+		L["DBSLASH_PROFILE_SET_DESC"],
+		L["DBSLASH_PROFILE_SET_PATTERN"],
+		"SetProfile",
+	},
+}
+
+function Dongle.InjectDBCommands(cmd, db, ...)
+	assert(3, commands[cmd], string.format(L["MUST_CALLFROM_SLASH"], "InjectDBCommands"))
+	assert(3, databases[db], string.format(L["BAD_ARGUMENT_DB"], 2, "InjectDBCommands"))
+	local argc = select("#", ...)
+	assert(3, argc > 0, L["INJECTDB_USAGE"])
+
+	for i=1,argc do
+		local cmdname = string.lower(select(i, ...))
+		local entry = dbcommands[cmdname]
+		assert(entry, L["INJECTDB_USAGE"])
+		local func = entry[3]
+
+		local handler
+		if cmdname == "list" then
+			handler = function(...)
+				local profiles = db:GetProfiles()
+				db.parent:Print(L["DBSLASH_PROFILE_LIST_OUT"] .. "\n" .. strjoin("\n", unpack(profiles)))
+			end
+		else
+			handler = function(...) db[entry[3]](db, ...) end
+		end
+
+		cmd:RegisterSlashHandler(entry[1], entry[2], handler)
+	end
 end
 
 --[[-------------------------------------------------------------------------
@@ -985,11 +1103,9 @@ local function Activate(self, old)
 		messages = old.messages or messages
 		frame = old.frame or CreateFrame("Frame")
 
-		local reg = self.registry[major]
-		reg.obj = self
+		registry[major].obj = self
 	else
-	  frame = CreateFrame("Frame")
-
+		frame = CreateFrame("Frame")
 		local reg = {obj = self, name = "Dongle"}
 		registry[major] = reg
 		lookup[self] = reg
