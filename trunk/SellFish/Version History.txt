@@ -1,5 +1,9 @@
 SellFish Version History
 
+1.1
+	Fixed an error when viewing the tooltip for an item from a quest giver
+	Increased default DB size to 29646 items
+	
 1.0
 	Initial release
 
