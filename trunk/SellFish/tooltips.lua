@@ -90,12 +90,12 @@ GameTooltip.SetAuctionItem = hookTip(GameTooltip.SetAuctionItem , function(type,
 end)
 
 GameTooltip.SetQuestItem = hookTip(GameTooltip.SetQuestItem, function(type, index)
-	return GetQuestItemLink(type, index), select(2, GetQuestItemInfo(type, index))
+	return GetQuestItemLink(type, index), select(3, GetQuestItemInfo(type, index))
 end)
 
 GameTooltip.SetCraftItem = hookTip(GameTooltip.SetCraftItem, function(skill, id)
 	if id then
-		return GetCraftReagentItemLink(skill, id), select(2, GetCraftReagentInfo(skill, id))
+		return GetCraftReagentItemLink(skill, id), select(3, GetCraftReagentInfo(skill, id))
 	end
 	return GetCraftItemLink(skill)
 end)
