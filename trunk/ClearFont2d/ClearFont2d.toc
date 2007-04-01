@@ -1,0 +1,12 @@
+## Interface: 20003
+## Title: ClearFont2d
+## Notes: A stripped down version of ClearFont2
+## Author: Tuller
+## Version: 2.5
+## X-Credits: Kirkburn, Evil Elvis, ckknight, Iriel et al
+## DefaultState: enabled
+## SavedVariables: ClearFont2dDB
+Dongle.lua
+Design.lua
+CustomDesign.lua
+Core.lua
