@@ -29,62 +29,13 @@ ClearFont.fonts = {
 		["italic"]		=fontLoc.."Calibri_v1\\CalibriItalic.ttf",
 		["bolditalic"]	=fontLoc.."Calibri_v1\\CalibriBoldItalic.ttf",
 		["number"]		=fontLoc.."Calibri_v1\\CalibriBold.ttf"},
-
-	{["name"]="Baar Philos",
-		["normal"]		=fontLoc.."BaarPhilos\\BaarPhilos.ttf",
-		["bold"]		=fontLoc.."BaarPhilos\\BaarPhilosBold.ttf",
-		["italic"]		=fontLoc.."BaarPhilos\\BaarPhilosItalic.ttf",
-		["bolditalic"]	=fontLoc.."BaarPhilos\\BaarPhilosBoldItalic.ttf",
-		["number"]		=fontLoc.."BaarPhilos\\BaarPhilosBold.ttf"},
-
-	{["name"]="Baar Sophia",
-		["normal"]		=fontLoc.."BaarSophia\\BaarSophia.ttf",
-		["bold"]		=fontLoc.."BaarSophia\\BaarSophiaBold.ttf",
-		["italic"]		=fontLoc.."BaarSophia\\BaarSophiaItalic.ttf",
-		["bolditalic"]	=fontLoc.."BaarSophia\\BaarSophiaBoldItalic.ttf",
-		["number"]		=fontLoc.."BaarSophia\\BaarSophiaBold.ttf"},
-
+	
 	{["name"]="Classic",
 		["normal"]		=fontLoc.."Calibri_v0.9\\Calibri.ttf",
 		["bold"]		=fontLoc.."Calibri_v0.9\\CalibriBold.ttf",
 		["italic"]		=fontLoc.."Calibri_v0.9\\CalibriItalic.ttf",
 		["bolditalic"]	=fontLoc.."Calibri_v0.9\\CalibriBoldItalic.ttf",
 		["number"]		=fontLoc.."Calibri_v0.9\\CalibriBold.ttf"},
-
-	{["name"]="Francophil Sans",
-		["normal"]		=fontLoc.."Franc\\Franc.ttf",
-		["bold"]		=fontLoc.."Franc\\FrancBold.ttf",
-		["italic"]		=fontLoc.."Franc\\Franc.ttf",
-		["bolditalic"]	=fontLoc.."Franc\\FrancBold.ttf",
-		["number"]		=fontLoc.."Franc\\FrancBold.ttf"},
-
-	{["name"]="Lucida Grande",
-		["normal"]		=fontLoc.."LucidaGrande\\LucidaGrande.ttf",
-		["bold"]		=fontLoc.."LucidaGrande\\LucidaGrande.ttf",
-		["italic"]		=fontLoc.."LucidaGrande\\LucidaGrande.ttf",
-		["bolditalic"]	=fontLoc.."LucidaGrande\\LucidaGrande.ttf",
-		["number"]		=fontLoc.."LucidaGrande\\LucidaGrande.ttf"},
-
-	{["name"]="Lucida Sans Demibold",
-		["normal"]		=fontLoc.."LucidaSD\\LucidaSD.ttf",
-		["bold"]		=fontLoc.."LucidaSD\\LucidaSD.ttf",
-		["italic"]		=fontLoc.."LucidaSD\\LucidaSDItalic.ttf",
-		["bolditalic"]	=fontLoc.."LucidaSD\\LucidaSDItalic.ttf",
-		["number"]		=fontLoc.."LucidaSD\\LucidaSD.ttf"},
-
-	{["name"]="Perspective Sans",
-		["normal"]		=fontLoc.."PerspectiveSans\\PerspectiveSans.ttf",
-		["bold"]		=fontLoc.."PerspectiveSans\\PerspectiveSansBold.ttf",
-		["italic"]		=fontLoc.."PerspectiveSans\\PerspectiveSansItalic.ttf",
-		["bolditalic"]	=fontLoc.."PerspectiveSans\\PerspectiveSansBoldItalic.ttf",
-		["number"]		=fontLoc.."PerspectiveSans\\PerspectiveSansBold.ttf"},
-
-	{["name"]="Tin Birdhouse",
-		["normal"]		=fontLoc.."TinBirdhouse\\TinBirdhouse.ttf",
-		["bold"]		=fontLoc.."TinBirdhouse\\TinBirdhouse.ttf",
-		["italic"]		=fontLoc.."TinBirdhouse\\TinBirdhouse.ttf",
-		["bolditalic"]	=fontLoc.."TinBirdhouse\\TinBirdhouse.ttf",
-		["number"]		=fontLoc.."TinBirdhouse\\TinBirdhouse.ttf"},
 }
 
 -- =============================================================================
