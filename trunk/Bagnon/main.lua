@@ -8,8 +8,8 @@ local L = BAGNON_LOCALS
 
 --[[ Startup and settings management ]]--
 
-function Bagnon:Initialize()	
-	local cVersion = GetAddOnMetadata('Bagnon', 'Version')
+function Bagnon:Initialize()
+	local cVersion = GetAddOnMetadata("Bagnon", "Version")
 	local defaults = {
 		inventory = {
 			bags = {0, 1, 2, 3, 4},
@@ -32,10 +32,10 @@ function Bagnon:Initialize()
 		showBagsAtBank = 1,
 		showBagsAtAH = 1,
 		showBankAtBank = 1,
-		
+
 		version = cVersion,
 	}
-	
+
 	if not BagnonSets or not BagnonSets.version then
 		BagnonSets = defaults
 		self:Print(L.NewUser)
@@ -71,7 +71,7 @@ function Bagnon:Enable()
 		StaticPopup_Show("DISABLE_VBAGNON")
 	else
 		BankFrame:UnregisterEvent('BANKFRAME_OPENED')
-		
+
 		self:RegisterEvent('BANKFRAME_OPENED')
 		self:RegisterEvent('BANKFRAME_CLOSED')
 		self:RegisterEvent('TRADE_SHOW')
@@ -112,7 +112,7 @@ function Bagnon:CreateInventory()
 	if not bags:IsUserPlaced() then
 		bags:SetPoint('RIGHT', UIParent)
 	end
-	
+
 	self.bags = bags
 
 	return bags
@@ -186,7 +186,7 @@ function Bagnon:CreateBank()
 	if not bank:IsUserPlaced() then
 		bank:SetPoint('LEFT', UIParent, 'LEFT', 24, 100)
 	end
-	
+
 	self.bank = bank
 
 	return bank
@@ -239,42 +239,48 @@ function Bagnon:GetBank()
 end
 
 
---[[ 
+--[[
 	Frame Hiding/Showing - bag clicks
 		These functions allow bagnon/banknon to be shown by clicking ona bag, or by using a bag's hotkey
 --]]
 
 local function FrameOpened(id, auto)
-	if BagnonUtil:ReplacingBags() and Bagnon:InventoryHasBag(id) then
+	if (Bagnon:InventoryHasBag(id) and BagnonUtil:ReplacingBags()) or
+	(BagnonUtil:ReusingFrames() and BagnonUtil:IsInventoryBag(id)) then
 		Bagnon:ShowInventory(auto)
 		return true
 	end
-	
-	if BagnonUtil:ReplacingBank() and Bagnon:BankHasBag(id) then
+
+	if (Bagnon:BankHasBag(id) and BagnonUtil:ReplacingBank()) or
+	(BagnonUtil:ReusingFrames() and BagnonUtil:IsBankBag(id)) then
 		Bagnon:ShowBank(auto)
 		return true
 	end
 end
 
 local function FrameClosed(id, auto)
-	if BagnonUtil:ReplacingBags() and Bagnon:InventoryHasBag(id) then
+	if (Bagnon:InventoryHasBag(id) and BagnonUtil:ReplacingBags()) or
+	(BagnonUtil:ReusingFrames() and BagnonUtil:IsInventoryBag(id)) then
 		Bagnon:HideInventory(auto)
 		return true
 	end
-	
-	if BagnonUtil:ReplacingBank() and Bagnon:BankHasBag(id) then
+
+	if (Bagnon:BankHasBag(id) and BagnonUtil:ReplacingBank()) or
+	(BagnonUtil:ReusingFrames() and BagnonUtil:IsBankBag(id)) then
 		Bagnon:HideBank(auto)
 		return true
 	end
 end
 
 local function FrameToggled(id, auto)
-	if BagnonUtil:ReplacingBags() and Bagnon:InventoryHasBag(id) then
+	if (Bagnon:InventoryHasBag(id) and BagnonUtil:ReplacingBags()) or
+	(BagnonUtil:ReusingFrames() and BagnonUtil:IsInventoryBag(id)) then
 		Bagnon:ToggleInventory(auto)
 		return true
 	end
-	
-	if BagnonUtil:ReplacingBank() and Bagnon:BankHasBag(id) then
+
+	if (Bagnon:BankHasBag(id) and BagnonUtil:ReplacingBank()) or
+	(BagnonUtil:ReusingFrames() and BagnonUtil:IsBankBag(id)) then
 		Bagnon:ToggleBank(auto)
 		return true
 	end
@@ -283,23 +289,28 @@ end
 function Bagnon:HookBagClicks()
 	local oOpenBackpack = OpenBackpack
 	OpenBackpack = function()
-		if not BagnonUtil:ReplacingBags() then
-			oOpenBackpack()
+		if not FrameOpened(0) then
+			oOpenBackpack(true)
 		end
 	end
 
-	local oToggleBag = ToggleBag
-	ToggleBag = function(id)
-		if IsOptionFrameOpen() then return end
-		
-		if not FrameToggled(id) then
-			oToggleBag(id)
+	local oCloseBackpack = CloseBackpack
+	CloseBackpack = function()
+		if not FrameClosed(0) then
+			oCloseBackpack(true)
+		end
+	end
+
+	local oToggleBackpack = ToggleBackpack
+	ToggleBackpack = function()
+		if not FrameToggled(0) then
+			oToggleBackpack()
 		end
 	end
 
 	local oOpenAllBags = OpenAllBags
 	OpenAllBags = function(force)
-		if BagnonUtil:ReplacingBags() then
+		if BagnonUtil:ReplacingBags() or BagnonUtil:ReusingFrames() then
 			if force then
 				Bagnon:ShowInventory()
 			else
@@ -312,10 +323,17 @@ function Bagnon:HookBagClicks()
 
 	local bCloseAllBags = CloseAllBags
 	CloseAllBags = function()
-		if BagnonUtil:ReplacingBags() then
+		if BagnonUtil:ReplacingBags() or BagnonUtil:ReusingFrames() then
 			Bagnon:HideInventory()
 		else
 			bCloseAllBags()
+		end
+	end
+
+	local oToggleBag = ToggleBag
+	ToggleBag = function(id)
+		if not FrameToggled(id) then
+			oToggleBag(id)
 		end
 	end
 
@@ -327,8 +345,8 @@ function Bagnon:HookBagClicks()
 	end
 end
 
---[[ 
-	Automatic Frame Display 
+--[[
+	Automatic Frame Display
 		These functions control the display of bagnon/banknon when an event happens, like opeing the AH
 --]]
 
@@ -347,11 +365,11 @@ local function ShowAtEvent(event, showBlizBank)
 	if Bagnon.sets[format('showBagsAt%s', event)] then
 		Bagnon:ShowInventory(true)
 	end
-	
+
 	if Bagnon.sets[format('showBankAt%s', event)] then
 		Bagnon:ShowBank(true)
 	end
-	
+
 	if showBlizBank then
 		ShowBlizBank()
 	end
@@ -361,7 +379,7 @@ local function HideAtEvent(event)
 	if Bagnon.sets[format('showBagsAt%s', event)] then
 		Bagnon:HideInventory(true)
 	end
-	
+
 	if Bagnon.sets[format('showBankAt%s', event)] then
 		Bagnon:HideBank(true)
 	end
@@ -369,7 +387,7 @@ end
 
 function Bagnon:BANKFRAME_OPENED()
 	self.atBank = true
-	ShowAtEvent('Bank', not BagnonUtil:ReplacingBank())
+	ShowAtEvent('Bank', not(BagnonUtil:ReplacingBank() or BagnonUtil:ReusingFrames()))
 end
 
 function Bagnon:BANKFRAME_CLOSED()
@@ -442,5 +460,5 @@ function Bagnon:ShowMenu()
 		end
 	else
 		self:ShowHelp()
-	end	
+	end
 end

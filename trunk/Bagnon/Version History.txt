@@ -1,5 +1,8 @@
 Bagnon Version History
 
+1.2
+	Rewrote the code for hooking the bag slots, and automatic display
+
 1.1
 	Clicking on the keyring button will now properly show the inventory window
 	Added a check to disable vBagnon if Bagnon is running
