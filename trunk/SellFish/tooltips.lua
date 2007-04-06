@@ -68,7 +68,7 @@ ItemRefTooltip.SetHyperlink = hookTip(ItemRefTooltip.SetHyperlink, function(link
 end)
 
 GameTooltip.SetBagItem = hookTip(GameTooltip.SetBagItem, function(bag, slot)
-	if not(MerchantFrame:IsVisible()) then 
+	if not MerchantFrame:IsVisible() then 
 		return GetContainerItemLink(bag, slot), select(2, GetContainerItemInfo(bag, slot))
 	end
 end)

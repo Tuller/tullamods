@@ -18,6 +18,7 @@ L.UnknownCommand = "'|cffffd700%s|r' is an unknown command"
 L.HelpDesc = "Shows commands"
 L.ResetDesc = "Resets sell value database"
 L.StyleDesc = "Toggles sell value display style"
+L.CompressDesc = "Compresses the sell value database"
 
 --tooltips
 L.SellsFor = "Sells for:"

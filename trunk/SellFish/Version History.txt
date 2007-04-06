@@ -1,5 +1,12 @@
 SellFish Version History
 
+1.2
+	Fixed a bug causing new sell values to not be stored
+
+	Disabled compressing of sell value data automatically upon logout
+	Added a new command
+		* /sf compress: compresses the sell value database
+
 1.1
 	Fixed an error when viewing the tooltip for an item from a quest giver
 	Increased default DB size to 29646 items

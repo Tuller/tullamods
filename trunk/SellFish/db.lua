@@ -58,7 +58,6 @@ local function ToID(link)
 	end
 end
 
-local newVals = {}
 local cache = {}
 setmetatable(cache, {__index = function(t, i)
 	if SellFishDB and SellFishDB.data then
@@ -74,22 +73,23 @@ end})
 SellFish = {}
 
 function SellFish:Load()
-	local tip = CreateFrame('GameTooltip', 'SellFishTooltip', nil, 'GameTooltipTemplate')
-	tip:SetScript('OnTooltipAddMoney', function() if not InRepairMode() then this.lastValue = arg1 end end)
+	local tip = CreateFrame('GameTooltip', 'SellFishTooltip', UIParent, 'GameTooltipTemplate')
+	tip:SetScript('OnTooltipAddMoney', function()
+		if not InRepairMode() then
+			tip.lastCost = arg1
+		end
+	end)
 
 	tip:SetScript('OnEvent', function()
 		if event == 'MERCHANT_SHOW' then
-			SellFish:ScanPrices()
+			self:ScanPrices()
 		elseif event == 'ADDON_LOADED' and arg1 == 'SellFish' then
 			this:UnregisterEvent('ADDON_LOADED')
-			SellFish:Initialize()
-		elseif event == 'PLAYER_LOGOUT' then
-			SellFish:Disable()
+			self:Initialize()
 		end
 	end)
 	tip:RegisterEvent('MERCHANT_SHOW')
 	tip:RegisterEvent('ADDON_LOADED')
-	tip:RegisterEvent('PLAYER_LOGOUT')
 
 	self.tip = tip
 
@@ -110,25 +110,23 @@ function SellFish:Initialize()
 			self:UpdateVersion(current)
 		end
 	end
-end
 
-function SellFish:Disable()
-	self:CompressDB()
+	if not SellFishDB.newVals then
+		SellFishDB.newVals = {}
+	end
 end
 
 function SellFish:LoadDefaults(current)
 	SellFishDB = {short = 1, version = current}
-	
+
 	if CompletePrices then
---		msg("Converting PriceMaster data")
 		self:ConvertPriceMaster(CompletePrices)
 	end
 
 	if ColaLight and ColaLight.db.account.SellValues then
---		msg("Converting ColaLight data")
 		self:ConvertColaLight(ColaLight.db.account.SellValues)
 	end
-	
+
 	if not SellFishDB.data and SellFish_GetDefaults then
 		SellFishDB.data = SellFish_GetDefaults()
 	end
@@ -148,7 +146,7 @@ function SellFish:ScanPrices()
 	for bag = 0, NUM_BAG_FRAMES do
 		for slot = 1, GetContainerNumSlots(bag) do
 			local link = GetContainerItemLink(bag, slot)
-			if id then
+			if link then
 				local cost = self:GetItemValue(bag, slot)
 				if cost then
 					local count = (select(2, GetContainerItemInfo(bag, slot)))
@@ -160,10 +158,10 @@ function SellFish:ScanPrices()
 end
 
 function SellFish:GetItemValue(bag, slot)
-	self.tip.lastValue = nil
+	self.tip.lastCost = nil
 	self.tip:SetBagItem(bag, slot)
 
-	return self.tip.lastValue
+	return self.tip.lastCost
 end
 
 function SellFish:SaveCost(id, cost)
@@ -171,13 +169,13 @@ function SellFish:SaveCost(id, cost)
 	local cost = ToBase(cost, maxBase)
 
 	if cost ~= cache[id] then
-		newVals[id] = cost
+		SellFishDB.newVals[id] = cost
 	end
 end
 
 function SellFish:GetCost(id, count)
 	local id = ToBase(id, maxBase)
-	local cost = newVals[id] or cache[id]
+	local cost = SellFishDB.newVals[id] or cache[id]
 
 	if cost and cost ~= "" then
 		return tonumber(cost, maxBase) * (count or 1)
@@ -186,7 +184,7 @@ end
 
 function SellFish:CompressDB()
 	local appendString = ""
-	for id, cost in pairs(newVals) do
+	for id, cost in pairs(SellFishDB.newVals) do
 		if cost == "" then cost = "0" end
 
 		local prevCost = cache[id]
@@ -200,7 +198,7 @@ function SellFish:CompressDB()
 			appendString = (appendString or "") .. format("%s,%s;", id, cost)
 		end
 
-		newVals[id] = nil
+		SellFishDB.newVals[id] = nil
 	end
 
 	if appendString ~= "" then
@@ -217,10 +215,10 @@ function SellFish:ConvertColaLight(t)
 	for id, cost in pairs(t) do
 		local cost = ToBase(tonumber(cost), maxBase)
 		local id = ToBase(tonumber(id), maxBase)
-		if newVals[id] ~= cost then
+		if SellFishDB.newVals[id] ~= cost then
 			changed = true
 		end
-		newVals[id] = cost
+		SellFishDB.newVals[id] = cost
 	end
 
 	return changed
@@ -233,13 +231,13 @@ function SellFish:ConvertPriceMaster(t)
 		if price then
 			local cost = ToBase(tonumber(price), maxBase)
 			local id = ToBase(tonumber(id), maxBase)
-			if newVals[id] ~= cost then
+			if SellFishDB.newVals[id] ~= cost then
 				changed = true
 			end
-			newVals[id] = cost
+			SellFishDB.newVals[id] = cost
 		end
 	end
-	
+
 	return changed
 end
 
@@ -284,6 +282,8 @@ function SellFish:LoadSlashCommands()
 				self:LoadDefaults()
 			elseif cmd == 'style' then
 				self:ToggleStyle()
+			elseif cmd == 'compress' then
+				self:CompressDB()
 			else
 				msg(format(L.UnknownCommand, cmd), true)
 			end
@@ -298,8 +298,9 @@ function SellFish:ShowCommands()
 
 	msg(L.CommandsHeader)
 	msg(format(cmdStr, "?", L.HelpDesc))
-	msg(format(cmdStr, "reset", L.ResetDesc))
 	msg(format(cmdStr, "style", L.StyleDesc))
+	msg(format(cmdStr, "compress", L.CompressDesc))
+	msg(format(cmdStr, "reset", L.ResetDesc))
 end
 
 function SellFish:ToggleStyle()
