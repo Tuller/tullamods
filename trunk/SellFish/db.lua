@@ -61,7 +61,7 @@ end
 local cache = {}
 setmetatable(cache, {__index = function(t, i)
 	if SellFishDB and SellFishDB.data then
-		local c = (SellFishDB.data:match(i .. ',(%w+);'))
+		local c = (SellFishDB.data:match(';' .. i .. ',(%w+);'))
 		if c then t[i] = c end
 		return c
 	end
@@ -134,7 +134,9 @@ function SellFish:LoadDefaults(current)
 end
 
 function SellFish:UpdateVersion(current)
-	self:LoadDefaults(current)
+	if SellFishDB.data then
+		SellFishDB.data = ';' .. SellFishDB.data
+	end
 	SellFishDB.version = current
 	msg(format(L.Updated, SellFishDB.version), true)
 end
@@ -190,12 +192,12 @@ function SellFish:CompressDB()
 		local prevCost = cache[id]
 		if prevCost and cost ~= prevCost then
 			if cost == "0" then
-				SellFishDB.data:gsub(format("%s,%s;", id, prevCost), "");
+				SellFishDB.data:gsub(format(";%s,%s;", id, prevCost), "");
 			else
-				SellFishDB.data:gsub(format("%s,%s;", id, prevCost), format("%s,%s;", id, cost))
+				SellFishDB.data:gsub(format(";%s,%s;", id, prevCost), format(";%s,%s;", id, cost))
 			end
 		elseif cost ~= "0" then
-			appendString = (appendString or "") .. format("%s,%s;", id, cost)
+			appendString = (appendString or "") .. format(";%s,%s", id, cost)
 		end
 
 		SellFishDB.newVals[id] = nil
