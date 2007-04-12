@@ -1,0 +1,14 @@
+OmniCC Version History, in the format mmddyy:
+
+1.0
+Addon folder name is now OmniCC, instead of !OmniCC.  DELETE !OMNICC BEFORE RUNNING!
+Added a pulse option, which causes the icon of an object to pulse when it becomes available.
+Added a time format option, which switches between MM:SS and MM formats
+Settings changes will now immediately affect all visible cooldown text
+Set cooldown text to toplevel to prevent issues with other mods
+Removed the shine option
+Removed support for Discord Action Bars
+
+
+TODO:
+Make a load on demand options menu.
