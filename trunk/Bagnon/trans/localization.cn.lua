@@ -3,6 +3,8 @@
 
 	Bagnon Localization file: Chinese 
 		Credit goes to Diablohu
+	
+	Last Update: 4.11.2007
 --]]
 
 
@@ -12,22 +14,22 @@ local L = BAGNON_LOCALS
 
 --bindings
 BINDING_HEADER_BAGNON = "Bagnon"
-BINDING_NAME_BAGNON_TOGGLE = "开关Bagnon"
-BINDING_NAME_BANKNON_TOGGLE = "开关Banknon"
+BINDING_NAME_BAGNON_TOGGLE = "开关 Bagnon"
+BINDING_NAME_BANKNON_TOGGLE = "开关 Banknon"
 
 --system messages
-L.NewUser = "New user detected, default settings loaded"
-L.Updated = "Updated to v%s"
-L.UpdatedIncompatible = "Updating from an incompatible version, defaults loaded"
+L.NewUser = "这是该角色第一次使用 Bagnon，已载入默认设置。"
+L.Updated = "已更新到 v%s"
+L.UpdatedIncompatible = "从一个错误的版本更新，已载入默认设置。"
 
 --errors
-L.ErrorNoSavedBank = "Cannot open the bank, no saved information available"
+L.ErrorNoSavedBank = "无法打开银行：无可用的存储信息。"
 
 --slash commands
-L.Commands = "Commands:"
-L.ShowMenuDesc = "Shows the options menu"
-L.ShowBagsDesc = "Toggles the inventory frame"
-L.ShowBankDesc = "Toggles the bank frame"
+L.Commands = "命令:"
+L.ShowMenuDesc = "显示设置菜单"
+L.ShowBagsDesc = "开关背包界面"
+L.ShowBankDesc = "开关银行界面"
 
 --frame text
 L.TitleBank = "%s的银行"
@@ -40,15 +42,16 @@ L.TipShowMenu = "<右键点击>打开设置菜单"
 L.TipShowSearch = "<双击>进行搜索"
 L.TipShowBag = "<单击>显示"
 L.TipHideBag = "<单击>隐藏"
-L.TipGoldOnRealm = "Total on %s"
+L.TipGoldOnRealm = "%s服务器上的总资产"
 
 --menu text
-L.FrameSettings = "Frame Settings"
+L.FrameSettings = "框架设置"
 L.Lock = "锁定位置"
-L.Toplevel = "Toplevel"
+L.Toplevel = "总在最前"
 L.BackgroundColor = "背景颜色"
 L.FrameLevel = "层"
 L.Opacity = "透明度"
 L.Scale = "缩放"
 L.Spacing = "间距"
 L.Cols = "列数"
+L.ReverseSort = "反向排列"
