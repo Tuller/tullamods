@@ -22,6 +22,53 @@
 
 local UPDATE_DELAY = 1
 
+local function ShowAddonMemoryUsage()
+	if this:GetRight() >= (GetScreenWidth() / 2) then
+		GameTooltip:SetOwner(this, 'ANCHOR_LEFT')
+	else
+		GameTooltip:SetOwner(this, 'ANCHOR_RIGHT')
+	end
+
+	if IsModifierKeyDown() then
+		UpdateAddOnCPUUsage()
+
+		GameTooltip:SetText("Addon CPU Usage")
+		local total = 0
+
+		for i=1, GetNumAddOns() do
+			local secs = GetAddOnCPUUsage(i)/1000
+			if secs > 3600 then
+				GameTooltip:AddDoubleLine(GetAddOnInfo(i), format("%.2fh", secs/3600), 1, 1, 1, 1, 0.2, 0.2)
+			elseif secs > 60 then
+				GameTooltip:AddDoubleLine(GetAddOnInfo(i), format("%.2fm", secs/60), 1, 1, 1, 1, 1, 0.2)
+			elseif floor(secs) > 0 then
+				GameTooltip:AddDoubleLine(GetAddOnInfo(i), format("%ds", secs), 1, 1, 1, 0.2, 1, 0.2)
+			end
+			total = total + secs
+		end
+		GameTooltip:AddDoubleLine("Total", format("%.1fm", total/60), 0.4, 0.6, 1, 1, 1, 0.2)
+	else
+		UpdateAddOnMemoryUsage()
+
+		GameTooltip:SetText("Addon Memory Usage")
+		local total = 0
+
+		for i=1, GetNumAddOns() do
+			local mem = GetAddOnMemoryUsage(i)
+			if mem > 0 then
+				if mem > 1024 then
+					GameTooltip:AddDoubleLine(GetAddOnInfo(i), format("%.1fmb", mem/1024), 1, 1, 1, 1, 1, 0.2)
+				else
+					GameTooltip:AddDoubleLine(GetAddOnInfo(i), format("%.1fkb", mem), 1, 1, 1, 0.2, 1, 0.2)
+				end
+				total = total + mem
+			end
+		end
+		GameTooltip:AddDoubleLine("Total", format("%.2fmb", total/1024), 0.4, 0.6, 1, 1, 1, 0.2)
+	end
+	GameTooltip:Show()
+end
+
 local function Update(self)
 	if self.sets.showFPS then
 		self.fps:SetText(format("%.1ffps", GetFramerate()))
@@ -54,6 +101,10 @@ local function Update(self)
 		self:SetWidth(24)
 	else
 		self:SetWidth(width + 4)
+	end
+	
+	if GameTooltip:IsOwned(self) then
+		ShowAddonMemoryUsage(self)
 	end
 end
 
@@ -132,6 +183,7 @@ end
 --[[ Startup ]]--
 
 local function OnCreate(self)
+	self:EnableMouse(true)
 	self.fps = self:CreateFontString()
 	self.fps:SetFontObject("GameFontNormalLarge")
 	self.fps:SetPoint("LEFT", self)
@@ -150,6 +202,8 @@ local function OnCreate(self)
 	self:SetWidth(120)
 	self:SetHeight(20)
 	self:SetScript("OnUpdate", OnUpdate)
+	self:SetScript("OnEnter", function() ShowAddonMemoryUsage() end)
+	self:SetScript("OnLeave", function() GameTooltip:Hide() end)
 end
 
 Bongos.AddStartup(function()
