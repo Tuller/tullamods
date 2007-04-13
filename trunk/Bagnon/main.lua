@@ -3,7 +3,7 @@
 		Handles settings management, and bank and inventory viewing
 --]]
 
-Bagnon = DongleStub("Dongle-Beta1"):New("Bagnon")
+Bagnon = DongleStub("Dongle-1.0"):New("Bagnon")
 local L = BAGNON_LOCALS
 
 --[[ Startup and settings management ]]--
