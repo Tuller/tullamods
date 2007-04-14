@@ -252,22 +252,26 @@ end
 
 function OmniCC:StartTimer(cooldown, start, duration)
 	local parent = cooldown:GetParent()
-	local icon =
-		--ct mod
-		parent.icon or
-		--standard action button icon, $parentIcon
-		getglobal(parent:GetName() .. "Icon") or
-		--standard item button icon,  $parentIconTexture
-		getglobal(parent:GetName() .. "IconTexture")
+	if parent then
+		if parent.object and parent.object.icon then
+			msg(parent.icon:GetTexture())
+		end
 
-	if icon then
-		local timer = parent.timer or Timer_Create(parent, cooldown, icon)
+		local icon =
+			--standard action button icon, $parentIcon
+			getglobal(parent:GetName() .. "Icon") or
+			--standard item button icon,  $parentIconTexture
+			getglobal(parent:GetName() .. "IconTexture")
 
-		timer.start = start
-		timer.duration = duration
-		timer.toNextUpdate = 0
-		active[timer] = true
-		timer:Show()
+		if icon then
+			local timer = parent.timer or Timer_Create(parent, cooldown, icon)
+
+			timer.start = start
+			timer.duration = duration
+			timer.toNextUpdate = 0
+			active[timer] = true
+			timer:Show()
+		end
 	end
 end
 
@@ -301,14 +305,14 @@ end)
 --[[  Pulse Code ]]--
 
 local function Pulse_OnUpdate()
-	if this.scale >= 1.5 then
+	if this.scale >= 2 then
 		this.dec = 1
 	end
 
 	if this.dec then
-		this.scale = this.scale - this.scale * 0.06
+		this.scale = this.scale - this.scale * 0.09
 	else
-		this.scale = this.scale + this.scale * 0.06
+		this.scale = this.scale + this.scale * 0.09
 	end
 
 	if this.scale <= 1 then
