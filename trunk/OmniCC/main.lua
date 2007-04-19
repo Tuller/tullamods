@@ -11,7 +11,12 @@ local function msg(message, showAddon)
 	end
 end
 
+local active = {}
+local activePulses = {}
+
 OmniCC = CreateFrame("Frame")
+OmniCC:Hide()
+
 OmniCC:SetScript("OnEvent", function()
 	if arg1 == "OmniCC" then
 		this:UnregisterEvent(event)
@@ -20,7 +25,16 @@ OmniCC:SetScript("OnEvent", function()
 end)
 OmniCC:RegisterEvent("ADDON_LOADED")
 
-local active = {}
+OmniCC:SetScript("OnUpdate", function()
+	if next(activePulses) then
+		for pulse in pairs(activePulses) do
+			this:UpdatePulse(pulse)
+		end
+	else
+		this:Hide()
+	end
+end)
+
 
 --[[ Settings Loading ]]--
 
@@ -304,33 +318,11 @@ end)
 
 --[[  Pulse Code ]]--
 
-local function Pulse_OnUpdate()
-	if this.scale >= 2 then
-		this.dec = 1
-	end
-
-	if this.dec then
-		this.scale = this.scale - this.scale * 0.09
-	else
-		this.scale = this.scale + this.scale * 0.09
-	end
-
-	if this.scale <= 1 then
-		this.dec = nil
-		this:Hide()
-	else
-		this.icon:SetHeight(this:GetHeight() * this.scale)
-		this.icon:SetWidth(this:GetWidth() * this.scale)
-	end
-end
-
 local function Pulse_Create(parent)
 	local frame = CreateFrame("Frame", nil, parent)
 	frame:SetToplevel(true)
 	frame:SetAlpha(parent:GetAlpha())
 	frame:SetAllPoints(parent)
-	frame:Hide()
-	frame:SetScript("OnUpdate", Pulse_OnUpdate)
 
 	local icon = frame:CreateTexture(nil, "OVERLAY")
 	icon:SetPoint("CENTER", frame, "CENTER")
@@ -349,10 +341,34 @@ function OmniCC:StartPulse(cooldown)
 
 	if parent and parent:IsVisible() then
 		local pulse = parent.pulse or Pulse_Create(parent)
-
 		pulse.scale = 1
 		pulse.icon:SetTexture(cooldown.icon:GetTexture())
 		pulse:Show()
+		activePulses[pulse] = true
+		
+		self:Show()
+	end
+end
+
+function OmniCC:UpdatePulse(pulse)
+	if pulse.scale >= 2 then
+		pulse.dec = 1
+	end
+
+	if pulse.dec then
+		pulse.scale = pulse.scale - pulse.scale * 0.09
+	else
+		pulse.scale = pulse.scale + pulse.scale * 0.09
+	end
+
+	if pulse.scale <= 1 then
+		activePulses[pulse] = nil
+
+		pulse:Hide()
+		pulse.dec = nil
+	else
+		pulse.icon:SetHeight(pulse:GetHeight() * pulse.scale)
+		pulse.icon:SetWidth(pulse:GetWidth() * pulse.scale)
 	end
 end
 
