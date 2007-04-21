@@ -1,5 +1,8 @@
 OmniCC Version History, in the format mmddyy:
 
+1.1 beta
+Implemented text scaling
+
 1.0
 Addon folder name is now OmniCC, instead of !OmniCC.  DELETE !OMNICC BEFORE RUNNING!
 Added a pulse option, which causes the icon of an object to pulse when it becomes available.

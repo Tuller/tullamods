@@ -3,6 +3,8 @@
 		A universal cooldown count, based on an idea by Gello
 --]]
 
+local ICON_SCALE = 37
+
 local function msg(message, showAddon)
 	if showAddon then
 		ChatFrame1:AddMessage(format("|cFF33FF99OmniCC|r: %s", tostring(message)))
@@ -229,9 +231,11 @@ local function Timer_OnUpdate()
 		if floor(remain + 0.5) > 0 and this.icon:IsVisible() then
 			local time, toNextUpdate = GetFormattedTime(remain)
 			local font, size, r, g, b = GetFormattedFont(remain)
-
-			this.text:SetFont(font, size, "OUTLINE")
+			local scale = this:GetWidth() / ICON_SCALE
+			
+			this.text:SetFont(font, size * scale, "OUTLINE")
 			this.text:SetText(time)
+
 			this.text:SetTextColor(r, g, b)
 			this.toNextUpdate = toNextUpdate
 		else

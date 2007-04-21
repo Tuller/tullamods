@@ -6,6 +6,8 @@
 	You can also remove the saved variables line.
 --]]
 
+local ICON_SCALE = 37
+
 local function GetFormattedTime(secs)
 	if secs >= 86400 then
 		return floor(secs / 86400 + 0.5) .. "d", mod(secs, 86400)
@@ -42,10 +44,11 @@ local function Timer_Create(parent, cooldown, icon)
 	timer:SetScript("OnUpdate", Timer_OnUpdate)
 
 	timer.icon = icon
-
+	
+	local scale = timer:GetWidth() / ICON_SCALE
 	timer.text = timer:CreateFontString(nil, "OVERLAY")
 	timer.text:SetPoint("CENTER", timer, "CENTER", 0, 1)
-	timer.text:SetFont(STANDARD_TEXT_FONT, 20, "OUTLINE")
+	timer.text:SetFont(STANDARD_TEXT_FONT, 20 * scale, "OUTLINE")
 	timer.text:SetTextColor(1, 1, 0.4)
 	parent.timer = timer
 
