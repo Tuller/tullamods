@@ -83,9 +83,10 @@ local function CreateItemCacheTable()
 	return info
 end
 
-Ludwig = {}
 
 --[[ Usable Functions ]]--
+
+Ludwig = {}
 
 function Ludwig:GetAllItems(refresh)
 	if not itemInfo then
@@ -126,32 +127,30 @@ function Ludwig:GetItems(name, quality, type, subType, equipLoc, minLevel, maxLe
 	end
 
 	local count = 0
-	
-	for id, itemName in pairs(db) do
-		if itemName then
-			local addItem = true
-			if quality and stats[3][id] ~= quality then
-				addItem = nil
-			elseif minLevel and stats[5][id] < minLevel then
-				addItem = nil
-			elseif maxLevel and stats[5][id] > maxLevel then
-				addItem = nil
-			elseif type and stats[6][id] ~= type then
-				addItem = nil
-			elseif subType and stats[7][id] ~= subType then
-				addItem = nil
-			elseif equipLoc and stats[9][id] ~= equipLoc then
-				addItem = nil
-			elseif name then
-				if not(name == itemName or itemName:find(name)) then
-					addItem = nil
-				end
-			end
 
-			if addItem then
-				count = count + 1
-				filteredList[count] = id
+	for id, itemName in pairs(db) do
+		local addItem = true
+		if quality and stats[3][id] ~= quality then
+			addItem = nil
+		elseif minLevel and stats[5][id] < minLevel then
+			addItem = nil
+		elseif maxLevel and stats[5][id] > maxLevel then
+			addItem = nil
+		elseif type and stats[6][id] ~= type then
+			addItem = nil
+		elseif subType and stats[7][id] ~= subType then
+			addItem = nil
+		elseif equipLoc and stats[9][id] ~= equipLoc then
+			addItem = nil
+		elseif name then
+			if not(name == itemName or itemName:find(name)) then
+				addItem = nil
 			end
+		end
+
+		if addItem then
+			count = count + 1
+			filteredList[count] = id
 		end
 	end
 
