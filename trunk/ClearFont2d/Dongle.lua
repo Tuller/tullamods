@@ -28,8 +28,8 @@
   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ---------------------------------------------------------------------------]]
-local major = "DongleStub-Beta0"
-local minor = tonumber(string.match("$Revision: 221 $", "(%d+)") or 1)
+local major = "DongleStub"
+local minor = tonumber(string.match("$Revision: 313 $", "(%d+)") or 1)
 
 local g = getfenv(0)
 
@@ -46,10 +46,24 @@ if not g.DongleStub or g.DongleStub:IsNewerVersion(major, minor) then
 
 	function lib:IsNewerVersion(major, minor)
 		local versionData = self.versions and self.versions[major]
-		
+
+		-- If DongleStub versions have differing major version names
+		-- such as DongleStub-Beta0 and DongleStub-1.0-RC2 then a second
+		-- instance will be loaded, with older logic.  This code attempts
+		-- to compensate for that by matching the major version against
+		-- "^DongleStub", and handling the version check correctly.
+
+		if major:match("^DongleStub") then
+			local oldmajor,oldminor = self:GetVersion()
+			if self.versions and self.versions[oldmajor] then
+				return minor > oldminor
+			else
+				return true
+			end
+		end
+
 		if not versionData then return true end
 		local oldmajor,oldminor = versionData.instance:GetVersion()
-		
 		return minor > oldminor
 	end
 	
@@ -59,7 +73,19 @@ if not g.DongleStub or g.DongleStub:IsNewerVersion(major, minor) then
 	end
 
 	function lib:Register(newInstance, activate, deactivate)
+		assert(type(newInstance.GetVersion) == "function",
+			"Attempt to register a library with DongleStub that does not have a 'GetVersion' method.")
+
 		local major,minor = newInstance:GetVersion()
+		assert(type(major) == "string",
+			"Attempt to register a library with DongleStub that does not have a proper major version.")
+		assert(type(minor) == "number",
+			"Attempt to register a library with DongleStub that does not have a proper minor version.")
+
+		-- Generate a log of all library registrations
+		if not self.log then self.log = {} end
+		table.insert(self.log, string.format("Register: %s, %s", major, minor))
+
 		if not self:IsNewerVersion(major, minor) then return false end
 		if not self.versions then self.versions = {} end
 
@@ -73,6 +99,7 @@ if not g.DongleStub or g.DongleStub:IsNewerVersion(major, minor) then
 			
 			self.versions[major] = versionData
 			if type(activate) == "function" then
+				table.insert(self.log, string.format("Activate: %s, %s", major, minor))
 				activate(newInstance)
 			end
 			return newInstance
@@ -85,11 +112,14 @@ if not g.DongleStub or g.DongleStub:IsNewerVersion(major, minor) then
 		
 		local skipCopy
 		if type(activate) == "function" then
-			 skipCopy = activate(newInstance, oldInstance)
+			table.insert(self.log, string.format("Activate: %s, %s", major, minor))
+			skipCopy = activate(newInstance, oldInstance)
 		end
 
 		-- Deactivate the old libary if necessary
 		if type(oldDeactivate) == "function" then
+			local major, minor = oldInstance:GetVersion()
+			table.insert(self.log, string.format("Deactivate: %s, %s", major, minor))
 			oldDeactivate(oldInstance, newInstance)
 		end
 
@@ -103,23 +133,29 @@ if not g.DongleStub or g.DongleStub:IsNewerVersion(major, minor) then
 	function lib:GetVersion() return major,minor end
 
 	local function Activate(new, old)
+		-- This code ensures that we'll move the versions table even
+		-- if the major version names are different, in the case of 
+		-- DongleStub
+		if not old then old = g.DongleStub end
+
 		if old then
 			new.versions = old.versions
+			new.log = old.log
 		end
 		g.DongleStub = new
 	end
 	
 	-- Actually trigger libary activation here
 	local stub = g.DongleStub or lib
-	stub:Register(lib, Activate)
+	lib = stub:Register(lib, Activate)
 end
 
 --[[-------------------------------------------------------------------------
   Begin Library Implementation
 ---------------------------------------------------------------------------]]
 
-local major = "Dongle-Beta1"
-local minor = tonumber(string.match("$Revision: 264 $", "(%d+)") or 1)
+local major = "Dongle-1.0"
+local minor = tonumber(string.match("$Revision: 315 $", "(%d+)") or 1)
 
 assert(DongleStub, string.format("Dongle requires DongleStub.", major))
 
@@ -129,7 +165,7 @@ local Dongle = {}
 local methods = {
 	"RegisterEvent", "UnregisterEvent", "UnregisterAllEvents", "IsEventRegistered",
 	"RegisterMessage", "UnregisterMessage", "UnregisterAllMessages", "TriggerMessage", "IsMessageRegistered",
-	"EnableDebug", "IsDebugEnabled", "Print", "PrintF", "Debug", "DebugF",
+	"EnableDebug", "IsDebugEnabled", "Print", "PrintF", "Debug", "DebugF", "Echo", "EchoF",
 	"InitializeDB",
 	"InitializeSlashCommand",
 	"NewModule", "HasModule", "IterateModules",
@@ -190,8 +226,9 @@ local function assert(level,condition,message)
 end
 
 local function argcheck(value, num, ...)
-	assert(1, type(num) == "number",
-		string.format(L["BAD_ARGUMENT"], 2, "argcheck", "number", type(level)))
+	if type(num) ~= "number" then
+		error(L["BAD_ARGUMENT"]:format(2, "argcheck", "number", type(num)), 1)
+	end
 
 	for i=1,select("#", ...) do
 		if type(value) == select(i, ...) then return end
@@ -199,7 +236,7 @@ local function argcheck(value, num, ...)
 
 	local types = strjoin(", ", ...)
 	local name = string.match(debugstack(2,2,0), ": in function [`<](.-)['>]")
-	error(string.format(L["BAD_ARGUMENT"], num, name, types, type(value)), 3)
+	error(L["BAD_ARGUMENT"]:format(num, name, types, type(value)), 3)
 end
 
 local function safecall(func,...)
@@ -367,8 +404,7 @@ end
 ---------------------------------------------------------------------------]]
 
 function Dongle:RegisterMessage(msg, func)
-	local reg = lookup[self]
-	assert(3, reg, string.format(L["MUST_CALLFROM_REGISTERED"], "RegisterMessage"))
+	argcheck(self, 1, "table")
 	argcheck(msg, 2, "string")
 	argcheck(func, 3, "string", "function", "nil")
 
@@ -382,8 +418,7 @@ function Dongle:RegisterMessage(msg, func)
 end
 
 function Dongle:UnregisterMessage(msg)
-	local reg = lookup[self]
-	assert(3, reg, string.format(L["MUST_CALLFROM_REGISTERED"], "UnregisterMessage"))
+	argcheck(self, 1, "table")
 	argcheck(msg, 2, "string")
 
 	local tbl = messages[msg]
@@ -396,8 +431,7 @@ function Dongle:UnregisterMessage(msg)
 end
 
 function Dongle:UnregisterAllMessages()
-	local reg = lookup[self]
-	assert(3, reg, string.format(L["MUST_CALLFROM_REGISTERED"], "UnregisterAllMessages"))
+	argcheck(self, 1, "table")
 
 	for msg,tbl in pairs(messages) do
 		tbl[self] = nil
@@ -408,6 +442,7 @@ function Dongle:UnregisterAllMessages()
 end
 
 function Dongle:TriggerMessage(msg, ...)
+	argcheck(self, 1, "table")
 	argcheck(msg, 2, "string")
 	local msgTbl = messages[msg]
 	if not msgTbl then return end
@@ -424,8 +459,7 @@ function Dongle:TriggerMessage(msg, ...)
 end
 
 function Dongle:IsMessageRegistered(msg)
-	local reg = lookup[self]
-	assert(3, reg, string.format(L["MUST_CALLFROM_REGISTERED"], "IsMessageRegistered"))
+	argcheck(self, 1, "table")
 	argcheck(msg, 2, "string")
 
 	local tbl = messages[msg]
@@ -462,12 +496,16 @@ local function argsToStrings(a1, ...)
 	end
 end
 
-local function printHelp(obj, method, frame, msg, ...)
+local function printHelp(obj, method, header, frame, msg, ...)
 	local reg = lookup[obj]
 	assert(4, reg, string.format(L["MUST_CALLFROM_REGISTERED"], method))
 
 	local name = reg.name
-	msg = "|cFF33FF99"..name.."|r: "..tostring(msg)
+
+	if header then
+		msg = "|cFF33FF99"..name.."|r: "..tostring(msg)
+	end
+
 	if select("#", ...) > 0 then
 		msg = string.join(", ", msg, argsToStrings(...))
 	end
@@ -475,12 +513,20 @@ local function printHelp(obj, method, frame, msg, ...)
 	frame:AddMessage(msg)
 end
 
-local function printFHelp(obj, method, frame, msg, ...)
+local function printFHelp(obj, method, header, frame, msg, ...)
 	local reg = lookup[obj]
 	assert(4, reg, string.format(L["MUST_CALLFROM_REGISTERED"], method))
 
 	local name = reg.name
-	local success,txt = pcall(string.format, "|cFF33FF99%s|r: "..msg, name, ...)
+	local success,txt
+
+	if header then
+		msg = "|cFF33FF99%s|r: " .. msg
+		success,txt = pcall(string.format, msg, name, ...)
+	else
+		success,txt = pcall(string.format, msg, ...)
+	end
+
 	if success then
 		frame:AddMessage(txt)
 	else
@@ -490,16 +536,30 @@ end
 
 function Dongle:Print(msg, ...)
 	local reg = lookup[self]
-	assert(3, reg, string.format(L["MUST_CALLFROM_REGISTERED"], "Print"))
+	assert(1, reg, string.format(L["MUST_CALLFROM_REGISTERED"], "Print"))
 	argcheck(msg, 2, "number", "string", "boolean", "table", "function", "thread", "userdata")
-	return printHelp(self, "Print", DEFAULT_CHAT_FRAME, msg, ...)
+	return printHelp(self, "Print", true, DEFAULT_CHAT_FRAME, msg, ...)
 end
 
 function Dongle:PrintF(msg, ...)
 	local reg = lookup[self]
-	assert(3, reg, string.format(L["MUST_CALLFROM_REGISTERED"], "PrintF"))
+	assert(1, reg, string.format(L["MUST_CALLFROM_REGISTERED"], "PrintF"))
 	argcheck(msg, 2, "number", "string", "boolean", "table", "function", "thread", "userdata")
-	return printFHelp(self, "PrintF", DEFAULT_CHAT_FRAME, msg, ...)
+	return printFHelp(self, "PrintF", true, DEFAULT_CHAT_FRAME, msg, ...)
+end
+
+function Dongle:Echo(msg, ...)
+	local reg = lookup[self]
+	assert(1, reg, string.format(L["MUST_CALLFROM_REGISTERED"], "Echo"))
+	argcheck(msg, 2, "number", "string", "boolean", "table", "function", "thread", "userdata")
+	return printHelp(self, "Echo", false, DEFAULT_CHAT_FRAME, msg, ...)
+end
+
+function Dongle:EchoF(msg, ...)
+	local reg = lookup[self]
+	assert(1, reg, string.format(L["MUST_CALLFROM_REGISTERED"], "EchoF"))
+	argcheck(msg, 2, "number", "string", "boolean", "table", "function", "thread", "userdata")
+	return printFHelp(self, "EchoF", false, DEFAULT_CHAT_FRAME, msg, ...)
 end
 
 function Dongle:Debug(level, ...)
@@ -508,7 +568,7 @@ function Dongle:Debug(level, ...)
 	argcheck(level, 2, "number")
 
 	if reg.debugLevel and level <= reg.debugLevel then
-		printHelp(self, "Debug", reg.debugFrame, ...)
+		printHelp(self, "Debug", true, reg.debugFrame, ...)
 	end
 end
 
@@ -518,7 +578,7 @@ function Dongle:DebugF(level, ...)
 	argcheck(level, 2, "number")
 
 	if reg.debugLevel and level <= reg.debugLevel then
-		printFHelp(self, "DebugF", reg.debugFrame, ...)
+		printFHelp(self, "DebugF", true, reg.debugFrame, ...)
 	end
 end
 
@@ -650,6 +710,10 @@ local dbmt = {
 				if new then
 					Dongle:TriggerMessage("DONGLE_PROFILE_CREATED", t, rawget(t, "parent"), rawget(t, "sv_name"), key)
 				end
+			elseif section == "profiles" then
+				local sv = rawget(t, "sv")
+				if not sv.profiles then sv.profiles = {} end
+				rawset(t, "profiles", sv.profiles)
 			elseif section == "global" then
 				local sv = rawget(t, "sv")
 				if not sv.global then sv.global = {} end
@@ -680,9 +744,9 @@ local function initdb(parent, name, defaults, defaultProfile, olddb)
 	end
 
 	-- Generate the database keys for each section
-	local char = string.format("%s of %s", UnitName("player"), GetRealmName())
+	local char = string.format("%s - %s", UnitName("player"), GetRealmName())
 	local realm = GetRealmName()
-	local class = UnitClass("player")
+	local class = select(2, UnitClass("player"))
 	local race = select(2, UnitRace("player"))
 	local faction = UnitFactionGroup("player")
 	local factionrealm = string.format("%s - %s", faction, realm)
@@ -703,6 +767,7 @@ local function initdb(parent, name, defaults, defaultProfile, olddb)
 		["factionrealm"] = factionrealm,
 		["global"] = true,
 		["profile"] = profileKey,
+		["profiles"] = true, -- Don't create until we need
 	}
 
 	-- If we've been passed an old database, clear it out
@@ -734,7 +799,7 @@ end
 function Dongle:InitializeDB(name, defaults, defaultProfile)
 	local reg = lookup[self]
 	assert(3, reg, string.format(L["MUST_CALLFROM_REGISTERED"], "InitializeDB"))
-	argcheck(name, 2, "string")
+	argcheck(name, 2, "string", "table")
 	argcheck(defaults, 3, "table", "nil")
 	argcheck(defaultProfile, 4, "string", "nil")
 
@@ -771,7 +836,13 @@ function Dongle:ClearDBDefaults()
 			for section,key in pairs(db.keys) do
 				local tbl = rawget(db, section)
 				if tbl and not next(tbl) then
-					sv[section][key] = nil
+					if sv[section] then
+						if type(key) == "string" then
+							sv[section][key] = nil
+						else
+							sv[section] = nil
+						end
+					end
 				end
 			end
 		end
@@ -883,6 +954,9 @@ function Dongle.RegisterNamespace(db, name, defaults)
 	end
 
 	local newDB = initdb(db, sv.namespaces[name], defaults, db.keys.profile)
+	-- Remove the :SetProfile method from newDB
+	newDB.SetProfile = nil
+
 	if not db.children then db.children = {} end
 	table.insert(db.children, newDB)
 	return newDB
@@ -974,14 +1048,14 @@ end
 
 function Dongle.PrintUsage(cmd)
 	assert(3, commands[cmd], string.format(L["MUST_CALLFROM_SLASH"], "PrintUsage"))
+	local parent = cmd.parent
 
-	local usage = cmd.desc.."\n".."/"..table.concat(cmd.slashes, ", /")..":\n"
+	parent:Echo(cmd.desc.."\n".."/"..table.concat(cmd.slashes, ", /")..":\n")
 	if cmd.patterns then
 		for idx,tbl in ipairs(cmd.patterns) do
-			usage = usage.." - "..tbl.desc.."\n"
+			parent:Echo(" - " .. tbl.desc)
 		end
 	end
-	cmd.parent:Print(usage)
 end
 
 local dbcommands = {
@@ -1053,10 +1127,12 @@ end
 
 local function PLAYER_LOGIN()
 	Dongle.initialized = true
-	for i,obj in ipairs(loadorder) do
+	for i=1, #loadorder do
+		local obj = loadorder[i]
 		if type(obj.Enable) == "function" then
 			safecall(obj.Enable, obj)
 		end
+		loadorder[i] = nil
 	end
 end
 
@@ -1068,11 +1144,25 @@ local function ADDON_LOADED(event, ...)
 		if type(obj.Initialize) == "function" then
 			safecall(obj.Initialize, obj)
 		end
-
-		if Dongle.initialized and type(obj.Enable) == "function" then
-			safecall(obj.Enable, obj)
-		end
 		loadqueue[i] = nil
+	end
+
+	if not Dongle.initialized then
+		if type(IsLoggedIn) == "function" then
+			Dongle.initialized = IsLoggedIn()
+		else
+			Dongle.initialized = ChatFrame1.defaultLanguage
+		end
+	end
+
+	if Dongle.initialized then
+		for i=1, #loadorder do
+			local obj = loadorder[i]
+			if type(obj.Enable) == "function" then
+				safecall(obj.Enable, obj)
+			end
+			loadorder[i] = nil
+		end
 	end
 end
 
@@ -1080,7 +1170,16 @@ local function DONGLE_PROFILE_CHANGED(msg, db, parent, sv_name, profileKey)
 	local children = db.children
 	if children then
 		for i,namespace in ipairs(children) do
-			namespace:SetProfile(profileKey)
+			local old = namespace.profile
+			local defaults = namespace.defaults and namespace.defaults.profile
+
+			if defaults then
+				-- Remove the defaults from the old profile
+				removeDefaults(old, defaults)
+			end
+
+			namespace.profile = nil
+			namespace.keys["profile"] = profileKey
 		end
 	end
 end

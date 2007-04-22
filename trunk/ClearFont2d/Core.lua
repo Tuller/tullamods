@@ -15,7 +15,7 @@
 -- Create instance of the Ace2 addon
 -- -----------------------------------------------------------------------------
 
-ClearFont = DongleStub("Dongle-Beta1"):New("ClearFont2d")
+ClearFont = DongleStub("Dongle-1.0"):New("ClearFont2d")
 
 -- =============================================================================
 --  A. FONT LOCALS
