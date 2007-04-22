@@ -49,7 +49,7 @@ ClearFont.fonts = {
 function ClearFont:Initialize()
 	self.db = self:InitializeDB("ClearFont2dDB", {profile = {
 		currentFont = "Default",
-		currentScale = 1.0,
+		currentScale = 1,
 		applyAll = true,
 	}})
 	self.profile = self.db.profile
