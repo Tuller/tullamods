@@ -39,14 +39,13 @@ end
 
 function LudwigUI_OnShow()
 	displayChanged = true
-	Ludwig_Reload()
+	Ludwig:ReloadDB()
 end
 
 function LudwigUI_OnHide()
 	for i in pairs(displayList) do
 		displayList[i] = nil
 	end
-	collectgarbage()
 	displayChanged = true
 end
 
@@ -86,7 +85,7 @@ end
 
 function LudwigUIItem_OnEnter()
 	GameTooltip:SetOwner(this)
-	GameTooltip:SetHyperlink(Ludwig_GetHyperLink(this:GetID()))
+	GameTooltip:SetHyperlink(Ludwig:GetItemLink(this:GetID()))
 	GameTooltip:ClearAllPoints()
 
 	if this:GetLeft() < (UIParent:GetRight() / 2) then
@@ -121,7 +120,7 @@ function LudwigUIScrollBar_Update()
 	--update list only if there are changes
 	if not displayList or displayChanged then
 		displayChanged = nil
-		displayList = Ludwig_GetItems(filter.name, filter.quality, filter.type, filter.subType, filter.loc, filter.minLevel, filter.maxLevel, filter.player)
+		displayList = Ludwig:GetItems(filter.name, filter.quality, filter.type, filter.subType, filter.loc, filter.minLevel, filter.maxLevel, filter.player)
 	end
 
 	local size = #displayList
@@ -135,9 +134,9 @@ function LudwigUIScrollBar_Update()
 
 		if rIndex < size + 1 then
 			local id = displayList[rIndex]
-			lwb:SetText(Ludwig_GetName(id, true))
+			lwb:SetText(Ludwig:GetItemName(id, true))
 			lwb:SetID(id)
-			getglobal(lwb:GetName() ..  "Texture"):SetTexture(Ludwig_GetTexture(id))
+			getglobal(lwb:GetName() ..  "Texture"):SetTexture(Ludwig:GetItemTexture(id))
 			lwb:Show()
 		else
 			lwb:Hide()
@@ -151,7 +150,7 @@ end
 --]]
 
 function LudwigUI_Refresh()
-	Ludwig_Reload()
+	Ludwig:ReloadDB()
 	displayChanged = 1
 	LudwigUIScrollBar_Update()
 end
@@ -176,14 +175,12 @@ function LudwigUI_ResetFilters()
 	LudwigUIScrollBar_Update()
 end
 
+local info = {}
 local function AddItem(text, action, value, selectedValue)
-	local info = {}
 	info.text = text
 	info.func = action
 	info.value = value
-	if value == selectedValue then
-		info.checked = 1
-	end
+	info.checked = value == selectedValue
 	UIDropDownMenu_AddButton(info)
 end
 

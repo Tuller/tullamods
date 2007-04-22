@@ -307,11 +307,11 @@
 		<Scripts>
 			<OnClick>
 				if IsShiftKeyDown() then
-					ChatFrameEditBox:Insert(Ludwig_GetHyperLink(this:GetID()))
+					ChatFrameEditBox:Insert(Ludwig:GetItemLink(this:GetID()))
 				elseif IsControlKeyDown() then
-					DressUpItemLink(Ludwig_GetHyperLink(this:GetID()))
+					DressUpItemLink(Ludwig:GetItemLink(this:GetID()))
 				else
-					SetItemRef(Ludwig_GetHyperLink(this:GetID()))
+					SetItemRef(Ludwig:GetItemLink(this:GetID()))
 				end
 			</OnClick>
 			<OnEnter>

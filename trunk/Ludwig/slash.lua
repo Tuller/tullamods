@@ -26,7 +26,7 @@ end
 local function PrintList(name, list, startTime)
 	LMsg(format(L["There are %d items matching '%s':"], #list, name))
 	for i, link in ipairs(list) do 
-		PrintMsg(Ludwig_GetHyperLink(link))
+		PrintMsg(Ludwig:GetItemLink(link))
 		if i > 9 then break end
 	end
 	PrintMsg(format(L['Generated in %.3f seconds'], GetTime() - startTime))
@@ -34,8 +34,7 @@ end
 
 local function ListItemsOfName(name)
 	local startTime = GetTime()
-	local list = Ludwig_GetItems(name)
-	
+	local list = Ludwig:GetItems(name)
 	if list then
 		PrintList(name, list, startTime)
 	else
@@ -43,21 +42,15 @@ local function ListItemsOfName(name)
 	end
 end
 
---[[ Initialize Slash Command Handler ]]--
 SlashCmdList["LudwigSlashCOMMAND"] = function(msg)
 	if not msg or msg == "" and LudwigUIParent then
 		LudwigUIParent:Show()
 	else
-		local cmd, arg1 = string.match(msg:lower(), "%-(%w+)%s?(%d*)")
+		local cmd, arg1 = string.match(msg:lower(), "%-(%w+)")
 		if cmd then
 			if cmd == 'refresh' then
-				Ludwig_Reload()
+				Ludwig:ReloadDB()
 				LMsg(L['Database refreshed'])
-			elseif cmd == 'minquality' then
-				if tonumber(arg1) then 
-					Ludwig_SetMinQuality(tonumber(arg1))
-					LMsg(format(L['Quality threshold set to %d'], arg1))
-				end
 			else
 				LMsg(format(L["'%s' is an unknown command"] , cmd))
 			end
