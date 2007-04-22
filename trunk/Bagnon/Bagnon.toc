@@ -1,5 +1,5 @@
-﻿## Title: Bagnon
-## Interface: 20003
+﻿## Interface: 20100
+## Title: Bagnon
 ## Author: Tuller
 ## Notes: Single window displays for the inventory and bank
 ## Notes-zhCN: 在单一框架内显示背包或银行中的物品
