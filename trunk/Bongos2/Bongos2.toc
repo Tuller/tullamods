@@ -10,6 +10,7 @@ lib\Gooey.xml
 lib\Dongle.lua
 localization.lua
 dragFrame.lua
-BBar.lua
+bar.lua
+menu.lua
 Bongos.lua
 test.lua

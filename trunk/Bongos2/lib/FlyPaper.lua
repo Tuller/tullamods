@@ -128,10 +128,6 @@ end
 
 --[[ Usable Functions ]]--
 
-if not FlyPaper then FlyPaper = {} end
-
-FlyPaper.version = VERSION
-
 function FlyPaper.Stick(frame, otherFrame, tolerance, xOff, yOff)
 	if not xOff then xOff = 0 end
 	if not yOff then yOff = 0 end

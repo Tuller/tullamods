@@ -78,9 +78,8 @@ function BBar:Destroy(removeSettings)
 
 	if removeSettings then
 		Bongos:SetBarSets(self.id, nil)
-		self.sets = nil
 	end
-
+	self.sets = nil
 	self.dragFrame:Hide()
 	self:SetParent(nil)
 	self:ClearAllPoints()
@@ -239,7 +238,7 @@ function BBar:Reanchor()
 	if not(frame and Bongos:IsSticky() and FlyPaper.StickToPoint(self, frame, point, PADDING, PADDING)) then
 		self.sets.anchor = nil
 
-		local x, y = GetRelativeCoords(self, self:GetScale())	
+		local x, y = GetRelativeCoords(self, self:GetScale())
 		self:ClearAllPoints()
 		self:SetPoint('TOPLEFT', UIParent, 'BOTTOMLEFT', x, y)
 		self:SetUserPlaced(true)
@@ -253,6 +252,34 @@ function BBar:GetAnchor()
 		local pointStart = #anchorString - 1
 		return self:Get(anchorString:sub(1, pointStart - 1)), anchorString:sub(pointStart)
 	end
+end
+
+
+--[[ Menus ]]--
+
+function BBar:ShowMenu()
+	if not self.menu then
+		local menu = BongosMenu:Create(format('BongosMenu%d', self.id))
+		menu.text:SetText(format("bar %s", self.id))
+		menu.frame = self
+		self.menu = menu
+	end
+
+	local menu = self.menu
+	menu.onShow = 1
+	self:PlaceMenu(menu)
+	menu.onShow = nil
+end
+
+function BBar:PlaceMenu(menu)
+	local dragFrame = self.dragFrame
+	local ratio = UIParent:GetScale() / dragFrame:GetEffectiveScale()
+	local x = dragFrame:GetLeft()
+	local y = dragFrame:GetTop()
+
+	menu:ClearAllPoints()
+	menu:SetPoint("TOPRIGHT", UIParent, "BOTTOMLEFT", x  / ratio, y / ratio)
+	menu:Show()
 end
 
 

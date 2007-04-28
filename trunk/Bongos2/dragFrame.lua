@@ -105,7 +105,11 @@ function BDragFrame_New(parent)
 
 	local bg = frame:CreateTexture(nil, 'BACKGROUND')
 	bg:SetTexture('Interface\\Tooltips\\UI-Tooltip-Background')
-	bg:SetVertexColor(random(), random(), random(), 0.5)
+
+	local g = random(0, 1)
+	local b = random(0, 2 - g)
+	local r = random(0, 3 - (g+b))
+	bg:SetVertexColor(r, g, b, 0.5)
 	bg:SetAllPoints(frame)
 	frame:SetNormalTexture(bg)
 

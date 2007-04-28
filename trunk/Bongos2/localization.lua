@@ -35,3 +35,7 @@ L.ShowConfig = "<Right Click> to configure"
 L.HideBar = "<Middle Click> to hide"
 L.ShowBar = "<Middle Click> to show"
 L.SetAlpha = "<Mousewheel> to set opacity (%.2f)"
+
+--Menu Stuff
+L.Scale = "Scale"
+L.Opacity = "Opacity"
