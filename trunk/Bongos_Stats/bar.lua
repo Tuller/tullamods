@@ -1,88 +1,148 @@
 --[[
 	BongosStats
 		A movable memory, latency and fps display for Bongos
-
-	Version History
-		10/8/5
-			Initial release
-		10/11/5
-			Updated for Bongos 0.4.0/Patch 1800
-		12/16/05
-			Made the text bigger
-			Added a seperate keybinding
-		8/14/6
-			Made into a full Bongos Bar
-		10/27/6
-			Modified to use MiB instead of MB
-			Added customization options
-		12/28/6
-			Updated to use new Bongos code
 --]]
 
+BongosStats = Bongos:NewModule("Bongos-Stats")
 
+local L = BONGOS_STATS_LOCALS
 local UPDATE_DELAY = 1
 
-local function ShowAddonMemoryUsage()
-	if this:GetRight() >= (GetScreenWidth() / 2) then
-		GameTooltip:SetOwner(this, 'ANCHOR_LEFT')
+--display frame
+local function Stats_OnUpdate(self, arg1)
+	if not self.toNextUpdate or self.toNextUpdate <= 0 then
+		self.toNextUpdate = UPDATE_DELAY
+		BongosStats:Update()
 	else
-		GameTooltip:SetOwner(this, 'ANCHOR_RIGHT')
+		self.toNextUpdate = self.toNextUpdate - arg1
 	end
-
-	if IsModifierKeyDown() then
-		UpdateAddOnCPUUsage()
-
-		GameTooltip:SetText("Addon CPU Usage")
-		local total = 0
-
-		for i=1, GetNumAddOns() do
-			local secs = GetAddOnCPUUsage(i)/1000
-			if secs > 3600 then
-				GameTooltip:AddDoubleLine(GetAddOnInfo(i), format("%.2fh", secs/3600), 1, 1, 1, 1, 0.2, 0.2)
-			elseif secs > 60 then
-				GameTooltip:AddDoubleLine(GetAddOnInfo(i), format("%.2fm", secs/60), 1, 1, 1, 1, 1, 0.2)
-			elseif floor(secs) > 0 then
-				GameTooltip:AddDoubleLine(GetAddOnInfo(i), format("%ds", secs), 1, 1, 1, 0.2, 1, 0.2)
-			end
-			total = total + secs
-		end
-		GameTooltip:AddDoubleLine("Total", format("%.1fm", total/60), 0.4, 0.6, 1, 1, 1, 0.2)
-	else
-		UpdateAddOnMemoryUsage()
-
-		GameTooltip:SetText("Addon Memory Usage")
-		local total = 0
-
-		for i=1, GetNumAddOns() do
-			local mem = GetAddOnMemoryUsage(i)
-			if mem > 0 then
-				if mem > 1024 then
-					GameTooltip:AddDoubleLine(GetAddOnInfo(i), format("%.1fmb", mem/1024), 1, 1, 1, 1, 1, 0.2)
-				else
-					GameTooltip:AddDoubleLine(GetAddOnInfo(i), format("%.1fkb", mem), 1, 1, 1, 0.2, 1, 0.2)
-				end
-				total = total + mem
-			end
-		end
-		GameTooltip:AddDoubleLine("Total", format("%.2fmb", total/1024), 0.4, 0.6, 1, 1, 1, 0.2)
-	end
-	GameTooltip:Show()
 end
 
-local function Update(self)
-	if self.sets.showFPS then
+local function Stats_OnEnter()
+	BongosStats:UpdateProfilingInfo()
+end
+
+local function Stats_OnLeave()
+	GameTooltip:Hide()
+end
+
+local function Stats_OnClick(self, button)
+	if IsAltKeyDown() then
+		if button == "LeftButton" then
+			ReloadUI()
+		elseif button == "RightButton" then
+			if GetCVar("scriptProfile") == "1" then
+				SetCVar("scriptProfile", "0")
+			else
+				SetCVar("scriptProfile", "1")
+			end
+			ReloadUI()
+		end
+	end
+end
+
+local function Stats_Create(self)
+	local frame = CreateFrame("Button", nil, UIParent)
+	frame:RegisterForClicks("AnyUp")
+
+	self.fps = frame:CreateFontString()
+	self.fps:SetFontObject("GameFontNormalLarge")
+	self.fps:SetPoint("LEFT", frame)
+
+	self.mem = frame:CreateFontString()
+	self.mem:SetFontObject("GameFontHighlightLarge")
+	self.mem:SetPoint("LEFT", self.fps, "RIGHT", 2, 0)
+
+	self.ping = frame:CreateFontString()
+	self.ping:SetFontObject("GameFontHighlightLarge")
+	self.ping:SetPoint("LEFT", self.mem, "RIGHT", 2, 0)
+
+	frame:SetScript("OnUpdate", Stats_OnUpdate)
+	frame:SetScript("OnEnter", Stats_OnEnter)
+	frame:SetScript("OnLeave", Stats_OnLeave)
+	frame:SetScript("OnClick", Stats_OnClick)
+
+	self.toNextUpdate = 0
+	self.frame = frame
+end
+
+--stats bar
+local function StatsBar_CreateMenu(self)
+	local name = format("BongosMenu%s", self.id)
+	local menu = BongosMenu:Create(name)
+	menu.text:SetText(L.StatsBar)
+
+	local showMemory = BongosMenu:CreateCheckButton(menu, name .. "ShowMemory")
+	showMemory:SetScript("OnShow", function(b) b:SetChecked(self.sets.showMemory) end)
+	showMemory:SetScript("OnClick", function() BongosStats:SetShowMemory(not self.sets.showMemory) end)
+	showMemory:SetPoint("TOPLEFT", menu, "TOPLEFT", 6, -28)
+	showMemory:SetText(L.ShowMemory)
+
+	local showFPS = BongosMenu:CreateCheckButton(menu, name .. "ShowFPS")
+	showFPS:SetScript("OnShow", function(b) b:SetChecked(self.sets.showFPS) end)
+	showFPS:SetScript("OnClick", function() BongosStats:SetShowFPS(not self.sets.showFPS) end)
+	showFPS:SetPoint("TOP", showMemory, "BOTTOM", 0, 2)
+	showFPS:SetText(L.ShowFPS)
+
+	local showPing = BongosMenu:CreateCheckButton(menu, name .. "ShowPing")
+	showPing:SetScript("OnShow", function(b) b:SetChecked(self.sets.showPing) end)
+	showPing:SetScript("OnClick", function() BongosStats:SetShowPing(not self.sets.showPing) end)
+	showPing:SetPoint("TOP", showFPS, "BOTTOM", 0, 2)
+	showPing:SetText(L.ShowPing)
+	
+	menu:SetHeight(menu:GetHeight() + 90)
+
+	menu.frame = self
+
+	return menu
+end
+
+local function StatsBar_ShowMenu(self)
+	if not self.menu then
+		self.menu = StatsBar_CreateMenu(self)
+	end
+
+	local menu = self.menu
+	menu.onShow = 1
+	self:PlaceMenu(menu)
+	menu.onShow = nil
+end
+
+
+--[[ Startup ]]--
+
+function BongosStats:Initialize()
+	Stats_Create(self)
+end
+
+function BongosStats:Load()
+	self.bar = BBar:Create('stats')
+	self.bar.ShowMenu = StatsBar_ShowMenu
+	self.bar:SetSize(24)
+
+	self.bar:Attach(self.frame)
+	self.frame:SetAllPoints(self.bar)
+end
+
+function BongosStats:Unload()
+	self.bar:Destroy()
+end
+
+
+--[[ Update Functions ]]--
+
+function BongosStats:Update()
+	local sets = self.bar.sets
+
+	if sets.showFPS then
 		self.fps:SetText(format("%.1ffps", GetFramerate()))
-	else
-		self.fps:SetText('')
 	end
 
-	if self.sets.showMemory then
+	if sets.showMemory then
 		self.mem:SetText(format("%.3fmb", gcinfo() / 1024))
-	else
-		self.mem:SetText('')
 	end
 
-	if self.sets.showLatency then
+	if sets.showPing then
 		local latency = select(3, GetNetStats())
 		if (latency > PERFORMANCEBAR_MEDIUM_LATENCY) then
 			self.ping:SetTextColor(1, 0, 0)
@@ -92,123 +152,107 @@ local function Update(self)
 			self.ping:SetTextColor(0, 1, 0)
 		end
 		self.ping:SetText(format("%dms", latency))
+	end
+
+	self:UpdateWidth()
+
+	if GameTooltip:IsOwned(self.bar) then
+		self:UpdateProfilingInfo()
+	end
+end
+
+function BongosStats:UpdateProfilingInfo()
+	if self.bar:GetRight() >= (GetScreenWidth() / 2) then
+		GameTooltip:SetOwner(self.bar, 'ANCHOR_BOTTOMLEFT')
 	else
+		GameTooltip:SetOwner(self.bar, 'ANCHOR_BOTTOMRIGHT')
+	end
+
+	if IsModifierKeyDown() and GetCVar("scriptProfile") == "1" then
+		UpdateAddOnCPUUsage()
+		GameTooltip:SetText(L.CPUUsage)
+
+		local total = 0
+		for i=1, GetNumAddOns() do
+			local secs = GetAddOnCPUUsage(i) / 1000
+			local name = GetAddOnInfo(i)
+
+			if secs > 3600 then
+				GameTooltip:AddDoubleLine(name, format('%.2f h', secs/3600), 1, 1, 1, 1, 0.2, 0.2)
+			elseif secs > 60 then
+				GameTooltip:AddDoubleLine(name, format('%.2f m', secs/60), 1, 1, 1, 1, 1, 0.2)
+			elseif secs >= 1 then
+				GameTooltip:AddDoubleLine(name, format('%.1f s', secs), 1, 1, 1, 0.2, 1, 0.2)
+			elseif secs > 0 then
+				GameTooltip:AddDoubleLine(name, format('%.1f ms', secs * 1000), 1, 1, 1, 0.2, 1, 0.2)
+			end
+			total = total + secs
+		end
+
+		if total >= 60 then
+			GameTooltip:AddDoubleLine(L.Total, format('%.1f m', total/60), 0.4, 0.6, 1, 1, 1, 0.2)
+		elseif total >= 1 then
+			GameTooltip:AddDoubleLine(L.Total, format('%.1f s', total), 0.4, 0.6, 1, 1, 1, 0.2)
+		else
+			GameTooltip:AddDoubleLine(L.Total, format('%.1f ms', total * 1000), 0.4, 0.6, 1, 1, 1, 0.2)
+		end
+	else
+		UpdateAddOnMemoryUsage()
+		GameTooltip:SetText(L.MemUsage)
+
+		local total = 0
+		for i=1, GetNumAddOns() do
+			local mem = GetAddOnMemoryUsage(i)
+			local name = GetAddOnInfo(i)
+
+			if mem > 0 then
+				if mem > 1024 then
+					GameTooltip:AddDoubleLine(name, format('%.1f mb', mem/1024), 1, 1, 1, 1, 1, 0.2)
+				else
+					GameTooltip:AddDoubleLine(name, format('%.1f kb', mem), 1, 1, 1, 0.2, 1, 0.2)
+				end
+				total = total + mem
+			end
+		end
+		GameTooltip:AddDoubleLine(L.Total, format('%.2f mb', total/1024), 0.4, 0.6, 1, 1, 1, 0.2)
+	end
+	GameTooltip:Show()
+end
+
+function BongosStats:UpdateWidth()
+	local width = self.fps:GetStringWidth() + self.mem:GetStringWidth() + self.ping:GetStringWidth()
+	self.bar:SetWidth(max(24, width+4))
+end
+
+
+--[[ Config Functions ]]--
+
+function BongosStats:SetShowFPS(enable)
+	if enable then
+		self.bar.sets.showFPS = true
+		self:Update()
+	else
+		self.bar.sets.showFPS = nil
+		self.fps:SetText('')
+	end
+end
+
+function BongosStats:SetShowPing(enable)
+	if enable then
+		self.bar.sets.showPing = true
+		self:Update()
+	else
+		self.bar.sets.showPing = nil
 		self.ping:SetText('')
 	end
-
-	local width = self.fps:GetStringWidth() + self.mem:GetStringWidth() + self.ping:GetStringWidth()
-	if width == 0 then
-		self:SetWidth(24)
-	else
-		self:SetWidth(width + 4)
-	end
-	
-	if GameTooltip:IsOwned(self) then
-		ShowAddonMemoryUsage(self)
-	end
 end
 
-local function OnUpdate()
-	if this.toNextUpdate <= 0 then
-		this.toNextUpdate = UPDATE_DELAY
-		Update(this)
-	else
-		this.toNextUpdate = this.toNextUpdate - arg1
-	end
-end
-
-
---[[ Menu Functions ]]--
-
-local function SetFlag(self, var, enable)
+function BongosStats:SetShowMemory(enable)
 	if enable then
-		self.sets[var] = 1
+		self.bar.sets.showMemory = true
+		self:Update()
 	else
-		self.sets[var] = nil
+		self.bar.sets.showMemory = nil
+		self.mem:SetText('')
 	end
-	Update(self)
 end
-
-local function CreateConfigMenu(name, frame)
-	local menu = CreateFrame("Button", name, UIParent, "BongosRightClickMenu")
-	menu.frame = frame
-
-	menu:SetText("Stats Bar")
-	menu:SetWidth(220)
-	menu:SetHeight(220)
-
-	--checkbuttons
-	local fps = CreateFrame("CheckButton", name .. "FPS", menu, "GooeyCheckButton")
-	fps:SetScript("OnClick", function() SetFlag(frame, 'showFPS', this:GetChecked()) end)
-	fps:SetPoint("TOPLEFT", menu, "TOPLEFT", 6, -28)
-	fps:SetText(BONGOS_STATS_SHOW_FPS)
-
-	local mem = CreateFrame("CheckButton", name .. "Memory", menu, "GooeyCheckButton")
-	mem:SetScript("OnClick", function() SetFlag(frame, 'showMemory', this:GetChecked()) end)
-	mem:SetPoint("TOP", fps, "BOTTOM", 0, 2)
-	mem:SetText(BONGOS_STATS_SHOW_MEMORY)
-
-	local ping = CreateFrame("CheckButton", name .. "Latency", menu, "GooeyCheckButton")
-	ping:SetScript("OnClick", function() SetFlag(frame, 'showLatency', this:GetChecked()) end)
-	ping:SetPoint("TOP", mem, "BOTTOM", 0, 2)
-	ping:SetText(BONGOS_STATS_SHOW_LATENCY)
-	
-	--sliders
-	local opacity = CreateFrame("Slider", name .. "Opacity", menu, "BongosOpacitySlider")
-	opacity:SetPoint("BOTTOM", menu, "BOTTOM", 0, 24)
-	
-	local scale = CreateFrame("Slider", name .. "Scale", menu, "BongosScaleSlider")
-	scale:SetPoint("BOTTOM", opacity, "TOP", 0, 24)
-	
-	return menu
-end
-
---Called when the right click menu is shown, loads the correct values to the checkbuttons/sliders/text
-local function ShowMenu(self)
-	local name = 'BongosStatsBarMenu'
-	local menu = getglobal(name) or CreateConfigMenu(name, self)
-
-	menu.onShow = 1
-	
-	getglobal(name .. 'FPS'):SetChecked(self.sets.showFPS)
-	getglobal(name .. 'Memory'):SetChecked(self.sets.showMemory)
-	getglobal(name .. 'Latency'):SetChecked(self.sets.showLatency)
-
-	self:DisplayMenu(menu)
-
-	menu.onShow = nil
-end
-
-
---[[ Startup ]]--
-
-local function OnCreate(self)
-	self:EnableMouse(true)
-	self.fps = self:CreateFontString()
-	self.fps:SetFontObject("GameFontNormalLarge")
-	self.fps:SetPoint("LEFT", self)
-
-	self.mem = self:CreateFontString()
-	self.mem:SetFontObject("GameFontHighlightLarge")
-	self.mem:SetPoint("LEFT", self.fps, "RIGHT", 2, 0)
-
-	self.ping = self:CreateFontString()
-	self.ping:SetFontObject("GameFontHighlightLarge")
-	self.ping:SetPoint("LEFT", self.mem, "RIGHT", 2, 0)
-	
-	self.toNextUpdate = 0
-	self.ShowMenu = ShowMenu
-
-	self:SetWidth(120)
-	self:SetHeight(20)
-	self:SetScript("OnUpdate", OnUpdate)
-	self:SetScript("OnEnter", function() ShowAddonMemoryUsage() end)
-	self:SetScript("OnLeave", function() GameTooltip:Hide() end)
-end
-
-Bongos.AddStartup(function()
-	if not Bongos.GetBarSets('stats') then
-		Bongos.SetBarSets('stats', {x = 1271.714, y = 903.142, showMemory = 1, showLatency = 1, showFPS = 1, vis = 1})
-	end	
-	BBar.Create('stats', OnCreate) 
-end)

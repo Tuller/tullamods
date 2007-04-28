@@ -5,6 +5,13 @@
 BINDING_HEADER_BSTATS = "Bongos Stats";
 BINDING_NAME_BSTATSTOGGLE = "Toggle Bongos Stats";
 
-BONGOS_STATS_SHOW_FPS = "Show Framerate"
-BONGOS_STATS_SHOW_MEMORY = "Show Memory"
-BONGOS_STATS_SHOW_LATENCY = "Show Latency"
+BONGOS_STATS_LOCALS = {}
+local L = BONGOS_STATS_LOCALS
+
+L.StatsBar = "Stats Bar"
+L.ShowMemory = "Show Memory"
+L.ShowFPS = "Show Framerate"
+L.ShowPing = "Show Latency"
+L.CPUUsage = "Addon CPU Usage"
+L.MemUsage = "Addon Memory Usage"
+L.Total = "Total"

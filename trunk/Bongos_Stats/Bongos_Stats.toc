@@ -2,6 +2,6 @@
 ## Title: Bongos_Stats
 ## Notes: A movable FPS, memory, and latency display
 ## Author: Tuller
-## Dependencies: Bongos
+## Dependencies: Bongos2
 localization.lua
 bar.lua
