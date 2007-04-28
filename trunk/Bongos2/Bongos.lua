@@ -95,6 +95,7 @@ function Bongos:ResetProfile()
 end
 
 function Bongos:ListProfiles()
+	self:Print("Available Profiles:")
 	for i, k in ipairs(self.db:GetProfiles()) do
 		self:Print(k)
 	end
@@ -124,6 +125,7 @@ end
 
 function Bongos:DONGLE_PROFILE_CHANGED(event, db, parent, sv_name, profile_key)
 	self:Print(format("Loaded profile \"%s\"", profile_key))
+	self.profile = self.db.profile
 	self:LoadModules()
 end
 
@@ -189,23 +191,25 @@ end
 --[[ Slash Commands ]]--
 
 function Bongos:RegisterSlashCommands()
+	local cmdStr = "|cFF33FF99%s|r: %s"
+
 	local slash = self:InitializeSlashCommand("Bongos Commands", "BONGOS", "bongos", "bgs", "bob")
 
-	slash:RegisterSlashHandler(format("lock: %s", L.LockBarsDesc), "lock", "ToggleLockedBars")
-	slash:RegisterSlashHandler(format("sticky: %s", L.StickyBarsDesc), "sticky", "ToggleStickyBars")
+	slash:RegisterSlashHandler(format(cmdStr, "lock", L.LockBarsDesc), "lock", "ToggleLockedBars")
+	slash:RegisterSlashHandler(format(cmdStr, "sticky", L.StickyBarsDesc), "sticky", "ToggleStickyBars")
 
-	slash:RegisterSlashHandler(format("setscale <barList> <scale>: %s", L.SetScaleDesc), "setscale (.+)", "SetBarScale")
-	slash:RegisterSlashHandler(format("setalpha <barList> <opacity>: %s", L.SetAlphaDesc), "setalpha (.+)", "SetBarAlpha")
+	slash:RegisterSlashHandler(format(cmdStr, "scale <barList> <scale>", L.SetScaleDesc), "scale (.+)", "SetBarScale")
+	slash:RegisterSlashHandler(format(cmdStr, "setalpha <barList> <opacity>", L.SetAlphaDesc), "setalpha (.+)", "SetBarAlpha")
 
-	slash:RegisterSlashHandler(format("show <barList>: %s", L.ShowBarsDesc), "show (.+)", "ShowBars")
-	slash:RegisterSlashHandler(format("hide <barList>: %s", L.HideBarsDesc), "hide (.+)", "HideBars")
-	slash:RegisterSlashHandler(format("toggle <barList>: %s", L.ToggleBarsDesc), "toggle (.+)", "ToggleBars")
+	slash:RegisterSlashHandler(format(cmdStr, "show <barList>", L.ShowBarsDesc), "show (.+)", "ShowBars")
+	slash:RegisterSlashHandler(format(cmdStr, "hide <barList>", L.HideBarsDesc), "hide (.+)", "HideBars")
+	slash:RegisterSlashHandler(format(cmdStr, "toggle <barList>", L.ToggleBarsDesc), "toggle (.+)", "ToggleBars")
 
-	slash:RegisterSlashHandler(format("set: %s", L.ResetDesc), "set (%w+)", "SetProfile")
-	slash:RegisterSlashHandler(format("copy: %s", L.ResetDesc), "copy (%w+)", "CopyProfile")
-	slash:RegisterSlashHandler(format("delete: %s", L.ResetDesc), "delete (%w+)", "DeleteProfile")
-	slash:RegisterSlashHandler(format("reset: %s", L.ResetDesc), "reset", "ResetProfile")
-	slash:RegisterSlashHandler(format("list: %s", L.ResetDesc), "list", "ListProfiles")
+	slash:RegisterSlashHandler(format(cmdStr, "set <profle>", L.SetDesc), "set (%w+)", "SetProfile")
+	slash:RegisterSlashHandler(format(cmdStr, "copy <profile>", L.CopyDesc), "copy (%w+)", "CopyProfile")
+	slash:RegisterSlashHandler(format(cmdStr, "delete <profile>", L.DeleteDesc), "delete (%w+)", "DeleteProfile")
+	slash:RegisterSlashHandler(format(cmdStr, "reset", L.ResetDesc), "reset", "ResetProfile")
+	slash:RegisterSlashHandler(format(cmdStr, "list", L.ListDesc), "list", "ListProfiles")
 
 	self.slash = slash
 end

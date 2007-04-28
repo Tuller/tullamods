@@ -15,14 +15,20 @@ L.UpdatedIncompatible = "Updating from an incompatible version. Default settings
 L.LockBarsDesc = "Toggles locking bar positions"
 L.StickyBarsDesc = "Toggles auto anchoring bars"
 
-L.SetScaleDesc = "Sets the scale of the given list of bars"
-L.SetAlphaDesc = "Sets the opacity of the given list of bars"
+L.SetScaleDesc = "Sets the scale of <barList>"
+L.SetAlphaDesc = "Sets the opacity of <barList>"
 
-L.ShowBarsDesc = "Shows the given list of bars"
-L.HideBarsDesc = "Hides the given list of bars"
-L.ToggleBarsDesc = "Toggles the given list of bars"
+L.ShowBarsDesc = "Shows the given <barList>"
+L.HideBarsDesc = "Hides the given <barList>"
+L.ToggleBarsDesc = "Toggles the given <barList>"
 
+--slash commands for profiles
 L.ResetDesc = "Loads default settings"
+L.SetDesc = "Switches settings to <profile>"
+L.CopyDesc = "Copies settings from <profile>"
+L.DeleteDesc = "Deletes <profile>"
+L.ResetDesc = "Returns to default settings"
+L.ListDesc = "Lists all profiles"
 
 --dragFrame tooltips
 L.ShowConfig = "<Right Click> to configure"
