@@ -1,0 +1,15 @@
+## Interface: 20100
+## Title: Bongos2
+## Notes: Movable bar framework
+## Author: Tuller
+## Version: 0.1
+## SavedVariables: Bongos2DB
+## OptionalDeps: Dongle
+lib\FlyPaper.lua
+lib\Gooey.xml
+lib\Dongle.lua
+localization.lua
+dragFrame.lua
+BBar.lua
+Bongos.lua
+test.lua
