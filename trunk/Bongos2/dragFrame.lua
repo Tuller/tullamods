@@ -10,9 +10,9 @@ local function DragFrame_OnEnter(self)
 	GameTooltip:SetOwner(self, "ANCHOR_BOTTOMLEFT")
 
 	if tonumber(self:GetText()) then
-		GameTooltip:SetText(format("action bar %s", self:GetText()), 1, 1, 1)
+		GameTooltip:SetText(format("Action Bar %s", self:GetText()), 1, 1, 1)
 	else
-		GameTooltip:SetText(format("bar %s", self:GetText()), 1, 1, 1)
+		GameTooltip:SetText(format("%s Bar", self:GetText()), 1, 1, 1)
 	end
 
 	if self.parent.ShowMenu then
@@ -91,6 +91,7 @@ local function DragFrame_UpdateColor(self)
 	end
 end
 
+
 --[[ Constructor ]]--
 
 function BDragFrame_New(parent)
@@ -107,9 +108,10 @@ function BDragFrame_New(parent)
 	bg:SetTexture('Interface\\Tooltips\\UI-Tooltip-Background')
 
 	local g = random(0, 1)
-	local b = random(0, 2 - g)
-	local r = random(0, 3 - (g+b))
+	local b = random(0, 1 - g)
+	local r = random(0, 2 - (g+b))
 	bg:SetVertexColor(r, g, b, 0.5)
+--	bg:SetVertexColor(1, 1, 1, 0.5)
 	bg:SetAllPoints(frame)
 	frame:SetNormalTexture(bg)
 

@@ -27,16 +27,47 @@ end
 	-- Bongos:Print(format('Hiding %s', self.id))
 -- end
 
+local function Bar_OnAttributeChanged(self, arg1, arg2)
+	local fadeMode = self.sets.fadeMode
+
+	if arg1 == "incombat" and fadeMode then
+		local maxAlpha, minAlpha = self:GetFrameAlpha()
+		if arg2 == "true" then
+			if fadeMode == 1 then
+				UIFrameFadeOut(self, 0.4, maxAlpha, minAlpha)
+			elseif fadeMode == 2 then
+				UIFrameFadeIn(self, 0.15, self:GetAlpha(), maxAlpha)
+			end
+		else
+			if fadeMode == 1 then
+				UIFrameFadeIn(self, 0.15, self:GetAlpha(), maxAlpha)
+			elseif fadeMode == 2 then
+				UIFrameFadeOut(self, 0.4, maxAlpha, minAlpha)
+			end
+		end
+	end
+end
+
+local function Bar_OnEvent(self, event, ...)
+	if event == "PLAYER_REGEN_DISABLED" then
+		self:SetAttribute("incombat", "true")
+	elseif event == "PLAYER_REGEN_ENABLED" then
+		self:SetAttribute("incombat", "nil")
+	end		
+end
+
 local function Bar_New(id)
-	local bar = setmetatable(CreateFrame('Frame', nil, UIParent, 'SecureFrameTemplate'), Bar_MT)
+	local bar = setmetatable(CreateFrame('Frame', nil, UIParent), Bar_MT)
+	
 	bar.id = id
 	bar.dragFrame = BDragFrame_New(bar)
 
 	bar:SetClampedToScreen(true)
 	bar:SetMovable(true)
-	-- bar:SetScript('OnShow', Bar_OnShow)
-	-- bar:SetScript('OnHide', Bar_OnHide)
 	bar:SetSize(32)
+
+	bar:SetScript('OnEvent', Bar_OnEvent)
+	bar:SetScript('OnAttributeChanged', Bar_OnAttributeChanged)
 
 	return bar
 end
@@ -64,6 +95,9 @@ function BBar:Create(id, OnCreate, OnDelete)
 	bar:LoadSettings()
 	if OnCreate then OnCreate(bar) end
 
+	bar:RegisterEvent("PLAYER_REGEN_DISABLED")
+	bar:RegisterEvent("PLAYER_REGEN_ENABLED")
+	
 	active[id] = bar
 
 	return bar
@@ -87,6 +121,7 @@ function BBar:Destroy(removeSettings)
 	self:Hide()
 
 	self:ForAll('Reanchor')
+	self:UnregisterAllEvents()
 
 	unused[self.id] = self
 end
@@ -147,7 +182,17 @@ function BBar:SetFrameAlpha(alpha)
 	else
 		self.sets.alpha = alpha
 	end
-	self:SetAlpha(alpha or 1)
+
+	local mode = self.sets.fadeMode
+	if mode then
+		if mode == 2 and self:GetAttribute('incombat') then
+			self:SetAlpha(alpha or 1)
+		elseif mode == 1 and not self:GetAttribute('incombat')  then
+			self:SetAlpha(alpha or 1)
+		end
+	else
+		self:SetAlpha(alpha or 1)
+	end
 end
 
 function BBar:Attach(frame)
@@ -177,6 +222,42 @@ function BBar:ToggleFrame()
 	else
 		self:HideFrame()
 	end
+end
+
+--combat fading
+function BBar:SetFadeMode(mode)
+	if mode == 0 then
+		self.sets.fadeMode = nil
+	elseif not mode or (mode >= 0 and mode <= 3) then
+		self.sets.fadeMode = mode
+	end
+		
+	if not mode or mode == 0 then
+		self:SetAlpha(self.sets.alpha or 1)
+	else
+		Bar_OnAttributeChanged(self, 'incombat', self:GetAttribute('incombat'))
+	end
+end
+
+function BBar:SetFadeALpha(alpha)
+	if alpha == 0 then
+		self.sets.fadeAlpha = nil
+	else
+		self.sets.fadeAlpha = alpha
+	end
+
+	local mode = self.sets.fadeMode
+	if mode then
+		if mode == 1 and self:GetAttribute('incombat') then
+			self:SetAlpha(alpha or 0)
+		elseif mode == 2 and not self:GetAttribute('incombat')  then
+			self:SetAlpha(alpha or 0)
+		end
+	end
+end
+
+function BBar:GetFrameAlpha()
+	return self.sets.alpha or 1, self.sets.fadeAlpha or 0
 end
 
 
@@ -259,8 +340,8 @@ end
 
 function BBar:ShowMenu()
 	if not self.menu then
-		local menu = BongosMenu:Create(format('BongosMenu%d', self.id))
-		menu.text:SetText(format("bar %s", self.id))
+		local menu = BongosMenu:Create(format('BongosMenu%s', self.id))
+		menu.text:SetText(format("%s bar", self.id))
 		menu.frame = self
 		self.menu = menu
 	end

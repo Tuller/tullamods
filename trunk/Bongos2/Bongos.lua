@@ -6,6 +6,8 @@
 Bongos = DongleStub("Dongle-1.0"):New("Bongos")
 local CURRENT_VERSION = GetAddOnMetadata("Bongos2", "Version")
 local L = BONGOS_LOCALS
+L.SetFadeAlphaDesc = "Sets opacity when faded for <barList>"
+L.SetFadeModeDesc = "Sets when to automatically fade out <barList>. 0: never; 1: inCombat; 2: outOfCombat"
 
 
 --[[ Startup ]]--
@@ -51,14 +53,16 @@ function Bongos:UpdateVersion()
 end
 
 function Bongos:LoadModules()
-	for _, module in self:IterateModules() do
+	for name, module in self:IterateModules() do
+		assert(module.Load, format('Bongos Module %s: Missing Load function', name))
 		module:Load()
 	end
 	BBar:ForAll('Reanchor')
 end
 
 function Bongos:UnloadModules()
-	for _, module in self:IterateModules() do
+	for name, module in self:IterateModules() do
+		assert(module.Unload, format('Bongos Module %s: Missing Unload function', name))
 		module:Unload()
 	end
 end
@@ -198,19 +202,23 @@ function Bongos:RegisterSlashCommands()
 	slash:RegisterSlashHandler(format(cmdStr, "lock", L.LockBarsDesc), "lock", "ToggleLockedBars")
 	slash:RegisterSlashHandler(format(cmdStr, "sticky", L.StickyBarsDesc), "sticky", "ToggleStickyBars")
 
-	slash:RegisterSlashHandler(format(cmdStr, "scale <barList> <scale>", L.SetScaleDesc), "scale (.+)", "SetBarScale")
-	slash:RegisterSlashHandler(format(cmdStr, "setalpha <barList> <opacity>", L.SetAlphaDesc), "setalpha (.+)", "SetBarAlpha")
+	slash:RegisterSlashHandler(format(cmdStr, "scale <barList> <scale>", L.SetScaleDesc), "scale (.+) ([%d%.]+)", "SetBarScale")
+	slash:RegisterSlashHandler(format(cmdStr, "setalpha <barList> <opacity>", L.SetAlphaDesc), "setalpha (.+) ([%d%.]+)", "SetBarAlpha")
 
 	slash:RegisterSlashHandler(format(cmdStr, "show <barList>", L.ShowBarsDesc), "show (.+)", "ShowBars")
 	slash:RegisterSlashHandler(format(cmdStr, "hide <barList>", L.HideBarsDesc), "hide (.+)", "HideBars")
 	slash:RegisterSlashHandler(format(cmdStr, "toggle <barList>", L.ToggleBarsDesc), "toggle (.+)", "ToggleBars")
 
 	slash:RegisterSlashHandler(format(cmdStr, "set <profle>", L.SetDesc), "set (%w+)", "SetProfile")
-	slash:RegisterSlashHandler(format(cmdStr, "copy <profile>", L.CopyDesc), "copy (%w+)", "CopyProfile")
+--	slash:RegisterSlashHandler(format(cmdStr, "copy <profile>", L.CopyDesc), "copy (%w+)", "CopyProfile")
+	slash:RegisterSlashHandler(format(cmdStr, "load <profile>", L.CopyDesc), "load (%w+)", "CopyProfile")
 	slash:RegisterSlashHandler(format(cmdStr, "delete <profile>", L.DeleteDesc), "delete (%w+)", "DeleteProfile")
 	slash:RegisterSlashHandler(format(cmdStr, "reset", L.ResetDesc), "reset", "ResetProfile")
 	slash:RegisterSlashHandler(format(cmdStr, "list", L.ListDesc), "list", "ListProfiles")
-
+	
+	slash:RegisterSlashHandler(format(cmdStr, "fadealpha <barList> <opacity>", L.SetFadeAlphaDesc), "fadealpha (.+) ([%d%.]+)", "SetFadeAlpha")
+	slash:RegisterSlashHandler(format(cmdStr, "fademode <barList> <0 | 1 | 2>", L.SetFadeModeDesc), "fademode (.+) ([0-2])", "SetFadeMode")
+	
 	self.slash = slash
 end
 
@@ -222,24 +230,41 @@ function Bongos:ToggleStickyBars()
 	self:SetSticky(not self.profile.sticky)
 end
 
-function Bongos:SetBarScale(args)
-	local args = {strsplit(' ', args)}
-	local scale = tonumber(args[#args])
+function Bongos:SetBarScale(args, scale)
+	local scale = tonumber(scale)
 
 	if scale and scale > 0 and scale <= 10 then
-		for i = 1, #args - 1 do
-			BBar:ForBar(args[i], 'SetFrameScale', scale)
+		for _,barList in pairs({strsplit(' ', args)}) do
+			BBar:ForBar(barList, 'SetFrameScale', scale)
 		end
 	end
 end
 
-function Bongos:SetBarAlpha(args)
-	local args = {strsplit(' ', args)}
-	local alpha = tonumber(args[#args])
+function Bongos:SetBarAlpha(args, alpha)
+	local alpha = tonumber(alpha)
 
 	if alpha and alpha >= 0 and alpha <= 1 then
-		for i = 1, #args - 1 do
-			BBar:ForBar(args[i], 'SetFrameAlpha', alpha)
+		for _,barList in pairs({strsplit(' ', args)}) do
+			BBar:ForBar(barList, 'SetFrameAlpha', alpha)
+		end
+	end
+end
+
+function Bongos:SetFadeMode(args, mode)
+	local mode = tonumber(mode)
+	self:Print('setfademode', args, mode)
+
+	for _,barList in pairs({strsplit(' ', args)}) do
+		BBar:ForBar(barList, 'SetFadeMode', mode)
+	end
+end
+
+function Bongos:SetFadeAlpha(args)
+	local alpha = tonumber(alpha)
+
+	if alpha and alpha >= 0 and alpha <= 1 then
+		for _,barList in pairs({strsplit(' ', args)}) do
+			BBar:ForBar(barList 'SetFadeAlpha', alpha)
 		end
 	end
 end

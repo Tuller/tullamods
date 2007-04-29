@@ -13,8 +13,8 @@ end
 
 function BongosMenu:Create(name)
 	local menu = CreateFrame('Button', name, UIParent, 'GooeyPopup')
-	menu:SetWidth(220)
-	menu:SetHeight(130)
+	menu:SetWidth(210)
+	menu:SetHeight(230)
 
 	menu:RegisterForClicks('AnyUp')
 	menu:SetScript('OnClick', Menu_OnClick)
@@ -26,8 +26,17 @@ function BongosMenu:Create(name)
 	local close = CreateFrame('Button', nil, menu, 'UIPanelCloseButton')
 	close:SetPoint('TOPRIGHT', menu, 'TOPRIGHT', -2, -2)
 
+	local fadeInCombat = BongosMenu:CreateFadeInCombatButton(menu, name .. 'FadeInCombat')
+	fadeInCombat:SetPoint('TOPLEFT', menu, 'TOPLEFT', 6, -28)
+
+	local fadeOutCombat = BongosMenu:CreateFadeOutCombatButton(menu, name .. 'FadeOutCombat')
+	fadeOutCombat:SetPoint('TOP', fadeInCombat, 'BOTTOM', 0, 2)
+
+	local fade = self:CreateFadeSlider(menu, name .. 'FadeOpacity')
+	fade:SetPoint('BOTTOM', menu, 'BOTTOM', 0, 24)
+
 	local opacity = self:CreateAlphaSlider(menu, name .. 'Opacity')
-	opacity:SetPoint('BOTTOM', menu, 'BOTTOM', 0, 24)
+	opacity:SetPoint('BOTTOM', fade, 'TOP', 0, 24)
 
 	local scale = self:CreateScaleSlider(menu, name .. 'Scale')
 	scale:SetPoint('BOTTOM', opacity, 'TOP', 0, 24)
@@ -40,7 +49,8 @@ end
 
 function BongosMenu:CreateSlider(parent, name)
 	local slider = CreateFrame('Slider', name, parent, 'GooeySlider')
-	slider:SetWidth(200); slider:SetHeight(18)
+	slider:SetWidth(200)
+	slider:SetHeight(18)
 
 	return slider
 end
@@ -79,7 +89,8 @@ end
 --[[ Alpha Slider ]]--
 
 local function AlphaSlider_OnShow(self)
-	self:SetValue(self:GetParent().frame:GetAlpha() * 100)
+	local alpha = self:GetParent().frame:GetFrameAlpha()
+	self:SetValue(alpha * 100)
 end
 
 local function AlphaSlider_OnValueChanged(self, value)
@@ -105,9 +116,81 @@ function BongosMenu:CreateAlphaSlider(parent, name)
 	return slider
 end
 
+local function FadeSlider_OnShow(self)
+	local alpha = select(2, self:GetParent().frame:GetFrameAlpha())
+	self:SetValue(alpha * 100)
+end
+
+local function FadeSlider_OnValueChanged(self, value)
+	local parent = self:GetParent()
+	if not parent.onShow then
+		parent.frame:SetFadeALpha(value / 100)
+	end
+	getglobal(self:GetName() .. 'ValText'):SetText(value)
+end
+
+function BongosMenu:CreateFadeSlider(parent, name)
+	local slider = self:CreateAlphaSlider(parent, name)
+	getglobal(name .. 'Text'):SetText("Faded Opacity")
+	slider:SetScript('OnShow', FadeSlider_OnShow)
+	slider:SetScript('OnValueChanged', FadeSlider_OnValueChanged)
+
+	return slider
+end
+
 
 --[[ General Checkbutton ]]--
 
 function BongosMenu:CreateCheckButton(parent, name)
 	return CreateFrame('CheckButton', name, parent, 'GooeyCheckButton')
+end
+
+--fade when in combat
+local function FadeInCombat_OnClick(self)
+	if self:GetChecked() then
+		self:GetParent().frame:SetFadeMode(1)
+	else
+		self:GetParent().frame:SetFadeMode(0)
+	end
+
+	local unfade = getglobal(self:GetParent():GetName() .. 'FadeOutCombat')
+	unfade:SetChecked(false)
+end
+
+local function FadeInCombat_OnShow(self)
+	self:SetChecked(self:GetParent().frame.sets.fadeMode == 1)
+end
+
+function BongosMenu:CreateFadeInCombatButton(parent, name)
+	local button = self:CreateCheckButton(parent, name)
+	button:SetScript('OnClick', FadeInCombat_OnClick)
+	button:SetScript('OnShow', FadeInCombat_OnShow)
+	button:SetText("Fade In Combat")
+
+	return button
+end
+
+--fade out of combat
+local function FadeOutCombat_OnClick(self)
+	if self:GetChecked() then
+		self:GetParent().frame:SetFadeMode(2)
+	else
+		self:GetParent().frame:SetFadeMode(0)
+	end
+
+	local fade = getglobal(self:GetParent():GetName() .. 'FadeInCombat')
+	fade:SetChecked(false)
+end
+
+local function FadeOutCombat_OnShow(self)
+	self:SetChecked(self:GetParent().frame.sets.fadeMode == 2)
+end
+
+function BongosMenu:CreateFadeOutCombatButton(parent, name)
+	local button = self:CreateCheckButton(parent, name)
+	button:SetScript('OnShow', FadeOutCombat_OnShow)
+	button:SetScript('OnClick', FadeOutCombat_OnClick)
+	button:SetText("Fade Out Of Combat")
+
+	return button
 end
