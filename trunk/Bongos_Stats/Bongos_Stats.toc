@@ -1,5 +1,5 @@
 ## Interface: 20100
-## Title: Bongos_Stats
+## Title: Bongos Stats
 ## Notes: A movable FPS, memory, and latency display
 ## Author: Tuller
 ## Dependencies: Bongos2

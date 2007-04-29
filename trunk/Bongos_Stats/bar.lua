@@ -75,7 +75,7 @@ local function StatsBar_CreateMenu(self)
 	local showMemory = BongosMenu:CreateCheckButton(menu, name .. "ShowMemory")
 	showMemory:SetScript("OnShow", function(b) b:SetChecked(self.sets.showMemory) end)
 	showMemory:SetScript("OnClick", function() BongosStats:SetShowMemory(not self.sets.showMemory) end)
-	showMemory:SetPoint("TOPLEFT", menu, "TOPLEFT", 6, -28)
+	showMemory:SetPoint("TOPLEFT", menu, "TOPLEFT", 6, -88)
 	showMemory:SetText(L.ShowMemory)
 
 	local showFPS = BongosMenu:CreateCheckButton(menu, name .. "ShowFPS")
