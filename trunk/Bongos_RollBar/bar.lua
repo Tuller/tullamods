@@ -3,43 +3,11 @@
 		A movable frame for rolling on items
 --]]
 
-
---[[ Config Functions ]]--
-
-local function CreateConfigMenu(name, frame)
-	local menu = CreateFrame("Button", name, UIParent, "BongosRightClickMenu")
-	menu.frame = frame
-
-	menu:SetText("Roll Bar")
-	menu:SetWidth(220)
-	menu:SetHeight(140)
-
-	--sliders
-	local opacity = CreateFrame("Slider", name .. "Opacity", menu, "BongosOpacitySlider")
-	opacity:SetPoint("BOTTOM", menu, "BOTTOM", 0, 24)
-	
-	local scale = CreateFrame("Slider", name .. "Scale", menu, "BongosScaleSlider")
-	scale:SetPoint("BOTTOM", opacity, "TOP", 0, 24)
-	
-	return menu
-end
-
---Called when the right click menu is shown, loads the correct values to the checkbuttons/sliders/text
-local function ShowMenu(self)
-	local name = 'BongosRollBarMenu'
-	local menu = getglobal(name) or CreateConfigMenu(name, self)
-
-	menu.onShow = 1
-	self:DisplayMenu(menu)
-	menu.onShow = nil
-end
-
+BongosRollBar = Bongos:NewModule("Bongos-RollBar")
 
 --[[ Startup ]]--
 
 local function OnCreate(self)
-	self.ShowMenu = ShowMenu
-
 	local frame = getglobal("GroupLootFrame"..1)
 	frame:ClearAllPoints()
 	frame:SetPoint('BOTTOMLEFT', self, 'BOTTOMLEFT', 4, 2)
@@ -56,9 +24,14 @@ local function OnCreate(self)
 	self:SetHeight((GroupLootFrame1:GetHeight() + 3) * NUM_GROUP_LOOT_FRAMES)
 end
 
-Bongos.AddStartup(function()
-	local bar = BBar.Create('roll', OnCreate)
+function BongosRollBar:Load()
+	local bar = BBar:Create('roll', OnCreate)
+
 	if not bar:IsUserPlaced() then
 		bar:SetPoint("LEFT", UIParent)
 	end
-end)
+end
+
+function BongosRollBar:Unload()
+	BBar:Get('roll'):Destroy()
+end
