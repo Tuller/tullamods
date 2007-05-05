@@ -16,7 +16,7 @@ local function OnCreate(self)
 	for i=2, NUM_GROUP_LOOT_FRAMES do
 		local frame = getglobal("GroupLootFrame"..i)
 		frame:ClearAllPoints()
-		frame:SetPoint("BOTTOM", "GroupLootFrame" .. (i-1), "TOP", 0, 3)		
+		frame:SetPoint("BOTTOM", "GroupLootFrame" .. (i-1), "TOP", 0, 3)
 		self:Attach(frame)
 	end
 
