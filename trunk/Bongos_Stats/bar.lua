@@ -89,7 +89,7 @@ local function StatsBar_CreateMenu(self)
 	showPing:SetScript("OnClick", function() BongosStats:SetShowPing(not self.sets.showPing) end)
 	showPing:SetPoint("TOP", showFPS, "BOTTOM", 0, 2)
 	showPing:SetText(L.ShowPing)
-	
+
 	menu:SetHeight(menu:GetHeight() + 90)
 
 	menu.frame = self
