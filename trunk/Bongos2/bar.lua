@@ -19,43 +19,6 @@ local function GetRelativeCoords(frame, scale)
 	return frame:GetLeft() * ratio, frame:GetTop() * ratio
 end
 
--- local function Bar_OnShow(self)
-	-- Bongos:Print(format('Showing %s', self.id))
--- end
-
--- local function Bar_OnHide(self)
-	-- Bongos:Print(format('Hiding %s', self.id))
--- end
-
-local function Bar_OnAttributeChanged(self, arg1, arg2)
-	local fadeMode = self.sets.fadeMode
-
-	if arg1 == "incombat" and fadeMode then
-		local maxAlpha, minAlpha = self:GetFrameAlpha()
-		if arg2 == "true" then
-			if fadeMode == 1 then
-				UIFrameFadeOut(self, 0.4, maxAlpha, minAlpha)
-			elseif fadeMode == 2 then
-				UIFrameFadeIn(self, 0.15, self:GetAlpha(), maxAlpha)
-			end
-		else
-			if fadeMode == 1 then
-				UIFrameFadeIn(self, 0.15, self:GetAlpha(), maxAlpha)
-			elseif fadeMode == 2 then
-				UIFrameFadeOut(self, 0.4, maxAlpha, minAlpha)
-			end
-		end
-	end
-end
-
-local function Bar_OnEvent(self, event, ...)
-	if event == "PLAYER_REGEN_DISABLED" then
-		self:SetAttribute("incombat", "true")
-	elseif event == "PLAYER_REGEN_ENABLED" then
-		self:SetAttribute("incombat", "nil")
-	end		
-end
-
 local function Bar_New(id)
 	local bar = setmetatable(CreateFrame('Frame', nil, UIParent), Bar_MT)
 	
@@ -65,9 +28,6 @@ local function Bar_New(id)
 	bar:SetClampedToScreen(true)
 	bar:SetMovable(true)
 	bar:SetSize(32)
-
-	bar:SetScript('OnEvent', Bar_OnEvent)
-	bar:SetScript('OnAttributeChanged', Bar_OnAttributeChanged)
 
 	return bar
 end
@@ -94,9 +54,6 @@ function BBar:Create(id, OnCreate, OnDelete)
 
 	bar:LoadSettings()
 	if OnCreate then OnCreate(bar) end
-
-	bar:RegisterEvent("PLAYER_REGEN_DISABLED")
-	bar:RegisterEvent("PLAYER_REGEN_ENABLED")
 	
 	active[id] = bar
 
@@ -145,6 +102,7 @@ function BBar:LoadSettings()
 	else
 		self:Unlock()
 	end
+	self:UpdateCombatStatus()
 end
 
 --[[ Lock/Unlock ]]--
@@ -235,7 +193,7 @@ function BBar:SetFadeMode(mode)
 	if not mode or mode == 0 then
 		self:SetAlpha(self.sets.alpha or 1)
 	else
-		Bar_OnAttributeChanged(self, 'incombat', self:GetAttribute('incombat'))
+		self:UpdateCombatStatus()
 	end
 end
 
@@ -248,11 +206,33 @@ function BBar:SetFadeALpha(alpha)
 
 	local mode = self.sets.fadeMode
 	if mode then
-		if mode == 1 and self:GetAttribute('incombat') then
+		if mode == 1 and self.inCombat then
 			self:SetAlpha(alpha or 0)
-		elseif mode == 2 and not self:GetAttribute('incombat')  then
+		elseif mode == 2 and not self.inCombat then
 			self:SetAlpha(alpha or 0)
 		end
+	end
+end
+
+function BBar:UpdateCombatStatus()
+	local fadeMode = self.sets.fadeMode
+	local maxAlpha, minAlpha = self:GetFrameAlpha()
+	if fadeMode then
+		if self.inCombat then
+			if fadeMode == 1 then
+				UIFrameFadeOut(self, 0.4, maxAlpha, minAlpha)
+			elseif fadeMode == 2 then
+				UIFrameFadeIn(self, 0.15, self:GetAlpha(), maxAlpha)
+			end
+		else
+			if fadeMode == 1 then
+				UIFrameFadeIn(self, 0.15, self:GetAlpha(), maxAlpha)
+			elseif fadeMode == 2 then
+				UIFrameFadeOut(self, 0.4, maxAlpha, minAlpha)
+			end
+		end
+	else
+		self:SetAlpha(maxAlpha)
 	end
 end
 
@@ -422,3 +402,16 @@ function BBar:ForBar(id, method, ...)
 		end
 	end
 end
+
+--combat status updating
+local function BBar_OnCombatChange(self, event, ...)
+	if event == "PLAYER_REGEN_DISABLED" then
+		self.inCombat = true
+	else
+		self.inCombat = nil
+	end
+	self:ForAll("UpdateCombatStatus")
+end
+BBar:SetScript("OnEvent", BBar_OnCombatChange)
+BBar:RegisterEvent("PLAYER_REGEN_DISABLED")
+BBar:RegisterEvent("PLAYER_REGEN_ENABLED")
