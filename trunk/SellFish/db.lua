@@ -134,11 +134,10 @@ function SellFish:LoadDefaults(current)
 end
 
 function SellFish:UpdateVersion(current)
-	if SellFishDB.data then
-		SellFishDB.data = ';' .. SellFishDB.data
-	end
+	SellFishDB.data = SellFish_GetDefaults()
 	SellFishDB.version = current
 	msg(format(L.Updated, SellFishDB.version), true)
+	msg(format(L.Loaded, self:GetNumValues()), true)
 end
 
 
@@ -190,16 +189,17 @@ function SellFish:CompressDB()
 		if cost == "" then cost = "0" end
 
 		local prevCost = cache[id]
-		if prevCost and cost ~= prevCost then
-			if cost == "0" then
-				SellFishDB.data:gsub(format(";%s,%s;", id, prevCost), "");
-			else
-				SellFishDB.data:gsub(format(";%s,%s;", id, prevCost), format(";%s,%s;", id, cost))
+		if prevCost then
+			if(cost ~= prevCost) then
+				if cost == "0" then
+					SellFishDB.data:gsub(format(";%s,%s;", id, prevCost), "");
+				else
+					SellFishDB.data:gsub(format(";%s,%s;", id, prevCost), format(";%s,%s;", id, cost))
+				end
 			end
 		elseif cost ~= "0" then
 			appendString = (appendString or "") .. format(";%s,%s", id, cost)
 		end
-
 		SellFishDB.newVals[id] = nil
 	end
 
@@ -222,7 +222,6 @@ function SellFish:ConvertColaLight(t)
 		end
 		SellFishDB.newVals[id] = cost
 	end
-
 	return changed
 end
 
@@ -263,7 +262,7 @@ end
 
 function SellFish:GetNumValues()
 	local count = 0
-	for i in SellFishDB.data:gmatch('%w+,%w+;') do
+	for word in SellFishDB.data:gmatch('%w+,%w+;') do
 		count = count + 1
 	end
 	return count
