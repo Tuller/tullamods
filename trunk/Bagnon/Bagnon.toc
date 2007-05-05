@@ -5,6 +5,7 @@
 ## Notes-zhCN: 在单一框架内显示背包或银行中的物品
 ## SavedVariablesPerCharacter: BagnonSets
 ## Version: 1.2
+## OptionalDeps: Dongle
 lib\Gooey.xml
 lib\Dongle.lua
 localization.lua

@@ -29,7 +29,7 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ---------------------------------------------------------------------------]]
 local major = "DongleStub"
-local minor = tonumber(string.match("$Revision: 313 $", "(%d+)") or 1)
+local minor = tonumber(string.match("$Revision: 314 $", "(%d+)") or 1)
 
 local g = getfenv(0)
 
@@ -155,7 +155,7 @@ end
 ---------------------------------------------------------------------------]]
 
 local major = "Dongle-1.0"
-local minor = tonumber(string.match("$Revision: 315 $", "(%d+)") or 1)
+local minor = tonumber(string.match("$Revision: 676 $", "(%d+)") or 1)
 
 assert(DongleStub, string.format("Dongle requires DongleStub.", major))
 
@@ -297,7 +297,7 @@ function Dongle:HasModule(module)
 	assert(3, reg, string.format(L["MUST_CALLFROM_REGISTERED"], "HasModule"))
 	argcheck(module, 2, "string", "table")
 
-	return reg.modules[module]
+	return reg.modules and reg.modules[module]
 end
 
 local function ModuleIterator(t, name)
@@ -588,7 +588,7 @@ end
 
 local dbMethods = {
 	"RegisterDefaults", "SetProfile", "GetProfiles", "DeleteProfile", "CopyProfile",
-	"ResetProfile", "ResetDB",
+	"GetCurrentProfile", "ResetProfile", "ResetDB",
 	"RegisterNamespace",
 }
 
@@ -623,6 +623,10 @@ local function copyDefaults(dest, src, force)
 							tbl = copyTable(v)
 							rawset(cache, k, tbl)
 							local mt = getmetatable(tbl)
+							if not mt then
+								mt = {}
+								setmetatable(tbl, mt)
+							end
 							local newindex = function(t,k,v)
 								rawset(parent, parentkey, t)
 								rawset(t, k, v)
@@ -633,6 +637,10 @@ local function copyDefaults(dest, src, force)
 					end,
 				}
 				setmetatable(dest, mt)
+				-- Now need to set the metatable on any child tables
+				for dkey,dval in pairs(dest) do
+					copyDefaults(dval, v)
+				end
 			else
 				-- Values are not tables, so this is just a simple return
 				local mt = {__index = function() return v end}
@@ -663,6 +671,10 @@ local function removeDefaults(db, defaults)
 					-- Something's changed
 					rawset(db, cacheKey, cacheValue)
 				end
+			end
+			-- Now loop through all the actual k,v pairs and remove
+			for key,value in pairs(db) do
+				removeDefaults(value, v)
 			end
 		elseif type(v) == "table" and db[k] then
 			removeDefaults(db[k], v)
@@ -878,6 +890,11 @@ function Dongle.GetProfiles(db, t)
 		i = i + 1
 	end
 	return t, i - 1
+end
+
+function Dongle.GetCurrentProfile(db)
+	assert(e, databases[db], string.format(L["MUST_CALLFROM_DBOBJECT"], "GetCurrentProfile"))
+	return db.keys.profile
 end
 
 function Dongle.DeleteProfile(db, name)
