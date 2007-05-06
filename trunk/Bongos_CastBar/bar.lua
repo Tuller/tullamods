@@ -3,123 +3,152 @@
 		A Bongos based cast bar
 --]]
 
-local function AdjustWidth(castingBar)
-	local castingBarName = castingBar:GetName()
-	local textWidth = getglobal(castingBarName .. "Text"):GetStringWidth()
+BongosCastBar = Bongos:NewModule("Bongos-CastBar")
 
-	local time = getglobal(castingBarName .. "Time")
+--[[ CastingBar Stuff ]]--
+
+local function CastingBar_AdjustWidth(self)
+	local name = self:GetName()
+	local textWidth = getglobal(name .. "Text"):GetStringWidth()
+
+	local time = getglobal(name .. "Time")
 	if time:IsShown() then
 		textWidth = textWidth + 64
 	end
 
-	local diff = textWidth - castingBar.normalWidth
+	local diff = textWidth - self.normalWidth
 	if diff > 0 then
-		diff = textWidth - castingBar:GetWidth()
+		diff = textWidth - self:GetWidth()
 	else
-		diff = castingBar.normalWidth - castingBar:GetWidth()
+		diff = self.normalWidth - self:GetWidth()
 	end
 
 	if diff ~= 0 then
-		castingBar:GetParent():SetWidth(castingBar:GetParent():GetWidth() + diff)
-		castingBar:SetWidth(castingBar:GetWidth() + diff)
+		self:GetParent():SetWidth(self:GetParent():GetWidth() + diff)
+		self:SetWidth(self:GetWidth() + diff)
 	end
 end
 
-local function CastingBar_OnUpdate()
-	local barSpark = getglobal(this:GetName().."Spark")
-	local barFlash = getglobal(this:GetName().."Flash")
-	local barTime = getglobal(this:GetName().."Time")
+local function CastingBar_OnUpdate(self, arg1)
+	local name = self:GetName()
+	local barSpark = getglobal(name.."Spark")
+	local barFlash = getglobal(name.."Flash")
+	local barTime = getglobal(name.."Time")
 
-	if this.casting then
+	if self.casting then
 		local status = GetTime()
-		if status > this.maxValue then
-			status = this.maxValue
+		if status > self.maxValue then
+			status = self.maxValue
 		end
-		if status == this.maxValue then
-			this:SetValue(this.maxValue)
-			this:SetStatusBarColor(0.0, 1.0, 0.0)
+		if status == self.maxValue then
+			self:SetValue(self.maxValue)
+			self:SetStatusBarColor(0.0, 1.0, 0.0)
 			barSpark:Hide()
 			barFlash:SetAlpha(0)
 			barFlash:Show()
-			this.casting = nil
-			this.flash = 1
-			this.fadeOut = 1
+			self.casting = nil
+			self.flash = 1
+			self.fadeOut = 1
 			return
 		end
-		this:SetValue(status)
+		self:SetValue(status)
 		barFlash:Hide()
-		local sparkPosition = ((status - this.startTime) / (this.maxValue - this.startTime)) * this:GetWidth()
+		local sparkPosition = ((status - self.startTime) / (self.maxValue - self.startTime)) * self:GetWidth()
 		if sparkPosition < 0 then
 			sparkPosition = 0
 		end
-		barSpark:SetPoint("CENTER", this, "LEFT", sparkPosition, 2)
+		barSpark:SetPoint("CENTER", self, "LEFT", sparkPosition, 2)
 
 		--time display
-		barTime:SetText(format("%.1f", this.maxValue - status))
-		AdjustWidth(this)
-	elseif this.channeling then
+		barTime:SetText(format("%.1f", self.maxValue - status))
+		self:AdjustWidth()
+	elseif self.channeling then
 		local time = GetTime()
-		if time > this.endTime then
-			time = this.endTime
+		if time > self.endTime then
+			time = self.endTime
 		end
-		if time == this.endTime then
-			this:SetStatusBarColor(0.0, 1.0, 0.0)
+		if time == self.endTime then
+			self:SetStatusBarColor(0.0, 1.0, 0.0)
 			barSpark:Hide()
 			barFlash:SetAlpha(0)
 			barFlash:Show()
-			this.channeling = nil
-			this.flash = 1
-			this.fadeOut = 1
+			self.channeling = nil
+			self.flash = 1
+			self.fadeOut = 1
 			return
 		end
-		local barValue = this.startTime + (this.endTime - time)
-		this:SetValue(barValue)
+		local barValue = self.startTime + (self.endTime - time)
+		self:SetValue(barValue)
 		barFlash:Hide()
-		local sparkPosition = ((barValue - this.startTime) / (this.endTime - this.startTime)) * this:GetWidth()
-		barSpark:SetPoint("CENTER", this, "LEFT", sparkPosition, 2)
+		local sparkPosition = ((barValue - self.startTime) / (self.endTime - self.startTime)) * self:GetWidth()
+		barSpark:SetPoint("CENTER", self, "LEFT", sparkPosition, 2)
 
 		--time display
-		barTime:SetText(format("%.1f", this.endTime - time))
-		AdjustWidth(this)
-	elseif GetTime() < this.holdTime then
+		barTime:SetText(format("%.1f", self.endTime - time))
+		self:AdjustWidth()
+	elseif GetTime() < self.holdTime then
 		return
-	elseif this.flash then
+	elseif self.flash then
 		local alpha = barFlash:GetAlpha() + CASTING_BAR_FLASH_STEP
 		if alpha < 1 then
 			barFlash:SetAlpha(alpha)
 		else
 			barFlash:SetAlpha(1)
-			this.flash = nil
+			self.flash = nil
 		end
-	elseif this.fadeOut then
-		local alpha = this:GetAlpha() - CASTING_BAR_ALPHA_STEP
+	elseif self.fadeOut then
+		local alpha = self:GetAlpha() - CASTING_BAR_ALPHA_STEP
 		if alpha > 0 then
-			this:SetAlpha(alpha)
+			self:SetAlpha(alpha)
 		else
-			this.fadeOut = nil
-			this:Hide()
+			self.fadeOut = nil
+			self:Hide()
 		end
 	end
 end
 
-
---[[ CastingBar Constructor ]]--
-
 local function CastingBar_Create(parent)
 	local bar = CreateFrame("StatusBar", "BongosCastBar", parent, "BongosCastingBarTemplate")
+	bar.AdjustWidth = CastingBar_AdjustWidth
 	bar.normalWidth = bar:GetWidth()
-
 	bar:SetScript('OnUpdate', CastingBar_OnUpdate)
 
 	return bar
 end
 
 
---[[ Config Functions ]]--
+--[[ Bongos Bar Methods ]]--
 
-local function ToggleText(self, enable)
+local function Bar_CreateMenu(frame)
+	local name = format("BongosMenu%s", frame.id)
+	local menu = BongosMenu:Create(name)
+	menu.frame = frame
+	menu.text:SetText("Cast Bar")
+
+	--checkbuttons
+	local time = BongosMenu:CreateCheckButton(menu, name .. "Time")
+	time:SetScript("OnClick", function(self) frame:ToggleText(self:GetChecked()) end)
+	time:SetPoint("TOPLEFT", menu, "TOPLEFT", 6, -88)
+	time:SetText(BONGOS_CASTBAR_SHOW_TIME)
+
+	menu:SetHeight(menu:GetHeight() + 24)
+
+	return menu
+end
+
+local function Bar_ShowMenu(self)
+	if not self.menu then
+		self.menu = Bar_CreateMenu(self)
+	end
+
+	local menu = self.menu
+	menu.onShow = 1
+	self:PlaceMenu(menu)
+	menu.onShow = nil
+end
+
+local function Bar_ToggleText(self, enable)
 	local castingBar = self.castBar
-
 	if enable then
 		getglobal(castingBar:GetName() .. "Time"):Show()
 		self.sets.showText = 1
@@ -127,80 +156,35 @@ local function ToggleText(self, enable)
 		getglobal(castingBar:GetName() .. "Time"):Hide()
 		self.sets.showText = nil
 	end
-
-	AdjustWidth(castingBar)
+	castingBar:AdjustWidth()
 end
 
-local function CreateConfigMenu(name, frame)
-	local menu = CreateFrame("Button", name, UIParent, "BongosRightClickMenu")
-	menu.frame = frame
+local function Bar_OnCreate(self)
+	CastingBarFrame:UnregisterAllEvents()
+	CastingBarFrame:Hide()
 
-	menu:SetText("Cast Bar")
-	menu:SetWidth(220)
-	menu:SetHeight(160)
+	self.ShowMenu = Bar_ShowMenu
+	self.ToggleText = Bar_ToggleText
 
-	--checkbuttons
-	local time = CreateFrame("CheckButton", name .. "Time", menu, "GooeyCheckButton")
-	time:SetScript("OnClick", function() ToggleText(frame, this:GetChecked()) end)
-	time:SetPoint("TOPLEFT", menu, "TOPLEFT", 6, -28)
-	time:SetText(BONGOS_CASTBAR_SHOW_TIME)
+	self.castBar = CastingBar_Create(self)
+	self.castBar:SetPoint("TOPLEFT", self, "TOPLEFT", 6, -2)
+	self:Attach(self.castBar)
 
-	--sliders
-	local opacity = CreateFrame("Slider", name .. "Opacity", menu, "BongosOpacitySlider")
-	opacity:SetPoint("BOTTOM", menu, "BOTTOM", 0, 24)
-	
-	local scale = CreateFrame("Slider", name .. "Scale", menu, "BongosScaleSlider")
-	scale:SetPoint("BOTTOM", opacity, "TOP", 0, 24)
-	
-	return menu
-end
-
---Called when the right click menu is shown, loads the correct values to the checkbuttons/sliders/text
-local function ShowMenu(self)
-	local name = 'BongosCastBarMenu'
-	local menu = getglobal(name) or CreateConfigMenu(name, self)
-
-	menu.onShow = 1
-	
-	getglobal(name .. 'Time'):SetChecked(self.sets.showText)
-
-	self:DisplayMenu(menu)
-
-	menu.onShow = nil
+	self:SetSize(207, 24)
 end
 
 
 --[[ Startup ]]--
 
-local function OnCreate(self)
-	CastingBarFrame:UnregisterAllEvents()
-	CastingBarFrame:Hide()
+function BongosCastBar:Load()
+	if not Bongos:GetBarSets('cast') then
+		Bongos:SetBarSets('cast', {x = 635.257, y = 626.229, showText = 1})
+	end
 
-	self.ShowMenu = ShowMenu
-	self.castBar = CastingBar_Create(self)
-	self.castBar:SetPoint("TOPLEFT", self, "TOPLEFT", 6, -2)
-	self:Attach(self.castBar)
-
-	self:SetWidth(207)
-	self:SetHeight(24)
+	local bar = BBar:Create('cast', Bar_OnCreate)
+	bar:ToggleText(bar.sets.showText)
 end
 
-Bongos.AddVarInit(function()
-	if not Bongos.GetBarSets('cast') then
-		Bongos.SetBarSets('cast', {
-			["y"] = 626.2285902168067,
-			["x"] = 635.2570629826626,
-			["showText"] = 1,
-			["vis"] = 1,
-		})
-	end
-end)
-
-Bongos.AddStartup(function()
-	if not Bongos.GetBarSets('cast') then
-		Bongos.SetBarSets('cast', {x = 635.257, y = 626.229, showText = 1, vis = 1})
-	end
-	
-	local bar = BBar.Create('cast', OnCreate)
-	ToggleText(bar, bar.sets.showText)
-end)
+function BongosCastBar:Unload()
+	BBar:Get('cast'):Destroy()
+end
