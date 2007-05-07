@@ -14,13 +14,13 @@ local buttons = {}
 
 --[[ Button Events ]]--
 
-local function OnUpdate() this:OnUpdate(arg1) end
-local function PostClick() this:PostClick() end
-local function OnDragStart() this:OnDragStart() end
-local function OnReceiveDrag() this:OnReceiveDrag() end
-local function OnEnter() this:OnEnter() end
-local function OnLeave() this:OnLeave() end
-local function OnShow() this:Update(true) end
+local function OnUpdate(self, arg1) self:OnUpdate(arg1) end
+local function PostClick(self) self:PostClick() end
+local function OnDragStart(self) self:OnDragStart() end
+local function OnReceiveDrag(self) self:OnReceiveDrag() end
+local function OnEnter(self) self:OnEnter() end
+local function OnLeave(self) self:OnLeave() end
+local function OnShow(self) self:Update(true) end
 
 
 --[[ Action Button Methods ]]--
@@ -142,17 +142,17 @@ function BActionButton:OnUpdate(elapsed)
 		end
 	end
 
-	--Tooltip stuff, probably for the cooldown timer
-	if self.updateTooltip then
-		self.updateTooltip = self.updateTooltip - elapsed
-		if self.updateTooltip <= 0 then
-			if GameTooltip:IsOwned(self) then
-				self:UpdateTooltip(self)
-			else
-				self.updateTooltip = nil
-			end
-		end
-	end
+	-- Tooltip stuff, probably for the cooldown timer
+	-- if self.nextTooltipUpdate then
+		-- self.nextTooltipUpdate = self.nextTooltipUpdate - elapsed
+		-- if self.nextTooltipUpdate <= 0 then
+			-- if GameTooltip:IsOwned(self) then
+				-- self:UpdateTooltip(self)
+			-- else
+				-- self.nextTooltipUpdate = nil
+			-- end
+		-- end
+	-- end
 end
 
 function BActionButton:PostClick()
@@ -177,7 +177,7 @@ function BActionButton:OnEnter()
 end
 
 function BActionButton:OnLeave()
-	self.updateTooltip = nil
+	self.nextTooltipUpdate = nil
 	GameTooltip:Hide()
 end
 
@@ -235,7 +235,7 @@ function BActionButton:Update(force)
 	if GameTooltip:IsOwned(self) then
 		self:UpdateTooltip()
 	else
-		self.updateTooltip = nil
+		self.nextTooltipUpdate = nil
 	end
 
 	-- Update Macro Text
@@ -322,16 +322,16 @@ end
 function BActionButton:UpdateTooltip()
 	if BActionConfig.TooltipsShown() then
 		if GetCVar("UberTooltips") == "1" then
-			GameTooltip_SetDefaultAnchor(GameTooltip, UIParent)
+			GameTooltip_SetDefaultAnchor(GameTooltip, self)
 		else
 			GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 		end
 
 		local action = self:GetPagedID()
 		if GameTooltip:SetAction(action) then
-			self.updateTooltip = TOOLTIP_UPDATE_TIME
+			self.nextTooltipUpdate = TOOLTIP_UPDATE_TIME
 		else
-			self.updateTooltip = nil
+			self.nextTooltipUpdate = nil
 		end
 	end
 end
