@@ -39,3 +39,5 @@ L.SetAlpha = "<Mousewheel> to set opacity (%.2f)"
 --Menu Stuff
 L.Scale = "Scale"
 L.Opacity = "Opacity"
+L.Spacing = "Spacing"
+L.Columns = "Columns"

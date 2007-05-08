@@ -47,10 +47,25 @@ end
 
 --[[ General Slider ]]--
 
+local function Slider_OnValueChanged(self, value)
+	local parent = self:GetParent()
+	if not parent.onShow then
+		self:OnValueChanged(value)
+	end
+	self:UpdateText(value)
+end
+
+local function Slider_OnShow(self)
+	self:UpdateText()
+end
+
 function BongosMenu:CreateSlider(parent, name)
 	local slider = CreateFrame('Slider', name, parent, 'GooeySlider')
 	slider:SetWidth(200)
 	slider:SetHeight(18)
+
+	slider:SetScript("OnValueChanged", Slider_OnValueChanged)
+	slider:SetScript("OnShow", Slider_OnShow)
 
 	return slider
 end
@@ -116,6 +131,7 @@ function BongosMenu:CreateAlphaSlider(parent, name)
 	return slider
 end
 
+--fading
 local function FadeSlider_OnShow(self)
 	local alpha = select(2, self:GetParent().frame:GetFrameAlpha())
 	self:SetValue(alpha * 100)
@@ -135,6 +151,19 @@ function BongosMenu:CreateFadeSlider(parent, name)
 	slider:SetScript('OnShow', FadeSlider_OnShow)
 	slider:SetScript('OnValueChanged', FadeSlider_OnValueChanged)
 
+	return slider
+end
+
+--spacing
+function BongosMenu:CreateSpacingSlider(parent, name)
+	local slider = self:CreateSlider(parent, name)
+	slider:SetMinMaxValues(0, 32)
+	slider:SetValueStep(1)
+
+	getglobal(name .. 'Text'):SetText(L.Spacing)
+	getglobal(name .. 'Low'):SetText('0')
+	getglobal(name .. 'High'):SetText('32')
+	
 	return slider
 end
 

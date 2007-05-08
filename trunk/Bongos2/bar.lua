@@ -44,7 +44,7 @@ end
 
 --[[ Usable Functions ]]--
 
-function BBar:Create(id, OnCreate, OnDelete)
+function BBar:Create(id, OnCreate, OnDelete, defaults)
 	local id = tonumber(id) or id
 	assert(id, "id expected")
 	assert(not active[id], format("BBar '%s' is already in use", id))
@@ -52,7 +52,7 @@ function BBar:Create(id, OnCreate, OnDelete)
 	local bar = Bar_Restore(id) or Bar_New(id)
 	bar.OnDelete = OnDelete
 
-	bar:LoadSettings()
+	bar:LoadSettings(defaults)
 	if OnCreate then OnCreate(bar) end
 	
 	active[id] = bar
@@ -86,8 +86,8 @@ end
 
 --[[ Settings Loading ]]--
 
-function BBar:LoadSettings()
-	self.sets = Bongos:GetBarSets(self.id) or Bongos:SetBarSets(self.id, {})
+function BBar:LoadSettings(defaults)
+	self.sets = Bongos:GetBarSets(self.id) or Bongos:SetBarSets(self.id, defaults or {})
 	self:SetFrameAlpha(self.sets.alpha)
 	self:Reposition()
 

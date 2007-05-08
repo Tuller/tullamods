@@ -37,7 +37,7 @@ function Bongos:Initialize()
 		self.db:ResetProfile()
 		self:Print(L.UpdatedIncompatible)
 	elseif minor ~= cMinor then
-		self:UpdateSettings()
+		self:UpdateVersion()
 	end
 
 	self:RegisterSlashCommands()
