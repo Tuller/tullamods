@@ -4,6 +4,7 @@
 --]]
 
 BongosCastBar = Bongos:NewModule("Bongos-CastBar")
+BongosCastBar.defaults = {x = 635.257, y = 626.229, showText = 1}
 
 --[[ CastingBar Stuff ]]--
 
@@ -177,11 +178,7 @@ end
 --[[ Startup ]]--
 
 function BongosCastBar:Load()
-	if not Bongos:GetBarSets('cast') then
-		Bongos:SetBarSets('cast', {x = 635.257, y = 626.229, showText = 1})
-	end
-
-	local bar = BBar:Create('cast', Bar_OnCreate)
+	local bar = BBar:Create('cast', Bar_OnCreate, nil, self.defaults)
 	bar:ToggleText(bar.sets.showText)
 end
 
