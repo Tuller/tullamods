@@ -1,15 +1,18 @@
 --[[
-	BPetBar
+	BongosPetBar
 		A replacement for the default pet actionbar
 --]]
 
---constants
+BongosPetBar = BongosActionMain:NewModule("Bongos-PetBar")
+BongosPetBar.defaults = {x = 579.75, y = 598.80}
+
+--[[ Bar Functions ]]--
+
 local DEFAULT_SPACING = 2
 
+local function Bar_Layout(self, cols, space)
+	if InCombatLockdown() then return end
 
---[[ Layout Functions ]]--
-
-local function Layout(self, cols, space)
 	cols = (cols or self.sets.cols or NUM_PET_ACTION_SLOTS)
 	if cols == DEFAULT_COLS then
 		self.sets.cols = nil
@@ -24,138 +27,145 @@ local function Layout(self, cols, space)
 		self.sets.space = space
 	end
 	space = space + 2
-	
+
 	local buttonSize = 30 + space
 	local offset = space / 2
 
-	self:SetWidth(buttonSize * cols - space)
-	self:SetHeight(buttonSize * ceil(NUM_PET_ACTION_SLOTS / cols) - space)
+	self:SetSize(buttonSize * cols - space, buttonSize * ceil(NUM_PET_ACTION_SLOTS/cols) - space)
 
 	for i = 1, NUM_PET_ACTION_SLOTS do
 		local row = mod(i - 1, cols)
 		local col = ceil(i / cols) - 1
-		local button = BPetButton.Get(i)
+
+		local button = BongosPetButton:Get(i)
 		button:ClearAllPoints()
-		button:SetPoint('TOPLEFT', self, 'TOPLEFT', buttonSize * row, -buttonSize * col)
+		button:SetPoint("TOPLEFT", self, "TOPLEFT", buttonSize * row, -buttonSize * col)
 		button:Update()
-	end
-end
-
-
---[[ Events ]]--
-
-local function OnEvent()
-	if event == "UPDATE_BINDINGS" then
-		BPetButton.ForAll(BPetButton.UpdateHotkey)
-	elseif event == "UNIT_FLAGS" or event == "UNIT_AURA" then
-		if arg1 == 'pet' then
-			BPetButton.ForAll(BPetButton.Update)
-		end
-	elseif event == "PET_BAR_UPDATE" then
-		BPetButton.ForAll(BPetButton.Update)
-	elseif event =="PET_BAR_UPDATE_COOLDOWN" then
-		BPetButton.ForAll(BPetButton.UpdateCooldown)
-	elseif event =="PET_BAR_SHOWGRID" then
-		bg_showPetGrid = true
-		BPetButton.ForAll(BPetButton.UpdateVisibility)
-	elseif event =="PET_BAR_HIDEGRID" then
-		bg_showPetGrid = nil
-		BPetButton.ForAll(BPetButton.UpdateVisibility)
 	end
 end
 
 
 --[[ Rightclick Menu Functions ]]--
 
-local function CreateConfigMenu(name, frame)
-	local menu = CreateFrame("Button", name, UIParent, "BongosRightClickMenu")
+local function Bar_CreateMenu(frame)
+	local name = format("BongosMenu%s", frame.id)
+	local menu = BongosMenu:Create(name)
 	menu.frame = frame
+	menu.text:SetText("Pet Bar")
 
-	menu:SetText('Pet Bar')
-	menu:SetWidth(220)
-	menu:SetHeight(220)
-	
 	--sliders
-	local opacity = CreateFrame("Slider", name .. "Opacity", menu, "BongosOpacitySlider")
-	opacity:SetPoint("BOTTOM", menu, "BOTTOM", 0, 24)
-
-	local scale = CreateFrame("Slider", name .. "Scale", menu, "BongosScaleSlider")
-	scale:SetPoint("BOTTOM", opacity, "TOP", 0, 24)
-
-	local spacing = CreateFrame("Slider", name .. "Spacing", menu, "BongosSpaceSlider")
-	spacing:SetPoint("BOTTOM", scale, "TOP", 0, 24)
-	spacing:SetScript("OnValueChanged", function()
+	local spacing = BongosMenu:CreateSpacingSlider(menu, name .. "Spacing")
+	spacing:SetPoint("BOTTOM", name .. "Scale", "TOP", 0, 24)
+	spacing:SetScript("OnShow", function(self)
+		self:SetValue(frame.sets.space or DEFAULT_SPACING)
+	end)
+	spacing:SetScript("OnValueChanged", function(self, value)
 		if not menu.onShow then
-			frame:Layout(nil, this:GetValue())
+			frame:Layout(nil, value)
 		end
-		getglobal(this:GetName() .. 'ValText'):SetText(this:GetValue())
+		getglobal(self:GetName() .. "ValText"):SetText(value)
 	end)
 
-	local cols = CreateFrame("Slider", name .. "Cols", menu, "BongosSlider")
+	local cols = BongosMenu:CreateSlider(menu, name .. "Cols")
 	cols:SetPoint("BOTTOM", spacing, "TOP", 0, 24)
-	cols:SetScript("OnValueChanged", function()
+	cols:SetScript("OnShow", function(self)
+		getglobal(name .. "Cols"):SetValue(NUM_PET_ACTION_SLOTS - (frame.sets.cols or NUM_PET_ACTION_SLOTS) + 1)
+	end)
+	cols:SetScript("OnValueChanged", function(self, value)
 		if not menu.onShow then
-			frame:Layout(NUM_PET_ACTION_SLOTS - this:GetValue() + 1)
+			frame:Layout(NUM_PET_ACTION_SLOTS - value + 1)
 		end
-		getglobal(this:GetName() .. 'ValText'):SetText(NUM_PET_ACTION_SLOTS - this:GetValue() + 1)
+		getglobal(self:GetName() .. "ValText"):SetText(NUM_PET_ACTION_SLOTS - value + 1)
 	end)
 	cols:SetValueStep(1)
+	getglobal(name .. "ColsText"):SetText("Columns")
 	getglobal(name .. "Cols"):SetMinMaxValues(1, NUM_PET_ACTION_SLOTS)
-	getglobal(name .. "ColsText"):SetText(BONGOS_COLUMNS)
-	getglobal(name .. "ColsLow"):SetText(NUM_PET_ACTION_SLOTS)
 	getglobal(name .. "ColsHigh"):SetText(1)
-	
+	getglobal(name .. "ColsLow"):SetText(NUM_PET_ACTION_SLOTS)
+
+	menu:SetHeight(menu:GetHeight() + 96)
+
 	return menu
 end
 
---Called when the right click menu is shown, loads the correct values to the checkbuttons/sliders/text
-local function ShowMenu(self)
-	local name = 'BongosPetBarMenu'
-	local menu = getglobal(name) or CreateConfigMenu(name, self)
+local function Bar_ShowMenu(self)
+	if not self.menu then
+		self.menu = Bar_CreateMenu(self)
+	end
 
+	local menu = self.menu
 	menu.onShow = 1
-	
-	getglobal(name .. 'Cols'):SetValue(NUM_PET_ACTION_SLOTS - (self.sets.cols or NUM_PET_ACTION_SLOTS) + 1)
-	getglobal(name .. 'Spacing'):SetValue(self.sets.space or DEFAULT_SPACING)
-
-	self:DisplayMenu(menu)
-
+	self:PlaceMenu(menu)
 	menu.onShow = nil
 end
 
+local function Bar_OnCreate(self)
+	self.ShowMenu = Bar_ShowMenu
+	self.Layout = Bar_Layout
 
---[[ Startup ]]--
-
-local function OnCreate(self)
-	self:SetFrameStrata('DIALOG')
-	self.ShowMenu = ShowMenu
-	self.Layout = Layout
-
-	self:SetAttribute('unit', 'pet')
-	self:SetAttribute('statemap-unitexists-true',  '1')
-	self:SetAttribute('statemap-unitexists-false', '0')
+	self:SetFrameStrata("HIGH")
+	self:SetAttribute("unit", "pet")
+	self:SetAttribute("statemap-unitexists-true",  "1")
+	self:SetAttribute("statemap-unitexists-false", "0")
 	RegisterUnitWatch(self, true)
 
 	for i=1, NUM_PET_ACTION_SLOTS do
-		BPetButton.Set(i, self)
+		BongosPetButton:Set(i, self)
 	end
 	SecureStateHeader_Refresh(self)
 end
 
-Bongos.AddStartup(function()
-	if not Bongos.GetBarSets('pet') then
-		Bongos.SetBarSets('pet', {x = 579.75, y = 598.80, x = 579.75, vis = 1})
+
+--[[ Events ]]--
+
+function BongosPetBar:Load()
+	self.bar = BBar:CreateSecure("pet", Bar_OnCreate, nil, self.defaults)
+	self.bar:Layout()
+
+	self:RegisterEvent("UNIT_FLAGS", "UpdateIfPet")
+	self:RegisterEvent("UNIT_AURA", "UpdateIfPet")
+	self:RegisterEvent("PET_BAR_UPDATE", "Update")
+	self:RegisterEvent("PET_BAR_UPDATE_COOLDOWN", "UpdateCooldown")
+	self:RegisterEvent("PET_BAR_SHOWGRID", "UpdateShowGrid")
+	self:RegisterEvent("PET_BAR_HIDEGRID", "UpdateShowGrid")
+	self:RegisterEvent("UPDATE_BINDINGS", "UpdateBindings")
+end
+
+function BongosPetBar:Unload()
+	self.bar:Destroy()
+
+	self:UnregisterEvent("UNIT_FLAGS")
+	self:UnregisterEvent("UNIT_AURA")
+	self:UnregisterEvent("PET_BAR_UPDATE")
+	self:UnregisterEvent("PET_BAR_UPDATE_COOLDOWN")
+	self:UnregisterEvent("PET_BAR_SHOWGRID")
+	self:UnregisterEvent("PET_BAR_HIDEGRID")
+	self:UnregisterEvent("UPDATE_BINDINGS")
+end
+
+function BongosPetBar:UpdateBindings()
+	BongosPetButton:ForAll(BongosPetButton.UpdateHotkey)
+end
+
+function BongosPetBar:UpdateIfPet(event, unit)
+	if unit == "pet" then
+		BongosPetButton:ForAll(BongosPetButton.Update)
 	end
+end
 
-	local bar = BBar.Create('pet', OnCreate, nil, 'SecureStateHeaderTemplate')
-	bar:SetScript("OnEvent", OnEvent)
-	bar:RegisterEvent("UNIT_FLAGS")
-	bar:RegisterEvent("UNIT_AURA")
-	bar:RegisterEvent("PET_BAR_UPDATE")
-	bar:RegisterEvent("PET_BAR_UPDATE_COOLDOWN")
-	bar:RegisterEvent("PET_BAR_SHOWGRID")
-	bar:RegisterEvent("PET_BAR_HIDEGRID")
-	bar:RegisterEvent("UPDATE_BINDINGS")
+function BongosPetBar:Update()
+	BongosPetButton:ForAll(BongosPetButton.Update)
+end
 
-	bar:Layout()
-end)
+function BongosPetBar:UpdateCooldown()
+	BongosPetButton:ForAll(BongosPetButton.UpdateCooldown)
+end
+
+function BongosPetBar:UpdateShowGrid(event)
+	if event == "PET_BAR_SHOWGRID" then
+		BongosPetButton.showEmpty = true
+	elseif event == "PET_BAR_HIDEGRID" then
+		BongosPetButton.showEmpty = nil
+	end
+	BongosPetButton:ForAll(BongosPetButton.UpdateVisibility)
+end

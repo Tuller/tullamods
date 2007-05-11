@@ -2,32 +2,28 @@
 	Class Button
 --]]
 
-BClassButton = CreateFrame('CheckButton')
-local Button_mt = {__index = BClassButton}
+BongosClassButton = CreateFrame('CheckButton')
+local Button_mt = {__index = BongosClassButton}
 
-local NORMALTEX_RATIO = 1.833333333
+local NORMALTEX_RATIO = 1.833333334
 local BUTTON_SIZE = 30
 local buttons = {}
 
 
---[[ Button Events ]]--
-
-local function PostClick() this:PostClick() end
-local function OnEnter() this:OnEnter() end
-local function OnLeave() this:OnLeave() end
-
-
 --[[ Constructor ]]--
 
-function BClassButton.Create(id, parent)
-	local name = 'BClassButton' .. id
+local function PostClick(self) self:PostClick() end
+local function OnEnter(self) self:OnEnter() end
+local function OnLeave(self) self:OnLeave() end
 
-	local button = CreateFrame("CheckButton", name, parent, 'SecureActionButtonTemplate')
-	setmetatable(button, Button_mt)
-	
+function BongosClassButton:Create(id, parent)
+	local name = format("BongosClassButton%s", id)
+	local button = setmetatable(CreateFrame("CheckButton", name, parent, "SecureActionButtonTemplate"), Button_mt)
+
 	button:SetID(id)
 	button:SetAlpha(parent:GetAlpha())
-	button:SetHeight(BUTTON_SIZE); button:SetWidth(BUTTON_SIZE)
+	button:SetHeight(BUTTON_SIZE)
+	button:SetWidth(BUTTON_SIZE)
 
 	--icon texture
 	local icon = button:CreateTexture(name .. "Icon", "BACKGROUND")
@@ -52,7 +48,7 @@ function BClassButton.Create(id, parent)
 	hotkey:SetPoint("TOPRIGHT", button, "TOPRIGHT", 2, -2)
 	hotkey:SetJustifyH("RIGHT")
 	hotkey:SetWidth(BUTTON_SIZE); hotkey:SetHeight(10)
-	
+
 	--cooldown model
 	CreateFrame('Cooldown', name .. 'Cooldown', button, 'CooldownFrameTemplate')
 
@@ -65,7 +61,7 @@ function BClassButton.Create(id, parent)
 	button:SetScript("OnEnter", OnEnter)
 	button:SetScript("OnLeave", OnLeave)
 
-	button:ShowHotkey(BActionConfig.HotkeysShown())
+	button:ShowHotkey(BongosActionMain:ShowingHotkeys())
 	button:Update()
 
 	buttons[id] = button
@@ -76,12 +72,12 @@ end
 
 --[[ OnX Functions ]]--
 
-function BClassButton:PostClick()
+function BongosClassButton:PostClick()
 	self:SetChecked(not self:GetChecked())
 end
 
-function BClassButton:OnEnter()
-	if BActionConfig.TooltipsShown() then
+function BongosClassButton:OnEnter()
+	if BongosActionMain:ShowingTooltips() then
 		if GetCVar("UberTooltips") == "1" then
 			GameTooltip_SetDefaultAnchor(GameTooltip, self)
 		else
@@ -89,17 +85,17 @@ function BClassButton:OnEnter()
 		end
 		GameTooltip:SetShapeshift(self:GetID())
 	end
-	KeyBound_Set(self)
+	KeyBound:Set(self)
 end
 
-function BClassButton:OnLeave()
-	GameTooltip:Hide() 
+function BongosClassButton:OnLeave()
+	GameTooltip:Hide()
 end
 
 
 --[[ Update Functions ]]--
 
-function BClassButton:Update()
+function BongosClassButton:Update()
 	local texture, name, isActive, isCastable = GetShapeshiftFormInfo(self:GetID())
 	self:SetChecked(isActive)
 
@@ -128,37 +124,37 @@ end
 
 --[[ Hotkey Functions ]]--
 
-function BClassButton:ShowHotkey(show)
+function BongosClassButton:ShowHotkey(show)
 	if show then
-		getglobal(self:GetName() .. 'HotKey'):Show()
+		getglobal(self:GetName() .. "HotKey"):Show()
 		self:UpdateHotkey()
 	else
-		getglobal(self:GetName() .. 'HotKey'):Hide()
+		getglobal(self:GetName() .. "HotKey"):Hide()
 	end
 end
 
-function BClassButton:UpdateHotkey()
-	getglobal(self:GetName() .. 'HotKey'):SetText(self:GetHotkey() or '')
+function BongosClassButton:UpdateHotkey()
+	getglobal(self:GetName() .. "HotKey"):SetText(self:GetHotkey() or '')
 end
 
-function BClassButton:GetHotkey()
-	local key = GetBindingKey('CLICK ' .. self:GetName() .. ':LeftButton')
+function BongosClassButton:GetHotkey()
+	local key = GetBindingKey(format("CLICK %s:LeftButton", self:GetName()))
 	if not key then
-		key = GetBindingText(GetBindingKey('SHAPESHIFTBUTTON' .. self:GetID()), 'KEY_')
+		key = GetBindingText(GetBindingKey("SHAPESHIFTBUTTON" .. self:GetID()), "KEY_")
 	end
 
-	return BActionUtil.ToShortKey(key)
+	return KeyBound:ToShortKey(key)
 end
 
 
 --[[ Utility Functions ]]--
 
-function BClassButton.ForAll(action, ...)
+function BongosClassButton:ForAll(action, ...)
 	for _, button in pairs(buttons) do
 		action(button, ...)
 	end
 end
 
-function BClassButton.Get(id)
+function BongosClassButton:Get(id)
 	return buttons[id]
 end

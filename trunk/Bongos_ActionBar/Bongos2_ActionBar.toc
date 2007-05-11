@@ -1,0 +1,18 @@
+## Interface: 20100
+## Title: Bongos2 ActionBar
+## Notes: A main actionbar replacement
+## Author: Tuller
+## Version: 0.2
+## Dependencies: Bongos2
+## SavedVariablesPerCharacter: BongosActionBarDB
+localization.lua
+unreg.lua
+keyBound.lua
+main.lua
+bagBar\bar.lua
+keyBar\bar.lua
+menuBar\bar.lua
+classBar\button.lua
+classBar\bar.lua
+petBar\button.lua
+petBar\bar.lua

@@ -1,18 +1,10 @@
 --[[
 	bar.lua
 		Scripts used for the Bongos Bag bar
-
-	Saved Variables:
-		Bongos.bag = {
-			<All variables from BBar>
-			space
-				The spacing between action buttons, in pixels.  A nil value means that the bar is using default spacing
-			rows
-				How many rows the bar is organized into.
-			oneBag
-				Flag for if we're only showing the main bag.
-		}
 --]]
+
+BongosBagBar = BongosActionMain:NewModule("Bongos-BagBar")
+BongosBagBar.defaults = {x = 1261.85, y = 37, vis = 1}
 
 --constants
 local DEFAULT_SPACING = 4
@@ -20,24 +12,23 @@ local DEFAULT_ROWS = 1
 local BAG_SIZE = 37
 local bags = {CharacterBag3Slot, CharacterBag2Slot, CharacterBag1Slot, CharacterBag0Slot, MainMenuBarBackpackButton}
 
+--[[ Bar Functions ]]--
 
---[[ UI Functions ]]--
-
-local function Layout(self, rows, space)
+local function Bar_Layout(self, rows, space)
 	rows = (rows or self.sets.rows or DEFAULT_ROWS)
 	if rows == DEFAULT_ROWS then
 		self.sets.rows = nil
 	else
 		self.sets.rows = rows
 	end
-	
 	space = (space or self.sets.space or DEFAULT_SPACING)
+
 	if space == DEFAULT_SPACING then
 		self.sets.space = nil
 	else
 		self.sets.space = space
 	end
-	
+
 	for _,bag in pairs(bags) do bag:ClearAllPoints() end
 
 	if self.sets.oneBag then
@@ -46,7 +37,7 @@ local function Layout(self, rows, space)
 
 		self:SetWidth(BAG_SIZE); self:SetHeight(BAG_SIZE)
 	else
-		for _,bag in pairs(bags) do bag:Show() end	
+		for _,bag in pairs(bags) do bag:Show() end
 		bags[1]:SetPoint('TOPLEFT', self)
 
 		--horizontal alignment
@@ -54,23 +45,18 @@ local function Layout(self, rows, space)
 			for i = 2, #bags do
 				bags[i]:SetPoint('LEFT', bags[i-1], 'RIGHT', space, 0)
 			end
-			self:SetWidth((BAG_SIZE + space)* #bags - space)
-			self:SetHeight((BAG_SIZE + space) - space)
+			self:SetSize((BAG_SIZE + space) * #bags - space, (BAG_SIZE + space) - space)
 		--vertical alignment
 		else
 			for i = 2, #bags do
 				bags[i]:SetPoint('TOP', bags[i-1], 'BOTTOM', 0, -space)
 			end
-			self:SetWidth((BAG_SIZE + space) - space)
-			self:SetHeight((BAG_SIZE + space)*#bags - space)
+			self:SetSize((BAG_SIZE + space) - space, (BAG_SIZE + space)*#bags - space)
 		end
 	end
 end
 
-
---[[ Config Functions ]]--
-
-local function ShowAsOneBag(self, enable)
+local function Bar_SetOneBag(self, enable)
 	if enable then
 		self.sets.oneBag = 1
 	else
@@ -79,7 +65,7 @@ local function ShowAsOneBag(self, enable)
 	self:Layout()
 end
 
-local function SetVertical(self, enable)
+local function Bar_SetVertical(self, enable)
 	if enable then
 		self:Layout(5)
 	else
@@ -87,80 +73,75 @@ local function SetVertical(self, enable)
 	end
 end
 
-local function CreateConfigMenu(name, frame)
-	local menu = CreateFrame('Button', name, UIParent, "BongosRightClickMenu")
+local function Bar_CreateMenu(frame)
+	local name = format("BongosMenu%s", frame.id)
+	local menu = BongosMenu:Create(name)
 	menu.frame = frame
-
-	menu:SetText('Bag Bar')
-	menu:SetWidth(220); menu:SetHeight(230)
+	menu.text:SetText("Bag Bar")
 
 	--checkbuttons
-	local oneBag = CreateFrame("CheckButton", name .. "OneBag", menu, "GooeyCheckButton")
-	oneBag:SetScript("OnClick", function() ShowAsOneBag(frame, this:GetChecked()) end)
-	oneBag:SetPoint("TOPLEFT", menu, "TOPLEFT", 6, -28)
-	oneBag:SetText(BONGOS_ONE_BAG)
+	local oneBag = BongosMenu:CreateCheckButton(menu, name .. "OneBag")
+	oneBag:SetScript("OnClick", function(self) frame:SetOneBag(self:GetChecked()) end)
+	oneBag:SetPoint("TOPLEFT", menu, "TOPLEFT", 6, -88)
+	oneBag:SetText("One Bag")
 
-	local vertical = CreateFrame("CheckButton", name .. "Vertical", menu, "GooeyCheckButton")
-	vertical:SetScript("OnClick", function() SetVertical(frame, this:GetChecked()) end)
+	local vertical = BongosMenu:CreateCheckButton(menu, name .. "Vertical")
+	vertical:SetScript("OnClick", function(self) frame:SetVertical(self:GetChecked()) end)
 	vertical:SetPoint("TOP", oneBag, "BOTTOM", 0, 2)
-	vertical:SetText(BONGOS_VERTICAL)
+	vertical:SetText("Vertical")
 
-	--sliders
-	local opacity = CreateFrame("Slider", name .. "Opacity", menu, "BongosOpacitySlider")
-	opacity:SetPoint("BOTTOM", menu, "BOTTOM", 0, 24)
-
-	local scale = CreateFrame("Slider", name .. "Scale", menu, "BongosScaleSlider")
-	scale:SetPoint("BOTTOM", opacity, "TOP", 0, 24)
-
-	local spacing = CreateFrame("Slider", name .. "Spacing", menu, "BongosSpaceSlider")
-	spacing:SetPoint("BOTTOM", scale, "TOP", 0, 24)
-	spacing:SetScript("OnValueChanged", function()
-		if not menu.onShow then
-			frame:Layout(nil, this:GetValue())
-		end
-		getglobal(this:GetName() .. 'ValText'):SetText(this:GetValue())
+	local spacing = BongosMenu:CreateSpacingSlider(menu, name .. "Spacing")
+	spacing:SetPoint("BOTTOM", name .. "Scale", "TOP", 0, 24)
+	spacing:SetScript("OnShow", function(self)
+		self:SetValue(frame.sets.space or DEFAULT_SPACING)
 	end)
-	
+	spacing:SetScript("OnValueChanged", function(self, value)
+		if not menu.onShow then
+			frame:Layout(nil, value)
+		end
+		getglobal(self:GetName() .. 'ValText'):SetText(value)
+	end)
+
+	menu:SetHeight(menu:GetHeight() + 96)
 	return menu
 end
 
---Called when the right click menu is shown, loads the correct values to the checkbuttons/sliders/text
-local function ShowMenu(self)
-	local name = 'BongosBagBarMenu'
-	local menu = getglobal(name) or CreateConfigMenu(name, self)
+local function Bar_ShowMenu(self)
+	if not self.menu then
+		self.menu = Bar_CreateMenu(self)
+	end
 
+	local menu = self.menu
 	menu.onShow = 1
-
-	getglobal(name .. 'Spacing'):SetValue(self.sets.space or DEFAULT_SPACING)
-	getglobal(name .. 'Vertical'):SetChecked(self.sets.rows)
-	getglobal(name .. 'OneBag'):SetChecked(self.sets.oneBag)
-
-	self:DisplayMenu(menu)
-
+	self:PlaceMenu(menu)
 	menu.onShow = nil
 end
 
-local function OnCreate(self)
-	self.ShowMenu = ShowMenu
-	self.Layout = Layout
-	
+local function Bar_OnCreate(self)
+	self.ShowMenu = Bar_ShowMenu
+	self.Layout = Bar_Layout
+	self.SetVertical = Bar_SetVertical
+	self.SetOneBag = Bar_ShowAsOneBag
+
 	for _,bag in pairs(bags) do
 		self:Attach(bag)
-	end
-
-	if self.sets.vis then
-		MainMenuBarBackpackButton:Show()
 	end
 end
 
 
 --[[ Startup ]]--
 
-Bongos.AddStartup(function()
-	if not Bongos.GetBarSets('bags') then
-		Bongos.SetBarSets('bags', {x = 1261.85, y = 37, vis = 1})
+function BongosBagBar:Load()
+	local bar = BBar:Create('bags', Bar_OnCreate, nil, self.defaults)
+	bar:Layout()
+
+	if bar:IsShown() then
+		MainMenuBarBackpackButton:Show()
 	end
 
-	local bar = BBar.Create('bags', OnCreate)
-	bar:Layout()
-end)
+	self.bar = bar
+end
+
+function BongosBagBar:Unload()
+	self.bar:Destroy()
+end

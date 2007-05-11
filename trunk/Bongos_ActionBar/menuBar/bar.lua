@@ -3,37 +3,40 @@
 		A movable bar for the micro buttons
 --]]
 
+BongosMenuBar = BongosActionMain:NewModule("Bongos-MenuBar")
+BongosMenuBar.defaults = {x = 1261.85, y = 37}
+
 local DEFAULT_SPACING = 2
 local DEFAULT_ROWS = 1
 local buttons = {
 	CharacterMicroButton,
-	SpellbookMicroButton, 
-	TalentMicroButton, 
-	QuestLogMicroButton, 
-	SocialsMicroButton, 
-	LFGMicroButton, 
-	MainMenuMicroButton, 
+	SpellbookMicroButton,
+	TalentMicroButton,
+	QuestLogMicroButton,
+	SocialsMicroButton,
+	LFGMicroButton,
+	MainMenuMicroButton,
 	HelpMicroButton
 }
 
 
---[[ Update Functions ]]--
+--[[ Bar Functions ]]--
 
-local function Layout(self, rows, space)
+local function Bar_Layout(self, rows, space)
 	rows = (rows or self.sets.rows or DEFAULT_ROWS)
 	if rows == DEFAULT_ROWS then
 		self.sets.rows = nil
 	else
 		self.sets.rows = rows
 	end
-	
+
 	space = (space or self.sets.space or DEFAULT_SPACING)
 	if space == DEFAULT_SPACING then
 		self.sets.space = nil
 	else
 		self.sets.space = space
 	end
-	
+
 	for _,button in pairs(buttons) do button:ClearAllPoints() end
 	buttons[1]:SetPoint('TOPLEFT', self, 'TOPLEFT', 0, 20)
 
@@ -59,7 +62,7 @@ local function Layout(self, rows, space)
 	end
 end
 
-local function SetVertical(self, enable)
+local function Bar_SetVertical(self, enable)
 	if enable then
 		self:Layout(5)
 	else
@@ -67,87 +70,80 @@ local function SetVertical(self, enable)
 	end
 end
 
-
---[[ Rightclick Menu Functions ]]--
-
-local function CreateConfigMenu(name, frame)
-	local menu = CreateFrame('Button', name, UIParent, "BongosRightClickMenu")
+local function Bar_CreateMenu(frame)
+	local name = format("BongosMenu%s", frame.id)
+	local menu = BongosMenu:Create(name)
 	menu.frame = frame
+	menu.text:SetText("Menu Bar")
 
-	menu:SetText('Menu Bar')
-	menu:SetWidth(220); menu:SetHeight(200)
+	local vertical = BongosMenu:CreateCheckButton(menu, name .. "Vertical")
+	vertical:SetScript("OnClick", function(self) frame:SetVertical(self:GetChecked()) end)
+	vertical:SetPoint("TOPLEFT", menu, "TOPLEFT", 6, -88)
+	vertical:SetText("Vertical")
 
-	--checkbuttons
-	local vertical = CreateFrame("CheckButton", name .. "Vertical", menu, "GooeyCheckButton")
-	vertical:SetScript("OnClick", function() SetVertical(frame, this:GetChecked()) end)
-	vertical:SetPoint("TOPLEFT", menu, "TOPLEFT", 6, -28)
-	vertical:SetText(BONGOS_VERTICAL)
-	
-	--sliders
-	local opacity = CreateFrame("Slider", name .. "Opacity", menu, "BongosOpacitySlider")
-	opacity:SetPoint("BOTTOM", menu, "BOTTOM", 0, 24)
-
-	local scale = CreateFrame("Slider", name .. "Scale", menu, "BongosScaleSlider")
-	scale:SetPoint("BOTTOM", opacity, "TOP", 0, 24)
-
-	local spacing = CreateFrame("Slider", name .. "Spacing", menu, "BongosSpaceSlider")
-	spacing:SetPoint("BOTTOM", scale, "TOP", 0, 24)
-	spacing:SetScript("OnValueChanged", function()
-		if not menu.onShow then
-			frame:Layout(nil, this:GetValue())
-		end
-		getglobal(this:GetName() .. 'ValText'):SetText(this:GetValue())
+	local spacing = BongosMenu:CreateSpacingSlider(menu, name .. "Spacing")
+	spacing:SetPoint("BOTTOM", name .. "Scale", "TOP", 0, 24)
+	spacing:SetScript("OnShow", function(self)
+		self:SetValue(frame.sets.space or DEFAULT_SPACING)
 	end)
-	
+	spacing:SetScript("OnValueChanged", function(self, value)
+		if not menu.onShow then
+			frame:Layout(nil, value)
+		end
+		getglobal(self:GetName() .. 'ValText'):SetText(value)
+	end)
+
+	menu:SetHeight(menu:GetHeight() + 64)
+
 	return menu
 end
 
---Called when the right click menu is shown, loads the correct values to the checkbuttons/sliders/text
-local function ShowMenu(self)
-	local name = 'BongosMenuBarMenu'
-	local menu = getglobal(name) or CreateConfigMenu(name, self)
+local function Bar_ShowMenu(self)
+	if not self.menu then
+		self.menu = Bar_CreateMenu(self)
+	end
 
+	local menu = self.menu
 	menu.onShow = 1
-
-	getglobal(name .. 'Spacing'):SetValue(self.sets.space or DEFAULT_SPACING)
-	getglobal(name .. 'Vertical'):SetChecked(self.sets.rows)
-
-	self:DisplayMenu(menu)
-
+	self:PlaceMenu(menu)
 	menu.onShow = nil
+end
+
+local function Bar_OnCreate(self)
+	self.ShowMenu = Bar_ShowMenu
+	self.Layout = Bar_Layout
+	self.SetVertical = Bar_SetVertical
+
+	for _,button in pairs(buttons) do
+		self:Attach(button)
+	end
+
+	--override UpdateTalentButton to properly show the micro button
+	function UpdateTalentButton()
+		if UnitLevel('player') < 10 then
+			TalentMicroButton:Hide()
+		elseif BBar.Get('menu') then
+			TalentMicroButton:Show()
+		end
+	end
 end
 
 
 --[[ Startup ]]--
 
-local function OnCreate(self)
-	self.ShowMenu = ShowMenu
-	self.Layout = Layout
-	
-	for _,button in pairs(buttons) do
-		self:Attach(button)
-	end
-end
-
-Bongos.AddStartup(function()
-	if not Bongos.GetBarSets('menu') then
-		Bongos.SetBarSets('menu', {x = 1242.857, y = 78, vis = 1})
-	end
-
-	local bar = BBar.Create('menu', OnCreate)
+function BongosMenuBar:Load()
+	local bar = BBar:Create('menu', Bar_OnCreate, nil, self.defaults)
 	bar:Layout()
 
 	--hack to make sure all the buttons are shown properly
-	if bar:IsShown() then bar:Hide(); bar:Show() end
-end)
-
---[[ Overrides ]]--
-
---Prevents the talent button from always showing up even when the bar is hidden
-UpdateTalentButton = function()
-	if UnitLevel('player') < 10 then
-		TalentMicroButton:Hide()
-	elseif BBar.Get('menu') then
-		TalentMicroButton:Show()
+	if bar:IsShown() then
+		bar:Hide()
+		bar:Show()
 	end
+	
+	self.bar = bar
+end
+
+function BongosMenuBar:Unload()
+	self.bar:Destroy()
 end
