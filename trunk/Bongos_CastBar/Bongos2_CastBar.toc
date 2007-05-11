@@ -1,5 +1,5 @@
 ## Interface: 20100
-## Title: Bongos CastBar
+## Title: Bongos2 CastBar
 ## Notes: A movable casting bar, with timer
 ## Author: Tuller
 ## Dependencies: Bongos2

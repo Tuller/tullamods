@@ -180,8 +180,10 @@ end
 function BongosCastBar:Load()
 	local bar = BBar:Create('cast', Bar_OnCreate, nil, self.defaults)
 	bar:ToggleText(bar.sets.showText)
+
+	self.bar = bar
 end
 
 function BongosCastBar:Unload()
-	BBar:Get('cast'):Destroy()
+	self.bar:Destroy()
 end
