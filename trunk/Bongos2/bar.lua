@@ -19,8 +19,13 @@ local function GetRelativeCoords(frame, scale)
 	return frame:GetLeft() * ratio, frame:GetTop() * ratio
 end
 
-local function Bar_New(id)
-	local bar = setmetatable(CreateFrame('Frame', nil, UIParent), Bar_MT)
+local function Bar_New(id, secure)
+	local bar
+	if secure then
+		bar = setmetatable(CreateFrame('Frame', nil, UIParent, "SecureFrameTemplate"), Bar_MT)
+	else
+		bar = setmetatable(CreateFrame('Frame', nil, UIParent), Bar_MT)
+	end
 	
 	bar.id = id
 	bar.dragFrame = BDragFrame_New(bar)
@@ -44,12 +49,12 @@ end
 
 --[[ Usable Functions ]]--
 
-function BBar:Create(id, OnCreate, OnDelete, defaults)
+function BBar:Create(id, OnCreate, OnDelete, defaults, secure)
 	local id = tonumber(id) or id
 	assert(id, "id expected")
 	assert(not active[id], format("BBar '%s' is already in use", id))
 
-	local bar = Bar_Restore(id) or Bar_New(id)
+	local bar = Bar_Restore(id) or Bar_New(id, secure)
 	bar.OnDelete = OnDelete
 
 	bar:LoadSettings(defaults)
@@ -58,6 +63,10 @@ function BBar:Create(id, OnCreate, OnDelete, defaults)
 	active[id] = bar
 
 	return bar
+end
+
+function BBar:CreateSecure(id, OnCreate, OnDelete, defaults)
+	return self:Create(id, OnCreate, OnDelete, defaults, true)
 end
 
 function BBar:Destroy(removeSettings)
