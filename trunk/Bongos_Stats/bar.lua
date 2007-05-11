@@ -4,7 +4,8 @@
 --]]
 
 BongosStats = Bongos:NewModule("Bongos-Stats")
-
+BongosStats.defaults = {showFPS = true, showMemory = true, showPing = true, x = 1253.7466, y = 895.0568}
+					
 local L = BONGOS_STATS_LOCALS
 local UPDATE_DELAY = 1
 
@@ -58,7 +59,9 @@ local function Stats_Create(self)
 	self.ping:SetPoint("LEFT", self.mem, "RIGHT", 2, 0)
 
 	frame:SetScript("OnUpdate", Stats_OnUpdate)
-	frame:SetScript("OnEnter", Stats_OnEnter)
+	if not(GetBuildInfo() == "2.0.12") then
+		frame:SetScript("OnEnter", Stats_OnEnter)
+	end
 	frame:SetScript("OnLeave", Stats_OnLeave)
 	frame:SetScript("OnClick", Stats_OnClick)
 
@@ -67,7 +70,7 @@ local function Stats_Create(self)
 end
 
 --stats bar
-local function StatsBar_CreateMenu(self)
+local function Bar_CreateMenu(self)
 	local name = format("BongosMenu%s", self.id)
 	local menu = BongosMenu:Create(name)
 	menu.text:SetText(L.StatsBar)
@@ -97,15 +100,20 @@ local function StatsBar_CreateMenu(self)
 	return menu
 end
 
-local function StatsBar_ShowMenu(self)
+local function Bar_ShowMenu(self)
 	if not self.menu then
-		self.menu = StatsBar_CreateMenu(self)
+		self.menu = Bar_CreateMenu(self)
 	end
 
 	local menu = self.menu
 	menu.onShow = 1
 	self:PlaceMenu(menu)
 	menu.onShow = nil
+end
+
+local function Bar_OnCreate(self)
+	self.ShowMenu = Bar_ShowMenu
+	self:SetSize(24)
 end
 
 
@@ -116,9 +124,7 @@ function BongosStats:Initialize()
 end
 
 function BongosStats:Load()
-	self.bar = BBar:Create('stats')
-	self.bar.ShowMenu = StatsBar_ShowMenu
-	self.bar:SetSize(24)
+	self.bar = BBar:Create("stats", Bar_OnCreate, nil, self.defaults)
 
 	self.bar:Attach(self.frame)
 	self.frame:SetAllPoints(self.bar)
