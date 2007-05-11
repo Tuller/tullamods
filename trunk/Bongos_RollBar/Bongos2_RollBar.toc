@@ -1,5 +1,5 @@
 ## Interface: 20100
-## Title: Bongos RollBar
+## Title: Bongos2 RollBar
 ## Notes: Makes the frame for rolling on items movable
 ## Author: Tuller
 ## Dependencies: Bongos2
