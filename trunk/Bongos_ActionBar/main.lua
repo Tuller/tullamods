@@ -112,9 +112,9 @@ function BongosActionMain:ShowHotkeys(enable)
 		self.profile.showHotkeys = nil
 	end
 
-	BongosActionButton:ForAll(BongosActionButton.ShowHotkey, enable)
+	BongosActionButton:ForAll("ShowHotkey", enable)
 	BongosPetBar:ForAll(BongosPetBar.ShowHotkey, enable)
-	-- BClassButton.ForAll(BClassButton.ShowHotkey, enable)
+	BongosClassButton:ForAll(BongosClassButton.ShowHotkey, enable)
 end
 
 function BongosActionMain:ShowingHotkeys()
@@ -131,7 +131,7 @@ function BongosActionMain:ShowMacros(enable)
 	else
 		self.profile.showMacros = nil
 	end
-	BongosActionButton:ForAll(BongosActionButton.ShowMacro, enable)
+	BongosActionButton:ForAll("ShowMacro", enable)
 end
 
 function BongosActionMain:ShowingMacros()
@@ -167,7 +167,7 @@ function BongosActionMain:SetRangeColoring(enable)
 	else
 		self.profile.rangeColoring = nil
 	end
-	BongosActionButton:ForAllShown(BongosActionButton.UpdateUsuable)
+	BongosActionButton:ForAllShown("UpdateUsuable")
 end
 
 function BongosActionMain:RangeColoring()

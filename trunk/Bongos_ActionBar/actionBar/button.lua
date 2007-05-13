@@ -270,7 +270,7 @@ function BongosActionButton:UpdateUsable()
 	local isUsable, notEnoughMana = IsUsableAction(action)
 	if isUsable then
 		if BongosActionMain:RangeColoring() and IsActionInRange(action) == 0 then
-			local r,g,b = BActionConfig.GetRangeColor()
+			local r,g,b = BongosActionMain:GetRangeColor()
 			icon:SetVertexColor(r,g,b)
 		else
 			icon:SetVertexColor(1, 1, 1)
@@ -477,37 +477,49 @@ end
 --[[ Meta Functions ]]--
 
 -- does the given action to every single button currently in use
-function BongosActionButton:ForAll(action, ...)
+function BongosActionButton:ForAll(method, ...)
 	for _,button in pairs(buttons) do
 		if button:GetParent() then
-			action(button, ...)
+			local action = button[method]
+			if action then
+				action(button, ...)
+			end
 		end
 	end
 end
 
 -- does the given action to every single button being shown
-function BongosActionButton:ForAllShown(action, ...)
+function BongosActionButton:ForAllShown(method, ...)
 	for _,button in pairs(buttons) do
 		if button:GetParent() and button:IsVisible() then
-			action(button, ...)
+			local action = button[method]
+			if action then
+				action(button, ...)
+			end
 		end
 	end
 end
 
 --does the action to every single button being shown with an action
-function BongosActionButton:ForAllWithAction(action, ...)
+function BongosActionButton:ForAllWithAction(method, ...)
 	for _,button in pairs(buttons) do
 		if button:GetParent() and button:IsVisible() and HasAction(button:GetPagedID()) then
-			action(button, ...)
+			local action = button[method]
+			if action then
+				action(button, ...)
+			end
 		end
 	end
 end
 
 --does the action to every single button matching the given id
-function BongosActionButton:ForID(id, action, ...)
+function BongosActionButton:ForID(id, method, ...)
 	for _,button in pairs(buttons) do
 		if button:GetPagedID() == id then
-			action(button, ...)
+			local action = button[method]
+			if action then
+				action(button, ...)
+			end
 		end
 	end
 end

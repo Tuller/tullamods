@@ -28,22 +28,61 @@ function BongosActionBar:Load()
 	self:RegisterEvent("START_AUTOREPEAT_SPELL", "UpdateFlash")
 	self:RegisterEvent("STOP_AUTOREPEAT_SPELL", "UpdateFlash")
 	
+	self:RegisterMessage("KEYBOUND_ENABLED", function() BActionBar:UpdateVisibilityForAll(true) end)
+	self:RegisterMessage("KEYBOUND_DISABLED", function() BActionBar:UpdateVisibilityForAll(nil) end)
+	
 	for i = 1, BActionBar:GetNumber() do 
 		BActionBar:Create(i)
 	end
 end
 
+-- local function OnEvent()
+	-- if event == 'ACTIONBAR_SLOT_CHANGED' then
+		-- BActionButton.ForID(arg1, BActionButton.UpdateSlot)
+	-- elseif event == 'PLAYER_ENTERING_WORLD'then
+		-- BActionButton.ForAll(BActionButton.Update)
+	-- elseif event == 'ACTIONBAR_SHOWGRID' then
+		-- bg_showGrid = true
+		-- BActionBar.UpdateVisibilityForAll(bg_showGrid)
+	-- elseif event == 'ACTIONBAR_HIDEGRID' then
+		-- bg_showGrid = nil
+		-- BActionBar.UpdateVisibilityForAll(bg_showGrid)
+	-- elseif event == 'ACTIONBAR_PAGE_CHANGED' then
+		-- BActionBar.ForAllWithPage(BActionButton.Update, true)
+	-- elseif event == 'UPDATE_SHAPESHIFT_FORM' or event == 'UPDATE_STEALTH' then
+		-- BActionBar.ForAllWithStance(BActionButton.Update, true)
+	-- elseif event == 'UPDATE_BINDINGS' then
+		-- BActionButton.ForAll(BActionButton.UpdateHotkey)
+	-- elseif event == 'PLAYER_TARGET_CHANGED' then
+		-- BActionButton.ForAllWithAction(BActionButton.UpdateUsable)
+	-- elseif event == 'PLAYER_AURAS_CHANGED' then
+		-- BActionButton.ForAllWithAction(BActionButton.UpdateUsable)
+	-- elseif event == 'UNIT_INVENTORY_CHANGED' then
+		-- if arg1 == 'player' then
+			-- BActionButton.ForAllWithAction(BActionButton.Update)
+		-- end
+	-- elseif event == 'ACTIONBAR_UPDATE_USABLE' or event == 'UPDATE_INVENTORY_ALERTS' or event == 'ACTIONBAR_UPDATE_COOLDOWN' then
+		-- BActionButton.ForAllWithAction(BActionButton.UpdateCooldown)
+		-- BActionButton.ForAllWithAction(BActionButton.UpdateUsable)
+	-- elseif event == 'ACTIONBAR_UPDATE_STATE' or event == 'CRAFT_SHOW' or event == 'CRAFT_CLOSE' or event == 'TRADE_SKILL_SHOW' or event == 'TRADE_SKILL_CLOSE' then
+		-- BActionButton.ForAllWithAction(BActionButton.UpdateState)
+	-- elseif event == 'PLAYER_ENTER_COMBAT' or event == 'PLAYER_LEAVE_COMBAT' or event == 'START_AUTOREPEAT_SPELL' or event == 'STOP_AUTOREPEAT_SPELL' then
+		-- BActionButton.ForAllWithAction(BActionButton.UpdateFlash)
+	-- end
+-- end
+
 function BongosActionBar:Unload()
 	self:UnregisterAllEvents()
+	self:UnregisterAllMessages()
 
 	for i = 1, BActionBar:GetNumber() do 
-		self:Get(i):Destroy()
+		BActionBar:Get(i):Destroy()
 	end
 end
 
 --event functions
 function BongosActionBar:UpdateSlot(event, slot)
-	BongosActionButton:ForID(slot, BongosActionButton.UpdateSlot)
+	BongosActionButton:ForID(slot, "UpdateSlot")
 end
 
 function BongosActionBar:UpdateGrid(event)
@@ -56,7 +95,7 @@ function BongosActionBar:UpdateGrid(event)
 end
 
 function BongosActionBar:UpdateAllButtons()
-	BongosActionButton:ForAll(BongosActionButton.Update)
+	BongosActionButton:ForAll("Update")
 end
 
 function BongosActionBar:UpdatePages()
@@ -68,30 +107,30 @@ function BongosActionBar:UpdateStances()
 end
 
 function BongosActionBar:UpdateHotkeys()
-	BongosActionButton:ForAll(BongosActionButton.UpdateHotkey)
+	BongosActionButton:ForAll("UpdateHotkey")
 end
 
 function BongosActionBar:UpdateUsuable()
-	BongosActionButton:ForAllWithAction(BongosActionButton.UpdateUsable)
+	BongosActionButton:ForAllWithAction("UpdateUsable")
 end
 
 function BongosActionBar:UpdateInventory(event, unit)
 	if unit == "player" then
-		BongosActionButton:ForAllWithAction(BongosActionButton.Update)
+		BongosActionButton:ForAllWithAction("Update")
 	end
 end
 
 function BongosActionBar:UpdateCooldownAndUsable()
-	BongosActionButton:ForAllWithAction(BongosActionButton.UpdateCooldown)
-	BongosActionButton:ForAllWithAction(BongosActionButton.UpdateUsable)
+	BongosActionButton:ForAllWithAction("UpdateCooldown")
+	BongosActionButton:ForAllWithAction("UpdateUsable")
 end
 
 function BongosActionBar:UpdateState()
-	BongosActionButton:ForAllWithAction(BongosActionButton.UpdateState)
+	BongosActionButton:ForAllWithAction("UpdateState")
 end
 
 function BongosActionBar:UpdateFlash()
-	BongosActionButton:ForAllWithAction(BongosActionButton.UpdateFlash)
+	BongosActionButton:ForAllWithAction("UpdateFlash")
 end
 
 -- local function RegisterEvents()

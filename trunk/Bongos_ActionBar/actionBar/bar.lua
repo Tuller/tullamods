@@ -3,7 +3,6 @@
 --]]
 
 --basically, BActionBar inherits all methods from BBar
-local BBar = BBar
 BActionBar = setmetatable(CreateFrame("Button"), {__index = BBar})
 local Bar_mt = {__index = BActionBar}
 
@@ -388,7 +387,10 @@ function BActionBar:ForAllShown(action, ...)
 	for i = 1, self:GetNumber() do
 		local bar = self:Get(i)
 		if bar and bar:IsShown() then
-			action(bar, ...)
+			local action = bar[method]
+			if action then
+				action(bar, ...)
+			end
 		end
 	end
 end

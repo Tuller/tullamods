@@ -5,16 +5,8 @@
 
 BState = {}
 
-local STANCES = {
-	["DRUID"] = {[0] = "Caster", "Bear", "Aquatic", "Cat", "Travel", "Moonkin|Tree of Life", "Flight", "Prowl"},
-	["ROGUE"] = {[0] = "Unstealth", "Stealth"},
-	["WARRIOR"] = {"Battle Stance", "Defensive Stance", "Berserker Stance"},
-	["PRIEST"] = {[0] = "Healer", "Shadowform|Redemption"},
-	["SHAMAN"] = {[0] = "Caster", "Ghostwolf"},
-}
 local CLASS = select(2, UnitClass("player"))
-STANCES = STANCES[CLASS]
-
+local STANCES = BONGOS_STANCES[CLASS]
 local CAT_STANCE = 3
 local PROWL_STANCE = 7
 local MAX_PAGES = 6
@@ -30,20 +22,20 @@ end
 
 --[[ load/unload statemaps ]]--
 
-function BState:Load()
-	if not self.driver then
-		local driver = CreateFrame("Frame", nil, UIParent, "SecureStateDriverTemplate")
-		self:LoadStanceMaps(driver)
-		self:LoadPageMaps(driver)
-		self:LoadStateButton(driver)
+function BState:CreateDriver()
+	local driver = CreateFrame("Frame", nil, UIParent, "SecureStateDriverTemplate")
+	self:LoadStanceMaps(driver)
+	self:LoadPageMaps(driver)
+	self:LoadStateButton(driver)
 
-		driver:SetAttribute("state", self:GetCurrentState())
-		self.driver = driver
-	end
+	driver:SetAttribute("state", self:GetCurrentState())
+	
+	return driver
 end
 
 function BState:Register(frame)
-	if not self.driver then self:Load() end
+	if not self.driver then self.driver = self:CreateDriver() end
+
 	self.driver:SetAttribute("addchild", frame)
 
 	frame:SetParent(self.driver)
