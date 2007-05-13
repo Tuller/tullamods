@@ -13,11 +13,11 @@ L.SetFadeModeDesc = "Sets when to automatically fade out <barList>. 0: never; 1:
 --[[ Startup ]]--
 
 function Bongos:Initialize()
-	self:RegisterMessage('DONGLE_PROFILE_CREATED')
-	self:RegisterMessage('DONGLE_PROFILE_CHANGED')
-	self:RegisterMessage('DONGLE_PROFILE_DELETED')
-	self:RegisterMessage('DONGLE_PROFILE_COPIED')
-	self:RegisterMessage('DONGLE_PROFILE_RESET')
+	self:RegisterMessage("DONGLE_PROFILE_CREATED")
+	self:RegisterMessage("DONGLE_PROFILE_CHANGED")
+	self:RegisterMessage("DONGLE_PROFILE_DELETED")
+	self:RegisterMessage("DONGLE_PROFILE_COPIED")
+	self:RegisterMessage("DONGLE_PROFILE_RESET")
 
 	local defaults = {
 		profile = {
@@ -54,15 +54,15 @@ end
 
 function Bongos:LoadModules()
 	for name, module in self:IterateModules() do
-		assert(module.Load, format('Bongos Module %s: Missing Load function', name))
+		assert(module.Load, format("Bongos Module %s: Missing Load function", name))
 		module:Load()
 	end
-	BBar:ForAll('Reanchor')
+	BBar:ForAll("Reanchor")
 end
 
 function Bongos:UnloadModules()
 	for name, module in self:IterateModules() do
-		assert(module.Unload, format('Bongos Module %s: Missing Unload function', name))
+		assert(module.Unload, format("Bongos Module %s: Missing Unload function", name))
 		module:Unload()
 	end
 end
@@ -110,7 +110,7 @@ function Bongos:MatchProfile(name)
 	local profileList = self.db:GetProfiles()
 
 	local name = name:lower()
-	local nameRealm = format('%s - %s', name, GetRealmName():lower())
+	local nameRealm = format("%s - %s", name, GetRealmName():lower())
 
 	for i, k in ipairs(profileList) do
 		local key = k:lower()
@@ -153,10 +153,10 @@ end
 function Bongos:SetLock(enable)
 	if enable then
 		self.profile.locked = true
-		BBar:ForAll('Lock')
+		BBar:ForAll("Lock")
 	else
 		self.profile.locked = nil
-		BBar:ForAll('Unlock')
+		BBar:ForAll("Unlock")
 	end
 end
 
@@ -170,7 +170,7 @@ function Bongos:SetSticky(enable)
 	else
 		self.profile.sticky = nil
 	end
-	BBar:ForAll('Reanchor')
+	BBar:ForAll("Reanchor")
 end
 
 function Bongos:IsSticky()
@@ -234,8 +234,8 @@ function Bongos:SetBarScale(args, scale)
 	local scale = tonumber(scale)
 
 	if scale and scale > 0 and scale <= 10 then
-		for _,barList in pairs({strsplit(' ', args)}) do
-			BBar:ForBar(barList, 'SetFrameScale', scale)
+		for _,barList in pairs({strsplit(" ", args)}) do
+			BBar:ForBar(barList, "SetFrameScale", scale)
 		end
 	end
 end
@@ -244,18 +244,18 @@ function Bongos:SetBarAlpha(args, alpha)
 	local alpha = tonumber(alpha)
 
 	if alpha and alpha >= 0 and alpha <= 1 then
-		for _,barList in pairs({strsplit(' ', args)}) do
-			BBar:ForBar(barList, 'SetFrameAlpha', alpha)
+		for _,barList in pairs({strsplit(" ", args)}) do
+			BBar:ForBar(barList, "SetFrameAlpha", alpha)
 		end
 	end
 end
 
 function Bongos:SetFadeMode(args, mode)
 	local mode = tonumber(mode)
-	self:Print('setfademode', args, mode)
+	self:Print("setfademode", args, mode)
 
-	for _,barList in pairs({strsplit(' ', args)}) do
-		BBar:ForBar(barList, 'SetFadeMode', mode)
+	for _,barList in pairs({strsplit(" ", args)}) do
+		BBar:ForBar(barList, "SetFadeMode", mode)
 	end
 end
 
@@ -263,26 +263,26 @@ function Bongos:SetFadeAlpha(args)
 	local alpha = tonumber(alpha)
 
 	if alpha and alpha >= 0 and alpha <= 1 then
-		for _,barList in pairs({strsplit(' ', args)}) do
-			BBar:ForBar(barList 'SetFadeAlpha', alpha)
+		for _,barList in pairs({strsplit(" ", args)}) do
+			BBar:ForBar(barList "SetFadeAlpha", alpha)
 		end
 	end
 end
 
 function Bongos:ShowBars(args)
-	for _, barList in pairs({strsplit(' ', args)}) do
-		BBar:ForBar(barList, 'ShowFrame')
+	for _, barList in pairs({strsplit(" ", args)}) do
+		BBar:ForBar(barList, "ShowFrame")
 	end
 end
 
 function Bongos:HideBars(args)
-	for _, barList in pairs({strsplit(' ', args)}) do
-		BBar:ForBar(barList, 'HideFrame')
+	for _, barList in pairs({strsplit(" ", args)}) do
+		BBar:ForBar(barList, "HideFrame")
 	end
 end
 
 function Bongos:ToggleBars(args)
-	for _, barList in pairs({strsplit(' ', args)}) do
-		BBar:ForBar(barList, 'ToggleFrame')
+	for _, barList in pairs({strsplit(" ", args)}) do
+		BBar:ForBar(barList, "ToggleFrame")
 	end
 end

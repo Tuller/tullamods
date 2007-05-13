@@ -12,7 +12,7 @@ local function DragFrame_OnEnter(self)
 	if tonumber(self:GetText()) then
 		GameTooltip:SetText(format("Action Bar %s", self:GetText()), 1, 1, 1)
 	else
-		GameTooltip:SetText(format("%s Bar", self:GetText()), 1, 1, 1)
+		GameTooltip:SetText(format("%s bar", self:GetText()), 1, 1, 1)
 	end
 
 	if self.parent.ShowMenu then
@@ -37,7 +37,7 @@ end
 --[[ Movement Functions ]]--
 
 local function DragFrame_OnMouseDown(self, arg1)
-	if arg1 == 'LeftButton' then
+	if arg1 == "LeftButton" then
 		self.isMoving = true
 		self.parent:StartMoving()
 	end
@@ -60,13 +60,13 @@ local function DragFrame_OnMouseWheel(self, arg1)
 end
 
 local function DragFrame_OnClick(self, arg1)
-	if arg1 == 'RightButton' then
+	if arg1 == "RightButton" then
 		if IsShiftKeyDown() then
 			self.parent:ToggleFrame()
-		elseif this.parent.ShowMenu then
+		elseif self.parent.ShowMenu then
 			self.parent:ShowMenu()
 		end
-	elseif arg1 == 'MiddleButton' then
+	elseif arg1 == "MiddleButton" then
 		self.parent:ToggleFrame()
 	end
 	DragFrame_OnEnter(self)
@@ -95,27 +95,27 @@ end
 --[[ Constructor ]]--
 
 function BDragFrame_New(parent)
-	local frame = CreateFrame('Button', nil, UIParent)
+	local frame = CreateFrame("Button", nil, UIParent)
 	frame.parent = parent
 	frame.UpdateColor = DragFrame_UpdateColor
 
 	frame:SetToplevel(true)
 	frame:SetClampedToScreen(true)
-	frame:SetFrameStrata('DIALOG')
+	frame:SetFrameStrata("DIALOG")
 	frame:SetAllPoints(parent)
 
-	local bg = frame:CreateTexture(nil, 'BACKGROUND')
-	bg:SetTexture('Interface\\Tooltips\\UI-Tooltip-Background')
+	local bg = frame:CreateTexture(nil, "BACKGROUND")
+	bg:SetTexture("Interface\\Tooltips\\UI-Tooltip-Background")
 
-	local g = random(0, 1)
-	local b = random(0, 1 - g)
-	local r = random(0, 2 - (g+b))
-	bg:SetVertexColor(r, g, b, 0.5)
---	bg:SetVertexColor(1, 1, 1, 0.5)
+	-- local g = random(0, 1)
+	-- local b = random(0, 1 - g)
+	-- local r = random(0, 2 - (g+b))
+	-- bg:SetVertexColor(r, g, b, 0.5)
+	bg:SetVertexColor(0, 0, 0, 0.5)
 	bg:SetAllPoints(frame)
 	frame:SetNormalTexture(bg)
 
-	local highlight = frame:CreateTexture(nil, 'BACKGROUND')
+	local highlight = frame:CreateTexture(nil, "BACKGROUND")
 	highlight:SetTexture(0, 0, 0.6, 0.5)
 	highlight:SetAllPoints(frame)
 	frame:SetHighlightTexture(highlight)
@@ -125,15 +125,15 @@ function BDragFrame_New(parent)
 	frame:SetHighlightTextColor(1, 1, 1)
 	frame:SetText(parent.id)
 
-	frame:RegisterForClicks('AnyUp')
-	frame:RegisterForDrag('LeftButton', 'RightButton')
+	frame:RegisterForClicks("AnyUp")
+	frame:RegisterForDrag("LeftButton", "RightButton")
 	frame:EnableMouseWheel(true)
-	frame:SetScript('OnMouseDown', DragFrame_OnMouseDown)
-	frame:SetScript('OnMouseUp', DragFrame_OnMouseUp)
-	frame:SetScript('OnMouseWheel', DragFrame_OnMouseWheel)
-	frame:SetScript('OnClick', DragFrame_OnClick)
-	frame:SetScript('OnEnter', DragFrame_OnEnter)
-	frame:SetScript('OnLeave', DragFrame_OnLeave)
+	frame:SetScript("OnMouseDown", DragFrame_OnMouseDown)
+	frame:SetScript("OnMouseUp", DragFrame_OnMouseUp)
+	frame:SetScript("OnMouseWheel", DragFrame_OnMouseWheel)
+	frame:SetScript("OnClick", DragFrame_OnClick)
+	frame:SetScript("OnEnter", DragFrame_OnEnter)
+	frame:SetScript("OnLeave", DragFrame_OnLeave)
 	frame:Hide()
 
 	return frame
