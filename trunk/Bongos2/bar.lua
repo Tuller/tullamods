@@ -23,6 +23,7 @@ local function Bar_New(id, secure)
 	local bar
 	if secure then
 		bar = setmetatable(CreateFrame('Frame', nil, UIParent, "SecureFrameTemplate"), Bar_MT)
+		bar.secure = true
 	else
 		bar = setmetatable(CreateFrame('Frame', nil, UIParent), Bar_MT)
 	end
@@ -175,12 +176,20 @@ function BBar:ShowFrame()
 	self.sets.hidden = nil
 	self:Show()
 	self.dragFrame:UpdateColor()
+	
+	if self.secure then
+		self:SetAttribute('hidestates', nil)
+	end
 end
 
 function BBar:HideFrame()
 	self.sets.hidden = true
 	self:Hide()
 	self.dragFrame:UpdateColor()
+
+	if self.secure then
+		self:SetAttribute('hidestates', '*')
+	end
 end
 
 function BBar:ToggleFrame()
