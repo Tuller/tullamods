@@ -2,31 +2,23 @@
 	BActionBar - A Bongos Actionbar
 --]]
 
-
---[[ Object  stuff ]]--
-
 --basically, BActionBar inherits all methods from BBar
-BActionBar = CreateFrame('Button')
-setmetatable(BActionBar, {__index = BBar})
+local BBar = BBar
 local Bar_mt = {__index = BActionBar}
-local super = BBar
-
-
---[[ Constants ]]--
+local BongosActionButton = BongosActionButton
+BActionBar = setmetatable(CreateFrame("Button"), {__index = BBar})
 
 local DEFAULT_SPACING = 2
 local DEFAULT_SIZE = 12
 local DEFAULT_COLS = 12
-local MAX_BUTTONS = BActionButton.GetMax()
-local BUTTON_SIZE = BActionButton.GetSize()
+local MAX_BUTTONS = BongosActionButton:GetMax()
+local BUTTON_SIZE = BongosActionButton:GetSize()
+local STANCE_FORMAT = "s%d"
 
-
---[[ Constructor ]]--
-
---create a new actionbar, load settings and layout
-function BActionBar.Create(id)
-	if not Bongos.GetBarSets(id) then
-		local sets = Bongos.SetBarSets(id, {vis = 1})
+function BActionBar:Create(id)
+	--load settings
+	if not Bongos:GetBarSets(id) then
+		local sets = Bongos:SetBarSets(id, {})
 		if id == 1 then
 			sets.paging = 1
 			local class = select(2,UnitClass("player"))
@@ -40,37 +32,28 @@ function BActionBar.Create(id)
 		end
 	end
 
-	local bar = BBar.Create(id, nil, BActionButton.OnDelete, 'SecureStateHeaderTemplate')
-	setmetatable(bar, Bar_mt)
-	
-	if not bar.sets.vis then
-		bar:SetAttribute('hidestates', '*')
-	else
-		bar:SetAttribute('hidestates', nil)
-	end
+	local bar = setmetatable(BBar:Create(id, nil, nil, 'SecureStateHeaderTemplate'), Bar_mt)
 	bar:SetAttribute('useparent-statebutton', true)
 	bar:SetAttribute('useparent-unit', true)
 	BState.Register(bar)
 
+	--layout the bar
 	if not bar:IsUserPlaced() then
 		local start = bar:GetStartID()
 		local row = mod(start - 1, 12)
 		local col = ceil(start / 12) - 1
 		bar:SetPoint('CENTER', UIParent, 'CENTER', 36 * row, -36 * col)
-	end	
+	end
 	bar:Layout()
-	
+
 	SecureStateHeader_Refresh(bar)
 
 	return bar
 end
 
-
---[[ Destructor ]]--
-
 function BActionBar:OnDelete()
 	for i = self:GetStartID(), self:GetEndID() do
-		local button = BActionButton.Get(i)
+		local button = BongosActionButton:Get(i)
 		if button then
 			button:Release()
 		end
@@ -80,90 +63,89 @@ end
 
 --[[ Menu Functions ]]--
 
---adds all buttons to the right click menu
-local function CreateConfigMenu(name)
-	local menu = CreateFrame("Button", name, UIParent, "BongosRightClickMenu")
-	menu:SetWidth(220)
-	menu:SetHeight(290)
+function BActionBar:CreateMenu()
+	local name = format("BongosMenu%s", self.id)
+	local menu = BongosMenu:Create(name)
 
 	--checkbuttons
-	local paging = CreateFrame('CheckButton', name .. 'Paging', menu, 'GooeyCheckButton')
-	paging:SetPoint("TOPLEFT", menu, "TOPLEFT", 6, -28)
-	paging:SetScript('OnClick', function() menu.frame:SetPaging(this:GetChecked()) end)
-	paging:SetText('Page')
+	local paging = BongosMenu:CreateCheckButton(menu, name .. "Paging")
+	paging:SetPoint("TOPLEFT", menu, "TOPLEFT", 6, -88)
+	paging:SetScript("OnShow", function(self) self:SetChecked(menu.frame:CanPage()) end)
+	paging:SetScript("OnCick", function(self) menu.frame:SetPaging(self:GetChecked()) end)
+	paging:SetText("Page")
 
-	--sliders
-	local opacity = CreateFrame("Slider", name .. "Opacity", menu, "BongosOpacitySlider")
-	opacity:SetPoint("BOTTOM", menu, "BOTTOM", 0, 24)
-
-	local scale = CreateFrame("Slider", name .. "Scale", menu, "BongosScaleSlider")
-	scale:SetPoint("BOTTOM", opacity, "TOP", 0, 24)
-
-	local spacing = CreateFrame("Slider", name .. "Spacing", menu, "BongosSpaceSlider")
-	spacing:SetPoint("BOTTOM", scale, "TOP", 0, 24)
-	spacing:SetScript("OnValueChanged", function()
+	--spacing
+	local spacing = BongosMenu:CreateSpacingSlider(menu, name .. "Spacing")
+	spacing:SetPoint("BOTTOM", name .. "Scale", "TOP", 0, 24)
+	spacing:SetScript("OnShow", function(self)
+		self:SetValue(menu.frame:GetSpacing())
+	end)
+	spacing:SetScript("OnValueChanged", function(self, value)
 		if not menu.onShow then
-			menu.frame:SetSpacing(this:GetValue())
+			menu.frame:Layout(nil, value)
 		end
-		getglobal(this:GetName() .. 'ValText'):SetText(this:GetValue())
+		getglobal(self:GetName() .. 'ValText'):SetText(value)
 	end)
 
-	local cols = CreateFrame("Slider", name .. "Cols", menu, "BongosSlider")
+	--columns
+	local cols = BongosMenu:CreateSlider(menu, name .. "Cols")
 	cols:SetPoint("BOTTOM", spacing, "TOP", 0, 24)
-	cols:SetScript("OnValueChanged", function()
+	cols:SetScript("OnShow", function(self)
+		self:SetValue(menu.frame:GetSize() - menu.frame:GetColumns() + 1)
+	end)
+	cols:SetScript("OnValueChanged", function(self, value)
 		if not menu.onShow then
-			menu.frame:SetColumns(menu.frame:GetSize() - this:GetValue() + 1)
+			menu.frame:SetColumns(menu.frame:GetSize() - value + 1)
 		end
-		getglobal(this:GetName() .. 'ValText'):SetText(menu.frame:GetColumns())
+		getglobal(self:GetName() .. "ValText"):SetText(menu.frame:GetColumns())
 	end)
 	cols:SetValueStep(1)
-	getglobal(name .. "ColsText"):SetText(BONGOS_COLUMNS)
+	getglobal(name .. "ColsText"):SetText("Columns")
 	getglobal(name .. "ColsHigh"):SetText(1)
 
-	local size = CreateFrame("Slider", name .. "Size", menu, "BongosSlider")
+	--size
+	local size = BongosMenu:CreateSlider(menu, name .. "Size")
 	size:SetPoint("BOTTOM", cols, "TOP", 0, 24)
-	size:SetScript("OnValueChanged", function()
+	size:SetScript("OnShow", function(self)
+		local frame = menu.frame
+		getglobal(name .. "Size"):SetMinMaxValues(1, frame:GetMaxSize())
+		getglobal(name .. "Size"):SetValue(frame:GetSize())
+		getglobal(name .. "SizeHigh"):SetText(frame:GetMaxSize())
+	end)
+	size:SetScript("OnValueChanged", function(self, value)
 		if not menu.onShow then
-			menu.frame:SetSize(this:GetValue())
+			menu.frame:SetSize(value)
 		end
-		getglobal(this:GetName() .. 'ValText'):SetText(this:GetValue())
+		getglobal(this:GetName() .. "ValText"):SetText(value)
 
 		local size = menu.frame:GetSize()
 		local cols = menu.frame:GetColumns()
-		getglobal(name .. 'Cols'):SetMinMaxValues(1, size)
-		getglobal(name .. 'Cols'):SetValue(size - cols + 1)
+		cols:SetMinMaxValues(1, size)
+		cols:SetValue(size - cols + 1)
 		getglobal(name .. "ColsLow"):SetText(size)
 		getglobal(name .. "ColsValText"):SetText(cols)
-
 	end)
 	size:SetValueStep(1)
 	getglobal(name .. "SizeText"):SetText(BONGOS_SIZE)
 	getglobal(name .. "SizeLow"):SetText(1)
-	
+
+	menu:SetHeight(menu:GetHeight() + 96)
+
 	return menu
 end
 
 --Called when the right click menu is shown, loads the correct values to the checkbuttons/sliders/text
 function BActionBar:ShowMenu()
-	local name = 'BongosActionBarMenu'
-	local menu = getglobal(name) or CreateConfigMenu(name)
+	if not self.menu then
+		BActionBar.menu = self:CreateMenu()
+	end
 
-	menu:SetText(format('Action Bar %s', self.id))
+	local menu = self.menu
 	menu.frame = self
-	menu.onShow = 1
-	
-	getglobal(name .. 'Paging'):SetChecked(self:CanPage())
+	menu:SetText(format("Action Bar %s", self.id))
 
-	getglobal(name .. 'Size'):SetMinMaxValues(1, self:GetMaxSize())
-	getglobal(name .. 'Size'):SetValue(self:GetSize())
-	getglobal(name .. 'SizeHigh'):SetText(self:GetMaxSize())
-	getglobal(name .. 'Cols'):SetValue(self:GetSize() - self:GetColumns() + 1)
-	getglobal(name .. 'Spacing'):SetValue(self:GetSpacing())
-	getglobal(name .. 'Scale'):SetValue(self:GetScale() * 100)
-	getglobal(name .. 'Opacity'):SetValue(self:GetAlpha() * 100)
-
-	self:DisplayMenu(menu)
-
+	menu.onShow = true
+	self:PlaceMenu(menu)
 	menu.onShow = nil
 end
 
@@ -173,7 +155,7 @@ end
 --enable/disables a bar paging
 function BActionBar:SetPaging(enable)
 	if enable then
-		self.sets.paging = 1
+		self.sets.paging = true
 	else
 		self.sets.paging = nil
 	end
@@ -184,7 +166,7 @@ end
 function BActionBar:UpdatePaging()
 	self.state = nil
 	for i = self:GetStartID(), self:GetEndID() do
-		BActionButton.Get(i):UpdateAllPages()
+		BongosActionButton:Get(i):UpdateAllPages()
 	end
 	SecureStateHeader_Refresh(self)
 end
@@ -192,7 +174,7 @@ end
 --returns a bar's offset for the given page, in buttons
 function BActionBar:GetPageOffset(page)
 	if self:CanPage() then
-		return ((page * self:GetPageSkip() + page) * BActionBar.GetMaxSize()) or 0
+		return ((page * self:GetPageSkip() + page) * self:GetMaxSize()) or 0
 	end
 	return 0
 end
@@ -204,13 +186,12 @@ end
 
 --returns how many bars are "skipped" when paging, 0 is default
 function BActionBar:GetPageSkip()
-	return BActionConfig.GetPageSkip()
+	return 0
 end
 
 
 --[[ Stances ]]--
 
-local STANCE_FORMAT = 's%d'
 function BActionBar:SetStanceBar(id, barID)
 	self.sets[format(STANCE_FORMAT, id)] = barID
 	self:UpdateStance(id)
@@ -223,14 +204,14 @@ end
 function BActionBar:UpdateStance(id)
 	self.state = nil
 	for i = self:GetStartID(), self:GetEndID() do
-		BActionButton.Get(i):UpdateStance(id)
+		BongosActionButton:Get(i):UpdateStance(id)
 	end
 	SecureStateHeader_Refresh(self)
 end
 
 function BActionBar:UpdateStances()
 	for i = self:GetStartID(), self:GetEndID() do
-		BActionButton.Get(i):UpdateAllStances()
+		BongosActionButton:Get(i):UpdateAllStances()
 	end
 	SecureStateHeader_Refresh(self)
 end
@@ -248,13 +229,13 @@ end
 --[[ Visibility ]]--
 
 function BActionBar:UpdateVisibility(showAll)
-	local starti = self:GetStartID()
-	local endi = self:GetEndID()
-	local showEmpty = showAll or BActionButton.ShowingEmpty()
+	local s = self:GetStartID()
+	local e = self:GetEndID()
+	local showEmpty = showAll or BongosActionButton:ShowingEmpty()
 
 	local changed
-	for i = starti, endi do
-		if BActionButton.Get(i):UpdateVisibility(showEmpty) then
+	for i = s, e do
+		if BongosActionButton:Get(i):UpdateVisibility(showEmpty) then
 			changed = true
 		end
 	end
@@ -262,16 +243,6 @@ function BActionBar:UpdateVisibility(showAll)
 	if changed then
 		SecureStateHeader_Refresh(self)
 	end
-end
-
-function BActionBar:ShowFrame()
-	super.ShowFrame(self)
-	self:SetAttribute('hidestates', nil)
-end
-
-function BActionBar:HideFrame()
-	super.HideFrame(self)
-	self:SetAttribute('hidestates', '*')
 end
 
 
@@ -290,7 +261,7 @@ function BActionBar:GetSize()
 end
 
 function BActionBar:GetMaxSize()
-	return MAX_BUTTONS / BActionBar.GetNumber()
+	return MAX_BUTTONS / self:GetNumber()
 end
 
 
@@ -328,7 +299,7 @@ end
 
 --returns the first button ID on the given bar
 function BActionBar:GetStartID()
-	local prev = BActionBar.Get(self.id - 1)
+	local prev = self:Get(self.id - 1)
 	if prev then
 		self.start = prev:GetMaxID() + 1
 	else
@@ -368,14 +339,14 @@ function BActionBar:Layout()
 	for i = 1, size do
 		local row = mod(i-1, cols)
 		local col = ceil(i / cols) - 1
-		local button = BActionButton.Set(startID + i-1, self)
+		local button = BongosActionButton:Set(startID + i-1, self)
 		button:SetPoint('TOPLEFT', self, 'TOPLEFT', buttonSize * row, -buttonSize * col)
 	end
 
 	--remove any unused buttons
 	if startID < maxID then
 		for i = endID + 1, maxID do
-			local button = BActionButton.Get(i)
+			local button = BongosActionButton:Get(i)
 			if button then
 				button:Release()
 			else break end
@@ -384,84 +355,72 @@ function BActionBar:Layout()
 end
 
 
---[[ Non Bar Specific Functions ]]--
-
-
 --[[ Bar Numbers ]]--
 
-function BActionBar.SetNumber(newSize)
-	local oldSize = BActionBar.GetNumber()
+function BActionBar:SetNumber(newSize)
+	local oldSize = self:GetNumber()
 	if oldSize ~= newSize then
 		for i = 1, (oldSize or 10) do
-			BActionBar.Get(i):Delete()
+			self:Get(i):Delete()
 		end
 
-		BActionDB.number = newSize
+--		BActionDB.number = newSize
 		for i = 1, (newSize or 10) do
-			BActionBar.Create(i)
+			self:Create(i)
 		end
 	end
 end
 
-function BActionBar.GetNumber()
-	return BActionDB.number or 10
+function BActionBar:GetNumber()
+	return 10
+--	return BActionDB.number or 10
 end
 
 
 --[[ Utility ]]--
 
 --does an action to every visible bar
-function BActionBar.ForAllShown(action, ...)
-	for i = 1, BActionBar.GetNumber() do
-		local bar = BActionBar.Get(i)
+function BActionBar:ForAllShown(action, ...)
+	for i = 1, self:GetNumber() do
+		local bar = self:Get(i)
 		if bar and bar:IsShown() then
-			action(BActionBar.Get(i), ...)
+			action(bar, ...)
 		end
 	end
 end
 
 --does an action to every button on a visible bar that has a stance page
-function BActionBar.ForAllWithStance(action, ...)
-	for i = 1, BActionBar.GetNumber() do
-		local bar = BActionBar.Get(i)
+function BActionBar:ForAllWithStance(action, ...)
+	for i = 1, self:GetNumber() do
+		local bar = self:Get(i)
 		if bar:IsShown() and bar:HasStance() then
 			bar.state = nil
 			for j = bar:GetStartID(), bar:GetEndID() do
-				action(BActionButton.Get(j), ...)
+				action(BActionButton:Get(j), ...)
 			end
 		end
 	end
 end
 
 --does an action to every button on a visible bar that is able to page
-function BActionBar.ForAllWithPage(action, ...)
-	for i = 1, BActionBar.GetNumber() do
-		local bar = BActionBar.Get(i)
+function BActionBar:ForAllWithPage(action, ...)
+	for i = 1, self:GetNumber() do
+		local bar = self:Get(i)
 		if bar:IsShown() and bar:CanPage() then
 			bar.state = nil
 			for j = bar:GetStartID(), bar:GetEndID() do
-				action(BActionButton.Get(j), ...)
+				action(BActionButton:Get(j), ...)
 			end
 		end
 	end
 end
 
 --updates the showstates of every button on every bar
-function BActionBar.UpdateVisibilityForAll(showEmpty)
-	for i = 1, BActionBar.GetNumber() do
-		local bar = BActionBar.Get(i)
+function BActionBar:UpdateVisibilityForAll(showEmpty)
+	for i = 1, self:GetNumber() do
+		local bar = self:Get(i)
 		if bar:IsShown() then
 			bar:UpdateVisibility(showEmpty)
 		end
 	end
 end
-
-
---[[ Startup ]]--
-
---create all actionbars
-Bongos.AddStartup(function() 
-	for i = 1, BActionBar.GetNumber() do 
-		BActionBar.Create(i)
-	end
-end)

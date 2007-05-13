@@ -4,7 +4,7 @@
 --]]
 
 BongosActionMain = Bongos:NewModule("Bongos-ActionMain")
-local CURRENT_VERSION = GetAddOnMetadata("Bongos_ActionBar", "Version")
+local CURRENT_VERSION = GetAddOnMetadata("Bongos2_ActionBar", "Version")
 
 
 --[[ startup / shutdown ]]--
@@ -112,7 +112,7 @@ function BongosActionMain:ShowHotkeys(enable)
 		self.profile.showHotkeys = nil
 	end
 
-	-- BActionButton.ForAll(BActionButton.ShowHotkey, enable)
+	BongosActionButton:ForAll(BongosActionButton.ShowHotkey, enable)
 	BongosPetBar:ForAll(BongosPetBar.ShowHotkey, enable)
 	-- BClassButton.ForAll(BClassButton.ShowHotkey, enable)
 end
@@ -131,7 +131,7 @@ function BongosActionMain:ShowMacros(enable)
 	else
 		self.profile.showMacros = nil
 	end
-	-- BActionButton.ForAll(BActionButton.ShowMacro, enable)
+	BongosActionButton:ForAll(BongosActionButton.ShowMacro, enable)
 end
 
 function BongosActionMain:ShowingMacros()
@@ -167,7 +167,7 @@ function BongosActionMain:SetRangeColoring(enable)
 	else
 		self.profile.rangeColoring = nil
 	end
-	-- BActionButton.ForAllShown(BActionButton.UpdateUsable)
+	BongosActionButton:ForAllShown(BongosActionButton.UpdateUsuable)
 end
 
 function BongosActionMain:RangeColoring()

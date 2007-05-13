@@ -4,7 +4,7 @@
 --]]
 
 local class = select(2, UnitClass("player"))
-if not(class == "DRUID" or class == "ROGUE" or class = "WARRIOR" or class == "PALADIN" or class == "HUNTER")then
+if not(class == "DRUID" or class == "ROGUE" or class == "WARRIOR" or class == "PALADIN" or class == "HUNTER") then
 	return
 end
 
