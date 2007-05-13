@@ -2,7 +2,7 @@
 	BBar.lua - A movable, scalable, container frame
 --]]
 
-BBar = CreateFrame('Frame')
+BBar = CreateFrame("Frame")
 local Bar_MT = {__index = BBar}
 
 local STICKY_TOLERANCE = 16 --how close one frame must be to another to trigger auto anchoring
@@ -16,16 +16,16 @@ local unused = {}
 --returns the adjusted x and y coordinates for a frame at the given scale
 local function GetRelativeCoords(frame, scale)
 	local ratio = frame:GetScale() / scale
-	return frame:GetLeft() * ratio, frame:GetTop() * ratio
+	return (frame:GetLeft() or 0) * ratio, (frame:GetTop() or 0) * ratio
 end
 
 local function Bar_New(id, secure)
 	local bar
 	if secure then
-		bar = setmetatable(CreateFrame('Frame', nil, UIParent, "SecureFrameTemplate"), Bar_MT)
+		bar = setmetatable(CreateFrame("Frame", nil, UIParent, "SecureStateHeaderTemplate"), Bar_MT)
 		bar.secure = true
 	else
-		bar = setmetatable(CreateFrame('Frame', nil, UIParent), Bar_MT)
+		bar = setmetatable(CreateFrame("Frame", nil, UIParent), Bar_MT)
 	end
 	
 	bar.id = id
@@ -53,7 +53,7 @@ end
 function BBar:Create(id, OnCreate, OnDelete, defaults, secure)
 	local id = tonumber(id) or id
 	assert(id, "id expected")
-	assert(not active[id], format("BBar '%s' is already in use", id))
+	assert(not active[id], format("BBar \"%s\" is already in use", id))
 
 	local bar = Bar_Restore(id) or Bar_New(id, secure)
 	bar.OnDelete = OnDelete
@@ -87,7 +87,7 @@ function BBar:Destroy(removeSettings)
 	self:SetUserPlaced(false)
 	self:Hide()
 
-	self:ForAll('Reanchor')
+	self:ForAll("Reanchor")
 	self:UnregisterAllEvents()
 
 	unused[self.id] = self
@@ -139,7 +139,7 @@ function BBar:SetFrameScale(scale)
 
 	self:SetScale(scale)
 	self:ClearAllPoints()
-	self:SetPoint('TOPLEFT', UIParent, 'BOTTOMLEFT', x, y)
+	self:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", x, y)
 	self:Reanchor()
 	self:SavePosition()
 end
@@ -153,9 +153,9 @@ function BBar:SetFrameAlpha(alpha)
 
 	local mode = self.sets.fadeMode
 	if mode then
-		if mode == 2 and self:GetAttribute('incombat') then
+		if mode == 2 and self:GetAttribute("incombat") then
 			self:SetAlpha(alpha or 1)
-		elseif mode == 1 and not self:GetAttribute('incombat')  then
+		elseif mode == 1 and not self:GetAttribute("incombat")  then
 			self:SetAlpha(alpha or 1)
 		end
 	else
@@ -178,7 +178,7 @@ function BBar:ShowFrame()
 	self.dragFrame:UpdateColor()
 	
 	if self.secure then
-		self:SetAttribute('hidestates', nil)
+		self:SetAttribute("hidestates", nil)
 	end
 end
 
@@ -188,7 +188,7 @@ function BBar:HideFrame()
 	self.dragFrame:UpdateColor()
 
 	if self.secure then
-		self:SetAttribute('hidestates', '*')
+		self:SetAttribute("hidestates", "*")
 	end
 end
 
@@ -292,17 +292,17 @@ function BBar:SavePosition()
 	end
 end
 
---place the frame at it's saved position
+--place the frame at it"s saved position
 function BBar:Reposition()
 	local x, y = self.sets.x, self.sets.y
 	self:Rescale()
 
 	if x and y then
 		self:ClearAllPoints()
-		self:SetPoint('TOPLEFT', UIParent, 'BOTTOMLEFT', x, y)
+		self:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", x, y)
 		self:SetUserPlaced(true)
-	else
-		self:SetPoint('TOPLEFT', UIParent, 'BOTTOMLEFT', random(0, GetScreenWidth()), random(0, GetScreenHeight()))
+	-- else
+		-- self:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", random(0, GetScreenWidth()), random(0, GetScreenHeight()))
 	end
 end
 
@@ -319,7 +319,7 @@ function BBar:Reanchor()
 
 		local x, y = GetRelativeCoords(self, self:GetScale())
 		self:ClearAllPoints()
-		self:SetPoint('TOPLEFT', UIParent, 'BOTTOMLEFT', x, y)
+		self:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", x, y)
 		self:SetUserPlaced(true)
 	end
 	self.dragFrame:UpdateColor()
@@ -338,7 +338,7 @@ end
 
 function BBar:ShowMenu()
 	if not self.menu then
-		local menu = BongosMenu:Create(format('BongosMenu%s', self.id))
+		local menu = BongosMenu:Create(format("BongosMenu%s", self.id))
 		menu.text:SetText(format("%s bar", self.id))
 		menu.frame = self
 		self.menu = menu
@@ -384,12 +384,12 @@ end
 --takes a barID, and performs the specified action on that bar
 --this adds two special IDs, "all" for all bars and number-number for a range of IDs
 function BBar:ForBar(id, method, ...)
-	assert(id and id ~= '', 'Invalid barID')
+	assert(id and id ~= "", "Invalid barID")
 
-	if id == 'all' then
+	if id == "all" then
 		self:ForAll(method, ...)
 	else
-		local startID, endID = id:match('(%d+)-(%d+)')
+		local startID, endID = id:match("(%d+)-(%d+)")
 		startID = tonumber(startID)
 		endID = tonumber(endID)
 
