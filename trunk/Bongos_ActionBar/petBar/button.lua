@@ -4,7 +4,7 @@
 		Should work exactly like the normal pet action buttons, but with a modified appearance
 --]]
 
-BongosPetButton = CreateFrame('CheckButton')
+BongosPetButton = CreateFrame("CheckButton")
 local Button_mt = {__index = BongosPetButton}
 
 --[[ Constructorish ]]--
@@ -19,13 +19,13 @@ function BongosPetButton:Set(id, parent)
 	local button = setmetatable(self:Get(id), Button_mt)
 
 	button:SetToplevel(false)
-	button:SetAttribute('showstates', '1')
+	button:SetAttribute("showstates", "1")
 	button:SetScripts()
 	button:Style()
 	button:ShowHotkey(BongosActionMain:ShowingHotkeys())
 
 	parent:Attach(button)
-	parent:SetAttribute('addchild', button)
+	parent:SetAttribute("addchild", button)
 
 	return button
 end
@@ -37,19 +37,19 @@ function BongosPetButton:Style()
 	autoCast:SetPoint("TOPLEFT", self, "TOPLEFT", -0.5, -1)
 	autoCast:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", 0.5, -1.5)
 
-	getglobal(name .. 'Icon'):SetTexCoord(0.06, 0.94, 0.06, 0.94)
-	getglobal(name .. 'NormalTexture2'):SetVertexColor(1, 1, 1, 0.5)
+	getglobal(name .. "Icon"):SetTexCoord(0.06, 0.94, 0.06, 0.94)
+	getglobal(name .. "NormalTexture2"):SetVertexColor(1, 1, 1, 0.5)
 end
 
 function BongosPetButton:SetScripts()
-	self:RegisterForDrag('LeftButton', 'RightButton')
-	self:RegisterForClicks('anyUp')
+	self:RegisterForDrag("LeftButton", "RightButton")
+	self:RegisterForClicks("anyUp")
 
-	self:SetScript('OnLoad', nil)
-	self:SetScript('OnEvent', nil)
-	self:SetScript('OnDragStart', OnDragStart)
-	self:SetScript('OnReceiveDrag', OnReceiveDrag)
-	self:SetScript('OnEnter', OnEnter)
+	self:SetScript("OnLoad", nil)
+	self:SetScript("OnEvent", nil)
+	self:SetScript("OnDragStart", OnDragStart)
+	self:SetScript("OnReceiveDrag", OnReceiveDrag)
+	self:SetScript("OnEnter", OnEnter)
 end
 
 
@@ -95,15 +95,15 @@ function BongosPetButton:Update()
 	self.tooltipSubtext = subtext
 	self:SetChecked(isActive)
 
-	local icon = getglobal(selfName .. 'Icon')
+	local icon = getglobal(selfName .. "Icon")
 	SetDesaturation(icon, not GetPetActionsUsable())
 
 	if texture then
 		icon:Show()
-		self:SetNormalTexture('Interface\\Buttons\\UI-Quickslot2')
+		self:SetNormalTexture("Interface\\Buttons\\UI-Quickslot2")
 	else
 		icon:Hide()
-		self:SetNormalTexture('Interface\\Buttons\\UI-Quickslot')
+		self:SetNormalTexture("Interface\\Buttons\\UI-Quickslot")
 	end
 
 	if not isToken then
@@ -114,14 +114,14 @@ function BongosPetButton:Update()
 		self.tooltipName = getglobal(name)
 	end
 
-	local autoCastTexture = getglobal(selfName .. 'AutoCastable')
+	local autoCastTexture = getglobal(selfName .. "AutoCastable")
 	if autoCastAllowed then
 		autoCastTexture:Show()
 	else
 		autoCastTexture:Hide()
 	end
 
-	local autoCastModel = getglobal(selfName .. 'AutoCast')
+	local autoCastModel = getglobal(selfName .. "AutoCast")
 	if autoCastEnabled then
 		autoCastModel:Show()
 	else
@@ -131,7 +131,7 @@ end
 
 function BongosPetButton:UpdateCooldown()
 	local start, duration, enable = GetPetActionCooldown(self:GetID())
-	CooldownFrame_SetTimer(getglobal(self:GetName() .. 'Cooldown'), start, duration, enable)
+	CooldownFrame_SetTimer(getglobal(self:GetName() .. "Cooldown"), start, duration, enable)
 end
 
 function BongosPetButton:UpdateVisibility()
@@ -147,21 +147,21 @@ end
 
 function BongosPetButton:ShowHotkey(show)
 	if show then
-		getglobal(self:GetName() .. 'HotKey'):Show()
+		getglobal(self:GetName() .. "HotKey"):Show()
 		self:UpdateHotkey()
 	else
-		getglobal(self:GetName() .. 'HotKey'):Hide()
+		getglobal(self:GetName() .. "HotKey"):Hide()
 	end
 end
 
 function BongosPetButton:UpdateHotkey()
-	getglobal(self:GetName() .. 'HotKey'):SetText(self:GetHotkey() or '')
+	getglobal(self:GetName() .. "HotKey"):SetText(self:GetHotkey() or "")
 end
 
 function BongosPetButton:GetHotkey()
-	local key = GetBindingKey(format('CLICK %s:LeftButton', self:GetName()))
+	local key = GetBindingKey(format("CLICK %s:LeftButton", self:GetName()))
 	if not key then
-		key = GetBindingText(GetBindingKey('BONUSACTIONBUTTON' .. self:GetID()), 'KEY_')
+		key = GetBindingText(GetBindingKey("BONUSACTIONBUTTON" .. self:GetID()), "KEY_")
 	end
 	return KeyBound:ToShortKey(key)
 end
@@ -174,7 +174,7 @@ function BongosPetButton:ShowingEmptyButtons()
 end
 
 function BongosPetButton:Get(id)
-	return getglobal(format('PetActionButton%d', id))
+	return getglobal(format("PetActionButton%d", id))
 end
 
 function BongosPetButton:ForAll(action, ...)

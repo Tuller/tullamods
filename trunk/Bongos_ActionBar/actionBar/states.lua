@@ -3,10 +3,20 @@
 		Does state changing for class bars and paging
 --]]
 
+BState = {}
+
+local STANCES = {
+	["DRUID"] = {[0] = "Caster", "Bear", "Aquatic", "Cat", "Travel", "Moonkin|Tree of Life", "Flight", "Prowl"},
+	["ROGUE"] = {[0] = "Unstealth", "Stealth"},
+	["WARRIOR"] = {"Battle Stance", "Defensive Stance", "Berserker Stance"},
+	["PRIEST"] = {[0] = "Healer", "Shadowform|Redemption"},
+	["SHAMAN"] = {[0] = "Caster", "Ghostwolf"},
+}
+local CLASS = select(2, UnitClass("player"))
+STANCES = STANCES[CLASS]
+
 local CAT_STANCE = 3
 local PROWL_STANCE = 7
-local CLASS = select(2, UnitClass("player"))
-local STANCES = BONGOS_STANCES[CLASS]
 local MAX_PAGES = 6
 
 local function Trans(state, map)
@@ -43,6 +53,20 @@ end
 
 function BState:Unregister(frame)
 	frame:SetParent(nil)
+end
+
+--0:s0;10:s1;20:s2;...
+--1:p1;2:p2;11:p1;12:p2;...
+function BState:LoadStateButton(driver)
+	local statemap = ""
+	local s,e = self:GetStanceRange()
+	for stance = s, e do
+		statemap = statemap .. Trans(stance*10, format("s%d", stance * 10))
+		for page = 1, MAX_PAGES-1 do
+			statemap = statemap .. Trans((stance*10) + page, format("s%d", stance * 10 + page))
+		end
+	end
+	driver:SetAttribute("statebutton", statemap)
 end
 
 
@@ -144,7 +168,7 @@ end
 
 function BState:GetStanceName(id)
 	if STANCES then
-		return STANCES[id] or BONGOS_UNKNOWN
+		return STANCES[id] or "unknown"
 	end
 	return "unknown"
 end

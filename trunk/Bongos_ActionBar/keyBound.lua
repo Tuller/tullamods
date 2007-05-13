@@ -88,12 +88,12 @@ local function Binder_GetBindings(button)
 
 	local keys
 	local binding = Binder_ToBinding(button)
-	for i = 1, select('#', GetBindingKey(binding)) do
+	for i = 1, select("#", GetBindingKey(binding)) do
 		local hotKey = select(i, GetBindingKey(binding))
 		if keys then
-			keys = keys .. ', ' .. GetBindingText(hotKey,'KEY_')
+			keys = keys .. ", " .. GetBindingText(hotKey,"KEY_")
 		else
-			keys = GetBindingText(hotKey,'KEY_')
+			keys = GetBindingText(hotKey,"KEY_")
 		end
 	end
 
@@ -185,9 +185,9 @@ local function Binder_OnMouseWheel(self, arg1)
 end
 
 local function Binder_Create()
-	local binder = CreateFrame('Button')
-	binder:RegisterForClicks('anyUp')
-	binder:SetFrameStrata('DIALOG')
+	local binder = CreateFrame("Button")
+	binder:RegisterForClicks("anyUp")
+	binder:SetFrameStrata("DIALOG")
 	binder:EnableKeyboard(true)
 	binder:EnableMouseWheel(true)
 
@@ -195,18 +195,18 @@ local function Binder_Create()
 	bg:SetTexture(0, 0, 0, 0.5)
 	bg:SetAllPoints(binder)
 
-	local text = binder:CreateFontString('OVERLAY')
-	text:SetFontObject('GameFontNormalLarge')
+	local text = binder:CreateFontString("OVERLAY")
+	text:SetFontObject("GameFontNormalLarge")
 	text:SetTextColor(0, 1, 0)
 	text:SetAllPoints(binder)
 	binder.text = text
 
-	binder:SetScript('OnClick', Binder_OnKeyDown)
-	binder:SetScript('OnKeyDown', Binder_OnKeyDown)
-	binder:SetScript('OnMouseWheel', Binder_OnMouseWheel)
-	binder:SetScript('OnEnter', Binder_OnEnter)
-	binder:SetScript('OnLeave', Binder_OnLeave)
-	binder:SetScript('OnHide', function() KeyBound:Set(nil) end)
+	binder:SetScript("OnClick", Binder_OnKeyDown)
+	binder:SetScript("OnKeyDown", Binder_OnKeyDown)
+	binder:SetScript("OnMouseWheel", Binder_OnMouseWheel)
+	binder:SetScript("OnEnter", Binder_OnEnter)
+	binder:SetScript("OnLeave", Binder_OnLeave)
+	binder:SetScript("OnHide", function() KeyBound:Set(nil) end)
 	binder:Hide()
 
 	return binder
@@ -217,11 +217,11 @@ end
 
 --events
 function KeyBound:Enable()
-	self:RegisterEvent('PLAYER_REGEN_ENABLED')
-	self:RegisterEvent('PLAYER_REGEN_DISABLED')
+	self:RegisterEvent("PLAYER_REGEN_ENABLED")
+	self:RegisterEvent("PLAYER_REGEN_DISABLED")
 
-	self:RegisterMessage('KEYBOUND_ENABLED')
-	self:RegisterMessage('KEYBOUND_DISABLED')
+	self:RegisterMessage("KEYBOUND_ENABLED")
+	self:RegisterMessage("KEYBOUND_DISABLED")
 end
 
 function KeyBound:PLAYER_REGEN_ENABLED()
@@ -247,13 +247,13 @@ function KeyBound:Show()
 		self.frame = Binder_Create()
 	end
 	self:Set(nil)
-	self:TriggerMessage('KEYBOUND_ENABLED')
+	self:TriggerMessage("KEYBOUND_ENABLED")
 end
 
 function KeyBound:Hide()
 	self.enabled = nil
 	self:Set(nil)
-	self:TriggerMessage('KEYBOUND_DISABLED')
+	self:TriggerMessage("KEYBOUND_DISABLED")
 end
 
 function KeyBound:Set(button)
@@ -263,10 +263,10 @@ function KeyBound:Set(button)
 		bindFrame.button = button
 		bindFrame:SetAllPoints(button)
 
-		bindFrame.text:SetFontObject('GameFontNormalLarge')
+		bindFrame.text:SetFontObject("GameFontNormalLarge")
 		bindFrame.text:SetText(button:GetHotkey())
 		if bindFrame.text:GetStringWidth() > bindFrame:GetWidth() then
-			bindFrame.text:SetFontObject('GameFontNormal')
+			bindFrame.text:SetFontObject("GameFontNormal")
 		end
 		bindFrame:Show()
 		Binder_OnEnter(bindFrame)
@@ -280,28 +280,28 @@ end
 function KeyBound:ToShortKey(key)
 	if key then
 		key = key:upper()
-		key = key:gsub(' ', '')
-		key = key:gsub('ALT%-', 'A')
-		key = key:gsub('CTRL%-', 'C')
-		key = key:gsub('SHIFT%-', 'S')
+		key = key:gsub(" ", "")
+		key = key:gsub("ALT%-", "A")
+		key = key:gsub("CTRL%-", "C")
+		key = key:gsub("SHIFT%-", "S")
 
-		key = key:gsub('NUMPAD', 'N')
+		key = key:gsub("NUMPAD", "N")
 
-		key = key:gsub('BACKSPACE', 'BS')
-		key = key:gsub('PLUS', '%+')
-		key = key:gsub('MINUS', '%-')
-		key = key:gsub('MULTIPLY', '%*')
-		key = key:gsub('DIVIDE', '%/')
-		key = key:gsub('HOME', 'HN')
-		key = key:gsub('INSERT', 'Ins')
-		key = key:gsub('DELETE', 'Del')
-		key = key:gsub('BUTTON3', 'M3')
-		key = key:gsub('BUTTON4', 'M4')
-		key = key:gsub('BUTTON5', 'M5')
-		key = key:gsub('MOUSEWHEELDOWN', 'WD')
-		key = key:gsub('MOUSEWHEELUP', 'WU')
-		key = key:gsub('PAGEDOWN', 'PD')
-		key = key:gsub('PAGEUP', 'PU')
+		key = key:gsub("BACKSPACE", "BS")
+		key = key:gsub("PLUS", "%+")
+		key = key:gsub("MINUS", "%-")
+		key = key:gsub("MULTIPLY", "%*")
+		key = key:gsub("DIVIDE", "%/")
+		key = key:gsub("HOME", "HN")
+		key = key:gsub("INSERT", "Ins")
+		key = key:gsub("DELETE", "Del")
+		key = key:gsub("BUTTON3", "M3")
+		key = key:gsub("BUTTON4", "M4")
+		key = key:gsub("BUTTON5", "M5")
+		key = key:gsub("MOUSEWHEELDOWN", "WD")
+		key = key:gsub("MOUSEWHEELUP", "WU")
+		key = key:gsub("PAGEDOWN", "PD")
+		key = key:gsub("PAGEUP", "PU")
 
 		return key
 	end

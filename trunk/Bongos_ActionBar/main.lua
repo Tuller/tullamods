@@ -45,14 +45,14 @@ end
 
 function BongosActionMain:Load()
 	for name, module in self:IterateModules() do
-		assert(module.Load, format('%s: Missing Load function', name))
+		assert(module.Load, format("%s: Missing Load function", name))
 		module:Load()
 	end
 end
 
 function BongosActionMain:Unload()
 	for name, module in self:IterateModules() do
-		assert(module.Unload, format('%s: Missing Unload function', name))
+		assert(module.Unload, format("%s: Missing Unload function", name))
 		module:Unload()
 	end
 end
@@ -95,7 +95,7 @@ function BongosActionMain:ShowEmptyButtons(enable)
 	end
 
 	-- BActionBar.UpdateVisibilityForAll(enable)
-	if UnitExists('pet') then
+	if UnitExists("pet") then
 		BongosPetBar:ForAll(BongosPetBar.UpdateVisibility)
 	end
 end

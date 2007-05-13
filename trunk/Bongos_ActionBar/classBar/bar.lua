@@ -44,7 +44,7 @@ local function Bar_Layout(self, cols, space)
 	for i = 1, numForms do
 		local row = mod(i-1, cols)
 		local col = ceil(i / cols) - 1
-		BongosClassButton:Get(i):SetPoint('TOPLEFT', self, 'TOPLEFT', buttonSize * row, -buttonSize * col)
+		BongosClassButton:Get(i):SetPoint("TOPLEFT", self, "TOPLEFT", buttonSize * row, -buttonSize * col)
 	end
 end
 
@@ -64,7 +64,7 @@ local function Bar_CreateMenu(frame)
 		if not menu.onShow then
 			frame:Layout(nil, value)
 		end
-		getglobal(self:GetName() .. 'ValText'):SetText(value)
+		getglobal(self:GetName() .. "ValText"):SetText(value)
 	end)
 
 	local cols = BongosMenu:CreateSlider(menu, name .. "Cols")
@@ -122,7 +122,7 @@ function BongosClassBar:Load()
 	self:RegisterEvent("UNIT_ENERGY", "UpdateAll")
 	self:RegisterEvent("UPDATE_BINDINGS", "UpdateBindings")
 
-	self.bar = BBar:Create("class", Bar_OnCreate, nil, self.defaults)
+	self.bar = BBar:CreateSecure("class", Bar_OnCreate, nil, self.defaults)
 end
 
 function BongosClassBar:Unload()

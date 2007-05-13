@@ -9,7 +9,7 @@ BongosKeyBar.defaults = {x = 1241.857, y = 39, vis = 1}
 local function Bar_OnCreate(self)
 	local key = KeyRingButton
 	key:ClearAllPoints()
-	key:SetPoint('TOPLEFT', self)
+	key:SetPoint("TOPLEFT", self)
 	key:Show()
 
 	self:Attach(key)
@@ -17,7 +17,7 @@ local function Bar_OnCreate(self)
 end
 
 function BongosKeyBar:Load()
-	self.bar = BBar:Create('key', Bar_OnCreate, nil, self.defaults)
+	self.bar = BBar:Create("key", Bar_OnCreate, nil, self.defaults)
 end
 
 function BongosKeyBar:Unload()

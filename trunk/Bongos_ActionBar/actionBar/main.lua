@@ -28,7 +28,7 @@ function BongosActionBar:Load()
 	self:RegisterEvent("START_AUTOREPEAT_SPELL", "UpdateFlash")
 	self:RegisterEvent("STOP_AUTOREPEAT_SPELL", "UpdateFlash")
 	
-	for i = 1, self:GetNumber() do 
+	for i = 1, BActionBar:GetNumber() do 
 		BActionBar:Create(i)
 	end
 end
@@ -36,7 +36,7 @@ end
 function BongosActionBar:Unload()
 	self:UnregisterAllEvents()
 
-	for i = 1, self:GetNumber() do 
+	for i = 1, BActionBar:GetNumber() do 
 		self:Get(i):Destroy()
 	end
 end

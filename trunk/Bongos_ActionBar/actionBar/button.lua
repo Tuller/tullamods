@@ -25,7 +25,7 @@ local function OnLeave(self) self:OnLeave() end
 local function OnShow(self) self:Update(true) end
 
 --Create an Action Button with the given ID and parent
-function BongosActionButton.Create(id)
+function BongosActionButton:Create(id)
 	local name = format(BUTTON_NAME, id)
 	local button = setmetatable(CreateFrame("CheckButton", name, nil, "SecureActionButtonTemplate, ActionButtonTemplate"), Button_mt)
 

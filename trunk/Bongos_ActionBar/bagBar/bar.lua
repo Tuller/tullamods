@@ -33,23 +33,23 @@ local function Bar_Layout(self, rows, space)
 
 	if self.sets.oneBag then
 		for i = 1, #bags-1 do bags[i]:Hide() end
-		bags[#bags]:SetPoint('TOPLEFT', self)
+		bags[#bags]:SetPoint("TOPLEFT", self)
 
 		self:SetWidth(BAG_SIZE); self:SetHeight(BAG_SIZE)
 	else
 		for _,bag in pairs(bags) do bag:Show() end
-		bags[1]:SetPoint('TOPLEFT', self)
+		bags[1]:SetPoint("TOPLEFT", self)
 
 		--horizontal alignment
 		if rows == 1 then
 			for i = 2, #bags do
-				bags[i]:SetPoint('LEFT', bags[i-1], 'RIGHT', space, 0)
+				bags[i]:SetPoint("LEFT", bags[i-1], "RIGHT", space, 0)
 			end
 			self:SetSize((BAG_SIZE + space) * #bags - space, (BAG_SIZE + space) - space)
 		--vertical alignment
 		else
 			for i = 2, #bags do
-				bags[i]:SetPoint('TOP', bags[i-1], 'BOTTOM', 0, -space)
+				bags[i]:SetPoint("TOP", bags[i-1], "BOTTOM", 0, -space)
 			end
 			self:SetSize((BAG_SIZE + space) - space, (BAG_SIZE + space)*#bags - space)
 		end
@@ -99,7 +99,7 @@ local function Bar_CreateMenu(frame)
 		if not menu.onShow then
 			frame:Layout(nil, value)
 		end
-		getglobal(self:GetName() .. 'ValText'):SetText(value)
+		getglobal(self:GetName() .. "ValText"):SetText(value)
 	end)
 
 	menu:SetHeight(menu:GetHeight() + 96)
@@ -132,7 +132,7 @@ end
 --[[ Startup ]]--
 
 function BongosBagBar:Load()
-	local bar = BBar:Create('bags', Bar_OnCreate, nil, self.defaults)
+	local bar = BBar:Create("bags", Bar_OnCreate, nil, self.defaults)
 	bar:Layout()
 
 	if bar:IsShown() then

@@ -38,14 +38,14 @@ local function Bar_Layout(self, rows, space)
 	end
 
 	for _,button in pairs(buttons) do button:ClearAllPoints() end
-	buttons[1]:SetPoint('TOPLEFT', self, 'TOPLEFT', 0, 20)
+	buttons[1]:SetPoint("TOPLEFT", self, "TOPLEFT", 0, 20)
 
 	local actSpace = space
 	if rows == DEFAULT_ROWS then
 		--horizontal layout
 		space = space - 4 --apparently the anchors are weird on the micro buttons, and need to be adjusted
 		for i = 2, #buttons do
-			buttons[i]:SetPoint('LEFT', buttons[i-1], 'RIGHT', space, 0)
+			buttons[i]:SetPoint("LEFT", buttons[i-1], "RIGHT", space, 0)
 		end
 
 		self:SetHeight(39)
@@ -54,7 +54,7 @@ local function Bar_Layout(self, rows, space)
 		--vertical layoute
 		space = space - 24 --apparently the anchors are weird on the micro buttons, and need to be adjusted
 		for i = 2, #buttons do
-			buttons[i]:SetPoint('TOP', buttons[i-1], 'BOTTOM', 0, -space)
+			buttons[i]:SetPoint("TOP", buttons[i-1], "BOTTOM", 0, -space)
 		end
 
 		self:SetHeight(12 + (33 + actSpace) * #buttons - actSpace)
@@ -90,7 +90,7 @@ local function Bar_CreateMenu(frame)
 		if not menu.onShow then
 			frame:Layout(nil, value)
 		end
-		getglobal(self:GetName() .. 'ValText'):SetText(value)
+		getglobal(self:GetName() .. "ValText"):SetText(value)
 	end)
 
 	menu:SetHeight(menu:GetHeight() + 64)
@@ -120,9 +120,9 @@ local function Bar_OnCreate(self)
 
 	--override UpdateTalentButton to properly show the micro button
 	function UpdateTalentButton()
-		if UnitLevel('player') < 10 then
+		if UnitLevel("player") < 10 then
 			TalentMicroButton:Hide()
-		elseif BBar.Get('menu') then
+		elseif BBar.Get("menu") then
 			TalentMicroButton:Show()
 		end
 	end
@@ -132,7 +132,7 @@ end
 --[[ Startup ]]--
 
 function BongosMenuBar:Load()
-	local bar = BBar:Create('menu', Bar_OnCreate, nil, self.defaults)
+	local bar = BBar:Create("menu", Bar_OnCreate, nil, self.defaults)
 	bar:Layout()
 
 	--hack to make sure all the buttons are shown properly
