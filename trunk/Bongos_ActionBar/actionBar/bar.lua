@@ -4,46 +4,48 @@
 
 --basically, BActionBar inherits all methods from BBar
 BActionBar = setmetatable(CreateFrame("Button"), {__index = BBar})
-local Bar_mt = {__index = BActionBar}
+local Bar_MT = {__index = BActionBar}
 
 local DEFAULT_SPACING = 2
 local DEFAULT_SIZE = 12
 local DEFAULT_COLS = 12
-local MAX_BUTTONS = BongosActionButton:GetMax()
-local BUTTON_SIZE = BongosActionButton:GetSize()
+local MAX_BUTTONS = 120
+local BUTTON_SIZE = 36
 local STANCE_FORMAT = "s%d"
 
 function BActionBar:Create(id)
-	--load settings
-	if not Bongos:GetBarSets(id) then
-		local sets = Bongos:SetBarSets(id, {})
-		if id == 1 then
-			sets.paging = true
-			local class = select(2,UnitClass("player"))
-			if class == "DRUID" then
-				sets["s1"] = 9; sets["s3"] = 7; sets["s7"] = 7
-			elseif class == "WARRIOR" then
-				sets["s1"] = 7; sets["s2"] = 8; sets["s3"] = 9
-			elseif class == "ROGUE" then
-				sets["s1"] = 7
-			end
-		end
-	end
+	local bar = setmetatable(BBar:CreateSecure(id), Bar_MT)
 
-	local bar = setmetatable(BBar:CreateSecure(id), Bar_mt)
-	bar:SetAttribute("useparent-statebutton", true)
-	bar:SetAttribute("useparent-unit", true)
-	BState:Register(bar)
+	if(id == 1) then
+		local class = select(2, UnitClass("player"))
+		local classMap
+		local pageMap = "[actionbar:2]8;[actionbar:3]9;[actionbar:4]10;[actionbar:5]11;[actionbar:6]12;"
+		local stateButton = "8:p1;9:p2;10:p3;11:p4;12:p5;13:help;"
+
+		if(class == "ROGUE" or class == "PRIEST") then
+			classMap = "[stance:1]1;"
+			stateButton = "1:s1;" .. stateButton
+		elseif(class == "WARRIOR") then
+			classMap = "[stance:1]1;[stance:2]2;[stance:3]3;"
+			stateButton = "1:s1;2:s2;3:s3;" .. stateButton
+		elseif(class == "DRUID") then
+			classMap = "[stance:1]1;[stance:2]2;[stance:3,nostealth]3;[stance:3,stealth]4;[stance:4]5;[stance:5]6;[stance:6]7;"
+			stateButton = "1:s1;2:s2;3:s3;4:s4;5:s5;6:s6;7:s7;" .. stateButton
+		end
+		RegisterStateDriver(bar, "states", pageMap .. (classMap or "") .. "[help]13;0")
+
+		bar:SetAttribute("statemap-states", "$input")
+		bar:SetAttribute("statebutton", stateButton)
+	end
 
 	--layout the bar
 	if not bar:IsUserPlaced() then
 		local start = bar:GetStartID()
-		local row = mod(start - 1, 12)
+		local row = mod(start-1, 12)
 		local col = ceil(start / 12) - 1
 		bar:SetPoint("CENTER", UIParent, "CENTER", 36 * row, -36 * col)
 	end
 	bar:Layout()
-
 	SecureStateHeader_Refresh(bar)
 
 	return bar
@@ -64,13 +66,6 @@ end
 function BActionBar:CreateMenu()
 	local name = format("BongosMenu%s", self.id)
 	local menu = BongosMenu:Create(name)
-
-	--checkbuttons
-	local paging = BongosMenu:CreateCheckButton(menu, name .. "Paging")
-	paging:SetPoint("TOPLEFT", menu, "TOPLEFT", 6, -88)
-	paging:SetScript("OnShow", function(self) self:SetChecked(menu.frame:CanPage()) end)
-	paging:SetScript("OnClick", function(self) menu.frame:SetPaging(self:GetChecked()) end)
-	paging:SetText("Page")
 
 	--spacing
 	local spacing = BongosMenu:CreateSpacingSlider(menu, name .. "Spacing")
@@ -127,7 +122,7 @@ function BActionBar:CreateMenu()
 	getglobal(name .. "SizeText"):SetText(BONGOS_SIZE)
 	getglobal(name .. "SizeLow"):SetText(1)
 
-	menu:SetHeight(menu:GetHeight() + 152)
+	menu:SetHeight(menu:GetHeight() + 128)
 
 	return menu
 end
@@ -150,102 +145,6 @@ function BActionBar:ShowMenu()
 	menu.onShow = true
 	self:PlaceMenu(menu)
 	menu.onShow = nil
-end
-
-
---[[ Paging ]]--
-
---enable/disables a bar paging
-function BActionBar:SetPaging(enable)
-	if enable then
-		self.sets.paging = true
-	else
-		self.sets.paging = nil
-	end
-	self:UpdatePaging()
-end
-
---update button ids for each button
-function BActionBar:UpdatePaging()
-	self.state = nil
-	for i = self:GetStartID(), self:GetEndID() do
-		BongosActionButton:Get(i):UpdateAllPages()
-	end
-	SecureStateHeader_Refresh(self)
-end
-
---returns a bar"s offset for the given page, in buttons
-function BActionBar:GetPageOffset(page)
-	if self:CanPage() then
-		return ((page * self:GetPageSkip() + page) * self:GetMaxSize()) or 0
-	end
-	return 0
-end
-
---returns true if a bar can page, nil otherwise
-function BActionBar:CanPage()
-	return self.sets.paging
-end
-
---returns how many bars are "skipped" when paging, 0 is default
-function BActionBar:GetPageSkip()
-	return 0
-end
-
-
---[[ Stances ]]--
-
-function BActionBar:SetStanceBar(id, barID)
-	self.sets[format(STANCE_FORMAT, id)] = barID
-	self:UpdateStance(id)
-end
-
-function BActionBar:GetStanceBar(id)
-	return self.sets[format(STANCE_FORMAT, id)]
-end
-
-function BActionBar:UpdateStance(id)
-	self.state = nil
-	for i = self:GetStartID(), self:GetEndID() do
-		BongosActionButton:Get(i):UpdateStance(id)
-	end
-	SecureStateHeader_Refresh(self)
-end
-
-function BActionBar:UpdateStances()
-	for i = self:GetStartID(), self:GetEndID() do
-		BongosActionButton:Get(i):UpdateAllStances()
-	end
-	SecureStateHeader_Refresh(self)
-end
-
-function BActionBar:HasStance()
-	local s,e = BState:GetStanceRange()
-	for i = s, e do
-		if self:GetStanceBar(i) then
-			return true
-		end
-	end
-end
-
-
---[[ Visibility ]]--
-
-function BActionBar:UpdateVisibility(showAll)
-	local s = self:GetStartID()
-	local e = self:GetEndID()
-	local showEmpty = showAll or BongosActionButton:ShowingEmpty()
-
-	local changed
-	for i = s, e do
-		if BongosActionButton:Get(i):UpdateVisibility(showEmpty) then
-			changed = true
-		end
-	end
-
-	if changed then
-		SecureStateHeader_Refresh(self)
-	end
 end
 
 
@@ -357,6 +256,23 @@ function BActionBar:Layout()
 	end
 end
 
+function BActionBar:UpdateVisibility(showAll)
+	local s = self:GetStartID()
+	local e = self:GetEndID()
+	local showEmpty = showAll or BongosActionButton:ShowingEmpty()
+
+	local changed
+	for i = s, e do
+		if BongosActionButton:Get(i):UpdateVisibility(showEmpty) then
+			changed = true
+		end
+	end
+
+	if changed then
+		SecureStateHeader_Refresh(self)
+	end
+end
+
 
 --[[ Bar Numbers ]]--
 
@@ -367,7 +283,6 @@ function BActionBar:SetNumber(newSize)
 			self:Get(i):Delete()
 		end
 
---		BActionDB.number = newSize
 		for i = 1, (newSize or 10) do
 			self:Create(i)
 		end
@@ -376,50 +291,10 @@ end
 
 function BActionBar:GetNumber()
 	return 10
---	return BActionDB.number or 10
 end
 
 
 --[[ Utility ]]--
-
---does an action to every visible bar
-function BActionBar:ForAllShown(action, ...)
-	for i = 1, self:GetNumber() do
-		local bar = self:Get(i)
-		if bar and bar:IsShown() then
-			local action = bar[method]
-			if action then
-				action(bar, ...)
-			end
-		end
-	end
-end
-
---does an action to every button on a visible bar that has a stance page
-function BActionBar:ForAllWithStance(action, ...)
-	for i = 1, self:GetNumber() do
-		local bar = self:Get(i)
-		if bar:IsShown() and bar:HasStance() then
-			bar.state = nil
-			for j = bar:GetStartID(), bar:GetEndID() do
-				action(BongosActionButton:Get(j), ...)
-			end
-		end
-	end
-end
-
---does an action to every button on a visible bar that is able to page
-function BActionBar:ForAllWithPage(action, ...)
-	for i = 1, self:GetNumber() do
-		local bar = self:Get(i)
-		if bar:IsShown() and bar:CanPage() then
-			bar.state = nil
-			for j = bar:GetStartID(), bar:GetEndID() do
-				action(BongosActionButton:Get(j), ...)
-			end
-		end
-	end
-end
 
 --updates the showstates of every button on every bar
 function BActionBar:UpdateVisibilityForAll(showEmpty)
