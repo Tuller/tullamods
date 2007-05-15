@@ -30,6 +30,12 @@ local function OnAttributeChanged(self, var, val)
 	end
 end
 
+-- function BongosActionButton:Reuse(id)
+	-- if(id <= 12) then
+		-- local button = getglobal(
+	-- end
+-- end
+
 --Create an Action Button with the given ID and parent
 function BongosActionButton:Create(id)
 	local button = CreateFrame("CheckButton", format(BUTTON_NAME, id), nil, "SecureActionButtonTemplate, ActionButtonTemplate")
