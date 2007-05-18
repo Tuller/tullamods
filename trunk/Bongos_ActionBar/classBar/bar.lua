@@ -55,8 +55,7 @@ local function Bar_CreateMenu(frame)
 	menu.text:SetText("Class Bar")
 
 	--sliders
-	local spacing = BongosMenu:CreateSpacingSlider(menu, name .. "Spacing")
-	spacing:SetPoint("BOTTOM", name .. "Scale", "TOP", 0, 24)
+	local spacing = menu:CreateSpacingSlider(name .. "Spacing")
 	spacing:SetScript("OnShow", function(self)
 		self:SetValue(frame.sets.space or DEFAULT_SPACING)
 	end)
@@ -67,8 +66,7 @@ local function Bar_CreateMenu(frame)
 		getglobal(self:GetName() .. "ValText"):SetText(value)
 	end)
 
-	local cols = BongosMenu:CreateSlider(menu, name .. "Cols")
-	cols:SetPoint("BOTTOM", spacing, "TOP", 0, 24)
+	local cols = menu:CreateSlider(name .. "Cols")
 	cols:SetScript("OnShow", function(self)
 		getglobal(name .. "Cols"):SetMinMaxValues(1, GetNumShapeshiftForms())
 		getglobal(name .. "ColsLow"):SetText(GetNumShapeshiftForms())
@@ -83,8 +81,6 @@ local function Bar_CreateMenu(frame)
 	cols:SetValueStep(1)
 	getglobal(name .. "ColsText"):SetText("Columns")
 	getglobal(name .. "ColsHigh"):SetText(1)
-
-	menu:SetHeight(menu:GetHeight() + 96)
 
 	return menu
 end

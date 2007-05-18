@@ -76,13 +76,11 @@ local function Bar_CreateMenu(frame)
 	menu.frame = frame
 	menu.text:SetText("Menu Bar")
 
-	local vertical = BongosMenu:CreateCheckButton(menu, name .. "Vertical")
+	local vertical = menu:CreateCheckButton(name .. "Vertical")
 	vertical:SetScript("OnClick", function(self) frame:SetVertical(self:GetChecked()) end)
-	vertical:SetPoint("TOPLEFT", menu, "TOPLEFT", 6, -88)
 	vertical:SetText("Vertical")
 
-	local spacing = BongosMenu:CreateSpacingSlider(menu, name .. "Spacing")
-	spacing:SetPoint("BOTTOM", name .. "Scale", "TOP", 0, 24)
+	local spacing = menu:CreateSpacingSlider(name .. "Spacing")
 	spacing:SetScript("OnShow", function(self)
 		self:SetValue(frame.sets.space or DEFAULT_SPACING)
 	end)
@@ -92,8 +90,6 @@ local function Bar_CreateMenu(frame)
 		end
 		getglobal(self:GetName() .. "ValText"):SetText(value)
 	end)
-
-	menu:SetHeight(menu:GetHeight() + 64)
 
 	return menu
 end

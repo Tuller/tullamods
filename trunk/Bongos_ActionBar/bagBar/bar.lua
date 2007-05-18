@@ -80,18 +80,17 @@ local function Bar_CreateMenu(frame)
 	menu.text:SetText("Bag Bar")
 
 	--checkbuttons
-	local oneBag = BongosMenu:CreateCheckButton(menu, name .. "OneBag")
+	local oneBag = menu:CreateCheckButton(name .. "OneBag")
+	oneBag:SetScript("OnShow", function(self) self:SetChecked(frame.sets.oneBag) end)
 	oneBag:SetScript("OnClick", function(self) frame:SetOneBag(self:GetChecked()) end)
-	oneBag:SetPoint("TOPLEFT", menu, "TOPLEFT", 6, -88)
 	oneBag:SetText("One Bag")
 
-	local vertical = BongosMenu:CreateCheckButton(menu, name .. "Vertical")
+	local vertical = menu:CreateCheckButton(name .. "Vertical")
+	oneBag:SetScript("OnShow", function(self) self:SetChecked(frame.sets.rows) end)
 	vertical:SetScript("OnClick", function(self) frame:SetVertical(self:GetChecked()) end)
-	vertical:SetPoint("TOP", oneBag, "BOTTOM", 0, 2)
 	vertical:SetText("Vertical")
 
-	local spacing = BongosMenu:CreateSpacingSlider(menu, name .. "Spacing")
-	spacing:SetPoint("BOTTOM", name .. "Scale", "TOP", 0, 24)
+	local spacing = menu:CreateSpacingSlider(name .. "Spacing")
 	spacing:SetScript("OnShow", function(self)
 		self:SetValue(frame.sets.space or DEFAULT_SPACING)
 	end)
@@ -102,7 +101,6 @@ local function Bar_CreateMenu(frame)
 		getglobal(self:GetName() .. "ValText"):SetText(value)
 	end)
 
-	menu:SetHeight(menu:GetHeight() + 96)
 	return menu
 end
 

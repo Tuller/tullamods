@@ -13,30 +13,45 @@ local MAX_BUTTONS = 120
 local BUTTON_SIZE = 36
 local STANCE_FORMAT = "s%d"
 
+function BActionBar:GetCurrentState()
+	local page = GetActionBarPage()
+	if(page == 1) then
+		local stance = GetShapeshiftForm()
+		if(stance == 3 and IsStealthed()) then
+			return 4
+		else
+			return stance
+		end
+	else
+		return page + 6
+	end
+end
+
+function BActionBar:LoadStates()
+	local class = select(2, UnitClass("player"))
+	local classMap
+	local pageMap = "[actionbar:2]8;[actionbar:3]9;[actionbar:4]10;[actionbar:5]11;[actionbar:6]12;"
+	local stateButton = "8:p1;9:p2;10:p3;11:p4;12:p5;13:help;"
+
+	if(class == "ROGUE" or class == "PRIEST") then
+		classMap = "[stance:1]1;"
+		stateButton = "1:s1;" .. stateButton
+	elseif(class == "WARRIOR") then
+		classMap = "[stance:1]1;[stance:2]2;[stance:3]3;"
+		stateButton = "1:s1;2:s2;3:s3;" .. stateButton
+	elseif(class == "DRUID") then
+		classMap = "[stance:1]1;[stance:2]2;[stance:3,nostealth]3;[stance:3,stealth]4;[stance:4]5;[stance:5]6;[stance:6]7;"
+		stateButton = "1:s1;2:s2;3:s3;4:s4;5:s5;6:s6;7:s7;" .. stateButton
+	end
+	RegisterStateDriver(self, "states", pageMap .. (classMap or "") .. "[help]13;0")
+
+	self:SetAttribute("statemap-states", "$input")
+	self:SetAttribute("statebutton", stateButton)
+end
+
 function BActionBar:Create(id)
 	local bar = setmetatable(BBar:CreateSecure(id), Bar_MT)
-
-	if(id == 1) then
-		local class = select(2, UnitClass("player"))
-		local classMap
-		local pageMap = "[actionbar:2]8;[actionbar:3]9;[actionbar:4]10;[actionbar:5]11;[actionbar:6]12;"
-		local stateButton = "8:p1;9:p2;10:p3;11:p4;12:p5;13:help;"
-
-		if(class == "ROGUE" or class == "PRIEST") then
-			classMap = "[stance:1]1;"
-			stateButton = "1:s1;" .. stateButton
-		elseif(class == "WARRIOR") then
-			classMap = "[stance:1]1;[stance:2]2;[stance:3]3;"
-			stateButton = "1:s1;2:s2;3:s3;" .. stateButton
-		elseif(class == "DRUID") then
-			classMap = "[stance:1]1;[stance:2]2;[stance:3,nostealth]3;[stance:3,stealth]4;[stance:4]5;[stance:5]6;[stance:6]7;"
-			stateButton = "1:s1;2:s2;3:s3;4:s4;5:s5;6:s6;7:s7;" .. stateButton
-		end
-		RegisterStateDriver(bar, "states", pageMap .. (classMap or "") .. "[help]13;0")
-
-		bar:SetAttribute("statemap-states", "$input")
-		bar:SetAttribute("statebutton", stateButton)
-	end
+	bar:LoadStates()
 
 	--layout the bar
 	if not bar:IsUserPlaced() then
@@ -46,7 +61,7 @@ function BActionBar:Create(id)
 		bar:SetPoint("CENTER", UIParent, "CENTER", 36 * row, -36 * col)
 	end
 	bar:Layout()
-	SecureStateHeader_Refresh(bar)
+	SecureStateHeader_Refresh(bar, self:GetCurrentState())
 
 	return bar
 end
@@ -68,8 +83,7 @@ function BActionBar:CreateMenu()
 	local menu = BongosMenu:Create(name)
 
 	--spacing
-	local spacing = BongosMenu:CreateSpacingSlider(menu, name .. "Spacing")
-	spacing:SetPoint("BOTTOM", name .. "Scale", "TOP", 0, 24)
+	local spacing = menu:CreateSpacingSlider(name .. "Spacing")
 	spacing:SetScript("OnShow", function(self)
 		self:SetValue(menu.frame:GetSpacing())
 	end)
@@ -81,8 +95,7 @@ function BActionBar:CreateMenu()
 	end)
 
 	--columns
-	local cols = BongosMenu:CreateSlider(menu, name .. "Cols")
-	cols:SetPoint("BOTTOM", spacing, "TOP", 0, 24)
+	local cols = menu:CreateSlider(name .. "Cols")
 	cols:SetScript("OnShow", function(self)
 		self:SetValue(menu.frame:GetSize() - menu.frame:GetColumns() + 1)
 	end)
@@ -97,8 +110,7 @@ function BActionBar:CreateMenu()
 	getglobal(name .. "ColsHigh"):SetText(1)
 
 	--size
-	local size = BongosMenu:CreateSlider(menu, name .. "Size")
-	size:SetPoint("BOTTOM", cols, "TOP", 0, 24)
+	local size = menu:CreateSlider(name .. "Size")
 	size:SetScript("OnShow", function(self)
 		local frame = menu.frame
 		getglobal(name .. "Size"):SetMinMaxValues(1, frame:GetMaxSize())
@@ -121,8 +133,6 @@ function BActionBar:CreateMenu()
 	size:SetValueStep(1)
 	getglobal(name .. "SizeText"):SetText(BONGOS_SIZE)
 	getglobal(name .. "SizeLow"):SetText(1)
-
-	menu:SetHeight(menu:GetHeight() + 128)
 
 	return menu
 end
@@ -269,7 +279,7 @@ function BActionBar:UpdateVisibility(showAll)
 	end
 
 	if changed then
-		SecureStateHeader_Refresh(self)
+		SecureStateHeader_Refresh(self, self:GetCurrentState())
 	end
 end
 

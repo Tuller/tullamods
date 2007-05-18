@@ -54,8 +54,7 @@ local function Bar_CreateMenu(frame)
 	menu.text:SetText("Pet Bar")
 
 	--sliders
-	local spacing = BongosMenu:CreateSpacingSlider(menu, name .. "Spacing")
-	spacing:SetPoint("BOTTOM", name .. "Scale", "TOP", 0, 24)
+	local spacing = menu:CreateSpacingSlider(name .. "Spacing")
 	spacing:SetScript("OnShow", function(self)
 		self:SetValue(frame.sets.space or DEFAULT_SPACING)
 	end)
@@ -66,8 +65,7 @@ local function Bar_CreateMenu(frame)
 		getglobal(self:GetName() .. "ValText"):SetText(value)
 	end)
 
-	local cols = BongosMenu:CreateSlider(menu, name .. "Cols")
-	cols:SetPoint("BOTTOM", spacing, "TOP", 0, 24)
+	local cols = menu:CreateSlider(name .. "Cols")
 	cols:SetScript("OnShow", function(self)
 		getglobal(name .. "Cols"):SetValue(NUM_PET_ACTION_SLOTS - (frame.sets.cols or NUM_PET_ACTION_SLOTS) + 1)
 	end)
@@ -82,8 +80,6 @@ local function Bar_CreateMenu(frame)
 	getglobal(name .. "Cols"):SetMinMaxValues(1, NUM_PET_ACTION_SLOTS)
 	getglobal(name .. "ColsHigh"):SetText(1)
 	getglobal(name .. "ColsLow"):SetText(NUM_PET_ACTION_SLOTS)
-
-	menu:SetHeight(menu:GetHeight() + 96)
 
 	return menu
 end
