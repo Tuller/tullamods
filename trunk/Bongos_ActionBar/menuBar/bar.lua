@@ -77,6 +77,7 @@ local function Bar_CreateMenu(frame)
 	menu.text:SetText("Menu Bar")
 
 	local vertical = menu:CreateCheckButton(name .. "Vertical")
+	vertical:SetScript("OnShow", function(self) self:SetChecked(frame.sets.rows) end)
 	vertical:SetScript("OnClick", function(self) frame:SetVertical(self:GetChecked()) end)
 	vertical:SetText("Vertical")
 
