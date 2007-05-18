@@ -5,16 +5,18 @@
 
 local L = BONGOS_LOCALS
 
-BongosMenu = {}
+BongosMenu = CreateFrame("Button")
+local Button_MT = {__index = BongosMenu}
 
 local function Menu_OnClick(self)
 	self:Hide()
 end
 
 function BongosMenu:Create(name)
-	local menu = CreateFrame("Button", name, UIParent, "GooeyPopup")
+	local menu = setmetatable(CreateFrame("Button", name, UIParent, "GooeyPopup"), Button_MT)
 	menu:SetWidth(210)
-	menu:SetHeight(230)
+	menu:SetHeight(38)
+	-- menu:SetHeight(230)
 
 	menu:RegisterForClicks("AnyUp")
 	menu:SetScript("OnClick", Menu_OnClick)
@@ -26,20 +28,15 @@ function BongosMenu:Create(name)
 	local close = CreateFrame("Button", nil, menu, "UIPanelCloseButton")
 	close:SetPoint("TOPRIGHT", menu, "TOPRIGHT", -2, -2)
 
-	local fadeInCombat = BongosMenu:CreateFadeInCombatButton(menu, name .. "FadeInCombat")
-	fadeInCombat:SetPoint("TOPLEFT", menu, "TOPLEFT", 6, -28)
+	-- local fadeInCombat = menu:CreateFadeInCombatButton(name .. "FadeInCombat")
+	-- fadeInCombat:SetPoint("TOPLEFT", menu, "TOPLEFT", 6, -28)
 
-	local fadeOutCombat = BongosMenu:CreateFadeOutCombatButton(menu, name .. "FadeOutCombat")
-	fadeOutCombat:SetPoint("TOP", fadeInCombat, "BOTTOM", 0, 2)
+	-- local fadeOutCombat = BongosMenu:CreateFadeOutCombatButton(name .. "FadeOutCombat")
+	-- fadeOutCombat:SetPoint("TOP", fadeInCombat, "BOTTOM", 0, 2)
 
-	local fade = self:CreateFadeSlider(menu, name .. "FadeOpacity")
-	fade:SetPoint("BOTTOM", menu, "BOTTOM", 0, 24)
-
-	local opacity = self:CreateAlphaSlider(menu, name .. "Opacity")
-	opacity:SetPoint("BOTTOM", fade, "TOP", 0, 24)
-
-	local scale = self:CreateScaleSlider(menu, name .. "Scale")
-	scale:SetPoint("BOTTOM", opacity, "TOP", 0, 24)
+	-- menu:CreateFadeSlider(name .. "FadeOpacity")
+	menu:CreateAlphaSlider(name .. "Opacity")
+	menu:CreateScaleSlider(name .. "Scale")
 
 	return menu
 end
@@ -59,13 +56,22 @@ local function Slider_OnShow(self)
 	self:UpdateText()
 end
 
-function BongosMenu:CreateSlider(parent, name)
-	local slider = CreateFrame("Slider", name, parent, "GooeySlider")
+function BongosMenu:CreateSlider(name)
+	local slider = CreateFrame("Slider", name, self, "GooeySlider")
 	slider:SetWidth(200)
 	slider:SetHeight(18)
 
 	slider:SetScript("OnValueChanged", Slider_OnValueChanged)
 	slider:SetScript("OnShow", Slider_OnShow)
+	
+	if(self.slider) then
+		slider:SetPoint("BOTTOM", self.slider, "TOP", 0, 24)
+	else
+		slider:SetPoint("BOTTOM", self, "BOTTOM", 0, 24)
+	end
+	self:SetHeight(self:GetHeight() + 44)
+
+	self.slider = slider
 
 	return slider
 end
@@ -85,8 +91,8 @@ local function ScaleSlider_OnValueChanged(self, value)
 	getglobal(self:GetName() .. "ValText"):SetText(value)
 end
 
-function BongosMenu:CreateScaleSlider(parent, name)
-	local slider = self:CreateSlider(parent, name)
+function BongosMenu:CreateScaleSlider(name)
+	local slider = self:CreateSlider(name)
 	slider:SetMinMaxValues(50, 150)
 	slider:SetValueStep(1)
 
@@ -116,8 +122,8 @@ local function AlphaSlider_OnValueChanged(self, value)
 	getglobal(self:GetName() .. "ValText"):SetText(value)
 end
 
-function BongosMenu:CreateAlphaSlider(parent, name)
-	local slider = self:CreateSlider(parent, name)
+function BongosMenu:CreateAlphaSlider(name)
+	local slider = self:CreateSlider(name)
 	slider:SetMinMaxValues(0, 100)
 	slider:SetValueStep(1)
 
@@ -145,8 +151,8 @@ local function FadeSlider_OnValueChanged(self, value)
 	getglobal(self:GetName() .. "ValText"):SetText(value)
 end
 
-function BongosMenu:CreateFadeSlider(parent, name)
-	local slider = self:CreateAlphaSlider(parent, name)
+function BongosMenu:CreateFadeSlider(name)
+	local slider = self:CreateAlphaSlider(name)
 	getglobal(name .. "Text"):SetText("Faded Opacity")
 	slider:SetScript("OnShow", FadeSlider_OnShow)
 	slider:SetScript("OnValueChanged", FadeSlider_OnValueChanged)
@@ -155,8 +161,8 @@ function BongosMenu:CreateFadeSlider(parent, name)
 end
 
 --spacing
-function BongosMenu:CreateSpacingSlider(parent, name)
-	local slider = self:CreateSlider(parent, name)
+function BongosMenu:CreateSpacingSlider(name)
+	local slider = self:CreateSlider(name)
 	slider:SetMinMaxValues(0, 32)
 	slider:SetValueStep(1)
 
@@ -170,8 +176,17 @@ end
 
 --[[ General Checkbutton ]]--
 
-function BongosMenu:CreateCheckButton(parent, name)
-	return CreateFrame("CheckButton", name, parent, "GooeyCheckButton")
+function BongosMenu:CreateCheckButton(name)
+	local button = CreateFrame("CheckButton", name, self, "GooeyCheckButton")
+	if(self.button) then
+		button:SetPoint("TOP", self.button, "BOTTOM", 0, 2)
+	else
+		button:SetPoint("TOPLEFT", self, "TOPLEFT", 6, -28)
+	end
+	self:SetHeight(self:GetHeight() + 30)
+	self.button = button
+
+	return button
 end
 
 --fade when in combat
@@ -190,8 +205,8 @@ local function FadeInCombat_OnShow(self)
 	self:SetChecked(self:GetParent().frame.sets.fadeMode == 1)
 end
 
-function BongosMenu:CreateFadeInCombatButton(parent, name)
-	local button = self:CreateCheckButton(parent, name)
+function BongosMenu:CreateFadeInCombatButton(name)
+	local button = self:CreateCheckButton(name)
 	button:SetScript("OnClick", FadeInCombat_OnClick)
 	button:SetScript("OnShow", FadeInCombat_OnShow)
 	button:SetText("Fade In Combat")
@@ -215,8 +230,8 @@ local function FadeOutCombat_OnShow(self)
 	self:SetChecked(self:GetParent().frame.sets.fadeMode == 2)
 end
 
-function BongosMenu:CreateFadeOutCombatButton(parent, name)
-	local button = self:CreateCheckButton(parent, name)
+function BongosMenu:CreateFadeOutCombatButton(name)
+	local button = self:CreateCheckButton(name)
 	button:SetScript("OnShow", FadeOutCombat_OnShow)
 	button:SetScript("OnClick", FadeOutCombat_OnClick)
 	button:SetText("Fade Out Of Combat")
