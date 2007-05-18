@@ -75,25 +75,20 @@ local function Bar_CreateMenu(self)
 	local menu = BongosMenu:Create(name)
 	menu.text:SetText(L.StatsBar)
 
-	local showMemory = BongosMenu:CreateCheckButton(menu, name .. "ShowMemory")
+	local showMemory = menu:CreateCheckButton(name .. "ShowMemory")
 	showMemory:SetScript("OnShow", function(b) b:SetChecked(self.sets.showMemory) end)
 	showMemory:SetScript("OnClick", function() BongosStats:SetShowMemory(not self.sets.showMemory) end)
-	showMemory:SetPoint("TOPLEFT", menu, "TOPLEFT", 6, -88)
 	showMemory:SetText(L.ShowMemory)
 
-	local showFPS = BongosMenu:CreateCheckButton(menu, name .. "ShowFPS")
+	local showFPS = menu:CreateCheckButton(name .. "ShowFPS")
 	showFPS:SetScript("OnShow", function(b) b:SetChecked(self.sets.showFPS) end)
 	showFPS:SetScript("OnClick", function() BongosStats:SetShowFPS(not self.sets.showFPS) end)
-	showFPS:SetPoint("TOP", showMemory, "BOTTOM", 0, 2)
 	showFPS:SetText(L.ShowFPS)
 
-	local showPing = BongosMenu:CreateCheckButton(menu, name .. "ShowPing")
+	local showPing = menu:CreateCheckButton(name .. "ShowPing")
 	showPing:SetScript("OnShow", function(b) b:SetChecked(self.sets.showPing) end)
 	showPing:SetScript("OnClick", function() BongosStats:SetShowPing(not self.sets.showPing) end)
-	showPing:SetPoint("TOP", showFPS, "BOTTOM", 0, 2)
 	showPing:SetText(L.ShowPing)
-
-	menu:SetHeight(menu:GetHeight() + 90)
 
 	menu.frame = self
 
@@ -169,9 +164,9 @@ end
 
 function BongosStats:UpdateProfilingInfo()
 	if self.bar:GetRight() >= (GetScreenWidth() / 2) then
-		GameTooltip:SetOwner(self.bar, 'ANCHOR_BOTTOMLEFT')
+		GameTooltip:SetOwner(self.bar, "ANCHOR_BOTTOMLEFT")
 	else
-		GameTooltip:SetOwner(self.bar, 'ANCHOR_BOTTOMRIGHT')
+		GameTooltip:SetOwner(self.bar, "ANCHOR_BOTTOMRIGHT")
 	end
 
 	if IsModifierKeyDown() and GetCVar("scriptProfile") == "1" then
@@ -184,23 +179,23 @@ function BongosStats:UpdateProfilingInfo()
 			local name = GetAddOnInfo(i)
 
 			if secs > 3600 then
-				GameTooltip:AddDoubleLine(name, format('%.2f h', secs/3600), 1, 1, 1, 1, 0.2, 0.2)
+				GameTooltip:AddDoubleLine(name, format("%.2f h", secs/3600), 1, 1, 1, 1, 0.2, 0.2)
 			elseif secs > 60 then
-				GameTooltip:AddDoubleLine(name, format('%.2f m', secs/60), 1, 1, 1, 1, 1, 0.2)
+				GameTooltip:AddDoubleLine(name, format("%.2f m", secs/60), 1, 1, 1, 1, 1, 0.2)
 			elseif secs >= 1 then
-				GameTooltip:AddDoubleLine(name, format('%.1f s', secs), 1, 1, 1, 0.2, 1, 0.2)
+				GameTooltip:AddDoubleLine(name, format("%.1f s", secs), 1, 1, 1, 0.2, 1, 0.2)
 			elseif secs > 0 then
-				GameTooltip:AddDoubleLine(name, format('%.1f ms', secs * 1000), 1, 1, 1, 0.2, 1, 0.2)
+				GameTooltip:AddDoubleLine(name, format("%.1f ms", secs * 1000), 1, 1, 1, 0.2, 1, 0.2)
 			end
 			total = total + secs
 		end
 
 		if total >= 60 then
-			GameTooltip:AddDoubleLine(L.Total, format('%.1f m', total/60), 0.4, 0.6, 1, 1, 1, 0.2)
+			GameTooltip:AddDoubleLine(L.Total, format("%.1f m", total/60), 0.4, 0.6, 1, 1, 1, 0.2)
 		elseif total >= 1 then
-			GameTooltip:AddDoubleLine(L.Total, format('%.1f s', total), 0.4, 0.6, 1, 1, 1, 0.2)
+			GameTooltip:AddDoubleLine(L.Total, format("%.1f s", total), 0.4, 0.6, 1, 1, 1, 0.2)
 		else
-			GameTooltip:AddDoubleLine(L.Total, format('%.1f ms', total * 1000), 0.4, 0.6, 1, 1, 1, 0.2)
+			GameTooltip:AddDoubleLine(L.Total, format("%.1f ms", total * 1000), 0.4, 0.6, 1, 1, 1, 0.2)
 		end
 	else
 		UpdateAddOnMemoryUsage()
@@ -213,14 +208,14 @@ function BongosStats:UpdateProfilingInfo()
 
 			if mem > 0 then
 				if mem > 1024 then
-					GameTooltip:AddDoubleLine(name, format('%.1f mb', mem/1024), 1, 1, 1, 1, 1, 0.2)
+					GameTooltip:AddDoubleLine(name, format("%.1f mb", mem/1024), 1, 1, 1, 1, 1, 0.2)
 				else
-					GameTooltip:AddDoubleLine(name, format('%.1f kb', mem), 1, 1, 1, 0.2, 1, 0.2)
+					GameTooltip:AddDoubleLine(name, format("%.1f kb", mem), 1, 1, 1, 0.2, 1, 0.2)
 				end
 				total = total + mem
 			end
 		end
-		GameTooltip:AddDoubleLine(L.Total, format('%.2f mb', total/1024), 0.4, 0.6, 1, 1, 1, 0.2)
+		GameTooltip:AddDoubleLine(L.Total, format("%.2f mb", total/1024), 0.4, 0.6, 1, 1, 1, 0.2)
 	end
 	GameTooltip:Show()
 end
@@ -239,7 +234,7 @@ function BongosStats:SetShowFPS(enable)
 		self:Update()
 	else
 		self.bar.sets.showFPS = nil
-		self.fps:SetText('')
+		self.fps:SetText("")
 	end
 end
 
@@ -249,7 +244,7 @@ function BongosStats:SetShowPing(enable)
 		self:Update()
 	else
 		self.bar.sets.showPing = nil
-		self.ping:SetText('')
+		self.ping:SetText("")
 	end
 end
 
@@ -259,6 +254,6 @@ function BongosStats:SetShowMemory(enable)
 		self:Update()
 	else
 		self.bar.sets.showMemory = nil
-		self.mem:SetText('')
+		self.mem:SetText("")
 	end
 end
