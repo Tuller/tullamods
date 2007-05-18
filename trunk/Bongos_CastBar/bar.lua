@@ -127,12 +127,10 @@ local function Bar_CreateMenu(frame)
 	menu.text:SetText("Cast Bar")
 
 	--checkbuttons
-	local time = BongosMenu:CreateCheckButton(menu, name .. "Time")
+	local time = menu:CreateCheckButton(menu, name .. "Time")
 	time:SetScript("OnClick", function(self) frame:ToggleText(self:GetChecked()) end)
-	time:SetPoint("TOPLEFT", menu, "TOPLEFT", 6, -88)
+	time:SetScript("OnShow", function(self) self:SetChecked(frame.sets.showText) end)
 	time:SetText(BONGOS_CASTBAR_SHOW_TIME)
-
-	menu:SetHeight(menu:GetHeight() + 24)
 
 	return menu
 end
