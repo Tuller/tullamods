@@ -216,8 +216,8 @@ function Bongos:RegisterSlashCommands()
 	slash:RegisterSlashHandler(format(cmdStr, "reset", L.ResetDesc), "reset", "ResetProfile")
 	slash:RegisterSlashHandler(format(cmdStr, "list", L.ListDesc), "list", "ListProfiles")
 	
-	slash:RegisterSlashHandler(format(cmdStr, "fadealpha <barList> <opacity>", L.SetFadeAlphaDesc), "fadealpha (.+) ([%d%.]+)", "SetFadeAlpha")
-	slash:RegisterSlashHandler(format(cmdStr, "fademode <barList> <0 | 1 | 2>", L.SetFadeModeDesc), "fademode (.+) ([0-2])", "SetFadeMode")
+	-- slash:RegisterSlashHandler(format(cmdStr, "fadealpha <barList> <opacity>", L.SetFadeAlphaDesc), "fadealpha (.+) ([%d%.]+)", "SetFadeAlpha")
+	-- slash:RegisterSlashHandler(format(cmdStr, "fademode <barList> <0 | 1 | 2>", L.SetFadeModeDesc), "fademode (.+) ([0-2])", "SetFadeMode")
 	
 	self.slash = slash
 end
