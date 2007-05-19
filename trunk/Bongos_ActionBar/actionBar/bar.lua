@@ -12,6 +12,7 @@ local DEFAULT_COLS = 12
 local MAX_BUTTONS = 120
 local BUTTON_SIZE = 36
 local STANCE_FORMAT = "s%d"
+local CLASS = select(2, UnitClass("player"))
 
 function BActionBar:GetCurrentState()
 	local page = GetActionBarPage()
@@ -19,33 +20,35 @@ function BActionBar:GetCurrentState()
 		local stance = GetShapeshiftForm()
 		if(stance == 3 and IsStealthed()) then
 			return 4
-		else
-			return stance
 		end
+		return stance
 	else
 		return page + 6
 	end
 end
 
 function BActionBar:LoadStates()
-	local class = select(2, UnitClass("player"))
-	local classMap
 	local pageMap = "[actionbar:2]8;[actionbar:3]9;[actionbar:4]10;[actionbar:5]11;[actionbar:6]12;"
-	local stateButton = "8:p1;9:p2;10:p3;11:p4;12:p5;13:help;"
+	local stateButton = "8:p1;9:p2;10:p3;11:p4;12:p5;"
 
-	if(class == "ROGUE" or class == "PRIEST") then
+	local classMap
+	if(CLASS == "ROGUE" or CLASS == "PRIEST") then
 		classMap = "[stance:1]1;"
 		stateButton = "1:s1;" .. stateButton
-	elseif(class == "WARRIOR") then
+	elseif(CLASS == "WARRIOR") then
 		classMap = "[stance:1]1;[stance:2]2;[stance:3]3;"
 		stateButton = "1:s1;2:s2;3:s3;" .. stateButton
-	elseif(class == "DRUID") then
-		classMap = "[stance:1]1;[stance:2]2;[stance:3,nostealth]3;[stance:3,stealth]4;[stance:4]5;[stance:5]6;[stance:6]7;"
-		stateButton = "1:s1;2:s2;3:s3;4:s4;5:s5;6:s6;7:s7;" .. stateButton
+	elseif(CLASS == "DRUID") then
+		classMap = "[stance:1]1;[stance:2,nostealth]2;[stance:2,stealth]7;[stance:3,nostealth]3;[stance:3,stealth]7;[stance:4]5;[stance:5]6;[stance:6]7;"
+		stateButton = "1:s1;2:s2;3:s3;4:s4;5:s5;6:s6;7:prowl;" .. stateButton
 	end
-	RegisterStateDriver(self, "states", pageMap .. (classMap or "") .. "[help]13;0")
 
-	self:SetAttribute("statemap-states", "$input")
+	if(classMap) then
+		RegisterStateDriver(self, "state", pageMap .. classMap .. "0")
+	else
+		RegisterStateDriver(self, "state", pageMap .. "0")
+	end
+	self:SetAttribute("statemap-state", "$input")
 	self:SetAttribute("statebutton", stateButton)
 end
 

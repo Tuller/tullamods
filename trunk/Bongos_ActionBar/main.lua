@@ -23,7 +23,7 @@ function BongosActionMain:Initialize()
 		}
 	}
 
-	self.db = self:InitializeDB("BongosActionBarDB", defaults)
+	self.db = self:InitializeDB("Bongos2ActionBarDB", defaults)
 	self.profile = self.db.profile
 
 	local cMajor, cMinor = CURRENT_VERSION:match("(%d+)%.(%d+)")

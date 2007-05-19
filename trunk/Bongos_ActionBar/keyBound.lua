@@ -27,7 +27,6 @@ L.CombatBindingsEnabled = "Exiting combat, keybinding mode enabled"
 L.CombatBindingsDisabled = "Entering combat, keybinding mode disabled"
 
 
-
 --[[ Bindframe functions ]]--
 
 local function Binder_ToBinding(button)

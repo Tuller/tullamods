@@ -8,10 +8,13 @@ local Button_MT = {__index = BongosActionButton}
 local BUTTON_NAME = "BongosActionButton%d"
 local SIZE = 36
 local MAX_BUTTONS = 120 --the current maximum amount of action buttons
+local CLASS = select(2, UnitClass("player"))
 
 local buttons = {}
 local maxStance = 7
 local maxPage = 5
+
+local function toValid(id) return mod(id - 1, 120) + 1 end
 
 
 --[[ fram events ]]--
@@ -26,7 +29,8 @@ local function OnLeave(self) self:OnLeave() end
 local function OnShow(self) self.id = nil end
 
 local function OnAttributeChanged(self, var, val)
-	if(self:GetParent() and var == "state-parent") then
+	local parent = self:GetParent()
+	if(parent and parent:IsShown() and var == "state-parent") then
 		self.id = nil
 	end
 end
@@ -41,10 +45,9 @@ local function OnEvent(self, event, arg1)
 	if(event == "ACTIONBAR_SLOT_CHANGED") then
 		if(self:GetPagedID() == arg1) then
 			if self:UpdateVisibility() then
-				local parent = self:GetParent()
-				SecureStateHeader_Refresh(parent, parent:GetCurrentState())
+				SecureStateHeader_Refresh(self:GetParent())
 			end
-			self.id = nil
+			self:Update()
 		end
 	end
 
@@ -81,8 +84,8 @@ function BongosActionButton:Create(id)
 	button:SetScript("OnEnter", OnEnter)
 	button:SetScript("OnLeave", OnLeave)
 	button:SetScript("OnShow", OnShow)
-	button:SetScript("OnAttributeChanged", OnAttributeChanged)
 	button:SetScript("OnEvent", OnEvent)
+	button:SetScript("OnAttributeChanged", OnAttributeChanged)
 
 	button:SetAttribute("type", "action")
 	button:SetAttribute("checkselfcast", true)
@@ -91,33 +94,34 @@ function BongosActionButton:Create(id)
 	button:RegisterForDrag("LeftButton", "RightButton")
 	button:RegisterForClicks("AnyUp")
 
-	button:SetAttribute("action", id)
-	if(id <= 12) then
-		local class = select(2, UnitClass("player"))
-		if(class == "ROGUE") then
-			button:SetAttribute("*action-s1", id + 72)
-		elseif(class == "DRUID") then
-			button:SetAttribute("*action-s1", id + 96)
-			button:SetAttribute("*action-s3", id + 72)
-			button:SetAttribute("*action-s4", id + 84)
-			button:SetAttribute("*action-help", id + 12)
-		elseif(class == "WARRIOR") then
-			button:SetAttribute("*action-s1", id + 96)
-			button:SetAttribute("*action-s2", id + 72)
-			button:SetAttribute("*action-s3", id + 84)
-		end
-
-		for i = 1, 5 do
-			button:SetAttribute(format("*action-p%d", i), id + (i*12))
-		end
-	end
-
+	button:LoadStates(id)
 	button:Style()
 	button:UpdateHotkey()
 	button:Hide()
 
 	buttons[id] = button
 	return button
+end
+
+function BongosActionButton:LoadStates(id)
+	self:SetAttribute("action", id)
+	
+	if(CLASS == "ROGUE") then
+		self:SetAttribute("*action-s1", toValid(id + 72)) --stealth
+	elseif(CLASS == "DRUID") then
+		self:SetAttribute("*action-s1", toValid(id + 96)) --bear
+		self:SetAttribute("*action-s3", toValid(id + 72)) --cat
+		self:SetAttribute("*action-s6", toValid(id + 108)) --moonkin
+		self:SetAttribute("*action-prowl", toValid(id + 84)) --prowl
+	elseif(CLASS == "WARRIOR") then
+		self:SetAttribute("*action-s1", toValid(id + 96)) --battle
+		self:SetAttribute("*action-s2", toValid(id + 72)) --defensive
+		self:SetAttribute("*action-s3", toValid(id + 84)) --berserker
+	end
+	
+	for i = 1, 5 do
+		self:SetAttribute(format("*action-p%d", i), toValid(id + (i*12)))
+	end
 end
 
 function BongosActionButton:RegisterEvents()
@@ -172,9 +176,7 @@ end
 --[[ OnX Functions ]]--
 
 function BongosActionButton:OnUpdate(elapsed)
-	if(not self.id) then
-		self:Update()
-	end
+	if(not self.id) then self:Update() end
 	
 	local name = self:GetName()
 	if not getglobal(name .. "Icon"):IsShown() then return end
@@ -477,8 +479,8 @@ end
 
 --[[ Utility Functions ]]--
 
-function BongosActionButton:GetPagedID(update)
-	if not self.id or update then
+function BongosActionButton:GetPagedID()
+	if not self.id then
 		self.id = SecureButton_GetModifiedAttribute(self, "action", SecureStateChild_GetEffectiveButton(self)) or 1
 	end
 	return self.id or 1
@@ -492,18 +494,15 @@ function BongosActionButton:ForAll(method, ...)
 	end
 end
 
-function BongosActionButton:ForAllShown(method, ...)
-	for _, button in pairs(buttons) do
-		if button:IsShown() then
-			local action = button[method]
-			assert(action, (method or "null") .. " does not exist")
-			action(button, ...)
-		end
-	end
-end
-
-
---[[ Access ]]--
+-- function BongosActionButton:ForAllShown(method, ...)
+	-- for _, button in pairs(buttons) do
+		-- if button:IsShown() then
+			-- local action = button[method]
+			-- assert(action, (method or "null") .. " does not exist")
+			-- action(button, ...)
+		-- end
+	-- end
+-- end
 
 function BongosActionButton:ShowingEmpty()
 	return BongosActionBar.showEmpty or BongosActionMain:ShowingEmptyButtons()
