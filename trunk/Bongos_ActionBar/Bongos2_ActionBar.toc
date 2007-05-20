@@ -6,6 +6,7 @@
 ## Dependencies: Bongos2
 ## SavedVariables: Bongos2ActionBarDB
 localization.lua
+keyBound\localization.lua
 keyBound\keyBound.lua
 keyBound\spellBound.lua
 unreg.lua

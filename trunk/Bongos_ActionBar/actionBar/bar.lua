@@ -9,6 +9,7 @@ local Bar_MT = {__index = BActionBar}
 --constants
 local CLASS = BONGOS_CLASS
 local MAX_BUTTONS = BONGOS_MAX_BUTTONS
+local MAX_STANCE = (BONGOS_STANCES and table.maxn(BONGOS_STANCES)) or 0
 local MAX_PAGES = BONGOS_MAX_PAGES
 local BUTTON_SIZE = 36
 
@@ -32,7 +33,7 @@ function BActionBar:Create(id)
 		bar:SetPoint("CENTER", UIParent, "CENTER", 36 * row, -36 * col)
 	end
 	bar:Layout()
-	-- SecureStateHeader_Refresh(bar, self:GetCurrentState())
+	SecureStateHeader_Refresh(bar, self:GetCurrentState())
 
 	return bar
 end
@@ -62,7 +63,7 @@ function BActionBar:LoadStates()
 		stateButton = "1:s1;2:s2;3:s3;" .. stateButton
 	elseif(CLASS == "DRUID") then
 		classMap = "[stance:1]1;[stance:2,nostealth]2;[stance:2,stealth]7;[stance:3,nostealth]3;[stance:3,stealth]7;[stance:4]5;[stance:5]6;[stance:6]7;"
-		stateButton = "1:s1;2:s2;3:s3;4:s4;5:s5;6:s6;7:prowl;" .. stateButton
+		stateButton = "1:s1;2:s2;3:s3;4:s4;5:s5;6:s6;7:s7;" .. stateButton
 	end
 
 	if(classMap) then

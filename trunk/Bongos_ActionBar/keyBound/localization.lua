@@ -6,6 +6,8 @@
 KEYBOUND_LOCALS = {}
 
 local L = KEYBOUND_LOCALS
+L.Enabled = "Bindings mode enabled"
+L.Disabled = "Bindings mode disabled"
 L.ClearTip = format("Press %s to clear all bindings", GetBindingText("ESCAPE", "KEY_"))
 L.NoKeysBoundTip = "No current bindings"
 L.ClearedBindings = "Removed all bindings from %s"

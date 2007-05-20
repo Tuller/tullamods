@@ -16,6 +16,7 @@ local SIZE = 36
 
 --globals
 local buttons = {}
+local hasHelp = (CLASS == "DRUID" or CLASS == "SHAMAN" or CLASS == "PALADIN" or CLASS == "PRIEST")
 
 --converts an ID into a valid action ID (between 1 and 120)
 local function toValid(id) return mod(id - 1, 120) + 1 end
@@ -112,12 +113,11 @@ function BongosActionButton:Set(id, parent)
 	local button = buttons[id] or self:Create(id)
 	parent:Attach(button)
 	parent:SetAttribute("addchild", button)
-	self:SetAttribute("action", id)
+	button:SetAttribute("action", id)
 
-	self:LoadStates()
-	self:RegisterEvents()
-
-	-- button:UpdateVisibility()
+	button:LoadStates()
+	button:RegisterEvents()
+	button:UpdateVisibility()
 	-- button:Update()
 
 	return button
@@ -135,19 +135,20 @@ end
 --load up the action ID when in forms/paged from the parent action bar
 function BongosActionButton:LoadStates()
 	local id = self:GetAttribute("action")
+	local parent = self:GetParent()
 
 	for i = 1, MAX_STANCE do
 		local state = format("s%d", i)
-		self:SetAttribute("*action-" .. state, id + parent:GetOffset(state))
+		self:SetAttribute("*action-" .. state, id + parent:GetStateOffset(state))
 	end
 
-	if(CLASS == "DRUID" or class == "SHAMAN" or class == "PALADIN" or class == "PRIEST") then
-		self:SetAttribute("*action-help", id + parent:GetOffset("help"))
+	if(CLASS == "DRUID" or CLASS == "SHAMAN" or CLASS == "PALADIN" or CLASS == "PRIEST") then
+		self:SetAttribute("*action-help", id + parent:GetStateOffset("help"))
 	end
 
 	for i = 1, MAX_PAGE do
 		local state = format("p%d", i)
-		self:SetAttribute("*action-" .. state, id + parent:GetOffset(state))
+		self:SetAttribute("*action-" .. state, id + parent:GetStateOffset(state))
 	end
 end
 
@@ -415,23 +416,25 @@ function BongosActionButton:UpdateVisibility(showEmpty)
 		newstates = 0
 	end
 
-	for i = 1, 7 do
+	for i = 1, MAX_STANCE do
 		local action = self:GetAttribute("*action-s" .. i) or normAction
 		if showEmpty or HasAction(action) then
 			newstates = (newstates and newstates .. "," .. i) or i
 		end
 	end
 
-	for i = 1, 5 do
+	for i = 1, MAX_PAGE do
 		local action = self:GetAttribute("*action-p" .. i) or normAction
 		if showEmpty or HasAction(action) then
 			newstates = (newstates and newstates .. "," .. i+7) or i+7
 		end
 	end
 
-	local action = self:GetAttribute("*action-help") or normAction
-	if showEmpty or HasAction(action) then
-		newstates = (newstates and newstates .. "," .. 13) or 13
+	if(hasHelp) then
+		local action = self:GetAttribute("*action-help") or normAction
+		if showEmpty or HasAction(action) then
+			newstates = (newstates and newstates .. "," .. 13) or 13
+		end
 	end
 
 	newstates = newstates or "!*"
@@ -492,7 +495,7 @@ end
 function BongosActionButton:ForAll(method, ...)
 	for _, button in pairs(buttons) do
 		local action = button[method]
-		assert(action, (method or "null") .. " does not exist")
+		-- assert(action, (method or "null") .. " does not exist")
 		action(button, ...)
 	end
 end

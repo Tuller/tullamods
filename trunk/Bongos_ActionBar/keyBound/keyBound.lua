@@ -218,20 +218,36 @@ end
 function KeyBound:PLAYER_REGEN_ENABLED()
 	if self.wasEnabled or self.enabled then
 		self:Show()
-		UIErrorsFrame:AddMessage(L.CombatBindingsEnabled, 1, 1, 1, 1, UIERRORS_HOLD_TIME)
+		UIErrorsFrame:AddMessage(L.CombatBindingsEnabled, 1, 0, 0, 1, UIERRORS_HOLD_TIME)
 	end
 	self.wasEnabled = nil
+	self.inCombat = false
 end
 
 function KeyBound:PLAYER_REGEN_DISABLED()
+	self.inCombat = true
 	self.wasEnabled = self.enabled
 	if self.wasEnabled then
 		self:Hide()
-		UIErrorsFrame:AddMessage(L.CombatBindingsDisabled, 1, 1, 1, 1, UIERRORS_HOLD_TIME)
+		UIErrorsFrame:AddMessage(L.CombatBindingsDisabled, 1, 0, 0, 1, UIERRORS_HOLD_TIME)
 	end
 end
 
 --usable functions
+function KeyBound:Toggle()
+	if(self.enabled) then
+		self:Hide()
+		UIErrorsFrame:AddMessage(L.Disabled, 1, 1, 1, 1, 30)
+	else
+		if(not self.inCombat) then
+			self:Show()
+			UIErrorsFrame:AddMessage(L.Enabled, 1, 1, 1, 1, 30)
+		else
+			UIErrorsFrame:AddMessage(L.CannotBindInCombat, 1, 0, 0, 1, UIERRORS_HOLD_TIME)
+		end
+	end
+end
+
 function KeyBound:Show()
 	self.enabled = true
 	if not self.frame then
@@ -297,3 +313,7 @@ function KeyBound:ToShortKey(key)
 		return key
 	end
 end
+
+SlashCmdList["KeyBoundSlashCOMMAND"] = function() KeyBound:Toggle() end
+SLASH_KeyBoundSlashCOMMAND1 = "/keybound"
+SLASH_KeyBoundSlashCOMMAND1 = "/kb"
