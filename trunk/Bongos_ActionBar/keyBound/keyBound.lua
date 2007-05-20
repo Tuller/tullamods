@@ -11,7 +11,7 @@
 			button:FreeKey(key) - unbinds the given key from all other buttons
 			button:ClearBindings() - removes all keys bound to the given button
 			button:GetBindings() - returns a string listing all bindings of the given button
-			button:GetBindAction() - what we're binding to, used for printing
+			button:GetActionName() - what we're binding to, used for printing
 --]]
 
 KeyBound = DongleStub("Dongle-1.0"):New("KeyBound")
@@ -24,16 +24,21 @@ local function Binder_ToBinding(button)
 end
 
 local function Binder_FreeKey(button, key)
+	local msg
 	if button.FreeKey then
 		local action = button:FreeKey(key)
 		if button:FreeKey(key) then
-			KeyBound:Print(format(L.UnboundKey, GetBindingText(key, "KEY_"), action))
+			msg = format(L.UnboundKey, GetBindingText(key, "KEY_"), action)
 		end
 	else
 		local action = GetBindingAction(key)
 		if action and action ~= "" and action ~= Binder_ToBinding(button) then
-			KeyBound:Print(format(L.UnboundKey, GetBindingText(key, "KEY_"), action))
+			msg = format(L.UnboundKey, GetBindingText(key, "KEY_"), action)
 		end
+	end
+
+	if msg then
+		UIErrorsFrame:AddMessage(msg, 1, 1, 0, 1, UIERRORS_HOLD_TIME)
 	end
 end
 
@@ -41,34 +46,38 @@ local function Binder_SetKey(button, key)
 	if not InCombatLockdown() then
 		Binder_FreeKey(button, key)
 
+		local msg
 		if button.SetKey then
 			button:SetKey(key)
-			KeyBound:Print(format(L.BoundKey, GetBindingText(key, "KEY_"), button:GetBindAction()))
+			msg = format(L.BoundKey, GetBindingText(key, "KEY_"), button:GetActionName())
 		else
 			SetBindingClick(key, button:GetName(), "LeftButton")
-			KeyBound:Print(format(L.BoundKey, GetBindingText(key, "KEY_"), button:GetName()))
+			msg = format(L.BoundKey, GetBindingText(key, "KEY_"), button:GetName())
 		end
 		SaveBindings(GetCurrentBindingSet())
+		UIErrorsFrame:AddMessage(msg, 1, 1, 1, 1, UIERRORS_HOLD_TIME)
 	else
-		KeyBound:Print(L.CannotBindInCombat)
+		UIErrorsFrame:AddMessage(L.CannotBindInCombat, 1, 0, 0, 1, UIERRORS_HOLD_TIME)
 	end
 end
 
 local function Binder_ClearBindings(button)
 	if not InCombatLockdown() then
+		local msg
 		if button.ClearBindings then
 			button:ClearBindings()
-			KeyBound:Print(format(L.ClearedBindings, button:GetBindAction()))
+			msg = format(L.ClearedBindings, button:GetActionName())
 		else
 			local binding = Binder_ToBinding(button)
 			while GetBindingKey(binding) do
 				SetBinding(GetBindingKey(binding), nil)
 			end
-			KeyBound:Print(format(L.ClearedBindings, button:GetName()))
+			msg = format(L.ClearedBindings, button:GetName())
 		end
 		SaveBindings(GetCurrentBindingSet())
+		UIErrorsFrame:AddMessage(msg, 1, 1, 1, 1, UIERRORS_HOLD_TIME)
 	else
-		KeyBound:Print(L.CannotBindInCombat)
+		UIErrorsFrame:AddMessage(L.CannotBindInCombat, 1, 0, 0, 1, UIERRORS_HOLD_TIME)
 	end
 end
 
@@ -147,7 +156,11 @@ local function Binder_OnEnter(self)
 		else
 			GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 		end
-		GameTooltip:SetText(button:GetName(), 1, 1, 1)
+		if(button.GetActionName) then
+			GameTooltip:SetText(button:GetActionName(), 1, 1, 1)
+		else
+			GameTooltip:SetText(button:GetName(), 1, 1, 1)
+		end
 
 		local bindings = Binder_GetBindings(button)
 		if bindings then
@@ -237,11 +250,11 @@ end
 function KeyBound:Toggle()
 	if(self.enabled) then
 		self:Hide()
-		UIErrorsFrame:AddMessage(L.Disabled, 1, 1, 1, 1, 30)
+		UIErrorsFrame:AddMessage(L.Disabled, 1, 1, 0, 1, UIERRORS_HOLD_TIME)
 	else
 		if(not self.inCombat) then
 			self:Show()
-			UIErrorsFrame:AddMessage(L.Enabled, 1, 1, 1, 1, 30)
+			UIErrorsFrame:AddMessage(L.Enabled, 1, 1, 0, 1, UIERRORS_HOLD_TIME)
 		else
 			UIErrorsFrame:AddMessage(L.CannotBindInCombat, 1, 0, 0, 1, UIERRORS_HOLD_TIME)
 		end
