@@ -11,21 +11,11 @@
 			button:FreeKey(key) - unbinds the given key from all other buttons
 			button:ClearBindings() - removes all keys bound to the given button
 			button:GetBindings() - returns a string listing all bindings of the given button
+			button:GetBindAction() - what we're binding to, used for printing
 --]]
 
 KeyBound = DongleStub("Dongle-1.0"):New("KeyBound")
-
-KEYBOUND_LOCALS = {}
 local L = KEYBOUND_LOCALS
-L.ClearTip = format("Press %s to clear all bindings", GetBindingText("ESCAPE", "KEY_"))
-L.NoKeysBoundTip = "No current bindings"
-L.ClearedBindings = "Removed all bindings from %s"
-L.BoundKey = "Set %s to %s"
-L.UnboundKey = "Unbound %s from %s"
-L.CannotBindInCombat = "Cannot bind keys in combat"
-L.CombatBindingsEnabled = "Exiting combat, keybinding mode enabled"
-L.CombatBindingsDisabled = "Entering combat, keybinding mode disabled"
-
 
 --[[ Bindframe functions ]]--
 
@@ -53,11 +43,12 @@ local function Binder_SetKey(button, key)
 
 		if button.SetKey then
 			button:SetKey(key)
+			KeyBound:Print(format(L.BoundKey, GetBindingText(key, "KEY_"), button:GetBindAction()))
 		else
 			SetBindingClick(key, button:GetName(), "LeftButton")
-			SaveBindings(GetCurrentBindingSet())
+			KeyBound:Print(format(L.BoundKey, GetBindingText(key, "KEY_"), button:GetName()))
 		end
-		KeyBound:Print(format(L.BoundKey, GetBindingText(key, "KEY_"), button:GetName()))
+		SaveBindings(GetCurrentBindingSet())
 	else
 		KeyBound:Print(L.CannotBindInCombat)
 	end
@@ -67,14 +58,15 @@ local function Binder_ClearBindings(button)
 	if not InCombatLockdown() then
 		if button.ClearBindings then
 			button:ClearBindings()
+			KeyBound:Print(format(L.ClearedBindings, button:GetBindAction()))
 		else
 			local binding = Binder_ToBinding(button)
 			while GetBindingKey(binding) do
 				SetBinding(GetBindingKey(binding), nil)
 			end
-			SaveBindings(GetCurrentBindingSet())
+			KeyBound:Print(format(L.ClearedBindings, button:GetName()))
 		end
-		KeyBound:Print(format(L.ClearedBindings, button:GetName()))
+		SaveBindings(GetCurrentBindingSet())
 	else
 		KeyBound:Print(L.CannotBindInCombat)
 	end

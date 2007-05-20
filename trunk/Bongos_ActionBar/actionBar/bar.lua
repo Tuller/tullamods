@@ -6,26 +6,48 @@
 BActionBar = setmetatable(CreateFrame("Button"), {__index = BBar})
 local Bar_MT = {__index = BActionBar}
 
+--constants
+local CLASS = BONGOS_CLASS
+local MAX_BUTTONS = BONGOS_MAX_BUTTONS
+local MAX_PAGES = BONGOS_MAX_PAGES
+local BUTTON_SIZE = 36
+
+local DEFAULT_NUM_ACTIONBARS = 10
 local DEFAULT_SPACING = 2
 local DEFAULT_SIZE = 12
 local DEFAULT_COLS = 12
-local MAX_BUTTONS = 120
-local BUTTON_SIZE = 36
-local STANCE_FORMAT = "s%d"
-local CLASS = select(2, UnitClass("player"))
 
-function BActionBar:GetCurrentState()
-	local page = GetActionBarPage()
-	if(page == 1) then
-		local stance = GetShapeshiftForm()
-		if(stance == 3 and IsStealthed()) then
-			return 4
+
+--[[ Constructor/Destructor]]--
+
+function BActionBar:Create(id)
+	local bar = setmetatable(BBar:CreateSecure(id), Bar_MT)
+	bar:LoadStates()
+
+	--layout the bar
+	if not bar:IsUserPlaced() then
+		local start = bar:GetStartID()
+		local row = mod(start-1, 12)
+		local col = ceil(start / 12) - 1
+		bar:SetPoint("CENTER", UIParent, "CENTER", 36 * row, -36 * col)
+	end
+	bar:Layout()
+	-- SecureStateHeader_Refresh(bar, self:GetCurrentState())
+
+	return bar
+end
+
+function BActionBar:OnDelete()
+	for i = self:GetStartID(), self:GetEndID() do
+		local button = BongosActionButton:Get(i)
+		if button then
+			button:Release()
 		end
-		return stance
-	else
-		return page + 6
 	end
 end
+
+
+--[[ State Functions ]]--
 
 function BActionBar:LoadStates()
 	local pageMap = "[actionbar:2]8;[actionbar:3]9;[actionbar:4]10;[actionbar:5]11;[actionbar:6]12;"
@@ -52,29 +74,16 @@ function BActionBar:LoadStates()
 	self:SetAttribute("statebutton", stateButton)
 end
 
-function BActionBar:Create(id)
-	local bar = setmetatable(BBar:CreateSecure(id), Bar_MT)
-	bar:LoadStates()
-
-	--layout the bar
-	if not bar:IsUserPlaced() then
-		local start = bar:GetStartID()
-		local row = mod(start-1, 12)
-		local col = ceil(start / 12) - 1
-		bar:SetPoint("CENTER", UIParent, "CENTER", 36 * row, -36 * col)
-	end
-	bar:Layout()
-	SecureStateHeader_Refresh(bar, self:GetCurrentState())
-
-	return bar
-end
-
-function BActionBar:OnDelete()
-	for i = self:GetStartID(), self:GetEndID() do
-		local button = BongosActionButton:Get(i)
-		if button then
-			button:Release()
+function BActionBar:GetCurrentState()
+	local page = GetActionBarPage()
+	if(page == 1) then
+		local stance = GetShapeshiftForm()
+		if(stance == 3 and IsStealthed()) then
+			return 4
 		end
+		return stance
+	else
+		return page + 6
 	end
 end
 
@@ -303,7 +312,19 @@ function BActionBar:SetNumber(newSize)
 end
 
 function BActionBar:GetNumber()
-	return 10
+	return BongosActionMain.profile.numActionBars or DEFAULT_NUM_ACTIONBARS
+end
+
+
+--[[ Stance Settings ]]--
+
+function BActionBar:SetStateOffset(state, offset)
+	if(offset == 0) then offset = nil end
+	self.sets[state] = offset
+end
+
+function BActionBar:GetStateOffset(state)
+	return self.sets[state] or 0
 end
 
 
