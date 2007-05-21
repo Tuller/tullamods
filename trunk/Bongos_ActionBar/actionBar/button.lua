@@ -7,16 +7,14 @@ local Button_MT = {__index = BongosActionButton}
 
 --constants
 local MAX_BUTTONS = BONGOS_MAX_BUTTONS
-local MAX_STANCE = (BONGOS_STANCES and table.maxn(BONGOS_STANCES)) or 0
-local MAX_PAGE = BONGOS_MAX_PAGES
-local CLASS = BONGOS_CLASS
+local STANCES = BONGOS_STANCES
+local MAX_PAGES = BONGOS_MAX_PAGES
 
 local BUTTON_NAME = "BongosActionButton%d"
 local SIZE = 36
 
 --globals
 local buttons = {}
-local hasHelp = (CLASS == "DRUID" or CLASS == "SHAMAN" or CLASS == "PALADIN" or CLASS == "PRIEST")
 
 --converts an ID into a valid action ID (between 1 and 120)
 local function toValid(id) return mod(id - 1, 120) + 1 end
@@ -36,6 +34,7 @@ local function OnAttributeChanged(self, var, val)
 	local parent = self:GetParent()
 	if(parent and parent:IsShown() and var == "state-parent") then
 		self.id = nil
+		-- self.state = tonumber(val)
 	end
 end
 
@@ -48,7 +47,8 @@ local function OnEvent(self, event, arg1)
 
 	if(event == "ACTIONBAR_SLOT_CHANGED") then
 		if(self:GetPagedID() == arg1) then
-			if self:UpdateVisibility() then
+			local changed = self:UpdateVisibility()
+			if changed then
 				SecureStateHeader_Refresh(self:GetParent())
 			end
 			self:Update()
@@ -82,9 +82,22 @@ function BongosActionButton:Create(id)
 	local button = CreateFrame("CheckButton", name, nil, "SecureActionButtonTemplate, ActionButtonTemplate")
 	setmetatable(button, Button_MT)
 
-	getglobal(name .. "Icon"):SetTexCoord(0.06, 0.94, 0.06, 0.94)
-	getglobal(name .. "Border"):SetVertexColor(0, 1, 0, 0.6)
-	getglobal(name .. "NormalTexture"):SetVertexColor(1, 1, 1, 0.5)
+	button.icon = getglobal(name .. "Icon")
+	button.icon:SetTexCoord(0.06, 0.94, 0.06, 0.94)
+
+	button.border = getglobal(name .. "Border")
+	button.border:SetVertexColor(0, 1, 0, 0.6)
+
+	button.normal = getglobal(name .. "NormalTexture")
+	button.normal:SetVertexColor(1, 1, 1, 0.5)
+
+	button.cooldown = getglobal(name .. "Cooldown")
+
+	button.flash = getglobal(name .. "Flash")
+	button.hotkey = getglobal(name .. "HotKey")
+	button.macro = getglobal(name .. "Name")
+	button.count = getglobal(name .. "Count")
+
 	button:UpdateHotkey()
 	button:Hide()
 
@@ -99,9 +112,11 @@ function BongosActionButton:Create(id)
 	button:SetScript("OnAttributeChanged", OnAttributeChanged)
 
 	button:SetAttribute("type", "action")
+	button:SetAttribute("action", id)
 	button:SetAttribute("checkselfcast", true)
 	button:SetAttribute("useparent-unit", true)
 	button:SetAttribute("useparent-statebutton", true)
+
 	button:RegisterForDrag("LeftButton", "RightButton")
 	button:RegisterForClicks("AnyUp")
 
@@ -109,49 +124,19 @@ function BongosActionButton:Create(id)
 	return button
 end
 
+--attatch the button to a bar,  make active
 function BongosActionButton:Set(id, parent)
 	local button = buttons[id] or self:Create(id)
 	parent:Attach(button)
 	parent:SetAttribute("addchild", button)
-	button:SetAttribute("action", id)
 
-	button:LoadStates()
 	button:RegisterEvents()
-	button:UpdateVisibility()
-	-- button:Update()
+	button:UpdateStates()
 
 	return button
 end
 
-function BongosActionButton:Release()
-	self:SetParent(nil)
-	self:ClearAllPoints()
-	self:UnregisterAllEvents()
-	self:Hide()
-
-	self.id = nil
-end
-
---load up the action ID when in forms/paged from the parent action bar
-function BongosActionButton:LoadStates()
-	local id = self:GetAttribute("action")
-	local parent = self:GetParent()
-
-	for i = 1, MAX_STANCE do
-		local state = format("s%d", i)
-		self:SetAttribute("*action-" .. state, id + parent:GetStateOffset(state))
-	end
-
-	if(CLASS == "DRUID" or CLASS == "SHAMAN" or CLASS == "PALADIN" or CLASS == "PRIEST") then
-		self:SetAttribute("*action-help", id + parent:GetStateOffset("help"))
-	end
-
-	for i = 1, MAX_PAGE do
-		local state = format("p%d", i)
-		self:SetAttribute("*action-" .. state, id + parent:GetStateOffset(state))
-	end
-end
-
+--load events
 function BongosActionButton:RegisterEvents()
 	self:RegisterEvent("ACTIONBAR_SLOT_CHANGED")
 	self:RegisterEvent("UPDATE_BINDINGS")
@@ -174,14 +159,23 @@ function BongosActionButton:RegisterEvents()
 	self:RegisterEvent("STOP_AUTOREPEAT_SPELL")
 end
 
+--hide the button
+function BongosActionButton:Release()
+	self:SetParent(nil)
+	self:ClearAllPoints()
+	self:UnregisterAllEvents()
+	self:Hide()
+
+	self.id = nil
+end
+
 
 --[[ OnX Functions ]]--
 
 function BongosActionButton:OnUpdate(elapsed)
 	if(not self.id) then self:Update() end
 
-	local name = self:GetName()
-	if not getglobal(name .. "Icon"):IsShown() then return end
+	if not self.icon:IsShown() then return end
 
 	--update flashing
 	if self.flashing then
@@ -193,7 +187,7 @@ function BongosActionButton:OnUpdate(elapsed)
 			end
 			self.flashtime = ATTACK_BUTTON_FLASH_TIME - overtime
 
-			local flashTexture = getglobal(name .. "Flash")
+			local flashTexture = self.flash
 			if flashTexture:IsShown() then
 				flashTexture:Hide()
 			else
@@ -206,17 +200,17 @@ function BongosActionButton:OnUpdate(elapsed)
 	if self.rangeTimer then
 		if self.rangeTimer < 0 then
 			local action = self:GetPagedID()
-			local hotkey = getglobal(name .. "HotKey")
+			local hotkey = self.hotkey
 			if IsActionInRange(action) == 0 then
 				hotkey:SetVertexColor(1, 0.1, 0.1)
 				if BongosActionMain:RangeColoring() and IsUsableAction(action) then
 					local r,g,b = BongosActionMain:GetRangeColor()
-					getglobal(name .. "Icon"):SetVertexColor(r,g,b)
+					self.icon:SetVertexColor(r,g,b)
 				end
 			else
 				hotkey:SetVertexColor(0.6, 0.6, 0.6)
 				if IsUsableAction(action) then
-					getglobal(name .. "Icon"):SetVertexColor(1, 1, 1)
+					self.icon:SetVertexColor(1, 1, 1)
 				end
 			end
 			self.rangeTimer = TOOLTIP_UPDATE_TIME
@@ -271,10 +265,9 @@ end
 function BongosActionButton:Update()
 	if not self:GetParent() then return end
 
-	local name = self:GetName()
 	local action = self:GetPagedID()
-	local icon = getglobal(name .. "Icon")
-	local cooldown = getglobal(name .. "Cooldown")
+	local icon = self.icon
+	local cooldown = self.cooldown
 	local texture = GetActionTexture(action)
 
 	if texture then
@@ -289,7 +282,7 @@ function BongosActionButton:Update()
 		cooldown:Hide()
 
 		self:SetNormalTexture("Interface\\Buttons\\UI-Quickslot")
-		getglobal(name .. "HotKey"):SetVertexColor(0.6, 0.6, 0.6)
+		self.hotkey:SetVertexColor(0.6, 0.6, 0.6)
 	end
 
 	if HasAction(action) then
@@ -303,7 +296,7 @@ function BongosActionButton:Update()
 	self:UpdateCount()
 
 	-- Add a green border if button is an equipped item
-	local border = getglobal(name .. "Border")
+	local border = self.border
 	if IsEquippedAction(action) then
 		border:SetVertexColor(0, 1, 0, 0.6)
 		border:Show()
@@ -318,18 +311,18 @@ function BongosActionButton:Update()
 	end
 
 	-- Update Macro Text
-	getglobal(name .. "Name"):SetText(GetActionText(action))
+	self.macro:SetText(GetActionText(action))
 end
 
 --Update the cooldown timer
 function BongosActionButton:UpdateCooldown()
 	local start, duration, enable = GetActionCooldown(self:GetPagedID())
-	CooldownFrame_SetTimer(getglobal(self:GetName().."Cooldown"), start, duration, enable)
+	CooldownFrame_SetTimer(self.cooldown, start, duration, enable)
 end
 
 --Update item count
 function BongosActionButton:UpdateCount()
-	local text = getglobal(self:GetName() .. "Count")
+	local text = self.count
 	local action = self:GetPagedID()
 
 	if IsConsumableAction(action) then
@@ -348,7 +341,7 @@ end
 --colors the action button if out of mana, out of range, etc
 function BongosActionButton:UpdateUsable()
 	local action = self:GetPagedID()
-	local icon = getglobal(self:GetName() .. "Icon")
+	local icon = self.icon
 
 	local isUsable, notEnoughMana = IsUsableAction(action)
 	if isUsable then
@@ -384,7 +377,7 @@ end
 
 function BongosActionButton:StopFlash()
 	self.flashing = nil
-	getglobal(self:GetName() .. "Flash"):Hide()
+	self.flash:Hide()
 
 	self:UpdateState()
 end
@@ -406,34 +399,85 @@ function BongosActionButton:UpdateTooltip()
 	end
 end
 
+--[[ State Updating ]]--
+
+--load up the action ID when in forms/paged from the parent action bar
+function BongosActionButton:UpdateStates()
+	local id = self:GetAttribute("action")
+	local parent = self:GetParent()
+
+	if(STANCES) then
+		for i in pairs(STANCES) do
+			local state = format("s%d", i)
+			local offset = parent:GetStateOffset(state)
+			if(offset) then
+				self:SetAttribute("*action-" .. state, toValid(id + offset))
+				self:SetAttribute("*action-" .. state .. "s", toValid(id + offset))
+			else
+				self:SetAttribute("*action-" .. state, nil)
+				self:SetAttribute("*action-" .. state .. "s", nil)
+			end
+		end
+	end
+
+	for i = 1, MAX_PAGES do
+		local state = format("p%d", i)
+		local offset = parent:GetStateOffset(state)
+		if(offset) then
+			self:SetAttribute("*action-" .. state, toValid(id + offset))
+			self:SetAttribute("*action-" .. state .. "s", toValid(id + offset))
+		else
+			self:SetAttribute("*action-" .. state, nil)
+			self:SetAttribute("*action-" .. state .. "s", nil)
+		end
+	end
+
+	local offset = parent:GetStateOffset("help")
+	if(offset) then
+		self:SetAttribute("*action-help", toValid(id + offset))
+		self:SetAttribute("*action-helps", toValid(id + offset))
+	else
+		self:SetAttribute("*action-help", nil)
+		self:SetAttribute("*action-helps", nil)
+	end
+
+	--don't double update
+	if not(self:UpdateVisibility()) then
+		self.id = nil
+		self:Update()
+	end
+end
+
 --show if showing empty buttons, or if the slot has an action, hide otherwise
-function BongosActionButton:UpdateVisibility(showEmpty)
-	showEmpty = showEmpty or self:ShowingEmpty()
+function BongosActionButton:UpdateVisibility()
+	local showEmpty = self:ShowingEmpty()
 
 	local newstates
-	local normAction = self:GetAttribute("action")
-	if showEmpty or HasAction(normAction) then
-		newstates = 0
-	end
+	if(showEmpty) then
+		newstates = "*"
+	else
+		local id = self:GetAttribute("action")
+		if HasAction(id) then newstates = 0 end
 
-	for i = 1, MAX_STANCE do
-		local action = self:GetAttribute("*action-s" .. i) or normAction
-		if showEmpty or HasAction(action) then
-			newstates = (newstates and newstates .. "," .. i) or i
+		if(STANCES) then
+			for i in pairs(STANCES) do
+				local action = self:GetAttribute("*action-s" .. i) or id
+				if HasAction(action) then
+					newstates = (newstates and newstates .. "," .. i) or i
+				end
+			end
 		end
-	end
 
-	for i = 1, MAX_PAGE do
-		local action = self:GetAttribute("*action-p" .. i) or normAction
-		if showEmpty or HasAction(action) then
-			newstates = (newstates and newstates .. "," .. i+7) or i+7
+		for i = 1, MAX_PAGES do
+			local action = self:GetAttribute("*action-p" .. i) or id
+			if HasAction(action) then
+				newstates = (newstates and newstates .. "," .. (10 + i-1)) or (10 + i-1)
+			end
 		end
-	end
 
-	if(hasHelp) then
-		local action = self:GetAttribute("*action-help") or normAction
-		if showEmpty or HasAction(action) then
-			newstates = (newstates and newstates .. "," .. 13) or 13
+		local action = self:GetAttribute("*action-help") or id
+		if HasAction(action) then
+			newstates = (newstates and newstates .. "," .. 15) or 15
 		end
 	end
 
@@ -441,6 +485,7 @@ function BongosActionButton:UpdateVisibility(showEmpty)
 	local oldstates = self:GetAttribute("showstates")
 	if not oldstates or oldstates ~= newstates then
 		self:SetAttribute("showstates", newstates)
+		self.id = nil
 		self:Update()
 		return true
 	end
@@ -450,7 +495,7 @@ end
 --[[ Hotkey Functions ]]--
 
 function BongosActionButton:ShowHotkey(enable)
-	local hotkey = getglobal(self:GetName() .. "HotKey")
+	local hotkey = self.hotkey
 	if enable then
 		hotkey:Show()
 		self:UpdateHotkey()
@@ -460,7 +505,7 @@ function BongosActionButton:ShowHotkey(enable)
 end
 
 function BongosActionButton:UpdateHotkey()
-	getglobal(self:GetName() .. "HotKey"):SetText(self:GetHotkey() or "")
+	self.hotkey:SetText(self:GetHotkey() or "")
 end
 
 function BongosActionButton:GetHotkey()
@@ -474,7 +519,7 @@ end
 --[[ Macro Functions ]]--
 
 function BongosActionButton:ShowMacro(enable)
-	local macro = getglobal(self:GetName() .. "Name")
+	local macro = self.macro
 	if enable then
 		macro:Show()
 	else
@@ -486,22 +531,32 @@ end
 --[[ Utility Functions ]]--
 
 function BongosActionButton:GetPagedID()
-	if not self.id then
-		self.id = SecureButton_GetModifiedAttribute(self, "action", SecureStateChild_GetEffectiveButton(self)) or 1
+	if not(self.id) then
+		-- local state = self.state
+		-- local id = self:GetAttribute("action")
+		-- if(not state or state == 0) then
+			-- self.id = id
+		-- elseif(state < 10) then
+			-- self.id = self:GetAttribute("*action-s" .. state) or id
+		-- elseif(state < 15) then
+			-- self.id = self:GetAttribute("*action-p" .. state - 9) or id
+		-- elseif(state == 15) then
+			-- self.id = self:GetAttribute("*action-help") or id
+		-- end
+		self.id = SecureButton_GetModifiedAttribute(self, "action", SecureStateChild_GetEffectiveButton(self))
 	end
-	return self.id or 1
+	return tonumber(self.id) or 1
 end
 
 function BongosActionButton:ForAll(method, ...)
 	for _, button in pairs(buttons) do
 		local action = button[method]
-		-- assert(action, (method or "null") .. " does not exist")
 		action(button, ...)
 	end
 end
 
 function BongosActionButton:ShowingEmpty()
-	return BongosActionBar.showEmpty or BongosActionMain:ShowingEmptyButtons()
+	return BongosActionBar.showEmpty or BongosActionMain:ShowingEmptyButtons() or KeyBound:IsShown()
 end
 
 function BongosActionButton:Get(id)

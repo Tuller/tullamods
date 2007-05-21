@@ -24,20 +24,19 @@ function BongosActionBar:Unload()
 	self:UnregisterAllMessages()
 end
 
-
 function BongosActionBar:UpdateGrid(event)
 	if(event == "ACTIONBAR_SHOWGRID") then
 		self.showEmpty = true
 	elseif(event == "ACTIONBAR_HIDEGRID") then
 		self.showEmpty = nil
 	end
-	BActionBar:UpdateVisibilityForAll(self.showEmpty)
+	BActionBar:UpdateVisibilityForAll()
 end
 
 function BongosActionBar:UpdateBindingMode(event)
 	if(event == "KEYBOUND_ENABLED") then
-		BActionBar:UpdateVisibilityForAll(true) 
+		BActionBar:UpdateVisibilityForAll() 
 	elseif(event == "KEYBOUND_DISABLED") then
-		BActionBar:UpdateVisibilityForAll(nil)
+		BActionBar:UpdateVisibilityForAll()
 	end
 end

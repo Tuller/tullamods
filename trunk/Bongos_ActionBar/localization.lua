@@ -10,15 +10,13 @@ BONGOS_MAX_PAGES = 5
 
 --names of stances, and what people call them
 if(BONGOS_CLASS == "DRUID") then
-	BONGOS_STANCES = {[0] = "Normal", "Bear", "Aquatic", "Cat", "Travel", "Moonkin|Tree of Life", "Flight", "Prowl"}
+	BONGOS_STANCES = {"Bear", "Aquatic", "Cat", "Travel", "Moonkin/Tree", "Flight", "Prowl"}
 elseif(BONGOS_CLASS == "ROGUE") then
-	BONGOS_STANCES = {[0] = "Normal", "Stealth"}
+	BONGOS_STANCES = {"Stealth"}
 elseif(BONGOS_CLASS == "WARRIOR") then
-	BONGOS_STANCES = {"Battle Stance", "Defensive Stance", "Berserker Stance"}
+	BONGOS_STANCES = {"Battle", "Defensive", "Berserker"}
 elseif(BONGOS_CLASS == "PRIEST") then
-	BONGOS_STANCES = {[0] = "Normal", "Shadowform|Redemption"}
-elseif(BONGOS_CLASS == "SHAMAN") then
-	BONGOS_STANCES = {[0] = "Normal", "Ghostwolf"}
+	BONGOS_STANCES = {"Shadowform/Redemption"}
 end
 BONGOS_FRIENDLY_STANCE = "Friendly Target"
 

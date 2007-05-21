@@ -276,6 +276,10 @@ function KeyBound:Hide()
 	self:TriggerMessage("KEYBOUND_DISABLED")
 end
 
+function KeyBound:IsShown()
+	return self.enabled
+end
+
 function KeyBound:Set(button)
 	local bindFrame = self.frame
 
