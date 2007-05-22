@@ -10,7 +10,7 @@ local L = BONGOS_LOCALS
 
 --[[ Startup ]]--
 
-function Bongos:Initialize()
+function Bongos:Enable()
 	self:RegisterMessage("DONGLE_PROFILE_CREATED")
 	self:RegisterMessage("DONGLE_PROFILE_CHANGED")
 	self:RegisterMessage("DONGLE_PROFILE_DELETED")
@@ -21,6 +21,16 @@ function Bongos:Initialize()
 		profile = {
 			version = CURRENT_VERSION,
 			sticky = true,
+			lockButtons = true,
+			showTooltips = true,
+			showHotkeys = true,
+			showMacros = true,
+			rangeColoring = true,
+			showEmpty = false,
+			showHotkeys = false,
+			rangeColor = {r = 1, g = 0.5, b = 0.5},
+			rightClickUnit = "player",
+			quickMoveKey = 1,
 			bars = {}
 		}
 	}
@@ -39,9 +49,6 @@ function Bongos:Initialize()
 	end
 
 	self:RegisterSlashCommands()
-end
-
-function Bongos:Enable()
 	self:LoadModules()
 end
 
