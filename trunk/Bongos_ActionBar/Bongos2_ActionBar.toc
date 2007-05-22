@@ -9,8 +9,8 @@ localization.lua
 keyBound\localization.lua
 keyBound\keyBound.lua
 keyBound\spellBound.lua
-unreg.lua
-main.lua
+core\unreg.lua
+core\config.lua
 bagBar\bar.lua
 keyBar\bar.lua
 menuBar\bar.lua

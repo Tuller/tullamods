@@ -3,7 +3,7 @@
 		A movable bar for the micro buttons
 --]]
 
-BongosMenuBar = BongosActionMain:NewModule("Bongos-MenuBar")
+BongosMenuBar = Bongos:NewModule("Bongos-MenuBar")
 
 local DEFAULT_SPACING = 2
 local DEFAULT_ROWS = 1

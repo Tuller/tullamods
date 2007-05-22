@@ -198,8 +198,8 @@ function BongosActionButton:OnUpdate(elapsed)
 			local hotkey = self.hotkey
 			if IsActionInRange(action) == 0 then
 				hotkey:SetVertexColor(1, 0.1, 0.1)
-				if BongosActionMain:RangeColoring() and IsUsableAction(action) then
-					local r,g,b = BongosActionMain:GetRangeColor()
+				if BongosActionConfig:RangeColoring() and IsUsableAction(action) then
+					local r,g,b = BongosActionConfig:GetRangeColor()
 					self.icon:SetVertexColor(r,g,b)
 				end
 			else
@@ -232,7 +232,7 @@ function BongosActionButton:PostClick()
 end
 
 function BongosActionButton:OnDragStart()
-	if not(BongosActionMain:ButtonsLocked()) or self.showEmpty or BongosActionMain:IsQuickMoveKeyDown() then
+	if not(BongosActionConfig:ButtonsLocked()) or self.showEmpty or BongosActionConfig:IsQuickMoveKeyDown() then
 		PickupAction(self:GetPagedID())
 		self:UpdateState()
 	end
@@ -340,8 +340,8 @@ function BongosActionButton:UpdateUsable()
 
 	local isUsable, notEnoughMana = IsUsableAction(action)
 	if isUsable then
-		if BongosActionMain:RangeColoring() and IsActionInRange(action) == 0 then
-			local r,g,b = BongosActionMain:GetRangeColor()
+		if BongosActionConfig:RangeColoring() and IsActionInRange(action) == 0 then
+			local r,g,b = BongosActionConfig:GetRangeColor()
 			icon:SetVertexColor(r,g,b)
 		else
 			icon:SetVertexColor(1, 1, 1)
@@ -378,7 +378,7 @@ function BongosActionButton:StopFlash()
 end
 
 function BongosActionButton:UpdateTooltip()
-	if BongosActionMain:ShowingTooltips() then
+	if BongosActionConfig:ShowingTooltips() then
 		if GetCVar("UberTooltips") == "1" then
 			GameTooltip_SetDefaultAnchor(GameTooltip, self)
 		else
@@ -537,7 +537,7 @@ function BongosActionButton:ForAll(method, ...)
 end
 
 function BongosActionButton:ShowingEmpty()
-	return self.showEmpty or BongosActionMain:ShowingEmptyButtons() or KeyBound:IsShown()
+	return self.showEmpty or BongosActionConfig:ShowingEmptyButtons() or KeyBound:IsShown()
 end
 
 function BongosActionButton:Get(id)

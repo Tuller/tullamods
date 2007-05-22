@@ -3,7 +3,7 @@
 		Scripts used for the Bongos Bag bar
 --]]
 
-BongosBagBar = BongosActionMain:NewModule("Bongos-BagBar")
+BongosBagBar = Bongos:NewModule("Bongos-BagBar")
 
 --constants
 local DEFAULT_SPACING = 4

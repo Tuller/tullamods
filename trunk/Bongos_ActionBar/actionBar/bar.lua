@@ -82,7 +82,7 @@ function BActionBar:Create(id)
 	local bar = setmetatable(BBar:CreateSecure(id, nil, nil, defaults), Bar_MT)
 	bar:SetScript("OnShow", OnShow)
 	bar:LoadStates()
-	bar:SetRightClickUnit(BongosActionMain.profile.rightClickUnit)
+	bar:SetRightClickUnit(BongosActionConfig:GetRightClickUnit())
 	bar:SetAttribute("state", bar:GetCurrentState())
 
 	--layout the bar

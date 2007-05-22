@@ -8,7 +8,7 @@ if not(class == "DRUID" or class == "ROGUE" or class == "WARRIOR" or class == "P
 	return
 end
 
-BongosClassBar = BongosActionMain:NewModule("Bongos-ClassBar")
+BongosClassBar = Bongos:NewModule("Bongos-ClassBar")
 
 --constants
 local DEFAULT_SPACING = 2

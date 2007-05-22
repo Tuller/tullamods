@@ -3,7 +3,7 @@
 		A replacement for the default pet actionbar
 --]]
 
-BongosPetBar = BongosActionMain:NewModule("Bongos-PetBar")
+BongosPetBar = Bongos:NewModule("Bongos-PetBar")
 
 --[[ Bar Functions ]]--
 

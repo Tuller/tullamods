@@ -22,7 +22,7 @@ function BongosPetButton:Set(id, parent)
 	button:SetAttribute("showstates", "1")
 	button:SetScripts()
 	button:Style()
-	button:ShowHotkey(BongosActionMain:ShowingHotkeys())
+	button:ShowHotkey(BongosActionConfig:ShowingHotkeys())
 
 	parent:Attach(button)
 	parent:SetAttribute("addchild", button)
@@ -56,7 +56,7 @@ end
 --[[ OnX Functions ]]--
 
 function BongosPetButton:OnDragStart()
-	if not BongosActionMain:ButtonsLocked() or BongosActionMain:IsQuickMoveKeyDown() or self.showEmpty then
+	if not BongosActionConfig:ButtonsLocked() or BongosActionConfig:IsQuickMoveKeyDown() or self.showEmpty then
 		self:SetChecked(false)
 		PickupPetAction(self:GetID())
 		self:UpdateVisibility()
@@ -64,7 +64,7 @@ function BongosPetButton:OnDragStart()
 end
 
 function BongosPetButton:OnReceiveDrag()
-	if self.showEmpty or BongosActionMain:IsQuickMoveKeyDown() then
+	if self.showEmpty or BongosActionConfig:IsQuickMoveKeyDown() then
 		self:SetChecked(false)
 		PickupPetAction(self:GetID())
 		self:UpdateVisibility()
@@ -72,7 +72,7 @@ function BongosPetButton:OnReceiveDrag()
 end
 
 function BongosPetButton:OnEnter()
-	if BongosActionMain:ShowingTooltips() then
+	if BongosActionConfig:ShowingTooltips() then
 		PetActionButton_OnEnter(self)
 	end
 	KeyBound:Set(self)
@@ -170,7 +170,7 @@ end
 --[[ Utility Functions ]]--
 
 function BongosPetButton:ShowingEmpty()
-	return self.showEmpty or BongosActionMain:ShowingEmptyButtons() or KeyBound:IsShown()
+	return self.showEmpty or BongosActionConfig:ShowingEmptyButtons() or KeyBound:IsShown()
 end
 
 function BongosPetButton:Get(id)

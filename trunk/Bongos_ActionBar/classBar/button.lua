@@ -60,7 +60,7 @@ function BongosClassButton:Create(id, parent)
 	button:SetScript("OnEnter", OnEnter)
 	button:SetScript("OnLeave", OnLeave)
 
-	button:ShowHotkey(BongosActionMain:ShowingHotkeys())
+	button:ShowHotkey(BongosActionConfig:ShowingHotkeys())
 	button:Update()
 
 	buttons[id] = button
@@ -76,7 +76,7 @@ function BongosClassButton:PostClick()
 end
 
 function BongosClassButton:OnEnter()
-	if BongosActionMain:ShowingTooltips() then
+	if BongosActionConfig:ShowingTooltips() then
 		if GetCVar("UberTooltips") == "1" then
 			GameTooltip_SetDefaultAnchor(GameTooltip, self)
 		else

@@ -3,7 +3,7 @@
 		Makes the keyring button movable
 --]]
 
-BongosKeyBar = BongosActionMain:NewModule("Bongos-KeyBar")
+BongosKeyBar = Bongos:NewModule("Bongos-KeyBar")
 
 local function Bar_OnCreate(self)
 	local key = KeyRingButton

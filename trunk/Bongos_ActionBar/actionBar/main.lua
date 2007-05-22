@@ -2,7 +2,7 @@
 	actionbar event code
 --]]
 
-BongosActionBar = BongosActionMain:NewModule("Bongos-ActionBar")
+BongosActionBar = Bongos:NewModule("Bongos-ActionBar")
 
 local DEFAULT_NUM_ACTIONBARS = 10
 
@@ -49,11 +49,11 @@ end
 function BongosActionBar:SetNumber(newSize)
 	if(newSize ~= self:GetNumber()) then
 		self:Unload()
-		BongosActionMain.profile.numActionBars = newSize
+		Bongos.profile.numActionBars = newSize
 		self:Load()
 	end
 end
 
 function BongosActionBar:GetNumber()
-	return BongosActionMain.profile.numActionBars or 10
+	return Bongos.profile.numActionBars or 10
 end
