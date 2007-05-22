@@ -5,17 +5,19 @@
 --]]
 
 local function LinkifyName(head, text, tail)
-	if not(head == "|h" or tail == "|h" or text:find('%d+%s?')) then
-		local list = Ludwig:GetItemsNamedLike(text)
-		if list and next(list) then 
-			return Ludwig:GetItemLink(list[1])
+	if not(head == "|h" or tail == "|h") then
+		if(#text > 3) then
+			local list = Ludwig:GetItemsNamedLike(text)
+			if list and next(list) then 
+				return Ludwig:GetItemLink(list[1])
+			end
 		end
 	end
-	return head .. "[" .. text .. "]" .. tail
+	return format("%s[%s]%s", head, text, tail)
 end
 
 local function ParseChatMessage(text)
-	return text:gsub('([|]?[h]?)%[(.-)%]([|]?[h]?)', LinkifyName)
+	return text:gsub("([|]?[h]?)%[(.-)%]([|]?[h]?)", LinkifyName)
 end
 
 -- Hooks
@@ -23,7 +25,7 @@ local Orig_ChatEdit_OnTextChanged = ChatEdit_OnTextChanged;
 ChatEdit_OnTextChanged = function()
     local text = this:GetText()
 	if not(text == "" or text:sub(1,1) == "/") then
-	    text = ParseChatMessage(text)
+		text = ParseChatMessage(text)
 		this:SetText(text)
 	end
 	Orig_ChatEdit_OnTextChanged(this)
