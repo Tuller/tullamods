@@ -48,12 +48,12 @@ function BOptionsVisibility_OnLoad(self)
 		allActionBars:SetText(BONGOS_OPTIONS_ACTIONBARS)
 		allActionBars:SetScript("OnClick", function(self)
 			if self:GetChecked() then
-				for i = 1, BActionBar:GetNumber() do
-					BActionBar:Get(i):ShowFrame()
+				for i = 1, BongosActionBar:GetNumber() do
+					BBar:Get(i):ShowFrame()
 				end
 			else
-				for i = 1, BActionBar:GetNumber() do
-					BActionBar:Get(i):HideFrame()
+				for i = 1, BongosActionBar:GetNumber() do
+					BBar:Get(i):HideFrame()
 				end
 			end
 			BOptionsVisibilityScrollBar_Update()

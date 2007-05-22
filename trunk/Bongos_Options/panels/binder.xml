@@ -31,6 +31,9 @@
 					<OnShow>
 						BOptionsBinderPerCharacter_OnShow(self)
 					</OnShow>
+					<OnHide>
+						BOptionsBinderPerCharacter_OnHide(self)
+					</OnHide>
 					<OnClick>
 						BOptionsBinderPerCharacter_OnClick(self)
 					</OnClick>

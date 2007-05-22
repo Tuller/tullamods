@@ -17,6 +17,12 @@ function BOptionsBinderPerCharacter_OnShow(self)
 	self:SetChecked(GetCurrentBindingSet() == CHARACTER_BINDINGS)
 end
 
+function BOptionsBinderPerCharacter_OnHide(self)
+	if(not InCombatLockdown()) then
+		SaveBindings(current)
+	end
+end
+
 function BOptionsBinderPerCharacter_OnClick(self)
 	if self:GetChecked() then
 		current = CHARACTER_BINDINGS

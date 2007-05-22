@@ -3,51 +3,45 @@
 		This panel does things like enabling altcast, toggling range coloring, etc
 --]]
 
-local frameName
+local name
 
 --[[ Panel ]]--
 
 function BOptionsActionBarGlobal_OnLoad(self)
-	frameName = self:GetName()
+	name = self:GetName()
 end
 
-function BOptionsActionBarGlobal_OnShow(self)
-	self.onShow = 1
+--[[ ActionBar Slider ]]--
 
-	getglobal(frameName .. "LockButtons"):SetChecked(BActionConfig.ButtonsLocked())
-	getglobal(frameName .. "ShowGrid"):SetChecked(BActionConfig.ShowGrid())
-
-	getglobal(frameName .. "Tooltips"):SetChecked(BActionConfig.TooltipsShown())
-	getglobal(frameName .. "Range"):SetChecked(BActionConfig.ColorOutOfRange())
-	getglobal(frameName .. "MacroText"):SetChecked(BActionConfig.MacrosShown())
-	getglobal(frameName .. "HotkeysText"):SetChecked(BActionConfig.HotkeysShown())
---[[
-	if BActionConfig.GetUnit(2) then
-		getglobal(frameName .. "RightClickSelfCast"):SetChecked(true)
-	else
-		getglobal(frameName .. "RightClickSelfCast"):SetChecked(false)
-	end
+function BOptionsNumActionbars_OnLoad(self)
+	local name = self:GetName()
+	getglobal(name .. "Text"):SetText("Action Bars")
+	getglobal(name .. "Low"):SetText(1)
+	getglobal(name .. "High"):SetText(120)
 	
-	if BActionConfig.GetUnit(3) then
-		getglobal(frameName .. "MiddleClickFocusCast"):SetChecked(true)
-	else
-		getglobal(frameName .. "MiddleClickFocusCast"):SetChecked(false)
-	end
---]]
-	local r, g, b = BActionConfig.GetRangeColor()
-	getglobal(frameName .. "RangeColorNormalTexture"):SetVertexColor(r, g, b)
+	self.vals = {1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 24, 30, 40, 60, 120}
+end
 
-	UIDropDownMenu_SetSelectedValue(getglobal(frameName .. "QuickMove"), BActionConfig.GetQuickMoveMode())
+function BOptionsNumActionbars_OnShow(self)
+	self.onShow = true
 
-	local numbars = BActionBar:GetNumber()
-	for i,v in ipairs(getglobal(frameName .. "NumActionBars").vals) do
+	local numbars = BongosActionBar:GetNumber()
+	for i,v in ipairs(self.vals) do
 		if v == numbars then
-			getglobal(frameName .. "NumActionBars"):SetValue(i)
+			self:SetValue(i)
 			break
 		end
 	end
-	
+
 	self.onShow = nil
+end
+
+function BOptionsNumActionbars_OnValueChanged(self, value)
+	local numBars = self.vals[value]
+	if not self.onShow then
+		BongosActionBar:SetNumber(numBars)
+	end
+	getglobal(self:GetName() .. "ValText"):SetText(numBars)
 end
 
 --[[ Quick Move Dropdown ]]--
@@ -57,24 +51,17 @@ local function AddDropdownButton(text, value, selectedValue, action)
 	info.text = text
 	info.func = action
 	info.value = value
-	if value == selectedValue then
-		info.checked = 1
-	end
+	info.checked = value == selectedValue
 	UIDropDownMenu_AddButton(info)
 end
 
-function BOptionsQuickMove_OnShow(self)
-	UIDropDownMenu_Initialize(self, BOptionsQuickMove_Initialize)
-	UIDropDownMenu_SetWidth(72, self)
-end
-
-local function QuickMove_OnClick(self)
-	UIDropDownMenu_SetSelectedValue(getglobal(frameName .. "QuickMove"), self.value)
-	BActionConfig.SetQuickMoveMode(self.value)
+local function QuickMove_OnClick()
+	UIDropDownMenu_SetSelectedValue(getglobal(name .. "QuickMove"), this.value)
+	BongosActionConfig:SetQuickMoveMode(this.value)
 end
 
 function BOptionsQuickMove_Initialize()
-	local selectedValue = UIDropDownMenu_GetSelectedValue(getglobal(frameName .. "QuickMove"))
+	local selectedValue = UIDropDownMenu_GetSelectedValue(getglobal(name .. "QuickMove"))
 
 	AddDropdownButton("None", nil, selectedValue, QuickMove_OnClick)
 	AddDropdownButton("Shift", 1, selectedValue, QuickMove_OnClick)
@@ -85,16 +72,16 @@ end
 --[[ Out of Range Coloring Functions ]]--
 
 --set the background of the frame between opaque/transparent
-function BOptionsRangeColor_OnClick()
+function BOptionsRangeColor_OnClick(self)
 	if ColorPickerFrame:IsShown() then
 		ColorPickerFrame:Hide()
 	else
-		local red, green, blue = BActionConfig.GetRangeColor()
+		local red, green, blue = BongosActionConfig:GetRangeColor()
 
 		ColorPickerFrame.func = BOptionsRangeColor_ColorChange
 		ColorPickerFrame.cancelFunc = BOptionsRangeColor_CancelChanges
 
-		getglobal(frameName .. "RangeColorNormalTexture"):SetVertexColor(red, green, blue)
+		getglobal(name .. "RangeColorNormalTexture"):SetVertexColor(red, green, blue)
 		ColorPickerFrame:SetColorRGB(red, green, blue)
 		ColorPickerFrame.previousValues = {r = red, g = green, b = blue}
 
@@ -107,13 +94,13 @@ function BOptionsRangeColor_ColorChange()
 
 	BActionConfig.SetRangeColor(r, g, b)
 
-	getglobal(frameName .. "RangeColorNormalTexture"):SetVertexColor(r, g, b)
+	getglobal(name .. "RangeColorNormalTexture"):SetVertexColor(r, g, b)
 end
 
 function BOptionsRangeColor_CancelChanges()
 	local prevValues = ColorPickerFrame.previousValues
 
-	BActionConfig.SetRangeColor(prevValues.r, prevValues.g, prevValues.b)
+	BongosActionConfig:SetRangeColor(prevValues.r, prevValues.g, prevValues.b)
 
-	getglobal(frameName .. "RangeColorNormalTexture"):SetVertexColor(prevValues.r, prevValues.g, prevValues.b)
+	getglobal(name .. "RangeColorNormalTexture"):SetVertexColor(prevValues.r, prevValues.g, prevValues.b)
 end
