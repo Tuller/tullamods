@@ -8,30 +8,30 @@
 
 local ICON_SCALE = 37
 
-local function GetFormattedTime(secs)
-	if secs >= 86400 then
-		return floor(secs / 86400 + 0.5) .. "d", mod(secs, 86400)
-	elseif secs >= 3600 then
-		return floor(secs / 3600 + 0.5) .. "h", mod(secs, 3600)
-	elseif secs >= 60 then
-		return floor(secs / 60 + 0.5) .. "m", mod(secs, 60)
+local function GetFormattedTime(s)
+	if s >= 86400 then
+		return floor(s / 86400 + 0.5) .. "d", mod(s, 86400)
+	elseif s >= 3600 then
+		return floor(s / 3600 + 0.5) .. "h", mod(s, 3600)
+	elseif s >= 60 then
+		return floor(s / 60 + 0.5) .. "m", mod(s, 60)
 	end
-	return floor(secs + 0.5), secs - floor(secs)
+	return floor(s + 0.5), s - floor(s)
 end
 
-local function Timer_OnUpdate()
-	if this.toNextUpdate <= 0 or not this.icon:IsVisible() then
-		local remain = this.duration - (GetTime() - this.start)
+local function Timer_OnUpdate(self, elapsed)
+	if self.toNextUpdate <= 0 or not self.icon:IsVisible() then
+		local remain = self.duration - (GetTime() - self.start)
 
-		if floor(remain + 0.5) > 0 and this.icon:IsVisible() then
+		if floor(remain + 0.5) > 0 and self.icon:IsVisible() then
 			local time, toNextUpdate = GetFormattedTime(remain)
-			this.text:SetText(time)
-			this.toNextUpdate = toNextUpdate
+			self.text:SetText(time)
+			self.toNextUpdate = toNextUpdate
 		else
-			this:Hide()
+			self:Hide()
 		end
 	else
-		this.toNextUpdate = this.toNextUpdate - arg1
+		self.toNextUpdate = self.toNextUpdate - elapsed
 	end
 end
 
@@ -44,7 +44,7 @@ local function Timer_Create(parent, cooldown, icon)
 	timer:SetScript("OnUpdate", Timer_OnUpdate)
 
 	timer.icon = icon
-	
+
 	local scale = timer:GetWidth() / ICON_SCALE
 	timer.text = timer:CreateFontString(nil, "OVERLAY")
 	timer.text:SetPoint("CENTER", timer, "CENTER", 0, 1)

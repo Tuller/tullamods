@@ -4,6 +4,7 @@
 --]]
 
 local ICON_SCALE = 37
+local DEFAULT_FONT = "Fonts\\FRIZQT__.TTF"
 
 local function msg(message, showAddon)
 	if showAddon then
@@ -19,21 +20,21 @@ local activePulses = {}
 OmniCC = CreateFrame("Frame")
 OmniCC:Hide()
 
-OmniCC:SetScript("OnEvent", function()
+OmniCC:SetScript("OnEvent", function(self, event, arg1)
 	if arg1 == "OmniCC" then
-		this:UnregisterEvent(event)
-		this:Init()
+		self:UnregisterEvent(event)
+		self:Init()
 	end
 end)
 OmniCC:RegisterEvent("ADDON_LOADED")
 
-OmniCC:SetScript("OnUpdate", function()
+OmniCC:SetScript("OnUpdate", function(self)
 	if next(activePulses) then
 		for pulse in pairs(activePulses) do
-			this:UpdatePulse(pulse)
+			self:UpdatePulse(pulse)
 		end
 	else
-		this:Hide()
+		self:Hide()
 	end
 end)
 
@@ -52,8 +53,8 @@ function OmniCC:LoadSettings()
 		self:LoadDefaults(current)
 		msg("Initialized", true)
 	else
-		local cMajor, cMinor = current:match('(%d+)%.(%d+)')
-		local major, minor = OmniCC2DB.version:match('(%d+)%.(%d+)')
+		local cMajor, cMinor = current:match("(%d+)%.(%d+)")
+		local major, minor = OmniCC2DB.version:match("(%d+)%.(%d+)")
 
 		if major ~= cMajor then
 			self:LoadDefaults(current)
@@ -72,7 +73,7 @@ function OmniCC:LoadDefaults(current)
 		long = {r = 0.8, g = 0.8, b = 0.9, s = 0.8}, 	--settings for cooldowns greater than one minute
 		med = {r = 1, g = 1, b = 0.4, s = 1}, 			--settings for cooldowns under a minute
 		short = {r = 1, g = 0, b = 0, s = 1.3}, 		--settings for cooldowns less than five seconds
-		pulse = 1,
+		-- pulse = 1,
 	}
 end
 
@@ -107,7 +108,7 @@ function OmniCC:LoadFont()
 	if not self.font:SetFont(font, size) then
 		self.sets.font = nil
 		if not self.font:SetFont(STANDARD_TEXT_FONT, size) then
-			self.font:SetFont("Fonts\\FRIZQT__.TTF", size)
+			self.font:SetFont(DEFAULT_FONT, size)
 		end
 	end
 end
@@ -135,7 +136,7 @@ function OmniCC:SetFontFormat(index, r, g, b, s)
 end
 
 function OmniCC:GetFont()
-	return self.sets.font or STANDARD_TEXT_FONT or "Fonts\\FRIZQT__.TTF", self.sets.fontSize or 20
+	return self.sets.font or STANDARD_TEXT_FONT or DEFAULT_FONT, self.sets.fontSize or 20
 end
 
 
@@ -198,13 +199,13 @@ local function GetFormattedTime(s)
 	local mmSSFormat = OmniCC:InMMSSFormat()
 
 	if s >= 86400 then
-		return format('%dd', floor(s/86400 + 0.5)), mod(s, 86400)
+		return format("%dd", floor(s/86400 + 0.5)), mod(s, 86400)
 	elseif s >= 3600 then
-		return format('%dh', floor(s/3600 + 0.5)), mod(s, 3600)
+		return format("%dh", floor(s/3600 + 0.5)), mod(s, 3600)
 	elseif s >= 180 or (not mmSSFormat and s >= 60.5) then
-		return format('%dm', floor(s/60 + 0.5)), mod(s, 60)
+		return format("%dm", floor(s/60 + 0.5)), mod(s, 60)
 	elseif mmSSFormat and s >= 60.5 then
-		return format('%d:%02d', floor(s/60), mod(s, 60)), s - floor(s)
+		return format("%d:%02d", floor(s/60), mod(s, 60)), s - floor(s)
 	end
 	return floor(s + 0.5), s - floor(s)
 end
@@ -212,40 +213,42 @@ end
 local function GetFormattedFont(s)
 	local index
 	if s >= 3600 then
-		index = 'vlong'
+		index = "vlong"
 	elseif s >= 60.5 then
-		index = 'long'
+		index = "long"
 	elseif s >= 5.5 then
-		index = 'med'
+		index = "med"
 	end
-	local sets = OmniCC.sets[index or 'short']
+	local sets = OmniCC.sets[index or "short"]
 	local font, size = OmniCC:GetFont()
 
 	return font, size * (sets.s or 1), (sets.r or 1), (sets.g or 1), (sets.b or 1)
 end
 
-local function Timer_OnUpdate()
-	if this.toNextUpdate <= 0 or not this.icon:IsVisible() then
-		local remain = this.duration - (GetTime() - this.start)
+local function Timer_OnUpdate(self, elapsed)
+	if self.toNextUpdate <= 0 or not self.icon:IsVisible() then
+		local remain = self.duration - (GetTime() - self.start)
 
-		if floor(remain + 0.5) > 0 and this.icon:IsVisible() then
+		if floor(remain + 0.5) > 0 and self.icon:IsVisible() then
 			local time, toNextUpdate = GetFormattedTime(remain)
 			local font, size, r, g, b = GetFormattedFont(remain)
 			local scale = this:GetWidth() / ICON_SCALE
 			
-			this.text:SetFont(font, size * scale, "OUTLINE")
-			this.text:SetText(time)
+			self.text:SetFont(font, size * scale, "OUTLINE")
+			self.text:SetText(time)
 
-			this.text:SetTextColor(r, g, b)
-			this.toNextUpdate = toNextUpdate
+			self.text:SetTextColor(r, g, b)
+			self.toNextUpdate = toNextUpdate
 		else
-			OmniCC:StopTimer(this)
-			if OmniCC:ShowingPulse() then
-				OmniCC:StartPulse(this)
+			OmniCC:StopTimer(self)
+			if(self.icon:IsVisible()) then
+				if OmniCC:ShowingPulse() then
+					OmniCC:StartPulse(self)
+				end
 			end
 		end
 	else
-		this.toNextUpdate = this.toNextUpdate - arg1
+		self.toNextUpdate = self.toNextUpdate - elapsed
 	end
 end
 
@@ -396,7 +399,7 @@ SlashCmdList["OmniCCCOMMAND"] = function(message)
 	if not message or message == "" or message:lower() == "help" or message == "?" then
 		PrintCommands();
 	else
-		local args = {strsplit(' ', message:lower())}
+		local args = {strsplit(" ", message:lower())}
 		local cmd = args[1]
 
 		if cmd == "font" then
@@ -437,7 +440,7 @@ SlashCmdList["OmniCCCOMMAND"] = function(message)
 			OmniCC:Reset()
 			msg("Loaded default settings", true)
 		else
-			msg(format("'%s' is an invalid command", cmd), true)
+			msg(format(""%s" is an invalid command", cmd), true)
 		end
 	end
 end

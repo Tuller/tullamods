@@ -1,6 +1,7 @@
 OmniCC Version History, in the format mmddyy:
 
-1.1 beta
+1.1
+Updated for 2.1
 Implemented text scaling
 
 1.0
