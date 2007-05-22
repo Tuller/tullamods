@@ -23,7 +23,7 @@
 --]]
 
 local L = SELLFISH_LOCALS
-local base36 = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'}
+local base36 = {"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"}
 local maxBase = 10 + #base36
 
 --[[ Local Functions ]]--
@@ -38,7 +38,7 @@ end
 
 --converts a base 10 integer into base<base>
 local function ToBase(num, base)
-	local newNum = ''
+	local newNum = ""
 	while num > 0 do
 		local remain = mod(num, base)
 		num = floor(num / base)
@@ -54,14 +54,14 @@ end
 --returns the numeric code of an item link
 local function ToID(link)
 	if link then
-		return tonumber(link) or tonumber(link:match('item:(%d+)') or tonumber(select(2, GetItemInfo(link)):match('item:(%d+)')))
+		return tonumber(link) or tonumber(link:match("item:(%d+)") or tonumber(select(2, GetItemInfo(link)):match("item:(%d+)")))
 	end
 end
 
 local cache = {}
 setmetatable(cache, {__index = function(t, i)
 	if SellFishDB and SellFishDB.data then
-		local c = (SellFishDB.data:match(';' .. i .. ',(%w+);'))
+		local c = (SellFishDB.data:match(";" .. i .. ",(%w+);"))
 		if c then t[i] = c end
 		return c
 	end
@@ -73,23 +73,23 @@ end})
 SellFish = {}
 
 function SellFish:Load()
-	local tip = CreateFrame('GameTooltip', 'SellFishTooltip', UIParent, 'GameTooltipTemplate')
-	tip:SetScript('OnTooltipAddMoney', function()
+	local tip = CreateFrame("GameTooltip", "SellFishTooltip", UIParent, "GameTooltipTemplate")
+	tip:SetScript("OnTooltipAddMoney", function()
 		if not InRepairMode() then
 			tip.lastCost = arg1
 		end
 	end)
 
-	tip:SetScript('OnEvent', function()
-		if event == 'MERCHANT_SHOW' then
+	tip:SetScript("OnEvent", function()
+		if event == "MERCHANT_SHOW" then
 			self:ScanPrices()
-		elseif event == 'ADDON_LOADED' and arg1 == 'SellFish' then
-			this:UnregisterEvent('ADDON_LOADED')
+		elseif event == "ADDON_LOADED" and arg1 == "SellFish" then
+			this:UnregisterEvent("ADDON_LOADED")
 			self:Initialize()
 		end
 	end)
-	tip:RegisterEvent('MERCHANT_SHOW')
-	tip:RegisterEvent('ADDON_LOADED')
+	tip:RegisterEvent("MERCHANT_SHOW")
+	tip:RegisterEvent("ADDON_LOADED")
 
 	self.tip = tip
 
@@ -102,8 +102,8 @@ function SellFish:Initialize()
 	if not(SellFishDB and SellFishDB.version) then
 		self:LoadDefaults(current)
 	else
-		local cMajor, cMinor = current:match('(%d+)%.(%d+)')
-		local major, minor = SellFishDB.version:match('(%d+)%.(%d+)')
+		local cMajor, cMinor = current:match("(%d+)%.(%d+)")
+		local major, minor = SellFishDB.version:match("(%d+)%.(%d+)")
 		if major ~= cMajor then
 			self:LoadDefaults(current)
 		elseif minor ~= cMinor then
@@ -134,10 +134,12 @@ function SellFish:LoadDefaults(current)
 end
 
 function SellFish:UpdateVersion(current)
-	SellFishDB.data = SellFish_GetDefaults()
+	if(SellFishDB.version ~= "1.4") then
+		SellFishDB.data = SellFish_GetDefaults()
+		msg(format(L.Loaded, self:GetNumValues()), true)
+	end
 	SellFishDB.version = current
 	msg(format(L.Updated, SellFishDB.version), true)
-	msg(format(L.Loaded, self:GetNumValues()), true)
 end
 
 
@@ -211,7 +213,7 @@ end
 
 --[[ Converters ]]--
 
---adds all of cola light's sellvalue data to the list of new values, then compresses if new data has been added
+--adds all of cola light"s sellvalue data to the list of new values, then compresses if new data has been added
 function SellFish:ConvertColaLight(t)
 	local changed = false
 	for id, cost in pairs(t) do
@@ -262,7 +264,7 @@ end
 
 function SellFish:GetNumValues()
 	local count = 0
-	for word in SellFishDB.data:gmatch('%w+,%w+;') do
+	for word in SellFishDB.data:gmatch("%w+,%w+;") do
 		count = count + 1
 	end
 	return count
@@ -273,17 +275,17 @@ end
 
 function SellFish:LoadSlashCommands()
 	SlashCmdList["SellFishCOMMAND"] = function(cmd)
-		if cmd == '' then
+		if cmd == "" then
 			self:ShowCommands()
 		else
 			cmd = cmd:lower()
-			if cmd == 'help' or cmd == '?' then
+			if cmd == "help" or cmd == "?" then
 				self:ShowCommands()
-			elseif cmd == 'reset' then
+			elseif cmd == "reset" then
 				self:LoadDefaults()
-			elseif cmd == 'style' then
+			elseif cmd == "style" then
 				self:ToggleStyle()
-			elseif cmd == 'compress' then
+			elseif cmd == "compress" then
 				self:CompressDB()
 			else
 				msg(format(L.UnknownCommand, cmd), true)

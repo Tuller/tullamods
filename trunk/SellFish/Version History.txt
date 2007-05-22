@@ -1,5 +1,8 @@
 SellFish Version History
 
+1.5
+	Updated for 2.1
+
 1.4
 	Removed duplicate entries
 	Imported ItemPrice-1.0 data (http://www.wowace.com/files/ItemPrice-1.0/ItemPrice-1.0-r34533.zip)

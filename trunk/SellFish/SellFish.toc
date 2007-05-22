@@ -1,9 +1,9 @@
-## Interface: 20003
+## Interface: 20100
 ## Title: SellFish
 ## Author: Tuller
 ## Notes: Lets you view sell value data about items from anywhere
 ## SavedVariables: SellFishDB
-## Version: 1.4
+## Version: 1.5
 localization.lua
 localization.de.lua
 defaults.lua
