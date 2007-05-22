@@ -34,7 +34,6 @@ local function OnAttributeChanged(self, var, val)
 	local parent = self:GetParent()
 	if(parent and parent:IsShown() and var == "state-parent") then
 		self.id = nil
-		-- self.state = tonumber(val)
 	end
 end
 
@@ -532,17 +531,6 @@ end
 
 function BongosActionButton:GetPagedID()
 	if not(self.id) then
-		-- local state = self.state
-		-- local id = self:GetAttribute("action")
-		-- if(not state or state == 0) then
-			-- self.id = id
-		-- elseif(state < 10) then
-			-- self.id = self:GetAttribute("*action-s" .. state) or id
-		-- elseif(state < 15) then
-			-- self.id = self:GetAttribute("*action-p" .. state - 9) or id
-		-- elseif(state == 15) then
-			-- self.id = self:GetAttribute("*action-help") or id
-		-- end
 		self.id = SecureButton_GetModifiedAttribute(self, "action", SecureStateChild_GetEffectiveButton(self))
 	end
 	return tonumber(self.id) or 1

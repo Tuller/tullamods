@@ -40,14 +40,14 @@ local function GenerateStateMap()
 		stanceMap = "1:s1;2:s2;3:s3;4:s4;5:s5;6:s6;7:s7"
 		stanceMap2 = "1:s1s;2:s2s;3:s3s;4:s4s;5:s5s;6:s6s;7:s7s"
 	end
-	
+
 	local stateHeader
 	if(classStates) then
 		stateHeader = pageStates .. classStates .. "[help]15;0"
 	else
 		stateHeader = pageStates .. "[help]15;0"
 	end
-	
+
 	local stateButton1, stateButton2
 	if(STANCES) then
 		stateButton1 = format("%s;%s", stanceMap, pageMap)
@@ -63,9 +63,21 @@ end
 --[[ Constructor/Destructor]]--
 
 function BActionBar:Create(id)
-	local bar = setmetatable(BBar:CreateSecure(id), Bar_MT)
+	local defaults
+	if(id == 1) then
+		defaults = {p1 = 1, p2 = 2, p3 = 3, p4 = 4, p5 = 5}
+		if CLASS == "DRUID" then
+			defaults.s1 = 8; defaults.s3 = 6; defaults.s7 = 6
+		elseif CLASS == "WARRIOR" then
+			defaults.s1 = 6; defaults.s2 = 7; defaults.s3 = 8
+		elseif CLASS == "ROGUE" then
+			defaults.s1 = 6
+		end
+	end
+
+	local bar = setmetatable(BBar:CreateSecure(id, nil, nil, defaults), Bar_MT)
 	bar:LoadStates()
-	bar:SetRightClickUnit("player")
+	bar:SetRightClickUnit(BongosActionMain.profile.rightClickUnit)
 
 	--layout the bar
 	if not bar:IsUserPlaced() then
@@ -436,6 +448,6 @@ function BActionBar:SetRightClickUnit(unit)
 			self:SetAttribute("unit-stance" .. i .. "s", unit)
 		end
 	end
-	
+
 	self:SetAttribute("alt-unit*", "mouseover")
 end
