@@ -116,7 +116,7 @@ end
 --[[ Events ]]--
 
 function BongosPetBar:Load()
-	self.bar = BBar:CreateSecure("pet", Bar_OnCreate, nil, {["y"] = 598.8, ["x"] = 579.75})
+	self.bar = BBar:CreateSecure("pet", Bar_OnCreate, nil, {["y"] = 591, ["x"] = 553})
 	self.bar:Layout()
 
 	self:RegisterEvent("UNIT_FLAGS", "UpdateIfPet")

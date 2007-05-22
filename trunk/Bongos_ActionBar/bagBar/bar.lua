@@ -129,7 +129,7 @@ end
 --[[ Startup ]]--
 
 function BongosBagBar:Load()
-	local bar = BBar:Create("bags", Bar_OnCreate, nil, {["x"] = 1261.85, ["y"] = 37})
+	local bar = BBar:Create("bags", Bar_OnCreate, nil, {["y"] = 37, ["x"] = 1241})
 	bar:Layout()
 
 	if bar:IsShown() then

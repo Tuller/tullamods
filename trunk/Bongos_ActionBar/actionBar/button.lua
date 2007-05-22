@@ -42,14 +42,11 @@ local function OnEvent(self, event, arg1)
 		self:UpdateHotkey()
 	end
 
-	if(not self:GetParent():IsShown()) then return end
+	local parent = self:GetParent()
+	if(not parent:IsShown()) then return end
 
 	if(event == "ACTIONBAR_SLOT_CHANGED") then
 		if(self:GetPagedID() == arg1) then
-			local changed = self:UpdateVisibility()
-			if changed then
-				SecureStateHeader_Refresh(self:GetParent())
-			end
 			self:Update()
 		end
 	end
@@ -98,7 +95,6 @@ function BongosActionButton:Create(id)
 	button.count = getglobal(name .. "Count")
 
 	button:UpdateHotkey()
-	button:Hide()
 
 	button:SetScript("OnUpdate", OnUpdate)
 	button:SetScript("PostClick", PostClick)
@@ -172,7 +168,7 @@ end
 --[[ OnX Functions ]]--
 
 function BongosActionButton:OnUpdate(elapsed)
-	if(not self.id) then self:Update() end
+	if(not self.id) then self:Update() return end
 
 	if not self.icon:IsShown() then return end
 
@@ -236,7 +232,7 @@ function BongosActionButton:PostClick()
 end
 
 function BongosActionButton:OnDragStart()
-	if not(BongosActionMain:ButtonsLocked()) or BongosActionBar.showEmpty or BongosActionMain:IsQuickMoveKeyDown() then
+	if not(BongosActionMain:ButtonsLocked()) or self.showEmpty or BongosActionMain:IsQuickMoveKeyDown() then
 		PickupAction(self:GetPagedID())
 		self:UpdateState()
 	end
@@ -261,8 +257,8 @@ end
 --[[ Update Code ]]--
 
 --Updates the icon, count, cooldown, usability color, if the button is flashing, if the button is equipped,  and macro text.
-function BongosActionButton:Update()
-	if not self:GetParent() then return end
+function BongosActionButton:Update(refresh)
+	if(refresh) then self.id = nil end
 
 	local action = self:GetPagedID()
 	local icon = self.icon
@@ -398,6 +394,7 @@ function BongosActionButton:UpdateTooltip()
 	end
 end
 
+
 --[[ State Updating ]]--
 
 --load up the action ID when in forms/paged from the parent action bar
@@ -440,11 +437,8 @@ function BongosActionButton:UpdateStates()
 		self:SetAttribute("*action-helps", nil)
 	end
 
-	--don't double update
-	if not(self:UpdateVisibility()) then
-		self.id = nil
-		self:Update()
-	end
+	self:UpdateVisibility()
+	self.id = nil
 end
 
 --show if showing empty buttons, or if the slot has an action, hide otherwise
@@ -484,8 +478,7 @@ function BongosActionButton:UpdateVisibility()
 	local oldstates = self:GetAttribute("showstates")
 	if not oldstates or oldstates ~= newstates then
 		self:SetAttribute("showstates", newstates)
-		self.id = nil
-		self:Update()
+		self:Update(true)
 		return true
 	end
 end
@@ -544,7 +537,7 @@ function BongosActionButton:ForAll(method, ...)
 end
 
 function BongosActionButton:ShowingEmpty()
-	return BongosActionBar.showEmpty or BongosActionMain:ShowingEmptyButtons() or KeyBound:IsShown()
+	return self.showEmpty or BongosActionMain:ShowingEmptyButtons() or KeyBound:IsShown()
 end
 
 function BongosActionButton:Get(id)

@@ -117,7 +117,7 @@ function BongosClassBar:Load()
 	self:RegisterEvent("UNIT_ENERGY", "UpdateAll")
 	self:RegisterEvent("UPDATE_BINDINGS", "UpdateBindings")
 
-	self.bar = BBar:CreateSecure("class", Bar_OnCreate, nil, {["y"] = 600.571, ["x"] = 504.428})
+	self.bar = BBar:CreateSecure("class", Bar_OnCreate, nil, {["y"] = 651, ["x"] = 703})
 end
 
 function BongosClassBar:Unload()

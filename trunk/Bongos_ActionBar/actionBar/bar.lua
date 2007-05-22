@@ -11,11 +11,11 @@ local CLASS = BONGOS_CLASS
 local MAX_BUTTONS = BONGOS_MAX_BUTTONS
 local STANCES = BONGOS_STANCES
 local MAX_PAGES = BONGOS_MAX_PAGES
+
 local BUTTON_SIZE = 36
 local PROWL_STATE = 7
 local HELP_STATE = 15
 
-local DEFAULT_NUM_ACTIONBARS = 10
 local DEFAULT_SPACING = 2
 local DEFAULT_SIZE = 12
 local DEFAULT_COLS = 12
@@ -62,6 +62,10 @@ end
 
 --[[ Constructor/Destructor]]--
 
+local function OnShow(self)
+	self:UpdateVisibility()
+end
+
 function BActionBar:Create(id)
 	local defaults
 	if(id == 1) then
@@ -76,8 +80,10 @@ function BActionBar:Create(id)
 	end
 
 	local bar = setmetatable(BBar:CreateSecure(id, nil, nil, defaults), Bar_MT)
+	bar:SetScript("OnShow", OnShow)
 	bar:LoadStates()
 	bar:SetRightClickUnit(BongosActionMain.profile.rightClickUnit)
+	bar:SetAttribute("state", bar:GetCurrentState())
 
 	--layout the bar
 	if not bar:IsUserPlaced() then
@@ -87,12 +93,14 @@ function BActionBar:Create(id)
 		bar:SetPoint("CENTER", UIParent, "CENTER", 36 * row, -36 * col)
 	end
 	bar:Layout()
-	SecureStateHeader_Refresh(bar, bar:GetCurrentState())
+	SecureStateHeader_Refresh(bar)
 
 	return bar
 end
 
 function BActionBar:OnDelete()
+	self:SetScript("OnShow", nil)
+
 	for i = self:GetStartID(), self:GetEndID() do
 		local button = BongosActionButton:Get(i)
 		if button then
@@ -122,12 +130,10 @@ function BActionBar:GetCurrentState()
 		--prowl check
 		if((stance == 3 or stance == 2) and IsStealthed()) then
 			return PROWL_STATE
-		elseif(stance == 0) then
-			if(UnitCanAssist("player", "target")) then
-				return HELP_STATE
-			end
-			return stance
+		elseif(stance == 0 and UnitCanAssist("player", "target")) then
+			return HELP_STATE
 		end
+		return stance
 	else
 		return page + 9
 	end
@@ -139,9 +145,9 @@ end
 local function StanceSlider_OnShow(self)
 	local frame = self:GetParent().frame
 
-	self:SetMinMaxValues(0, frame:GetNumber())
+	self:SetMinMaxValues(0, BongosActionBar:GetNumber())
 	self:SetValue(frame.sets[self.id] or 0)
-	getglobal(self:GetName() .. "High"):SetText(frame:GetNumber()-1)
+	getglobal(self:GetName() .. "High"):SetText(BongosActionBar:GetNumber()-1)
 end
 
 local function StanceSlider_OnValueChanged(self, value)
@@ -272,7 +278,7 @@ function BActionBar:GetSize()
 end
 
 function BActionBar:GetMaxSize()
-	return MAX_BUTTONS / self:GetNumber()
+	return MAX_BUTTONS / BongosActionBar:GetNumber()
 end
 
 
@@ -365,41 +371,21 @@ function BActionBar:Layout()
 	end
 end
 
-function BActionBar:UpdateVisibility(showAll)
+function BActionBar:UpdateVisibility()
 	local s = self:GetStartID()
 	local e = self:GetEndID()
-	local showEmpty = showAll or BongosActionButton:ShowingEmpty()
-
 	local changed
+
 	for i = s, e do
-		if BongosActionButton:Get(i):UpdateVisibility(showEmpty) then
+		local button = BongosActionButton:Get(i)
+		if button:UpdateVisibility() then
 			changed = true
 		end
 	end
 
 	if changed then
-		SecureStateHeader_Refresh(self, self:GetCurrentState())
+		SecureStateHeader_Refresh(self)
 	end
-end
-
-
---[[ Bar Numbers ]]--
-
-function BActionBar:SetNumber(newSize)
-	local oldSize = self:GetNumber()
-	if oldSize ~= newSize then
-		for i = 1, (oldSize or 10) do
-			self:Get(i):Delete()
-		end
-
-		for i = 1, (newSize or 10) do
-			self:Create(i)
-		end
-	end
-end
-
-function BActionBar:GetNumber()
-	return BongosActionMain.profile.numActionBars or DEFAULT_NUM_ACTIONBARS
 end
 
 
@@ -426,16 +412,6 @@ end
 
 
 --[[ Utility ]]--
-
---updates the showstates of every button on every bar
-function BActionBar:UpdateVisibilityForAll()
-	for i = 1, self:GetNumber() do
-		local bar = self:Get(i)
-		if bar:IsShown() then
-			bar:UpdateVisibility()
-		end
-	end
-end
 
 function BActionBar:SetRightClickUnit(unit)
 	self:SetAttribute("unit2", unit)

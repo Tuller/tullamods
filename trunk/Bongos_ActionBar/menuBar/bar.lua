@@ -128,7 +128,7 @@ end
 --[[ Startup ]]--
 
 function BongosMenuBar:Load()
-	local bar = BBar:Create("menu", Bar_OnCreate, nil, {["y"] = 37, ["x"] = 1261.85})
+	local bar = BBar:Create("menu", Bar_OnCreate, nil, {["y"] = 39, ["x"] = 988})
 	bar:Layout()
 
 	--hack to make sure all the buttons are shown properly
