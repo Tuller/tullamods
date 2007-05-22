@@ -175,7 +175,7 @@ end
 --[[ Startup ]]--
 
 function BongosCastBar:Load()
-	local bar = BBar:Create("cast", Bar_OnCreate, nil, {["y"] = 626.229, ["x"] = 635.257, ["showText"] = true})
+	local bar = BBar:Create("cast", Bar_OnCreate, nil, {["y"] = 617, ["x"] = 618, ["showText"] = true})
 	bar:ToggleText(bar.sets.showText)
 
 	self.bar = bar
