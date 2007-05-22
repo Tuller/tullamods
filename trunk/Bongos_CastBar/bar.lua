@@ -4,7 +4,7 @@
 --]]
 
 BongosCastBar = Bongos:NewModule("Bongos-CastBar")
-BongosCastBar.defaults = {x = 635.257, y = 626.229, showText = 1}
+BongosCastBar.defaults = {x = 635.257, y = 626.229, showText = true}
 
 --[[ CastingBar Stuff ]]--
 
@@ -112,7 +112,7 @@ local function CastingBar_Create(parent)
 	local bar = CreateFrame("StatusBar", "BongosCastBar", parent, "BongosCastingBarTemplate")
 	bar.AdjustWidth = CastingBar_AdjustWidth
 	bar.normalWidth = bar:GetWidth()
-	bar:SetScript('OnUpdate', CastingBar_OnUpdate)
+	bar:SetScript("OnUpdate", CastingBar_OnUpdate)
 
 	return bar
 end
@@ -141,7 +141,7 @@ local function Bar_ShowMenu(self)
 	end
 
 	local menu = self.menu
-	menu.onShow = 1
+	menu.onShow = true
 	self:PlaceMenu(menu)
 	menu.onShow = nil
 end
@@ -150,7 +150,7 @@ local function Bar_ToggleText(self, enable)
 	local castingBar = self.castBar
 	if enable then
 		getglobal(castingBar:GetName() .. "Time"):Show()
-		self.sets.showText = 1
+		self.sets.showText = true
 	else
 		getglobal(castingBar:GetName() .. "Time"):Hide()
 		self.sets.showText = nil
@@ -176,7 +176,7 @@ end
 --[[ Startup ]]--
 
 function BongosCastBar:Load()
-	local bar = BBar:Create('cast', Bar_OnCreate, nil, self.defaults)
+	local bar = BBar:Create("cast", Bar_OnCreate, nil, self.defaults)
 	bar:ToggleText(bar.sets.showText)
 
 	self.bar = bar
