@@ -4,7 +4,6 @@
 --]]
 
 BongosStats = Bongos:NewModule("Bongos-Stats")
-BongosStats.defaults = {showFPS = true, showMemory = true, showPing = true, x = 1253.7466, y = 895.0568}
 					
 local L = BONGOS_STATS_LOCALS
 local UPDATE_DELAY = 1
@@ -119,7 +118,9 @@ function BongosStats:Initialize()
 end
 
 function BongosStats:Load()
-	self.bar = BBar:Create("stats", Bar_OnCreate, nil, self.defaults)
+	self.bar = BBar:Create("stats", Bar_OnCreate, nil, {
+		["y"] = 895.0568, ["x"] = 1253.7466, ["showMemory"] = true, ["showPing"] = true, ["showFPS"] = true,
+	})
 
 	self.bar:Attach(self.frame)
 	self.frame:SetAllPoints(self.bar)
