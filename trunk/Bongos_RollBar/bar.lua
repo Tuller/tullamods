@@ -10,7 +10,7 @@ BongosRollBar = Bongos:NewModule("Bongos-RollBar")
 local function OnCreate(self)
 	local frame = getglobal("GroupLootFrame"..1)
 	frame:ClearAllPoints()
-	frame:SetPoint('BOTTOMLEFT', self, 'BOTTOMLEFT', 4, 2)
+	frame:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 4, 2)
 	self:Attach(frame)
 
 	for i=2, NUM_GROUP_LOOT_FRAMES do
@@ -25,7 +25,7 @@ local function OnCreate(self)
 end
 
 function BongosRollBar:Load()
-	local bar = BBar:Create('roll', OnCreate)
+	local bar = BBar:Create("roll", OnCreate)
 
 	if not bar:IsUserPlaced() then
 		bar:SetPoint("LEFT", UIParent)
@@ -33,5 +33,5 @@ function BongosRollBar:Load()
 end
 
 function BongosRollBar:Unload()
-	BBar:Get('roll'):Destroy()
+	BBar:Get("roll"):Destroy()
 end
