@@ -1,6 +1,4 @@
-<Ui xmlns="http://www.blizzard.com/wow/ui/" 
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
 
 	<Frame name="BongosOptionsPanel" hidden="true" virtual="true">
 		<Anchors>
@@ -13,15 +11,41 @@
 		</Anchors>
 	</Frame>
 	
-	<Slider name="BongosOptionsSlider" inherits="BongosSlider" virtual="true">
-		<Size x="234" y="18"/>
+	<Slider name="BongosOptionsSlider" inherits="GooeySlider" virtual="true">
+		<Size x="238" y="18"/>
 	</Slider>
-	
-	<Slider name="BongosOptionsOpacitySlider" inherits="BongosOpacitySlider" virtual="true">
-		<Size x="234" y="18"/>
+
+	<!-- scale -->
+	<Slider name="BongosOptionsScaleSlider" inherits="BongosOptionsSlider" minValue="50" maxValue="150" valuestep="1" virtual="true">
+		<Scripts>
+			<OnLoad>
+				getglobal(this:GetName() .. "Text"):SetText("Scale")
+				getglobal(this:GetName() .. "Low"):SetText("50%")
+				getglobal(this:GetName() .. "High"):SetText("150%")
+			</OnLoad>
+			<OnValueChanged>
+				if not this:GetParent().onShow then
+					Sage.ForFrame(this:GetParent().unit, SageFrame.SetFrameScale, this:GetValue() / 100)
+				end
+				getglobal(this:GetName() .. "ValText"):SetText(this:GetValue())
+			</OnValueChanged>
+		</Scripts>
 	</Slider>
-	
-	<Slider name="BongosOptionsScaleSlider" inherits="BongosScaleSlider" virtual="true">
-		<Size x="234" y="18"/>
+
+	<!-- opacity -->
+	<Slider name="BongosOptionsOpacitySlider" inherits="BongosOptionsSlider" minValue="0" maxValue="100" valuestep="1" virtual="true">
+		<Scripts>
+			<OnLoad>
+				getglobal(this:GetName() .. "Text"):SetText("Opacity")
+				getglobal(this:GetName() .. "Low"):SetText("0%")
+				getglobal(this:GetName() .. "High"):SetText("100%")
+			</OnLoad>
+			<OnValueChanged>
+				if not this:GetParent().onShow then
+					Sage.ForFrame(this:GetParent().unit, SageFrame.SetFrameOpacity, this:GetValue() / 100)
+				end
+				getglobal(this:GetName() .. "ValText"):SetText(this:GetValue())
+			</OnValueChanged>
+		</Scripts>
 	</Slider>
 </Ui>

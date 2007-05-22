@@ -26,34 +26,34 @@ function BOptionsVisibility_OnMousewheel(scrollframe, direction)
 	BOptionsVisibilityScrollBar_Update()
 end
 
-function BOptionsVisibility_OnLoad()
-	frameName = this:GetName()
+function BOptionsVisibility_OnLoad(self)
+	frameName = self:GetName()
 
-	local allButton = CreateFrame("CheckButton", frameName .. "All", this, "BOptionsShowButton")
+	local allButton = CreateFrame("CheckButton", frameName .. "All", self, "BOptionsShowButton")
 	allButton:SetPoint("TOPLEFT", this, "TOPLEFT", 4, 4)
 	allButton:SetText(BONGOS_OPTIONS_ALL)
-	allButton:SetScript("OnClick", function()
-		if this:GetChecked() then
-			BBar.ForAll('ShowFrame')
+	allButton:SetScript("OnClick", function(self)
+		if self:GetChecked() then
+			BBar:ForAll("ShowFrame")
 		else
-			BBar.ForAll('HideFrame')
+			BBar:ForAll("HideFrame")
 		end
 		BOptionsVisibilityScrollBar_Update()
 	end)
 	allButton:SetChecked(true)
 
-	if IsAddOnLoaded("Bongos_ActionBar") then
-		local allActionBars = CreateFrame("CheckButton", frameName .. "AllActionBars", this, "BOptionsShowButton")
+	if IsAddOnLoaded("Bongos2_ActionBar") then
+		local allActionBars = CreateFrame("CheckButton", frameName .. "AllActionBars", self, "BOptionsShowButton")
 		allActionBars:SetPoint("LEFT", allButton, "RIGHT", 34, 0)
 		allActionBars:SetText(BONGOS_OPTIONS_ACTIONBARS)
-		allActionBars:SetScript("OnClick", function()
-			if this:GetChecked() then
-				for i = 1, BActionBar.GetNumber() do
-					BActionBar.Get(i):ShowFrame()
+		allActionBars:SetScript("OnClick", function(self)
+			if self:GetChecked() then
+				for i = 1, BActionBar:GetNumber() do
+					BActionBar:Get(i):ShowFrame()
 				end
 			else
-				for i = 1, BActionBar.GetNumber() do
-					BActionBar.Get(i):HideFrame()
+				for i = 1, BActionBar:GetNumber() do
+					BActionBar:Get(i):HideFrame()
 				end
 			end
 			BOptionsVisibilityScrollBar_Update()
@@ -63,7 +63,7 @@ function BOptionsVisibility_OnLoad()
 
 	local firstOfRow
 	for i = 1, ROWS do
-		local button = CreateFrame("CheckButton", frameName .. (i-1)*COLS + 1, this, "BOptionsShowButton")
+		local button = CreateFrame("CheckButton", frameName .. (i-1)*COLS + 1, self, "BOptionsShowButton")
 		if not firstOfRow then
 			button:SetPoint("TOPLEFT", allButton, "BOTTOMLEFT")
 		else
@@ -71,18 +71,18 @@ function BOptionsVisibility_OnLoad()
 		end
 		firstOfRow = button
 		for j = 2, COLS do
-			local button = CreateFrame("CheckButton", frameName .. (i-1)*COLS + j, this, "BOptionsShowButton")
+			local button = CreateFrame("CheckButton", frameName .. (i-1)*COLS + j, self, "BOptionsShowButton")
 			button:SetPoint("LEFT", frameName .. (i-1)*COLS + j-1, "RIGHT", 34, 0)
 		end
 	end
 end
 
-function BOptionsVisibility_OnShow()
+function BOptionsVisibility_OnShow(self)
 	for i in pairs(list) do
 		list[i] = nil
 	end
 
-	for _, bar in BBar.GetAll() do
+	for _, bar in BBar:GetAll() do
 		table.insert(list, bar)
 	end
 	table.sort(list, sortList)
@@ -93,8 +93,8 @@ end
 function BOptionsVisibilityScrollBar_Update()
 	local numButtons = ROWS*COLS
 	local size = #list
-	local offset = getglobal(frameName .. 'ScrollFrame').offset
-	FauxScrollFrame_Update(getglobal(frameName .. 'ScrollFrame'), size, ROWS*COLS, COLS)
+	local offset = getglobal(frameName .. "ScrollFrame").offset
+	FauxScrollFrame_Update(getglobal(frameName .. "ScrollFrame"), size, ROWS*COLS, COLS)
 
 	for index = 1, numButtons do
 		local rIndex = index + offset
@@ -102,7 +102,7 @@ function BOptionsVisibilityScrollBar_Update()
 
 		if rIndex <= size then
 			button:SetText(list[rIndex].id)
-			button:SetChecked(list[rIndex].sets.vis)
+			button:SetChecked(not list[rIndex].sets.hidden)
 			button:Show()
 		else
 			button:Hide()

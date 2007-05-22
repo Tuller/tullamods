@@ -4,8 +4,6 @@
 	<Include file="panels\profiles.xml"/>
 	<Include file="panels\visibility.xml"/>
 	<Include file="panels\actionBarGlobal.xml"/>
-	<Include file="panels\stance.xml"/>
-	<Include file="panels\paging.xml"/>
 	<Include file="panels\binder.xml"/>
 
 	<Script file="menu.lua"/>
@@ -31,14 +29,14 @@
 				</Scripts>
 			</CheckButton>
 			
-			<CheckButton name="$parentProfiles" inherits="BongosOptionsTabButton" text="BONGOS_PANEL_PROFILES">
+		<CheckButton name="$parentProfiles" inherits="BongosOptionsTabButton" text="BONGOS_PANEL_PROFILES">
 				<Scripts>
 					<OnClick>
 						BOptions_SwitchTab("Profiles")
 					</OnClick>
 				</Scripts>
 			</CheckButton>
-			
+		
 			<CheckButton name="$parentVisibility" inherits="BongosOptionsTabButton" text="BONGOS_PANEL_VISIBILITY">
 				<Scripts>
 					<OnClick>
@@ -106,16 +104,16 @@
 
 		<Scripts>
 			<OnLoad>
-				BOptions_OnLoad()
+				BOptions_OnLoad(self)
 			</OnLoad>
 			<OnShow>
-				BOptions_OnShow()
+				BOptions_OnShow(self)
 			</OnShow>
 			<OnMouseDown>
-				this:StartMoving()
+				self:StartMoving()
 			</OnMouseDown>
 			<OnMouseUp>
-				this:StopMovingOrSizing()
+				self:StopMovingOrSizing()
 			</OnMouseUp>
 		</Scripts>
 	</Frame>

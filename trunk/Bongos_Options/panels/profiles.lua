@@ -1,55 +1,23 @@
-StaticPopupDialogs["BONGOS_OPTIONS_SAVE_PROFILE"] = {
-	text = TEXT(BONGOS_OPTIONS_PROFILE_ENTER_NAME),
-	button1 = TEXT(ACCEPT),
-	button2 = TEXT(CANCEL),
-	hasEditBox = 1,
-	maxLetters = 24,
-	OnAccept = function()
-		local text = getglobal(this:GetParent():GetName().."EditBox"):GetText()
-		if text ~= "" then
-			BProfile.Save(text)
-			BOptionsProfilesScrollBar_Update()
-		end
-	end,
-	EditBoxOnEnterPressed = function()
-		local text = getglobal(this:GetParent():GetName().."EditBox"):GetText()
-		if text ~= "" then
-			BProfile.Save(text)
-			BOptionsProfilesScrollBar_Update()
-		end
-	end,
-	OnShow = function()
-		getglobal(this:GetName().."EditBox"):SetFocus()
-		getglobal(this:GetName().."EditBox"):SetText(UnitName("player"))
-		getglobal(this:GetName().."EditBox"):HighlightText()
-	end,
-	OnHide = function()
-		if ChatFrameEditBox:IsVisible() then
-			ChatFrameEditBox:SetFocus()
-		end
-		getglobal(this:GetName().."EditBox"):SetText("")
-	end,
-	timeout = 0,
-	exclusive = 1,
-	hideOnEscape = 1
-}
-
+--[[
+	profiles.lua
+		A gui for managing bongos profiles
+--]]
 
 local listSize = 14
-local selectedButton
+local selected
 
 --[[ Profile Button ]]--
 
-function BOptionsProfileButton_OnClick(clickedButton)
+function BOptionsProfileButton_OnClick(self)
 	for i = 1, listSize do
 		local button = getglobal("BongosOptionsPanelProfiles".. i)
-		if clickedButton ~= button then
-			button:UnlockHighlight()
-		else
+		if self == button then
 			button:LockHighlight()
+		else
+			button:UnlockHighlight()
 		end
 	end
-	selectedButton = clickedButton
+	selected = self
 end
 
 function BOptionsProfilesButton_OnMousewheel(scrollframe, direction)
@@ -59,69 +27,60 @@ function BOptionsProfilesButton_OnMousewheel(scrollframe, direction)
 end
 
 --[[ Profile Actions ]]--
-function BOptionsProfiles_SaveProfile()
-	StaticPopup_Show("BONGOS_OPTIONS_SAVE_PROFILE")
-end
 
 function BOptionsProfiles_LoadProfile()
-	if selectedButton then
-		BProfile.Load(selectedButton:GetText())
+	if selected then
+		Bongos:SetProfile(selected:GetText())
 		BOptionsProfilesScrollBar_Update()
 	end
 end
 
 --delete
 function BOptionsProfiles_DeleteProfile()
-	if selectedButton then
-		BProfile.Delete(selectedButton:GetText())
+	if selected then
+		Bongos:DeleteProfile(selected:GetText())
 		BOptionsProfilesScrollBar_Update()
 	end
 end
 
 --[[ Scroll Bar Functions ]]--
-function BOptionsProfiles_OnLoad()
-	local thisName = this:GetName()
+function BOptionsProfiles_OnLoad(self)
+	local name = self:GetName()
 	local i = 1
 	local size = 19
 
-	local button = CreateFrame("Button", thisName .. i, this, "BongosOptionsProfileButton")
-	button:SetPoint("TOPLEFT", this, "TOPLEFT", 4, -4)
-	button:SetPoint("BOTTOMRIGHT", thisName .. "ScrollFrame", "TOPLEFT", -24, -20)
+	local button = CreateFrame("Button", name .. i, self, "BongosOptionsProfileButton")
+	button:SetPoint("TOPLEFT", self, "TOPLEFT", 4, -4)
+	button:SetPoint("BOTTOMRIGHT", name .. "ScrollFrame", "TOPLEFT", -24, -20)
 	button:SetID(i)
 
 	for i = 2, listSize do
-		button = CreateFrame("Button", thisName .. i, this, "BongosOptionsProfileButton")
-		button:SetPoint("TOPLEFT", thisName .. i-1, "BOTTOMLEFT", 0, -1)
-		button:SetPoint("BOTTOMRIGHT", thisName .. i-1, "BOTTOMRIGHT", 0, -size)
+		button = CreateFrame("Button", name .. i, self, "BongosOptionsProfileButton")
+		button:SetPoint("TOPLEFT", name .. i-1, "BOTTOMLEFT", 0, -1)
+		button:SetPoint("BOTTOMRIGHT", name .. i-1, "BOTTOMRIGHT", 0, -size)
 		button:SetID(i)
 	end
 end
 
-function BOptionsProfiles_OnShow()
+function BOptionsProfiles_OnShow(self)
 	BOptionsProfilesScrollBar_Update()
 end
 
-function BOptionsProfilesScrollBar_Update(parentName)
+function BOptionsProfilesScrollBar_Update()
 	--update list if there are changes
-	local list = {}
-	if BongosProfiles then
-		for name in pairs(BongosProfiles) do
-			table.insert(list, name)
-		end
-	end
-	table.sort(list)
+	local list = Bongos.db:GetProfiles()
 
 	local size = #list
 	local offset = BongosOptionsPanelProfilesScrollFrame.offset
 
 	FauxScrollFrame_Update(BongosOptionsPanelProfilesScrollFrame, size, listSize, listSize)
 
-	for index = 1, listSize do
-		local rIndex = index + offset
-		local button = getglobal("BongosOptionsPanelProfiles".. index)
+	for i = 1, listSize do
+		local index = i + offset
+		local button = getglobal("BongosOptionsPanelProfiles".. i)
 
-		if rIndex <= size then
-			button:SetText(list[rIndex])
+		if index <= size then
+			button:SetText(list[index])
 			button:Show()
 		else
 			button:Hide()

@@ -9,7 +9,7 @@ local function UpdateTabs(menu)
 	local prev
 	local numShown = 0
 
-	for i = 1, select('#', menu:GetChildren()) do
+	for i = 1, select("#", menu:GetChildren()) do
 		local frame = select(i, menu:GetChildren())
 		if frame:IsShown() then
 			numShown = numShown + 1
@@ -25,14 +25,14 @@ local function UpdateTabs(menu)
 	menu:SetHeight(12 + 26 * numShown)
 end
 
-function BOptions_OnShow()
-	local thisName = this:GetName()
-	UpdateTabs(getglobal(thisName .. "Menu"))
+function BOptions_OnShow(self)
+	local name = self:GetName()
+	UpdateTabs(getglobal(name .. "Menu"))
 
-	currentFrame = getglobal(thisName .. "Panel" .. currentFrameName)
+	currentFrame = getglobal(name .. "Panel" .. currentFrameName)
 	if not currentFrame:IsShown() then
 		currentFrame:Show()
-		getglobal(thisName .. "Menu" .. currentFrameName):LockHighlight()
+		getglobal(name .. "Menu" .. currentFrameName):LockHighlight()
 	end
 end
 
@@ -52,18 +52,12 @@ local function AddTab(name, title)
 	tab:SetText(title)
 end
 
-function BOptions_OnLoad()
-	if IsAddOnLoaded("Bongos_ActionBar") then
-		local name = this:GetName() .. "Panel"
+function BOptions_OnLoad(self)
+	if IsAddOnLoaded("Bongos2_ActionBar") then
+		local name = self:GetName() .. "Panel"
 
 		AddTab("ActionBar", BONGOS_PANEL_ACTIONBARS)
 		CreateFrame("Frame", name .. "ActionBar", BongosOptionsPanel, "BongosOptionsActionBar")
-		
-		AddTab("Paging", BONGOS_PANEL_PAGING)
-		CreateFrame("Frame", name .. "Paging", BongosOptionsPanel, "BongosOptionsPaging")
-
-		AddTab("Stance", BONGOS_PANEL_STANCE)
-		CreateFrame("Frame", name .. "Stance", BongosOptionsPanel, "BongosOptionsStance")
 
 		AddTab("Bindings", BONGOS_PANEL_BINDINGS)
 		CreateFrame("Frame", name .. "Bindings", BongosOptionsPanel, "BongosOptionsBindings")

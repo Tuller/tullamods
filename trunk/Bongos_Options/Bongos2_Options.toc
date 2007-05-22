@@ -1,0 +1,9 @@
+## Interface: 20100
+## Title: Bongos2 Options
+## Notes: A load on demand option menu for Bongos
+## Author: Tuller
+## Dependencies: Bongos2
+## LoadOnDemand: 1
+localization.lua
+templates.xml
+menu.xml

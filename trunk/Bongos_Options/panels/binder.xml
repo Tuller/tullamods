@@ -1,11 +1,8 @@
-<Ui xmlns="http://www.blizzard.com/wow/ui/" 
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	xsi:schemaLocation="http://www.blizzard.com/wow/ui/C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
 	
 	<Script file="binder.lua"/>
 	
 	<!-- Trinity has a nifty way of implementing keybindings, I'm using it for Bongos -->
-
 	<Frame name="BongosOptionsBindings" inherits="BongosOptionsPanel" frameStrata="DIALOG" virtual="true">
 		<Layers>
 			<Layer level="ARTWORK">		
@@ -32,17 +29,17 @@
 						
 				<Scripts>
 					<OnShow>
-						BOptionsBinderPerCharacter_OnShow()
+						BOptionsBinderPerCharacter_OnShow(self)
 					</OnShow>
 					<OnClick>
-						BOptionsBinderPerCharacter_OnClick(this)
+						BOptionsBinderPerCharacter_OnClick(self)
 					</OnClick>
 					<OnEnter>
-						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
-						GameTooltip:SetText(CHARACTER_SPECIFIC_KEYBINDING_TOOLTIP, nil, nil, nil, nil, 1);
+						GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+						GameTooltip:SetText(CHARACTER_SPECIFIC_KEYBINDING_TOOLTIP, nil, nil, nil, nil, 1)
 					</OnEnter>
 					<OnLeave>
-						GameTooltip:Hide();
+						GameTooltip:Hide()
 					</OnLeave>
 				</Scripts>
 			</CheckButton>
@@ -50,10 +47,10 @@
 
 		<Scripts>
 			<OnShow>
-				BOptionsBinder_OnShow()
+				KeyBound:Toggle()
 			</OnShow>
 			<OnHide>
-				BOptionsBinder_OnHide()
+				KeyBound:Toggle()
 			</OnHide>
 		</Scripts>
 	</Frame>

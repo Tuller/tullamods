@@ -1,13 +1,11 @@
-<Ui xmlns="http://www.blizzard.com/wow/ui/"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
 
 	<Script file="profiles.lua"/>
 
 	<Button name="BongosOptionsProfileButton" virtual="true">
 		<Scripts>
 			<OnClick>
-				BOptionsProfileButton_OnClick(this)
+				BOptionsProfileButton_OnClick(self)
 			</OnClick>
 			<OnMouseWheel>
 				BOptionsProfilesButton_OnMousewheel(BongosOptionsPanelProfilesScrollFrame, arg1)
@@ -54,27 +52,11 @@
 				</Scripts>
 			</Button>
 
-			<Button name="$parentSave" inherits="GooeyButton" text="BONGOS_OPTIONS_SAVE">
-				<Size x="44" y="24"/>
-
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentLoad" relativePoint="RIGHT">
-						<Offset x="2" y="0"/>
-					</Anchor>
-				</Anchors>
-
-				<Scripts>
-					<OnClick>
-						BOptionsProfiles_SaveProfile()
-					</OnClick>
-				</Scripts>
-			</Button>
-
 			<Button name="$parentDelete" inherits="GooeyButton" text="BONGOS_OPTIONS_DELETE">
 				<Size x="52" y="24"/>
 
 				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentSave" relativePoint="RIGHT">
+					<Anchor point="LEFT" relativeTo="$parentLoad" relativePoint="RIGHT">
 						<Offset x="2" y="0"/>
 					</Anchor>
 				</Anchors>
@@ -88,10 +70,10 @@
 		</Frames>
 		<Scripts>
 			<OnLoad>
-				BOptionsProfiles_OnLoad()
+				BOptionsProfiles_OnLoad(self)
 			</OnLoad>
 			<OnShow>
-				BOptionsProfiles_OnShow()
+				BOptionsProfiles_OnShow(self)
 			</OnShow>
 		</Scripts>
 	</Frame>

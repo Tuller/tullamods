@@ -1,8 +1,4 @@
-<Ui xmlns="http://www.blizzard.com/wow/ui/"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
-
-	<Script file="general.lua"/>
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
 
 	<!-- General options panel -->
 	<Frame name="BongosOptionsGeneral" inherits="BongosOptionsPanel" virtual="true">
@@ -14,8 +10,11 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
+					<OnShow>
+						self:SetChecked(Bongos:IsLocked())
+					</OnShow>
 					<OnClick>
-						Bongos.SetLock(this:GetChecked())
+						Bongos:SetLock(self:GetChecked())
 					</OnClick>
 				</Scripts>
 			</CheckButton>
@@ -25,13 +24,16 @@
 					<Anchor point="TOP" relativeTo="$parentLock" relativePoint="BOTTOM"/>
 				</Anchors>
 				<Scripts>
+					<OnShow>
+						self:SetChecked(Bongos:IsSticky())
+					</OnShow>
 					<OnClick>
-						Bongos.SetSticky(this:GetChecked())
+						Bongos:SetSticky(self:GetChecked())
 					</OnClick>
 				</Scripts>
 			</CheckButton>
 			
-			<CheckButton name="$parentShowMinimap" inherits="GooeyCheckButton" text="BONGOS_OPTIONS_GENERAL_SHOW_MINIMAP">
+<!-- 			<CheckButton name="$parentShowMinimap" inherits="GooeyCheckButton" text="BONGOS_OPTIONS_GENERAL_SHOW_MINIMAP">
 				<Anchors>
 					<Anchor point="TOP" relativeTo="$parentStickyBars" relativePoint="BOTTOM"/>
 				</Anchors>
@@ -40,7 +42,7 @@
 						Bongos.SetMinimapVis(this:GetChecked())
 					</OnClick>
 				</Scripts>
-			</CheckButton>
+			</CheckButton> -->
 
 			<Slider name="$parentAlpha" inherits="BongosOptionsOpacitySlider">
 				<Anchors>
@@ -50,12 +52,16 @@
 				</Anchors>
 
 				<Scripts>
-					<OnShow/>
+					<OnShow>
+						self.onShow = true
+						self:SetValue(100)
+						self.onShow = nil
+					</OnShow>
 					<OnValueChanged>
-						if not this:GetParent().onShow then
-							BBar.ForAll(BBar.SetFrameOpacity, this:GetValue()/100, 1)
+						if not self.onShow then
+							BBar:ForAll("SetFrameAlpha", value/100)
 						end
-						getglobal(this:GetName() .. "ValText"):SetText(this:GetValue())
+						getglobal(self:GetName() .. "ValText"):SetText(value)
 					</OnValueChanged>
 				</Scripts>
 			</Slider>
@@ -67,21 +73,19 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnShow/>
+					<OnShow>
+						self.onShow = true
+						self:SetValue(100)
+						self.onShow = nil
+					</OnShow>
 					<OnValueChanged>
-						if not this:GetParent().onShow then
-							BBar.ForAll(BBar.SetFrameScale, this:GetValue()/100, 1)
+						if not self.onShow then
+							BBar:ForAll("SetFrameScale", value/100)
 						end
-						getglobal(this:GetName() .. "ValText"):SetText(this:GetValue())
+						getglobal(self:GetName() .. "ValText"):SetText(value)
 					</OnValueChanged>
 				</Scripts>
 			</Slider>
 		</Frames>
-
-		<Scripts>
-			<OnShow>
-				BOptionsGeneral_OnShow()
-			</OnShow>
-		</Scripts>
 	</Frame>
 </Ui>

@@ -1,16 +1,14 @@
-<Ui xmlns="http://www.blizzard.com/wow/ui/"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
 
 	<Script file="visibility.lua"/>
 
 	<CheckButton name="BOptionsShowButton" inherits="GooeyCheckButton" virtual="true">
 		<Scripts>
 			<OnClick>
-				if this:GetChecked() then
-					BBar.Get(this:GetText()):ShowFrame()
+				if self:GetChecked() then
+					BBar:Get(self:GetText()):ShowFrame()
 				else
-					BBar.Get(this:GetText()):HideFrame()
+					BBar:Get(self:GetText()):HideFrame()
 				end
 			</OnClick>
 			<OnMouseWheel>
@@ -40,13 +38,13 @@
 		</Frames>
 		<Scripts>
 			<OnLoad>
-				BOptionsVisibility_OnLoad()
+				BOptionsVisibility_OnLoad(self)
 			</OnLoad>
 			<OnShow>
-				BOptionsVisibility_OnShow()
+				BOptionsVisibility_OnShow(self)
 			</OnShow>
 			<OnMouseWheel>
-				BOptionsVisibility_OnMousewheel(getglobal(this:GetName() .. "ScrollFrame"), arg1)
+				BOptionsVisibility_OnMousewheel(getglobal(self:GetName() .. "ScrollFrame"), arg1)
 			</OnMouseWheel>
 		</Scripts>
 	</Frame>

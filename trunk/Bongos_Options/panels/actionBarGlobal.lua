@@ -7,12 +7,12 @@ local frameName
 
 --[[ Panel ]]--
 
-function BOptionsActionBarGlobal_OnLoad()
-	frameName = this:GetName()
+function BOptionsActionBarGlobal_OnLoad(self)
+	frameName = self:GetName()
 end
 
-function BOptionsActionBarGlobal_OnShow()
-	this.onShow = 1
+function BOptionsActionBarGlobal_OnShow(self)
+	self.onShow = 1
 
 	getglobal(frameName .. "LockButtons"):SetChecked(BActionConfig.ButtonsLocked())
 	getglobal(frameName .. "ShowGrid"):SetChecked(BActionConfig.ShowGrid())
@@ -47,13 +47,13 @@ function BOptionsActionBarGlobal_OnShow()
 		end
 	end
 	
-	this.onShow = nil
+	self.onShow = nil
 end
 
 --[[ Quick Move Dropdown ]]--
 
+local info = {}
 local function AddDropdownButton(text, value, selectedValue, action)
-	local info = {}
 	info.text = text
 	info.func = action
 	info.value = value
@@ -63,14 +63,14 @@ local function AddDropdownButton(text, value, selectedValue, action)
 	UIDropDownMenu_AddButton(info)
 end
 
-function BOptionsQuickMove_OnShow()
-	UIDropDownMenu_Initialize(this, BOptionsQuickMove_Initialize)
-	UIDropDownMenu_SetWidth(72, this)
+function BOptionsQuickMove_OnShow(self)
+	UIDropDownMenu_Initialize(self, BOptionsQuickMove_Initialize)
+	UIDropDownMenu_SetWidth(72, self)
 end
 
-local function QuickMove_OnClick()
-	UIDropDownMenu_SetSelectedValue(getglobal(frameName .. "QuickMove"), this.value)
-	BActionConfig.SetQuickMoveMode(this.value)
+local function QuickMove_OnClick(self)
+	UIDropDownMenu_SetSelectedValue(getglobal(frameName .. "QuickMove"), self.value)
+	BActionConfig.SetQuickMoveMode(self.value)
 end
 
 function BOptionsQuickMove_Initialize()
