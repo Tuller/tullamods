@@ -16,7 +16,6 @@ function BongosMenu:Create(name)
 	local menu = setmetatable(CreateFrame("Button", name, UIParent, "GooeyPopup"), Button_MT)
 	menu:SetWidth(210)
 	menu:SetHeight(38)
-	-- menu:SetHeight(230)
 
 	menu:RegisterForClicks("AnyUp")
 	menu:SetScript("OnClick", Menu_OnClick)
@@ -44,32 +43,17 @@ end
 
 --[[ General Slider ]]--
 
-local function Slider_OnValueChanged(self, value)
-	local parent = self:GetParent()
-	if not parent.onShow then
-		self:OnValueChanged(value)
-	end
-	self:UpdateText(value)
-end
-
-local function Slider_OnShow(self)
-	self:UpdateText()
-end
-
 function BongosMenu:CreateSlider(name)
 	local slider = CreateFrame("Slider", name, self, "GooeySlider")
 	slider:SetWidth(200)
 	slider:SetHeight(18)
 
-	slider:SetScript("OnValueChanged", Slider_OnValueChanged)
-	slider:SetScript("OnShow", Slider_OnShow)
-	
 	if(self.slider) then
 		slider:SetPoint("BOTTOM", self.slider, "TOP", 0, 24)
 	else
 		slider:SetPoint("BOTTOM", self, "BOTTOM", 0, 24)
 	end
-	self:SetHeight(self:GetHeight() + 44)
+	self:SetHeight(self:GetHeight() + 43)
 
 	self.slider = slider
 

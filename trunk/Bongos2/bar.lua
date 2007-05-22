@@ -88,7 +88,7 @@ function BBar:Destroy(removeSettings)
 	self:Hide()
 
 	self:ForAll("Reanchor")
-	self:UnregisterAllEvents()
+	-- self:UnregisterAllEvents()
 
 	unused[self.id] = self
 end
@@ -301,8 +301,6 @@ function BBar:Reposition()
 		self:ClearAllPoints()
 		self:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", x, y)
 		self:SetUserPlaced(true)
-	-- else
-		-- self:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", random(0, GetScreenWidth()), random(0, GetScreenHeight()))
 	end
 end
 
@@ -345,7 +343,7 @@ function BBar:ShowMenu()
 	end
 
 	local menu = self.menu
-	menu.onShow = 1
+	menu.onShow = true
 	self:PlaceMenu(menu)
 	menu.onShow = nil
 end
@@ -422,14 +420,14 @@ function BBar:ForBar(id, method, ...)
 end
 
 --combat status updating
-local function BBar_OnCombatChange(self, event, ...)
-	if event == "PLAYER_REGEN_DISABLED" then
-		self.inCombat = true
-	else
-		self.inCombat = nil
-	end
-	self:ForAll("UpdateCombatStatus")
-end
-BBar:SetScript("OnEvent", BBar_OnCombatChange)
-BBar:RegisterEvent("PLAYER_REGEN_DISABLED")
-BBar:RegisterEvent("PLAYER_REGEN_ENABLED")
+-- local function BBar_OnCombatChange(self, event, ...)
+	-- if event == "PLAYER_REGEN_DISABLED" then
+		-- self.inCombat = true
+	-- else
+		-- self.inCombat = nil
+	-- end
+	-- self:ForAll("UpdateCombatStatus")
+-- end
+-- BBar:SetScript("OnEvent", BBar_OnCombatChange)
+-- BBar:RegisterEvent("PLAYER_REGEN_DISABLED")
+-- BBar:RegisterEvent("PLAYER_REGEN_ENABLED")

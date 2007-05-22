@@ -29,6 +29,7 @@ L.CopyDesc = "Copies settings from <profile>"
 L.DeleteDesc = "Deletes <profile>"
 L.ResetDesc = "Returns to default settings"
 L.ListDesc = "Lists all profiles"
+L.AvailableProfiles = "Available Profiles"
 
 --dragFrame tooltips
 L.ShowConfig = "<Right Click> to configure"
