@@ -339,6 +339,8 @@ end
 --[[ Layout ]]--
 
 function BActionBar:Layout()
+	if InCombatLockdown() then return end
+
 	local startID = self:GetStartID()
 	local endID = self:GetEndID()
 	local maxID = self:GetMaxID()

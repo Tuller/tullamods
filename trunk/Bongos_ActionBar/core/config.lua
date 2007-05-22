@@ -41,7 +41,7 @@ function BongosActionConfig:ShowEmptyButtons(enable)
 		Bongos.profile.showEmpty = false
 	end
 
-	BongosActionButton:ForAll("UpdateVisibility")
+	BongosActionBar:UpdateVisibility()
 	if UnitExists("pet") then
 		BongosPetButton:ForAll("UpdateVisibility")
 	end
@@ -95,7 +95,7 @@ function BongosActionConfig:GetQuickMoveMode()
 end
 
 function BongosActionConfig:IsQuickMoveKeyDown()
-	local quickMoveKey = self.profile.quickMoveKey
+	local quickMoveKey = Bongos.profile.quickMoveKey
 	if quickMoveKey then
 		if quickMoveKey == 1 and IsShiftKeyDown() then
 			return true
@@ -132,6 +132,13 @@ function BongosActionConfig:GetRangeColor()
 	end
 end
 
+function BongosActionConfig:SetRightClickUnit(unit)
+	Bongos.profile.rightClickUnit = unit
+	for i = 1, BongosActionBar:GetNumber() do
+		BBar:Get(i):SetRightClickUnit(unit)
+	end
+end
+
 function BongosActionConfig:GetRightClickUnit()
-	Bongos.profile.rightClickUnit
+	return Bongos.profile.rightClickUnit
 end

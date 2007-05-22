@@ -121,24 +121,12 @@ function BongosClassBar:Load()
 end
 
 function BongosClassBar:Unload()
-	self:UnregisterEvent("UPDATE_SHAPESHIFT_FORMS")
-	self:UnregisterEvent("ACTIONBAR_UPDATE_USABLE")
-	self:UnregisterEvent("UPDATE_INVENTORY_ALERTS")
-	self:UnregisterEvent("SPELL_UPDATE_COOLDOWN")
-	self:UnregisterEvent("SPELL_UPDATE_USABLE")
-	self:UnregisterEvent("PLAYER_AURAS_CHANGED")
-	self:UnregisterEvent("ACTIONBAR_PAGE_CHANGED")
-	self:UnregisterEvent("UNIT_HEALTH")
-	self:UnregisterEvent("UNIT_RAGE")
-	self:UnregisterEvent("UNIT_FOCUS")
-	self:UnregisterEvent("UNIT_ENERGY")
-	self:UnregisterEvent("UPDATE_BINDINGS")
-
+	self:UnregisterAllEvents()
 	self.bar:Destroy()
 end
 
 function BongosClassBar:UpdateBindings()
-	BongosClassButton:ForAll(BongosClassButton.UpdateHotkey)
+	BongosClassButton:ForAll("UpdateHotkey")
 end
 
 function BongosClassBar:UpdateAll()

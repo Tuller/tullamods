@@ -2,9 +2,8 @@
 ## Title: Bongos2 ActionBar
 ## Notes: A main actionbar replacement
 ## Author: Tuller
-## Version: 0.4
+## Version: 0.9
 ## Dependencies: Bongos2
-## SavedVariables: Bongos2ActionBarDB
 localization.lua
 keyBound\localization.lua
 keyBound\keyBound.lua
