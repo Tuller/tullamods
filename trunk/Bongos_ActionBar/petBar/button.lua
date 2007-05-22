@@ -82,12 +82,12 @@ end
 --[[ Update Functions ]]--
 
 function BongosPetButton:Update()
-	local name, subtext, texture, isToken, isActive, autoCastAllowed, autoCastEnabled = GetPetActionInfo(self:GetID())
-	local selfName = self:GetName()
+	local action, subtext, texture, isToken, isActive, autoCastAllowed, autoCastEnabled = GetPetActionInfo(self:GetID())
+	local name = self:GetName()
 
-	if name then
+	if action then
 		self:Show()
-	elseif not self:ShowingEmptyButtons() then
+	elseif not self:ShowingEmpty() then
 		self:Hide()
 	end
 
@@ -95,7 +95,7 @@ function BongosPetButton:Update()
 	self.tooltipSubtext = subtext
 	self:SetChecked(isActive)
 
-	local icon = getglobal(selfName .. "Icon")
+	local icon = getglobal(name .. "Icon")
 	SetDesaturation(icon, not GetPetActionsUsable())
 
 	if texture then
@@ -108,20 +108,20 @@ function BongosPetButton:Update()
 
 	if not isToken then
 		icon:SetTexture(texture)
-		self.tooltipName = name
+		self.tooltipName = action
 	else
 		icon:SetTexture(getglobal(texture))
-		self.tooltipName = getglobal(name)
+		self.tooltipName = getglobal(action)
 	end
 
-	local autoCastTexture = getglobal(selfName .. "AutoCastable")
+	local autoCastTexture = getglobal(name .. "AutoCastable")
 	if autoCastAllowed then
 		autoCastTexture:Show()
 	else
 		autoCastTexture:Hide()
 	end
 
-	local autoCastModel = getglobal(selfName .. "AutoCast")
+	local autoCastModel = getglobal(name .. "AutoCast")
 	if autoCastEnabled then
 		autoCastModel:Show()
 	else
@@ -135,7 +135,7 @@ function BongosPetButton:UpdateCooldown()
 end
 
 function BongosPetButton:UpdateVisibility()
-	if self:ShowingEmptyButtons() or GetPetActionInfo(self:GetID()) then
+	if self:ShowingEmpty() or GetPetActionInfo(self:GetID()) then
 		self:Show()
 	else
 		self:Hide()
@@ -169,16 +169,18 @@ end
 
 --[[ Utility Functions ]]--
 
-function BongosPetButton:ShowingEmptyButtons()
-	return self.showEmpty or BongosActionMain:ShowingEmptyButtons()
+function BongosPetButton:ShowingEmpty()
+	return self.showEmpty or BongosActionMain:ShowingEmptyButtons() or KeyBound:IsShown()
 end
 
 function BongosPetButton:Get(id)
 	return getglobal(format("PetActionButton%d", id))
 end
 
-function BongosPetButton:ForAll(action, ...)
+function BongosPetButton:ForAll(method, ...)
 	for i = 1, NUM_PET_ACTION_SLOTS do
-		action(self:Get(i), ...)
+		local button = self:Get(i)
+		local action = button[method]
+		action(button, ...)
 	end
 end

@@ -9,7 +9,6 @@ if not(class == "DRUID" or class == "ROGUE" or class == "WARRIOR" or class == "P
 end
 
 BongosClassBar = BongosActionMain:NewModule("Bongos-ClassBar")
-BongosClassBar.defaults = {x = 504.428, y = 600.571}
 
 --constants
 local DEFAULT_SPACING = 2
@@ -118,7 +117,7 @@ function BongosClassBar:Load()
 	self:RegisterEvent("UNIT_ENERGY", "UpdateAll")
 	self:RegisterEvent("UPDATE_BINDINGS", "UpdateBindings")
 
-	self.bar = BBar:CreateSecure("class", Bar_OnCreate, nil, self.defaults)
+	self.bar = BBar:CreateSecure("class", Bar_OnCreate, nil, {["y"] = 600.571, ["x"] = 504.428})
 end
 
 function BongosClassBar:Unload()

@@ -17,6 +17,8 @@ function BongosActionMain:Initialize()
 			showHotkeys = true,
 			showMacros = true,
 			rangeColoring = true,
+			showEmpty = false,
+			showHotkeys = false,
 			rangeColor = {r = 1, g = 0.5, b = 0.5},
 			quickMoveKey = 1,
 			version = CURRENT_VERSION,
@@ -65,7 +67,7 @@ function BongosActionMain:ShowTooltips(enable)
 	if enable then
 		self.profile.showTooltips = true
 	else
-		self.profile.showTooltips = nil
+		self.profile.showTooltips = false
 	end
 end
 
@@ -78,7 +80,7 @@ function BongosActionMain:LockButtons(enable)
 	if enable then
 		self.profile.lockButtons = true
 	else
-		self.profile.lockButtons = nil
+		self.profile.lockButtons = false
 	end
 end
 
@@ -91,12 +93,12 @@ function BongosActionMain:ShowEmptyButtons(enable)
 	if enable then
 		self.profile.showEmpty = true
 	else
-		self.profile.showEmpty = nil
+		self.profile.showEmpty = false
 	end
 
-	-- BActionBar.UpdateVisibilityForAll(enable)
+	BongosActionButton:ForAll("UpdateVisibility")
 	if UnitExists("pet") then
-		BongosPetBar:ForAll(BongosPetBar.UpdateVisibility)
+		BongosPetButton:ForAll("UpdateVisibility")
 	end
 end
 
@@ -109,12 +111,12 @@ function BongosActionMain:ShowHotkeys(enable)
 	if enable then
 		self.profile.showHotkeys = true
 	else
-		self.profile.showHotkeys = nil
+		self.profile.showHotkeys = false
 	end
 
 	BongosActionButton:ForAll("ShowHotkey", enable)
-	BongosPetBar:ForAll(BongosPetBar.ShowHotkey, enable)
-	BongosClassButton:ForAll(BongosClassButton.ShowHotkey, enable)
+	BongosPetButton:ForAll("ShowHotkey", enable)
+	BongosClassButton:ForAll("ShowHotkey", enable)
 end
 
 function BongosActionMain:ShowingHotkeys()
@@ -129,7 +131,7 @@ function BongosActionMain:ShowMacros(enable)
 	if enable then
 		self.profile.showMacros = true
 	else
-		self.profile.showMacros = nil
+		self.profile.showMacros = false
 	end
 	BongosActionButton:ForAll("ShowMacro", enable)
 end
@@ -165,7 +167,7 @@ function BongosActionMain:SetRangeColoring(enable)
 	if enable then
 		self.profile.rangeColoring = true
 	else
-		self.profile.rangeColoring = nil
+		self.profile.rangeColoring = false
 	end
 	BongosActionButton:ForAllShown("UpdateUsuable")
 end

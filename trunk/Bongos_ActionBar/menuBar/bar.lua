@@ -4,7 +4,6 @@
 --]]
 
 BongosMenuBar = BongosActionMain:NewModule("Bongos-MenuBar")
-BongosMenuBar.defaults = {x = 1261.85, y = 37}
 
 local DEFAULT_SPACING = 2
 local DEFAULT_ROWS = 1
@@ -129,7 +128,7 @@ end
 --[[ Startup ]]--
 
 function BongosMenuBar:Load()
-	local bar = BBar:Create("menu", Bar_OnCreate, nil, self.defaults)
+	local bar = BBar:Create("menu", Bar_OnCreate, nil, {["y"] = 37, ["x"] = 1261.85})
 	bar:Layout()
 
 	--hack to make sure all the buttons are shown properly

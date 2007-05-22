@@ -4,7 +4,6 @@
 --]]
 
 BongosBagBar = BongosActionMain:NewModule("Bongos-BagBar")
-BongosBagBar.defaults = {x = 1261.85, y = 37, vis = 1}
 
 --constants
 local DEFAULT_SPACING = 4
@@ -119,7 +118,7 @@ local function Bar_OnCreate(self)
 	self.ShowMenu = Bar_ShowMenu
 	self.Layout = Bar_Layout
 	self.SetVertical = Bar_SetVertical
-	self.SetOneBag = Bar_ShowAsOneBag
+	self.SetOneBag = Bar_SetOneBag
 
 	for _,bag in pairs(bags) do
 		self:Attach(bag)
@@ -130,7 +129,7 @@ end
 --[[ Startup ]]--
 
 function BongosBagBar:Load()
-	local bar = BBar:Create("bags", Bar_OnCreate, nil, self.defaults)
+	local bar = BBar:Create("bags", Bar_OnCreate, nil, {["x"] = 1261.85, ["y"] = 37})
 	bar:Layout()
 
 	if bar:IsShown() then

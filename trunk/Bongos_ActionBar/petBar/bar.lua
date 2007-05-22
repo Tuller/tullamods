@@ -4,7 +4,6 @@
 --]]
 
 BongosPetBar = BongosActionMain:NewModule("Bongos-PetBar")
-BongosPetBar.defaults = {x = 579.75, y = 598.80}
 
 --[[ Bar Functions ]]--
 
@@ -14,7 +13,7 @@ local function Bar_Layout(self, cols, space)
 	if InCombatLockdown() then return end
 
 	cols = (cols or self.sets.cols or NUM_PET_ACTION_SLOTS)
-	if cols == DEFAULT_COLS then
+	if cols == NUM_PET_ACTION_SLOTS then
 		self.sets.cols = nil
 	else
 		self.sets.cols = cols
@@ -43,9 +42,6 @@ local function Bar_Layout(self, cols, space)
 		button:Update()
 	end
 end
-
-
---[[ Rightclick Menu Functions ]]--
 
 local function Bar_CreateMenu(frame)
 	local name = format("BongosMenu%s", frame.id)
@@ -90,7 +86,7 @@ local function Bar_ShowMenu(self)
 	end
 
 	local menu = self.menu
-	menu.onShow = 1
+	menu.onShow = true
 	self:PlaceMenu(menu)
 	menu.onShow = nil
 end
@@ -108,14 +104,19 @@ local function Bar_OnCreate(self)
 	for i=1, NUM_PET_ACTION_SLOTS do
 		BongosPetButton:Set(i, self)
 	end
-	SecureStateHeader_Refresh(self)
+
+	if(UnitExists("pet")) then
+		SecureStateHeader_Refresh(self, "1")
+	else
+		SecureStateHeader_Refresh(self, "0")
+	end
 end
 
 
 --[[ Events ]]--
 
 function BongosPetBar:Load()
-	self.bar = BBar:CreateSecure("pet", Bar_OnCreate, nil, self.defaults)
+	self.bar = BBar:CreateSecure("pet", Bar_OnCreate, nil, {["y"] = 598.8, ["x"] = 579.75})
 	self.bar:Layout()
 
 	self:RegisterEvent("UNIT_FLAGS", "UpdateIfPet")
@@ -140,21 +141,21 @@ function BongosPetBar:Unload()
 end
 
 function BongosPetBar:UpdateBindings()
-	BongosPetButton:ForAll(BongosPetButton.UpdateHotkey)
+	BongosPetButton:ForAll("UpdateHotkey")
 end
 
 function BongosPetBar:UpdateIfPet(event, unit)
 	if unit == "pet" then
-		BongosPetButton:ForAll(BongosPetButton.Update)
+		BongosPetButton:ForAll("Update")
 	end
 end
 
 function BongosPetBar:Update()
-	BongosPetButton:ForAll(BongosPetButton.Update)
+	BongosPetButton:ForAll("Update")
 end
 
 function BongosPetBar:UpdateCooldown()
-	BongosPetButton:ForAll(BongosPetButton.UpdateCooldown)
+	BongosPetButton:ForAll("UpdateCooldown")
 end
 
 function BongosPetBar:UpdateShowGrid(event)
@@ -163,5 +164,5 @@ function BongosPetBar:UpdateShowGrid(event)
 	elseif event == "PET_BAR_HIDEGRID" then
 		BongosPetButton.showEmpty = nil
 	end
-	BongosPetButton:ForAll(BongosPetButton.UpdateVisibility)
+	BongosPetButton:ForAll("UpdateVisibility")
 end

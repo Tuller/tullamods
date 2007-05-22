@@ -2,13 +2,12 @@
 	Class Button
 --]]
 
-BongosClassButton = CreateFrame('CheckButton')
+BongosClassButton = CreateFrame("CheckButton")
 local Button_mt = {__index = BongosClassButton}
 
 local NORMALTEX_RATIO = 1.833333334
 local BUTTON_SIZE = 30
 local buttons = {}
-
 
 --[[ Constructor ]]--
 
@@ -50,12 +49,12 @@ function BongosClassButton:Create(id, parent)
 	hotkey:SetWidth(BUTTON_SIZE); hotkey:SetHeight(10)
 
 	--cooldown model
-	CreateFrame('Cooldown', name .. 'Cooldown', button, 'CooldownFrameTemplate')
+	CreateFrame("Cooldown", name .. "Cooldown", button, "CooldownFrameTemplate")
 
 	--set what spell this button casts
 	local spell = select(2, GetShapeshiftFormInfo(id))
-	button:SetAttribute('type', 'spell')
-	button:SetAttribute('spell', spell)
+	button:SetAttribute("type", "spell")
+	button:SetAttribute("spell", spell)
 
 	button:SetScript("PostClick", PostClick)
 	button:SetScript("OnEnter", OnEnter)
@@ -134,7 +133,7 @@ function BongosClassButton:ShowHotkey(show)
 end
 
 function BongosClassButton:UpdateHotkey()
-	getglobal(self:GetName() .. "HotKey"):SetText(self:GetHotkey() or '')
+	getglobal(self:GetName() .. "HotKey"):SetText(self:GetHotkey() or "")
 end
 
 function BongosClassButton:GetHotkey()
@@ -149,8 +148,9 @@ end
 
 --[[ Utility Functions ]]--
 
-function BongosClassButton:ForAll(action, ...)
+function BongosClassButton:ForAll(method, ...)
 	for _, button in pairs(buttons) do
+		local action = button[method]
 		action(button, ...)
 	end
 end
