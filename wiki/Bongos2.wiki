@@ -58,12 +58,3 @@ Slash Commands
     * delete <profile>: Deletes the given profile
     * reset: Loads default settings
     * list: Lists available profiles
-
-
-==FAQ==
-
-*My bindings don't work when I switch stances!*
-   * Bind your action buttons using the Bongos keybindings menu (/bob menu)
-
-*Druids forms do not work*
-  * Cat form does not work properly until you learn aquatic form.  To solve this problem, learn aquatic form.
