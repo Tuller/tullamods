@@ -94,7 +94,7 @@ function BongosActionButton:Create(id)
 	button.macro = getglobal(name .. "Name")
 	button.count = getglobal(name .. "Count")
 
-	button:UpdateHotkey()
+	button:ShowHotkey(BongosActionConfig:ShowingHotkeys())
 
 	button:SetScript("OnUpdate", OnUpdate)
 	button:SetScript("PostClick", PostClick)

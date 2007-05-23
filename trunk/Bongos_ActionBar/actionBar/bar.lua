@@ -160,7 +160,7 @@ local function StanceSlider_OnValueChanged(self, value)
 	getglobal(self:GetName() .. "ValText"):SetText(value)
 end
 
-local function Menu_CreateStanceSlider(self, id, title)
+local function Panel_AddStanceSlider(self, id, title)
 	local name = self:GetName() .. "Stance" .. id
 
 	local slider = self:CreateSlider(name)
@@ -174,42 +174,56 @@ local function Menu_CreateStanceSlider(self, id, title)
 	getglobal(name .. "Low"):SetText(0)
 end
 
-function BActionBar:CreateMenu()
-	local name = format("BongosMenu%s", self.id)
-	local menu, panel = BongosMenu:Create(name, true)
-	
-	--layout panel
+local function Panel_AddLayoutSliders(panel)
+	local name = panel:GetName()
+	--spacing
+	local spacing = panel:CreateSpacingSlider(name .. "Spacing")
+	spacing:SetScript("OnShow", function(self)
+		local parent = self:GetParent()
+		self:SetValue(parent.frame:GetSpacing())
+	end)
+	spacing:SetScript("OnValueChanged", function(self, value)
+		local parent = self:GetParent()
+		if not parent.onShow then
+			parent.frame:SetSpacing(value)
+		end
+		getglobal(self:GetName() .. "ValText"):SetText(value)
+	end)
+
 	--columns
 	local cols = panel:CreateSlider(name .. "Cols")
 	cols:SetScript("OnShow", function(self)
-		self:SetValue(menu.frame:GetSize() - menu.frame:GetColumns() + 1)
+		local parent = self:GetParent()
+		self:SetValue(parent.frame:GetSize() - parent.frame:GetColumns() + 1)
 	end)
 	cols:SetScript("OnValueChanged", function(self, value)
-		if not panel.onShow then
-			panel.frame:SetColumns(menu.frame:GetSize() - value + 1)
+		local parent = self:GetParent()
+		if not parent.onShow then
+			parent.frame:SetColumns(parent.frame:GetSize() - value + 1)
 		end
-		getglobal(self:GetName() .. "ValText"):SetText(menu.frame:GetColumns())
+		getglobal(self:GetName() .. "ValText"):SetText(parent.frame:GetColumns())
 	end)
 	cols:SetValueStep(1)
 	getglobal(name .. "ColsText"):SetText(L.Columns)
 	getglobal(name .. "ColsHigh"):SetText(1)
-
+	
 	--size
 	local size = panel:CreateSlider(name .. "Size")
 	size:SetScript("OnShow", function(self)
-		local frame = panel.frame
+		local frame = self:GetParent().frame
 		getglobal(name .. "Size"):SetMinMaxValues(1, frame:GetMaxSize())
 		getglobal(name .. "Size"):SetValue(frame:GetSize())
 		getglobal(name .. "SizeHigh"):SetText(frame:GetMaxSize())
 	end)
 	size:SetScript("OnValueChanged", function(self, value)
-		if not panel.onShow then
-			panel.frame:SetSize(value)
+		local parent = self:GetParent()
+		if not parent.onShow then
+			parent.frame:SetSize(value)
 		end
 		getglobal(self:GetName() .. "ValText"):SetText(value)
 
-		local size = panel.frame:GetSize()
-		local cols = panel.frame:GetColumns()
+		local size = parent.frame:GetSize()
+		local cols = parent.frame:GetColumns()
 		getglobal(name .. "Cols"):SetMinMaxValues(1, size)
 		getglobal(name .. "Cols"):SetValue(size - cols + 1)
 		getglobal(name .. "ColsLow"):SetText(size)
@@ -218,32 +232,28 @@ function BActionBar:CreateMenu()
 	size:SetValueStep(1)
 	getglobal(name .. "SizeText"):SetText(L.Size)
 	getglobal(name .. "SizeLow"):SetText(1)
+end
+
+function BActionBar:CreateMenu()
+	local name = format("BongosMenu%s", self.id)
+	local menu, panel = BongosMenu:Create(name, true)
 	
-	--spacing
-	local spacing = panel:CreateSpacingSlider(name .. "Spacing")
-	spacing:SetScript("OnShow", function(self)
-		self:SetValue(panel.frame:GetSpacing())
-	end)
-	spacing:SetScript("OnValueChanged", function(self, value)
-		if not panel.onShow then
-			panel.frame:SetSpacing(value)
-		end
-		getglobal(self:GetName() .. "ValText"):SetText(value)
-	end)
+	--layout panel
+	Panel_AddLayoutSliders(panel)
 	
 	--stances panel
-	panel = menu:AddPanel(L.Stances)
+	local stancePanel = menu:AddPanel(L.Stances)
+	Panel_AddStanceSlider(stancePanel, "help", L.FriendlyStance)
 	if(STANCES) then
 		for i in ipairs(STANCES) do
-			Menu_CreateStanceSlider(panel, "s" .. i, STANCES[i])
+			Panel_AddStanceSlider(stancePanel, "s" .. i, STANCES[i])
 		end
 	end
-	Menu_CreateStanceSlider(panel, "help", L.FriendlyStance)
 
 	--paging panel
-	panel = menu:AddPanel(L.Paging)
+	local panel = menu:AddPanel(L.Paging)
 	for i = MAX_PAGES, 1, -1 do
-		Menu_CreateStanceSlider(panel, "p" .. i, format(L.Page, i))
+		Panel_AddStanceSlider(panel, "p" .. i, format(L.Page, i))
 	end
 
 	return menu

@@ -97,20 +97,19 @@ local function Bar_OnCreate(self)
 	self.Layout = Bar_Layout
 
 	self:SetFrameStrata("HIGH")
-	self:SetAttribute("unit", "pet")
-	self:SetAttribute("statemap-unitexists-true",  "1")
-	self:SetAttribute("statemap-unitexists-false", "0")
-	RegisterUnitWatch(self, true)
+	RegisterStateDriver(self, "state", "[pet]1;0")
+	self:SetAttribute("statemap-state", "$input")
 
 	for i=1, NUM_PET_ACTION_SLOTS do
 		BongosPetButton:Set(i, self)
 	end
 
 	if(UnitExists("pet")) then
-		SecureStateHeader_Refresh(self, "1")
+		self:SetAttribute("state", "1")
 	else
-		SecureStateHeader_Refresh(self, "0")
+		self:SetAttribute("state", "0")
 	end
+	SecureStateHeader_Refresh(self)
 end
 
 

@@ -13,7 +13,7 @@ L.ActionBar = "Action Bar %s"
 L.Paging = "Paging"
 L.Stances = "Stances"
 L.Page = "Page %s"
-L.FriendlyTarget = "Friendly Target"
+L.FriendlyStance = "Friendly Target"
 
 L.ClassBar = "Class Bar"
 L.MenuBar = "Menu Bar"
