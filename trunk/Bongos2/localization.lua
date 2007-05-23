@@ -38,6 +38,7 @@ L.DeleteDesc = "Deletes <profile>"
 L.ResetDesc = "Returns to default settings"
 L.ListDesc = "Lists all profiles"
 L.AvailableProfiles = "Available Profiles"
+L.PrintVersionDesc = "Prints the current Bongos version"
 
 --dragFrame tooltips
 L.ShowConfig = "<Right Click> to configure"

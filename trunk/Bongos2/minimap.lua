@@ -42,7 +42,7 @@ function BongosMinimap:OnUpdate(elapsed)
 	xpos = xmin - xpos / Minimap:GetEffectiveScale() + 70
 	ypos = ypos / Minimap:GetEffectiveScale() - ymin - 70
 
-	pos = deg(atan2(ypos, xpos))
+	pos = atan2(ypos, xpos)
 
 	xpos = 80 * cos(pos)
 	ypos = 80 * sin(pos);

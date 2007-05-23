@@ -57,8 +57,10 @@ function Bongos:Enable()
 end
 
 function Bongos:UpdateVersion()
+	if(self.profile.version == "1.0") then
+		self.profile.showMinimap = true
+	end
 	self.profile.version = CURRENT_VERSION
-	self.profile.showMinimap = true
 	self:Print(format(L.Updated, self.profile.version))
 end
 
@@ -239,6 +241,7 @@ function Bongos:RegisterSlashCommands()
 	slash:RegisterSlashHandler(format(cmdStr, "delete <profile>", L.DeleteDesc), "^delete (%w+)", "DeleteProfile")
 	slash:RegisterSlashHandler(format(cmdStr, "reset", L.ResetDesc), "^reset$", "ResetProfile")
 	slash:RegisterSlashHandler(format(cmdStr, "list", L.ListDesc), "^list$", "ListProfiles")
+	slash:RegisterSlashHandler(format(cmdStr, "version", L.PrintVersionDesc), "^version$", "PrintVersion")
 
 	-- slash:RegisterSlashHandler(format(cmdStr, "fadealpha <barList> <opacity>", L.SetFadeAlphaDesc), "fadealpha (.+) ([%d%.]+)", "SetFadeAlpha")
 	-- slash:RegisterSlashHandler(format(cmdStr, "fademode <barList> <0 | 1 | 2>", L.SetFadeModeDesc), "fademode (.+) ([0-2])", "SetFadeMode")
@@ -289,6 +292,10 @@ function Bongos:SetBarAlpha(args, alpha)
 			BBar:ForBar(barList, "SetFrameAlpha", alpha)
 		end
 	end
+end
+
+function Bongos:PrintVersion()
+	self:Print(self.profile.version)
 end
 
 -- function Bongos:SetFadeMode(args, mode)

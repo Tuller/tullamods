@@ -7,6 +7,7 @@ Bongos2 Version History
 	Fixed a bug causing an error when attempting toggle range coloring
 	Fixed a bug causing hotkeys on the class bar and action bars to not properly be set when loading a profile
 	Fixed a bug causing macro text on the action bars to not be properly set when loading a profile
+	Fixed a bug causing the minimap button to go crazy when adjusting its location
 	
 	Added options to save and copy profiles
 
