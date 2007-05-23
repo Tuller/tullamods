@@ -84,7 +84,6 @@ function BActionBar:Create(id)
 	local bar = setmetatable(BBar:CreateSecure(id, nil, nil, defaults), Bar_MT)
 	bar:SetScript("OnShow", OnShow)
 	bar:LoadStates()
-	bar:SetRightClickUnit(BongosActionConfig:GetRightClickUnit())
 	bar:SetAttribute("state", bar:GetCurrentState())
 
 	--layout the bar
@@ -139,9 +138,8 @@ function BActionBar:GetCurrentState()
 			return stance
 		end
 		return 0
-	else
-		return page + 9
 	end
+	return page + 8
 end
 
 
@@ -439,14 +437,12 @@ end
 function BActionBar:SetRightClickUnit(unit)
 	self:SetAttribute("unit2", unit)
 	for i = 1, MAX_PAGES do
-		self:SetAttribute("unit-page" .. i .. "s", unit)
+		self:SetAttribute("unit-p" .. i .. "s", unit)
 	end
 
 	if(STANCES) then
 		for i in pairs(STANCES) do
-			self:SetAttribute("unit-stance" .. i .. "s", unit)
+			self:SetAttribute("unit-s" .. i .. "s", unit)
 		end
 	end
-	
-	self:SetAttribute("alt-unit*", "player")
 end

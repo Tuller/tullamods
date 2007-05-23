@@ -34,6 +34,9 @@ local function OnAttributeChanged(self, var, val)
 	local parent = self:GetParent()
 	if(parent and parent:IsShown() and var == "state-parent") then
 		self.id = nil
+		-- if(self == BongosActionButton1) then
+			-- Bongos:Print(val)
+		-- end
 	end
 end
 

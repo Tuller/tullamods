@@ -114,7 +114,7 @@ function BongosActionConfig:SetRangeColoring(enable)
 	else
 		Bongos.profile.rangeColoring = false
 	end
-	BongosActionButton:ForAllShown("UpdateUsuable")
+	BongosActionButton:ForAll("UpdateUsable")
 end
 
 function BongosActionConfig:RangeColoring()
