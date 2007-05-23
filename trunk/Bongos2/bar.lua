@@ -165,7 +165,7 @@ end
 
 function BBar:Attach(frame)
 	frame:SetParent(self)
-	frame:SetAlpha(self:GetAlpha())
+	frame:SetAlpha(1)
 	frame:SetFrameLevel(0)
 end
 

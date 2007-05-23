@@ -5,6 +5,8 @@ Bongos2 Version History
 	Fixed a bug causing right click selfcast to not work
 	Fixed a bug causing the user to be in the wrong state when logging in and already paged
 	Fixed a bug causing an error when attempting toggle range coloring
+	Fixed a bug causing hotkeys on the class bar and action bars to not properly be set when loading a profile
+	Fixed a bug causing macro text on the action bars to not be properly set when loading a profile
 	
 	Added options to save and copy profiles
 
