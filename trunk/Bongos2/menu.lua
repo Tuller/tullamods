@@ -12,12 +12,19 @@ local function Menu_OnClick(self)
 	self:Hide()
 end
 
-function BongosMenu:Create(name)
+local function Menu_OnShow(self)
+	if(not self.panels) then
+		self:SetWidth(self.width)
+		self:SetHeight(self.height)
+	end
+end
+
+function BongosMenu:Create(name, tabbed)
 	local menu = setmetatable(CreateFrame("Button", name, UIParent, "GooeyPopup"), Button_MT)
-	menu:SetWidth(210)
-	menu:SetHeight(38)
+	self.width = 210; self.height = 38
 
 	menu:RegisterForClicks("AnyUp")
+	menu:SetScript("OnShow", Menu_OnShow)
 	menu:SetScript("OnClick", Menu_OnClick)
 
 	menu.text = menu:CreateFontString(nil, "OVERLAY")
@@ -27,17 +34,101 @@ function BongosMenu:Create(name)
 	local close = CreateFrame("Button", nil, menu, "UIPanelCloseButton")
 	close:SetPoint("TOPRIGHT", menu, "TOPRIGHT", -2, -2)
 
-	-- local fadeInCombat = menu:CreateFadeInCombatButton(name .. "FadeInCombat")
-	-- fadeInCombat:SetPoint("TOPLEFT", menu, "TOPLEFT", 6, -28)
+	local panel
+	if(tabbed) then
+		panel = menu:AddPanel(L.Layout)
+		panel:CreateAlphaSlider(name .. "Opacity")
+		panel:CreateScaleSlider(name .. "Scale")
+	else
+		menu:CreateAlphaSlider(name .. "Opacity")
+		menu:CreateScaleSlider(name .. "Scale")
+	end
 
-	-- local fadeOutCombat = BongosMenu:CreateFadeOutCombatButton(name .. "FadeOutCombat")
-	-- fadeOutCombat:SetPoint("TOP", fadeInCombat, "BOTTOM", 0, 2)
+	return menu, panel
+end
 
-	-- menu:CreateFadeSlider(name .. "FadeOpacity")
-	menu:CreateAlphaSlider(name .. "Opacity")
-	menu:CreateScaleSlider(name .. "Scale")
+function BongosMenu:SetFrame(frame)
+	if(self.panels) then
+		for _,panel in pairs(self.panels) do
+			panel.frame = frame
+		end
+	end
+	self.frame = frame
+end
 
+--[[ Tabbed Menu ]]--
+
+local function MenuItem_OnClick(self)
+	self:GetParent():GetParent():ShowPanel(self:GetText())
+end
+
+local function TabbedMenu_AddItem(self, name)
+	local button = CreateFrame("Button", self:GetName() .. name, self)
+	button:SetWidth(48)
+	button:SetHeight(20)
+	button:SetScript("OnClick", MenuItem_OnClick)
+
+	button:SetTextFontObject("GameFontNormalSmall")
+	button:SetText(name)
+	button:SetHighlightTextColor(1, 1, 1)
+
+	if not self.button then
+		button:SetPoint("TOPLEFT", self, "TOPLEFT", 2, -2)
+		self:SetHeight(self:GetHeight() + 26)
+	else
+		button:SetPoint("TOPLEFT", self.button, "BOTTOMLEFT", 0, 0)
+		self:SetHeight(self:GetHeight() + 20)
+	end
+	self.button = button
+end
+
+function BongosMenu:AddMenu()
+	local menu = CreateFrame("Frame", self:GetName() .. "Menu", self, "GooeyFrame")
+	menu:SetWidth(52)
+	menu.AddItem = TabbedMenu_AddItem
+	menu:SetPoint("TOPRIGHT", self, "TOPLEFT", 6, -16)
+	
+	self.menu = menu
 	return menu
+end
+
+--[[ Panel Functions ]]--
+
+local function Panel_OnShow(self)
+	local parent = self:GetParent()
+	parent:SetWidth(self.width)
+	parent:SetHeight(self.height)
+end
+
+function BongosMenu:AddPanel(name)
+	local panel = setmetatable(CreateFrame("Frame", self:GetName() .. "Panel" .. name, self), Button_MT)
+	panel:SetScript("OnShow", Panel_OnShow)
+	panel:SetAllPoints(self)
+	panel:Hide()
+
+	panel.width = 210
+	panel.height = 38
+
+	if(not self.panels) then 
+		self.panels = {} 
+		self:AddMenu()
+	end
+	self.panels[name] = panel
+	self.menu:AddItem(name)
+	
+	return panel
+end
+
+function BongosMenu:ShowPanel(name)
+	for index, panel in pairs(self.panels) do
+		if(index == name) then
+			panel:Show()
+			getglobal(self.menu:GetName() .. name):LockHighlight()
+		else
+			panel:Hide()
+			getglobal(self.menu:GetName() .. name):UnlockHighlight()
+		end
+	end
 end
 
 
@@ -53,8 +144,7 @@ function BongosMenu:CreateSlider(name)
 	else
 		slider:SetPoint("BOTTOM", self, "BOTTOM", 0, 24)
 	end
-	self:SetHeight(self:GetHeight() + 43)
-
+	self.height = self.height + 43
 	self.slider = slider
 
 	return slider
@@ -122,27 +212,27 @@ function BongosMenu:CreateAlphaSlider(name)
 end
 
 --fading
-local function FadeSlider_OnShow(self)
-	local alpha = select(2, self:GetParent().frame:GetFrameAlpha())
-	self:SetValue(alpha * 100)
-end
+-- local function FadeSlider_OnShow(self)
+	-- local alpha = select(2, self:GetParent().frame:GetFrameAlpha())
+	-- self:SetValue(alpha * 100)
+-- end
 
-local function FadeSlider_OnValueChanged(self, value)
-	local parent = self:GetParent()
-	if not parent.onShow then
-		parent.frame:SetFadeALpha(value / 100)
-	end
-	getglobal(self:GetName() .. "ValText"):SetText(value)
-end
+-- local function FadeSlider_OnValueChanged(self, value)
+	-- local parent = self:GetParent()
+	-- if not parent.onShow then
+		-- parent.frame:SetFadeALpha(value / 100)
+	-- end
+	-- getglobal(self:GetName() .. "ValText"):SetText(value)
+-- end
 
-function BongosMenu:CreateFadeSlider(name)
-	local slider = self:CreateAlphaSlider(name)
-	getglobal(name .. "Text"):SetText("Faded Opacity")
-	slider:SetScript("OnShow", FadeSlider_OnShow)
-	slider:SetScript("OnValueChanged", FadeSlider_OnValueChanged)
+-- function BongosMenu:CreateFadeSlider(name)
+	-- local slider = self:CreateAlphaSlider(name)
+	-- getglobal(name .. "Text"):SetText("Faded Opacity")
+	-- slider:SetScript("OnShow", FadeSlider_OnShow)
+	-- slider:SetScript("OnValueChanged", FadeSlider_OnValueChanged)
 
-	return slider
-end
+	-- return slider
+-- end
 
 --spacing
 function BongosMenu:CreateSpacingSlider(name)
@@ -167,58 +257,58 @@ function BongosMenu:CreateCheckButton(name)
 	else
 		button:SetPoint("TOPLEFT", self, "TOPLEFT", 6, -28)
 	end
-	self:SetHeight(self:GetHeight() + 30)
+	self.height = self.height + 30
 	self.button = button
 
 	return button
 end
 
 --fade when in combat
-local function FadeInCombat_OnClick(self)
-	if self:GetChecked() then
-		self:GetParent().frame:SetFadeMode(1)
-	else
-		self:GetParent().frame:SetFadeMode(0)
-	end
+-- local function FadeInCombat_OnClick(self)
+	-- if self:GetChecked() then
+		-- self:GetParent().frame:SetFadeMode(1)
+	-- else
+		-- self:GetParent().frame:SetFadeMode(0)
+	-- end
 
-	local unfade = getglobal(self:GetParent():GetName() .. "FadeOutCombat")
-	unfade:SetChecked(false)
-end
+	-- local unfade = getglobal(self:GetParent():GetName() .. "FadeOutCombat")
+	-- unfade:SetChecked(false)
+-- end
 
-local function FadeInCombat_OnShow(self)
-	self:SetChecked(self:GetParent().frame.sets.fadeMode == 1)
-end
+-- local function FadeInCombat_OnShow(self)
+	-- self:SetChecked(self:GetParent().frame.sets.fadeMode == 1)
+-- end
 
-function BongosMenu:CreateFadeInCombatButton(name)
-	local button = self:CreateCheckButton(name)
-	button:SetScript("OnClick", FadeInCombat_OnClick)
-	button:SetScript("OnShow", FadeInCombat_OnShow)
-	button:SetText("Fade In Combat")
+-- function BongosMenu:CreateFadeInCombatButton(name)
+	-- local button = self:CreateCheckButton(name)
+	-- button:SetScript("OnClick", FadeInCombat_OnClick)
+	-- button:SetScript("OnShow", FadeInCombat_OnShow)
+	-- button:SetText("Fade In Combat")
 
-	return button
-end
+	-- return button
+-- end
 
 --fade out of combat
-local function FadeOutCombat_OnClick(self)
-	if self:GetChecked() then
-		self:GetParent().frame:SetFadeMode(2)
-	else
-		self:GetParent().frame:SetFadeMode(0)
-	end
+-- local function FadeOutCombat_OnClick(self)
+	-- if self:GetChecked() then
+		-- self:GetParent().frame:SetFadeMode(2)
+	-- else
+		-- self:GetParent().frame:SetFadeMode(0)
+	-- end
 
-	local fade = getglobal(self:GetParent():GetName() .. "FadeInCombat")
-	fade:SetChecked(false)
-end
+	-- local fade = getglobal(self:GetParent():GetName() .. "FadeInCombat")
+	-- fade:SetChecked(false)
+-- end
 
-local function FadeOutCombat_OnShow(self)
-	self:SetChecked(self:GetParent().frame.sets.fadeMode == 2)
-end
+-- local function FadeOutCombat_OnShow(self)
+	-- self:SetChecked(self:GetParent().frame.sets.fadeMode == 2)
+-- end
 
-function BongosMenu:CreateFadeOutCombatButton(name)
-	local button = self:CreateCheckButton(name)
-	button:SetScript("OnShow", FadeOutCombat_OnShow)
-	button:SetScript("OnClick", FadeOutCombat_OnClick)
-	button:SetText("Fade Out Of Combat")
+-- function BongosMenu:CreateFadeOutCombatButton(name)
+	-- local button = self:CreateCheckButton(name)
+	-- button:SetScript("OnShow", FadeOutCombat_OnShow)
+	-- button:SetScript("OnClick", FadeOutCombat_OnClick)
+	-- button:SetText("Fade Out Of Combat")
 
-	return button
-end
+	-- return button
+-- end

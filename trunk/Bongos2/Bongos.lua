@@ -41,7 +41,7 @@ function Bongos:Enable()
 	local cMajor, cMinor = CURRENT_VERSION:match("(%d+)%.(%d+)")
 	local major, minor = self.profile.version:match("(%d+)%.(%d+)")
 
-	if major ~= cMajor then
+	if major ~= cMajor and not(self.profile.version == "0.9") then
 		self.db:ResetProfile()
 		self:Print(L.UpdatedIncompatible)
 	elseif minor ~= cMinor then
@@ -130,29 +130,29 @@ end
 
 function Bongos:DONGLE_PROFILE_CREATED(event, db, parent, sv_name, profile_key)
 	self.profile = self.db.profile
-	self:Print(format("Created new profile \"%s\"", profile_key))
+	self:Print(format(L.ProfileCreated , profile_key))
 end
 
 function Bongos:DONGLE_PROFILE_CHANGED(event, db, parent, sv_name, profile_key)
 	self.profile = self.db.profile
 	self:LoadModules()
-	self:Print(format("Loaded profile \"%s\"", profile_key))
+	self:Print(format(L.ProfileLoaded, profile_key))
 end
 
 function Bongos:DONGLE_PROFILE_DELETED(event, db, parent, sv_name, profile_key)
-	self:Print(format("Deleted profile \"%s\"", profile_key))
+	self:Print(format(L.ProfileDeleted, profile_key))
 end
 
 function Bongos:DONGLE_PROFILE_COPIED(event, db, parent, sv_name, profile_key, intoProfile_key)
 	self.profile = self.db.profile
 	self:LoadModules()
-	self:Print(format("Copied profile \"%s\" to \"%s\"", profile_key, intoProfile_key))
+	self:Print(format(L.ProfileCopied, profile_key, intoProfile_key))
 end
 
 function Bongos:DONGLE_PROFILE_RESET(event, db, parent, sv_name, profile_key)
 	self.profile = self.db.profile
 	self:LoadModules()
-	self:Print(format("Reset profile \"%s\"", profile_key))
+	self:Print(format(L.ProfileReset, profile_key))
 end
 
 
@@ -218,9 +218,8 @@ function Bongos:RegisterSlashCommands()
 	slash:RegisterSlashHandler(format(cmdStr, "hide <barList>", L.HideBarsDesc), "^hide (.+)", "HideBars")
 	slash:RegisterSlashHandler(format(cmdStr, "toggle <barList>", L.ToggleBarsDesc), "^toggle (.+)", "ToggleBars")
 
-	-- slash:RegisterSlashHandler(format(cmdStr, "set <profle>", L.SetDesc), "set (%w+)", "SetProfile")
-	-- slash:RegisterSlashHandler(format(cmdStr, "copy <profile>", L.CopyDesc), "copy (%w+)", "CopyProfile")
-	slash:RegisterSlashHandler(format(cmdStr, "load <profile>", L.CopyDesc), "^load (%w+)", "CopyProfile")
+	slash:RegisterSlashHandler(format(cmdStr, "set <profle>", L.SetDesc), "set (%w+)", "SetProfile")
+	slash:RegisterSlashHandler(format(cmdStr, "copy <profile>", L.CopyDesc), "copy (%w+)", "CopyProfile")
 	slash:RegisterSlashHandler(format(cmdStr, "delete <profile>", L.DeleteDesc), "^delete (%w+)", "DeleteProfile")
 	slash:RegisterSlashHandler(format(cmdStr, "reset", L.ResetDesc), "^reset$", "ResetProfile")
 	slash:RegisterSlashHandler(format(cmdStr, "list", L.ListDesc), "^list$", "ListProfiles")

@@ -11,6 +11,13 @@ L.NewPlayer = "Created new profile for %s"
 L.Updated = "Updated to v%s"
 L.UpdatedIncompatible = "Updating from an incompatible version. Default settings loaded"
 
+--profiles
+L.ProfileCreated = "Created new profile \"%s\""
+L.ProfileLoaded = "Loaded profile \"%s\""
+L.ProfileDeleted = "Deleted profile \"%s\""
+L.ProfileCopied = "Copied settings from \"%s\" to \"%s\""
+L.ProfileReset = "Reset profile \"%s\""
+
 --slash command help
 L.LockBarsDesc = "Toggles locking bar positions"
 L.StickyBarsDesc = "Toggles auto anchoring bars"
@@ -40,5 +47,5 @@ L.SetAlpha = "<Mousewheel> to set opacity (%.2f)"
 --Menu Stuff
 L.Scale = "Scale"
 L.Opacity = "Opacity"
+L.Visibility = "Visibility"
 L.Spacing = "Spacing"
-L.Columns = "Columns"
