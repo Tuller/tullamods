@@ -34,7 +34,7 @@ function BongosMenu:Create(name, tabbed)
 	local close = CreateFrame("Button", nil, menu, "UIPanelCloseButton")
 	close:SetPoint("TOPRIGHT", menu, "TOPRIGHT", -2, -2)
 
-	local panel
+	local panel = nil
 	if(tabbed) then
 		panel = menu:AddPanel(L.Layout)
 		panel:CreateAlphaSlider(name .. "Opacity")
@@ -59,7 +59,8 @@ end
 --[[ Tabbed Menu ]]--
 
 local function MenuItem_OnClick(self)
-	self:GetParent():GetParent():ShowPanel(self:GetText())
+	local menu = self:GetParent():GetParent()
+	menu:ShowPanel(self:GetText())
 end
 
 local function TabbedMenu_AddItem(self, name)
@@ -120,13 +121,14 @@ function BongosMenu:AddPanel(name)
 end
 
 function BongosMenu:ShowPanel(name)
+	local menuName = self.menu:GetName()
 	for index, panel in pairs(self.panels) do
 		if(index == name) then
 			panel:Show()
-			getglobal(self.menu:GetName() .. name):LockHighlight()
+			getglobal(menuName .. index):LockHighlight()
 		else
 			panel:Hide()
-			getglobal(self.menu:GetName() .. name):UnlockHighlight()
+			getglobal(menuName .. index):UnlockHighlight()
 		end
 	end
 end

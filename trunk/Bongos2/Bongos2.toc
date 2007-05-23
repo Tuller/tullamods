@@ -12,5 +12,5 @@ localization.lua
 dragFrame.lua
 bar.lua
 menu.lua
+minimap.xml
 Bongos.lua
-test.lua

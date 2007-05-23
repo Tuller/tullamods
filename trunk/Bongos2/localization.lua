@@ -49,3 +49,12 @@ L.Scale = "Scale"
 L.Opacity = "Opacity"
 L.Visibility = "Visibility"
 L.Spacing = "Spacing"
+L.Layout = "Layout"
+
+--minimap button stuff
+L.ShowMenuTip = "<Right Click> to show the options menu"
+L.HideMenuTip = "<Right Click> to hide the options menu"
+L.LockBarsTip = "<Left Click> to lock bar positions"
+L.UnlockBarsTip = "<Left Click> to unlock bar positions"
+L.LockButtonsTip = "<Shift Left Click> to lock button positions"
+L.UnlockButtonsTip = "<Shift Left Click> to unlock button positions"

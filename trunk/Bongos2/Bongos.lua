@@ -28,9 +28,12 @@ function Bongos:Enable()
 			rangeColoring = true,
 			showEmpty = false,
 			showHotkeys = false,
+			showMinimap = true,
 			rangeColor = {r = 1, g = 0.5, b = 0.5},
 			rightClickUnit = "player",
 			quickMoveKey = 1,
+			mapx = -24,
+			mapy = -76,
 			bars = {}
 		}
 	}
@@ -50,10 +53,12 @@ function Bongos:Enable()
 
 	self:RegisterSlashCommands()
 	self:LoadModules()
+	self:LoadMinimap()
 end
 
 function Bongos:UpdateVersion()
 	self.profile.version = CURRENT_VERSION
+	self.profile.showMinimap = true
 	self:Print(format(L.Updated, self.profile.version))
 end
 
@@ -310,4 +315,37 @@ function Bongos:ToggleBars(args)
 	for _, barList in pairs({strsplit(" ", args)}) do
 		BBar:ForBar(barList, "ToggleFrame")
 	end
+end
+
+--minimap functions
+function Bongos:LoadMinimap()
+	local x, y = Bongos:GetMapCoords()
+	BongosMinimapFrame:ClearAllPoints()
+	BongosMinimapFrame:SetPoint("TOPLEFT", "Minimap", "TOPLEFT", x, y)
+	
+	if not self:ShowingMinimap() then
+		BongosMinimapFrame:Hide()
+	end
+end
+
+function Bongos:ShowMinimap(enable)
+	self.showMinimap = true
+	if(enable) then
+		BongosMinimapFrame:Show()
+	else
+		BongosMinimapFrame:Hide()
+	end
+end
+
+function Bongos:ShowingMinimap()
+	return self.profile.showMinimap
+end
+
+function Bongos:SetMapCoords(x, y)
+	self.profile.mapx = x
+	self.profile.mapy = y
+end
+
+function Bongos:GetMapCoords()
+	return self.profile.mapx, self.profile.mapy
 end
