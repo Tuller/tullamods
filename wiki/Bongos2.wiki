@@ -4,14 +4,13 @@ Bongos is an action bar replacement designed to be both low memory, and easy to 
 You must bind your keys via Bongos' key bindings menu. If you do not, there will be issues with stances.
 Bear form work, but not cat form? Learn aquatic form!
 
-
 Included Addons
-    * Bongos2 - The core addon.
-    * Bongos2 ActionBar - Breaks up the main action bar into movable parts.
-    * Bongos2 Stats - A display for latency, framerate, and memory usage
-    * Bongos2 RollBar - Makes the frame for rolling on items movable
-    * Bongos2 CastBar - A movable casting bar, with the ability to show cast time.
-    * Bongos2 Options - A dynamically loaded options menu for Bongos. 
+    * Bongos2: The core addon.
+    * Bongos2 ActionBar: Breaks up the main action bar into movable parts.
+    * Bongos2 Stats: A display for latency, framerate, and memory usage
+    * Bongos2 RollBar: Makes the frame for rolling on items movable
+    * Bongos2 CastBar: A movable casting bar, with the ability to show cast time.
+    * Bongos2 Options: A dynamically loaded options menu for Bongos. 
 
 Features
     * Every Bongos bar can be moved, hidden, and have its scale and opacity altered
@@ -59,3 +58,12 @@ Slash Commands
     * delete <profile: Deletes the given profile
     * reset: Loads default settings
     * list: Lists available profiles
+
+
+==FAQ==
+
+*My bindings don't work when I switch stances!*
+   * Bind your action buttons using the Bongos keybindings menu (/bob menu)
+
+*Druids forms do not work*
+  * Cat form does not work properly until you learn aquatic form.  To solve this problem, learn aquatic form.
