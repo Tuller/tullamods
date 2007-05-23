@@ -55,7 +55,7 @@ Slash Commands
     * setalpha <barList> <opacity>:  Set the opacity of a bar to <value>. 0 is translucent, 1 is opaque.
     * set <profile>: Sets the current profile to <profile>
     * copy <profile>: Copies settings from <profile>
-    * delete <profile: Deletes the given profile
+    * delete <profile>: Deletes the given profile
     * reset: Loads default settings
     * list: Lists available profiles
 
