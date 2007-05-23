@@ -2,6 +2,11 @@ Bongos2 Version History
 
 1.2
 	Fixed a bug causing the minimap button to not hide
+	Fixed a bug causing right click selfcast to not work
+	Fixed a bug causing the user to be in the wrong state when logging in and already paged
+	Fixed a bug causing an error when attempting toggle range coloring
+	
+	Added options to save and copy profiles
 
 1.1
 	Fixed a bug causing it not to be possible to bind mouse buttons 4 and 5
@@ -13,7 +18,7 @@ Bongos2 Version History
 	Updated for 2.1	
 
 known issues:
-	Right click selfcast potentially does not work when targeting a friendly unit
+	Tainting issues from other addons
 
 todo:
 	Profile Save and Copy commands in the GUI

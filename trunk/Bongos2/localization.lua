@@ -13,10 +13,11 @@ L.UpdatedIncompatible = "Updating from an incompatible version. Default settings
 
 --profiles
 L.ProfileCreated = "Created new profile \"%s\""
-L.ProfileLoaded = "Loaded profile \"%s\""
+L.ProfileLoaded = "Set profile to \"%s\""
 L.ProfileDeleted = "Deleted profile \"%s\""
 L.ProfileCopied = "Copied settings from \"%s\" to \"%s\""
 L.ProfileReset = "Reset profile \"%s\""
+L.CantDeleteCurrentProfile = "Cannot delete the current profile"
 
 --slash command help
 L.LockBarsDesc = "Toggles locking bar positions"

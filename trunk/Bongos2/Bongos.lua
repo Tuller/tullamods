@@ -80,6 +80,15 @@ end
 
 --[[ Profile Functions ]]--
 
+function Bongos:SaveProfile(profile)
+	local currentProfile = self.db:GetCurrentProfile()
+	if profile and profile ~= self.db:GetCurrentProfile() then
+		self:UnloadModules()
+		self.db:SetProfile(profile)
+		self:CopyProfile(currentProfile)
+	end
+end
+
 function Bongos:SetProfile(name)
 	local profile = self:MatchProfile(name)
 	if profile and profile ~= self.db:GetCurrentProfile() then
@@ -92,6 +101,8 @@ function Bongos:DeleteProfile(name)
 	local profile = self:MatchProfile(name)
 	if profile and profile ~= self.db:GetCurrentProfile() then
 		self.db:DeleteProfile(profile)
+	else
+		self:Print(L.CantDeleteCurrentProfile)
 	end
 end
 
@@ -322,7 +333,7 @@ function Bongos:LoadMinimap()
 	local x, y = Bongos:GetMapCoords()
 	BongosMinimapFrame:ClearAllPoints()
 	BongosMinimapFrame:SetPoint("TOPLEFT", "Minimap", "TOPLEFT", x, y)
-	
+
 	if not self:ShowingMinimap() then
 		BongosMinimapFrame:Hide()
 	end
