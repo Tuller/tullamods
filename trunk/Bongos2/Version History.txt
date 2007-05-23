@@ -1,0 +1,13 @@
+Bongos2 Version History
+
+1.1
+	Fixed a bug causing it not to be possible to bind mouse buttons 4 and 5
+	Fixed a bug causing macro text to not remain hidden on login if the option is set
+	Fixed a bug causing alt + binding to target mouseover :)
+	Fixed a bug causing the bars for paladins to not work properly when first loaded
+	
+1.0
+	Updated for 2.1	
+
+
+Known Bugs:
