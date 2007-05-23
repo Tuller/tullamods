@@ -4,6 +4,7 @@
 --]]
 
 BongosPetBar = Bongos:NewModule("Bongos-PetBar")
+local L = BONGOS_LOCALS
 
 --[[ Bar Functions ]]--
 
@@ -47,7 +48,7 @@ local function Bar_CreateMenu(frame)
 	local name = format("BongosMenu%s", frame.id)
 	local menu = BongosMenu:Create(name)
 	menu.frame = frame
-	menu.text:SetText("Pet Bar")
+	menu.text:SetText(L.PetBar)
 
 	--sliders
 	local spacing = menu:CreateSpacingSlider(name .. "Spacing")
@@ -72,7 +73,7 @@ local function Bar_CreateMenu(frame)
 		getglobal(self:GetName() .. "ValText"):SetText(NUM_PET_ACTION_SLOTS - value + 1)
 	end)
 	cols:SetValueStep(1)
-	getglobal(name .. "ColsText"):SetText("Columns")
+	getglobal(name .. "ColsText"):SetText(L.Columns)
 	getglobal(name .. "Cols"):SetMinMaxValues(1, NUM_PET_ACTION_SLOTS)
 	getglobal(name .. "ColsHigh"):SetText(1)
 	getglobal(name .. "ColsLow"):SetText(NUM_PET_ACTION_SLOTS)

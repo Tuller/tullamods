@@ -5,6 +5,8 @@
 
 BongosBagBar = Bongos:NewModule("Bongos-BagBar")
 
+local L = BONGOS_LOCALS
+
 --constants
 local DEFAULT_SPACING = 4
 local DEFAULT_ROWS = 1
@@ -76,18 +78,18 @@ local function Bar_CreateMenu(frame)
 	local name = format("BongosMenu%s", frame.id)
 	local menu = BongosMenu:Create(name)
 	menu.frame = frame
-	menu.text:SetText("Bag Bar")
+	menu.text:SetText(L.BagBar)
 
 	--checkbuttons
 	local oneBag = menu:CreateCheckButton(name .. "OneBag")
 	oneBag:SetScript("OnShow", function(self) self:SetChecked(frame.sets.oneBag) end)
 	oneBag:SetScript("OnClick", function(self) frame:SetOneBag(self:GetChecked()) end)
-	oneBag:SetText("One Bag")
+	oneBag:SetText(L.OneBag)
 
 	local vertical = menu:CreateCheckButton(name .. "Vertical")
 	vertical:SetScript("OnShow", function(self) self:SetChecked(frame.sets.rows) end)
 	vertical:SetScript("OnClick", function(self) frame:SetVertical(self:GetChecked()) end)
-	vertical:SetText("Vertical")
+	vertical:SetText(L.Vertical)
 
 	local spacing = menu:CreateSpacingSlider(name .. "Spacing")
 	spacing:SetScript("OnShow", function(self)
@@ -109,7 +111,7 @@ local function Bar_ShowMenu(self)
 	end
 
 	local menu = self.menu
-	menu.onShow = 1
+	menu.onShow = true
 	self:PlaceMenu(menu)
 	menu.onShow = nil
 end

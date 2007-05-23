@@ -6,6 +6,8 @@
 BActionBar = setmetatable(CreateFrame("Button"), {__index = BBar})
 local Bar_MT = {__index = BActionBar}
 
+local L = BONGOS_LOCALS
+
 --constants
 local CLASS = BONGOS_CLASS
 local MAX_BUTTONS = BONGOS_MAX_BUTTONS
@@ -174,70 +176,75 @@ end
 
 function BActionBar:CreateMenu()
 	local name = format("BongosMenu%s", self.id)
-	local menu = BongosMenu:Create(name)
-
-	for i = MAX_PAGES, 1, -1 do
-		Menu_CreateStanceSlider(menu, "p" .. i, "Page " .. i)
-	end
-
-	if(STANCES) then
-		for i in ipairs(STANCES) do
-			Menu_CreateStanceSlider(menu, "s" .. i, STANCES[i])
-		end
-	end
-	Menu_CreateStanceSlider(menu, "help", "Friendly Target")
-
-	--spacing
-	local spacing = menu:CreateSpacingSlider(name .. "Spacing")
-	spacing:SetScript("OnShow", function(self)
-		self:SetValue(menu.frame:GetSpacing())
-	end)
-	spacing:SetScript("OnValueChanged", function(self, value)
-		if not menu.onShow then
-			menu.frame:SetSpacing(value)
-		end
-		getglobal(self:GetName() .. "ValText"):SetText(value)
-	end)
-
+	local menu, panel = BongosMenu:Create(name, true)
+	
+	--layout panel
 	--columns
-	local cols = menu:CreateSlider(name .. "Cols")
+	local cols = panel:CreateSlider(name .. "Cols")
 	cols:SetScript("OnShow", function(self)
 		self:SetValue(menu.frame:GetSize() - menu.frame:GetColumns() + 1)
 	end)
 	cols:SetScript("OnValueChanged", function(self, value)
-		if not menu.onShow then
-			menu.frame:SetColumns(menu.frame:GetSize() - value + 1)
+		if not panel.onShow then
+			panel.frame:SetColumns(menu.frame:GetSize() - value + 1)
 		end
 		getglobal(self:GetName() .. "ValText"):SetText(menu.frame:GetColumns())
 	end)
 	cols:SetValueStep(1)
-	getglobal(name .. "ColsText"):SetText("Columns")
+	getglobal(name .. "ColsText"):SetText(L.Columns)
 	getglobal(name .. "ColsHigh"):SetText(1)
 
 	--size
-	local size = menu:CreateSlider(name .. "Size")
+	local size = panel:CreateSlider(name .. "Size")
 	size:SetScript("OnShow", function(self)
-		local frame = menu.frame
+		local frame = panel.frame
 		getglobal(name .. "Size"):SetMinMaxValues(1, frame:GetMaxSize())
 		getglobal(name .. "Size"):SetValue(frame:GetSize())
 		getglobal(name .. "SizeHigh"):SetText(frame:GetMaxSize())
 	end)
 	size:SetScript("OnValueChanged", function(self, value)
-		if not menu.onShow then
-			menu.frame:SetSize(value)
+		if not panel.onShow then
+			panel.frame:SetSize(value)
 		end
 		getglobal(self:GetName() .. "ValText"):SetText(value)
 
-		local size = menu.frame:GetSize()
-		local cols = menu.frame:GetColumns()
+		local size = panel.frame:GetSize()
+		local cols = panel.frame:GetColumns()
 		getglobal(name .. "Cols"):SetMinMaxValues(1, size)
 		getglobal(name .. "Cols"):SetValue(size - cols + 1)
 		getglobal(name .. "ColsLow"):SetText(size)
 		getglobal(name .. "ColsValText"):SetText(cols)
 	end)
 	size:SetValueStep(1)
-	getglobal(name .. "SizeText"):SetText("Size")
+	getglobal(name .. "SizeText"):SetText(L.Size)
 	getglobal(name .. "SizeLow"):SetText(1)
+	
+	--spacing
+	local spacing = panel:CreateSpacingSlider(name .. "Spacing")
+	spacing:SetScript("OnShow", function(self)
+		self:SetValue(panel.frame:GetSpacing())
+	end)
+	spacing:SetScript("OnValueChanged", function(self, value)
+		if not panel.onShow then
+			panel.frame:SetSpacing(value)
+		end
+		getglobal(self:GetName() .. "ValText"):SetText(value)
+	end)
+	
+	--stances panel
+	panel = menu:AddPanel(L.Stances)
+	if(STANCES) then
+		for i in ipairs(STANCES) do
+			Menu_CreateStanceSlider(panel, "s" .. i, STANCES[i])
+		end
+	end
+	Menu_CreateStanceSlider(panel, "help", L.FriendlyStance)
+
+	--paging panel
+	panel = menu:AddPanel(L.Paging)
+	for i = MAX_PAGES, 1, -1 do
+		Menu_CreateStanceSlider(panel, "p" .. i, format(L.Page, i))
+	end
 
 	return menu
 end
@@ -254,11 +261,12 @@ function BActionBar:ShowMenu()
 		menu:Hide()
 	end
 
-	menu.frame = self
-	menu.text:SetText(format("Action Bar %s", self.id))
+	menu:SetFrame(self)
+	menu.text:SetText(format(L.ActionBar, self.id))
 
 	menu.onShow = true
 	self:PlaceMenu(menu)
+	menu:ShowPanel(L.Layout)
 	menu.onShow = nil
 end
 

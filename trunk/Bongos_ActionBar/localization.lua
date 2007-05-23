@@ -3,6 +3,22 @@
 		English (default)
 --]]
 
+local L = BONGOS_LOCALS
+L.Columns = "Columns"
+L.Size = "Size"
+L.Vertical = "Vertical"
+L.OneBag = "One Bag"
+L.BagBar = "Bag Bar"
+L.ActionBar = "Action Bar %s"
+L.Paging = "Paging"
+L.Stances = "Stances"
+L.Page = "Page %s"
+L.FriendlyTarget = "Friendly Target"
+
+L.ClassBar = "Class Bar"
+L.MenuBar = "Menu Bar"
+L.PetBar = "Pet Bar"
+
 --global constants, locale independent
 BONGOS_CLASS = select(2, UnitClass("player"))
 BONGOS_MAX_BUTTONS = 120
@@ -18,7 +34,6 @@ elseif(BONGOS_CLASS == "WARRIOR") then
 elseif(BONGOS_CLASS == "PRIEST") then
 	BONGOS_STANCES = {"Shadowform/Redemption"}
 end
-BONGOS_FRIENDLY_STANCE = "Friendly Target"
 
 --keybindings
 BINDING_HEADER_BGPAGE = "Bongos Paging"

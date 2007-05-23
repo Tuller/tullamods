@@ -3,12 +3,13 @@
 		A replacement for the Blizzard shapeshift bar
 --]]
 
-local class = select(2, UnitClass("player"))
+local class = BONGOS_CLASS
 if not(class == "DRUID" or class == "ROGUE" or class == "WARRIOR" or class == "PALADIN" or class == "HUNTER") then
 	return
 end
 
 BongosClassBar = Bongos:NewModule("Bongos-ClassBar")
+local L = BONGOS_LOCALS
 
 --constants
 local DEFAULT_SPACING = 2
@@ -51,7 +52,7 @@ local function Bar_CreateMenu(frame)
 	local name = format("BongosMenu%s", frame.id)
 	local menu = BongosMenu:Create(name)
 	menu.frame = frame
-	menu.text:SetText("Class Bar")
+	menu.text:SetText(L.ClassBar)
 
 	--sliders
 	local spacing = menu:CreateSpacingSlider(name .. "Spacing")
@@ -78,7 +79,7 @@ local function Bar_CreateMenu(frame)
 		getglobal(self:GetName() .. "ValText"):SetText(GetNumShapeshiftForms() - value + 1)
 	end)
 	cols:SetValueStep(1)
-	getglobal(name .. "ColsText"):SetText("Columns")
+	getglobal(name .. "ColsText"):SetText(L.Columns)
 	getglobal(name .. "ColsHigh"):SetText(1)
 
 	return menu
