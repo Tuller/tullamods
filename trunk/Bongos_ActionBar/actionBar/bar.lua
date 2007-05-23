@@ -128,14 +128,17 @@ end
 function BActionBar:GetCurrentState()
 	local page = GetActionBarPage()
 	if(page == 1) then
-		local stance = GetShapeshiftForm()
-		--prowl check
-		if((stance == 3 or stance == 2) and IsStealthed()) then
-			return PROWL_STATE
-		elseif(stance == 0 and UnitCanAssist("player", "target")) then
-			return HELP_STATE
+		if(STANCES) then
+			local stance = GetShapeshiftForm()
+			--prowl check
+			if((stance == 3 or stance == 2) and IsStealthed()) then
+				return PROWL_STATE
+			elseif(stance == 0 and UnitCanAssist("player", "target")) then
+				return HELP_STATE
+			end
+			return stance
 		end
-		return stance
+		return 0
 	else
 		return page + 9
 	end
