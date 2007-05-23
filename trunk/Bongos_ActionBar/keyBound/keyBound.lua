@@ -122,9 +122,9 @@ local function Binder_OnKeyDown(self, key)
 		return
 	elseif key == "MiddleButton" then
 		key = "BUTTON3"
-	elseif newKey == "Button4" then
+	elseif key == "Button4" then
 		key = "BUTTON4"
-	elseif newKey == "Button5" then
+	elseif key == "Button5" then
 		key = "BUTTON5"
 	end
 
