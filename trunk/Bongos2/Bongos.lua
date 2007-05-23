@@ -347,10 +347,11 @@ function Bongos:LoadMinimap()
 end
 
 function Bongos:ShowMinimap(enable)
-	self.profile.showMinimap = true
-	if(enable) then
+	if enable then
+		self.profile.showMinimap = true
 		BongosMinimapFrame:Show()
 	else
+		self.profile.showMinimap = false
 		BongosMinimapFrame:Hide()
 	end
 end
