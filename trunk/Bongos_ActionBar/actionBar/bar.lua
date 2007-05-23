@@ -85,6 +85,7 @@ function BActionBar:Create(id)
 	bar:SetScript("OnShow", OnShow)
 	bar:LoadStates()
 	bar:SetAttribute("state", bar:GetCurrentState())
+	bar:SetRightClickUnit(BongosActionConfig:GetRightClickUnit())
 
 	--layout the bar
 	if not bar:IsUserPlaced() then
@@ -435,14 +436,15 @@ end
 --[[ Utility ]]--
 
 function BActionBar:SetRightClickUnit(unit)
-	self:SetAttribute("unit2", unit)
+	self:SetAttribute("*unit2", unit)
 	for i = 1, MAX_PAGES do
-		self:SetAttribute("unit-p" .. i .. "s", unit)
+		self:SetAttribute("*unit-p" .. i .. "s", unit)
 	end
 
 	if(STANCES) then
 		for i in pairs(STANCES) do
-			self:SetAttribute("unit-s" .. i .. "s", unit)
+			self:SetAttribute("*unit-s" .. i .. "s", unit)
 		end
 	end
+	self:SetAttribute("*unit-helps", unit)
 end
