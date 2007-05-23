@@ -45,7 +45,9 @@ Stances and Paging
     * Stances and paging are configured via a bar's right click menu.  Select the stances or paging panel and adjust the offsets to change what buttons are displayed for an actionbar in a given state.
 
 Slash Commands
-All commands start with either /bongos, /bob, or /bgs.  <barList> can have a possible value of an actionbar number, menu, bags, pet. class, or all.  You can also specify a group or range of bars:  The command /bg scale 1-3 class 1.2 will scale actionbars 1 2 3, and the class bar to 120% of their normal size.
+   * All commands start with either /bongos, /bob, or /bgs
+   *  <barList> can have a possible value of an actionbar number, menu, bags, pet. class, or all 
+   * You can also specify a group or range of bars, the command /bo scale 1-3 class 1.2 will scale actionbars 1 2 3, and the class bar to 120% of their normal size.
 
 || *Command Syntax* || *Description* ||
 || /bongos || Displays the command list ||
