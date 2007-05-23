@@ -100,7 +100,7 @@ local function Bar_ShowMenu(self)
 	end
 
 	local menu = self.menu
-	menu.onShow = 1
+	menu.onShow = true
 	self:PlaceMenu(menu)
 	menu.onShow = nil
 end
@@ -119,7 +119,7 @@ end
 
 function BongosStats:Load()
 	self.bar = BBar:Create("stats", Bar_OnCreate, nil, {
-		["y"] = 895.0568, ["x"] = 1253.7466, ["showMemory"] = true, ["showPing"] = true, ["showFPS"] = true,
+		["y"] = 895, ["x"] = 1254, ["showMemory"] = true, ["showPing"] = true, ["showFPS"] = true,
 	})
 
 	self.bar:Attach(self.frame)
