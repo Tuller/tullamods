@@ -1,4 +1,6 @@
+#summary The Bongos2 readme
 #labels Featured
+
 ===Description===
 Bongos is an action bar replacement designed to be both low memory, and easy to setup. It is not as feature rich as other bar mods, but should include the features most commonly used.
 You must bind your keys via Bongos' key bindings menu. If you do not, there will be issues with stances.
