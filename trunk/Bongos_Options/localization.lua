@@ -40,22 +40,8 @@ BONGOS_OPTIONS_ACTIONBAR_RANGE_COLORING = "Range Coloring"
 BONGOS_OPTIONS_ACTIONBAR_SHOW_MACROS = "Show Macro Text"
 BONGOS_OPTIONS_ACTIONBAR_SHOW_HOTKEYS = "Show Hotkeys"
 
---profiles
-BONGOS_OPTIONS_PROFILE_ENTER_NAME = "Enter Layout Name"
-
 --Visibility
 BONGOS_OPTIONS_ACTIONBARS = "action bars"
 BONGOS_OPTIONS_ALL = "all"
-
---Paging
-BONGOS_OPTIONS_PAGE_SKIP = "Page Skip"
-
---Stance
---Event: Switch bar <bar or range> by amount
-BONGOS_STANCE_TEXT = '%s:  Switch Bar %s to Bar %d'
---BONGOS_STANCE_FRIENDLY = "Friendly"
-BONGOS_STANCE_STANCE = "State To Switch In"
-BONGOS_STANCE_BARS = "Bar Transition"
-BONGOS_TO_BAR = "to"
 
 BONGOS_BINDINGS_HELP = "Hover over a button, then press a key to set its binding.  To clear a button's current keybinding, press " .. GetBindingText('ESCAPE','KEY_') .. "."

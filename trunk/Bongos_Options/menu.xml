@@ -9,13 +9,13 @@
 	<Script file="menu.lua"/>
 
 	<!-- Tab Button Menu -->
-	<CheckButton name="BongosOptionsTabButton" virtual="true">
+	<Button name="BongosOptionsTabButton" virtual="true">
 		<Size x="64" y="26"/>
 
 		<ButtonText setAllPoints="true" nonspacewrap="false"/>
 		<NormalFont font="GameFontNormalSmall" justifyH="RIGHT"/>
 		<HighlightFont font="GameFontHighlightSmall" justifyH="RIGHT"/>
-	</CheckButton>
+	</Button>
 
 	<Frame name="BongosOptionsTabbedMenu" virtual="true">
 		<Size x="70" y="0"/>

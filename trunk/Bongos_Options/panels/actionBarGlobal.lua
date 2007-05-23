@@ -92,7 +92,7 @@ end
 function BOptionsRangeColor_ColorChange()
 	local r, g, b = ColorPickerFrame:GetColorRGB()
 
-	BActionConfig.SetRangeColor(r, g, b)
+	BongosActionConfig:SetRangeColor(r, g, b)
 
 	getglobal(name .. "RangeColorNormalTexture"):SetVertexColor(r, g, b)
 end
