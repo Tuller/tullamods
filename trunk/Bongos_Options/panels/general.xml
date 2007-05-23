@@ -33,16 +33,19 @@
 				</Scripts>
 			</CheckButton>
 			
-<!-- 			<CheckButton name="$parentShowMinimap" inherits="GooeyCheckButton" text="BONGOS_OPTIONS_GENERAL_SHOW_MINIMAP">
+ 			<CheckButton name="$parentShowMinimap" inherits="GooeyCheckButton" text="BONGOS_OPTIONS_GENERAL_SHOW_MINIMAP">
 				<Anchors>
 					<Anchor point="TOP" relativeTo="$parentStickyBars" relativePoint="BOTTOM"/>
 				</Anchors>
 				<Scripts>
+					<OnShow>
+						self:SetChecked(Bongos:ShowingMinimap())
+					</OnShow>
 					<OnClick>
-						Bongos.SetMinimapVis(this:GetChecked())
+						Bongos:ShowMinimap(self:GetChecked())
 					</OnClick>
 				</Scripts>
-			</CheckButton> -->
+			</CheckButton>
 
 			<Slider name="$parentAlpha" inherits="BongosOptionsOpacitySlider">
 				<Anchors>
