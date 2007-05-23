@@ -444,6 +444,6 @@ function BActionBar:SetRightClickUnit(unit)
 			self:SetAttribute("unit-stance" .. i .. "s", unit)
 		end
 	end
-
-	self:SetAttribute("alt-unit*", "mouseover")
+	
+	self:SetAttribute("alt-unit*", "player")
 end
