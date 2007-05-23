@@ -16,6 +16,7 @@ end
 
 local active = {}
 local activePulses = {}
+local blackList = {}
 
 OmniCC = CreateFrame("Frame")
 OmniCC:Hide()
@@ -44,6 +45,7 @@ end)
 function OmniCC:Init()
 	self:LoadSettings()
 	self:LoadFont()
+	self:BlackList("TargetFrameBuff%d+Cooldown")
 end
 
 function OmniCC:LoadSettings()
@@ -74,12 +76,20 @@ function OmniCC:LoadDefaults(current)
 		med = {r = 1, g = 1, b = 0.4, s = 1}, 			--settings for cooldowns under a minute
 		short = {r = 1, g = 0, b = 0, s = 1.3}, 		--settings for cooldowns less than five seconds
 		-- pulse = 1,
+		ignoreBuffs = 1,
 	}
 end
 
 function OmniCC:UpdateSettings(current)
+	OmniCC2DB.ignoreBuffs = 1
 	OmniCC2DB.version = current
 	msg(format("Updated to v%s", OmniCC2DB.version), true)
+end
+
+--[[ Frame Blacklisting ]]--
+
+function OmniCC:BlackList(name)
+	table.insert(blackList, name)
 end
 
 
@@ -192,6 +202,18 @@ function OmniCC:ShowingPulse()
 	return self.sets.pulse
 end
 
+--buff ignoring
+function OmniCC:ToggleIgnoreBuffs()
+	if self.sets.ignoreBuffs then
+		self.sets.ignoreBuffs = nil
+	else
+		self.sets.ignoreBuffs = 1
+	end
+end
+
+function OmniCC:IgnoringBuffs()
+	return self.sets.ignoreBuffs
+end
 
 --[[ Cooldown Timer Code ]]--
 
@@ -313,6 +335,14 @@ hooksecurefunc("CooldownFrame_SetTimer", function(frame, start, duration, enable
 	end
 
 	if start > 0 and duration > OmniCC:GetMinimumDuration() and enable == 1 then
+		if OmniCC:IgnoringBuffs() then
+			local frameName = frame:GetName()
+			if(frameName) then
+				for _, name in pairs(blackList) do
+					if frameName:find(name) then return end
+				end
+			end
+		end
 		OmniCC:StartTimer(frame, start, duration)
 	else
 		local timer = frame:GetParent().timer
@@ -383,16 +413,18 @@ end
 --[[ Slash Commands ]]--
 
 local function PrintCommands()
+	local cmdStr = " - |cffffd700%s|r: %s"
 	msg("Commands (/omnicc)", true)
-	msg("- size <size>: Set font size. 20 is default");
-	msg("- font <font>: Set the font to use. " .. STANDARD_TEXT_FONT .. " is default")
-	msg("- color <dur> <r> <g> <b>: Set the color to use for cooldowns of <dur>. <dur> can be vlong, long, med or short")
-	msg("- scale <dur> <scale>: Set the scale to use for cooldowns of <dur>. <dur> can be vlong, long, med or short")
-	msg("- min <time>: Set the minimum duration (secs) a cooldown should be to show text. Default value of 3")
-	msg("- model: Toggles the cooldown model")
-	msg("- pulse: Toggles a pulse when cooldowns are finished")
-	msg("- mmss: Toggles MM:SS format")
-	msg("- reset: Returns to default settings")
+	msg(format(cmdStr, "size <size>", "Set font size. 20 is default"))
+	msg(format(cmdStr, "font <font>", format("Set the font to use. %s is default", STANDARD_TEXT_FONT)))
+	msg(format(cmdStr, "color <dur> <r> <g> <b>", "Set the color to use for cooldowns of <dur>. <dur> can be vlong, long, med or short"))
+	msg(format(cmdStr, "scale <dur> <scale>", "Set the scale to use for cooldowns of <dur>. <dur> can be vlong, long, med or short"))
+	msg(format(cmdStr, "min <time>", "Set the minimum duration (secs) a cooldown should be to show text. Default value of 3"))
+	msg(format(cmdStr, "model", "Toggles the cooldown model"))
+	msg(format(cmdStr, "pulse", "Toggles a pulse when cooldowns are finished"))
+	msg(format(cmdStr, "mmss", "Toggles MM:SS format"))
+	msg(format(cmdStr, "buffs", "Toggles showing cooldown text on buffs"))
+	msg(format(cmdStr, "reset", "Returns to default settings"))
 end
 
 SlashCmdList["OmniCCCOMMAND"] = function(message)
@@ -431,6 +463,13 @@ SlashCmdList["OmniCCCOMMAND"] = function(message)
 				msg("MM:SS format enabled", true)
 			else
 				msg("MM:SS format disabled", true)
+			end
+		elseif cmd == "buffs" then
+			OmniCC:ToggleIgnoreBuffs()
+			if OmniCC:IgnoringBuffs() then
+				msg("Hiding cooldown text on buffs/debuffs", true)
+			else
+				msg("Showing cooldown text on buffs/debuffs", true)
 			end
 		elseif cmd == "color" then
 			OmniCC:SetFontFormat(args[2], tonumber(args[3]), tonumber(args[4]), tonumber(args[5]))
