@@ -123,7 +123,7 @@ local function Bar_CreateMenu(frame)
 	local name = format("BongosMenu%s", frame.id)
 	local menu = BongosMenu:Create(name)
 	menu.frame = frame
-	menu.text:SetText("Cast Bar")
+	menu.text:SetText(BONGOS_CASTBAR)
 
 	--checkbuttons
 	local time = menu:CreateCheckButton(menu, name .. "Time")
