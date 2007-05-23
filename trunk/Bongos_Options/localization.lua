@@ -8,9 +8,10 @@
 --]]
 
 BONGOS_OPTIONS_SAVE = "Save"
-BONGOS_OPTIONS_ADD = "Add"
+BONGOS_OPTIONS_SET = "Set"
+BONGOS_OPTIONS_COPY = "Copy"
 BONGOS_OPTIONS_DELETE = "Delete"
-BONGOS_OPTIONS_LOAD = "Load"
+BONGOS_OPTIONS_PROFILE_ENTER_NAME = "Enter a Name to Save the Profile as"
 
 --tabbed menu and title
 BONGOS_OPTIONS = "Bongos Options"

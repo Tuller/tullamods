@@ -35,8 +35,8 @@
 					</OnVerticalScroll>
 				</Scripts>
 			</ScrollFrame>
-
-			<Button name="$parentLoad" inherits="GooeyButton" text="BONGOS_OPTIONS_LOAD">
+			
+			<Button name="$parentSet" inherits="GooeyButton" text="BONGOS_OPTIONS_SET">
 				<Size x="42" y="24"/>
 
 				<Anchors>
@@ -47,7 +47,39 @@
 
 				<Scripts>
 					<OnClick>
-						BOptionsProfiles_LoadProfile()
+						BOptionsProfiles_SetProfile()
+					</OnClick>
+				</Scripts>
+			</Button>
+			
+			<Button name="$parentSave" inherits="GooeyButton" text="BONGOS_OPTIONS_SAVE">
+				<Size x="44" y="24"/>
+
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentSet" relativePoint="RIGHT">
+						<Offset x="2" y="0"/>
+					</Anchor>
+				</Anchors>
+
+				<Scripts>
+					<OnClick>
+						BOptionsProfiles_SaveProfile()
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentCopy" inherits="GooeyButton" text="BONGOS_OPTIONS_COPY">
+				<Size x="42" y="24"/>
+
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentSave" relativePoint="RIGHT">
+						<Offset x="2" y="0"/>
+					</Anchor>
+				</Anchors>
+
+				<Scripts>
+					<OnClick>
+						BOptionsProfiles_CopyProfile()
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -56,8 +88,8 @@
 				<Size x="52" y="24"/>
 
 				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentLoad" relativePoint="RIGHT">
-						<Offset x="2" y="0"/>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset x="-4" y="4"/>
 					</Anchor>
 				</Anchors>
 
