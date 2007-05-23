@@ -97,9 +97,6 @@ function BongosActionButton:Create(id)
 	button.macro = getglobal(name .. "Name")
 	button.count = getglobal(name .. "Count")
 
-	button:ShowHotkey(BongosActionConfig:ShowingHotkeys())
-	button:ShowMacro(BongosActionConfig:ShowingMacros())
-
 	button:SetScript("OnUpdate", OnUpdate)
 	button:SetScript("PostClick", PostClick)
 	button:SetScript("OnDragStart", OnDragStart)
@@ -129,6 +126,8 @@ function BongosActionButton:Set(id, parent)
 	parent:Attach(button)
 	parent:SetAttribute("addchild", button)
 
+	button:ShowHotkey(BongosActionConfig:ShowingHotkeys())
+	button:ShowMacro(BongosActionConfig:ShowingMacros())
 	button:RegisterEvents()
 	button:UpdateStates()
 

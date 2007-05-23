@@ -60,8 +60,8 @@ function BongosClassButton:Create(id, parent)
 	button:SetScript("OnEnter", OnEnter)
 	button:SetScript("OnLeave", OnLeave)
 
-	button:ShowHotkey(BongosActionConfig:ShowingHotkeys())
 	button:Update()
+	button:ShowHotkey(BongosActionConfig:ShowingHotkeys())
 
 	buttons[id] = button
 
