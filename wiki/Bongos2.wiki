@@ -1,0 +1,63 @@
+#labels Featured
+==Bongos==
+
+===Description===
+Bongos is an action bar replacement designed to be both low memory, and easy to setup. It is not as feature rich as other bar mods, but should include the features most commonly used.
+You must bind your keys via Bongos' key bindings menu. If you do not, there will be issues with stances.
+Bear form work, but not cat form? Learn aquatic form!
+
+
+Included Addons
+    * Bongos2 - The core addon.
+    * Bongos2 ActionBar - Breaks up the main action bar into movable parts.
+    * Bongos2 Stats - A display for latency, framerate, and memory usage
+    * Bongos2 RollBar - Makes the frame for rolling on items movable
+    * Bongos2 CastBar - A movable casting bar, with the ability to show cast time.
+    * Bongos2 Options - A dynamically loaded options menu for Bongos. 
+
+Features
+    * Every Bongos bar can be moved, hidden, and have its scale and opacity altered
+    * Sticky bars - Each bar can be anchored to any other bar
+    * 120 action buttons, which can be setup in any number of bars.
+    * Both macro and key binding text on action buttons can be hidden
+    * Customizable stance transitions for each bar 
+
+
+===Usage===
+
+General
+    * To bring up the options menu: type /bongos menu
+    * To unlock bars: uncheck the lock bars option in the main options menu
+    * To hide or show a bar: unlock bars, then middle click or shift right click it
+    * To move a bar: unlock bars, and then click and drag it with the left mouse button
+    * To bring up a bar's configuration menu, right click it 
+
+Key Bindings
+    * *Bindings for the Bongos action bar should only be done via the bindings menu in Bongos*
+    * To bind keys, open the main options panel, and select the bindings option. Hover over a button, then press a key to bind it to that button
+
+Action Bars
+    * Accessing general action bar options:  open up the main options window (_/bongos menu_) and select the action bars panel
+    * Adjusting the layout of a given bar:  unlock bars and right click the bar you want to adjust to bring up its configuration menu
+    * Moving buttons: Hold down the key for moving buttons (shift by default), and drag a button. Alternatively, unlock button positions by shift right clicking the mini map button, or unchecking the option in the main options menu
+    * Making a bar bigger: You can increase the maximum size of a given bar by reducing the number of action bars. To do so, adjust the action bars slider on the action bar panel of the main options menu. This option will reset the settings of your actionbars 
+
+Stances and Paging
+    * Stances and paging are configured via a bar's right click menu.  Select the stances or paging panel and adjust the offsets to change what buttons are displayed for an actionbar in a given state.
+
+Slash Commands
+    * All commands start with either /bongos, /bob, or /bgs
+    * <barList> can have a possible value of an actionbar number, menu, bags, pet. class, or all.  You can also specify a group or range of bars:  The command /bg scale 1-3 class 1.2 will scale actionbars 1 2 3, and the class bar to 120% of their normal size.
+    * menu: Shows the options menu, if present.
+    * help: Displays list of commands
+    * lock: Toggles locking bar positions
+    * show <barList>: Shows the given bar
+    * hide <barList>: Hides the given bar
+    * toggle <barList>: Hides the given bar
+    * scale <barList> <scale>: Set the scale of the given bar. 1 is normal size.
+    * setalpha <barList> <opacity>:  Set the opacity of a bar to <value>. 0 is translucent, 1 is opaque.
+    * set <profile>: Sets the current profile to <profile>
+    * copy <profile>: Copies settings from <profile>
+    * delete <profile: Deletes the given profile
+    * reset: Loads default settings
+    * list: Lists available profiles
