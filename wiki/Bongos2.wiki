@@ -62,4 +62,5 @@ Slash Commands
 || /bongos copy <profile> || Copies all settings from <profile> ||
 || /bongos delete <profile> || Deletes <profile> ||
 || /bongos reset || Loads default settings ||
+|| /bongos version || Prints version information ||
 || /keybound || Toggles keybinding mode ||
