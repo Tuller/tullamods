@@ -7,6 +7,8 @@
 --]]
 
 local ICON_SCALE = 37
+local FONT_SIZE = 18
+local TEXT_FONT = STANDARD_TEXT_FONT
 
 local function GetFormattedTime(s)
 	if s >= 86400 then
@@ -20,65 +22,56 @@ local function GetFormattedTime(s)
 end
 
 local function Timer_OnUpdate(self, elapsed)
-	if self.toNextUpdate <= 0 or not self.icon:IsVisible() then
-		local remain = self.duration - (GetTime() - self.start)
-
-		if floor(remain + 0.5) > 0 and self.icon:IsVisible() then
-			local time, toNextUpdate = GetFormattedTime(remain)
-			self.text:SetText(time)
-			self.toNextUpdate = toNextUpdate
+	if self.text:IsShown() then
+		if self.nextUpdate <= 0 then
+			local remain = self.duration - (GetTime() - self.start)
+			if floor(remain + 0.5) > 0 then
+				local time, toNextUpdate = GetFormattedTime(remain)
+				self.text:SetText(time)
+				self.toNextUpdate = toNextUpdate
+			else
+				self.text:Hide()
+			end
 		else
-			self:Hide()
-		end
-	else
-		self.toNextUpdate = self.toNextUpdate - elapsed
-	end
-end
-
-local function Timer_Create(parent, cooldown, icon)
-	local timer = CreateFrame("Frame", nil, parent)
-	timer:SetToplevel(true)
-	timer:SetAllPoints(parent)
-	timer:SetAlpha(parent:GetAlpha())
-	timer:Hide()
-	timer:SetScript("OnUpdate", Timer_OnUpdate)
-
-	timer.icon = icon
-
-	local scale = timer:GetWidth() / ICON_SCALE
-	timer.text = timer:CreateFontString(nil, "OVERLAY")
-	timer.text:SetPoint("CENTER", timer, "CENTER", 0, 1)
-	timer.text:SetFont(STANDARD_TEXT_FONT, 20 * scale, "OUTLINE")
-	timer.text:SetTextColor(1, 1, 0.4)
-	parent.timer = timer
-
-	return timer
-end
-
-local function Timer_Start(cooldown, start, duration)
-	local parent = cooldown:GetParent()
-	if parent then
-		local icon = parent.icon or
-			getglobal(parent:GetName() .. "Icon") or
-			getglobal(parent:GetName() .. "IconTexture")
-
-		if icon then
-			local timer = parent.timer or Timer_Create(parent, cooldown, icon)
-			timer.start = start
-			timer.duration = duration
-			timer.toNextUpdate = 0
-			timer:Show()
+			self.nextUpdate = self.nextUpdate - elapsed
 		end
 	end
 end
 
-hooksecurefunc("CooldownFrame_SetTimer", function(frame, start, duration, enable)
+local function Timer_Create(self)
+	local scale = min(self:GetParent():GetWidth() / ICON_SCALE, 1)
+
+	local text
+	if (FONT_SIZE * scale) > 8 then
+		text = self:CreateFontString(nil, "OVERLAY")
+		text:SetPoint("CENTER", self, "CENTER", 0, 1)
+		text:SetFont(TEXT_FONT, FONT_SIZE * scale, "OUTLINE")
+		text:SetTextColor(1, 0.9, 0)
+
+		self.text = text
+		self:SetScript("OnUpdate", Timer_OnUpdate)
+	end
+	return text
+end
+
+local function Timer_Start(self, start, duration)
+	self.start = start
+	self.duration = duration
+	self.nextUpdate = 0
+
+	local text = self.text or Timer_Create(self)
+	if text then
+		text:Show()
+	end
+end
+
+hooksecurefunc("CooldownFrame_SetTimer", function(self, start, duration, enable)
 	if start > 0 and duration > 3 and enable == 1 then
-		Timer_Start(frame, start, duration)
+		Timer_Start(self, start, duration)
 	else
-		local timer = frame:GetParent().timer
-		if timer then
-			timer:Hide()
+		local text = self.text
+		if text then
+			text:Hide()
 		end
 	end
 end)

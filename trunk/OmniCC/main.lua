@@ -3,8 +3,12 @@
 		A universal cooldown count, based on an idea by Gello
 --]]
 
+local L = OMNICC_LOCALS
 local ICON_SCALE = 37
-local DEFAULT_FONT = "Fonts\\FRIZQT__.TTF"
+
+local active = {}
+local activePulses = {}
+local blackList = {}
 
 local function msg(message, showAddon)
 	if showAddon then
@@ -13,10 +17,6 @@ local function msg(message, showAddon)
 		ChatFrame1:AddMessage(tostring(message))
 	end
 end
-
-local active = {}
-local activePulses = {}
-local blackList = {}
 
 OmniCC = CreateFrame("Frame")
 OmniCC:Hide()
@@ -45,7 +45,6 @@ end)
 function OmniCC:Init()
 	self:LoadSettings()
 	self:LoadFont()
-	self:BlackList("TargetFrameBuff%d+Cooldown")
 end
 
 function OmniCC:LoadSettings()
@@ -53,14 +52,14 @@ function OmniCC:LoadSettings()
 
 	if not(OmniCC2DB and OmniCC2DB.version) then
 		self:LoadDefaults(current)
-		msg("Initialized", true)
+		msg(L.Initialized, true)
 	else
 		local cMajor, cMinor = current:match("(%d+)%.(%d+)")
 		local major, minor = OmniCC2DB.version:match("(%d+)%.(%d+)")
 
 		if major ~= cMajor then
 			self:LoadDefaults(current)
-			msg("Upgrading from an incompatible version. Default settings loaded", true)
+			msg(L.UpgradeIncompatible, true)
 		elseif minor ~= cMinor then
 			self:UpdateSettings(current)
 		end
@@ -75,21 +74,14 @@ function OmniCC:LoadDefaults(current)
 		long = {r = 0.8, g = 0.8, b = 0.9, s = 0.8}, 	--settings for cooldowns greater than one minute
 		med = {r = 1, g = 1, b = 0.4, s = 1}, 			--settings for cooldowns under a minute
 		short = {r = 1, g = 0, b = 0, s = 1.3}, 		--settings for cooldowns less than five seconds
-		-- pulse = 1,
-		ignoreBuffs = 1,
+		useBlacklist = 1,
 	}
 end
 
 function OmniCC:UpdateSettings(current)
-	OmniCC2DB.ignoreBuffs = 1
+	OmniCC2DB.useBlacklist = 1
 	OmniCC2DB.version = current
-	msg(format("Updated to v%s", OmniCC2DB.version), true)
-end
-
---[[ Frame Blacklisting ]]--
-
-function OmniCC:BlackList(name)
-	table.insert(blackList, name)
+	msg(format(L.Updated, OmniCC2DB.version), true)
 end
 
 
@@ -117,9 +109,7 @@ function OmniCC:LoadFont()
 
 	if not self.font:SetFont(font, size) then
 		self.sets.font = nil
-		if not self.font:SetFont(STANDARD_TEXT_FONT, size) then
-			self.font:SetFont(DEFAULT_FONT, size)
-		end
+		self.font:SetFont(STANDARD_TEXT_FONT, size)
 	end
 end
 
@@ -146,7 +136,7 @@ function OmniCC:SetFontFormat(index, r, g, b, s)
 end
 
 function OmniCC:GetFont()
-	return self.sets.font or STANDARD_TEXT_FONT or DEFAULT_FONT, self.sets.fontSize or 20
+	return self.sets.font or STANDARD_TEXT_FONT, self.sets.fontSize or 20
 end
 
 
@@ -202,18 +192,24 @@ function OmniCC:ShowingPulse()
 	return self.sets.pulse
 end
 
---buff ignoring
-function OmniCC:ToggleIgnoreBuffs()
-	if self.sets.ignoreBuffs then
-		self.sets.ignoreBuffs = nil
+
+--frame blacklisting
+function OmniCC:ToggleBlacklist()
+	if self.sets.useBlacklist then
+		self.sets.useBlacklist = nil
 	else
-		self.sets.ignoreBuffs = 1
+		self.sets.useBlacklist = 1
 	end
 end
 
-function OmniCC:IgnoringBuffs()
-	return self.sets.ignoreBuffs
+function OmniCC:UsingBlacklist()
+	return self.sets.useBlacklist
 end
+
+function OmniCC:Blacklist(name)
+	table.insert(blackList, name)
+end
+
 
 --[[ Cooldown Timer Code ]]--
 
@@ -248,25 +244,43 @@ local function GetFormattedFont(s)
 end
 
 local function Timer_OnUpdate(self, elapsed)
-	if self.toNextUpdate <= 0 or not self.icon:IsVisible() then
+	local icon = self.icon
+	if self.toNextUpdate <= 0 or not icon:IsVisible() then
+		--check and see if the frame we're on is still visible
+		if(not icon:IsVisible()) then
+			OmniCC:StopTimer(self)
+			return
+		end
+	
+		--icon check for bufs
+		local texture = icon:GetTexture()
+		if texture ~= self.texture then
+			OmniCC:StopTimer(self)
+			return
+		end
+		
+		--update text
 		local remain = self.duration - (GetTime() - self.start)
-
-		if floor(remain + 0.5) > 0 and self.icon:IsVisible() then
+		if floor(remain + 0.5) > 0 then
 			local time, toNextUpdate = GetFormattedTime(remain)
 			local font, size, r, g, b = GetFormattedFont(remain)
-			local scale = this:GetWidth() / ICON_SCALE
-			
-			self.text:SetFont(font, size * scale, "OUTLINE")
-			self.text:SetText(time)
+			local scale = min(self:GetWidth() / ICON_SCALE, 1)
 
-			self.text:SetTextColor(r, g, b)
+			--hide the timer if text is too small to see
+			if (size * scale) >= 8 then
+				self.text:SetFont(font, size * scale, "OUTLINE")
+				self.text:SetText(time)
+				self.text:SetTextColor(r, g, b)
+			else
+				OmniCC:StopTimer(self)
+				return
+			end
 			self.toNextUpdate = toNextUpdate
+		--finished cooldown, show pulse
 		else
 			OmniCC:StopTimer(self)
-			if(self.icon:IsVisible()) then
-				if OmniCC:ShowingPulse() then
-					OmniCC:StartPulse(self)
-				end
+			if OmniCC:ShowingPulse() then
+				OmniCC:StartPulse(self)
 			end
 		end
 	else
@@ -281,7 +295,6 @@ local function Timer_Create(parent, cooldown, icon)
 	timer:Hide()
 
 	timer:SetAllPoints(parent)
-	timer:SetAlpha(parent:GetAlpha())
 	timer:SetScript("OnUpdate", Timer_OnUpdate)
 
 	timer.icon = icon
@@ -296,11 +309,8 @@ end
 function OmniCC:StartTimer(cooldown, start, duration)
 	local parent = cooldown:GetParent()
 	if parent then
-		if parent.object and parent.object.icon then
-			msg(parent.icon:GetTexture())
-		end
-
 		local icon =
+			parent.icon or
 			--standard action button icon, $parentIcon
 			getglobal(parent:GetName() .. "Icon") or
 			--standard item button icon,  $parentIconTexture
@@ -308,10 +318,10 @@ function OmniCC:StartTimer(cooldown, start, duration)
 
 		if icon then
 			local timer = parent.timer or Timer_Create(parent, cooldown, icon)
-
 			timer.start = start
 			timer.duration = duration
 			timer.toNextUpdate = 0
+			timer.texture = icon:GetTexture()
 			active[timer] = true
 			timer:Show()
 		end
@@ -335,11 +345,11 @@ hooksecurefunc("CooldownFrame_SetTimer", function(frame, start, duration, enable
 	end
 
 	if start > 0 and duration > OmniCC:GetMinimumDuration() and enable == 1 then
-		if OmniCC:IgnoringBuffs() then
+		if OmniCC:UsingBlacklist() then
 			local frameName = frame:GetName()
 			if(frameName) then
 				for _, name in pairs(blackList) do
-					if frameName:find(name) then return end
+					if frameName:match(name) then return end
 				end
 			end
 		end
@@ -358,7 +368,6 @@ end)
 local function Pulse_Create(parent)
 	local frame = CreateFrame("Frame", nil, parent)
 	frame:SetToplevel(true)
-	frame:SetAlpha(parent:GetAlpha())
 	frame:SetAllPoints(parent)
 
 	local icon = frame:CreateTexture(nil, "OVERLAY")
@@ -382,7 +391,7 @@ function OmniCC:StartPulse(cooldown)
 		pulse.icon:SetTexture(cooldown.icon:GetTexture())
 		pulse:Show()
 		activePulses[pulse] = true
-		
+
 		self:Show()
 	end
 end
@@ -414,17 +423,17 @@ end
 
 local function PrintCommands()
 	local cmdStr = " - |cffffd700%s|r: %s"
-	msg("Commands (/omnicc)", true)
-	msg(format(cmdStr, "size <size>", "Set font size. 20 is default"))
-	msg(format(cmdStr, "font <font>", format("Set the font to use. %s is default", STANDARD_TEXT_FONT)))
-	msg(format(cmdStr, "color <dur> <r> <g> <b>", "Set the color to use for cooldowns of <dur>. <dur> can be vlong, long, med or short"))
-	msg(format(cmdStr, "scale <dur> <scale>", "Set the scale to use for cooldowns of <dur>. <dur> can be vlong, long, med or short"))
-	msg(format(cmdStr, "min <time>", "Set the minimum duration (secs) a cooldown should be to show text. Default value of 3"))
-	msg(format(cmdStr, "model", "Toggles the cooldown model"))
-	msg(format(cmdStr, "pulse", "Toggles a pulse when cooldowns are finished"))
-	msg(format(cmdStr, "mmss", "Toggles MM:SS format"))
-	msg(format(cmdStr, "buffs", "Toggles showing cooldown text on buffs"))
-	msg(format(cmdStr, "reset", "Returns to default settings"))
+	msg(L.Commands, true)
+	msg(format(cmdStr, "size <size>", L.SetSizeDesc))
+	msg(format(cmdStr, "font <font>", L.SetFontDesc))
+	msg(format(cmdStr, "color <dur> <r> <g> <b>", L.SetColorDesc))
+	msg(format(cmdStr, "scale <dur> <scale>", L.SetScaleDesc))
+	msg(format(cmdStr, "min <time>", L.SetMinDurDesc))
+	msg(format(cmdStr, "model", L.ToggleModelDesc))
+	msg(format(cmdStr, "pulse", L.TogglePulseDesc))
+	msg(format(cmdStr, "mmss", L.ToggleMMSSDesc))
+	msg(format(cmdStr, "blacklist", L.ToggleBlacklistDesc))
+	msg(format(cmdStr, "reset", L.ResetDesc))
 end
 
 SlashCmdList["OmniCCCOMMAND"] = function(message)
@@ -436,40 +445,40 @@ SlashCmdList["OmniCCCOMMAND"] = function(message)
 
 		if cmd == "font" then
 			OmniCC:SetFont(args[2])
-			msg(format("Set font to %s", (OmniCC:GetFont())), true)
+			msg(format(L.SetFont, (OmniCC:GetFont())), true)
 		elseif cmd == "size" then
 			OmniCC:SetFontSize(tonumber(args[2]))
-			msg(format("Set font size to %s", select(2, OmniCC:GetFont())), true)
+			msg(format(L.SetFontSize, select(2, OmniCC:GetFont())), true)
 		elseif cmd == "min" then
 			OmniCC:SetMinimumDuration(tonumber(args[2]))
-			msg(format("Set minimum duration to %s", OmniCC:GetMinimumDuration(), true))
+			msg(format(L.SetMinDur, OmniCC:GetMinimumDuration(), true))
 		elseif cmd == "model" then
 			OmniCC:ToggleModel()
 			if OmniCC:ShowingModel() then
-				msg("Cooldown models enabled", true)
+				msg(L.ModelsEnabled, true)
 			else
-				msg("Cooldown models disabled", true)
+				msg(L.ModelsDisabled, true)
 			end
 		elseif cmd == "pulse" then
 			OmniCC:TogglePulse()
 			if OmniCC:ShowingPulse() then
-				msg("Pulse enabled", true)
+				msg(L.PulseEnabled, true)
 			else
-				msg("Pulse disabled", true)
+				msg(L.PulseDisabled, true)
 			end
 		elseif cmd == "mmss" then
 			OmniCC:ToggleMMSS()
 			if OmniCC:InMMSSFormat() then
-				msg("MM:SS format enabled", true)
+				msg(L.MMSSEnabled, true)
 			else
-				msg("MM:SS format disabled", true)
+				msg(L.MMSSDisabled, true)
 			end
-		elseif cmd == "buffs" then
-			OmniCC:ToggleIgnoreBuffs()
-			if OmniCC:IgnoringBuffs() then
-				msg("Hiding cooldown text on buffs/debuffs", true)
+		elseif cmd == "blacklist" then
+			OmniCC:ToggleBlacklist()
+			if OmniCC:UsingBlacklist() then
+				msg(L.BlacklistEnabled, true)
 			else
-				msg("Showing cooldown text on buffs/debuffs", true)
+				msg(L.BlacklistDisabled, true)
 			end
 		elseif cmd == "color" then
 			OmniCC:SetFontFormat(args[2], tonumber(args[3]), tonumber(args[4]), tonumber(args[5]))
@@ -477,9 +486,9 @@ SlashCmdList["OmniCCCOMMAND"] = function(message)
 			OmniCC:SetFontFormat(args[2], nil, nil, nil, tonumber(args[3]))
 		elseif cmd == "reset" then
 			OmniCC:Reset()
-			msg("Loaded default settings", true)
+			msg(L.Reset, true)
 		else
-			msg(format(""%s" is an invalid command", cmd), true)
+			msg(format(L.InvalidCommand, cmd), true)
 		end
 	end
 end

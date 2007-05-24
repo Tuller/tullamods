@@ -1,7 +1,11 @@
 OmniCC Version History, in the format mmddyy:
 
 1.2
+Fixed a bug causing cooldown text to be transparent on Bartender3
+Fixed the font not set error
+
 Added the ability to toggle showing text on buffs/debuffs with the option /omnicc buffs
+Added localization file
 
 1.1
 Updated for 2.1

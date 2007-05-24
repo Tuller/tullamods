@@ -4,4 +4,6 @@
 ## Notes: Cooldown count for everything
 ## Version: 1.2
 ## SavedVariables: OmniCC2DB
+localization.lua
 main.lua
+blacklist.lua
