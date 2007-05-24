@@ -23,31 +23,20 @@ local DEFAULT_SIZE = 12
 local DEFAULT_COLS = 12
 
 --2.1 statemap function!
-local function GenerateStateMap()
-	local pageStates = "[actionbar:2]10;[actionbar:3]11;[actionbar:4]12;[actionbar:5]13;[actionbar:6]14;"
+local function GenerateStateButton()
 	local pageMap = "10:p1;11:p2;12:p3;13:p4;14:p5;15:help"
 	local pageMap2 = "10:p1s;11:p2s;12:p3s;13:p4s;14:p5s;15:helps"
 
 	local classStates, stanceMap, stanceMap2
 	if(CLASS == "ROGUE" or CLASS == "PRIEST") then
-		classStates = "[stance:1]1;"
 		stanceMap = "1:s1"
 		stanceMap2 = "1:s1s"
 	elseif(CLASS == "WARRIOR") then
-		classStates = "[stance:1]1;[stance:2]2;[stance:3]3;"
 		stanceMap = "1:s1;2:s2;3:s3"
 		stanceMap2 = "1:s1s;2:s2s;3:s3s"
 	elseif(CLASS == "DRUID") then
-		classStates = "[stance:1]1;[stance:2,nostealth]2;[stance:2,stealth]7;[stance:3,nostealth]3;[stance:3,stealth]7;[stance:4]4;[stance:5]5;[stance:6]6;"
 		stanceMap = "1:s1;2:s2;3:s3;4:s4;5:s5;6:s6;7:s7"
 		stanceMap2 = "1:s1s;2:s2s;3:s3s;4:s4s;5:s5s;6:s6s;7:s7s"
-	end
-
-	local stateHeader
-	if(classStates) then
-		stateHeader = pageStates .. classStates .. "[help]15;0"
-	else
-		stateHeader = pageStates .. "[help]15;0"
 	end
 
 	local stateButton1, stateButton2
@@ -58,8 +47,10 @@ local function GenerateStateMap()
 		stateButton1 = pageMap
 		stateButton2 = pageMap2
 	end
-	return stateHeader, stateButton1, stateButton2
+
+	return stateButton1, stateButton2
 end
+local stateButton1, stateButton2 = GenerateStateButton()
 
 
 --[[ Constructor/Destructor]]--
@@ -73,7 +64,7 @@ function BActionBar:Create(id)
 	if(id == 1) then
 		defaults = {p1 = 1, p2 = 2, p3 = 3, p4 = 4, p5 = 5}
 		if CLASS == "DRUID" then
-			defaults.s1 = 8; defaults.s3 = 6; defaults.s7 = 6
+			defaults.s1 = 8; defaults.s3 = 6
 		elseif CLASS == "WARRIOR" then
 			defaults.s1 = 6; defaults.s2 = 7; defaults.s3 = 8
 		elseif CLASS == "ROGUE" then
@@ -82,10 +73,13 @@ function BActionBar:Create(id)
 	end
 
 	local bar = setmetatable(BBar:CreateSecure(id, nil, nil, defaults), Bar_MT)
-	bar:SetScript("OnShow", OnShow)
-	bar:LoadStates()
-	bar:SetAttribute("state", bar:GetCurrentState())
+	bar:SetAttribute("statemap-state", "$input")
+	bar:SetAttribute("statebutton", stateButton1)
+	bar:SetAttribute("statebutton2", stateButton2)
+
 	bar:SetRightClickUnit(BongosActionConfig:GetRightClickUnit())
+	bar:UpdateStateHeader()
+	bar:SetScript("OnShow", OnShow)
 
 	--layout the bar
 	if not bar:IsUserPlaced() then
@@ -114,33 +108,97 @@ end
 
 --[[ State Functions ]]--
 
-local stateHeader, stateButton1, stateButton2 = GenerateStateMap()
-function BActionBar:LoadStates()
-	RegisterStateDriver(self, "state", stateHeader)
+--generates a new stance header based on what states we want to switch in
+--priority is modifier, then pages, then stances, then friendly target, then default
+function BActionBar:UpdateStateHeader()
+	UnregisterStateDriver(self, "state", 0)
 
-	self:SetAttribute("statemap-state", "$input")
-	self:SetAttribute("statebutton", stateButton1)
-	self:SetAttribute("statebutton2", stateButton2)
+	local header
+	for i = 1, MAX_PAGES do
+		if(self:GetStateOffset("p" .. i)) then
+			local state = format("[actionbar:%d]%d;", i+1, i+9)
+			header = (header and header .. state) or state
+		end
+	end
+
+	local maxState = 0
+	if CLASS == "ROGUE" or CLASS == "PRIEST" then
+		maxState = 1
+	elseif CLASS == "WARRIOR" then
+		maxState = 3
+	end
+
+	--rogue, priest, warrior states
+	for i = 1, maxState do
+		if(self:GetStateOffset("s" .. i)) then
+			local state = format("[stance:%d]%d;", i, i)
+			header = (header and header .. state) or state
+		end
+	end
+
+	--druid states
+	if(CLASS == "DRUID") then
+		local hasProwl = self:GetStateOffset("s7")
+		for i = 1, 7 do
+			if(i == 3 and hasProwl) then
+				if(self:GetStateOffset("s" .. i)) then
+					local state = format("[stance:%d,nostealth]%d;", i, i)
+					header = (header and header .. state) or state
+				end
+				local state = format("[stance:%d,stealth]%d;", i, PROWL_STATE)
+				header = (header and header .. state) or state
+			else
+				if(self:GetStateOffset("s" .. i)) then
+					local state = format("[stance:%d]%d;", i, i)
+					header = (header and header .. state) or state
+				end
+			end
+		end
+	end
+
+	if(self:GetStateOffset("help")) then
+		local state = format("[help]%d;", HELP_STATE)
+		header = (header and header .. state) or state
+	end
+
+	--add in default state
+	if(header) then
+		header = header .. "0"
+		RegisterStateDriver(self, "state", header)
+	end
+
+	self:SetAttribute("state", self:GetCurrentState())
 end
 
---things that should be documented more: this function
---hurray magic numbers!
+--returns the current state of the given bar
 function BActionBar:GetCurrentState()
-	local page = GetActionBarPage()
-	if(page == 1) then
-		if(STANCES) then
-			local stance = GetShapeshiftForm()
-			--prowl check
-			if((stance == 3 or stance == 2) and IsStealthed()) then
-				return PROWL_STATE
-			elseif(stance == 0 and UnitCanAssist("player", "target")) then
-				return HELP_STATE
-			end
+	--page check
+	local page = GetActionBarPage()-1
+	if(page > 0 and self:GetStateOffset("p" .. page)) then
+		return page + 9
+	end
+	
+	--stance check
+	local stance = GetShapeshiftForm()
+	if(stance > 0) then
+		--prowl check
+		if(stance == 3 and IsStealthed() and self:GetStateOffset("s7")) then
+			return PROWL_STATE
+		end
+
+		--some sort of stance
+		if(self:GetStateOffset("s" .. stance)) then
 			return stance
 		end
-		return 0
 	end
-	return page + 8
+	
+	--friently target check
+	if(UnitCanAssist("player", "target") and self:GetStateOffset("help")) then
+		return HELP_STATE
+	end
+
+	--default state
+	return 0
 end
 
 
@@ -208,7 +266,7 @@ local function Panel_AddLayoutSliders(panel)
 	cols:SetValueStep(1)
 	getglobal(name .. "ColsText"):SetText(L.Columns)
 	getglobal(name .. "ColsHigh"):SetText(1)
-	
+
 	--size
 	local size = panel:CreateSlider(name .. "Size")
 	size:SetScript("OnShow", function(self)
@@ -239,10 +297,10 @@ end
 function BActionBar:CreateMenu()
 	local name = format("BongosMenu%s", self.id)
 	local menu, panel = BongosMenu:Create(name, true)
-	
+
 	--layout panel
 	Panel_AddLayoutSliders(panel)
-	
+
 	--stances panel
 	local stancePanel = menu:AddPanel(L.Stances)
 	Panel_AddStanceSlider(stancePanel, "help", L.FriendlyStance)
@@ -416,6 +474,7 @@ end
 function BActionBar:SetStateOffset(state, offset)
 	if(offset == 0) then offset = nil end
 	self.sets[state] = offset
+	self:UpdateStateHeader()
 
 	for i = self:GetStartID(), self:GetEndID() do
 		local button = BongosActionButton:Get(i)

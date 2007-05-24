@@ -12,7 +12,7 @@
 		Pet
 --]]
 
-local noop = function() return end
+-- local noop = function() return end
 
 --[[ Unregistering Functions ]]--
 
@@ -21,7 +21,7 @@ local function UnregisterActionButton(button)
 	button:ClearAllPoints()
 	button:UnregisterAllEvents()
 	button:Hide()
-	button.buttonType = nil
+	-- button.buttonType = nil
 end
 
 --Hide action bar
@@ -40,8 +40,8 @@ local function UnregisterActionBars()
 	BonusActionBarFrame:UnregisterAllEvents()
 	ShapeshiftBarFrame:UnregisterAllEvents()
 
-	MultiActionBar_ShowAllGrids = noop
-	MultiActionBar_HideAllGrids = noop
+	-- MultiActionBar_ShowAllGrids = noop
+	-- MultiActionBar_HideAllGrids = noop
 end
 
 --Hide shapeshift bars
@@ -53,9 +53,9 @@ end
 local function UnregisterPetBar()
 	PetActionBarFrame:UnregisterAllEvents()
 	PetActionBarFrame:Hide()
-	PetActionBarFrame.showgrid = nil
+	-- PetActionBarFrame.showgrid = nil
 
-	for i=1, NUM_PET_ACTION_SLOTS do
+	for i = 1, NUM_PET_ACTION_SLOTS do
 		getglobal("PetActionButton" .. i):UnregisterAllEvents()
 	end
 end
