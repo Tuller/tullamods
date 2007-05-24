@@ -15,7 +15,7 @@
 		<Scripts>
 			<OnClick>
 				if not BagnonDBUICharacterList:IsShown() then
-					BagnonDBUI_ShowCharacterList(this:GetParent())	
+					BagnonDBUI_ShowCharacterList(self:GetParent())	
 				else
 					BagnonDBUICharacterList:Hide()
 				end
@@ -52,8 +52,8 @@
 
 		<Scripts>
 			<OnClick>
-				local parent = this:GetParent()
-				local clickedPlayer = this:GetText()
+				local parent = self:GetParent()
+				local clickedPlayer = self:GetText()
 				
 				if(arg1 == "RightButton" and IsShiftKeyDown()) then
 					local player = parent.frame:GetPlayer()
@@ -74,7 +74,7 @@
 	<Frame name="BagnonDBUICharacterList" inherits="GooeyPopup">
 		<Scripts>
 			<OnLoad>
-				this:RegisterEvent("BANKFRAME_OPENED");
+				self:RegisterEvent("BANKFRAME_OPENED");
 			</OnLoad>
 			<OnEvent>
 				if Banknon then
@@ -82,7 +82,7 @@
 				end
 			</OnEvent>
 			<OnHide>
-				this:SetParent(UIParent);
+				self:SetParent(UIParent);
 			</OnHide>
 		</Scripts>
 	</Frame>
