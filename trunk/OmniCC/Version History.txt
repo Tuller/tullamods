@@ -4,8 +4,9 @@ OmniCC Version History, in the format mmddyy:
 Fixed a bug causing cooldown text to be transparent on Bartender3
 Fixed the font not set error
 
-Added the ability to toggle showing text on buffs/debuffs with the option /omnicc buffs
 Added localization file
+Added blaclist file, please add any frames you do not want omnicc to show to to this list
+Added a command, /omnicc blacklist: toggles not showing text on blacklisted frames
 
 1.1
 Updated for 2.1
