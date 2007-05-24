@@ -22,25 +22,24 @@ end
 
 --[[ Slider Template ]]--
 
-local function Slider_OnValueChanged()
-	local parent = this:GetParent()
-	local value = this:GetValue()
-	local values = this.values
+local function Slider_OnValueChanged(self, value)
+	local parent = self:GetParent()
+	local values = self.values
 
 	if not parent.onShow then
-		if this.isPercent then
-			this.OnChange(parent.anchor, value/100)
+		if self.isPercent then
+			self.OnChange(parent.anchor, value/100)
 		elseif values then
-			this.OnChange(parent.anchor, values[value])
+			self.OnChange(parent.anchor, values[value])
 		else
-			this.OnChange(parent.anchor, value)
+			self.OnChange(parent.anchor, value)
 		end
 	end
 	
 	if values then
-		getglobal(this:GetName() .. 'ValText'):SetText(values[value])
+		getglobal(self:GetName() .. 'ValText'):SetText(values[value])
 	else
-		getglobal(this:GetName() .. 'ValText'):SetText(value)
+		getglobal(self:GetName() .. 'ValText'):SetText(value)
 	end
 end
 
@@ -217,22 +216,22 @@ local function CreateMenu(name)
 	--checkbuttons
 	local lock = CreateFrame('CheckButton', name .. 'Lock', menu, 'GooeyCheckButton')
 	lock:SetPoint('TOPLEFT', menu, 'TOPLEFT', 6, -30)
-	lock:SetScript('OnClick', function() menu.anchor:Lock(this:GetChecked()) end)
+	lock:SetScript('OnClick', function(self) menu.anchor:Lock(self:GetChecked()) end)
 	lock:SetText(L.Lock)
 	
 	local reverse = CreateFrame('CheckButton', name .. 'Reverse', menu, 'GooeyCheckButton')
 	reverse:SetPoint('TOPLEFT', lock, 'BOTTOMLEFT')
-	reverse:SetScript('OnClick', function() SetReverseSort(menu.anchor, this:GetChecked()) end)
+	reverse:SetScript('OnClick', function(self) SetReverseSort(menu.anchor, self:GetChecked()) end)
 	reverse:SetText(L.ReverseSort)
 	
 	local topLevel = CreateFrame('CheckButton', name .. 'TopLevel', menu, 'GooeyCheckButton')
 	topLevel:SetPoint('TOPLEFT', reverse, 'BOTTOMLEFT')
-	topLevel:SetScript('OnClick', function() SetToplevel(menu.anchor, this:GetChecked()) end)
+	topLevel:SetScript('OnClick', function(self) SetToplevel(menu.anchor, self:GetChecked()) end)
 	topLevel:SetText(L.Toplevel)
 	
 	local colorPicker = CreateFrame('Button', name .. 'BGColor', menu, 'GooeyColorPicker')
 	colorPicker:SetPoint('TOPLEFT', topLevel, 'BOTTOMLEFT', 4, 2)
-	colorPicker:SetScript('OnClick', function() BGColor_OnClick(menu.anchor) end)
+	colorPicker:SetScript('OnClick', function(self) BGColor_OnClick(self.anchor) end)
 	colorPicker:SetText(L.BackgroundColor)
 
 	--sliders

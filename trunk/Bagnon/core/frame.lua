@@ -68,12 +68,12 @@ local function CreateTitle(parent)
 	title:SetTextColor(1, 0.82, 0)
 	title:RegisterForClicks('LeftButtonUp', 'LeftButtonDown', 'RightButtonUp', 'RightButtonDown')
 
-	title:SetScript('OnClick', function() this:GetParent():OnClick(arg1) end)
-	title:SetScript('OnDoubleClick', function() this:GetParent():OnDoubleClick(arg1) end)
-	title:SetScript('OnEnter', function() this:GetParent():OnEnter(this) end)
-	title:SetScript('OnLeave', function() this:GetParent():OnLeave(this) end)
-	title:SetScript('OnMouseUp', function() this:GetParent():OnMouseUp() end)
-	title:SetScript('OnMouseDown', function() this:GetParent():OnMouseDown() end)
+	title:SetScript('OnClick', function(self, arg1) self:GetParent():OnClick(arg1) end)
+	title:SetScript('OnDoubleClick', function(self, arg1) self:GetParent():OnDoubleClick(arg1) end)
+	title:SetScript('OnEnter', function(self) self:GetParent():OnEnter(this) end)
+	title:SetScript('OnLeave', function(self) self:GetParent():OnLeave(this) end)
+	title:SetScript('OnMouseUp', function(self) self:GetParent():OnMouseUp() end)
+	title:SetScript('OnMouseDown', function(self) self:GetParent():OnMouseDown() end)
 
 	return title
 end

@@ -11,10 +11,10 @@ local lastCreated = 0
 
 --[[ Constructor ]]--
 
-local function OnShow() this:OnShow() end
-local function OnClick() this:GetParent():OnClick(arg1) end
-local function OnEnter() this:GetParent():OnEnter() end
-local function OnLeave() this:GetParent():OnLeave() end
+local function OnShow(self) self:OnShow() end
+local function OnClick(self, arg1) self:GetParent():OnClick(arg1) end
+local function OnEnter(self) self:GetParent():OnEnter() end
+local function OnLeave(self) self:GetParent():OnLeave() end
 
 local function MoneyFrame_Create()
 	local frame = CreateFrame('Frame', format('BagnonMoney%s', lastCreated), nil, 'SmallMoneyFrameTemplate')

@@ -8,8 +8,8 @@ local L = BAGNON_LOCALS
 
 local lastCreated = 0
 
-local function Toggle_OnClick()
-	this:GetParent():ShowBags(not this:GetParent().shown, true)
+local function Toggle_OnClick(self)
+	self:GetParent():ShowBags(not self:GetParent().shown, true)
 end
 
 local function Toggle_New(parent, shown)

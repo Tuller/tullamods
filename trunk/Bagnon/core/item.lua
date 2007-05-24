@@ -31,36 +31,36 @@ end
 
 --[[ Frame Events ]]--
 
-local function OnUpdate()
-	if not this.cached and GameTooltip:IsOwned(this) then
-		if not this.elapsed or this.elapsed < 0 then
-			local start, duration, enable = GetContainerItemCooldown(this:GetBag(), this:GetID())
+local function OnUpdate(self, elapsed)
+	if not self.cached and GameTooltip:IsOwned(self) then
+		if not self.elapsed or self.elapsed < 0 then
+			local start, duration, enable = GetContainerItemCooldown(self:GetBag(), self:GetID())
 			if (start > 0 and duration > 0 and enable == 1) then
-				this:OnEnter()
+				self:OnEnter()
 			end
-			this.elapsed = UPDATE_DELAY
+			self.elapsed = UPDATE_DELAY
 		else
-			this.elapsed = this.elapsed - arg1
+			self.elapsed = self.elapsed - elapsed
 		end
 	end
 end
 
-local function OnEnter()
-	this.elapsed = nil
-	this:OnEnter()
+local function OnEnter(self)
+	self.elapsed = nil
+	self:OnEnter()
 end
 
-local function OnLeave()
-	this.elapsed = nil
-	this:OnLeave()
+local function OnLeave(self)
+	self.elapsed = nil
+	self:OnLeave()
 end
 
-local function OnHide()
-	this:OnHide()
+local function OnHide(self)
+	self:OnHide()
 end
 
-local function PostClick()
-	this:PostClick(arg1)
+local function PostClick(self, button)
+	self:PostClick(button)
 end
 
 

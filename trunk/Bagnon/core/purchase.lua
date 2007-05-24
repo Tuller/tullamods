@@ -52,7 +52,7 @@ local function PurchaseFrame_Create()
 	MoneyFrame_SetType('STATIC')
 	this = oldthis
 	
-	frame:SetScript('OnEvent', function() frame:UpdateSlotCost() end)
+	frame:SetScript('OnEvent', function(self) self:UpdateSlotCost() end)
 	
 	lastCreated = lastCreated + 1
 

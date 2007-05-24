@@ -11,9 +11,9 @@ local function SearchBox_Create()
 	frame:SetTextInsets(8, 8, 0, 0)
 	frame:SetFontObject('ChatFontNormal')
 
-	frame:SetScript('OnShow', function() this:SetFocus(); this:HighlightText() end)
-	frame:SetScript('OnTextChanged', function() BagnonSpot:SetTextSearch(this:GetText()) end)
-	frame:SetScript('OnEscapePressed', function() BagnonSpot:Hide() end)
+	frame:SetScript('OnShow', function(self) self:SetFocus(); self:HighlightText() end)
+	frame:SetScript('OnTextChanged', function(self) BagnonSpot:SetTextSearch(self:GetText()) end)
+	frame:SetScript('OnEscapePressed', function(self) BagnonSpot:Hide() end)
 	
 	return frame
 end

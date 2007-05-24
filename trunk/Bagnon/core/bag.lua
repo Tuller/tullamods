@@ -17,11 +17,11 @@ local lastCreated = 0
 
 --[[ Bag Constructor ]]--
 
-local function OnEnter() this:OnEnter() end
-local function OnLeave() this:OnLeave() end
-local function OnShow()  this:OnShow()  end
-local function OnClick() this:OnClick() end
-local function OnDrag()  this:OnDrag()  end
+local function OnEnter(self) self:OnEnter() end
+local function OnLeave(self) self:OnLeave() end
+local function OnShow(self)  self:OnShow()  end
+local function OnClick(self) self:OnClick(arg1) end
+local function OnDrag(self)  self:OnDrag()  end
 
 local function LoadScripts(bag)
 	bag:RegisterForClicks("LeftButtonUp", "RightButtonUp")
@@ -240,7 +240,7 @@ end
 
 --[[ Frame Events ]]--
 
-function BagnonBag:OnClick()
+function BagnonBag:OnClick(button)
 	local parent = self:GetParent():GetParent()
 	local player = parent:GetPlayer()
 	local bagID = self:GetID()
