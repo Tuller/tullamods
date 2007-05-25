@@ -2,8 +2,10 @@
 	BActionBar - A Bongos Actionbar
 --]]
 
+function BActionBar_Init()
+
 --basically, BActionBar inherits all methods from BBar
-BActionBar = setmetatable(CreateFrame("Button"), {__index = BBar})
+BActionBar = setmetatable(CreateFrame("Frame", nil, nil, "SecureFrameTemplate"), {__index = BBar})
 local Bar_MT = {__index = BActionBar}
 
 local L = BONGOS_LOCALS
@@ -12,6 +14,7 @@ local L = BONGOS_LOCALS
 local CLASS = BONGOS_CLASS
 local MAX_BUTTONS = BONGOS_MAX_BUTTONS
 local MAX_PAGES = BONGOS_MAX_PAGES
+local hasStance = (CLASS == "DRUID" or CLASS == "ROGUE" or CLASS == "WARRIOR" or CLASS == "PRIEST")
 
 local BUTTON_SIZE = 36
 local PROWL_STATE = 7
@@ -138,31 +141,33 @@ function BActionBar:UpdateStateHeader()
 		end
 	end
 
-	local maxState = ((CLASS == "PRIEST") and 1) or GetNumShapeshiftForms()
-	
-	--rogue, priest, warrior states
-	if(CLASS == "DRUID") then
-		local hasProwl = self:GetStateOffset("s7")
-		for i = 1, maxState do
-			if((i == 2 or i == 3) and hasProwl) then
-				if(self:GetStateOffset("s" .. i)) then
-					local state = format("[stance:%d,nostealth]%d;", i, i)
+	if(hasStance) then
+		local maxState = ((CLASS == "PRIEST") and 1) or GetNumShapeshiftForms()
+		
+		--rogue, priest, warrior states
+		if(CLASS == "DRUID") then
+			local hasProwl = self:GetStateOffset("s7")
+			for i = 1, maxState do
+				if((i == 2 or i == 3) and hasProwl) then
+					if(self:GetStateOffset("s" .. i)) then
+						local state = format("[stance:%d,nostealth]%d;", i, i)
+						header = (header and header .. state) or state
+					end
+					local state = format("[stance:%d,stealth]%d;", i, PROWL_STATE)
 					header = (header and header .. state) or state
+				else
+					if(self:GetStateOffset("s" .. i)) then
+						local state = format("[stance:%d]%d;", i, i)
+						header = (header and header .. state) or state
+					end
 				end
-				local state = format("[stance:%d,stealth]%d;", i, PROWL_STATE)
-				header = (header and header .. state) or state
-			else
+			end
+		else
+			for i = 1, maxState do
 				if(self:GetStateOffset("s" .. i)) then
 					local state = format("[stance:%d]%d;", i, i)
 					header = (header and header .. state) or state
 				end
-			end
-		end
-	else
-		for i = 1, maxState do
-			if(self:GetStateOffset("s" .. i)) then
-				local state = format("[stance:%d]%d;", i, i)
-				header = (header and header .. state) or state
 			end
 		end
 	end
@@ -201,16 +206,18 @@ function BActionBar:GetCurrentState()
 	end
 
 	--stance check
-	local stance = GetShapeshiftForm()
-	if(stance > 0) then
-		--prowl check
-		if(stance == 3 and IsStealthed() and self:GetStateOffset("s7")) then
-			return PROWL_STATE
-		end
+	if(hasStance) then
+		local stance = GetShapeshiftForm()
+		if(stance > 0) then
+			--prowl check
+			if(stance == 3 and IsStealthed() and self:GetStateOffset("s7")) then
+				return PROWL_STATE
+			end
 
-		--some sort of stance
-		if(self:GetStateOffset("s" .. stance)) then
-			return stance
+			--some sort of stance
+			if(self:GetStateOffset("s" .. stance)) then
+				return stance
+			end
 		end
 	end
 
@@ -329,29 +336,31 @@ end
 local function Panel_AddStanceSliders(panel)
 	Panel_AddStanceSlider(panel, "help", L.FriendlyStance)
 
-	if(CLASS == "PRIEST") then
-		Panel_AddStanceSlider(panel, "s" .. i, L.ShadowForm)
-	else
-		if(CLASS == "DRUID") then
-			panel.s7 = Panel_AddStanceSlider(panel, "s7", L.Prowl)
-		end
-
-		local OnShow = panel:GetScript("OnShow")
-		panel:SetScript("OnShow", function(self)
-			for i = GetNumShapeshiftForms(), 1, -1 do
-				local state = "s" .. i
-				local name = select(2, GetShapeshiftFormInfo(i))
-
-				local slider = self[state]
-				if slider then
-					getglobal(slider:GetName() .. "Text"):SetText(name)
-				else
-					self[state] = Panel_AddStanceSlider(self, state, name)
-					StanceSlider_OnShow(self[state])
-				end
+	if(hasStance) then
+		if(CLASS == "PRIEST") then
+			Panel_AddStanceSlider(panel, "s" .. i, L.ShadowForm)
+		else
+			if(CLASS == "DRUID") then
+				panel.s7 = Panel_AddStanceSlider(panel, "s7", L.Prowl)
 			end
-			OnShow(self)
-		end)
+
+			local OnShow = panel:GetScript("OnShow")
+			panel:SetScript("OnShow", function(self)
+				for i = GetNumShapeshiftForms(), 1, -1 do
+					local state = "s" .. i
+					local name = select(2, GetShapeshiftFormInfo(i))
+
+					local slider = self[state]
+					if slider then
+						getglobal(slider:GetName() .. "Text"):SetText(name)
+					else
+						self[state] = Panel_AddStanceSlider(self, state, name)
+						StanceSlider_OnShow(self[state])
+					end
+				end
+				OnShow(self)
+			end)
+		end
 	end
 end
 
@@ -564,12 +573,16 @@ function BActionBar:SetRightClickUnit(unit)
 		self:SetAttribute(format("*unit-p%ds", i), unit)
 	end
 	
-	local maxState = ((CLASS == "PRIEST") and 1) or GetNumShapeshiftForms() or 0
-	if(CLASS == "DRUID") then maxState = maxState + 1 end
+	if(hasStance) then
+		local maxState = ((CLASS == "PRIEST") and 1) or GetNumShapeshiftForms() or 0
+		if(CLASS == "DRUID") then maxState = maxState + 1 end
 
-	for i = 1, maxState do
-		self:SetAttribute(format("*unit-s%ds", i), unit)
+		for i = 1, maxState do
+			self:SetAttribute(format("*unit-s%ds", i), unit)
+		end
 	end
 	
 	self:SetAttribute("*unit-helps", unit)
+end
+
 end

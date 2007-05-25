@@ -2,7 +2,6 @@
 ## Title: Bongos2 ActionBar
 ## Notes: A main actionbar replacement
 ## Author: Tuller
-## Version: 0.9
 ## Dependencies: Bongos2
 localization.lua
 keyBound\localization.lua
@@ -17,7 +16,6 @@ classBar\button.lua
 classBar\bar.lua
 petBar\button.lua
 petBar\bar.lua
-actionBar\states.lua
 actionBar\button.lua
 actionBar\bar.lua
 actionBar\main.lua
