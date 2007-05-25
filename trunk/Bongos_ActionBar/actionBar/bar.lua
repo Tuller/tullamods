@@ -579,10 +579,13 @@ function BActionBar:SetRightClickUnit(unit)
 	
 	if(hasStance) then
 		local maxState = ((CLASS == "PRIEST") and 1) or GetNumShapeshiftForms() or 0
-		if(CLASS == "DRUID") then maxState = maxState + 1 end
 
 		for i = 1, maxState do
 			self:SetAttribute(format("*unit-s%ds", i), unit)
+		end
+
+		if(CLASS == "DRUID") then
+			self:SetAttribute(format("*unit-s%ds", PROWL_STATE), unit)
 		end
 	end
 	
