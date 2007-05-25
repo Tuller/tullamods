@@ -7,13 +7,15 @@ BongosActionBar = Bongos:NewModule("Bongos-ActionBar")
 local DEFAULT_NUM_ACTIONBARS = 10
 
 function BongosActionBar:Load()
-	for i = 1, self:GetNumber() do
+	for i = 1, self:GetNumber() do 
 		BActionBar:Create(i)
 	end
 
 	self:RegisterEvent("ACTIONBAR_SLOT_CHANGED", "UpdateVisibility")
 	self:RegisterEvent("ACTIONBAR_SHOWGRID", "UpdateGrid")
 	self:RegisterEvent("ACTIONBAR_HIDEGRID", "UpdateGrid")
+	self:RegisterEvent("PLAYER_REGEN_ENABLED", "UpdateCombatStatus")
+	self:RegisterEvent("PLAYER_REGEN_DISABLED", "UpdateCombatStatus")
 	self:RegisterMessage("KEYBOUND_ENABLED", "UpdateVisibility")
 	self:RegisterMessage("KEYBOUND_DISABLED", "UpdateVisibility")
 end
@@ -27,6 +29,19 @@ function BongosActionBar:Unload()
 	self:UnregisterAllMessages()
 end
 
+function BongosActionBar:UpdateCombatStatus(event)
+	if(event == "PLAYER_REGEN_ENABLED") then
+		self.inCombat = nil
+
+		if(self.needToUpdate) then
+			self.needToUpdate = nil
+			self:UpdateVisibility()
+		end
+	elseif(event == "PLAYER_REGEN_DISABLED") then
+		self.inCombat = true
+	end
+end
+
 function BongosActionBar:UpdateGrid(event)
 	if(event == "ACTIONBAR_SHOWGRID") then
 		BongosActionButton.showEmpty = true
@@ -38,11 +53,15 @@ end
 
 --updates the showstates of every button on every bar
 function BongosActionBar:UpdateVisibility()
-	for i = 1, self:GetNumber() do
-		local bar = BActionBar:Get(i)
-		if bar:IsShown() then
-			bar:UpdateVisibility()
+	if(not self.inCombat) then
+		for i = 1, self:GetNumber() do
+			local bar = BActionBar:Get(i)
+			if bar:IsShown() then
+				bar:UpdateVisibility()
+			end
 		end
+	else
+		self.needToUpdate = true
 	end
 end
 

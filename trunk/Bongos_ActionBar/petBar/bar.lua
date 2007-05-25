@@ -40,7 +40,6 @@ local function Bar_Layout(self, cols, space)
 		local button = BongosPetButton:Get(i)
 		button:ClearAllPoints()
 		button:SetPoint("TOPLEFT", self, "TOPLEFT", buttonSize * row, -buttonSize * col)
-		button:Update()
 	end
 end
 
@@ -53,6 +52,7 @@ local function Bar_CreateMenu(frame)
 	--sliders
 	local spacing = menu:CreateSpacingSlider(name .. "Spacing")
 	spacing:SetScript("OnShow", function(self)
+		self.onShow = true
 		self:SetValue(frame.sets.space or DEFAULT_SPACING)
 	end)
 	spacing:SetScript("OnValueChanged", function(self, value)
@@ -95,21 +95,11 @@ end
 local function Bar_OnCreate(self)
 	self.ShowMenu = Bar_ShowMenu
 	self.Layout = Bar_Layout
-
 	self:SetFrameStrata("HIGH")
-	RegisterStateDriver(self, "state", "[pet]1;0")
-	self:SetAttribute("statemap-state", "$input")
 
-	for i=1, NUM_PET_ACTION_SLOTS do
+	for i = 1, NUM_PET_ACTION_SLOTS do
 		BongosPetButton:Set(i, self)
 	end
-
-	if(UnitExists("pet")) then
-		self:SetAttribute("state", "1")
-	else
-		self:SetAttribute("state", "0")
-	end
-	SecureStateHeader_Refresh(self)
 end
 
 
@@ -119,50 +109,19 @@ function BongosPetBar:Load()
 	self.bar = BBar:CreateSecure("pet", Bar_OnCreate, nil, {["y"] = 591, ["x"] = 553})
 	self.bar:Layout()
 
-	self:RegisterEvent("UNIT_FLAGS", "UpdateIfPet")
-	self:RegisterEvent("UNIT_AURA", "UpdateIfPet")
-	self:RegisterEvent("PET_BAR_UPDATE", "Update")
-	self:RegisterEvent("PET_BAR_UPDATE_COOLDOWN", "UpdateCooldown")
-	self:RegisterEvent("PET_BAR_SHOWGRID", "UpdateShowGrid")
-	self:RegisterEvent("PET_BAR_HIDEGRID", "UpdateShowGrid")
-	self:RegisterEvent("UPDATE_BINDINGS", "UpdateBindings")
+	PetActionBarFrame:RegisterEvent("PLAYER_CONTROL_LOST")
+	PetActionBarFrame:RegisterEvent("PLAYER_CONTROL_GAINED")
+	PetActionBarFrame:RegisterEvent("PLAYER_FARSIGHT_FOCUS_CHANGED")
+	PetActionBarFrame:RegisterEvent("UNIT_PET")
+	PetActionBarFrame:RegisterEvent("UNIT_FLAGS")
+	PetActionBarFrame:RegisterEvent("UNIT_AURA")
+	PetActionBarFrame:RegisterEvent("PET_BAR_UPDATE")
+	PetActionBarFrame:RegisterEvent("PET_BAR_UPDATE_COOLDOWN")
+	PetActionBarFrame:RegisterEvent("PET_BAR_SHOWGRID")
+	PetActionBarFrame:RegisterEvent("PET_BAR_HIDEGRID")
 end
 
 function BongosPetBar:Unload()
 	self.bar:Destroy()
-
-	self:UnregisterEvent("UNIT_FLAGS")
-	self:UnregisterEvent("UNIT_AURA")
-	self:UnregisterEvent("PET_BAR_UPDATE")
-	self:UnregisterEvent("PET_BAR_UPDATE_COOLDOWN")
-	self:UnregisterEvent("PET_BAR_SHOWGRID")
-	self:UnregisterEvent("PET_BAR_HIDEGRID")
-	self:UnregisterEvent("UPDATE_BINDINGS")
-end
-
-function BongosPetBar:UpdateBindings()
-	BongosPetButton:ForAll("UpdateHotkey")
-end
-
-function BongosPetBar:UpdateIfPet(event, unit)
-	if unit == "pet" then
-		BongosPetButton:ForAll("Update")
-	end
-end
-
-function BongosPetBar:Update()
-	BongosPetButton:ForAll("Update")
-end
-
-function BongosPetBar:UpdateCooldown()
-	BongosPetButton:ForAll("UpdateCooldown")
-end
-
-function BongosPetBar:UpdateShowGrid(event)
-	if event == "PET_BAR_SHOWGRID" then
-		BongosPetButton.showEmpty = true
-	elseif event == "PET_BAR_HIDEGRID" then
-		BongosPetButton.showEmpty = nil
-	end
-	BongosPetButton:ForAll("UpdateVisibility")
+	PetActionBarFrame:UnregisterAllEvents()
 end

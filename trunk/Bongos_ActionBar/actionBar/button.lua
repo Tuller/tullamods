@@ -28,15 +28,11 @@ local function OnDragStart(self) self:OnDragStart() end
 local function OnReceiveDrag(self) self:OnReceiveDrag() end
 local function OnEnter(self) self:OnEnter() end
 local function OnLeave(self) self:OnLeave() end
-local function OnShow(self) self.id = nil end
-
+local function OnHide(self) self.id = nil end
 local function OnAttributeChanged(self, var, val)
 	local parent = self:GetParent()
 	if(parent and parent:IsShown() and var == "state-parent") then
 		self.id = nil
-		-- if(self == BongosActionButton1) then
-			-- Bongos:Print(val)
-		-- end
 	end
 end
 
@@ -103,7 +99,8 @@ function BongosActionButton:Create(id)
 	button:SetScript("OnReceiveDrag", OnReceiveDrag)
 	button:SetScript("OnEnter", OnEnter)
 	button:SetScript("OnLeave", OnLeave)
-	button:SetScript("OnShow", OnShow)
+	-- button:SetScript("OnShow", OnShow)
+	button:SetScript("OnHide", OnHide)
 	button:SetScript("OnEvent", OnEvent)
 	button:SetScript("OnAttributeChanged", OnAttributeChanged)
 

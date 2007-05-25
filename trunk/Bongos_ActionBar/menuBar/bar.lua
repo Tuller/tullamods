@@ -114,15 +114,28 @@ local function Bar_OnCreate(self)
 	for _,button in pairs(buttons) do
 		self:Attach(button)
 	end
-
-	--override UpdateTalentButton to properly show the micro button
-	function UpdateTalentButton()
+	
+	--mess with the talent button to make it hide properly, it causes layout issues otherwise
+	local function TalentButton_Update(self)
 		if UnitLevel("player") < 10 then
-			TalentMicroButton:Hide()
-		elseif BBar.Get("menu") then
-			TalentMicroButton:Show()
+			self:Hide()
+		elseif BBar:Get("menu") then
+			self:Show()
 		end
 	end
+
+	TalentMicroButton:SetScript("OnEvent", function(self, event)
+		if event == "PLAYER_LEVEL_UP" then
+			TalentButton_Update(self)
+			if not CharacterFrame:IsShown() then
+				SetButtonPulse(self, 60, 1)
+			end
+		elseif event == "UNIT_LEVEL" or event == "PLAYER_ENTERING_WORLD" then
+			TalentButton_Update(self)
+		elseif event == "UPDATE_BINDINGS" then
+			self.tooltipText =  MicroButtonTooltipText(TALENTS_BUTTON, "TOGGLETALENTS")
+		end
+	end)
 end
 
 
@@ -133,10 +146,7 @@ function BongosMenuBar:Load()
 	bar:Layout()
 
 	--hack to make sure all the buttons are shown properly
-	if bar:IsShown() then
-		bar:Hide()
-		bar:Show()
-	end
+	if bar:IsShown() then bar:Hide(); bar:Show() end
 	
 	self.bar = bar
 end
