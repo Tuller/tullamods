@@ -1,11 +1,9 @@
-<Ui xmlns="http://www.blizzard.com/wow/ui/"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
 
 	<!--  Bongos CastBar - Puts the casting bar in a movable bar -->
 	<Script file="bar.lua"/>
 	
-	<StatusBar name="BongosCastingBarTemplate" drawLayer="BORDER" topLevel="true" hidden="true" virtual="true">
+	<StatusBar name="BongosCastingBarTemplate" drawLayer="BORDER" hidden="true" virtual="true">
 		<Size x="195" y="18"/>
 		
 		<Layers>
