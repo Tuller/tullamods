@@ -84,7 +84,7 @@
 						<Offset x="0" y="4"/>
 					</Anchor>
 				</Anchors>
-				
+
 				<Scripts>
 					<OnShow>
 						self:SetChecked(BongosActionConfig:ShowingEmptyButtons())
@@ -101,7 +101,7 @@
 						<Offset x="0" y="4"/>
 					</Anchor>
 				</Anchors>
-				
+
 				<Scripts>
 					<OnShow>
 						self:SetChecked(BongosActionConfig:ShowingTooltips())
@@ -118,7 +118,7 @@
 						<Offset x="0" y="4"/>
 					</Anchor>
 				</Anchors>
-				
+
 				<Scripts>
 					<OnShow>
 						self:SetChecked(BongosActionConfig:ShowingMacros())
@@ -135,7 +135,7 @@
 						<Offset x="0" y="4"/>
 					</Anchor>
 				</Anchors>
-				
+
 				<Scripts>
 					<OnShow>
 						self:SetChecked(BongosActionConfig:ShowingHotkeys())
@@ -145,7 +145,7 @@
 					</OnClick>
 				</Scripts>
 			</CheckButton>
-			
+
 			<Frame name="$parentQuickMove" inherits="GooeyDropDown">
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="$parentHotkeysText" relativePoint="BOTTOMLEFT">
@@ -164,7 +164,7 @@
 					</OnShow>
 				</Scripts>
 			</Frame>
-			
+
 			<Slider name="$parentNumActionBars" inherits="BongosOptionsSlider" minValue = "1" maxValue="16" valuestep="1">
 				<Anchors>
 					<Anchor point="BOTTOM">

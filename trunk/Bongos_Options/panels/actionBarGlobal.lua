@@ -18,7 +18,7 @@ function BOptionsNumActionbars_OnLoad(self)
 	getglobal(name .. "Text"):SetText("Action Bars")
 	getglobal(name .. "Low"):SetText(1)
 	getglobal(name .. "High"):SetText(120)
-	
+
 	self.vals = {1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 24, 30, 40, 60, 120}
 end
 
