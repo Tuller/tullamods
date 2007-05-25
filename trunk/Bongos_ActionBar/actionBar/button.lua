@@ -7,7 +7,7 @@ local Button_MT = {__index = BongosActionButton}
 
 --constants
 local MAX_BUTTONS = BONGOS_MAX_BUTTONS
-local STANCES = BONGOS_STANCES
+local CLASS = BONGOS_CLASS
 local MAX_PAGES = BONGOS_MAX_PAGES
 
 local BUTTON_NAME = "BongosActionButton%d"
@@ -402,19 +402,20 @@ function BongosActionButton:UpdateStates()
 	local id = self:GetAttribute("action")
 	local parent = self:GetParent()
 
-	if(STANCES) then
-		for i in pairs(STANCES) do
-			local state = format("s%d", i)
-			local selfState = format("s%ds", i)
-			local offset = parent:GetStateOffset(state)
+	local maxState = ((CLASS == "PRIEST") and 1) or GetNumShapeshiftForms() or 0
+	if(CLASS == "DRUID") then maxState = maxState + 1 end
 
-			if(offset) then
-				self:SetAttribute("*action-" .. state, toValid(id + offset))
-				self:SetAttribute("*action-" .. selfState, toValid(id + offset))
-			else
-				self:SetAttribute("*action-" .. state, nil)
-				self:SetAttribute("*action-" .. selfState, nil)
-			end
+	for i = 1, maxState do
+		local state = format("s%d", i)
+		local selfState = format("s%ds", i)
+		local offset = parent:GetStateOffset(state)
+
+		if(offset) then
+			self:SetAttribute("*action-" .. state, toValid(id + offset))
+			self:SetAttribute("*action-" .. selfState, toValid(id + offset))
+		else
+			self:SetAttribute("*action-" .. state, nil)
+			self:SetAttribute("*action-" .. selfState, nil)
 		end
 	end
 
@@ -431,7 +432,7 @@ function BongosActionButton:UpdateStates()
 			self:SetAttribute("*action-" .. selfState, nil)
 		end
 	end
-	
+
 	for i = 1, 3 do
 		local state = format("m%d", i)
 		local selfState = format("m%ds", i)
@@ -469,13 +470,14 @@ function BongosActionButton:UpdateVisibility()
 	else
 		local id = self:GetAttribute("action")
 		if HasAction(id) then newstates = 0 end
-
-		if(STANCES) then
-			for i in pairs(STANCES) do
-				local action = self:GetAttribute("*action-s" .. i) or id
-				if HasAction(action) then
-					newstates = (newstates and newstates .. "," .. i) or i
-				end
+		
+		local maxState = ((CLASS == "PRIEST") and 1) or GetNumShapeshiftForms() or 0
+		if(CLASS == "DRUID") then maxState = maxState + 1 end
+		
+		for i = 1, maxState do
+			local action = self:GetAttribute("*action-s" .. i) or id
+			if HasAction(action) then
+				newstates = (newstates and newstates .. "," .. i) or i
 			end
 		end
 
@@ -485,7 +487,7 @@ function BongosActionButton:UpdateVisibility()
 				newstates = (newstates and newstates .. "," .. (i+9)) or (i+9)
 			end
 		end
-		
+
 		for i = 1, 3 do
 			local action = self:GetAttribute("*action-m" .. i) or id
 			if HasAction(action) then

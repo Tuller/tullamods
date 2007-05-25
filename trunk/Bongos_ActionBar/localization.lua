@@ -14,6 +14,9 @@ L.Paging = "Paging"
 L.Stances = "Stances"
 L.Page = "Page %s"
 L.FriendlyStance = "Friendly Target"
+L.Modifier = "Modifier"
+L.Prowl = "Prowl"
+L.ShadowForm = "Shadowform/Redemption"
 
 L.ClassBar = "Class Bar"
 L.MenuBar = "Menu Bar"
@@ -23,17 +26,6 @@ L.PetBar = "Pet Bar"
 BONGOS_CLASS = select(2, UnitClass("player"))
 BONGOS_MAX_BUTTONS = 120
 BONGOS_MAX_PAGES = 5
-
---names of stances, and what people call them
-if(BONGOS_CLASS == "DRUID") then
-	BONGOS_STANCES = {"Bear", "Aquatic", "Cat", "Travel", "Moonkin/Tree", "Flight", "Prowl"}
-elseif(BONGOS_CLASS == "ROGUE") then
-	BONGOS_STANCES = {"Stealth"}
-elseif(BONGOS_CLASS == "WARRIOR") then
-	BONGOS_STANCES = {"Battle", "Defensive", "Berserker"}
-elseif(BONGOS_CLASS == "PRIEST") then
-	BONGOS_STANCES = {"Shadowform/Redemption"}
-end
 
 --keybindings
 BINDING_HEADER_BGPAGE = "Bongos Paging"

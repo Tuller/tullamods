@@ -11,7 +11,6 @@ local L = BONGOS_LOCALS
 --constants
 local CLASS = BONGOS_CLASS
 local MAX_BUTTONS = BONGOS_MAX_BUTTONS
-local STANCES = BONGOS_STANCES
 local MAX_PAGES = BONGOS_MAX_PAGES
 
 local BUTTON_SIZE = 36
@@ -43,7 +42,7 @@ local function GenerateStateButton()
 	end
 
 	local stateButton1, stateButton2
-	if(STANCES) then
+	if stanceMap then
 		stateButton1 = format("%s;%s", stanceMap, pageMap)
 		stateButton2 =  format("%s;%s", stanceMap2, pageMap2)
 	else
@@ -139,26 +138,13 @@ function BActionBar:UpdateStateHeader()
 		end
 	end
 
-	local maxState = 0
-	if CLASS == "ROGUE" or CLASS == "PRIEST" then
-		maxState = 1
-	elseif CLASS == "WARRIOR" then
-		maxState = 3
-	end
-
+	local maxState = ((CLASS == "PRIEST") and 1) or GetNumShapeshiftForms()
+	
 	--rogue, priest, warrior states
-	for i = 1, maxState do
-		if(self:GetStateOffset("s" .. i)) then
-			local state = format("[stance:%d]%d;", i, i)
-			header = (header and header .. state) or state
-		end
-	end
-
-	--druid states
 	if(CLASS == "DRUID") then
 		local hasProwl = self:GetStateOffset("s7")
-		for i = 1, 7 do
-			if(i == 3 and hasProwl) then
+		for i = 1, maxState do
+			if((i == 2 or i == 3) and hasProwl) then
 				if(self:GetStateOffset("s" .. i)) then
 					local state = format("[stance:%d,nostealth]%d;", i, i)
 					header = (header and header .. state) or state
@@ -172,6 +158,13 @@ function BActionBar:UpdateStateHeader()
 				end
 			end
 		end
+	else
+		for i = 1, maxState do
+			if(self:GetStateOffset("s" .. i)) then
+				local state = format("[stance:%d]%d;", i, i)
+				header = (header and header .. state) or state
+			end
+		end
 	end
 
 	if(self:GetStateOffset("help")) then
@@ -181,8 +174,7 @@ function BActionBar:UpdateStateHeader()
 
 	--add in default state
 	if(header) then
-		header = header .. "0"
-		RegisterStateDriver(self, "state", header)
+		RegisterStateDriver(self, "state", header .. "0")
 	end
 
 	self:SetAttribute("state", self:GetCurrentState())
@@ -193,15 +185,15 @@ function BActionBar:GetCurrentState()
 	if(IsControlKeyDown() and self:GetStateOffset("m1")) then
 		return CTRL_STATE
 	end
-	
+
 	if(IsAltKeyDown() and self:GetStateOffset("m2")) then
 		return ALT_STATE
 	end
-	
+
 	if(IsShiftKeyDown() and self:GetStateOffset("m3")) then
 		return SHIFT_STATE
 	end
-		
+
 	--page check
 	local page = GetActionBarPage()-1
 	if(page > 0 and self:GetStateOffset("p" .. page)) then
@@ -235,16 +227,18 @@ end
 --[[ Menu Functions ]]--
 
 local function StanceSlider_OnShow(self)
+	self.onShow = true
 	local frame = self:GetParent().frame
 
 	self:SetMinMaxValues(0, BongosActionBar:GetNumber())
 	self:SetValue(frame.sets[self.id] or 0)
 	getglobal(self:GetName() .. "High"):SetText(BongosActionBar:GetNumber()-1)
+	self.onShow = nil
 end
 
 local function StanceSlider_OnValueChanged(self, value)
 	local menu = self:GetParent()
-	if not menu.onShow then
+	if not self.onShow then
 		menu.frame:SetStateOffset(self.id, value)
 	end
 	getglobal(self:GetName() .. "ValText"):SetText(value)
@@ -262,6 +256,8 @@ local function Panel_AddStanceSlider(self, id, title)
 
 	getglobal(name .. "Text"):SetText(title)
 	getglobal(name .. "Low"):SetText(0)
+	
+	return slider
 end
 
 local function Panel_AddLayoutSliders(panel)
@@ -269,12 +265,14 @@ local function Panel_AddLayoutSliders(panel)
 	--spacing
 	local spacing = panel:CreateSpacingSlider(name .. "Spacing")
 	spacing:SetScript("OnShow", function(self)
+		self.onShow = true
 		local parent = self:GetParent()
 		self:SetValue(parent.frame:GetSpacing())
+		self.onShow = nil
 	end)
 	spacing:SetScript("OnValueChanged", function(self, value)
-		local parent = self:GetParent()
-		if not parent.onShow then
+		if not self.onShow then
+			local parent = self:GetParent()
 			parent.frame:SetSpacing(value)
 		end
 		getglobal(self:GetName() .. "ValText"):SetText(value)
@@ -283,12 +281,14 @@ local function Panel_AddLayoutSliders(panel)
 	--columns
 	local cols = panel:CreateSlider(name .. "Cols")
 	cols:SetScript("OnShow", function(self)
+		self.onShow = true
 		local parent = self:GetParent()
 		self:SetValue(parent.frame:GetSize() - parent.frame:GetColumns() + 1)
+		self.onShow = nil
 	end)
 	cols:SetScript("OnValueChanged", function(self, value)
 		local parent = self:GetParent()
-		if not parent.onShow then
+		if not self.onShow then
 			parent.frame:SetColumns(parent.frame:GetSize() - value + 1)
 		end
 		getglobal(self:GetName() .. "ValText"):SetText(parent.frame:GetColumns())
@@ -300,14 +300,16 @@ local function Panel_AddLayoutSliders(panel)
 	--size
 	local size = panel:CreateSlider(name .. "Size")
 	size:SetScript("OnShow", function(self)
+		self.onShow = true
 		local frame = self:GetParent().frame
 		getglobal(name .. "Size"):SetMinMaxValues(1, frame:GetMaxSize())
 		getglobal(name .. "Size"):SetValue(frame:GetSize())
 		getglobal(name .. "SizeHigh"):SetText(frame:GetMaxSize())
+		self.onShow = nil
 	end)
 	size:SetScript("OnValueChanged", function(self, value)
 		local parent = self:GetParent()
-		if not parent.onShow then
+		if not self.onShow then
 			parent.frame:SetSize(value)
 		end
 		getglobal(self:GetName() .. "ValText"):SetText(value)
@@ -324,6 +326,35 @@ local function Panel_AddLayoutSliders(panel)
 	getglobal(name .. "SizeLow"):SetText(1)
 end
 
+local function Panel_AddStanceSliders(panel)
+	Panel_AddStanceSlider(panel, "help", L.FriendlyStance)
+
+	if(CLASS == "PRIEST") then
+		Panel_AddStanceSlider(panel, "s" .. i, L.ShadowForm)
+	else
+		if(CLASS == "DRUID") then
+			panel.s7 = Panel_AddStanceSlider(panel, "s7", L.Prowl)
+		end
+
+		local OnShow = panel:GetScript("OnShow")
+		panel:SetScript("OnShow", function(self)
+			for i = GetNumShapeshiftForms(), 1, -1 do
+				local state = "s" .. i
+				local name = select(2, GetShapeshiftFormInfo(i))
+
+				local slider = self[state]
+				if slider then
+					getglobal(slider:GetName() .. "Text"):SetText(name)
+				else
+					self[state] = Panel_AddStanceSlider(self, state, name)
+					StanceSlider_OnShow(self[state])
+				end
+			end
+			OnShow(self)
+		end)
+	end
+end
+
 function BActionBar:CreateMenu()
 	local name = format("BongosMenu%s", self.id)
 	local menu, panel = BongosMenu:Create(name, true)
@@ -332,24 +363,19 @@ function BActionBar:CreateMenu()
 	Panel_AddLayoutSliders(panel)
 
 	--stances panel
-	local stancePanel = menu:AddPanel(L.Stances)
-	Panel_AddStanceSlider(stancePanel, "help", L.FriendlyStance)
-	if(STANCES) then
-		for i in ipairs(STANCES) do
-			Panel_AddStanceSlider(stancePanel, "s" .. i, STANCES[i])
-		end
-	end
+	local panel = menu:AddPanel(L.Stances)
+	Panel_AddStanceSliders(panel)
 
 	--paging panel
 	local panel = menu:AddPanel(L.Paging)
 	for i = MAX_PAGES, 1, -1 do
 		Panel_AddStanceSlider(panel, "p" .. i, format(L.Page, i))
 	end
-	
-	local panel = menu:AddPanel(L.Modifier or "Modifier")
-	Panel_AddStanceSlider(panel, "m1", "Ctrl")
-	Panel_AddStanceSlider(panel, "m2", "Alt")
+
+	local panel = menu:AddPanel(L.Modifier)
 	Panel_AddStanceSlider(panel, "m3", "Shift")
+	Panel_AddStanceSlider(panel, "m2", "Alt")
+	Panel_AddStanceSlider(panel, "m1", "Ctrl")
 
 	return menu
 end
@@ -487,8 +513,7 @@ function BActionBar:Layout()
 end
 
 function BActionBar:UpdateVisibility()
-	local s = self:GetStartID()
-	local e = self:GetEndID()
+	local s, e = self:GetStartID(), self:GetEndID()
 	local changed
 
 	for i = s, e do
@@ -512,8 +537,7 @@ function BActionBar:SetStateOffset(state, offset)
 	self:UpdateStateHeader()
 
 	for i = self:GetStartID(), self:GetEndID() do
-		local button = BongosActionButton:Get(i)
-		button:UpdateStates()
+		BongosActionButton:Get(i):UpdateStates()
 	end
 	SecureStateHeader_Refresh(self, self:GetCurrentState())
 end
@@ -539,11 +563,13 @@ function BActionBar:SetRightClickUnit(unit)
 	for i = 1, MAX_PAGES do
 		self:SetAttribute(format("*unit-p%ds", i), unit)
 	end
+	
+	local maxState = ((CLASS == "PRIEST") and 1) or GetNumShapeshiftForms() or 0
+	if(CLASS == "DRUID") then maxState = maxState + 1 end
 
-	if(STANCES) then
-		for i in pairs(STANCES) do
-			self:SetAttribute(format("*unit-s%ds", i), unit)
-		end
+	for i = 1, maxState do
+		self:SetAttribute(format("*unit-s%ds", i), unit)
 	end
+	
 	self:SetAttribute("*unit-helps", unit)
 end
