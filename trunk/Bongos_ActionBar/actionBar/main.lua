@@ -4,12 +4,12 @@
 
 BongosActionBar = Bongos:NewModule("Bongos-ActionBar")
 
+local CLASS = BONGOS_CLASS
+local hasStance = (CLASS == "DRUID" or CLASS == "ROGUE" or CLASS == "WARRIOR" or CLASS == "PRIEST")
 local DEFAULT_NUM_ACTIONBARS = 10
 
 function BongosActionBar:Load()
-	for i = 1, self:GetNumber() do 
-		BActionBar:Create(i)
-	end
+	for i = 1, self:GetNumber() do BActionBar:Create(i) end
 
 	self:RegisterEvent("ACTIONBAR_SLOT_CHANGED", "UpdateVisibility")
 	self:RegisterEvent("ACTIONBAR_SHOWGRID", "UpdateGrid")
@@ -18,6 +18,11 @@ function BongosActionBar:Load()
 	self:RegisterEvent("PLAYER_REGEN_DISABLED", "UpdateCombatStatus")
 	self:RegisterMessage("KEYBOUND_ENABLED", "UpdateVisibility")
 	self:RegisterMessage("KEYBOUND_DISABLED", "UpdateVisibility")
+	
+	if(hasStance) then
+		self.numForms = GetNumShapeshiftForms()
+		self:RegisterEvent("UPDATE_SHAPESHIFT_FORMS", "UpdateStanceNumbers")
+	end
 end
 
 function BongosActionBar:Unload()
@@ -75,4 +80,17 @@ end
 
 function BongosActionBar:GetNumber()
 	return Bongos.profile.numActionBars or 10
+end
+
+function BongosActionBar:UpdateStanceNumbers()
+	local prev = self.numForms
+	self.numForms = GetNumShapeshiftForms()
+
+	if(self.numForms ~= prev) then
+		for i = 1, self:GetNumber() do
+			local bar = BActionBar:Get(i)
+			bar:UpdateStateHeader()
+			bar:UpdateButtonStates()
+		end
+	end
 end

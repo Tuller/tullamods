@@ -237,9 +237,10 @@ local function StanceSlider_OnShow(self)
 	self.onShow = true
 	local frame = self:GetParent().frame
 
-	self:SetMinMaxValues(0, BongosActionBar:GetNumber())
+	local maxOffset = BongosActionBar:GetNumber() - 1
+	self:SetMinMaxValues(0, maxOffset)
 	self:SetValue(frame.sets[self.id] or 0)
-	getglobal(self:GetName() .. "High"):SetText(BongosActionBar:GetNumber()-1)
+	getglobal(self:GetName() .. "High"):SetText(maxOffset)
 	self.onShow = nil
 end
 
@@ -378,7 +379,7 @@ function BActionBar:CreateMenu()
 	--paging panel
 	local panel = menu:AddPanel(L.Paging)
 	for i = MAX_PAGES, 1, -1 do
-		Panel_AddStanceSlider(panel, "p" .. i, format(L.Page, i))
+		Panel_AddStanceSlider(panel, "p" .. i, format(L.Page, i+1))
 	end
 
 	local panel = menu:AddPanel(L.Modifier)
@@ -544,11 +545,7 @@ function BActionBar:SetStateOffset(state, offset)
 	if(offset == 0) then offset = nil end
 	self.sets[state] = offset
 	self:UpdateStateHeader()
-
-	for i = self:GetStartID(), self:GetEndID() do
-		BongosActionButton:Get(i):UpdateStates()
-	end
-	SecureStateHeader_Refresh(self, self:GetCurrentState())
+	self:UpdateButtonStates()
 end
 
 function BActionBar:GetStateOffset(state)
@@ -557,6 +554,13 @@ function BActionBar:GetStateOffset(state)
 		return offset * self:GetMaxSize()
 	end
 	return nil
+end
+
+function BActionBar:UpdateButtonStates()
+	for i = self:GetStartID(), self:GetEndID() do
+		BongosActionButton:Get(i):UpdateStates()
+	end
+	SecureStateHeader_Refresh(self, self:GetCurrentState())
 end
 
 
