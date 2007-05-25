@@ -17,6 +17,9 @@ local MAX_PAGES = BONGOS_MAX_PAGES
 local BUTTON_SIZE = 36
 local PROWL_STATE = 7
 local HELP_STATE = 15
+local CTRL_STATE = 16
+local ALT_STATE = 17
+local SHIFT_STATE = 18
 
 local DEFAULT_SPACING = 2
 local DEFAULT_SIZE = 12
@@ -24,8 +27,8 @@ local DEFAULT_COLS = 12
 
 --2.1 statemap function!
 local function GenerateStateButton()
-	local pageMap = "10:p1;11:p2;12:p3;13:p4;14:p5;15:help"
-	local pageMap2 = "10:p1s;11:p2s;12:p3s;13:p4s;14:p5s;15:helps"
+	local pageMap = "10:p1;11:p2;12:p3;13:p4;14:p5;15:help;16:m1;17:m2;18:m3"
+	local pageMap2 = "10:p1s;11:p2s;12:p3s;13:p4s;14:p5s;15:helps;16:m1s;17:m2s;18:m3s"
 
 	local classStates, stanceMap, stanceMap2
 	if(CLASS == "ROGUE" or CLASS == "PRIEST") then
@@ -114,6 +117,21 @@ function BActionBar:UpdateStateHeader()
 	UnregisterStateDriver(self, "state", 0)
 
 	local header
+	if(self:GetStateOffset("m1")) then
+		local state = "[modifier:ctrl]16;"
+		header = (header and header .. state) or state
+	end
+
+	if(self:GetStateOffset("m2")) then
+		local state = "[modifier:alt]17;"
+		header = (header and header .. state) or state
+	end
+
+	if(self:GetStateOffset("m3")) then
+		local state = "[modifier:shift]18;"
+		header = (header and header .. state) or state
+	end
+
 	for i = 1, MAX_PAGES do
 		if(self:GetStateOffset("p" .. i)) then
 			local state = format("[actionbar:%d]%d;", i+1, i+9)
@@ -172,12 +190,24 @@ end
 
 --returns the current state of the given bar
 function BActionBar:GetCurrentState()
+	if(IsControlKeyDown() and self:GetStateOffset("m1")) then
+		return CTRL_STATE
+	end
+	
+	if(IsAltKeyDown() and self:GetStateOffset("m2")) then
+		return ALT_STATE
+	end
+	
+	if(IsShiftKeyDown() and self:GetStateOffset("m3")) then
+		return SHIFT_STATE
+	end
+		
 	--page check
 	local page = GetActionBarPage()-1
 	if(page > 0 and self:GetStateOffset("p" .. page)) then
 		return page + 9
 	end
-	
+
 	--stance check
 	local stance = GetShapeshiftForm()
 	if(stance > 0) then
@@ -191,7 +221,7 @@ function BActionBar:GetCurrentState()
 			return stance
 		end
 	end
-	
+
 	--friently target check
 	if(UnitCanAssist("player", "target") and self:GetStateOffset("help")) then
 		return HELP_STATE
@@ -315,6 +345,11 @@ function BActionBar:CreateMenu()
 	for i = MAX_PAGES, 1, -1 do
 		Panel_AddStanceSlider(panel, "p" .. i, format(L.Page, i))
 	end
+	
+	local panel = menu:AddPanel(L.Modifier or "Modifier")
+	Panel_AddStanceSlider(panel, "m1", "Ctrl")
+	Panel_AddStanceSlider(panel, "m2", "Alt")
+	Panel_AddStanceSlider(panel, "m3", "Shift")
 
 	return menu
 end
@@ -496,13 +531,18 @@ end
 
 function BActionBar:SetRightClickUnit(unit)
 	self:SetAttribute("*unit2", unit)
+
+	for i = 1, 3 do
+		self:SetAttribute(format("*unit-m%ds", i), unit)
+	end
+
 	for i = 1, MAX_PAGES do
-		self:SetAttribute("*unit-p" .. i .. "s", unit)
+		self:SetAttribute(format("*unit-p%ds", i), unit)
 	end
 
 	if(STANCES) then
 		for i in pairs(STANCES) do
-			self:SetAttribute("*unit-s" .. i .. "s", unit)
+			self:SetAttribute(format("*unit-s%ds", i), unit)
 		end
 	end
 	self:SetAttribute("*unit-helps", unit)

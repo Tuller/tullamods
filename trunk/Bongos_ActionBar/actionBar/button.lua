@@ -405,26 +405,44 @@ function BongosActionButton:UpdateStates()
 	if(STANCES) then
 		for i in pairs(STANCES) do
 			local state = format("s%d", i)
+			local selfState = format("s%ds", i)
 			local offset = parent:GetStateOffset(state)
+
 			if(offset) then
 				self:SetAttribute("*action-" .. state, toValid(id + offset))
-				self:SetAttribute("*action-" .. state .. "s", toValid(id + offset))
+				self:SetAttribute("*action-" .. selfState, toValid(id + offset))
 			else
 				self:SetAttribute("*action-" .. state, nil)
-				self:SetAttribute("*action-" .. state .. "s", nil)
+				self:SetAttribute("*action-" .. selfState, nil)
 			end
 		end
 	end
 
 	for i = 1, MAX_PAGES do
 		local state = format("p%d", i)
+		local selfState = format("p%ds", i)
 		local offset = parent:GetStateOffset(state)
+
 		if(offset) then
 			self:SetAttribute("*action-" .. state, toValid(id + offset))
-			self:SetAttribute("*action-" .. state .. "s", toValid(id + offset))
+			self:SetAttribute("*action-" .. selfState, toValid(id + offset))
 		else
 			self:SetAttribute("*action-" .. state, nil)
-			self:SetAttribute("*action-" .. state .. "s", nil)
+			self:SetAttribute("*action-" .. selfState, nil)
+		end
+	end
+	
+	for i = 1, 3 do
+		local state = format("m%d", i)
+		local selfState = format("m%ds", i)
+		local offset = parent:GetStateOffset(state)
+
+		if(offset) then
+			self:SetAttribute("*action-" .. state, toValid(id + offset))
+			self:SetAttribute("*action-" .. selfState, toValid(id + offset))
+		else
+			self:SetAttribute("*action-" .. state, nil)
+			self:SetAttribute("*action-" .. selfState, nil)
 		end
 	end
 
@@ -464,7 +482,14 @@ function BongosActionButton:UpdateVisibility()
 		for i = 1, MAX_PAGES do
 			local action = self:GetAttribute("*action-p" .. i) or id
 			if HasAction(action) then
-				newstates = (newstates and newstates .. "," .. (10 + i-1)) or (10 + i-1)
+				newstates = (newstates and newstates .. "," .. (i+9)) or (i+9)
+			end
+		end
+		
+		for i = 1, 3 do
+			local action = self:GetAttribute("*action-m" .. i) or id
+			if HasAction(action) then
+				newstates = (newstates and newstates .. "," .. (i+15)) or (i+15)
 			end
 		end
 
