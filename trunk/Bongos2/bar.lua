@@ -2,7 +2,9 @@
 	BBar.lua - A movable, scalable, container frame
 --]]
 
-BBar = CreateFrame("Frame")
+function BBar_Init()
+
+BBar = CreateFrame("Frame", nil, nil, "SecureFrameTemplate")
 local Bar_MT = {__index = BBar}
 
 local STICKY_TOLERANCE = 16 --how close one frame must be to another to trigger auto anchoring
@@ -20,20 +22,14 @@ local function GetRelativeCoords(frame, scale)
 end
 
 local function Bar_New(id, secure)
-	local bar
-	if secure then
-		bar = setmetatable(CreateFrame("Frame", nil, UIParent, "SecureStateHeaderTemplate"), Bar_MT)
-		bar.secure = true
-	else
-		bar = setmetatable(CreateFrame("Frame", nil, UIParent), Bar_MT)
-	end
-	
+	local bar = setmetatable(CreateFrame("Frame", nil, UIParent, secure and "SecureStateHeaderTemplate"), Bar_MT)
 	bar.id = id
 	bar.dragFrame = BDragFrame_New(bar)
 
 	bar:SetClampedToScreen(true)
 	bar:SetMovable(true)
 	bar:SetSize(32)
+	bar.isNew = true
 
 	return bar
 end
@@ -59,7 +55,12 @@ function BBar:Create(id, OnCreate, OnDelete, defaults, secure)
 	bar.OnDelete = OnDelete
 
 	bar:LoadSettings(defaults)
-	if OnCreate then OnCreate(bar) end
+	if(bar.isNew) then
+		if(OnCreate) then
+			OnCreate(bar)
+		end
+		bar.isNew = nil
+	end
 	
 	active[id] = bar
 
@@ -88,7 +89,6 @@ function BBar:Destroy(removeSettings)
 	self:Hide()
 
 	self:ForAll("Reanchor")
-	-- self:UnregisterAllEvents()
 
 	unused[self.id] = self
 end
@@ -112,7 +112,6 @@ function BBar:LoadSettings(defaults)
 	else
 		self:Unlock()
 	end
-	self:UpdateCombatStatus()
 end
 
 --[[ Lock/Unlock ]]--
@@ -151,16 +150,11 @@ function BBar:SetFrameAlpha(alpha)
 		self.sets.alpha = alpha
 	end
 
-	local mode = self.sets.fadeMode
-	if mode then
-		if mode == 2 and self:GetAttribute("incombat") then
-			self:SetAlpha(alpha or 1)
-		elseif mode == 1 and not self:GetAttribute("incombat")  then
-			self:SetAlpha(alpha or 1)
-		end
-	else
-		self:SetAlpha(alpha or 1)
-	end
+	self:SetAlpha(alpha or 1)
+end
+
+function BBar:GetFrameAlpha()
+	return self.sets.alpha or 1
 end
 
 function BBar:Attach(frame)
@@ -198,64 +192,6 @@ function BBar:ToggleFrame()
 	else
 		self:HideFrame()
 	end
-end
-
---combat fading
-function BBar:SetFadeMode(mode)
-	if mode == 0 then
-		self.sets.fadeMode = nil
-	elseif not mode or (mode >= 0 and mode <= 3) then
-		self.sets.fadeMode = mode
-	end
-		
-	if not mode or mode == 0 then
-		self:SetAlpha(self.sets.alpha or 1)
-	else
-		self:UpdateCombatStatus()
-	end
-end
-
-function BBar:SetFadeALpha(alpha)
-	if alpha == 0 then
-		self.sets.fadeAlpha = nil
-	else
-		self.sets.fadeAlpha = alpha
-	end
-
-	local mode = self.sets.fadeMode
-	if mode then
-		if mode == 1 and self.inCombat then
-			self:SetAlpha(alpha or 0)
-		elseif mode == 2 and not self.inCombat then
-			self:SetAlpha(alpha or 0)
-		end
-	end
-end
-
-function BBar:UpdateCombatStatus()
-	local fadeMode = self.sets.fadeMode
-	local maxAlpha, minAlpha = self:GetFrameAlpha()
-	if fadeMode then
-		if self.inCombat then
-			if fadeMode == 1 then
-				UIFrameFadeOut(self, 0.4, maxAlpha, minAlpha)
-			elseif fadeMode == 2 then
-				UIFrameFadeIn(self, 0.15, self:GetAlpha(), maxAlpha)
-			end
-		else
-			if fadeMode == 1 then
-				UIFrameFadeIn(self, 0.15, self:GetAlpha(), maxAlpha)
-			elseif fadeMode == 2 then
-				UIFrameFadeOut(self, 0.4, maxAlpha, minAlpha)
-			end
-		end
-	else
-		self:SetAlpha(maxAlpha)
-	end
-end
-
-function BBar:GetFrameAlpha()
-	return self.sets.alpha or 1, self.sets.fadeAlpha or 0
 end
 
 
@@ -419,15 +355,4 @@ function BBar:ForBar(id, method, ...)
 	end
 end
 
---combat status updating
--- local function BBar_OnCombatChange(self, event, ...)
-	-- if event == "PLAYER_REGEN_DISABLED" then
-		-- self.inCombat = true
-	-- else
-		-- self.inCombat = nil
-	-- end
-	-- self:ForAll("UpdateCombatStatus")
--- end
--- BBar:SetScript("OnEvent", BBar_OnCombatChange)
--- BBar:RegisterEvent("PLAYER_REGEN_DISABLED")
--- BBar:RegisterEvent("PLAYER_REGEN_ENABLED")
+end
