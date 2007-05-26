@@ -17,15 +17,14 @@ local function OnLeave(self) self:OnLeave() end
 
 function BongosPetButton:Set(id, parent)
 	local button = setmetatable(self:Get(id), Button_mt)
-
-	button:SetToplevel(false)
-	button:SetAttribute("showstates", "1")
+	button:SetToplevel(nil)
 	button:SetScripts()
 	button:Style()
 	button:ShowHotkey(BongosActionConfig:ShowingHotkeys())
 
 	parent:Attach(button)
 	parent:SetAttribute("addchild", button)
+	button:SetAttribute("showstates", "1")
 
 	return button
 end
@@ -59,7 +58,6 @@ function BongosPetButton:OnDragStart()
 	if not BongosActionConfig:ButtonsLocked() or BongosActionConfig:IsQuickMoveKeyDown() or self.showEmpty then
 		self:SetChecked(false)
 		PickupPetAction(self:GetID())
-		self:UpdateVisibility()
 	end
 end
 
@@ -67,7 +65,6 @@ function BongosPetButton:OnReceiveDrag()
 	if self.showEmpty or BongosActionConfig:IsQuickMoveKeyDown() then
 		self:SetChecked(false)
 		PickupPetAction(self:GetID())
-		self:UpdateVisibility()
 	end
 end
 
@@ -84,12 +81,6 @@ end
 function BongosPetButton:Update()
 	local action, subtext, texture, isToken, isActive, autoCastAllowed, autoCastEnabled = GetPetActionInfo(self:GetID())
 	local name = self:GetName()
-
-	if action then
-		self:Show()
-	elseif not self:ShowingEmpty() then
-		self:Hide()
-	end
 
 	self.isToken = isToken
 	self.tooltipSubtext = subtext
@@ -136,9 +127,9 @@ end
 
 function BongosPetButton:UpdateVisibility()
 	if self:ShowingEmpty() or GetPetActionInfo(self:GetID()) then
-		self:Show()
+		self:SetAttribute("showstates", "1")
 	else
-		self:Hide()
+		self:SetAttribute("showstates", "!*")
 	end
 end
 
