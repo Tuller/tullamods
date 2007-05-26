@@ -128,13 +128,14 @@ end
 
 local function Bar_OnCreate(self)
 	self.ShowMenu = Bar_ShowMenu
-
+	self:EnableMouse(false)
 	self:Attach(MinimapCluster)
 	self:SetWidth(MinimapCluster:GetWidth())
 	
 	--make the minimap scrollable via the mousewheel
 	local scrollFrame = CreateFrame("Frame", nil, Minimap)
-	scrollFrame:SetAllPoints(scrollFrame:GetParent())
+	scrollFrame:SetAllPoints(Minimap)
+	scrollFrame:EnableMouse(false)
 	scrollFrame:EnableMouseWheel(true)
 	scrollFrame:SetScript("OnMouseWheel", function(self, arg1)
 		if (Minimap:GetZoom() + arg1 <= Minimap:GetZoomLevels()) and (Minimap:GetZoom() + arg1 >= 0) then
