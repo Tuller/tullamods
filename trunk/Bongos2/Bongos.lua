@@ -57,9 +57,6 @@ function Bongos:Enable()
 end
 
 function Bongos:UpdateVersion()
-	if(self.profile.version == "1.0") then
-		self.profile.showMinimap = true
-	end
 	self.profile.version = CURRENT_VERSION
 	self:Print(format(L.Updated, self.profile.version))
 end
@@ -137,7 +134,7 @@ function Bongos:MatchProfile(name)
 
 	for i, k in ipairs(profileList) do
 		local key = k:lower()
-		if key == nameRealm or key == name then
+		if key == name or key == nameRealm then
 			return k
 		end
 	end
@@ -296,25 +293,6 @@ end
 function Bongos:PrintVersion()
 	self:Print(self.profile.version)
 end
-
--- function Bongos:SetFadeMode(args, mode)
-	-- local mode = tonumber(mode)
-	-- self:Print("setfademode", args, mode)
-
-	-- for _,barList in pairs({strsplit(" ", args)}) do
-		-- BBar:ForBar(barList, "SetFadeMode", mode)
-	-- end
--- end
-
--- function Bongos:SetFadeAlpha(args)
-	-- local alpha = tonumber(alpha)
-
-	-- if alpha and alpha >= 0 and alpha <= 1 then
-		-- for _,barList in pairs({strsplit(" ", args)}) do
-			-- BBar:ForBar(barList "SetFadeAlpha", alpha)
-		-- end
-	-- end
--- end
 
 function Bongos:ShowBars(args)
 	for _, barList in pairs({strsplit(" ", args)}) do

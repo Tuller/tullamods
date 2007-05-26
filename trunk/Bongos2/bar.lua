@@ -19,14 +19,15 @@ local function GetRelativeCoords(frame, scale)
 	return (frame:GetLeft() or 0) * ratio, (frame:GetTop() or 0) * ratio
 end
 
-local function Bar_New(id, type)
+local function Bar_New(id, secure, strata)
 	local bar
-	if(type == 1) then
-		bar = setmetatable(CreateFrame("Frame", nil, UIParent, "SecureFrameTemplate"), Bar_MT)
-	elseif(type == 2) then
+	if(secure) then
 		bar = setmetatable(CreateFrame("Frame", nil, UIParent, "SecureStateHeaderTemplate"), Bar_MT)
 	else
 		bar = setmetatable(CreateFrame("Frame", nil, UIParent), Bar_MT)
+	end
+	if(strata) then
+		bar:SetFrameStrata(strata)
 	end
 
 	bar.id = id
@@ -52,12 +53,12 @@ end
 
 --[[ Usable Functions ]]--
 
-function BBar:Create(id, OnCreate, OnDelete, defaults, type)
+function BBar:Create(id, OnCreate, OnDelete, defaults, strata, secure)
 	local id = tonumber(id) or id
 	assert(id, "id expected")
 	assert(not active[id], format("BBar \"%s\" is already in use", id))
 
-	local bar = Bar_Restore(id) or Bar_New(id, type)
+	local bar = Bar_Restore(id) or Bar_New(id, secure, strata)
 	bar.OnDelete = OnDelete
 
 	bar:LoadSettings(defaults)
@@ -73,32 +74,23 @@ function BBar:Create(id, OnCreate, OnDelete, defaults, type)
 	return bar
 end
 
-function BBar:CreateSecure(id, OnCreate, OnDelete, defaults)
-	return self:Create(id, OnCreate, OnDelete, defaults, 1)
+function BBar:CreateHeader(id, OnCreate, OnDelete, defaults, strata)
+	return self:Create(id, OnCreate, OnDelete, defaults, strata, true)
 end
 
-function BBar:CreateHeader(id, OnCreate, OnDelete, defaults)
-	return self:Create(id, OnCreate, OnDelete, defaults, 2)
-end
-
-function BBar:Destroy(removeSettings)
+function BBar:Destroy()
 	active[self.id] = nil
 
 	if self.OnDelete then
 		self:OnDelete()
 	end
 
-	if removeSettings then
-		Bongos:SetBarSets(self.id, nil)
-	end
 	self.sets = nil
 	self.dragFrame:Hide()
 	self:SetParent(nil)
 	self:ClearAllPoints()
 	self:SetUserPlaced(false)
 	self:Hide()
-
-	self:ForAll("Reanchor")
 
 	unused[self.id] = self
 end
@@ -123,6 +115,7 @@ function BBar:LoadSettings(defaults)
 		self:Unlock()
 	end
 end
+
 
 --[[ Lock/Unlock ]]--
 
@@ -168,9 +161,10 @@ function BBar:GetFrameAlpha()
 end
 
 function BBar:Attach(frame)
+	frame:SetFrameStrata(self:GetFrameStrata())
+	frame:SetFrameLevel(0)
 	frame:SetParent(self)
 	frame:SetAlpha(1)
-	frame:SetFrameLevel(0)
 end
 
 

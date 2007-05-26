@@ -99,10 +99,10 @@ function BDragFrame_New(parent)
 	frame.parent = parent
 	frame.UpdateColor = DragFrame_UpdateColor
 
-	frame:SetToplevel(true)
 	frame:SetClampedToScreen(true)
 	frame:SetFrameStrata(parent:GetFrameStrata())
 	frame:SetAllPoints(parent)
+	frame:SetFrameLevel(6)
 
 	local bg = frame:CreateTexture(nil, "BACKGROUND")
 	bg:SetTexture("Interface\\Tooltips\\UI-Tooltip-Background")

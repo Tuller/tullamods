@@ -4,17 +4,18 @@ Bongos2 Version History
 	Fixed a bug causing the minimap button to not hide (seriously)
 	Fixed a bug causing right click selfcast to not work (seriously)
 	Fixed a bug causing duplicate frames to be created after loading a profile
+	Fixed a bug causing frames to not attach to their anchors after loading a profile
 
-	Modified the pet bar to be blizzard controlled
 	Modified the menu bar code to remove a possible source of tainting
 	Modified the main actionbar hiding code to remove a possible source of tainting
+	Modified the right click menus to be able to be movied
 
 	Altered the stateheaders for actionbars to be dynamically generated
 	Altered stance names for actionbars to be dynamically generated
-	Recoded the pet bar to be controlled by blizzard functions, instead of my own
-
 	Added in settings for modifier (ctrl, alt, shift) paging
-	Added in a basic experience bar
+
+	Reimplemented the Bongos experience bar
+	Reimplemented the Bongos map bar
 
 1.2
 	Fixed a bug causing the minimap button to not hide
