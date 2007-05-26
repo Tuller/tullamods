@@ -3,10 +3,13 @@
 		Scripts for the Bongos XP bar
 --]]
 
+BongosXP = Bongos:NewModule("Bongos-XP")
+
 local DEFAULT_HEIGHT = 14
 local DEFAULT_SIZE = 0.75
-local REP_FORMAT = '%d / %d'
-local XP_FORMAT = '%d tnl'
+local REP_FORMAT = "%s:  %s / %s"
+local REST_FORMAT = "%s / %s (+%s)"
+local XP_FORMAT = "%s / %s"
 
 local xpBar, restBar, text, bg
 local WatchRep, WatchXP
@@ -27,7 +30,7 @@ local function OnRepEvent()
 			xpBar:SetMinMaxValues(0, max)
 			xpBar:SetValue(value)
 
-			text:SetText(format(REP_FORMAT, value, max))
+			text:SetText(format(REP_FORMAT, name, value, max))
 		else
 			WatchXP()
 		end
@@ -56,12 +59,18 @@ local function OnXPEvent()
 			xpBar:SetValue(value)
 
 			restBar:SetMinMaxValues(0, max)
-			if GetXPExhaustion() then
-				restBar:SetValue(value + GetXPExhaustion())
+			local rest = GetXPExhaustion()
+			if rest then
+				restBar:SetValue(value + rest)
+				if(rest > 10000) then
+					text:SetText(format(REST_FORMAT, value, max, format("%.1fk", rest / 1000)))
+				else
+					text:SetText(format(REST_FORMAT, value, max, rest))
+				end
 			else
 				restBar:SetValue(0)
+				text:SetText(format(XP_FORMAT, value, max))
 			end
-			text:SetText(format(XP_FORMAT, max - value))
 		end
 	end
 end
@@ -82,9 +91,10 @@ function WatchXP()
 	OnXPEvent()
 end
 
+
 --[[ Configuration ]]--
 
-local function SetSize(self, percent)
+local function Bar_SetSize(self, percent)
 	if self.sets.vertical then
 		self:SetHeight(GetScreenHeight() * (percent or DEFAULT_SIZE))
 	else
@@ -94,7 +104,7 @@ local function SetSize(self, percent)
 end
 
 --yes, a weird name
-local function SetHeight(self, value)
+local function Bar_SetHeight(self, value)
 	if self.sets.vertical then
 		self:SetWidth(value or DEFAULT_HEIGHT)
 	else
@@ -104,7 +114,7 @@ local function SetHeight(self, value)
 end
 
 --set how tall/wide the xp bar should be
-local function SetVertical(self, vertical)
+local function Bar_SetVertical(self, vertical)
 	if vertical then
 		xpBar:SetOrientation("VERTICAL")
 		xpBar:SetStatusBarTexture(BONGOS_XP_VERTICAL_TEXTURE)
@@ -123,134 +133,140 @@ local function SetVertical(self, vertical)
 		self.sets.vertical = nil
 	end
 
-	SetSize(self, self.sets.size)
-	SetHeight(self, self.sets.height)
+	Bar_SetSize(self, self.sets.size)
+	Bar_SetHeight(self, self.sets.height)
 end
 
 
 --[[ Menu Functions ]]--
 
-local function CreateConfigMenu(name, frame)
-	local menu = CreateFrame("Button", name, UIParent, "BongosRightClickMenu")
+local function Bar_CreateMenu(frame)
+	local name = format("BongosMenu%s", frame.id)
+	local menu = BongosMenu:Create(name)
 	menu.frame = frame
-	menu:SetText('XP Bar')
-	menu:SetWidth(220)
-	menu:SetHeight(240)
-
+	menu.text:SetText("XP Bar")
+	
 	--checkbuttons
-	local vertical = CreateFrame("CheckButton", name .. 'Vertical', menu, "GooeyCheckButton")
-	vertical:SetScript("OnClick", function() 
-		SetVertical(frame, this:GetChecked())
+	local vertical = menu:CreateCheckButton(name .. "Vertical")
+	vertical:SetScript("OnShow", function(self) self:SetChecked(frame.sets.vertical) end)
+	vertical:SetScript("OnClick",  function(self)
+		Bar_SetVertical(frame, self:GetChecked())
 
-		if this:GetChecked() then
-			getglobal(name .. "SizeText"):SetText(BONGOS_XP_HEIGHT)
-			getglobal(name .. "HeightText"):SetText(BONGOS_XP_WIDTH)
+		if self:GetChecked() then
+			getglobal(name .. "SizeText"):SetText("Height")
+			getglobal(name .. "HeightText"):SetText("Width")
 		else
-			getglobal(name .. "SizeText"):SetText(BONGOS_XP_WIDTH)
-			getglobal(name .. "HeightText"):SetText(BONGOS_XP_HEIGHT)
+			getglobal(name .. "SizeText"):SetText("Width")
+			getglobal(name .. "HeightText"):SetText("Height")
 		end
 	end)
-	vertical:SetPoint("TOPLEFT", menu, "TOPLEFT", 6, -28)
-	vertical:SetText(BONGOS_XP_VERTICAL)
-
-	--sliders
-	local opacity = CreateFrame("Slider", name .. "Opacity", menu, "BongosOpacitySlider")
-	opacity:SetPoint("BOTTOM", menu, "BOTTOM", 0, 24)
-
-	local scale = CreateFrame("Slider", name .. "Scale", menu, "BongosScaleSlider")
-	scale:SetPoint("BOTTOM", opacity, "TOP", 0, 24)
-
-	local height = CreateFrame("Slider", name .. "Height", menu, "BongosSlider")
-	height:SetPoint("BOTTOM", scale, "TOP", 0, 24)
-	height:SetScript("OnValueChanged", function()
-		if not menu.onShow then
-			SetHeight(frame, this:GetValue())
+	vertical:SetText("Vertical")
+	
+	--height slider
+	local height = menu:CreateSlider(name .. "Height")
+	height:SetScript("OnShow", function(self)
+		if(frame.sets.vertical) then
+			getglobal(self:GetName() .. "Text"):SetText("Width")
+		else
+			getglobal(self:GetName() .. "Text"):SetText("Height")
 		end
-		getglobal(this:GetName() .. "ValText"):SetText(this:GetValue())
+		self:SetValue(frame.sets.height or DEFAULT_HEIGHT)
+	end)
+	height:SetScript("OnValueChanged", function(self, value)
+		if not menu.onShow then
+			Bar_SetHeight(frame, value)
+		end
+		getglobal(self:GetName() .. "ValText"):SetText(value)
 	end)
 	height:SetValueStep(1)
 	height:SetMinMaxValues(0, 128)
 	getglobal(name .. "HeightLow"):SetText(0)
 	getglobal(name .. "HeightHigh"):SetText(128)
 
-	local size = CreateFrame("Slider", name .. "Size", menu, "BongosSlider")
-	size:SetPoint("BOTTOM", height, "TOP", 0, 24)
-	size:SetScript("OnValueChanged", function()
-		if not menu.onShow then
-			SetSize(frame, this:GetValue() / 100)
+	--size slider
+	local size = menu:CreateSlider(name .. "Size")
+	size:SetScript("OnShow", function(self)
+		if(frame.sets.vertical) then
+			getglobal(self:GetName() .. "Text"):SetText("Height")
+		else
+			getglobal(self:GetName() .. "Text"):SetText("Width")
 		end
-		getglobal(this:GetName() .. "ValText"):SetText(this:GetValue())
+		self:SetValue((frame.sets.size or DEFAULT_SIZE) * 100)
+	end)
+	size:SetScript("OnValueChanged", function(self, value)
+		if not menu.onShow then
+			Bar_SetSize(frame, value / 100)
+		end
+		getglobal(this:GetName() .. "ValText"):SetText(value)
 	end)
 	size:SetValueStep(1)
 	size:SetMinMaxValues(0, 100)
 	getglobal(name .. "SizeLow"):SetText("0%")
 	getglobal(name .. "SizeHigh"):SetText("100%")
-	
+
 	return menu
 end
 
 --Called when the right click menu is shown, loads the correct values to the checkbuttons/sliders/text
-local function ShowMenu(self)
-	local name = 'BongosXPBarMenu'
-	local menu = getglobal(name) or CreateConfigMenu(name, self)
+local function Bar_ShowMenu(self)
+	if not self.menu then
+		self.menu = Bar_CreateMenu(self)
+	end
 
-	menu.onShow = 1
-
-	getglobal(name .. 'Vertical'):SetChecked(self.sets.vertical)
-	if self.sets.vertical then
-		getglobal(name .. 'SizeText'):SetText(BONGOS_XP_HEIGHT)
-		getglobal(name .. 'HeightText'):SetText(BONGOS_XP_WIDTH)
-	else
-		getglobal(name .. 'SizeText'):SetText(BONGOS_XP_WIDTH)
-		getglobal(name .. 'HeightText'):SetText(BONGOS_XP_HEIGHT)
-	end	
-	
-	getglobal(name .. 'Size'):SetValue((self.sets.size or DEFAULT_SIZE) * 100)
-	getglobal(name .. 'Height'):SetValue(self.sets.height or DEFAULT_HEIGHT)
-	
-	self:DisplayMenu(menu)
+	local menu = self.menu
+	menu.onShow = true
+	self:PlaceMenu(menu)
 	menu.onShow = nil
 end
 
 
 --[[ Startup Functions ]]--
 
-local function OnCreate(self)
-	self.ShowMenu = ShowMenu
-	self:SetFrameStrata('BACKGROUND')
+local function Bar_OnCreate(self)
+	self.ShowMenu = Bar_ShowMenu
+	self:SetFrameStrata("BACKGROUND")
 	self:SetFrameLevel(0)
 
-	restBar = CreateFrame('StatusBar', nil, self)
+	restBar = CreateFrame("StatusBar", nil, self)
 	restBar:SetAllPoints(self)
-	restBar:SetAlpha(self:GetAlpha())
 	restBar:SetClampedToScreen(true)
 
 	bg = restBar:CreateTexture(nil, "BACKGROUND")
 	bg:SetAllPoints(restBar)
 
-	xpBar = CreateFrame('StatusBar', nil, restBar)
+	xpBar = CreateFrame("StatusBar", nil, restBar)
 	xpBar:EnableMouse(true)
 	xpBar:SetClampedToScreen(true)
 	xpBar:SetAllPoints(restBar)
-	xpBar:SetAlpha(restBar:GetAlpha())
-	xpBar:SetScript('OnEnter', function() text:Show() end)
-	xpBar:SetScript('OnLeave', function() text:Hide() end)
+	xpBar:SetScript("OnEnter", function() text:Show() end)
+	xpBar:SetScript("OnLeave", function() text:Hide() end)
 
 	text = xpBar:CreateFontString(nil, "OVERLAY")
 	text:SetFontObject(GameFontHighlight)
 	text:SetNonSpaceWrap(false)
 	text:SetAllPoints(xpBar)
-	text:SetJustifyH('CENTER')
-	text:SetJustifyV('CENTER')
+	text:SetJustifyH("CENTER")
+	text:SetJustifyV("CENTER")
 	text:Hide()
 end
 
-Bongos.AddStartup(function()
-	local bar = BBar.Create('xp', OnCreate)
+function BongosXP:Load()
+	local bar = BBar:Create("xp", Bar_OnCreate)
 	if not bar:IsUserPlaced() then
 		bar:SetPoint("TOP", UIParent, "TOP", 0, -32)
 	end
-	SetVertical(bar, bar.sets.vertical)
 
-	if GetWatchedFactionInfo() then WatchRep() else WatchXP() end
-end)
+	Bar_SetVertical(bar, bar.sets.vertical)
+
+	if GetWatchedFactionInfo() then 
+		WatchRep() 
+	else 
+		WatchXP()
+	end
+
+	self.bar = bar
+end
+
+function BongosXP:Unload()
+	self.bar:Destroy()
+end

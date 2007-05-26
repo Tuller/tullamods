@@ -1,7 +1,7 @@
-## Interface: 20003
-## Title: Bongos_XP
+## Interface: 20100
+## Title: Bongos2 XP
 ## Notes: A movable experience and reputation bar
 ## Author: Tuller
-## Dependencies: Bongos
+## Dependencies: Bongos2
 localization.lua
 bar.lua
