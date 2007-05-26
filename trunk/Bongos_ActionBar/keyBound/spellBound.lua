@@ -1,6 +1,6 @@
 local CastButton = {}
 
-function CastButton:Load()
+function SpellBound_Load()
 	hooksecurefunc("SpellButton_OnEnter", function()
 		local id = SpellBook_GetSpellID(this:GetID())
 		local bookType = SpellBookFrame.bookType
