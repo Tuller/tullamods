@@ -66,4 +66,6 @@ function CastButton:GetHotkey()
 	return KeyBound:ToShortKey(GetBindingKey(self:GetBindAction()))
 end
 
-CastButton:Load()
+local f = CreateFrame("Frame")
+f:SetScript("OnEvent", function() CastButton:Load() end)
+f:RegisterEvent("PLAYER_LOGIN")

@@ -229,7 +229,7 @@ function KeyBound:Enable()
 end
 
 function KeyBound:PLAYER_REGEN_ENABLED()
-	if self.wasEnabled or self.enabled then
+	if self.wasEnabled then
 		self:Show()
 		UIErrorsFrame:AddMessage(L.CombatBindingsEnabled, 1, 0, 0, 1, UIERRORS_HOLD_TIME)
 	end
@@ -239,16 +239,16 @@ end
 
 function KeyBound:PLAYER_REGEN_DISABLED()
 	self.inCombat = true
-	self.wasEnabled = self.enabled
-	if self.wasEnabled then
+	if self.enabled then
 		self:Hide()
+		self.wasEnabled = true
 		UIErrorsFrame:AddMessage(L.CombatBindingsDisabled, 1, 0, 0, 1, UIERRORS_HOLD_TIME)
 	end
 end
 
 --usable functions
 function KeyBound:Toggle()
-	if(self.enabled) then
+	if(self.wasEnabled or self.enabled) then
 		self:Hide()
 		UIErrorsFrame:AddMessage(L.Disabled, 1, 1, 0, 1, UIERRORS_HOLD_TIME)
 	else
@@ -272,6 +272,7 @@ end
 
 function KeyBound:Hide()
 	self.enabled = nil
+	self.wasEnabled = nil
 	self:Set(nil)
 	self:TriggerMessage("KEYBOUND_DISABLED")
 end

@@ -2,16 +2,14 @@
 	BongosActionButton - A Bongos ActionButton
 --]]
 
-function BongosActionButton_Init()
-
-BongosActionButton = CreateFrame("CheckButton", nil, nil, "SecureFrameTemplate")
+BongosActionButton = CreateFrame("CheckButton")
 local Button_MT = {__index = BongosActionButton}
 
 --constants
 local MAX_BUTTONS = BONGOS_MAX_BUTTONS
 local CLASS = BONGOS_CLASS
 local MAX_PAGES = BONGOS_MAX_PAGES
-local hasStance = (CLASS == "DRUID" or CLASS == "ROGUE" or CLASS == "WARRIOR" or CLASS == "PRIEST")
+local hasStance = (CLASS == "DRUID" or CLASS == "ROGUE" or CLASS == "WARRIOR" or CLASS == "ROGUE")
 
 local BUTTON_NAME = "BongosActionButton%d"
 local SIZE = 36
@@ -32,6 +30,7 @@ local function OnReceiveDrag(self) self:OnReceiveDrag() end
 local function OnEnter(self) self:OnEnter() end
 local function OnLeave(self) self:OnLeave() end
 local function OnHide(self) self.id = nil end
+
 local function OnAttributeChanged(self, var, val)
 	local parent = self:GetParent()
 	if(parent and parent:IsShown() and var == "state-parent") then
@@ -406,7 +405,7 @@ function BongosActionButton:UpdateStates()
 	local parent = self:GetParent()
 
 	if(hasStance) then
-		local maxState = ((CLASS == "PRIEST") and 1) or GetNumShapeshiftForms() or 0
+		local maxState = (CLASS == "PRIEST" and 1) or GetNumShapeshiftForms()
 
 		for i = 1, maxState do
 			local state = format("s%d", i)
@@ -490,7 +489,7 @@ function BongosActionButton:UpdateVisibility()
 		if HasAction(id) then newstates = 0 end
 		
 		if(hasStance) then
-			local maxState = ((CLASS == "PRIEST") and 1) or GetNumShapeshiftForms() or 0
+			local maxState = (CLASS == "PRIEST" and 1) or GetNumShapeshiftForms()
 			
 			for i = 1, maxState do
 				local action = self:GetAttribute("*action-s" .. i) or id
@@ -595,6 +594,4 @@ end
 
 function BongosActionButton:Get(id)
 	return buttons[id]
-end
-
 end

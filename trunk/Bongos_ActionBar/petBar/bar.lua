@@ -106,7 +106,7 @@ end
 --[[ Events ]]--
 
 function BongosPetBar:Load()
-	self.bar = BBar:CreateSecure("pet", Bar_OnCreate, nil, {["y"] = 591, ["x"] = 553})
+	self.bar = BBar:Create("pet", Bar_OnCreate, nil, {["y"] = 591, ["x"] = 553})
 	self.bar:Layout()
 
 	PetActionBarFrame:RegisterEvent("PLAYER_CONTROL_LOST")

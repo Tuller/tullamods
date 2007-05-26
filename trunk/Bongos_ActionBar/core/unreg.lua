@@ -60,8 +60,12 @@ local function UnregisterPetBar()
 	end
 end
 
-MainMenuBar:Hide()
-ExhaustionTick:UnregisterAllEvents()
-UnregisterActionBars()
-UnregisterShapeshiftBar()
-UnregisterPetBar()
+local f = CreateFrame("Frame")
+f:SetScript("OnEvent", function()
+	MainMenuBar:Hide()
+	ExhaustionTick:UnregisterAllEvents()
+	UnregisterActionBars()
+	UnregisterShapeshiftBar()
+	UnregisterPetBar()
+end)
+f:RegisterEvent("PLAYER_LOGIN")

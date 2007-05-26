@@ -2,9 +2,7 @@
 	Class Button
 --]]
 
-function BongosClassButton_Init()
-
-BongosClassButton = CreateFrame("CheckButton", nil, nil, "SecureFrameTemplate")
+BongosClassButton = CreateFrame("CheckButton")
 local Button_mt = {__index = BongosClassButton}
 
 local NORMALTEX_RATIO = 1.833333334
@@ -159,6 +157,4 @@ end
 
 function BongosClassButton:Get(id)
 	return buttons[id]
-end
-
 end

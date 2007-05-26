@@ -118,7 +118,7 @@ function BongosClassBar:Load()
 	self:RegisterEvent("UNIT_ENERGY", "UpdateAll")
 	self:RegisterEvent("UPDATE_BINDINGS", "UpdateBindings")
 
-	self.bar = BBar:CreateSecure("class", Bar_OnCreate, nil, {["y"] = 651, ["x"] = 703})
+	self.bar = BBar:Create("class", Bar_OnCreate, nil, {["y"] = 651, ["x"] = 703})
 	BongosClassButton:ForAll("ShowHotkey", BongosActionConfig:ShowingHotkeys())
 end
 

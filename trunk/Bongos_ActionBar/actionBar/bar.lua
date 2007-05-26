@@ -2,10 +2,8 @@
 	BActionBar - A Bongos Actionbar
 --]]
 
-function BActionBar_Init()
-
 --basically, BActionBar inherits all methods from BBar
-BActionBar = setmetatable(CreateFrame("Frame", nil, nil, "SecureFrameTemplate"), {__index = BBar})
+BActionBar = setmetatable(CreateFrame("Frame"), {__index = BBar})
 local Bar_MT = {__index = BActionBar}
 
 local L = BONGOS_LOCALS
@@ -77,7 +75,7 @@ function BActionBar:Create(id)
 		end
 	end
 
-	local bar = setmetatable(BBar:CreateSecure(id, nil, nil, defaults), Bar_MT)
+	local bar = setmetatable(BBar:CreateHeader(id, nil, nil, defaults), Bar_MT)
 	bar:SetAttribute("statemap-state", "$input")
 	bar:SetAttribute("statebutton", stateButton1)
 	bar:SetAttribute("statebutton2", stateButton2)
@@ -142,7 +140,7 @@ function BActionBar:UpdateStateHeader()
 	end
 
 	if(hasStance) then
-		local maxState = ((CLASS == "PRIEST") and 1) or GetNumShapeshiftForms()
+		local maxState = (CLASS == "PRIEST" and 1) or GetNumShapeshiftForms()
 		
 		--rogue, priest, warrior states
 		if(CLASS == "DRUID") then
@@ -237,7 +235,8 @@ local function StanceSlider_OnShow(self)
 	self.onShow = true
 	local frame = self:GetParent().frame
 
-	local maxOffset = BongosActionBar:GetNumber() - 1
+	local maxOffset = floor(MAX_BUTTONS/self:GetSize()) - 1
+	-- local maxOffset = BongosActionBar:GetNumber() - 1
 	self:SetMinMaxValues(0, maxOffset)
 	self:SetValue(frame.sets[self.id] or 0)
 	getglobal(self:GetName() .. "High"):SetText(maxOffset)
@@ -339,7 +338,7 @@ local function Panel_AddStanceSliders(panel)
 
 	if(hasStance) then
 		if(CLASS == "PRIEST") then
-			Panel_AddStanceSlider(panel, "s" .. i, L.ShadowForm)
+			Panel_AddStanceSlider(panel, "s1", L.ShadowForm)
 		else
 			if(CLASS == "DRUID") then
 				panel.s7 = Panel_AddStanceSlider(panel, "s7", L.Prowl)
@@ -578,7 +577,7 @@ function BActionBar:SetRightClickUnit(unit)
 	end
 	
 	if(hasStance) then
-		local maxState = ((CLASS == "PRIEST") and 1) or GetNumShapeshiftForms() or 0
+		local maxState = (CLASS == "PRIEST" and 1) or GetNumShapeshiftForms()
 
 		for i = 1, maxState do
 			self:SetAttribute(format("*unit-s%ds", i), unit)
@@ -590,6 +589,4 @@ function BActionBar:SetRightClickUnit(unit)
 	end
 	
 	self:SetAttribute("*unit-helps", unit)
-end
-
 end

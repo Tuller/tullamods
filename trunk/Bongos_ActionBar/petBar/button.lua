@@ -4,9 +4,7 @@
 		Should work exactly like the normal pet action buttons, but with a modified appearance
 --]]
 
-function BongosPetButton_Init()
-
-BongosPetButton = CreateFrame("CheckButton", nil, nil, "SecureFrameTemplate")
+BongosPetButton = CreateFrame("CheckButton")
 local Button_mt = {__index = BongosPetButton}
 
 --[[ Constructorish ]]--
@@ -129,6 +127,4 @@ function BongosPetButton:ForAll(method, ...)
 		local action = button[method]
 		action(button, ...)
 	end
-end
-
 end
