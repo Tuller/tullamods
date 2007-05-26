@@ -440,9 +440,10 @@ end
 
 function Bagnon:RegisterSlashCommands()
 	local slash = self:InitializeSlashCommand(L.Commands, "BAGNON", "bagnon", "bgn")
-	slash:RegisterSlashHandler(format("menu: %s", L.ShowMenuDesc), "menu", "ShowMenu")
-	slash:RegisterSlashHandler(format("bags: %s", L.ShowBagsDesc), "bags", "ToggleInventory")
-	slash:RegisterSlashHandler(format("bank: %s", L.ShowBankDesc), "bank", "ToggleBank")
+	slash:RegisterSlashHandler(format("/bagnon: %s", L.ShowMenuDesc), "", "ShowMenu")
+	slash:RegisterSlashHandler(format("menu: %s", L.ShowMenuDesc), "^menu$", "ShowMenu")
+	slash:RegisterSlashHandler(format("bags: %s", L.ShowBagsDesc), "^bags$", "ToggleInventory")
+	slash:RegisterSlashHandler(format("bank: %s", L.ShowBankDesc), "^bank$", "ToggleBank")
 	self.slash = slash
 end
 
