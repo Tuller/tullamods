@@ -235,8 +235,7 @@ local function StanceSlider_OnShow(self)
 	self.onShow = true
 	local frame = self:GetParent().frame
 
-	local maxOffset = floor(MAX_BUTTONS/self:GetSize()) - 1
-	-- local maxOffset = BongosActionBar:GetNumber() - 1
+	local maxOffset = BongosActionBar:GetNumber() - 1
 	self:SetMinMaxValues(0, maxOffset)
 	self:SetValue(frame.sets[self.id] or 0)
 	getglobal(self:GetName() .. "High"):SetText(maxOffset)
