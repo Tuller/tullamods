@@ -30,10 +30,8 @@ local function OnReceiveDrag(self) self:OnReceiveDrag() end
 local function OnEnter(self) self:OnEnter() end
 local function OnLeave(self) self:OnLeave() end
 local function OnHide(self) self.id = nil end
-
 local function OnAttributeChanged(self, var, val)
-	local parent = self:GetParent()
-	if(parent and parent:IsShown() and var == "state-parent") then
+	if(var == "state-parent" or var == "statehidden") then
 		self.id = nil
 	end
 end
@@ -43,13 +41,14 @@ local function OnEvent(self, event, arg1)
 		self:UpdateHotkey()
 	end
 
-	local parent = self:GetParent()
-	if(not parent:IsShown()) then return end
+	if(not self:GetParent():IsShown()) then return end
 
 	if(event == "ACTIONBAR_SLOT_CHANGED") then
-		if(self:GetPagedID() == arg1) then
+		if(arg1 == 0 or self:GetPagedID() == arg1) then
 			self:Update()
 		end
+	elseif(event == "ACTIONBAR_PAGE_CHANGED" or event == "UPDATE_SHAPESHIFT_FORM" or event == "UPDATE_STEALTH") then
+		self:Update(true)
 	end
 
 	if not(self:IsShown() and HasAction(self:GetPagedID())) then return end
@@ -95,16 +94,15 @@ function BongosActionButton:Create(id)
 	button.macro = getglobal(name .. "Name")
 	button.count = getglobal(name .. "Count")
 
+	button:SetScript("OnAttributeChanged", OnAttributeChanged)
 	button:SetScript("OnUpdate", OnUpdate)
 	button:SetScript("PostClick", PostClick)
 	button:SetScript("OnDragStart", OnDragStart)
 	button:SetScript("OnReceiveDrag", OnReceiveDrag)
 	button:SetScript("OnEnter", OnEnter)
 	button:SetScript("OnLeave", OnLeave)
-	-- button:SetScript("OnShow", OnShow)
 	button:SetScript("OnHide", OnHide)
 	button:SetScript("OnEvent", OnEvent)
-	button:SetScript("OnAttributeChanged", OnAttributeChanged)
 
 	button:SetAttribute("type", "action")
 	button:SetAttribute("action", id)
@@ -154,6 +152,10 @@ function BongosActionButton:RegisterEvents()
 	self:RegisterEvent("PLAYER_LEAVE_COMBAT")
 	self:RegisterEvent("START_AUTOREPEAT_SPELL")
 	self:RegisterEvent("STOP_AUTOREPEAT_SPELL")
+
+	self:RegisterEvent("ACTIONBAR_PAGE_CHANGED")
+	self:RegisterEvent("UPDATE_SHAPESHIFT_FORM")
+	self:RegisterEvent("UPDATE_STEALTH")
 end
 
 --hide the button
@@ -319,14 +321,8 @@ end
 
 --Update item count
 function BongosActionButton:UpdateCount()
-	local text = self.count
 	local action = self:GetPagedID()
-
-	if IsConsumableAction(action) then
-		text:SetText(GetActionCount(action))
-	else
-		text:SetText("")
-	end
+	self.count:SetText((IsConsumableAction(action) and GetActionCount(action)) or "")
 end
 
 --Update if a button is checked or not
@@ -420,7 +416,7 @@ function BongosActionButton:UpdateStates()
 				self:SetAttribute("*action-" .. selfState, nil)
 			end
 		end
-		
+
 		if(CLASS == "DRUID") then
 			local state = format("s%d", 7)
 			local selfState = format("s%ds", 7)
@@ -487,10 +483,10 @@ function BongosActionButton:UpdateVisibility()
 	else
 		local id = self:GetAttribute("action")
 		if HasAction(id) then newstates = 0 end
-		
+
 		if(hasStance) then
 			local maxState = (CLASS == "PRIEST" and 1) or GetNumShapeshiftForms()
-			
+
 			for i = 1, maxState do
 				local action = self:GetAttribute("*action-s" .. i) or id
 				if HasAction(action) then
@@ -578,7 +574,7 @@ function BongosActionButton:GetPagedID()
 	if not(self.id) then
 		self.id = SecureButton_GetModifiedAttribute(self, "action", SecureStateChild_GetEffectiveButton(self))
 	end
-	return tonumber(self.id) or 1
+	return self.id
 end
 
 function BongosActionButton:ForAll(method, ...)

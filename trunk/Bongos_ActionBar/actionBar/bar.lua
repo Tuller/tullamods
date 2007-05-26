@@ -141,7 +141,7 @@ function BActionBar:UpdateStateHeader()
 
 	if(hasStance) then
 		local maxState = (CLASS == "PRIEST" and 1) or GetNumShapeshiftForms()
-		
+
 		--rogue, priest, warrior states
 		if(CLASS == "DRUID") then
 			local hasProwl = self:GetStateOffset("s7")
@@ -263,7 +263,7 @@ local function Panel_AddStanceSlider(self, id, title)
 
 	getglobal(name .. "Text"):SetText(title)
 	getglobal(name .. "Low"):SetText(0)
-	
+
 	return slider
 end
 
@@ -575,7 +575,7 @@ function BActionBar:SetRightClickUnit(unit)
 	for i = 1, MAX_PAGES do
 		self:SetAttribute(format("*unit-p%ds", i), unit)
 	end
-	
+
 	if(hasStance) then
 		local maxState = (CLASS == "PRIEST" and 1) or GetNumShapeshiftForms()
 
@@ -587,6 +587,6 @@ function BActionBar:SetRightClickUnit(unit)
 			self:SetAttribute(format("*unit-s%ds", PROWL_STATE), unit)
 		end
 	end
-	
+
 	self:SetAttribute("*unit-helps", unit)
 end
