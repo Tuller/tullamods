@@ -82,7 +82,6 @@ end
 function BOptionsProfiles_CopyProfile()
 	if selected then
 		Bongos:CopyProfile(selected:GetText())
-		BOptionsProfilesScrollBar_Update()
 	end
 end
 
@@ -90,6 +89,7 @@ function BOptionsProfiles_DeleteProfile()
 	if selected then
 		Bongos:DeleteProfile(selected:GetText())
 		BOptionsProfilesScrollBar_Update()
+		BOptionsProfilesScrollBar_HighlightProfile(Bongos.db:GetCurrentProfile())
 	end
 end
 
