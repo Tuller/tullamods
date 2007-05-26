@@ -126,7 +126,7 @@ function BongosPetButton:UpdateCooldown()
 end
 
 function BongosPetButton:UpdateVisibility()
-	if self:ShowingEmpty() or GetPetActionInfo(self:GetID()) then
+	if not(UnitExists("pet")) or self:ShowingEmpty() or GetPetActionInfo(self:GetID()) then
 		self:SetAttribute("showstates", "1")
 	else
 		self:SetAttribute("showstates", "!*")
