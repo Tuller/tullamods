@@ -224,8 +224,6 @@ end
 
 local function Bar_OnCreate(self)
 	self.ShowMenu = Bar_ShowMenu
-	self:SetFrameStrata("BACKGROUND")
-	self:SetFrameLevel(0)
 
 	restBar = CreateFrame("StatusBar", nil, self)
 	restBar:SetAllPoints(self)
@@ -251,7 +249,7 @@ local function Bar_OnCreate(self)
 end
 
 function BongosXP:Load()
-	local bar = BBar:Create("xp", Bar_OnCreate)
+	local bar = BBar:Create("xp", Bar_OnCreate, nil, nil, "BACKGROUND")
 	if not bar:IsUserPlaced() then
 		bar:SetPoint("TOP", UIParent, "TOP", 0, -32)
 	end
