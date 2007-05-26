@@ -129,7 +129,6 @@ end
 local function Bar_OnCreate(self)
 	self.ShowMenu = Bar_ShowMenu
 
-	self:SetFrameStrata("BACKGROUND")
 	self:Attach(MinimapCluster)
 	self:SetWidth(MinimapCluster:GetWidth())
 	
@@ -145,7 +144,7 @@ local function Bar_OnCreate(self)
 end
 
 function BongosMapBar:Load()
-	local bar = BBar:Create("minimap", Bar_OnCreate)
+	local bar = BBar:Create("minimap", Bar_OnCreate, nil, nil, "BACKGROUND")
 	if not bar:IsUserPlaced() then
 		bar:SetPoint("TOPRIGHT", UIParent)
 	end
