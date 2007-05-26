@@ -25,7 +25,7 @@ local function OnCreate(self)
 end
 
 function BongosRollBar:Load()
-	local bar = BBar:Create("roll", OnCreate)
+	local bar = BBar:Create("roll", OnCreate, nil, nil, "DIALOG")
 
 	if not bar:IsUserPlaced() then
 		bar:SetPoint("LEFT", UIParent)
