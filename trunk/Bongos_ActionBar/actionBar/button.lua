@@ -6,6 +6,8 @@ BongosActionButton = CreateFrame("CheckButton")
 local Button_MT = {__index = BongosActionButton}
 
 --constants
+local ATTACK_BUTTON_FLASH_TIME = 1
+local TOOLTIP_UPDATE_TIME = 1
 local MAX_BUTTONS = BONGOS_MAX_BUTTONS
 local CLASS = BONGOS_CLASS
 local MAX_PAGES = BONGOS_MAX_PAGES
@@ -151,9 +153,11 @@ function BongosActionButton:RegisterEvents()
 	self:RegisterEvent("START_AUTOREPEAT_SPELL")
 	self:RegisterEvent("STOP_AUTOREPEAT_SPELL")
 
-	-- self:RegisterEvent("ACTIONBAR_PAGE_CHANGED")
-	-- self:RegisterEvent("UPDATE_SHAPESHIFT_FORM")
-	-- self:RegisterEvent("UPDATE_STEALTH")
+	if(Bongos.profile.fixEvents) then
+		self:RegisterEvent("ACTIONBAR_PAGE_CHANGED")
+		self:RegisterEvent("UPDATE_SHAPESHIFT_FORM")
+		self:RegisterEvent("UPDATE_STEALTH")
+	end
 end
 
 --hide the button
