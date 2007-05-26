@@ -6,6 +6,7 @@ Bongos2 Version History
 	Fixed a bug causing duplicate frames to be created after loading a profile
 	Fixed a bug causing frames to not attach to their anchors after loading a profile
 
+	Modified the pet bar code to have empty button hiding work more consistently
 	Modified the menu bar code to remove a possible source of tainting
 	Modified the main actionbar hiding code to remove a possible source of tainting
 	Modified the right click menus to be able to be movied
