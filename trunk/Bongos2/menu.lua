@@ -213,29 +213,6 @@ function BongosMenu:CreateAlphaSlider(name)
 	return slider
 end
 
---fading
--- local function FadeSlider_OnShow(self)
-	-- local alpha = select(2, self:GetParent().frame:GetFrameAlpha())
-	-- self:SetValue(alpha * 100)
--- end
-
--- local function FadeSlider_OnValueChanged(self, value)
-	-- local parent = self:GetParent()
-	-- if not parent.onShow then
-		-- parent.frame:SetFadeALpha(value / 100)
-	-- end
-	-- getglobal(self:GetName() .. "ValText"):SetText(value)
--- end
-
--- function BongosMenu:CreateFadeSlider(name)
-	-- local slider = self:CreateAlphaSlider(name)
-	-- getglobal(name .. "Text"):SetText("Faded Opacity")
-	-- slider:SetScript("OnShow", FadeSlider_OnShow)
-	-- slider:SetScript("OnValueChanged", FadeSlider_OnValueChanged)
-
-	-- return slider
--- end
-
 --spacing
 function BongosMenu:CreateSpacingSlider(name)
 	local slider = self:CreateSlider(name)
@@ -264,53 +241,3 @@ function BongosMenu:CreateCheckButton(name)
 
 	return button
 end
-
---fade when in combat
--- local function FadeInCombat_OnClick(self)
-	-- if self:GetChecked() then
-		-- self:GetParent().frame:SetFadeMode(1)
-	-- else
-		-- self:GetParent().frame:SetFadeMode(0)
-	-- end
-
-	-- local unfade = getglobal(self:GetParent():GetName() .. "FadeOutCombat")
-	-- unfade:SetChecked(false)
--- end
-
--- local function FadeInCombat_OnShow(self)
-	-- self:SetChecked(self:GetParent().frame.sets.fadeMode == 1)
--- end
-
--- function BongosMenu:CreateFadeInCombatButton(name)
-	-- local button = self:CreateCheckButton(name)
-	-- button:SetScript("OnClick", FadeInCombat_OnClick)
-	-- button:SetScript("OnShow", FadeInCombat_OnShow)
-	-- button:SetText("Fade In Combat")
-
-	-- return button
--- end
-
---fade out of combat
--- local function FadeOutCombat_OnClick(self)
-	-- if self:GetChecked() then
-		-- self:GetParent().frame:SetFadeMode(2)
-	-- else
-		-- self:GetParent().frame:SetFadeMode(0)
-	-- end
-
-	-- local fade = getglobal(self:GetParent():GetName() .. "FadeInCombat")
-	-- fade:SetChecked(false)
--- end
-
--- local function FadeOutCombat_OnShow(self)
-	-- self:SetChecked(self:GetParent().frame.sets.fadeMode == 2)
--- end
-
--- function BongosMenu:CreateFadeOutCombatButton(name)
-	-- local button = self:CreateCheckButton(name)
-	-- button:SetScript("OnShow", FadeOutCombat_OnShow)
-	-- button:SetScript("OnClick", FadeOutCombat_OnClick)
-	-- button:SetText("Fade Out Of Combat")
-
-	-- return button
--- end

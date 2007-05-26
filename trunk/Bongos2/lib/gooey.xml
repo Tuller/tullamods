@@ -97,13 +97,13 @@
 
 		<Scripts>
 			<OnLoad>
-				this:SetTextInsets(6, 4, 0, 0)
+				self:SetTextInsets(6, 4, 0, 0)
 			</OnLoad>
 			<OnEscapePressed>
-				this:ClearFocus()
+				self:ClearFocus()
 			</OnEscapePressed>
 			<OnEditFocusLost>
-				this:HighlightText()
+				self:HighlightText()
 			</OnEditFocusLost>
 		</Scripts>
 
@@ -184,10 +184,10 @@
 
 		<Scripts>
 			<OnLoad>
-				this:RegisterForClicks("anyUp")
+				self:RegisterForClicks("anyUp")
 			</OnLoad>
 			<OnHide>
-				this:UnlockHighlight()
+				self:UnlockHighlight()
 			</OnHide>
 		</Scripts>
 	</Button>

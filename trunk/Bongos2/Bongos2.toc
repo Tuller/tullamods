@@ -4,7 +4,6 @@
 ## Author: Tuller
 ## Version: 1.2
 ## SavedVariables: Bongos2DB
-## OptionalDeps: Dongle
 lib\FlyPaper.lua
 lib\Gooey.xml
 lib\Dongle.lua

@@ -11,15 +11,6 @@ local L = BONGOS_LOCALS
 --[[ Startup ]]--
 
 function Bongos:Enable()
-	BBar_Init()
-
-	if(BActionBar_Init) then
-		BongosClassButton_Init()
-		BongosPetButton_Init()
-		BongosActionButton_Init()
-		BActionBar_Init()
-	end
-
 	self:RegisterMessage("DONGLE_PROFILE_CREATED")
 	self:RegisterMessage("DONGLE_PROFILE_CHANGED")
 	self:RegisterMessage("DONGLE_PROFILE_DELETED")

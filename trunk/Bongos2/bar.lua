@@ -2,9 +2,7 @@
 	BBar.lua - A movable, scalable, container frame
 --]]
 
-function BBar_Init()
-
-BBar = CreateFrame("Frame", nil, nil, "SecureFrameTemplate")
+BBar = CreateFrame("Frame")
 local Bar_MT = {__index = BBar}
 
 local STICKY_TOLERANCE = 16 --how close one frame must be to another to trigger auto anchoring
@@ -21,8 +19,16 @@ local function GetRelativeCoords(frame, scale)
 	return (frame:GetLeft() or 0) * ratio, (frame:GetTop() or 0) * ratio
 end
 
-local function Bar_New(id, secure)
-	local bar = setmetatable(CreateFrame("Frame", nil, UIParent, secure and "SecureStateHeaderTemplate"), Bar_MT)
+local function Bar_New(id, type)
+	local bar
+	if(type == 1) then
+		bar = setmetatable(CreateFrame("Frame", nil, UIParent, "SecureFrameTemplate"), Bar_MT)
+	elseif(type == 2) then
+		bar = setmetatable(CreateFrame("Frame", nil, UIParent, "SecureStateHeaderTemplate"), Bar_MT)
+	else
+		bar = setmetatable(CreateFrame("Frame", nil, UIParent), Bar_MT)
+	end
+
 	bar.id = id
 	bar.dragFrame = BDragFrame_New(bar)
 
@@ -46,12 +52,12 @@ end
 
 --[[ Usable Functions ]]--
 
-function BBar:Create(id, OnCreate, OnDelete, defaults, secure)
+function BBar:Create(id, OnCreate, OnDelete, defaults, type)
 	local id = tonumber(id) or id
 	assert(id, "id expected")
 	assert(not active[id], format("BBar \"%s\" is already in use", id))
 
-	local bar = Bar_Restore(id) or Bar_New(id, secure)
+	local bar = Bar_Restore(id) or Bar_New(id, type)
 	bar.OnDelete = OnDelete
 
 	bar:LoadSettings(defaults)
@@ -68,7 +74,11 @@ function BBar:Create(id, OnCreate, OnDelete, defaults, secure)
 end
 
 function BBar:CreateSecure(id, OnCreate, OnDelete, defaults)
-	return self:Create(id, OnCreate, OnDelete, defaults, true)
+	return self:Create(id, OnCreate, OnDelete, defaults, 1)
+end
+
+function BBar:CreateHeader(id, OnCreate, OnDelete, defaults)
+	return self:Create(id, OnCreate, OnDelete, defaults, 2)
 end
 
 function BBar:Destroy(removeSettings)
@@ -170,20 +180,12 @@ function BBar:ShowFrame()
 	self.sets.hidden = nil
 	self:Show()
 	self.dragFrame:UpdateColor()
-	
-	if self.secure then
-		self:SetAttribute("hidestates", nil)
-	end
 end
 
 function BBar:HideFrame()
 	self.sets.hidden = true
 	self:Hide()
 	self.dragFrame:UpdateColor()
-
-	if self.secure then
-		self:SetAttribute("hidestates", "*")
-	end
 end
 
 function BBar:ToggleFrame()
@@ -353,6 +355,4 @@ function BBar:ForBar(id, method, ...)
 			end
 		end
 	end
-end
-
 end

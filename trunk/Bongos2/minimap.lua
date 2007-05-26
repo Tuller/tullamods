@@ -4,9 +4,7 @@
 
 local L = BONGOS_LOCALS
 
-BongosMinimap = {}
-
-function BongosMinimap:OnEnter()
+function BongosMinimap_OnEnter()
 	GameTooltip:SetOwner(self, "ANCHOR_TOPRIGHT")
 	GameTooltip:SetText("Bongos2", 1, 1, 1)
 	
@@ -34,7 +32,7 @@ function BongosMinimap:OnEnter()
 end
 
 --taken from trinity, since I"m terrible at math
-function BongosMinimap:OnUpdate(elapsed)
+function BongosMinimap_OnUpdate(self, elapsed)
 	local pos;
 	local xpos,ypos = GetCursorPosition()
 	local xmin,ymin = Minimap:GetLeft(), Minimap:GetBottom()
@@ -52,7 +50,7 @@ function BongosMinimap:OnUpdate(elapsed)
 	Bongos:SetMapCoords(52 - xpos, ypos - 55)
 end
 
-function BongosMinimap:OnClick(button)
+function BongosMinimap_OnClick(self, button)
 	if button == "LeftButton" then
 		if IsAddOnLoaded("Bongos2_ActionBar") and IsShiftKeyDown() then
 			BongosActionConfig:LockButtons(not BongosActionConfig:ButtonsLocked())
