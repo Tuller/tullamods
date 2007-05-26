@@ -29,7 +29,6 @@ local function OnDragStart(self) self:OnDragStart() end
 local function OnReceiveDrag(self) self:OnReceiveDrag() end
 local function OnEnter(self) self:OnEnter() end
 local function OnLeave(self) self:OnLeave() end
-local function OnHide(self) self.id = nil end
 local function OnAttributeChanged(self, var, val)
 	if(var == "state-parent" or var == "statehidden") then
 		self.id = nil
@@ -101,7 +100,6 @@ function BongosActionButton:Create(id)
 	button:SetScript("OnReceiveDrag", OnReceiveDrag)
 	button:SetScript("OnEnter", OnEnter)
 	button:SetScript("OnLeave", OnLeave)
-	button:SetScript("OnHide", OnHide)
 	button:SetScript("OnEvent", OnEvent)
 
 	button:SetAttribute("type", "action")
@@ -153,9 +151,9 @@ function BongosActionButton:RegisterEvents()
 	self:RegisterEvent("START_AUTOREPEAT_SPELL")
 	self:RegisterEvent("STOP_AUTOREPEAT_SPELL")
 
-	self:RegisterEvent("ACTIONBAR_PAGE_CHANGED")
-	self:RegisterEvent("UPDATE_SHAPESHIFT_FORM")
-	self:RegisterEvent("UPDATE_STEALTH")
+	-- self:RegisterEvent("ACTIONBAR_PAGE_CHANGED")
+	-- self:RegisterEvent("UPDATE_SHAPESHIFT_FORM")
+	-- self:RegisterEvent("UPDATE_STEALTH")
 end
 
 --hide the button

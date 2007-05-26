@@ -8,6 +8,12 @@ local CLASS = BONGOS_CLASS
 local hasStance = (CLASS == "DRUID" or CLASS == "ROGUE" or CLASS == "WARRIOR" or CLASS == "PRIEST")
 local DEFAULT_NUM_ACTIONBARS = 10
 
+--this is a bad place to put it, but another hopeful tainting fix by not screwing with the main actionbar/casting button functions until after login
+function BongosActionBar:Enable()
+	CastButton:Load()
+	BUnreg_HideMainActionBar()
+end
+
 function BongosActionBar:Load()
 	for i = 1, self:GetNumber() do BActionBar:Create(i) end
 
