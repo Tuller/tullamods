@@ -43,7 +43,7 @@ function BongosActionConfig:ShowEmptyButtons(enable)
 
 	BongosActionBar:UpdateVisibility()
 	if UnitExists("pet") then
-		BongosPetButton:ForAll("UpdateVisibility")
+		BongosPetBar:UpdateVisibility()
 	end
 end
 
