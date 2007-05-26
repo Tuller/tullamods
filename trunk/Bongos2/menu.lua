@@ -24,6 +24,10 @@ function BongosMenu:Create(name, tabbed)
 	self.width = 210; self.height = 38
 
 	menu:RegisterForClicks("AnyUp")
+	local titleRegion = menu:CreateTitleRegion()
+	titleRegion:SetPoint("TOPLEFT", menu)
+	titleRegion:SetPoint("BOTTOMRIGHT", menu, "TOPRIGHT", 0, -24)
+
 	menu:SetScript("OnShow", Menu_OnShow)
 	menu:SetScript("OnClick", Menu_OnClick)
 

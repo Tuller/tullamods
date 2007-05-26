@@ -76,7 +76,7 @@
 				getglobal(self:GetName() .. "Icon"):SetTexCoord(0.075,0.925,0.075,0.925)
 			</OnDragStop>
 			<OnClick>
-				BongosMinimap.OnClick(self, arg1)
+				BongosMinimap_OnClick(self, arg1)
 				getglobal(self:GetName() .. "Icon"):SetTexCoord(0.075,0.925,0.075,0.925)
 			</OnClick>
 		</Scripts>

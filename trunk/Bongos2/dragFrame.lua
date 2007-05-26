@@ -101,7 +101,7 @@ function BDragFrame_New(parent)
 
 	frame:SetToplevel(true)
 	frame:SetClampedToScreen(true)
-	frame:SetFrameStrata("DIALOG")
+	frame:SetFrameStrata(parent:GetFrameStrata())
 	frame:SetAllPoints(parent)
 
 	local bg = frame:CreateTexture(nil, "BACKGROUND")
