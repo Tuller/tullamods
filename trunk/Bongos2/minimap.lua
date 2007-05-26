@@ -4,7 +4,7 @@
 
 local L = BONGOS_LOCALS
 
-function BongosMinimap_OnEnter()
+function BongosMinimap_OnEnter(self)
 	GameTooltip:SetOwner(self, "ANCHOR_TOPRIGHT")
 	GameTooltip:SetText("Bongos2", 1, 1, 1)
 	
