@@ -162,9 +162,9 @@ end
 
 function BBar:Attach(frame)
 	frame:SetFrameStrata(self:GetFrameStrata())
-	frame:SetFrameLevel(0)
 	frame:SetParent(self)
 	frame:SetAlpha(1)
+	frame:SetFrameLevel(0)
 end
 
 
