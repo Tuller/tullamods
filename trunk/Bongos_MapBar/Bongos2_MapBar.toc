@@ -1,9 +1,8 @@
-## Interface: 20003
-## Title: Bongos_Minimap
+## Interface: 20100
+## Title: Bongos2 MapBar
 ## Notes: A customizable, movable minimap
 ## Author: Tuller
-## Dependencies: Bongos
+## Dependencies: Bongos2
 ## OptionalDeps: Titan
-## DefaultState: Disabled
 localization.lua
 bar.lua

@@ -3,6 +3,8 @@
 		Makes the minimap frame movable
 --]]
 
+BongosMapBar = Bongos:NewModule("Bongos-MapBar")
+
 --[[
 	Compatibility Fixes
 		These functions are for fixing issues with other addons
@@ -80,97 +82,84 @@ local function ToggleMap(self, enable)
 	end
 end
 
-local function CreateConfigMenu(name, frame)
-	local menu = CreateFrame("Button", name, UIParent, "BongosRightClickMenu")
-	menu.frame = frame
-
-	menu:SetText("Map Bar")
-	menu:SetWidth(220)
-	menu:SetHeight(260)
+local function Bar_CreateMenu(self)
+	local name = format("BongosMenu%s", self.id)
+	local menu = BongosMenu:Create(name)
+	menu.text:SetText("Map Bar")
+	menu.frame = self
 
 	--checkbuttons
-	local showTitle = CreateFrame("CheckButton", name .. "ShowTitle", menu, "GooeyCheckButton")
-	showTitle:SetScript("OnClick", function() ToggleTitle(frame, this:GetChecked()) end)
-	showTitle:SetPoint("TOPLEFT", menu, "TOPLEFT", 6, -28)
+	local showTitle = menu:CreateCheckButton(name .. "ShowTitle")
+	showTitle:SetScript("OnShow", function(b) b:SetChecked(self.sets.showTitle) end)
+	showTitle:SetScript("OnClick", function(b) ToggleTitle(self, b:GetChecked()) end)
 	showTitle:SetText(BONGOS_MAPBAR_SHOW_TITLE)
 
-	local showZoom = CreateFrame("CheckButton", name .. "ShowZoom", menu, "GooeyCheckButton")
-	showZoom:SetScript("OnClick", function() ToggleZoomButtons(frame, this:GetChecked()) end)
-	showZoom:SetPoint("TOP", showTitle, "BOTTOM", 0, 2)
+	local showZoom = menu:CreateCheckButton(name .. "ShowZoom")
+	showZoom:SetScript("OnShow", function(b) b:SetChecked(self.sets.showZoom) end)
+	showZoom:SetScript("OnClick", function(b) ToggleZoomButtons(self, b:GetChecked()) end)
 	showZoom:SetText(BONGOS_MAPBAR_SHOW_ZOOM)
 
-	local showDayNight = CreateFrame("CheckButton", name .. "ShowDay", menu, "GooeyCheckButton")
-	showDayNight:SetScript("OnClick", function() ToggleDayIndicator(frame, this:GetChecked()) end)
-	showDayNight:SetPoint("TOP", showZoom, "BOTTOM", 0, 2)
+	local showDayNight = menu:CreateCheckButton(name .. "ShowDay")
+	showDayNight:SetScript("OnShow", function(b) b:SetChecked(self.sets.showDay) end)
+	showDayNight:SetScript("OnClick", function(b) ToggleDayIndicator(self, b:GetChecked()) end)
 	showDayNight:SetText(BONGOS_MAPBAR_SHOW_TIME)
 	
-	local showMap = CreateFrame("CheckButton", name .. "ShowMap", menu, "GooeyCheckButton")
-	showMap:SetScript("OnClick", function() ToggleMap(frame, this:GetChecked()) end)
-	showMap:SetPoint("TOP", showDayNight, "BOTTOM", 0, 2)
+	local showMap = menu:CreateCheckButton(name .. "ShowMap")
+	showMap:SetScript("OnShow", function(b) b:SetChecked(self.sets.showMap) end)
+	showMap:SetScript("OnClick", function(b) ToggleMap(self, b:GetChecked()) end)
 	showMap:SetText(BONGOS_MAPBAR_SHOW_MAP)
-
-	--sliders
-	local opacity = CreateFrame("Slider", name .. "Opacity", menu, "BongosOpacitySlider")
-	opacity:SetPoint("BOTTOM", menu, "BOTTOM", 0, 24)
-	
-	local scale = CreateFrame("Slider", name .. "Scale", menu, "BongosScaleSlider")
-	scale:SetPoint("BOTTOM", opacity, "TOP", 0, 24)
 	
 	return menu
-end
-
---Called when the right click menu is shown, loads the correct values to the checkbuttons/sliders/text
-local function ShowMenu(self)
-	local name = 'BongosMapBarMenu'
-	local menu = getglobal(name) or CreateConfigMenu(name, self)
-
-	menu.onShow = 1
-	
-	getglobal(name .. 'ShowTitle'):SetChecked(self.sets.showTitle)
-	getglobal(name .. 'ShowZoom'):SetChecked(self.sets.showZoom)
-	getglobal(name .. 'ShowDay'):SetChecked(self.sets.showDay)
-	getglobal(name .. 'ShowMap'):SetChecked(self.sets.showMap)
-
-	self:DisplayMenu(menu)
-
-	menu.onShow = nil
 end
 
 
 --[[ Startup ]]--
 
-local function OnCreate(self)
-	self.ShowMenu = ShowMenu
+local function Bar_ShowMenu(self)
+	if not self.menu then
+		self.menu = Bar_CreateMenu(self)
+	end
 
-	self:SetFrameStrata('BACKGROUND')
+	local menu = self.menu
+	menu.onShow = true
+	self:PlaceMenu(menu)
+	menu.onShow = nil
+end
+
+local function Bar_OnCreate(self)
+	self.ShowMenu = Bar_ShowMenu
+
+	self:SetFrameStrata("BACKGROUND")
 	self:Attach(MinimapCluster)
 	self:SetWidth(MinimapCluster:GetWidth())
 	
 	--make the minimap scrollable via the mousewheel
-	local scrollFrame = CreateFrame('Frame', nil, Minimap)
+	local scrollFrame = CreateFrame("Frame", nil, Minimap)
 	scrollFrame:SetAllPoints(scrollFrame:GetParent())
 	scrollFrame:EnableMouseWheel(true)
-	scrollFrame:SetScript('OnMouseWheel', function()
+	scrollFrame:SetScript("OnMouseWheel", function(self, arg1)
 		if (Minimap:GetZoom() + arg1 <= Minimap:GetZoomLevels()) and (Minimap:GetZoom() + arg1 >= 0) then
 			Minimap:SetZoom(Minimap:GetZoom() + arg1)
 		end
 	end)
 end
 
-Bongos.AddStartup(function()
-	if not Bongos.GetBarSets('minimap') then
-		Bongos.SetBarSets('minimap', {vis = 1, showTitle = 1})
-	end
-
-	local bar = BBar.Create('minimap', OnCreate)
+function BongosMapBar:Load()
+	local bar = BBar:Create("minimap", Bar_OnCreate)
 	if not bar:IsUserPlaced() then
 		bar:SetPoint("TOPRIGHT", UIParent)
 	end
 	
 	--load settings
-	--toggle title actually places the minimap on the bar, and adjusts the bar's height
+	--toggle title actually places the minimap on the bar, and adjusts the bar"s height
 	ToggleTitle(bar, bar.sets.showTitle)
 	ToggleZoomButtons(bar, bar.sets.showZoom)
 	ToggleDayIndicator(bar, bar.sets.showDay)
 	ToggleMap(bar, bar.sets.showMap)
-end)
+	
+	self.bar = bar
+end
+
+function BongosMapBar:Unload()
+	self.bar:Destroy()
+end
