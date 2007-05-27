@@ -152,12 +152,6 @@ function BongosActionButton:RegisterEvents()
 	self:RegisterEvent("PLAYER_LEAVE_COMBAT")
 	self:RegisterEvent("START_AUTOREPEAT_SPELL")
 	self:RegisterEvent("STOP_AUTOREPEAT_SPELL")
-
-	if(Bongos.profile.fixEvents) then
-		self:RegisterEvent("ACTIONBAR_PAGE_CHANGED")
-		self:RegisterEvent("UPDATE_SHAPESHIFT_FORM")
-		self:RegisterEvent("UPDATE_STEALTH")
-	end
 end
 
 --hide the button

@@ -78,7 +78,7 @@ function BActionBar:Create(id)
 	local bar = setmetatable(BBar:CreateHeader(id, nil, nil, defaults), Bar_MT)
 	bar:SetAttribute("statemap-state", "$input")
 	bar:SetAttribute("statebutton", stateButton1)
-	bar:SetAttribute("statebutton2", stateButton2)
+	bar:SetAttribute("*statebutton2", stateButton2)
 
 	bar:SetRightClickUnit(BongosActionConfig:GetRightClickUnit())
 	bar:UpdateStateHeader()
@@ -142,30 +142,17 @@ function BActionBar:UpdateStateHeader()
 	if(hasStance) then
 		local maxState = (CLASS == "PRIEST" and 1) or GetNumShapeshiftForms()
 
-		--rogue, priest, warrior states
-		if(CLASS == "DRUID") then
-			local hasProwl = self:GetStateOffset("s7")
-			for i = 1, maxState do
-				if((i == 2 or i == 3) and hasProwl) then
-					if(self:GetStateOffset("s" .. i)) then
-						local state = format("[stance:%d,nostealth]%d;", i, i)
-						header = (header and header .. state) or state
-					end
-					local state = format("[stance:%d,stealth]%d;", i, PROWL_STATE)
-					header = (header and header .. state) or state
-				else
-					if(self:GetStateOffset("s" .. i)) then
-						local state = format("[stance:%d]%d;", i, i)
-						header = (header and header .. state) or state
-					end
-				end
-			end
-		else
-			for i = 1, maxState do
-				if(self:GetStateOffset("s" .. i)) then
-					local state = format("[stance:%d]%d;", i, i)
-					header = (header and header .. state) or state
-				end
+		--prowl
+		if(CLASS == "DRUID" and self:GetStateOffset("s7")) then
+			local state = "[stance:2/3,stealth]7;"
+			header = (header and header .. state) or state
+		end
+
+		--other stances (bear, battle, shadowform, etc)
+		for i = 1, maxState do
+			if(self:GetStateOffset("s" .. i)) then
+				local state = format("[stance:%d]%d;", i, i)
+				header = (header and header .. state) or state
 			end
 		end
 	end
