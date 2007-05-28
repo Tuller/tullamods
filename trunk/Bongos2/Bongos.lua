@@ -84,9 +84,9 @@ end
 function Bongos:SaveProfile(profile)
 	local currentProfile = self.db:GetCurrentProfile()
 	if profile and profile ~= self.db:GetCurrentProfile() then
+		self.copyProfile = currentProfile
 		self:UnloadModules()
 		self.db:SetProfile(profile)
-		self:CopyProfile(currentProfile)
 	end
 end
 
@@ -155,7 +155,12 @@ end
 
 function Bongos:DONGLE_PROFILE_CHANGED(event, db, parent, sv_name, profile_key)
 	self.profile = self.db.profile
-	self:LoadModules()
+	if(self.copyProfile) then
+		self.db:CopyProfile(self.copyProfile)
+		self.copyProfile = nil
+	else
+		self:LoadModules()
+	end
 	self:Print(format(L.ProfileLoaded, profile_key))
 end
 
