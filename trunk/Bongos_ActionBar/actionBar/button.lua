@@ -392,7 +392,12 @@ function BongosActionButton:UpdateStates()
 	local parent = self:GetParent()
 
 	if(hasStance) then
-		local maxState = (CLASS == "PRIEST" and 1) or GetNumShapeshiftForms()
+		local maxState
+		if(CLASS == "PRIEST") then
+			maxState = 1
+		else
+			maxState = GetNumShapeshiftForms()
+		end
 
 		for i = 1, maxState do
 			local state = format("s%d", i)
@@ -476,7 +481,12 @@ function BongosActionButton:UpdateVisibility()
 		if HasAction(id) then newstates = 0 end
 
 		if(hasStance) then
-			local maxState = (CLASS == "PRIEST" and 1) or GetNumShapeshiftForms()
+			local maxState
+			if(CLASS == "PRIEST") then
+				maxState = 1
+			else
+				maxState = GetNumShapeshiftForms()
+			end
 
 			for i = 1, maxState do
 				local action = self:GetAttribute("*action-s" .. i) or id

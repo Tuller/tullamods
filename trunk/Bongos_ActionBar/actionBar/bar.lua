@@ -140,7 +140,12 @@ function BActionBar:UpdateStateHeader()
 	end
 
 	if(hasStance) then
-		local maxState = (CLASS == "PRIEST" and 1) or GetNumShapeshiftForms()
+		local maxState
+		if(CLASS == "PRIEST") then
+			maxState = 1
+		else
+			maxState = GetNumShapeshiftForms()
+		end
 
 		--prowl
 		if(CLASS == "DRUID" and self:GetStateOffset("s7")) then
@@ -563,14 +568,18 @@ function BActionBar:SetRightClickUnit(unit)
 	end
 
 	if(hasStance) then
-		local maxState = (CLASS == "PRIEST" and 1) or GetNumShapeshiftForms()
+		if(CLASS == "PRIEST") then
+			self:SetAttribute("*unit-s1", unit)
+		else
+			local maxState = GetNumShapeshiftForms()
 
-		for i = 1, maxState do
-			self:SetAttribute(format("*unit-s%ds", i), unit)
-		end
+			for i = 1, maxState do
+				self:SetAttribute(format("*unit-s%ds", i), unit)
+			end
 
-		if(CLASS == "DRUID") then
-			self:SetAttribute(format("*unit-s%ds", PROWL_STATE), unit)
+			if(CLASS == "DRUID") then
+				self:SetAttribute(format("*unit-s%ds", PROWL_STATE), unit)
+			end
 		end
 	end
 

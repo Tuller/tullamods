@@ -15,7 +15,6 @@ function BongosActionBar:ConvertBindings()
 		local key = GetBindingKey(format("CLICK BActionButton%d:LeftButton", i))
 		while key do
 			SetBindingClick(key, format("BongosActionButton%d", i), "LeftButton")
-			Bongos:Print(format("Converted BActionButton%d bind: %s", i, key))
 			key = GetBindingKey(format("CLICK BActionButton%d:LeftButton", i))
 		end
 	end
@@ -25,7 +24,6 @@ function BongosActionBar:ConvertBindings()
 		local key = GetBindingKey(format("ActionButton%d", i))
 		while key do
 			SetBindingClick(key, format("BongosActionButton%d", i), "LeftButton")
-			Bongos:Print(format("Converted BActionButton%d bind: %s", i, key))
 			key = GetBindingKey(format("ActionButton%d", i))
 		end
 	end
@@ -37,7 +35,6 @@ function BongosActionBar:ConvertBindings()
 			local key = GetBindingKey(format("MULTIACTIONBAR%dBUTTON%d", i, j))
 			while key do
 				SetBindingClick(key, format("BongosActionButton%d", j+(k*12)), "LeftButton")
-				Bongos:Print(format("Converted MULTIACTIONBAR%dBUTTON%d bind: %s", i, j, key))
 				key = GetBindingKey(format("ActionButton%d", i))
 			end
 		end
@@ -50,13 +47,14 @@ function BongosActionBar:ConvertBindings()
 			local key = GetBindingKey(format("MULTIACTIONBAR%dBUTTON%d", i, j))
 			while key do
 				SetBindingClick(key, format("BongosActionButton%d", j+(k*12)), "LeftButton")
-				Bongos:Print(format("Converted MULTIACTIONBAR%dBUTTON%d bind: %s", i, j, key))
 				key = GetBindingKey(format("ActionButton%d", i))
 			end
 		end
 		k = k - 1
 	end
 	SaveBindings(GetCurrentBindingSet())
+
+	Bongos:Print("Converted keys from the blizzard actionbars and old bongos versions")
 end
 
 function BongosActionBar:Load()
