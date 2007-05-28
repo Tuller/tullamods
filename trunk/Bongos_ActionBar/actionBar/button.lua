@@ -6,7 +6,6 @@ BongosActionButton = CreateFrame("CheckButton")
 local Button_MT = {__index = BongosActionButton}
 
 --constants
--- local STATE_DRIVER_UPDATE_THROTTLE = STATE_DRIVER_UPDATE_THROTTLE
 local ATTACK_BUTTON_FLASH_TIME = 1
 local TOOLTIP_UPDATE_TIME = 1
 local MAX_BUTTONS = BONGOS_MAX_BUTTONS
