@@ -126,18 +126,15 @@ function BongosPetBar:Load()
 	self:RegisterEvent("UPDATE_BINDINGS", "UpdateBindings")
 	self:RegisterEvent("PLAYER_REGEN_ENABLED", "UpdateCombat")
 	self:RegisterEvent("PLAYER_REGEN_DISABLED", "UpdateCombat")
+
+	self:RegisterMessage("KEYBOUND_ENABLED", "UpdateVisibility")
+	self:RegisterMessage("KEYBOUND_DISABLED", "UpdateVisibility")
 end
 
 function BongosPetBar:Unload()
 	self.bar:Destroy()
-
-	self:UnregisterEvent("UNIT_FLAGS")
-	self:UnregisterEvent("UNIT_AURA")
-	self:UnregisterEvent("PET_BAR_UPDATE")
-	self:UnregisterEvent("PET_BAR_UPDATE_COOLDOWN")
-	self:UnregisterEvent("PET_BAR_SHOWGRID")
-	self:UnregisterEvent("PET_BAR_HIDEGRID")
-	self:UnregisterEvent("UPDATE_BINDINGS")
+	self:UnregisterAllEvents()
+	self:UnregisterAllMessages()
 end
 
 function BongosPetBar:UpdateBindings()
