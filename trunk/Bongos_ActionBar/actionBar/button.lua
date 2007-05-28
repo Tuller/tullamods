@@ -6,6 +6,7 @@ BongosActionButton = CreateFrame("CheckButton")
 local Button_MT = {__index = BongosActionButton}
 
 --constants
+-- local STATE_DRIVER_UPDATE_THROTTLE = STATE_DRIVER_UPDATE_THROTTLE
 local ATTACK_BUTTON_FLASH_TIME = 1
 local TOOLTIP_UPDATE_TIME = 1
 local MAX_BUTTONS = BONGOS_MAX_BUTTONS
@@ -45,10 +46,6 @@ local function OnEvent(self, event, arg1)
 	if(not self:GetParent():IsShown()) then return end
 
 	if(event == "ACTIONBAR_SLOT_CHANGED") then
-		if(arg1 == 0 or self:GetPagedID() == arg1) then
-			self:Update()
-		end
-	elseif(event == "ACTIONBAR_PAGE_CHANGED" or event == "UPDATE_SHAPESHIFT_FORM" or event == "UPDATE_STEALTH") then
 		self:Update(true)
 	end
 
@@ -160,7 +157,6 @@ function BongosActionButton:Release()
 	self:ClearAllPoints()
 	self:UnregisterAllEvents()
 	self:Hide()
-
 	self.id = nil
 end
 
@@ -168,8 +164,7 @@ end
 --[[ OnX Functions ]]--
 
 function BongosActionButton:OnUpdate(elapsed)
-	if(not self.id) then self:Update() return end
-
+	if(not self.id) then self:Update() end
 	if not self.icon:IsShown() then return end
 
 	--update flashing
@@ -567,7 +562,7 @@ end
 --[[ Utility Functions ]]--
 
 function BongosActionButton:GetPagedID()
-	if not(self.id) then
+	if not self.id then
 		self.id = SecureButton_GetModifiedAttribute(self, "action", SecureStateChild_GetEffectiveButton(self))
 	end
 	return self.id

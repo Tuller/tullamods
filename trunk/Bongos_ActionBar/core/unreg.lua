@@ -55,10 +55,8 @@ local function UnregisterPetBar()
 	end
 end
 
-function BUnreg_HideMainActionBar()
-	MainMenuBar:Hide()
-	ExhaustionTick:UnregisterAllEvents()
-	UnregisterActionBars()
-	UnregisterShapeshiftBar()
-	UnregisterPetBar()
-end
+MainMenuBar:Hide()
+ExhaustionTick:UnregisterAllEvents()
+UnregisterActionBars()
+UnregisterShapeshiftBar()
+UnregisterPetBar()

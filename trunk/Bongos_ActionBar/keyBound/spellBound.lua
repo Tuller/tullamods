@@ -1,6 +1,6 @@
 local CastButton = {}
 
-function SpellBound_Load()
+function CastButton:Load()
 	hooksecurefunc("SpellButton_OnEnter", function()
 		local id = SpellBook_GetSpellID(this:GetID())
 		local bookType = SpellBookFrame.bookType
@@ -65,3 +65,5 @@ end
 function CastButton:GetHotkey()
 	return KeyBound:ToShortKey(GetBindingKey(self:GetBindAction()))
 end
+
+CastButton:Load()

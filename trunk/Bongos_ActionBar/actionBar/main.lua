@@ -8,10 +8,55 @@ local CLASS = BONGOS_CLASS
 local hasStance = (CLASS == "DRUID" or CLASS == "ROGUE" or CLASS == "WARRIOR" or CLASS == "PRIEST")
 local DEFAULT_NUM_ACTIONBARS = 10
 
---this is a bad place to put it, but another hopeful tainting fix by not screwing with the main actionbar/casting button functions until after login
-function BongosActionBar:Enable()
-	SpellBound_Load()
-	BUnreg_HideMainActionBar()
+--converts BActionButton and ActionButton bindings to their proper bongos bars, inspired from Bartender3
+function BongosActionBar:ConvertBindings()
+	--baction buttons
+	for i = 1, 120 do
+		local key = GetBindingKey(format("CLICK BActionButton%d:LeftButton", i))
+		while key do
+			SetBindingClick(key, format("BongosActionButton%d", i), "LeftButton")
+			Bongos:Print(format("Converted BActionButton%d bind: %s", i, key))
+			key = GetBindingKey(format("CLICK BActionButton%d:LeftButton", i))
+		end
+	end
+
+	--action buttons
+	for i = 1, 12 do
+		local key = GetBindingKey(format("ActionButton%d", i))
+		while key do
+			SetBindingClick(key, format("BongosActionButton%d", i), "LeftButton")
+			Bongos:Print(format("Converted BActionButton%d bind: %s", i, key))
+			key = GetBindingKey(format("ActionButton%d", i))
+		end
+	end
+	
+	--left side multibars
+	local k = 5
+	for i = 1, 2 do
+		for j = 1, 12 do
+			local key = GetBindingKey(format("MULTIACTIONBAR%dBUTTON%d", i, j))
+			while key do
+				SetBindingClick(key, format("BongosActionButton%d", j+(k*12)), "LeftButton")
+				Bongos:Print(format("Converted MULTIACTIONBAR%dBUTTON%d bind: %s", i, j, key))
+				key = GetBindingKey(format("ActionButton%d", i))
+			end
+		end
+		k = k - 1
+	end
+
+	--right side bars
+	for i = 4, 3, -1 do
+		for j = 1, 12 do
+			local key = GetBindingKey(format("MULTIACTIONBAR%dBUTTON%d", i, j))
+			while key do
+				SetBindingClick(key, format("BongosActionButton%d", j+(k*12)), "LeftButton")
+				Bongos:Print(format("Converted MULTIACTIONBAR%dBUTTON%d bind: %s", i, j, key))
+				key = GetBindingKey(format("ActionButton%d", i))
+			end
+		end
+		k = k - 1
+	end
+	SaveBindings(GetCurrentBindingSet())
 end
 
 function BongosActionBar:Load()
