@@ -17,6 +17,7 @@ Bongos2 Version History
 
 	Reimplemented the Bongos experience bar
 	Reimplemented the Bongos map bar
+	Bindings are now converted from the default actionbars/Bongos1
 
 1.2
 	Fixed a bug causing the minimap button to not hide
@@ -40,6 +41,3 @@ Bongos2 Version History
 
 known issues:
 	Tainting issues from other addons
-
-todo:
-	Profile Save and Copy commands in the GUI

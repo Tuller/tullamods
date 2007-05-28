@@ -27,7 +27,6 @@ function Bongos:Enable()
 			showMacros = true,
 			rangeColoring = true,
 			showEmpty = false,
-			showHotkeys = false,
 			showMinimap = true,
 			rangeColor = {r = 1, g = 0.5, b = 0.5},
 			rightClickUnit = "player",
@@ -58,6 +57,9 @@ end
 
 function Bongos:UpdateVersion()
 	self.profile.version = CURRENT_VERSION
+	if(BongosActionBar) then
+		BongosActionBar:ConvertBindings()
+	end
 	self:Print(format(L.Updated, self.profile.version))
 end
 
@@ -145,6 +147,9 @@ end
 
 function Bongos:DONGLE_PROFILE_CREATED(event, db, parent, sv_name, profile_key)
 	self.profile = self.db.profile
+	if(BongosActionBar) then
+		BongosActionBar:ConvertBindings()
+	end
 	self:Print(format(L.ProfileCreated , profile_key))
 end
 
