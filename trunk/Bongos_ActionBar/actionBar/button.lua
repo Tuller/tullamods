@@ -12,7 +12,7 @@ local TOOLTIP_UPDATE_TIME = 1
 local MAX_BUTTONS = BONGOS_MAX_BUTTONS
 local CLASS = BONGOS_CLASS
 local MAX_PAGES = BONGOS_MAX_PAGES
-local hasStance = (CLASS == "DRUID" or CLASS == "ROGUE" or CLASS == "WARRIOR" or CLASS == "ROGUE")
+local hasStance = (CLASS == "DRUID" or CLASS == "ROGUE" or CLASS == "WARRIOR" or CLASS == "PRIEST")
 
 local BUTTON_NAME = "BongosActionButton%d"
 local SIZE = 36
@@ -392,12 +392,7 @@ function BongosActionButton:UpdateStates()
 	local parent = self:GetParent()
 
 	if(hasStance) then
-		local maxState
-		if(CLASS == "PRIEST") then
-			maxState = 1
-		else
-			maxState = GetNumShapeshiftForms()
-		end
+		local maxState = (CLASS == "PRIEST" and 1) or GetNumShapeshiftForms()
 
 		for i = 1, maxState do
 			local state = format("s%d", i)
@@ -481,12 +476,7 @@ function BongosActionButton:UpdateVisibility()
 		if HasAction(id) then newstates = 0 end
 
 		if(hasStance) then
-			local maxState
-			if(CLASS == "PRIEST") then
-				maxState = 1
-			else
-				maxState = GetNumShapeshiftForms()
-			end
+			local maxState = (CLASS == "PRIEST" and 1) or GetNumShapeshiftForms()
 
 			for i = 1, maxState do
 				local action = self:GetAttribute("*action-s" .. i) or id
