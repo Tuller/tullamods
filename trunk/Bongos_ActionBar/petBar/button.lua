@@ -9,11 +9,11 @@ local Button_mt = {__index = BongosPetButton}
 
 --[[ Constructorish ]]--
 
-local function PostClick(self, arg1) self:PostClick(arg1) end
 local function OnDragStart(self) self:OnDragStart(arg1) end
 local function OnReceiveDrag(self) self:OnReceiveDrag(arg1) end
 local function OnEnter(self) self:OnEnter() end
 local function OnLeave(self) self:OnLeave() end
+local function OnAttributeChanged(self) self:Update() end
 
 function BongosPetButton:Set(id, parent)
 	local button = setmetatable(self:Get(id), Button_mt)
@@ -24,7 +24,7 @@ function BongosPetButton:Set(id, parent)
 
 	parent:Attach(button)
 	parent:SetAttribute("addchild", button)
-	button:SetAttribute("showstates", "1")
+	button:UpdateVisibility()
 
 	return button
 end
@@ -49,6 +49,7 @@ function BongosPetButton:SetScripts()
 	self:SetScript("OnDragStart", OnDragStart)
 	self:SetScript("OnReceiveDrag", OnReceiveDrag)
 	self:SetScript("OnEnter", OnEnter)
+	self:SetScript("OnAttributeChanged", OnAttributeChanged)
 end
 
 
@@ -126,7 +127,7 @@ function BongosPetButton:UpdateCooldown()
 end
 
 function BongosPetButton:UpdateVisibility()
-	if not(UnitExists("pet")) or self:ShowingEmpty() or GetPetActionInfo(self:GetID()) then
+	if(not(UnitExists("pet")) or IsMounted() or UnitIsDead("pet") or GetPetActionInfo(self:GetID())  or self:ShowingEmpty()) then
 		self:SetAttribute("showstates", "1")
 	else
 		self:SetAttribute("showstates", "!*")

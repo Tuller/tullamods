@@ -97,14 +97,12 @@ local function Bar_OnCreate(self)
 	self.Layout = Bar_Layout
 
 	self:SetFrameStrata("HIGH")
-	RegisterStateDriver(self, "state", "[pet]1;0")
-	self:SetAttribute("statemap-state", "$input")
+	self:SetAttribute("statemap-pet", "$input")
+	RegisterStateDriver(self, "pet", "[target=pet,nomounted,exists,nodead]1;0")
 
-	for i=1, NUM_PET_ACTION_SLOTS do
-		BongosPetButton:Set(i, self)
-	end
+	for i=1, NUM_PET_ACTION_SLOTS do BongosPetButton:Set(i, self) end
 
-	if(UnitExists("pet")) then
+	if(UnitExists("pet") and not(IsMounted() or UnitIsDead("pet"))) then
 		self:SetAttribute("state", "1")
 	else
 		self:SetAttribute("state", "0")
@@ -121,7 +119,7 @@ function BongosPetBar:Load()
 
 	self:RegisterEvent("UNIT_FLAGS", "UpdateIfPet")
 	self:RegisterEvent("UNIT_AURA", "UpdateIfPet")
-	self:RegisterEvent("PET_BAR_UPDATE", "Update")
+	self:RegisterEvent("PET_BAR_UPDATE", "UpdatePetBar")
 	self:RegisterEvent("PET_BAR_UPDATE_COOLDOWN", "UpdateCooldown")
 	self:RegisterEvent("PET_BAR_SHOWGRID", "UpdateShowGrid")
 	self:RegisterEvent("PET_BAR_HIDEGRID", "UpdateShowGrid")
@@ -152,7 +150,7 @@ function BongosPetBar:UpdateIfPet(event, unit)
 	end
 end
 
-function BongosPetBar:Update()
+function BongosPetBar:UpdatePetBar()
 	BongosPetButton:ForAll("Update")
 	self:UpdateVisibility()
 end
