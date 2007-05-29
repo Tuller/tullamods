@@ -23,8 +23,8 @@ end
 
 if not BVent then
 	BVent = CreateFrame('Frame')
-	BVent:SetScript('OnEvent', function()
-		BVent:Call(event, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
+	BVent:SetScript('OnEvent', function(self, event, ...)
+		BVent:Call(event, ...)
 		if fireOnce[event] then RemoveEvent(event) end
 	end)
 	BVent.events = {}

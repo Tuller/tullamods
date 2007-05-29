@@ -15,10 +15,14 @@
 
 --[[ library stuff ]]--
 
-assert(TLib, "TLib not loaded")
+local VERSION = 1
+if FlyPaper and tonumber(FlyPaper.version) and tonumber(FlyPaper.version) >= VERSION then return end
 
-local VERSION = '7.1.2'
-if TLib.IsCurrent(FlyPaper, VERSION) then return end
+if not FlyPaper then
+	FlyPaper = {version = VERSION}
+else
+	FlyPaper.version = VERSION
+end
 
 
 --returns true if <frame>, or one of the frames that <frame> is dependent on, is anchored to <otherFrame>.  Returns nil otherwise.
@@ -123,10 +127,6 @@ end
 
 
 --[[ Usable Functions ]]--
-
-if not FlyPaper then FlyPaper = {} end
-
-FlyPaper.version = VERSION
 
 function FlyPaper.Stick(frame, otherFrame, tolerance, xOff, yOff)
 	if not xOff then xOff = 0 end
