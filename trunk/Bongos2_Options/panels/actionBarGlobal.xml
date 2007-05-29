@@ -35,7 +35,7 @@
 						if self:GetChecked() then
 							BongosActionConfig:SetRightClickUnit("player")
 						else
-							BongosActionConfig:SetRightClickUnit("")
+							BongosActionConfig:SetRightClickUnit(nil)
 						end
 					</OnClick>
 				</Scripts>
