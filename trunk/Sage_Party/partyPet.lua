@@ -7,8 +7,9 @@ local function OnEnter() this:OnEnter() end
 local function OnLeave() this:OnLeave() end
 
 function SagePartyPet.Create(parent)
-	local frame = CreateFrame('Button', nil, parent, 'SecureUnitButtonTemplate')
-	frame.id = 'partypet' .. parent.id:match('%d')
+	local id = 'partypet' .. parent.id:match('%d')
+	local frame = CreateFrame('Button', format('SageClick%s', id), parent, 'SecureUnitButtonTemplate')
+	frame.id = id 
 	frame:Hide()
 
 	setmetatable(frame, Frame_mt)
@@ -17,6 +18,8 @@ function SagePartyPet.Create(parent)
 	frame:SetFrameLevel(0)
 	frame:RegisterForClicks("anyUp")
 	SecureUnitButton_OnLoad(frame, frame.id)
+	ClickCastFrames = ClickCastFrames or {}
+    ClickCastFrames[frame] = true
 
 	frame.health = SageHealth.Create(frame)
 	frame.health:SetAllPoints(frame)
