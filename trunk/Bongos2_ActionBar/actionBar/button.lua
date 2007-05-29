@@ -31,9 +31,10 @@ local function OnDragStart(self) self:OnDragStart() end
 local function OnReceiveDrag(self) self:OnReceiveDrag() end
 local function OnEnter(self) self:OnEnter() end
 local function OnLeave(self) self:OnLeave() end
+local function OnHide(self) self.needsUpdate = true end
 local function OnAttributeChanged(self, var, val)
 	if(var == "state-parent" or var == "statehidden") then
-		self.id = nil
+		self.needsUpdate = true
 	end
 end
 
@@ -45,12 +46,14 @@ local function OnEvent(self, event, arg1)
 	if(not self:GetParent():IsShown()) then return end
 
 	if(event == "ACTIONBAR_SLOT_CHANGED") then
-		self:Update(true)
+		if(arg1 == self:GetPagedID()) then
+			self:Update()
+		end
 	end
 
 	if not(self:IsShown() and HasAction(self:GetPagedID())) then return end
 
-	if event == "PLAYER_AURAS_CHANGED" then
+	if event == "PLAYER_AURAS_CHANGED" or event == "PLAYER_TARGET_CHANGED" then
 		self:UpdateUsable()
 	elseif event == "UNIT_INVENTORY_CHANGED" then
 		if arg1 == "player" then
@@ -99,6 +102,7 @@ function BongosActionButton:Create(id)
 	button:SetScript("OnEnter", OnEnter)
 	button:SetScript("OnLeave", OnLeave)
 	button:SetScript("OnEvent", OnEvent)
+	button:SetScript("OnHide", OnHide)
 
 	button:SetAttribute("type", "action")
 	button:SetAttribute("action", id)
@@ -133,6 +137,7 @@ function BongosActionButton:RegisterEvents()
 	self:RegisterEvent("UPDATE_BINDINGS")
 
 	self:RegisterEvent("PLAYER_AURAS_CHANGED")
+	self:RegisterEvent("PLAYER_TARGET_CHANGED")
 	self:RegisterEvent("UNIT_INVENTORY_CHANGED")
 	self:RegisterEvent("ACTIONBAR_UPDATE_USABLE")
 	self:RegisterEvent("UPDATE_INVENTORY_ALERTS")
@@ -163,7 +168,12 @@ end
 --[[ OnX Functions ]]--
 
 function BongosActionButton:OnUpdate(elapsed)
-	if(not self.id) then self:Update() end
+	if(self.needsUpdate) then
+		self.needsUpdate = nil
+		self:Update(true)
+		return
+	end
+
 	if not self.icon:IsShown() then return end
 
 	--update flashing
@@ -252,9 +262,7 @@ end
 
 --Updates the icon, count, cooldown, usability color, if the button is flashing, if the button is equipped,  and macro text.
 function BongosActionButton:Update(refresh)
-	if(refresh) then self.id = nil end
-
-	local action = self:GetPagedID()
+	local action = self:GetPagedID(refresh)
 	local icon = self.icon
 	local cooldown = self.cooldown
 	local texture = GetActionTexture(action)
@@ -460,7 +468,7 @@ function BongosActionButton:UpdateStates()
 	end
 
 	self:UpdateVisibility()
-	self.id = nil
+	self.needsUpdate = true
 end
 
 --show if showing empty buttons, or if the slot has an action, hide otherwise
@@ -560,8 +568,8 @@ end
 
 --[[ Utility Functions ]]--
 
-function BongosActionButton:GetPagedID()
-	if not self.id then
+function BongosActionButton:GetPagedID(refresh)
+	if refresh or not self.id then
 		self.id = SecureButton_GetModifiedAttribute(self, "action", SecureStateChild_GetEffectiveButton(self))
 	end
 	return self.id
