@@ -1,5 +1,8 @@
 Bongos2 Version History
 
+1.4c
+	Replaced the stance macro fix with a better one
+
 1.4b
 	Fixed a bug causing left click to target the player in shadowform if right click selfcast was enabled
 	Probably fixed a bug causing the pet bar to not properly show up when summoning a pet with no target in combat
