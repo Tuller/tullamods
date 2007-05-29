@@ -14,18 +14,14 @@ local frames = {}
 
 --[[ buff ]]--
 
-local function Buff_OnEnter()
-	local unitFrame = this:GetParent():GetParent()
-	local sets = unitFrame.sets
-	local unit = unitFrame.id
+local function Buff_OnEnter(self)
+	local frame = self:GetParent():GetParent()
+	local sets = frame.sets
+	local unit = frame.id
 
-	local showCastable
-	if sets and sets.showCastable and UnitIsFriend("player", unit) then
-		showCastable = 1
-	end
-
-	GameTooltip:SetOwner(this, "ANCHOR_BOTTOMRIGHT")
-	GameTooltip:SetUnitBuff(unit, this:GetID(), showCastable)
+	local showCastable = (sets and sets.showCastable and UnitCanAssist("player", unit)) or false
+	GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
+	GameTooltip:SetUnitBuff(unit, self:GetID(), showCastable)
 end
 
 local function Buff_OnLeave()
@@ -33,7 +29,7 @@ local function Buff_OnLeave()
 end
 
 local function Buff_Create(parent, id)
-	local buff = CreateFrame('Frame', nil, parent)
+	local buff = CreateFrame("Frame", nil, parent)
 	buff:EnableMouse(true)
 	buff:SetAlpha(parent:GetAlpha())
 	buff:SetID(id)
@@ -44,7 +40,12 @@ local function Buff_Create(parent, id)
 
 	buff.count = buff:CreateFontString(nil, "OVERLAY")
 	buff.count:SetFontObject(SageFontSmall)
-	buff.count:SetPoint("BOTTOMRIGHT", debuff, "BOTTOMRIGHT", -1, 0)
+	buff.count:SetPoint("BOTTOMRIGHT", buff, "BOTTOMRIGHT", -1, 0)
+	
+	buff.cooldown = CreateFrame("Cooldown", nil, buff, "CooldownFrameTemplate")
+	buff.cooldown:SetAllPoints(buff)
+	buff.cooldown:SetReverse(true)
+	buff.cooldown:Hide()
 
 	buff:SetScript("OnEnter", Buff_OnEnter)
 	buff:SetScript("OnLeave", Buff_OnLeave)
@@ -58,7 +59,7 @@ end
 --[[ Buff Frame ]]--
 
 local function UpdateBuff(frame, unit, index, castable)
-	local name, rank, icon, count = UnitBuff(unit, index, castable)
+	local name, rank, icon, count, duration, timeLeft = UnitBuff(unit, index, castable)
 	local buff = frame[index]
 
 	if name then
@@ -76,14 +77,23 @@ local function UpdateBuff(frame, unit, index, castable)
 		else
 			buff.count:Hide()
 		end
+
+		-- Handle cooldowns
+		if duration and duration > 0 then
+			CooldownFrame_SetTimer(buff.cooldown, GetTime()-(duration-timeLeft), duration, 1)
+			buff.cooldown:Show()
+		else
+			buff.cooldown:Hide()
+		end
+
 		buff:Show()
 		return true
+	elseif buff then
+		buff:Hide()
 	end
-
-	if buff then buff:Hide() end
 end
 
-local function OnShow() this:Update() end
+local function OnShow(self) self:Update() end
 
 
 --[[ Usable Functions ]]--
@@ -107,7 +117,7 @@ function SageBuff:Update()
 	local unit = self.id
 
 	local showCastable
-	if UnitCanAssist('player', unit) then
+	if UnitCanAssist("player", unit) then
 		local sets = Sage.GetFrameSets(unit)
 		if sets then
 			showCastable = sets.showCastable

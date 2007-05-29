@@ -51,6 +51,11 @@ local function Debuff_Create(parent, id)
 	debuff.count:SetFontObject(SageFontSmall)
 	debuff.count:SetPoint("BOTTOMRIGHT", debuff, "BOTTOMRIGHT", -1, 0)
 
+	debuff.cooldown = CreateFrame("Cooldown", nil, debuff, "CooldownFrameTemplate")
+	debuff.cooldown:SetAllPoints(debuff)
+	debuff.cooldown:SetReverse(true)
+	debuff.cooldown:Hide()
+	
 	debuff:SetScript("OnEnter", Debuff_OnEnter)
 	debuff:SetScript("OnLeave", Debuff_OnLeave)
 	
@@ -60,7 +65,7 @@ local function Debuff_Create(parent, id)
 end
 
 local function UpdateDebuff(frame, unit, index, curable)
-	local name, rank, icon, count, type = UnitDebuff(unit, index, curable)
+	local name, rank, icon, count, type, duration, timeLeft = UnitDebuff(unit, index, curable);
 	local debuff = frame[index]
 
 	if name then
@@ -77,6 +82,14 @@ local function UpdateDebuff(frame, unit, index, curable)
 			debuff.count:Show()
 		else
 			debuff.count:Hide()
+		end
+
+		-- Handle cooldowns
+		if duration and duration > 0 then
+			CooldownFrame_SetTimer(debuff.cooldown, GetTime()-(duration-timeLeft), duration, 1)
+			debuff.cooldown:Show()
+		else
+			debuff.cooldown:Hide()
 		end
 
 		--set the debuff border icon

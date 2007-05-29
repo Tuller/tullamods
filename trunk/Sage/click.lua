@@ -10,7 +10,7 @@ local function OnEnter() this:OnEnter() end
 local function OnLeave() this:OnLeave() end
 
 function SageClick.Create(parent)
-	local frame = CreateFrame('Button', nil, parent, 'SecureUnitButtonTemplate')
+	local frame = CreateFrame('Button', format('SageClick%s', (id or parent.id)), parent, 'SecureUnitButtonTemplate')
 	setmetatable(frame, Frame_mt)
 
 	SecureUnitButton_OnLoad(frame, id or parent.id, function() frame:ShowMenu() end)

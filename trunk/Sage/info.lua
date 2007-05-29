@@ -7,8 +7,6 @@
 
 		<frame>.extraWidth - an optional static amount to add to the width of a frame.
 		The max height of an infobar with party information should be 20, and 16 without
-
-	Throws the event SAGE_FRAME_WIDTH_UPDATE with arg1 being which unit it was called for
 --]]
 
 SageInfo = CreateFrame('Frame')
