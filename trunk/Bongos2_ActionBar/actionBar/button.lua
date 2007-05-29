@@ -46,7 +46,7 @@ local function OnEvent(self, event, arg1)
 	if(not self:GetParent():IsShown()) then return end
 
 	if(event == "ACTIONBAR_SLOT_CHANGED") then
-		if(arg1 == self:GetPagedID()) then
+		if(arg1 == self:GetPagedID()) then 
 			self:Update()
 		end
 	end
@@ -56,7 +56,7 @@ local function OnEvent(self, event, arg1)
 	if event == "PLAYER_AURAS_CHANGED" or event == "PLAYER_TARGET_CHANGED" then
 		self:UpdateUsable()
 	elseif event == "UNIT_INVENTORY_CHANGED" then
-		if arg1 == "player" then
+		if(arg1 == "player") then 
 			self:Update()
 		end
 	elseif event == "ACTIONBAR_UPDATE_USABLE" or event == "UPDATE_INVENTORY_ALERTS" or event == "ACTIONBAR_UPDATE_COOLDOWN" then
