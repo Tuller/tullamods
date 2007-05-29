@@ -96,9 +96,8 @@ local function Bar_OnCreate(self)
 	self.ShowMenu = Bar_ShowMenu
 	self.Layout = Bar_Layout
 
-	self:SetFrameStrata("HIGH")
 	self:SetAttribute("statemap-pet", "$input")
-	RegisterStateDriver(self, "pet", "[target=pet,nomounted,exists,nodead]1;0")
+	RegisterStateDriver(self, "pet", "[pet,nomounted]1;0")
 
 	for i=1, NUM_PET_ACTION_SLOTS do BongosPetButton:Set(i, self) end
 
@@ -114,7 +113,7 @@ end
 --[[ Events ]]--
 
 function BongosPetBar:Load()
-	self.bar = BBar:CreateHeader("pet", Bar_OnCreate, nil, {["y"] = 591, ["x"] = 553}, "HIGH")
+	self.bar = BBar:CreateHeader("pet", Bar_OnCreate, nil, {["y"] = 591, ["x"] = 553})
 	self.bar:Layout()
 
 	self:RegisterEvent("UNIT_FLAGS", "UpdateIfPet")
