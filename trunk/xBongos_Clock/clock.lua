@@ -8,7 +8,7 @@ local is24Hours
 local UPDATE_DELAY = 30
 
 local function UpdateTime(text, hours, minutes)
-	hours = math.fmod(hours + offset, 24)
+	hours = mod(hours + offset, 24)
 
 	if is24Hours then
 		text:SetText(format(TEXT(TIME_TWENTYFOURHOURS), hours, minutes));
@@ -27,46 +27,50 @@ local function UpdateTime(text, hours, minutes)
 	end
 end
 
-local function OnUpdate()
-	if  this.elapsed <= 0 then
-		this.elapsed = UPDATE_DELAY
+local function OnUpdate(self, elapsed)
+	if  self.elapsed <= 0 then
+		self.elapsed = UPDATE_DELAY
 
 		local hours, minutes = GetGameTime()
-		UpdateTime(getglobal(this:GetName() .. 'Text'), hours, minutes)
+		UpdateTime(self.text, hours, minutes)
 	else
-		this.elapsed = this.elapsed - arg1
+		self.elapsed = self.elapsed - elapsed
 	end
 end
 
 local function Clock_Create(parent)
-	local clock = CreateFrame('Frame', 'BongosClock', parent)
+	local clock = CreateFrame("Frame", "BongosClock", parent)
 	clock:SetAllPoints(parent)
 
-	local text = clock:CreateFontString(clock:GetName() .. 'Text', 'OVERLAY')
-	text:SetFontObject('GameFontNormalSmall')
+	clock.text = clock:CreateFontString(nil, "OVERLAY")
+	text:SetFontObject("GameFontNormalSmall")
 	text:SetAllPoints(clock)
 	
-	clock:SetBackdrop({ 
+	clock:SetBackdrop({
 	  bgFile = "Interface\\TutorialFrame\\TutorialFrameBackground", 
 	  edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border", tile = true, tileSize = 16, edgeSize = 16, 
 	  insets = {left = 4, right = 4, top = 4, bottom = 4},
 	})
 	
 	clock.elapsed = 0
-	clock:SetScript('OnUpdate', OnUpdate)
+	clock:SetScript("OnUpdate", OnUpdate)
 end
 
 
 --[[ Startup ]]--
 
-local function OnCreate(self)
-	self:SetWidth(70); self:SetHeight(24)	
+local function Bar_OnCreate(self)
+	self:SetSize(70, 24)
 	Clock_Create(self)
 end
 
-Bongos.AddStartup(function() 
-	local bar = BBar.Create('clock', OnCreate) 
-	if not bar:IsUserPlaced() then
-		bar:SetPoint("TOPRIGHT", UIParent)
+function BongosClock:Load()
+	self.bar = BBar:Create("clock", Bar_OnCreate) 
+	if not self.bar:IsUserPlaced() then
+		self.bar:SetPoint("TOPRIGHT", UIParent)
 	end
-end)
+end
+
+function BongosClock:Unload()
+	self.bar:Destroy()
+end
