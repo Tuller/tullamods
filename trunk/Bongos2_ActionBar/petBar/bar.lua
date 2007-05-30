@@ -5,10 +5,10 @@
 
 BongosPetBar = Bongos:NewModule("Bongos-PetBar")
 local L = BONGOS_LOCALS
+local DEFAULT_SPACING = 2
+
 
 --[[ Bar Functions ]]--
-
-local DEFAULT_SPACING = 2
 
 local function Bar_Layout(self, cols, space)
 	if InCombatLockdown() then return end
@@ -40,7 +40,6 @@ local function Bar_Layout(self, cols, space)
 		local button = BongosPetButton:Get(i)
 		button:ClearAllPoints()
 		button:SetPoint("TOPLEFT", self, "TOPLEFT", buttonSize * row, -buttonSize * col)
-		button:Update()
 	end
 end
 
@@ -96,17 +95,9 @@ local function Bar_OnCreate(self)
 	self.ShowMenu = Bar_ShowMenu
 	self.Layout = Bar_Layout
 
-	self:SetAttribute("statemap-pet", "$input")
-	RegisterStateDriver(self, "pet", "[pet,nomounted]1;0")
-
-	for i=1, NUM_PET_ACTION_SLOTS do BongosPetButton:Set(i, self) end
-
-	if(UnitExists("pet") and not(IsMounted() or UnitIsDead("pet"))) then
-		self:SetAttribute("state", "1")
-	else
-		self:SetAttribute("state", "0")
+	for i = 1, NUM_PET_ACTION_SLOTS do
+		BongosPetButton:Set(i, self)
 	end
-	SecureStateHeader_Refresh(self)
 end
 
 
@@ -116,71 +107,20 @@ function BongosPetBar:Load()
 	self.bar = BBar:CreateHeader("pet", Bar_OnCreate, nil, {["y"] = 591, ["x"] = 553})
 	self.bar:Layout()
 
-	self:RegisterEvent("UNIT_FLAGS", "UpdateIfPet")
-	self:RegisterEvent("UNIT_AURA", "UpdateIfPet")
-	self:RegisterEvent("PET_BAR_UPDATE", "UpdatePetBar")
-	self:RegisterEvent("PET_BAR_UPDATE_COOLDOWN", "UpdateCooldown")
-	self:RegisterEvent("PET_BAR_SHOWGRID", "UpdateShowGrid")
-	self:RegisterEvent("PET_BAR_HIDEGRID", "UpdateShowGrid")
-	self:RegisterEvent("UPDATE_BINDINGS", "UpdateBindings")
-	self:RegisterEvent("PLAYER_REGEN_ENABLED", "UpdateCombat")
-	self:RegisterEvent("PLAYER_REGEN_DISABLED", "UpdateCombat")
-
-	self:RegisterMessage("KEYBOUND_ENABLED", "UpdateVisibility")
-	self:RegisterMessage("KEYBOUND_DISABLED", "UpdateVisibility")
+	local petBar = PetActionBarFrame
+	petBar:RegisterEvent("PLAYER_CONTROL_LOST")
+	petBar:RegisterEvent("PLAYER_CONTROL_GAINED")
+	petBar:RegisterEvent("PLAYER_FARSIGHT_FOCUS_CHANGED")
+	petBar:RegisterEvent("UNIT_PET")
+	petBar:RegisterEvent("UNIT_FLAGS")
+	petBar:RegisterEvent("UNIT_AURA")
+	petBar:RegisterEvent("PET_BAR_UPDATE")
+	petBar:RegisterEvent("PET_BAR_UPDATE_COOLDOWN")
+	petBar:RegisterEvent("PET_BAR_SHOWGRID")
+	petBar:RegisterEvent("PET_BAR_HIDEGRID")
 end
 
 function BongosPetBar:Unload()
 	self.bar:Destroy()
-	self:UnregisterAllEvents()
-	self:UnregisterAllMessages()
-end
-
-function BongosPetBar:UpdateBindings()
-	BongosPetButton:ForAll("UpdateHotkey")
-end
-
-function BongosPetBar:UpdateIfPet(event, unit)
-	if unit == "pet" then
-		BongosPetButton:ForAll("Update")
-	end
-end
-
-function BongosPetBar:UpdatePetBar()
-	BongosPetButton:ForAll("Update")
-	self:UpdateVisibility()
-end
-
-function BongosPetBar:UpdateCooldown()
-	BongosPetButton:ForAll("UpdateCooldown")
-end
-
-function BongosPetBar:UpdateShowGrid(event)
-	if event == "PET_BAR_SHOWGRID" then
-		BongosPetButton.showEmpty = true
-	elseif event == "PET_BAR_HIDEGRID" then
-		BongosPetButton.showEmpty = nil
-	end
-	self:UpdateVisibility()
-end
-
-function BongosPetBar:UpdateVisibility()
-	if(self.inCombat) then
-		self.needsUpdate = true
-	else
-		self.needsUpdate = nil
-		BongosPetButton:ForAll("UpdateVisibility")
-		SecureStateHeader_Refresh(self.bar)
-	end
-end
-
-function BongosPetBar:UpdateCombat(event)
-	if(event == "PLAYER_REGEN_ENABLED") then
-		self.inCombat = nil
-		if(self.needsUpdate) then
-			self:UpdateVisibility()
-		end
-	elseif(event == "PLAYER_REGEN_DISABLED") then
-		self.inCombat = true
-	end
+	PetActionBarFrame:UnregisterAllEvents()
 end

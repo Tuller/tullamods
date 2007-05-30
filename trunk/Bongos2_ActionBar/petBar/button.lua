@@ -6,14 +6,19 @@
 
 BongosPetButton = CreateFrame("CheckButton")
 local Button_mt = {__index = BongosPetButton}
+local petBar = PetActionBarFrame
 
---[[ Constructorish ]]--
 
-local function OnDragStart(self) self:OnDragStart(arg1) end
-local function OnReceiveDrag(self) self:OnReceiveDrag(arg1) end
+--[[ Frame Events ]]--
+
+local function OnDragStart(self) self:OnDragStart() end
+local function OnReceiveDrag(self) self:OnReceiveDrag() end
 local function OnEnter(self) self:OnEnter() end
 local function OnLeave(self) self:OnLeave() end
-local function OnAttributeChanged(self) self:Update() end
+local function OnEvent(self) self:UpdateHotkey() end
+
+
+--[[ Constructorish ]]--
 
 function BongosPetButton:Set(id, parent)
 	local button = setmetatable(self:Get(id), Button_mt)
@@ -23,8 +28,6 @@ function BongosPetButton:Set(id, parent)
 	button:ShowHotkey(BongosActionConfig:ShowingHotkeys())
 
 	parent:Attach(button)
-	parent:SetAttribute("addchild", button)
-	button:UpdateVisibility()
 
 	return button
 end
@@ -44,28 +47,29 @@ function BongosPetButton:SetScripts()
 	self:RegisterForDrag("LeftButton", "RightButton")
 	self:RegisterForClicks("anyUp")
 
-	self:SetScript("OnLoad", nil)
-	self:SetScript("OnEvent", nil)
 	self:SetScript("OnDragStart", OnDragStart)
 	self:SetScript("OnReceiveDrag", OnReceiveDrag)
 	self:SetScript("OnEnter", OnEnter)
-	self:SetScript("OnAttributeChanged", OnAttributeChanged)
+	self:SetScript("OnEvent", OnEvent)
+	self:RegisterEvent("UPDATE_BINDINGS")
 end
 
 
 --[[ OnX Functions ]]--
 
 function BongosPetButton:OnDragStart()
-	if not BongosActionConfig:ButtonsLocked() or BongosActionConfig:IsQuickMoveKeyDown() or self.showEmpty then
-		self:SetChecked(false)
+	if petBar.showgrid > 0 or not(BongosActionConfig:ButtonsLocked()) or BongosActionConfig:IsQuickMoveKeyDown() then
+		self:SetChecked(0)
 		PickupPetAction(self:GetID())
+		PetActionBar_Update()
 	end
 end
 
 function BongosPetButton:OnReceiveDrag()
-	if self.showEmpty or BongosActionConfig:IsQuickMoveKeyDown() then
-		self:SetChecked(false)
+	if petBar.showgrid > 0 or BongosActionConfig:IsQuickMoveKeyDown() then
+		self:SetChecked(0)
 		PickupPetAction(self:GetID())
+		PetActionBar_Update()
 	end
 end
 
@@ -74,64 +78,6 @@ function BongosPetButton:OnEnter()
 		PetActionButton_OnEnter(self)
 	end
 	KeyBound:Set(self)
-end
-
-
---[[ Update Functions ]]--
-
-function BongosPetButton:Update()
-	local action, subtext, texture, isToken, isActive, autoCastAllowed, autoCastEnabled = GetPetActionInfo(self:GetID())
-	local name = self:GetName()
-
-	self.isToken = isToken
-	self.tooltipSubtext = subtext
-	self:SetChecked(isActive)
-
-	local icon = getglobal(name .. "Icon")
-	SetDesaturation(icon, not GetPetActionsUsable())
-
-	if texture then
-		icon:Show()
-		self:SetNormalTexture("Interface\\Buttons\\UI-Quickslot2")
-	else
-		icon:Hide()
-		self:SetNormalTexture("Interface\\Buttons\\UI-Quickslot")
-	end
-
-	if not isToken then
-		icon:SetTexture(texture)
-		self.tooltipName = action
-	else
-		icon:SetTexture(getglobal(texture))
-		self.tooltipName = getglobal(action)
-	end
-
-	local autoCastTexture = getglobal(name .. "AutoCastable")
-	if autoCastAllowed then
-		autoCastTexture:Show()
-	else
-		autoCastTexture:Hide()
-	end
-
-	local autoCastModel = getglobal(name .. "AutoCast")
-	if autoCastEnabled then
-		autoCastModel:Show()
-	else
-		autoCastModel:Hide()
-	end
-end
-
-function BongosPetButton:UpdateCooldown()
-	local start, duration, enable = GetPetActionCooldown(self:GetID())
-	CooldownFrame_SetTimer(getglobal(self:GetName() .. "Cooldown"), start, duration, enable)
-end
-
-function BongosPetButton:UpdateVisibility()
-	if(not(UnitExists("pet")) or IsMounted() or UnitIsDead("pet") or GetPetActionInfo(self:GetID())  or self:ShowingEmpty()) then
-		self:SetAttribute("showstates", "1")
-	else
-		self:SetAttribute("showstates", "!*")
-	end
 end
 
 
@@ -160,10 +106,6 @@ end
 
 
 --[[ Utility Functions ]]--
-
-function BongosPetButton:ShowingEmpty()
-	return self.showEmpty or BongosActionConfig:ShowingEmptyButtons() or KeyBound:IsShown()
-end
 
 function BongosPetButton:Get(id)
 	return getglobal(format("PetActionButton%d", id))
