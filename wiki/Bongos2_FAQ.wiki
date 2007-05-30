@@ -1,11 +1,14 @@
-#summary Frequently asked questions about Bongos2
+#summary The Bongos FAQ
 #labels Featured
 
 ==FAQ==
 
+*Will I be able to keep my profiles when upgrading from Bongos to Bongos2?*
+   * Profiles are incompatible between Bongos and Bongos2 due to the alterations I've made to the profiles system in Bongos2.
+
+*Will I lose my settings when updating from Bongos2 version X to Bongos2 version Y?*
+   * If the version you're upgrading to, and your current version share the same major version number (ie, Bongos2 1.0 and Bongos2 1.2, but not Bongos2 1.0 and Bongos2 2.0) then your settings will be preserved.  If they don't then they will most likely not be.
+
 *My bindings don't work when I switch stances!*
-   * Bind your action buttons using the Bongos keybindings menu (/bob menu)
-
-*Druids forms do not work*
-  * Cat form does not work properly until you learn aquatic form.  To solve this problem, learn aquatic form.
-
+   * You need to either convert your bindings from Bongos1/the default actionbar (/run BongosActionBar:ConvertBindings()) or bind your keys using KeyBound (/keybound).  
+   *The reason this happens is because if you have not bound your keys, then you're actually pressing the old blizzard buttons, and not the bongos ones, which share the same action IDs when in your base state (unstealthed, caster, battle stance, etc), but do not change when you switch stances.
