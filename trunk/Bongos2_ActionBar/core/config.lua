@@ -40,11 +40,7 @@ function BongosActionConfig:ShowEmptyButtons(enable)
 	else
 		Bongos.profile.showEmpty = false
 	end
-
 	BongosActionBar:UpdateVisibility()
-	if UnitExists("pet") then
-		BongosPetBar:UpdateVisibility()
-	end
 end
 
 function BongosActionConfig:ShowingEmptyButtons()
