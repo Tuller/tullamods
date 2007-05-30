@@ -45,7 +45,6 @@ local function Bar_Restore(id)
 	local bar = unused[id]
 	if bar then
 		unused[id] = nil
-		bar:SetParent(UIParent)
 		return bar
 	end
 end
@@ -87,7 +86,6 @@ function BBar:Destroy()
 
 	self.sets = nil
 	self.dragFrame:Hide()
-	self:SetParent(nil)
 	self:ClearAllPoints()
 	self:SetUserPlaced(false)
 	self:Hide()

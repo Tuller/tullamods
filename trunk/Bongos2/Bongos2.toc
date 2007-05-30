@@ -2,7 +2,7 @@
 ## Title: Bongos2
 ## Notes: Movable bar framework
 ## Author: Tuller
-## Version: 1.4
+## Version: 1.5
 ## SavedVariables: Bongos2DB
 lib\FlyPaper.lua
 lib\Gooey.xml

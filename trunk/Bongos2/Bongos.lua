@@ -52,7 +52,6 @@ function Bongos:Enable()
 
 	self:RegisterSlashCommands()
 	self:LoadModules()
-	self:LoadMinimap()
 end
 
 function Bongos:UpdateVersion()
@@ -69,6 +68,7 @@ function Bongos:LoadModules()
 		module:Load()
 	end
 	BBar:ForAll("Reanchor")
+	self:LoadMinimap()
 end
 
 function Bongos:UnloadModules()
@@ -146,38 +146,48 @@ end
 --[[ Events ]]--
 
 function Bongos:DONGLE_PROFILE_CREATED(event, db, parent, sv_name, profile_key)
-	self.profile = self.db.profile
-	if(BongosActionBar) then
-		BongosActionBar:ConvertBindings()
+	if(sv_name == "Bongos2DB") then
+		self.profile = self.db.profile
+		if(BongosActionBar) then
+			BongosActionBar:ConvertBindings()
+		end
+		self:Print(format(L.ProfileCreated , profile_key))
 	end
-	self:Print(format(L.ProfileCreated , profile_key))
 end
 
 function Bongos:DONGLE_PROFILE_CHANGED(event, db, parent, sv_name, profile_key)
-	self.profile = self.db.profile
-	if(self.copyProfile) then
-		self.db:CopyProfile(self.copyProfile)
-		self.copyProfile = nil
-	else
-		self:LoadModules()
+	if(sv_name == "Bongos2DB") then
+		self.profile = self.db.profile
+		if(self.copyProfile) then
+			self.db:CopyProfile(self.copyProfile)
+			self.copyProfile = nil
+		else
+			self:LoadModules()
+		end
+		self:Print(format(L.ProfileLoaded, profile_key))
 	end
-	self:Print(format(L.ProfileLoaded, profile_key))
 end
 
 function Bongos:DONGLE_PROFILE_DELETED(event, db, parent, sv_name, profile_key)
-	self:Print(format(L.ProfileDeleted, profile_key))
+	if(sv_name == "Bongos2DB") then
+		self:Print(format(L.ProfileDeleted, profile_key))
+	end
 end
 
 function Bongos:DONGLE_PROFILE_COPIED(event, db, parent, sv_name, profile_key, intoProfile_key)
-	self.profile = self.db.profile
-	self:LoadModules()
-	self:Print(format(L.ProfileCopied, profile_key, intoProfile_key))
+	if(sv_name == "Bongos2DB") then
+		self.profile = self.db.profile
+		self:LoadModules()
+		self:Print(format(L.ProfileCopied, profile_key, intoProfile_key))
+	end
 end
 
 function Bongos:DONGLE_PROFILE_RESET(event, db, parent, sv_name, profile_key)
-	self.profile = self.db.profile
-	self:LoadModules()
-	self:Print(format(L.ProfileReset, profile_key))
+	if(sv_name == "Bongos2DB") then
+		self.profile = self.db.profile
+		self:LoadModules()
+		self:Print(format(L.ProfileReset, profile_key))
+	end
 end
 
 
