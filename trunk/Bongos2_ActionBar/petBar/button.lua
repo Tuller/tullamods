@@ -26,7 +26,6 @@ function BongosPetButton:Set(id, parent)
 	button:SetScripts()
 	button:Style()
 	button:ShowHotkey(BongosActionConfig:ShowingHotkeys())
-
 	parent:Attach(button)
 
 	return button
