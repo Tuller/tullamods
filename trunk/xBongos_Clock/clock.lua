@@ -9,9 +9,9 @@ local offset = 0
 local UPDATE_DELAY = 30
 
 local function Clock_UpdateTime(text, hours, minutes)
-	local hours = mod(hours + offset, 24)
 	local pm = hours >= 12
-	hours = mod(hours-1, 12) + 1
+	hours = mod(hours, 12)
+	if(hours == 0) then hours = 12 end
 
 	if pm then
 		text:SetText(format(TEXT(TIME_TWELVEHOURPM), hours, minutes))
