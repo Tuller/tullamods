@@ -222,19 +222,22 @@ local function StanceSlider_OnShow(self)
 	self.onShow = true
 	local frame = self:GetParent().frame
 
-	local maxOffset = BongosActionBar:GetNumber() - 1
+	local numBars = BongosActionBar:GetNumber()
+	local maxOffset = numBars - 1
 	self:SetMinMaxValues(0, maxOffset)
 	self:SetValue(frame.sets[self.id] or 0)
 	getglobal(self:GetName() .. "High"):SetText(maxOffset)
+	getglobal(self:GetName() .. "ValText"):SetText(format("Bar %s", mod(frame.id+self:GetValue()-1, numBars)+1))
+	
 	self.onShow = nil
 end
 
 local function StanceSlider_OnValueChanged(self, value)
-	local menu = self:GetParent()
+	local frame = self:GetParent().frame
 	if not self.onShow then
-		menu.frame:SetStateOffset(self.id, value)
+		frame:SetStateOffset(self.id, value)
+		getglobal(self:GetName() .. "ValText"):SetText(format("Bar %s", mod(frame.id+value-1, BongosActionBar:GetNumber())+1))
 	end
-	getglobal(self:GetName() .. "ValText"):SetText(value)
 end
 
 local function Panel_AddStanceSlider(self, id, title)

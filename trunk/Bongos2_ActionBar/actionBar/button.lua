@@ -167,6 +167,9 @@ end
 
 --[[ OnX Functions ]]--
 
+local IsActionInRange = IsActionInRange
+local IsUsableAction = IsUsableAction
+
 function BongosActionButton:OnUpdate(elapsed)
 	if(self.needsUpdate) then
 		self.needsUpdate = nil
