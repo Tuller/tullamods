@@ -81,7 +81,7 @@ local function TabbedMenu_AddItem(self, name)
 		button:SetPoint("TOPLEFT", self, "TOPLEFT", 2, -2)
 		self:SetHeight(self:GetHeight() + 26)
 	else
-		button:SetPoint("TOPLEFT", self.button, "BOTTOMLEFT", 0, 0)
+		button:SetPoint("TOPLEFT", self.button, "BOTTOMLEFT")
 		self:SetHeight(self:GetHeight() + 20)
 	end
 	self.button = button
@@ -89,6 +89,7 @@ end
 
 function BongosMenu:AddMenu()
 	local menu = CreateFrame("Frame", self:GetName() .. "Menu", self, "GooeyFrame")
+	menu:SetClampedToScreen(true)
 	menu:SetWidth(52)
 	menu.AddItem = TabbedMenu_AddItem
 	menu:SetPoint("TOPRIGHT", self, "TOPLEFT", 6, -16)
@@ -220,11 +221,11 @@ end
 --spacing
 function BongosMenu:CreateSpacingSlider(name)
 	local slider = self:CreateSlider(name)
-	slider:SetMinMaxValues(0, 32)
+	slider:SetMinMaxValues(-8, 32)
 	slider:SetValueStep(1)
 
 	getglobal(name .. "Text"):SetText(L.Spacing)
-	getglobal(name .. "Low"):SetText("0")
+	getglobal(name .. "Low"):SetText("-8")
 	getglobal(name .. "High"):SetText("32")
 	
 	return slider

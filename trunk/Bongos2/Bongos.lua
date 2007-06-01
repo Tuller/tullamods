@@ -29,10 +29,8 @@ function Bongos:Enable()
 			showEmpty = false,
 			showMinimap = true,
 			rangeColor = {r = 1, g = 0.5, b = 0.5},
---			rightClickUnit = "player",
 			quickMoveKey = 1,
-			mapx = -24,
-			mapy = -76,
+			mapx = -24, mapy = -76,
 			bars = {}
 		}
 	}
