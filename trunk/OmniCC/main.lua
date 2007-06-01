@@ -306,6 +306,10 @@ local function Timer_Create(parent, cooldown, icon)
 	return timer
 end
 
+local function Cooldown_OnHide(self)
+	OmniCC:StopTimer(self:GetParent().timer)
+end
+
 function OmniCC:StartTimer(cooldown, start, duration)
 	local parent = cooldown:GetParent()
 	if parent and parent:GetName() then
@@ -323,6 +327,7 @@ function OmniCC:StartTimer(cooldown, start, duration)
 			timer.texture = icon:GetTexture()
 			active[timer] = true
 			timer:Show()
+			cooldown:SetScript("OnHide", Cooldown_OnHide)
 		end
 	end
 end
