@@ -148,9 +148,8 @@ function SageBuff:LayoutIcons(count)
 	local width = ceil(self:GetWidth())
 	local height = ceil(self:GetHeight())
 	local size = min(height, width)
-	
-	local scale = 1
-	local rows = 1
+
+	local scale = 1; local rows = 1
 	while size * scale  * count / rows > width do
 		scale = scale - 0.01
 		rows = height / (size * scale)
@@ -158,21 +157,15 @@ function SageBuff:LayoutIcons(count)
 	local cols = ceil(count / rows)
 	rows = floor(rows)
 	size = size * scale
-	
-	for i = 0, rows - 1 do
-		local prev
-		for j = 1, cols do
-			local buff = self[j + i*cols]
-			if buff then
+
+	for row = 0, rows-1 do
+		for col = 0, cols-1 do
+			local index = (col+1) + row*cols
+			if(index <= count) then
+				local buff = self[index]
 				buff:ClearAllPoints()
-				buff:SetWidth(size)
-				buff:SetHeight(size)
-				if prev then
-					buff:SetPoint('TOPLEFT', prev, 'TOPRIGHT')
-				else
-					buff:SetPoint('TOPLEFT', self, 'TOPLEFT', 0, -i*size)
-				end
-				prev = buff
+				buff:SetWidth(size); buff:SetHeight(size)
+				buff:SetPoint("TOPLEFT", self, "TOPLEFT", (size * col), -(size * row))
 			else return end
 		end
 	end
