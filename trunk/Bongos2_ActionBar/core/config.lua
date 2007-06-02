@@ -9,11 +9,7 @@ BongosActionConfig = {}
 
 --show tooltips
 function BongosActionConfig:ShowTooltips(enable)
-	if enable then
-		Bongos.profile.showTooltips = true
-	else
-		Bongos.profile.showTooltips = false
-	end
+	Bongos.profile.showTooltips = enable or false
 end
 
 function BongosActionConfig:ShowingTooltips()
@@ -22,11 +18,7 @@ end
 
 --lock button positions
 function BongosActionConfig:LockButtons(enable)
-	if enable then
-		Bongos.profile.lockButtons = true
-	else
-		Bongos.profile.lockButtons = false
-	end
+	Bongos.profile.lockButtons = enable or false
 end
 
 function BongosActionConfig:ButtonsLocked()
@@ -35,11 +27,7 @@ end
 
 --show empty buttons
 function BongosActionConfig:ShowEmptyButtons(enable)
-	if enable then
-		Bongos.profile.showEmpty = true
-	else
-		Bongos.profile.showEmpty = false
-	end
+	Bongos.profile.showEmpty = enable or false
 	BongosActionBar:UpdateVisibility()
 end
 
@@ -49,12 +37,7 @@ end
 
 --show hotkeys
 function BongosActionConfig:ShowHotkeys(enable)
-	if enable then
-		Bongos.profile.showHotkeys = true
-	else
-		Bongos.profile.showHotkeys = false
-	end
-
+	Bongos.profile.showHotkeys = enable or false
 	BongosActionButton:ForAll("ShowHotkey", enable)
 	BongosPetButton:ForAll("ShowHotkey", enable)
 	BongosClassButton:ForAll("ShowHotkey", enable)
@@ -69,11 +52,7 @@ end
 
 --show macro text
 function BongosActionConfig:ShowMacros(enable)
-	if enable then
-		Bongos.profile.showMacros = true
-	else
-		Bongos.profile.showMacros = false
-	end
+	Bongos.profile.showMacros = enable or false
 	BongosActionButton:ForAll("ShowMacro", enable)
 end
 
@@ -105,11 +84,7 @@ end
 
 --set range color
 function BongosActionConfig:SetRangeColoring(enable)
-	if enable then
-		Bongos.profile.rangeColoring = true
-	else
-		Bongos.profile.rangeColoring = false
-	end
+	Bongos.profile.rangeColoring = enable or false
 	BongosActionButton:ForAll("UpdateUsable")
 end
 
