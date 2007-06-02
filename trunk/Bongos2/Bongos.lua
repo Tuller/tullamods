@@ -192,11 +192,10 @@ end
 --[[ Config Functions ]]--
 
 function Bongos:SetLock(enable)
+	self.profile.locked = enable or false
 	if enable then
-		self.profile.locked = true
 		BBar:ForAll("Lock")
 	else
-		self.profile.locked = false
 		BBar:ForAll("Unlock")
 	end
 end
@@ -206,11 +205,7 @@ function Bongos:IsLocked()
 end
 
 function Bongos:SetSticky(enable)
-	if enable then
-		self.profile.sticky = true
-	else
-		self.profile.sticky = false
-	end
+	self.profile.sticky = enable or false
 	BBar:ForAll("Reanchor")
 end
 
@@ -342,11 +337,10 @@ function Bongos:LoadMinimap()
 end
 
 function Bongos:ShowMinimap(enable)
+	self.profile.showMinimap = enable or false
 	if enable then
-		self.profile.showMinimap = true
 		BongosMinimapFrame:Show()
 	else
-		self.profile.showMinimap = false
 		BongosMinimapFrame:Hide()
 	end
 end
