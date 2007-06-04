@@ -37,16 +37,13 @@ end
 
 --[[ Event Functions ]]--
 
-function CSpell:Update(unit)
-	local frame = self:Get(unit)
-	if(frame) then
-		if UnitChannelInfo(unit) then
-			self:OnSpellStart(frame)
-		elseif UnitCastingInfo(unit) then
-			self:OnChannelStart(frame)
-		else
-			self:Finish(frame)
-		end
+function CSpell:Update(frame)
+	if UnitChannelInfo(frame.unit) then
+		self:OnSpellStart(frame)
+	elseif UnitCastingInfo(frame.unit) then
+		self:OnChannelStart(frame)
+	else
+		self:Finish(frame)
 	end
 end
 
@@ -106,6 +103,9 @@ end
 function CSpell:Load()
 	self:Create("player", "target", "pet", "focus")
 
+	self:RegisterEvent("PLAYER_TARGET_CHANGED")
+	self:RegisterEvent("PLAYER_FOCUS_CHANGED")
+
 	self:RegisterEvent("UNIT_SPELLCAST_START")
 	self:RegisterEvent("UNIT_SPELLCAST_DELAYED")
 	self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_START")
@@ -122,6 +122,20 @@ function CSpell:Unload()
 		for _,frame in pairs(self.frames) do
 			frame:Destroy()
 		end
+	end
+end
+
+function CSpell:PLAYER_FOCUS_CHANGED(event)
+	local frame = self:Get("focus")
+	if(frame) then
+		self:Update(frame)
+	end
+end
+
+function CSpell:PLAYER_TARGET_CHANGED(event)
+	local frame = self:Get("target")
+	if(frame) then
+		self:Update(frame)
 	end
 end
 
