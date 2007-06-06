@@ -110,14 +110,10 @@ function SellFish:Initialize()
 			self:UpdateVersion(current)
 		end
 	end
-
-	if not SellFishDB.newVals then
-		SellFishDB.newVals = {}
-	end
 end
 
 function SellFish:LoadDefaults(current)
-	SellFishDB = {short = 1, version = current}
+	SellFishDB = {short = 1, version = current, newVals = {}}
 
 	if CompletePrices then
 		self:ConvertPriceMaster(CompletePrices)
