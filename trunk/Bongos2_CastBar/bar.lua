@@ -147,12 +147,11 @@ end
 
 local function Bar_ToggleText(self, enable)
 	local castingBar = self.castBar
+	self.sets.showText = enable or nil
 	if enable then
 		getglobal(castingBar:GetName() .. "Time"):Show()
-		self.sets.showText = true
 	else
 		getglobal(castingBar:GetName() .. "Time"):Hide()
-		self.sets.showText = nil
 	end
 	castingBar:AdjustWidth()
 end
