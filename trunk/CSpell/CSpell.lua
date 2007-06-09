@@ -39,7 +39,7 @@ end
 
 function CSpell:Update(frame)
 	if UnitChannelInfo(frame.unit) then
-		self:UnitChannelInfo(frame)
+		self:OnChannelStart(frame)
 	elseif UnitCastingInfo(frame.unit) then
 		self:OnSpellStart(frame)
 	else
