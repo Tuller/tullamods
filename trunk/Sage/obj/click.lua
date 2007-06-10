@@ -3,14 +3,14 @@
 		The clickable portion of a SageFrame
 --]]
 
-SageClick = CreateFrame('Button')
+SageClick = CreateFrame("Button")
 local Frame_mt = {__index = SageClick}
 
-local function OnEnter() this:OnEnter() end
-local function OnLeave() this:OnLeave() end
+local function Frame_OnEnter(self) self:OnEnter() end
+local function Frame_OnLeave(self) self:OnLeave() end
 
-function SageClick.Create(parent)
-	local frame = CreateFrame('Button', format('SageClick%s', (id or parent.id)), parent, 'SecureUnitButtonTemplate')
+function SageClick:Create(parent, id)
+	local frame = CreateFrame("Button", format("SageClick%s", id or parent.id), parent, "SecureUnitButtonTemplate")
 	setmetatable(frame, Frame_mt)
 
 	SecureUnitButton_OnLoad(frame, id or parent.id, function() frame:ShowMenu() end)
@@ -18,18 +18,16 @@ function SageClick.Create(parent)
 	ClickCastFrames = ClickCastFrames or {}
     ClickCastFrames[frame] = true
 
-	frame:RegisterForClicks('anyUp')
-	frame:SetScript('OnEnter', OnEnter)
-	frame:SetScript('OnLeave', OnLeave)
+	frame:RegisterForClicks("anyUp")
+	frame:SetScript("OnEnter", Frame_OnEnter)
+	frame:SetScript("OnLeave", Frame_OnLeave)
 
 	return frame
 end
 
---[[ OnX Functions ]]--
-
 --show tooltip, show text if its not always shown
 function SageClick:OnEnter()
-	local unit = self:GetAttribute('unit')
+	local unit = self:GetAttribute("unit")
 
 	if SpellIsTargeting() then
 		if SpellCanTargetUnit(unit) then
@@ -40,7 +38,6 @@ function SageClick:OnEnter()
 	end
 
 	GameTooltip_SetDefaultAnchor(GameTooltip, self)
-
 	if GameTooltip:SetUnit(unit) then
 		self.updateTooltip = TOOLTIP_UPDATE_TIME
 	else
@@ -48,7 +45,7 @@ function SageClick:OnEnter()
 	end
 	GameTooltipTextLeft1:SetTextColor(GameTooltip_UnitColor(unit))
 
-	self:GetParent():ShowText(true)
+	SageBar:UpdateAllText(unit, true)
 end
 
 --hide tooltip, and text if its not always shown
@@ -59,13 +56,13 @@ function SageClick:OnLeave()
 
 	GameTooltip:Hide()
 	self.updateTooltip = nil
-	
-	self:GetParent():ShowText(Sage.ShowingText())
+
+	SageBar:UpdateAllText(self:GetAttribute("unit"), Sage:ShowingText())
 end
 
 --credit goes to agUF for this function
 function SageClick:ShowMenu()
-	local unit = self:GetAttribute('unit')
+	local unit = self:GetAttribute("unit")
 	local menu
 
 	if unit == "player" then
@@ -75,14 +72,14 @@ function SageClick:ShowMenu()
 	elseif unit == "pet" then
 		menu = PetFrameDropDown
 	else
-		local partyID = unit:match('party(%d)')
+		local partyID = unit:match("party(%d)")
 		if partyID then
-			menu = getglobal('PartyMemberFrame' .. partyID .. 'DropDown')
+			menu = getglobal(format("PartyMemberFrame%sDropDown", partyID))
 		end
 	end
 
 	if menu then
 		HideDropDownMenu(1)
-		ToggleDropDownMenu(1, nil, menu, 'cursor')
+		ToggleDropDownMenu(1, nil, menu, "cursor")
 	end
 end

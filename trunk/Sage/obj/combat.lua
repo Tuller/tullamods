@@ -4,25 +4,24 @@
 --]]
 
 --create a combat indicator
-local function CreateCombatFrame(parent, fontHeight)
-	local frame = CreateFrame('Frame', nil, parent)
+local function CombatFrame_Create(parent, fontHeight)
+	local frame = CreateFrame("Frame", nil, parent)
+	frame.id = parent.id
+	frame.feedbackFontHeight = fontHeight
+
 	frame:SetAllPoints(parent)
 	frame:SetFrameLevel(parent:GetFrameLevel() + 2)
 
 	frame.feedbackText = frame:CreateFontString(nil, "OVERLAY")
-	frame.feedbackText:SetPoint("CENTER", parent.health, "CENTER", 0, 0)
+	frame.feedbackText:SetPoint("CENTER", parent.health)
 	frame.feedbackText:Hide()
-	frame.feedbackFontHeight = fontHeight
-	frame.unit = parent.id
-	
-	parent.combatText = frame
 
 	return frame
 end
 
-local function OnCombatEvent(event, flags, amount, type)
-	local feedbackText = this.feedbackText
-	local fontHeight = this.feedbackFontHeight
+local function CombatFrame_OnCombatEvent(self, event, flags, amount, type)
+	local feedbackText = self.feedbackText
+	local fontHeight = self.feedbackFontHeight
 	local text = ""
 	local r = 1.0
 	local g = 1.0
@@ -79,7 +78,7 @@ local function OnCombatEvent(event, flags, amount, type)
 		text = CombatFeedbackText[event]
 	end
 
-	this.feedbackStartTime = GetTime()
+	self.feedbackStartTime = GetTime()
 
 	feedbackText:SetFont(NumberFontNormal:GetFont(), fontHeight, "OUTLINE")
 	feedbackText:SetText(text)
@@ -88,34 +87,38 @@ local function OnCombatEvent(event, flags, amount, type)
 	feedbackText:Show()
 end
 
-local function OnEvent()
-	if arg1 == this.unit and this:IsVisible() then
-		OnCombatEvent(arg2, arg3, arg4, arg5)
+local function CombatFrame_OnEvent(self, event, unit, ...)
+	if unit == self.id and self:IsVisible() then
+		CombatFrame_OnCombatEvent(self, ...)
 	end
 end
+
 
 --[[ Usable Functions ]]--
 
-SageCombatText = {}
+SageCombat = {}
 
-function SageCombatText.Register(parent)
-	local combatText = parent.combatText or CreateCombatFrame(parent, parent.sets.combatTextSize)
+function SageCombat:Register(parent)
+	local frame = parent.combatFrame
+	if(not frame) then
+		frame = CombatFrame_Create(parent, parent.sets.combatTextSize)
+		parent.combatFrame = frame
+	end
 
-	if not combatText:GetScript("OnEvent") then
-		combatText:RegisterEvent("UNIT_COMBAT")
-		combatText:SetScript("OnEvent", OnEvent)
-		combatText:SetScript("OnUpdate", CombatFeedback_OnUpdate)
-		combatText:Show()
+	if not frame:GetScript("OnEvent") then
+		frame:RegisterEvent("UNIT_COMBAT")
+		frame:SetScript("OnEvent", CombatFrame_OnEvent)
+		frame:SetScript("OnUpdate", CombatFeedback_OnUpdate)
+		frame:Show()
 	end
 end
 
-function SageCombatText.Unregister(parent)
-	local combatText = parent.combatText
-
-	if combatText then
-		combatText:UnregisterEvent("UNIT_COMBAT")
-		combatText:SetScript("OnEvent", nil)
-		combatText:SetScript("OnUpdate", nil)
-		combatText:Hide()
+function SageCombat:Unregister(parent)
+	local frame = parent.combatFrame
+	if frame then
+		frame:Hide()
+		frame:UnregisterAllEvents()
+		frame:SetScript("OnEvent", nil)
+		frame:SetScript("OnUpdate", nil)
 	end
 end

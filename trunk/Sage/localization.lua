@@ -1,42 +1,59 @@
 --[[
-	Sage Localization file
+	Bongos' Localization File
+		English Language (default)
 --]]
 
---[[
-	English - Default Language
-		This version MUST always be loaded, as it has default values for all strings.
---]]
+SAGE_LOCALS = {}
+local L = SAGE_LOCALS
 
---[[ System Messages ]]--
+--system messages
+L.NewPlayer = "Created new profile for %s"
+L.Updated = "Updated to v%s"
+L.UpdatedIncompatible = "Updating from an incompatible version. Default settings loaded"
 
-SAGE_NEW_USER = "New user detected. Type /sage to bring up the options menu."
-SAGE_UPDATED = "Settings have been updated to v%s."
-SAGE_UNKNOWN_COMMAND = "'%s' is an unknown command."
+--profiles
+L.ProfileCreated = "Created new profile \"%s\""
+L.ProfileLoaded = "Set profile to \"%s\""
+L.ProfileDeleted = "Deleted profile \"%s\""
+L.ProfileCopied = "Copied settings from \"%s\" to \"%s\""
+L.ProfileReset = "Reset profile \"%s\""
+L.CantDeleteCurrentProfile = "Cannot delete the current profile"
 
---[[ Slash Command Help Messages ]]--
+--slash command help
+L.LockFramesDesc = "Toggles locking frame positions"
+L.StickyFramesDesc = "Toggles auto anchoring frames"
 
-SAGE_COMMANDS = "Sage Commands"
-SAGE_UNIT_DEFINITION = "<unit> - a unitID like player or target, party for all party frames, or all"
-SAGE_COMMAND_HELP = "/sg help - Displays list of commands"
-SAGE_COMMAND_LOCK = "/sg lock - Locks all frame positions"
-SAGE_COMMAND_UNLOCK = "/sg unlock - Unlocks all frame positions"
-SAGE_COMMAND_SCALE = "/sg scale <unit> <scale> - Sets the scale of the given frame. 1 is normal size"
-SAGE_COMMAND_SETALPHA = "/sg setAlpha <unit> <opacity> - Sets the opacity level of the given frame. 0 is translucent, 1 is opaque"
-SAGE_COMMAND_STICKY = "/sg sticky <on | off> - Enables/disables frames automatically anchoring when placed near each other"
-SAGE_COMMAND_TEXT = "/sg text <on | off> - Enables/disables always showing statusbar text"
-SAGE_COMMAND_PERCENTS = "/sg percents <on | off> - Shows/hides health percentages"
-SAGE_COMMAND_DYNAMICWIDTH = "/sg dynamicWidth <on | off> - Enables/disables frames automatically adjusting to fit unit names"
-SAGE_COMMAND_SETWIDTH = "/sg setwidth <unit> <width> - Sets the minimum width for the name portion of the given unitframe"
+L.SetScaleDesc = "Sets the scale of <frameList>"
+L.SetAlphaDesc = "Sets the opacity of <frameList>"
 
+--slash commands for profiles
+L.ResetDesc = "Loads default settings"
+L.SetDesc = "Switches settings to <profile>"
+L.CopyDesc = "Copies settings from <profile>"
+L.DeleteDesc = "Deletes <profile>"
+L.ResetDesc = "Returns to default settings"
+L.ListDesc = "Lists all profiles"
+L.AvailableProfiles = "Available Profiles"
+L.PrintVersionDesc = "Prints the current Bongos version"
 
---[[ Statusbar Text ]]--
+--dragFrame tooltips
+L.SetAlpha = "<Mousewheel> to set opacity (%.2f)"
 
-SAGE_DEAD = "Dead"
-SAGE_OFFLINE = "Offline"
-SAGE_GHOST = "Ghost"
+--Menu Stuff
+L.Scale = "Scale"
+L.Opacity = "Opacity"
+L.Visibility = "Visibility"
+L.Width = "Width"
+L.Layout = "Layout"
 
-SAGE_BOSS = "Boss"
-SAGE_RARE_ELITE = "Rare Elite"
-SAGE_ELITE = "Elite"
-SAGE_RARE = "Rare"
-SAGE_UNKNOWN_CREATURE_TYPE = "Not specified"
+--statusbar text
+L.Dead = "Dead"
+L.Offline = "Offline"
+L.Ghost = "Ghost"
+L.FeignDeath = "Feigning Death"
+
+L.Boss = "Boss"
+L.Rare = "Rare"
+L.Elite = "Elite"
+L.RareElite = "Rare Elite"
+L.UnknownCreature = "Not specified"

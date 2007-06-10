@@ -1,27 +1,22 @@
-## Interface: 20003
+## Interface: 20100
 ## Title: Sage
-## Notes: Unitframe components
+## Notes: Lightweight unit frame framework
 ## Author: Tuller
-## Version: 7.2.15
-## SavedVariablesPerCharacter: SageDB
-## SavedVariables: SageProfiles
-lib\TLib.lua
-lib\BVent.lua
+## Version: 0.1
+## SavedVariables: Sage2DB
 lib\FlyPaper.lua
-lib\SeeQ.lua
+lib\Dongle.lua
 localization.lua
-profile.lua
+obj\fonts.lua
+obj\drag.lua
+obj\frame.lua
+obj\click.lua
+obj\info.lua
+obj\npc.lua
+obj\combat.lua
+obj\bar.lua
+obj\health.lua
+obj\mana.lua
+obj\buff.lua
+obj\cast.lua
 Sage.lua
-fonts.lua
-dragFrame.lua
-frame.lua
-statusBar.lua
-health.lua
-mana.lua
-castBar.lua
-info.lua
-combatText.lua
-buff.lua
-debuff.lua
-click.lua
-slash.lua
