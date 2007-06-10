@@ -312,12 +312,12 @@ end
 
 function OmniCC:StartTimer(cooldown, start, duration)
 	local parent = cooldown:GetParent()
-	if parent and parent:GetName() then
-		local icon =
-			--standard action button icon, $parentIcon
-			getglobal(parent:GetName() .. "Icon") or
-			--standard item button icon,  $parentIconTexture
-			getglobal(parent:GetName() .. "IconTexture")
+	if parent then
+		local icon = parent.icon
+		local name = parent:GetName()
+		if(not(icon) and name) then
+			icon = getglobal(name .. "Icon") or getglobal(name .. "IconTexture")
+		end
 
 		if icon then
 			local timer = parent.timer or Timer_Create(parent, cooldown, icon)
