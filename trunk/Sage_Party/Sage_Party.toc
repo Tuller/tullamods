@@ -1,9 +1,7 @@
-## Interface: 20003
-## Title: Sage_Party
+## Interface: 20100
+## Title: Sage Party
 ## Notes: Party frames
 ## Author: Tuller
 ## Dependencies: Sage
 localization.lua
-partyPet.lua
 party.lua
-menu.lua
