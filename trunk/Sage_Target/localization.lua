@@ -1,1 +1,0 @@
-SAGE_TARGET_NUMERIC_COMBO = "Numeric Combo"
