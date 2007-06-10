@@ -1,1 +1,0 @@
-SAGE_TARGET_TARGET_UPDATE_INTERVAL = "Update Interval"

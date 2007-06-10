@@ -1,8 +1,7 @@
-## Interface: 20003
-## Title: Sage_TargetOfTarget
+## Interface: 20100
+## Title: Sage Target of Target
 ## Notes: A target of target frame
 ## Author: Tuller
 ## Dependencies: Sage
 localization.lua
 targetTarget.lua
-menu.lua
