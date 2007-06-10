@@ -3,35 +3,36 @@
 		A pet frame based on Sage
 --]]
 
+SagePet = Sage:NewModule("Sage-Pet")
+
 local DEBUFF_SIZE = 25
 local BUFF_SIZE = 16
-local inCombat
+
 
 --[[  Templates ]]--
 
-local function HappyFrame_OnEnter()
-	if this.tooltip then
-		GameTooltip:SetOwner(this, "ANCHOR_RIGHT")
-		GameTooltip:SetText(this.tooltip)
-		if this.tooltipDamage then
-			GameTooltip:AddLine(this.tooltipDamage, "", 1, 1, 1)
+local function HappyFrame_OnEnter(self)
+	if self.tooltip then
+		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+		GameTooltip:SetText(self.tooltip)
+		if self.tooltipDamage then
+			GameTooltip:AddLine(self.tooltipDamage, "", 1, 1, 1)
 		end
-		if this.tooltipLoyalty then
-			GameTooltip:AddLine(this.tooltipLoyalty, "", 1, 1, 1)
+		if self.tooltipLoyalty then
+			GameTooltip:AddLine(self.tooltipLoyalty, "", 1, 1, 1)
 		end
 		GameTooltip:Show()
 	end
 end
 
-local function HappyFrame_OnLeave()
-	GameTooltip:Hide()
-end
+local function HappyFrame_OnLeave() GameTooltip:Hide() end
 
 local function HappyFrame_Update(self)
 	local happiness, damagePercentage, loyaltyRate = GetPetHappiness()
 	local hasPetUI, isHunterPet = HasPetUI()
+
 	if not(happiness and isHunterPet) then
-		self:Hide()	
+		self:Hide()
 	else
 		self:Show()
 
@@ -43,7 +44,7 @@ local function HappyFrame_Update(self)
 			self.icon:SetTexCoord(0, 0.1875, 0, 0.359375)
 		end
 
-		self.tooltip = getglobal('PET_HAPPINESS'.. happiness)
+		self.tooltip = getglobal("PET_HAPPINESS".. happiness)
 		self.tooltipDamage = format(PET_DAMAGE_PERCENTAGE, damagePercentage)
 
 		if loyaltyRate < 0 then
@@ -58,149 +59,149 @@ end
 
 local function HappyFrame_Create(parent)
 	local frame = CreateFrame("Frame", nil, parent)
-	frame:SetWidth(26)
-	frame:SetHeight(30)
-	frame:SetAlpha(parent:GetAlpha())
+	frame:SetWidth(26); frame:SetHeight(30)
 	frame:EnableMouse(true)
-	
-	frame.icon = frame:CreateTexture(nil, 'BACKGROUND')
+
+	frame.icon = frame:CreateTexture(nil, "BACKGROUND")
 	frame.icon:SetTexture("Interface\\PetPaperDollFrame\\UI-PetHappiness")
 	frame.icon:SetAllPoints(frame)
 	frame.Update = HappyFrame_Update
-	
+
 	frame:SetScript("OnEnter", HappyFrame_OnEnter)
 	frame:SetScript("OnLeave", HappyFrame_OnLeave)
-	
+
 	return frame
 end
 
+
 --[[ Update Functions ]]--
 
-local function LayoutBuffs(self, count)
-	self:LayoutIcons(count)
+local function Frame_UpdateCombatStatus(self)
+	self.info.inCombat = self.inCombat
+	self.info:UpdateNameColor()
 end
 
-local function LayoutDebuffs(self, count)
-	self:LayoutIcons(count)
+local function Frame_Update(self)
+	self:UpdateCombatStatus()
+
+	if self.happy then self.happy:Update() end
+	self.info:UpdateAll()
+	self.health:UpdateAll()
+	self.mana:Update()
+	self.buff:Update()
+	self.debuff:Update()
 end
 
-local function UpdateCombatStatus(frame)
-	if inCombat then
-		frame.info.name:SetTextColor(1,0.4,0.4)
+local function Frame_OnCreate(self)
+	self.Update = Frame_Update
+	self.UpdateCombatStatus = Frame_UpdateCombatStatus
+
+	local debuff = SageBuff:Create(self, self.id, nil, true)
+	debuff:SetPoint("TOPRIGHT", self, "TOPRIGHT", 0, -16)
+	debuff:SetWidth(DEBUFF_SIZE * 2)
+	debuff:SetHeight(DEBUFF_SIZE)
+	self.extraWidth = (self.extraWidth or 0) + debuff:GetWidth()
+	self.debuff = debuff
+
+	if select(2, UnitClass("player")) == "HUNTER" then
+		local happy = HappyFrame_Create(self)
+		happy:SetPoint("TOPRIGHT", self.debuff, "TOPLEFT", 0, 2)
+		self.extraWidth = (self.extraWidth or 0) + happy:GetWidth()
+		self.happy = happy
+	end
+
+	local info = SageInfo:Create(self)
+	info:SetPoint("TOPLEFT", self)
+	if self.happy then
+		info:SetPoint("BOTTOMRIGHT", self.happy, "TOPLEFT", 0, -2)
 	else
-		frame.info.name:SetTextColor(1,1,1)
+		info:SetPoint("BOTTOMRIGHT", self.debuff, "TOPLEFT")
 	end
-end
+	self.info = info
 
-local function UpdateAll(frame)
-	UpdateCombatStatus(frame)
+	local health = SageHealth:Create(self)
+	health:SetPoint("TOPLEFT", self.info, "BOTTOMLEFT")
+	health:SetPoint("BOTTOMRIGHT", self.info, "BOTTOMRIGHT", 0, -18)
+	self.health = health
 
-	if frame.happy then
-		frame.happy:Update()
-	end
-	frame.info:UpdateAll()
-	frame.health:UpdateAll()
-	frame.mana:Update()
-	frame.buff:Update()
-	frame.debuff:Update()
-end
-
---[[ Event Handler ]]--
-
-local function OnEvent()
-	if event == 'UNIT_PET' and arg1 == 'player' then
-		UpdateAll(this)
-	elseif event == 'PET_ATTACK_START' then
-		inCombat = true
-		UpdateCombatStatus(this)
-	elseif event == 'PET_ATTACK_STOP' then
-		inCombat = nil
-		UpdateCombatStatus(this)
-	elseif event == 'UNIT_HAPPINESS' and arg1 == 'pet' then
-		this.happy:Update()
-	end
-end
-
---[[ Startup Functions ]]--
-
-local function AddEvents(frame)
-	frame:SetScript("OnEvent", OnEvent)
+	local mana = SageMana:Create(self)
+	mana:SetPoint("TOPLEFT", self.health, "BOTTOMLEFT")
+	mana:SetPoint("BOTTOMRIGHT", self.health, "BOTTOMRIGHT", 0, -10)
+	self.mana = mana
 	
-	frame:RegisterEvent("UNIT_PET")
-	frame:RegisterEvent("PET_ATTACK_START")
-	frame:RegisterEvent("PET_ATTACK_STOP")
-	if frame.happy then
-		frame:RegisterEvent("UNIT_HAPPINESS")
+	local cast = SageCast:Create(self, nil, true)
+	cast:SetPoint("TOPLEFT", self.mana, "TOPLEFT")
+	cast:SetPoint("BOTTOMRIGHT", self.mana, "TOPRIGHT", 0, -2)
+	cast.bar.icon:SetWidth(10); cast.bar.icon:SetHeight(10)
+	self.cast = cast
+
+	local buff = SageBuff:Create(self)
+	buff:SetPoint("TOPLEFT", self.mana, "BOTTOMLEFT", 0, -1)
+	buff:SetWidth(BUFF_SIZE * 8); buff:SetHeight(BUFF_SIZE)
+	self.buff = buff
+
+	if self.sets.showCombatText then
+		SageCombat:Register(self)
 	end
+
+	self.click:SetPoint("TOPLEFT", self.info)
+	self.click:SetPoint("BOTTOMRIGHT", self.mana)
+
+	self:SetHeight(BUFF_SIZE + 10 + 18 + 16)
 end
 
---this function adds all the stuff to the pet frame, like healthbars and the unit's name
-local function UnregsterBlizzPetFrame()
+
+--[[ Events ]]--
+
+function SagePet:Enable()
 	PetFrame:UnregisterAllEvents()
 	PetFrame:Hide()
 end
 
-local function OnCreate(self)
-	UnregsterBlizzPetFrame()
-	
-	local PLAYER_CLASS = select(2, UnitClass('player'))
-	
-	self.debuff = SageDebuff.Create(self, LayoutDebuffs)
-	self.debuff:SetPoint("TOPRIGHT", self, "TOPRIGHT", 0, -16)
-	self.debuff:SetWidth(DEBUFF_SIZE * 2)
-	self.debuff:SetHeight(DEBUFF_SIZE)
-	self.extraWidth = (self.extraWidth or 0) + self.debuff:GetWidth()
+function SagePet:Load()
+	local defaults = {
+		x = 11, y = 691, minWidth = 70,
+		anchor = "playerBL",
+		combatTextSize = 18,
+		showCombatText = true
+	}
 
-	if PLAYER_CLASS == "HUNTER" then
-		self.happy = HappyFrame_Create(self)
-		self.happy:SetPoint("TOPRIGHT", self.debuff, "TOPLEFT", 0, 2)
-		self.extraWidth = (self.extraWidth or 0) + self.happy:GetWidth()
-	end
+	local frame = SageFrame:Create("pet", Frame_OnCreate, defaults)
+	frame:SetAttribute("showstates", "1")
 
-	self.info = SageInfo.Create(self)
-	self.info:SetPoint("TOPLEFT", self)
-	if self.happy then
-		self.info:SetPoint("BOTTOMRIGHT", self.happy, "TOPLEFT", 0, -2)
-	else
-		self.info:SetPoint("BOTTOMRIGHT", self.debuff, "TOPLEFT")
-	end
+	self.frame = frame
+	frame.info:UpdateWidth()
 
-	self.health = SageHealth.Create(self)
-	self.health:SetPoint("TOPLEFT", self.info, "BOTTOMLEFT")
-	self.health:SetPoint("BOTTOMRIGHT", self.info, "BOTTOMRIGHT", 0, -18)
-
-	self.mana = SageMana.Create(self)
-	self.mana:SetPoint("TOPLEFT", self.health, "BOTTOMLEFT")
-	self.mana:SetPoint("BOTTOMRIGHT", self.health, "BOTTOMRIGHT", 0, -10)
-
-	self.buff = SageBuff.Create(self, LayoutBuffs)
-	self.buff:SetPoint("TOPLEFT", self.mana, "BOTTOMLEFT", 0, -1)
-	self.buff:SetWidth(BUFF_SIZE * 8)
-	self.buff:SetHeight(BUFF_SIZE)
-	
-	if self.sets.showCombatText then
-		SageCombatText.Register(self)
+	self:RegisterEvent("UNIT_PET")
+	self:RegisterEvent("PET_ATTACK_START", "OnCombatEvent")
+	self:RegisterEvent("PET_ATTACK_STOP", "OnCombatEvent")
+	if frame.happy then
+		self:RegisterEvent("UNIT_HAPPINESS")
 	end
 	
-	self.click:SetPoint('TOPLEFT', self.info)
-	self.click:SetPoint('BOTTOMRIGHT', self.mana)
-	
-	self:SetHeight(BUFF_SIZE + 10 + 18 + 16)
+	if(UnitExists("pet")) then
+		self.frame:Update()
+	end
 end
 
-Sage.AddStartup(function()
-	if not Sage.GetFrameSets('pet') then
-		Sage.SetFrameSets('pet', {
-			["combatTextSize"] = 18,
-			["x"] = 10.99999888241293,
-			["showCombatText"] = 1,
-			["anchor"] = "playerBL",
-			["minWidth"] = 70,
-			["y"] = 690.9999744445089,
-		})
-	end
+function SagePet:Unload()
+	self:UnregisterAllEvents()
+	self.frame:Destroy()
+end
 
-	local frame = SageFrame.Create('pet', OnCreate)
-	frame.info:UpdateWidth()
-	AddEvents(frame)
-end)
+function SagePet:UNIT_PET(self, event, unit)
+	if(unit == "player") then
+		self.frame:Update()
+	end
+end
+
+function SagePet:UNIT_HAPPINESS(self, event, unit)
+	if(unit == "pet") then
+		self.frame.happy:Update()
+	end
+end
+
+function SagePet:OnCombatEvent(event)
+	self.frame.inCombat = (event == "PET_ATTACK_START")
+	self.frame:UpdateCombatStatus()
+end
