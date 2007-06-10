@@ -147,23 +147,6 @@ function SageHealth:Update()
 	local value, maxValue = GetUnitHealth(unit)
 	self:SetMinMaxValues(0, maxValue)
 	self:SetValue(value)
-	
-	--low health fading
-	if(value > 0 and value/maxValue <= 0.4 and (UnitIsUnit(unit, "player") or UnitInParty(unit))) then
-		if(self.critical) then
-			self.bg.flashTimer = 0
-		else
-			self.critical = true
-			self.bg:SetVertexColor(0.6, 0, 0, 1)
-			UIFrameFlash(self.bg, 0.4, 0.4, 60, true, 0, 0)
-		end
-	elseif(self.critical) then
-		self.critical = nil
-		UIFrameFadeRemoveFrame(self.bg)
-		UIFrameFlashRemoveFrame(self.bg)
-		self.bg.flashTimer = nil		
-		self.bg:SetVertexColor(0.6, 0, 0, 0.6)
-	end
 
 	--Change displayed text depending on if disconnected/dead/ghost/etc
 	local text = self.text
