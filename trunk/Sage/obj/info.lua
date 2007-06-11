@@ -19,10 +19,7 @@ local UnitReactionColor = UnitReactionColor
 --this is an exercise in
 local function IndexToUnit(index)
 	if(index) then
-		if(index == 0) then
-			return "player"
-		end
-		return "party" .. index
+		return ((index == 0) and "player") or "party" .. index
 	end
 end
 
@@ -306,6 +303,7 @@ end
 
 function SageInfo:UNIT_NAME_UPDATE(unit)
 	self:ForUnit(unit, "UpdateName")
+	self:ForUnit(unit, "UpdateNameColor")
 end
 
 function SageInfo:UNIT_CLASSIFICATION_CHANGED(unit)

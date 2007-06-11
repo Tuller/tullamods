@@ -80,7 +80,7 @@ elseif MobHealthFrame then
 			local health, healthMax = UnitHealth(unit), UnitHealthMax(unit)
 			if MobHealthDB[index] then
 				local pts, pct = MobHealthDB[index]:match("^(%d+)/(%d+)$")
-				if(pts ~= "" and pct ~= "") then
+				if(tonumber(pts) and tonumber(pct)) then
 					local ppp = tonumber(pts) / tonumber(pct)
 					return floor(health * ppp + 0.5), floor(healthMax * ppp + 0.5)
 				end

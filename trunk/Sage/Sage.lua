@@ -109,6 +109,9 @@ function Sage:RegisterEvents()
 	
 	self:RegisterEvent("PARTY_LEADER_CHANGED", "UpdateInfo")
 	self:RegisterEvent("PARTY_LOOT_METHOD_CHANGED", "UpdateInfo")
+	
+	-- self:RegisterEvent("UNIT_MODEL_CHANGED", "DumpInfo")
+	-- self:RegisterEvent("PARTY_MEMBER_ENABLE", "DumpInfo")
 
 	self:SetShowCastBars(self:ShowingCastBars())
 end
@@ -198,6 +201,10 @@ end
 
 function Sage:UpdateCast(event, ...)
 	SageCast[event](SageCast, ...)
+end
+
+function Sage:DumpInfo(...)
+	self:Print(...)
 end
 
 
