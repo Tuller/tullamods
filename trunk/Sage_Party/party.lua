@@ -181,8 +181,6 @@ function SageParty:Enable()
 		getglobal(format("PartyMemberFrame%dManaBar", i)):UnregisterAllEvents()
 	end
 	HidePartyFrame()
-
-	self.frames = {}
 end
 
 function SageParty:Load()
@@ -202,6 +200,7 @@ function SageParty:Load()
 
 	self:RegisterEvent("PARTY_MEMBERS_CHANGED", "UpdateMembers")
 	self:RegisterEvent("RAID_ROSTER_UPDATE", "UpdateMembers")
+	self:RegisterEvent("UNIT_DYNAMIC_FLAGS", "UpdateAggro")
 	self:RegisterEvent("UNIT_FLAGS", "UpdateAggro")
 	self:UpdateMembers()
 end
@@ -226,11 +225,15 @@ end
 
 function SageParty:UpdateAggro(event, unit)
 	if(self.parent:IsShown()) then
-		for _,frame in pairs(self.frames) do
-			local prevFlag = frame.info.inCombat
-			frame.info.inCombat = UnitAffectingCombat(frame.id)
-			if(prevFlag ~= frame.info.inCombat) then
-				frame.info:UpdateNameColor()
+		for i in pairs(self.frames) do
+			if(unit == "party" .. i) then
+				local info = SageInfo:Get(unit)
+				local inCombat = UnitAffectingCombat(unit)
+				if(info.inCombat ~= inCombat) then
+					info.inCombat = inCombat
+					info:UpdateNameColor()
+				end
+				return
 			end
 		end
 	end
