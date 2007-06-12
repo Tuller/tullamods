@@ -302,6 +302,18 @@ function Sage:PrintVersion()
 	self:Print(self.profile.version)
 end
 
+function Sage:ListSharedTextures()
+	local SML = AceLibrary and AceLibrary("SharedMedia-1.0")
+	if(SML) then
+		local textures = SML:List(SML.MediaType.STATUSBAR)
+		if(textures) then
+			for _,name in pairs(textures) do
+				self:Print(name)
+			end
+		end
+	end
+end
+
 function Sage:SetFrameScale(args, scale)
 	local scale = tonumber(scale)
 	if scale and scale > 0 and scale <= 10 then
@@ -369,8 +381,17 @@ function Sage:SetBarTexture(texture)
 end
 
 function Sage:GetBarTexture()
-	local texture = self.profile.barTexture or "Blizz"
-	return (texture == "Blizz" and BLIZZ_TEXTURE) or format(TEXTURE_PATH, texture)
+	local texID = self.profile.barTexture or "blizz"
+	if(texID:lower() == "blizz") then return BLIZZ_TEXTURE end
+	
+	local SML = AceLibrary and AceLibrary("SharedMedia-1.0")
+	if(SML) then
+		local texture = SML:Fetch(SML.MediaType.STATUSBAR, texID, true)
+		if(texture) then
+			return texture
+		end
+	end
+	return format(TEXTURE_PATH, texID)
 end
 
 --font size
