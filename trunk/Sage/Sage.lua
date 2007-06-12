@@ -56,15 +56,6 @@ function Sage:Enable()
 	self:LoadModules()
 end
 
--- function Sage:Disable()
-	-- local frameSettings = self.profile.frames
-	-- for id in pairs(frameSettings) do
-		-- if(not SageFrame:Get(id)) then
-			-- frameSettings[id] = nil
-		-- end
-	-- end
--- end
-
 function Sage:UpdateVersion()
 	self.profile.version = CURRENT_VERSION
 	self:Print(format(L.Updated, self.profile.version))
@@ -79,6 +70,17 @@ function Sage:LoadModules()
 	SageFrame:ForAll("Reanchor")
 end
 
+function Sage:LoadOptionsPanels(event, addon)
+	if(addon == "Sage_Options") then
+		for name, module in self:IterateModules() do
+			if(module.LoadOptions) then
+				module:LoadOptions()
+			end
+		end
+		SageOptions:ShowPanel("General")
+	end	
+end
+
 function Sage:UnloadModules()
 	for name, module in self:IterateModules() do
 		assert(module.Unload, format("Sage Module %s: Missing Unload function", name))
@@ -87,6 +89,8 @@ function Sage:UnloadModules()
 end
 
 function Sage:RegisterEvents()
+	self:RegisterEvent("ADDON_LOADED", "LoadOptionsPanels")
+
 	self:RegisterEvent("UNIT_HEALTH", "UpdateHealth")
 	self:RegisterEvent("UNIT_MAXHEALTH", "UpdateHealth")
 
@@ -106,12 +110,9 @@ function Sage:RegisterEvents()
 	self:RegisterEvent("UNIT_NAME_UPDATE", "UpdateInfo")
 	self:RegisterEvent("UNIT_LEVEL", "UpdateInfo")
 	self:RegisterEvent("RAID_TARGET_UPDATE", "UpdateInfo")
-	
+
 	self:RegisterEvent("PARTY_LEADER_CHANGED", "UpdateInfo")
 	self:RegisterEvent("PARTY_LOOT_METHOD_CHANGED", "UpdateInfo")
-	
-	-- self:RegisterEvent("UNIT_MODEL_CHANGED", "DumpInfo")
-	-- self:RegisterEvent("PARTY_MEMBER_ENABLE", "DumpInfo")
 
 	self:SetShowCastBars(self:ShowingCastBars())
 end
@@ -181,7 +182,7 @@ end
 
 function Sage:UpdateHealth(event, ...)
 	SageHealth:OnEvent(...)
-	if Sage:ShowingPercents() then
+	if self:ShowingPercents() then
 		SageInfo:OnHealthEvent(...)
 	end
 end
@@ -203,9 +204,9 @@ function Sage:UpdateCast(event, ...)
 	SageCast[event](SageCast, ...)
 end
 
-function Sage:DumpInfo(...)
-	self:Print(...)
-end
+-- function Sage:DumpInfo(...)
+	-- self:Print(...)
+-- end
 
 
 --[[ Messages ]]--
@@ -273,7 +274,7 @@ function Sage:RegisterSlashCommands()
 	slash:RegisterSlashHandler(format(cmdStr, "scale <frameList> <scale>", L.SetScaleDesc), "^scale (.+) ([%d%.]+)", "SetFrameScale")
 	slash:RegisterSlashHandler(format(cmdStr, "setalpha <frameList> <opacity>", L.SetAlphaDesc), "^setalpha (.+) ([%d%.]+)", "SetFrameAlpha")
 	slash:RegisterSlashHandler(format(cmdStr, "texture <texture>", "Sets the statusbar texture"), "^texture ([%w_]+)", "SetBarTexture")
-	
+
 	slash:RegisterSlashHandler(format(cmdStr, "set <profle>", L.SetDesc), "set (%w+)", "SetProfile")
 	slash:RegisterSlashHandler(format(cmdStr, "copy <profile>", L.CopyDesc), "copy (%w+)", "CopyProfile")
 	slash:RegisterSlashHandler(format(cmdStr, "delete <profile>", L.DeleteDesc), "^delete (%w+)", "DeleteProfile")
@@ -288,11 +289,7 @@ function Sage:ShowMenu()
 	local enabled = select(4, GetAddOnInfo("Sage_Options"))
 	if enabled then
 		if SageOptions then
-			if SageOptions:IsShown() then
-				SageOptions:Hide()
-			else
-				SageOptions:Show()
-			end
+			SageOptions:Toggle()
 		else
 			LoadAddOn("Sage_Options")
 		end
@@ -357,7 +354,8 @@ end
 --text visibility
 function Sage:SetShowText(enable)
 	self.profile.showText = enable or false
-	SageBar:ForAll("ShowText", enable)
+	SageBar:UpdateAllText(nil, enable)
+	-- SageBar:ForAll("ShowText", enable)
 end
 
 function Sage:ShowingText()
