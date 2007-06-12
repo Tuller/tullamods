@@ -4,7 +4,7 @@
 ## Author: Tuller
 ## Dependencies: Sage
 ## LoadOnDemand: 1
-lib\gooey.xml
+gooey.xml
 localization.lua
-templates.xml
-menu.xml
+menu.lua
+profiles.lua
