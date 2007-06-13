@@ -371,7 +371,7 @@ function Sage:GetBarTexture()
 	local texID = self.profile.barTexture or "blizz"
 	if(texID:lower() == "blizz") then return BLIZZ_TEXTURE end
 
-	local SML = AceLibrary and AceLibrary("SharedMedia-1.0")
+	local SML = AceLibrary and AceLibrary:HasInstance("SharedMedia-1.0") and AceLibrary("SharedMedia-1.0")
 	if(SML) then
 		local texture = SML:Fetch(SML.MediaType.STATUSBAR, texID, true)
 		if(texture) then
