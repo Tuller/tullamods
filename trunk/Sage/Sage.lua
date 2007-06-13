@@ -249,19 +249,6 @@ function Sage:DONGLE_PROFILE_RESET(event, db, parent, sv_name, profile_key)
 end
 
 
---[[ Settings Access ]]--
-
-function Sage:SetFrameSets(id, sets)
-	local id = tonumber(id) or id
-	self.profile.frames[id] = sets
-	return self.profile.frames[id]
-end
-
-function Sage:GetFrameSets(id)
-	return self.profile.frames[tonumber(id) or id]
-end
-
-
 --[[ Slash Commands ]]--
 
 function Sage:RegisterSlashCommands()
@@ -274,7 +261,7 @@ function Sage:RegisterSlashCommands()
 
 	slash:RegisterSlashHandler(format(cmdStr, "scale <frameList> <scale>", L.SetScaleDesc), "^scale (.+) ([%d%.]+)", "SetFrameScale")
 	slash:RegisterSlashHandler(format(cmdStr, "setalpha <frameList> <opacity>", L.SetAlphaDesc), "^setalpha (.+) ([%d%.]+)", "SetFrameAlpha")
-	slash:RegisterSlashHandler(format(cmdStr, "texture <texture>", "Sets the statusbar texture"), "^texture ([%w_]+)", "SetBarTexture")
+	slash:RegisterSlashHandler(format(cmdStr, "texture <texture>", "Sets the statusbar texture"), "^texture (.+)", "SetBarTexture")
 
 	slash:RegisterSlashHandler(format(cmdStr, "save <profle>", L.SaveDesc), "save (%w+)", "SaveProfile")
 	slash:RegisterSlashHandler(format(cmdStr, "set <profle>", L.SetDesc), "set (%w+)", "SetProfile")
@@ -324,6 +311,17 @@ end
 
 
 --[[ Config Functions ]]--
+
+--access
+function Sage:SetFrameSets(id, sets)
+	local id = tonumber(id) or id
+	self.profile.frames[id] = sets
+	return self.profile.frames[id]
+end
+
+function Sage:GetFrameSets(id)
+	return self.profile.frames[tonumber(id) or id]
+end
 
 --lock frame positions
 function Sage:SetLock(enable)
@@ -423,32 +421,6 @@ function Sage:DebuffColoring()
 	return self.profile.debuffColoring
 end
 
---health text mode
-function Sage:SetHealthTextMode(mode)
-	local sets = self:GetFrameSets(unit)
-	if sets then
-		sets.healthTextMode = mode
-	end
-end
-
-function Sage:GetHealthTextMode(unit)
-	local sets = self:GetFrameSets(unit)
-	return sets and sets.healthTextMode
-end
-
---mana text mode
-function Sage:SetManaTextMode(mode)
-	local sets = self:GetFrameSets(unit)
-	if sets then
-		sets.manaTextMode = mode
-	end
-end
-
-function Sage:GetManaTextMode(unit)
-	local sets = self:GetFrameSets(unit)
-	return sets and sets.manaTextMode
-end
-
 --health percentages
 function Sage:SetShowPercents(enable)
 	self.profile.showPercents = enable or false
@@ -488,10 +460,101 @@ function Sage:ShowingCastBars()
 	return self.profile.showCastBars
 end
 
-function Sage:SetShowPartyInRaid(enable)
-	self.profile.showPartyInRaid = enable or false
+-- function Sage:SetShowPartyInRaid(enable)
+	-- self.profile.showPartyInRaid = enable or false
+-- end
+
+-- function Sage:ShowingPartyInRaid()
+	-- return self.profile.showPartyInRaid
+-- end
+
+
+--[[ Per Unit Settings ]]--
+
+function Sage:SetUnitSetting(unit, setting, value)
+	if(unit == "all") then
+		for _,frame in pairs(SageFrame:GetAll()) do
+			frame.sets[setting] = value or nil
+		end
+	elseif(unit == "party") then
+		for i = 1, 4 do
+			local sets = self:GetFrameSets("party"..i)
+			if(sets) then
+				sets[setting] = value or nil
+			end
+		end
+	else
+		local sets = self:GetFrameSets(unit)
+		if(sets) then
+			sets[setting] = value or nil
+		end
+	end
 end
 
-function Sage:ShowingPartyInRaid()
-	return self.profile.showPartyInRaid
+function Sage:GetUnitSetting(unit, setting)
+	local sets = self:GetFrameSets((unit == "party" and "party1") or unit)
+	return sets and sets[setting]
+end
+
+--show curable debuffs
+function Sage:SetShowCurable(unit, enable)
+	self:SetUnitSetting(unit, "showCurable", enable)
+end
+
+function Sage:ShowingCurable(unit)
+	return self:GetUnitSetting(unit, "showCurable")
+end
+
+--show castable buffs
+function Sage:SetShowCastable(unit, enable)
+end
+
+function Sage:ShowingCastable(unit)
+end
+
+--frame opacity
+function Sage:SetOpacity(unit, alpha)
+end
+
+function Sage:GetOpacity(unit)
+end
+
+--frame scale
+function Sage:SetScale(unit, scale)
+end
+
+function Sage:GetScale(unit)
+end
+
+--frame width
+function Sage:SetWidth(unit, width)
+end
+
+function Sage:GetWidth(unit)
+end
+
+--health text mode
+function Sage:SetHealthTextMode(unit, mode)
+	local sets = self:GetFrameSets(unit)
+	if sets then
+		sets.healthTextMode = mode
+	end
+end
+
+function Sage:GetHealthTextMode(unit)
+	local sets = self:GetFrameSets(unit)
+	return sets and sets.healthTextMode
+end
+
+--mana text mode
+function Sage:SetManaTextMode(unit, mode)
+	local sets = self:GetFrameSets(unit)
+	if sets then
+		sets.manaTextMode = mode
+	end
+end
+
+function Sage:GetManaTextMode(unit)
+	local sets = self:GetFrameSets(unit)
+	return sets and sets.manaTextMode
 end
