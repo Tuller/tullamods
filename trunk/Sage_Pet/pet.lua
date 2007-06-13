@@ -205,3 +205,7 @@ function SagePet:OnCombatEvent(event)
 	self.frame.inCombat = (event == "PET_ATTACK_START")
 	self.frame:UpdateCombatStatus()
 end
+
+function SagePet:LoadOptions()
+	local panel = SageOptions:AddPanel("Pet")
+end
