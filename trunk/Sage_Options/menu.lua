@@ -176,11 +176,11 @@ function SageOptions:AddPanel(name, unit)
 	self.panels[name] = panel
 	self.menu:AddItem(name)
 	
-	if(unit) then
-		local function Lock_OnShow(self) self:SetChecked(Sage:IsLocked()) end
-		local function Lock_OnClick(self) Sage:SetLock(self:GetChecked()) end
-		panel:AddCheckButton(L.ShowCurable, Lock_OnClick, Lock_OnShow)
-	end
+	-- if(unit) then
+		-- local function Castable_OnShow(self) self:SetChecked(Sage:IsLocked()) end
+		-- local function Castable_OnClick(self) Sage:SetLock(self:GetChecked()) end
+		-- panel:AddCheckButton(L.ShowCurable, Lock_OnClick, Lock_OnShow)
+	-- end
 
 	return panel
 end

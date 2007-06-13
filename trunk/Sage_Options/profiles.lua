@@ -194,5 +194,3 @@ StaticPopupDialogs["SAGE_OPTIONS_SAVE_PROFILE"] = {
 	end,
 	timeout = 0, exclusive = 1, hideOnEscape = 1
 }
-
-Panel_Create()
