@@ -122,3 +122,7 @@ end
 function SagePlayer:OnPartyEvent()
 	self.frame:UpdateGroupIndicator()
 end
+
+function SagePlayer:LoadOptions()
+	local panel = SageOptions:AddPanel("Player", "player")
+end
