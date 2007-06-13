@@ -26,7 +26,11 @@ local function ProfileButton_Create(name, parent)
 	local button = CreateFrame("Button", name, parent)
 	button:SetScript("OnClick", ProfileButton_OnClick)
 	button:SetScript("OnMouseWheel", ProfileButton_OnMouseWheel)
-	button:SetTextFontObject("GameFontNormal")
+
+	local text = button:CreateFontString()
+	text:SetFontObject("GameFontNormal"); text:SetJustifyH("LEFT")
+	text:SetAllPoints(button)
+	button:SetFontString(text)
 
 	local highlight = button:CreateTexture()
 	highlight:SetAllPoints(button)
@@ -106,7 +110,7 @@ local function Panel_Create()
 		end
 	end)
 	set:SetText("Set"); set:SetWidth(42); set:SetHeight(24)
-	set:SetPoint("BOTTOMLEFT", panel, "BOTTOMLEFT", 4, 4)
+	set:SetPoint("BOTTOMLEFT", panel, "BOTTOMLEFT", 6, 4)
 
 	local save = CreateFrame("Button", name .. "Save", panel, "GooeyButton")
 	save:SetScript("OnClick", function() StaticPopup_Show("SAGE_OPTIONS_SAVE_PROFILE") end)
@@ -153,6 +157,8 @@ local function Panel_Create()
 	return panel
 end
 
+local panel = Panel_Create()
+
 StaticPopupDialogs["SAGE_OPTIONS_SAVE_PROFILE"] = {
 	text = TEXT("Enter Profile Name"),
 	button1 = TEXT(ACCEPT),
@@ -163,16 +169,16 @@ StaticPopupDialogs["SAGE_OPTIONS_SAVE_PROFILE"] = {
 		local text = getglobal(this:GetParent():GetName().."EditBox"):GetText()
 		if text ~= "" then
 			Sage:SaveProfile(text)
-			UpdateScrollBar()
-			HighlightProfile(text)
+			panel:UpdateList()
+			panel:Highlight(text)
 		end
 	end,
 	EditBoxOnEnterPressed = function()
 		local text = getglobal(this:GetParent():GetName().."EditBox"):GetText()
 		if text ~= "" then
 			Sage:SaveProfile(text)
-			UpdateScrollBar()
-			HighlightProfile(text)
+			panel:UpdateList()
+			panel:Highlight(text)
 		end
 	end,
 	OnShow = function()

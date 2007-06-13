@@ -28,7 +28,8 @@ function SageOptions:Load()
 	menu:SetPoint("TOPLEFT", self, "TOPLEFT", 0, -12)
 
 	local content = self:AddContentPane()
-	content:SetPoint("TOPLEFT", menu, "TOPRIGHT", -4, 12)
+	content:SetFrameLevel(content:GetFrameLevel() + 1)
+	content:SetPoint("TOPLEFT", menu, "TOPRIGHT", -6, 12)
 	content:SetPoint("BOTTOMRIGHT", self)
 
 	self:AddGeneralPanel()
@@ -168,7 +169,7 @@ function SageOptions:AddPanel(name, unit)
 	panel:SetPoint("BOTTOMRIGHT", content, "BOTTOMRIGHT")
 	panel:Hide()
 
-	panel.width = 210
+	panel.width = 216
 	panel.height = 38
 
 	if(not self.panels) then self.panels = {} end
