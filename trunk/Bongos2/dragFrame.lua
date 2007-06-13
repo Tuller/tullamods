@@ -40,6 +40,10 @@ local function DragFrame_OnMouseDown(self, arg1)
 	if arg1 == "LeftButton" then
 		self.isMoving = true
 		self.parent:StartMoving()
+
+		if(GameTooltip:IsOwned(self)) then
+			GameTooltip:Hide()
+		end
 	end
 end
 
@@ -48,6 +52,7 @@ local function DragFrame_OnMouseUp(self, arg1)
 		self.isMoving = nil
 		self.parent:StopMovingOrSizing()
 		self.parent:Stick()
+		DragFrame_OnEnter(self)
 	end
 end
 
