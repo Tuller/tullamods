@@ -238,3 +238,7 @@ function SageParty:UpdateAggro(event, unit)
 		end
 	end
 end
+
+function SageParty:LoadOptions()
+	local panel = SageOptions:AddPanel("Party")
+end
