@@ -255,8 +255,6 @@ function SageTarget:Load()
 	self.frame.info:UpdateWidth()
 	
 	self:RegisterEvent("PLAYER_TARGET_CHANGED")
-	-- self:RegisterEvent("UNIT_FACTION")
-	-- self:RegisterEvent("UNIT_CLASSIFICATION_CHANGED")
 	if(hasCombo) then self:RegisterEvent("PLAYER_COMBO_POINTS") end
 end
 
@@ -277,16 +275,6 @@ function SageTarget:PLAYER_COMBO_POINTS()
 	end
 end
 
--- function SageTarget:UNIT_CLASSIFICATION_CHANGED(unit)
-	-- local frame = self.frame
-	-- if(unit == frame.id and frame:IsShown()) then
-		-- frame.npc:Update(unit)
-	-- end
--- end
-
--- function SageTarget:UNIT_FACTION(unit)
-	-- local frame = self.frame
-	-- if(unit == frame.id and frame:IsShown()) then
-		-- frame.npc:UpdateNameColor()
-	-- end
--- end
+function SageTarget:LoadOptions()
+	local panel = SageOptions:AddPanel("Target")
+end
