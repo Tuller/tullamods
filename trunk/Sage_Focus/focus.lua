@@ -153,8 +153,6 @@ function SageFocus:Load()
 	self.frame.info:UpdateWidth()
 
 	self:RegisterEvent("PLAYER_FOCUS_CHANGED")
-	-- self:RegisterEvent("UNIT_FACTION")
-	-- self:RegisterEvent("UNIT_CLASSIFICATION_CHANGED")
 end
 
 function SageFocus:Unload()
@@ -166,16 +164,6 @@ function SageFocus:PLAYER_FOCUS_CHANGED()
 	self.frame:Update()
 end
 
--- function SageFocus:UNIT_CLASSIFICATION_CHANGED(unit)
-	-- local frame = self.frame
-	-- if(unit == frame.id and frame:IsShown()) then
-		-- frame.npc:Update(unit)
-	-- end
--- end
-
--- function SageFocus:UNIT_FACTION(unit)
-	-- local frame = self.frame
-	-- if(unit == frame.id and frame:IsShown()) then
-		-- frame.npc:UpdateNameColor()
-	-- end
--- end
+function SageFocus:LoadOptions()
+	local panel = SageOptions:AddPanel("Focus")
+end
