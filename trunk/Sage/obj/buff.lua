@@ -128,7 +128,11 @@ local function BuffFrame_Update(self)
 	local filter
 	if(UnitIsFriend("player", unit)) then
 		local sets = Sage:GetFrameSets(unit)
-		filter = sets and ((isDebuff and sets.showCurable) or sets.showCastable)
+		if(isDebuff) then
+			filter = sets and sets.showCurable
+		else
+			filter = sets and sets.showCastable
+		end
 	end
 
 	local count = 0
