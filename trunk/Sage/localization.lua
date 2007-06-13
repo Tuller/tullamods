@@ -28,6 +28,7 @@ L.SetAlphaDesc = "Sets the opacity of <frameList>"
 
 --slash commands for profiles
 L.ResetDesc = "Loads default settings"
+L.SaveDesc = "Saves current settings as, and switches to <profile>"
 L.SetDesc = "Switches settings to <profile>"
 L.CopyDesc = "Copies settings from <profile>"
 L.DeleteDesc = "Deletes <profile>"

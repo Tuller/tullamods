@@ -70,17 +70,6 @@ function Sage:LoadModules()
 	SageFrame:ForAll("Reanchor")
 end
 
-function Sage:LoadOptionsPanels(event, addon)
-	if(addon == "Sage_Options") then
-		for name, module in self:IterateModules() do
-			if(module.LoadOptions) then
-				module:LoadOptions()
-			end
-		end
-		SageOptions:ShowPanel("General")
-	end	
-end
-
 function Sage:UnloadModules()
 	for name, module in self:IterateModules() do
 		assert(module.Unload, format("Sage Module %s: Missing Unload function", name))
@@ -89,7 +78,7 @@ function Sage:UnloadModules()
 end
 
 function Sage:RegisterEvents()
-	self:RegisterEvent("ADDON_LOADED", "LoadOptionsPanels")
+	self:RegisterEvent("ADDON_LOADED", "LoadOptions")
 
 	self:RegisterEvent("UNIT_HEALTH", "UpdateHealth")
 	self:RegisterEvent("UNIT_MAXHEALTH", "UpdateHealth")
@@ -118,16 +107,57 @@ function Sage:RegisterEvents()
 end
 
 
+--[[ Event Actions ]]--
+
+function Sage:LoadOptions(event, addon)
+	if(addon == "Sage_Options") then
+		for name, module in self:IterateModules() do
+			if(module.LoadOptions) then
+				module:LoadOptions()
+			end
+		end
+		SageOptions:ShowPanel("General")
+	end
+end
+
+function Sage:UpdateHealth(event, ...)
+	SageHealth:OnEvent(...)
+	if self:ShowingPercents() then
+		SageInfo:OnHealthEvent(...)
+	end
+end
+
+function Sage:UpdateMana(event, ...)
+	SageMana:OnEvent(...)
+end
+
+function Sage:UpdateBuff(event, ...)
+	SageBuff:OnEvent(...)
+	SageHealth:OnBuffEvent(...)
+end
+
+function Sage:UpdateInfo(event, ...)
+	SageInfo[event](SageInfo, ...)
+end
+
+function Sage:UpdateCast(event, ...)
+	SageCast[event](SageCast, ...)
+end
+
+
 --[[ Profile Functions ]]--
 
-function Sage:SetProfile(name, mustExist)
-	local profile
-	if(mustExist) then
-		profile = self:MatchProfile(name)
-	else
-		profile = name
+function Sage:SaveProfile(profile)
+	local currentProfile = self.db:GetCurrentProfile()
+	if profile and profile ~= self.db:GetCurrentProfile() then
+		self.copyProfile = currentProfile
+		self:UnloadModules()
+		self.db:SetProfile(profile)
 	end
+end
 
+function Sage:SetProfile(name)
+	local profile = self:MatchProfile(name)
 	if profile and profile ~= self.db:GetCurrentProfile() then
 		self:UnloadModules()
 		self.db:SetProfile(profile)
@@ -164,49 +194,14 @@ function Sage:ListProfiles()
 end
 
 function Sage:MatchProfile(name)
-	local profileList = self.db:GetProfiles()
-
 	local name = name:lower()
-	local nameRealm = format("%s - %s", name, GetRealmName():lower())
-
-	for i, k in ipairs(profileList) do
+	for i, k in ipairs(self.db:GetProfiles()) do
 		local key = k:lower()
-		if key == name or key == nameRealm then
+		if key == name then
 			return k
 		end
 	end
 end
-
-
---[[ Events ]]--
-
-function Sage:UpdateHealth(event, ...)
-	SageHealth:OnEvent(...)
-	if self:ShowingPercents() then
-		SageInfo:OnHealthEvent(...)
-	end
-end
-
-function Sage:UpdateMana(event, ...)
-	SageMana:OnEvent(...)
-end
-
-function Sage:UpdateBuff(event, ...)
-	SageBuff:OnEvent(...)
-	SageHealth:OnBuffEvent(...)
-end
-
-function Sage:UpdateInfo(event, ...)
-	SageInfo[event](SageInfo, ...)
-end
-
-function Sage:UpdateCast(event, ...)
-	SageCast[event](SageCast, ...)
-end
-
--- function Sage:DumpInfo(...)
-	-- self:Print(...)
--- end
 
 
 --[[ Messages ]]--
@@ -221,6 +216,12 @@ end
 function Sage:DONGLE_PROFILE_CHANGED(event, db, parent, sv_name, profile_key)
 	if(sv_name == self.dbName) then
 		self.profile = self.db.profile
+		if(self.copyProfile) then
+			self.db:CopyProfile(self.copyProfile)
+			self.copyProfile = nil
+		else
+			self:LoadModules()
+		end
 		self:Print(format(L.ProfileLoaded, profile_key))
 	end
 end
@@ -275,6 +276,7 @@ function Sage:RegisterSlashCommands()
 	slash:RegisterSlashHandler(format(cmdStr, "setalpha <frameList> <opacity>", L.SetAlphaDesc), "^setalpha (.+) ([%d%.]+)", "SetFrameAlpha")
 	slash:RegisterSlashHandler(format(cmdStr, "texture <texture>", "Sets the statusbar texture"), "^texture ([%w_]+)", "SetBarTexture")
 
+	slash:RegisterSlashHandler(format(cmdStr, "save <profle>", L.SaveDesc), "save (%w+)", "SaveProfile")
 	slash:RegisterSlashHandler(format(cmdStr, "set <profle>", L.SetDesc), "set (%w+)", "SetProfile")
 	slash:RegisterSlashHandler(format(cmdStr, "copy <profile>", L.CopyDesc), "copy (%w+)", "CopyProfile")
 	slash:RegisterSlashHandler(format(cmdStr, "delete <profile>", L.DeleteDesc), "^delete (%w+)", "DeleteProfile")
@@ -283,6 +285,10 @@ function Sage:RegisterSlashCommands()
 	slash:RegisterSlashHandler(format(cmdStr, "version", L.PrintVersionDesc), "^version$", "PrintVersion")
 
 	self.slash = slash
+end
+
+function Sage:PrintVersion()
+	self:Print(self.profile.version)
 end
 
 function Sage:ShowMenu()
@@ -295,22 +301,6 @@ function Sage:ShowMenu()
 		end
 	else
 		self.slash:PrintUsage()
-	end
-end
-
-function Sage:PrintVersion()
-	self:Print(self.profile.version)
-end
-
-function Sage:ListSharedTextures()
-	local SML = AceLibrary and AceLibrary("SharedMedia-1.0")
-	if(SML) then
-		local textures = SML:List(SML.MediaType.STATUSBAR)
-		if(textures) then
-			for _,name in pairs(textures) do
-				self:Print(name)
-			end
-		end
 	end
 end
 
@@ -367,7 +357,6 @@ end
 function Sage:SetShowText(enable)
 	self.profile.showText = enable or false
 	SageBar:UpdateAllText(nil, enable)
-	-- SageBar:ForAll("ShowText", enable)
 end
 
 function Sage:ShowingText()
@@ -383,7 +372,7 @@ end
 function Sage:GetBarTexture()
 	local texID = self.profile.barTexture or "blizz"
 	if(texID:lower() == "blizz") then return BLIZZ_TEXTURE end
-	
+
 	local SML = AceLibrary and AceLibrary("SharedMedia-1.0")
 	if(SML) then
 		local texture = SML:Fetch(SML.MediaType.STATUSBAR, texID, true)

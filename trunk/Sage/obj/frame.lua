@@ -60,10 +60,11 @@ function SageFrame:Create(id, OnCreate, defaults, hasHeader)
 		frame.isNew = nil
 	end
 	frame:SetAttribute("unit", id)
-	
+
 	frame.hasHeader = hasHeader
-	if(not hasHeader) then
-		RegisterUnitWatch(frame)
+	RegisterUnitWatch(frame)
+	if(UnitExists(id)) then
+		frame:Show()
 	end
 
 	active[id] = frame
@@ -79,11 +80,8 @@ function SageFrame:Destroy()
 	self:ClearAllPoints()
 	self:SetUserPlaced(false)
 	self:Hide()
-	
-	if(not self.hasHeader) then
-		UnregisterUnitWatch(self)
-		self.hasHeader = nil
-	end
+
+	UnregisterUnitWatch(self)
 
 	unused[self.id] = self
 end
