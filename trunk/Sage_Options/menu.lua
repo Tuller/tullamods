@@ -28,7 +28,6 @@ function SageOptions:Load()
 	menu:SetPoint("TOPLEFT", self, "TOPLEFT", 0, -12)
 
 	local content = self:AddContentPane()
-	content:SetFrameLevel(content:GetFrameLevel() + 1)
 	content:SetPoint("TOPLEFT", menu, "TOPRIGHT", -6, 12)
 	content:SetPoint("BOTTOMRIGHT", self)
 
@@ -47,6 +46,7 @@ end
 function SageOptions:AddContentPane()
 	--content pane, where all the panels are anchored to
 	local content = CreateFrame("Frame", self:GetName() .. "Panel", self, "GooeyFrame")
+	content:SetFrameLevel(content:GetFrameLevel() + 1)
 	content:SetScript("OnMouseDown", function(self) self:GetParent():StartMoving() end)
 	content:SetScript("OnMouseUp", function(self) self:GetParent():StopMovingOrSizing() end)
 	content:EnableMouse(true)
