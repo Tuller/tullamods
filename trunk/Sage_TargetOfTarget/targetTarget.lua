@@ -67,3 +67,7 @@ end
 function SageTargetTarget:PLAYER_TARGET_CHANGED()
 	self.frame.nextUpdate = 0
 end
+
+function SageTargetTarget:LoadOptions()
+	local panel = SageOptions:AddPanel("ToT")
+end
