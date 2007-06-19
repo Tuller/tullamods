@@ -1,5 +1,11 @@
 SellFish Version History
 
+1.6
+	Updated the database (credit goes to ItemPrice)
+	Disabled the /sf slash command for German locales
+	Added a third tooltip style
+	Altered updating code to only run on fully repaired items
+
 1.5
 	Updated for 2.1
 

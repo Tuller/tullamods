@@ -5,6 +5,7 @@
 
 	Copyright (C) 2007 Tuller
 	ColaLight (C) 2006  Murazorz
+	ItemPrice (C) 2007 Bam
 
 	This program is free software; you can redistribute it and/or
 	modify it under the terms of the GNU General Public License
@@ -22,9 +23,13 @@
 	02110-1301, USA.
 --]]
 
+local CURRENT_VERSION = GetAddOnMetadata("SellFish", "Version")
 local L = SELLFISH_LOCALS
 local base36 = {"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"}
 local maxBase = 10 + #base36
+
+local tonumber, tostring, mod, floor = tonumber, tostring, mod, floor
+local GetItemInfo = GetItemInfo
 
 --[[ Local Functions ]]--
 
@@ -60,8 +65,8 @@ end
 
 local cache = setmetatable({}, {__index = function(t, i)
 	if SellFishDB and SellFishDB.data then
-		local c = (SellFishDB.data:match(";" .. i .. ",(%w+);"))
-		if c then t[i] = c end
+		local c = (SellFishDB.data:match(";" .. i .. ",(%w+);")) or 0
+		t[i] = c
 		return c
 	end
 end})
@@ -70,6 +75,7 @@ end})
 --[[ Startup/Shutdown ]]--
 
 SellFish = {}
+SellFish.defaults = {style = 3, version = CURRENT_VERSION, newVals = {}, data = SellFish_GetDefaults()}
 
 function SellFish:Load()
 	local tip = CreateFrame("GameTooltip", "SellFishTooltip", UIParent, "GameTooltipTemplate")
@@ -96,29 +102,36 @@ function SellFish:Load()
 end
 
 function SellFish:Initialize()
-	local current = GetAddOnMetadata("SellFish", "Version")
+	SellFishDB = setmetatable(SellFishDB or {}, {__index = self.defaults})
 
-	if not(SellFishDB and SellFishDB.version) then
-		self:LoadDefaults(current)
-	else
-		local cMajor, cMinor = current:match("(%d+)%.(%d+)")
+	if(SellFishDB.version ~= CURRENT_VERSION) then
+		local cMajor, cMinor = CURRENT_VERSION:match("(%d+)%.(%d+)")
 		local major, minor = SellFishDB.version:match("(%d+)%.(%d+)")
 		if major ~= cMajor then
-			self:LoadDefaults(current)
+			self:LoadDefaults()
 		elseif minor ~= cMinor then
-			self:UpdateVersion(current)
+			self:UpdateVersion()
 		end
+	end
+
+	if(not SellFishDB.data) then
+		self:LoadSellValues()
 	end
 end
 
-function SellFish:LoadDefaults(current)
-	SellFishDB = {short = 1, version = current, newVals = {}}
+function SellFish:LoadDefaults()
+	SellFishDB = {}
 	self:LoadSellValues(true)
 end
 
-function SellFish:UpdateVersion(current)
+function SellFish:UpdateVersion()
+	if(SellFishDB.short) then
+		SellFishDB.short = nil
+		SellFishDB.style = 2
+	end
 	self:LoadSellValues(true)
-	SellFishDB.version = current
+
+	SellFishDB.version = CURRENT_VERSION
 	msg(format(L.Updated, SellFishDB.version), true)
 end
 
@@ -126,14 +139,19 @@ end
 --[[ Data Stuff ]]--
 
 function SellFish:ScanPrices()
+	local tip = self.tip
+
 	for bag = 0, NUM_BAG_FRAMES do
 		for slot = 1, GetContainerNumSlots(bag) do
-			local link = GetContainerItemLink(bag, slot)
-			if link then
-				local cost = self:GetItemValue(bag, slot)
-				if cost then
-					local count = (select(2, GetContainerItemInfo(bag, slot)))
-					self:SaveCost(ToID(link), cost/count)
+			local repairCost = select(2, tip:SetBagItem(bag, slot))
+			if(not(repairCost) or repairCost == 0) then
+				local link = GetContainerItemLink(bag, slot)
+				if link then
+					local cost = self:GetItemValue(bag, slot)
+					if cost then
+						local count = (select(2, GetContainerItemInfo(bag, slot)))
+						self:SaveCost(ToID(link), cost/count)
+					end
 				end
 			end
 		end
@@ -194,8 +212,8 @@ end
 --[[ Converters ]]--
 
 function SellFish:LoadSellValues(reset)
-	if reset or not(SellFishDB.data) and SellFish_GetDefaults then
-		SellFishDB.data = SellFish_GetDefaults()
+	if reset or SellFish_GetDefaults then
+		SellFishDB.data = nil
 	end
 
 	local changed = false
@@ -212,6 +230,38 @@ function SellFish:LoadSellValues(reset)
 
 	msg(format(L.Loaded, self:GetNumValues()), true)
 end
+
+-- function SellFish:ConvertItemPrice()
+	-- local prices = ""
+
+	-- local byte = string.byte
+	-- function get(id)
+		-- if id and id <= 33052 and id > 0 then
+			-- local index = id * 3
+			-- local a, b, c = byte(prices, index - 2, index)
+			-- if b == 0 then
+				-- if c == 0 then
+					-- if a == 0 then return else return a * 65536 end
+				-- else
+					-- return a * 65536 + c
+				-- end
+			-- else
+				-- return a * 65536 + b * 256 + c
+			-- end
+		-- end
+	-- end
+
+	-- local newVals = SellFishDB.newVals
+	-- for i = 1, 33052 do
+		-- local price = get(i)
+		-- if(price) then
+			-- newVals[ToBase(i, maxBase)] = ToBase(price, maxBase)
+			-- changed = true
+		-- end
+	-- end
+
+	-- return changed
+-- end
 
 --adds all of cola light"s sellvalue data to the list of new values, then compresses if new data has been added
 function SellFish:ConvertColaLight(t)
@@ -261,7 +311,7 @@ function GetSellValue(link)
 			return SellFish:GetCost(ToID(link))
 		end
 	end
-	
+
 	return oGetSellValue and oGetSellValue(link)
 end
 
@@ -312,12 +362,16 @@ function SellFish:ShowCommands()
 end
 
 function SellFish:ToggleStyle()
-	if SellFishDB.short then
-		SellFishDB.short = nil
+	local style = SellFishDB.style or 1
+	if(style == 1) then
+		SellFishDB.style  = 2
+		msg(format(L.SetStyle, "Compact"), true)
+	elseif(style == 2) then
+		SellFishDB.style  = 3
+		msg(format(L.SetStyle, "Short"), true)
+	elseif(style == 3) then
+		SellFishDB.style = 1
 		msg(format(L.SetStyle, "Blizzard"), true)
-	else
-		SellFishDB.short = 1
-		msg(format(L.SetStyle, "ColaLight"), true)
 	end
 end
 
