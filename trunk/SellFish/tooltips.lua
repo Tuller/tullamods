@@ -24,8 +24,9 @@
 
 local function AddMoneyToTooltip(tip, id, count)
     if id then
-		local cost = GetSellValue(id, count)
+		local cost = GetSellValue(id)
         if cost and cost > 0 then
+			cost = cost * (count or 1)
 			--short format, aka cola light style tooltips
 			if SellFishDB.short then		
 				local costText

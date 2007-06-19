@@ -58,8 +58,7 @@ local function ToID(link)
 	end
 end
 
-local cache = {}
-setmetatable(cache, {__index = function(t, i)
+local cache = setmetatable({}, {__index = function(t, i)
 	if SellFishDB and SellFishDB.data then
 		local c = (SellFishDB.data:match(";" .. i .. ",(%w+);"))
 		if c then t[i] = c end
@@ -114,26 +113,11 @@ end
 
 function SellFish:LoadDefaults(current)
 	SellFishDB = {short = 1, version = current, newVals = {}}
-
-	if CompletePrices then
-		self:ConvertPriceMaster(CompletePrices)
-	end
-
-	if ColaLight and ColaLight.db.account.SellValues then
-		self:ConvertColaLight(ColaLight.db.account.SellValues)
-	end
-
-	if not SellFishDB.data and SellFish_GetDefaults then
-		SellFishDB.data = SellFish_GetDefaults()
-	end
-	msg(format(L.Loaded, self:GetNumValues()), true)
+	self:LoadSellValues(true)
 end
 
 function SellFish:UpdateVersion(current)
-	if(SellFishDB.version ~= "1.4") then
-		SellFishDB.data = SellFish_GetDefaults()
-		msg(format(L.Loaded, self:GetNumValues()), true)
-	end
+	self:LoadSellValues(true)
 	SellFishDB.version = current
 	msg(format(L.Updated, SellFishDB.version), true)
 end
@@ -209,6 +193,26 @@ end
 
 --[[ Converters ]]--
 
+function SellFish:LoadSellValues(reset)
+	if reset or not(SellFishDB.data) and SellFish_GetDefaults then
+		SellFishDB.data = SellFish_GetDefaults()
+	end
+
+	local changed = false
+	if CompletePrices then
+		changed = changed or self:ConvertPriceMaster(CompletePrices)
+	end
+	if ColaLight and ColaLight.db.account.SellValues then
+		changed = changed or self:ConvertColaLight(ColaLight.db.account.SellValues)
+	end
+	if self.ConvertItemPrice then
+		changed = changed or self:ConvertItemPrice()
+	end
+	if(changed) then self:CompressDB() end
+
+	msg(format(L.Loaded, self:GetNumValues()), true)
+end
+
 --adds all of cola light"s sellvalue data to the list of new values, then compresses if new data has been added
 function SellFish:ConvertColaLight(t)
 	local changed = false
@@ -244,18 +248,21 @@ end
 --[[ Usable Functions ]]--
 
 -- cost = GetSellValue(itemID | "name" | "link" [, count])
-function GetSellValue(link, count)
-	assert(link, "Usage: GetSellValue(itemID|\"name\"|\"itemLink\" [, count])")
+local oGetSellValue = GetSellValue
+function GetSellValue(link)
+	assert(link, "Usage: GetSellValue(itemID|\"name\"|\"itemLink\")")
 
 	local id = tonumber(link)
 	if id then
-		return SellFish:GetCost(id, count or 1)
+		return SellFish:GetCost(id)
 	else
-		link = select(2, GetItemInfo(link))
+		local link = select(2, GetItemInfo(link))
 		if link then
-			return SellFish:GetCost(ToID(link), count or 1)
+			return SellFish:GetCost(ToID(link))
 		end
 	end
+	
+	return oGetSellValue and oGetSellValue(link)
 end
 
 function SellFish:GetNumValues()
