@@ -289,7 +289,9 @@ function SellFish:LoadSlashCommands()
 		end
 	end
 	SLASH_SellFishCOMMAND1 = "/sellfish"
-	SLASH_SellFishCOMMAND2 = "/sf"
+	if(GetLocale() ~= "deDE") then
+		SLASH_SellFishCOMMAND2 = "/sf"
+	end
 end
 
 function SellFish:ShowCommands()
