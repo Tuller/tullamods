@@ -4,6 +4,14 @@
 --]]
 
 local DebuffTypeColor = DebuffTypeColor
+local bg = {
+	bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+	tile = true,
+	tileSize = 1,
+	edgeFile = "",
+	edgeSize = 0,
+	insets = {left = 0, right = 0, top = 0, bottom = 0}
+}
 
 
 --[[ buff/debuff icons ]]--
@@ -34,15 +42,22 @@ local function Buff_Create(parent, id, isDebuff)
 	local buff = CreateFrame("Frame", nil, parent)
 	buff:EnableMouse(true)
 	buff:SetID(id)
+	buff:SetWidth(36); buff:SetHeight(36)
 
-	local icon = buff:CreateTexture(nil, "ARTWORK")
-	icon:SetTexCoord(0.06,0.94,0.06,0.94)
-	icon:SetAllPoints(buff)
+	local icon = buff:CreateTexture()
+	if(isDebuff) then
+		icon:SetTexCoord(0.09, 0.91, 0.09, 0.91)
+		icon:SetPoint("TOPLEFT", buff, "TOPLEFT", 4, -4)
+		icon:SetPoint("BOTTOMRIGHT", buff, "BOTTOMRIGHT", -4, 4)
+	else
+		icon:SetTexCoord(0.06,0.94,0.06,0.94)
+		icon:SetAllPoints(buff)
+	end
 	buff.icon = icon
 
 	local count = buff:CreateFontString(nil, "OVERLAY")
-	count:SetFontObject(SageFont:GetSmallOutsideFont())
-	count:SetPoint("BOTTOMRIGHT", buff, "BOTTOMRIGHT", -1, 0)
+	count:SetFontObject(NumberFontNormalLarge)
+	count:SetPoint("BOTTOMRIGHT", buff, "BOTTOMRIGHT", -2, 2)
 	buff.count = count
 
 	local cooldown = CreateFrame("Cooldown", nil, buff, "CooldownFrameTemplate")
@@ -52,12 +67,14 @@ local function Buff_Create(parent, id, isDebuff)
 	buff.cooldown = cooldown
 
 	if(isDebuff) then
-		local border = buff:CreateTexture(nil, "OVERLAY")
-		border:SetTexture("Interface\\Buttons\\UI-Debuff-Overlays")
-		border:SetPoint("TOPLEFT", buff, "TOPLEFT", -1, 1)
-		border:SetPoint("BOTTOMRIGHT", buff, "BOTTOMRIGHT", 1, -1)
-		border:SetTexCoord(0.296875, 0.5703125, 0, 0.515625)
-		buff.border = border
+		buff:SetBackdrop(bg)
+
+		-- local border = buff:CreateTexture(nil, "OVERLAY")
+		-- border:SetTexture("Interface\\Buttons\\UI-Debuff-Overlays")
+		-- border:SetPoint("TOPLEFT", buff, "TOPLEFT", -1, 1)
+		-- border:SetPoint("BOTTOMRIGHT", buff, "BOTTOMRIGHT", 1, -1)
+		-- border:SetTexCoord(0.296875, 0.5703125, 0, 0.515625)
+		-- buff.border = border
 
 		buff:SetScript("OnEnter", Debuff_OnEnter)
 	else
@@ -110,7 +127,8 @@ local function BuffFrame_UpdateBuff(self, unit, index, filter, isDebuff)
 		--set the debuff border color
 		if(isDebuff) then
 			local color = DebuffTypeColor[type or "none"]
-			buff.border:SetVertexColor(color.r, color.g, color.b)
+			buff:SetBackdropColor(color.r, color.g, color.b)
+			-- buff.border:SetVertexColor(color.r, color.g, color.b)
 		end
 
 		buff:Show()
@@ -156,16 +174,17 @@ local function BuffFrame_LayoutIcons(self)
 	local count = self.count or 0
 	local width = ceil(self:GetWidth())
 	local height = ceil(self:GetHeight())
-	local size = min(height, width)
+	local size = 36
+	local scale = min(width, height) / size
 
-	local scale = 1; local rows = 1
+	local rows = 1
 	while size * scale  * count / rows > width do
 		scale = scale - 0.01
 		rows = height / (size * scale)
 	end
 	local cols = ceil(count / rows)
 	rows = floor(rows)
-	size = size * scale
+	-- size = size * scale
 
 	local buffs = self.buffs
 	for row = 0, rows-1 do
@@ -174,7 +193,7 @@ local function BuffFrame_LayoutIcons(self)
 			if(index <= count) then
 				local buff = buffs[index]
 				buff:ClearAllPoints()
-				buff:SetWidth(size); buff:SetHeight(size)
+				buff:SetScale(scale)
 				buff:SetPoint("TOPLEFT", self, "TOPLEFT", (size * col), -(size * row))
 			else return end
 		end
@@ -218,7 +237,7 @@ function SageBuff:OnEvent(unit)
 	if(buffFrame and buffFrame:IsVisible()) then
 		buffFrame:Update()
 	end
-	
+
 	local debuffFrame = self:Get(unit, true)
 	if(debuffFrame and debuffFrame:IsVisible()) then
 		debuffFrame:Update()
