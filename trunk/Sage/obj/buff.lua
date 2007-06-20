@@ -39,12 +39,12 @@ local function Buff_OnLeave()
 end
 
 local function Buff_Create(parent, id, isDebuff)
-	local buff = CreateFrame("Frame", nil, parent)
+	local buff = CreateFrame("Frame", format("Sage%sBuff%d", parent.id, id), parent)
 	buff:EnableMouse(true)
 	buff:SetID(id)
 	buff:SetWidth(36); buff:SetHeight(36)
 
-	local icon = buff:CreateTexture()
+	local icon = buff:CreateTexture(format("Sage%sBuff%dIcon", parent.id, id))
 	if(isDebuff) then
 		icon:SetTexCoord(0.09, 0.91, 0.09, 0.91)
 		icon:SetPoint("TOPLEFT", buff, "TOPLEFT", 4, -4)
@@ -56,11 +56,11 @@ local function Buff_Create(parent, id, isDebuff)
 	buff.icon = icon
 
 	local count = buff:CreateFontString(nil, "OVERLAY")
-	count:SetFontObject(NumberFontNormalLarge)
-	count:SetPoint("BOTTOMRIGHT", buff, "BOTTOMRIGHT", -2, 2)
+	count:SetFontObject(GameFontHighlightLarge)
+	count:SetPoint("BOTTOMRIGHT", buff, "BOTTOMRIGHT")
 	buff.count = count
 
-	local cooldown = CreateFrame("Cooldown", nil, buff, "CooldownFrameTemplate")
+	local cooldown = CreateFrame("Cooldown", format("Sage%sBuff%dCooldown", parent.id, id), buff, "CooldownFrameTemplate")
 	cooldown:SetAllPoints(buff)
 	cooldown:SetReverse(true)
 	cooldown:Hide()
