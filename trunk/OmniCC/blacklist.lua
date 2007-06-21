@@ -5,6 +5,7 @@
 
 --Target frame buffs and debuffs
 OmniCC:Blacklist("TargetFrame")
+OmniCC:Blacklist("Sage")
 
 -- BongosActionButton
 -- OmniCC:Blacklist("BongosActionButton")
