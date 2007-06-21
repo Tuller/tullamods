@@ -110,8 +110,8 @@ local function PartyParent_Create()
 		["PRIEST"] = "Lesser Heal",
 		["PALADIN"] = "Holy Light",
 	}
-	local spell = spells[select(2, UnitClass("player"))]
 
+	local spell = spells[select(2, UnitClass("player"))]
 	if(spell) then
 		frame:SetScript("OnUpdate", function(self, elapsed)
 			self.nextUpdate = (self.nextUpdate or 0) - elapsed
@@ -133,7 +133,7 @@ local function PartyParent_Create()
 end
 
 function SageParty:ShouldShow()
-	return GetNumPartyMembers() > 0 and (GetNumRaidMembers() <= 5 or Sage:ShowingPartyInRaid())
+	return GetNumPartyMembers() > 0 and (GetNumRaidMembers() <= 5 or self:ShowingInRaid())
 end
 
 function SageParty:GetDefaults()
@@ -198,6 +198,7 @@ function SageParty:Load()
 		self.frames[i] = frame
 	end
 
+	self:RegisterEvent("PLAYER_REGEN_ENABLED")
 	self:RegisterEvent("PARTY_MEMBERS_CHANGED", "UpdateMembers")
 	self:RegisterEvent("RAID_ROSTER_UPDATE", "UpdateMembers")
 	self:RegisterEvent("UNIT_DYNAMIC_FLAGS", "UpdateAggro")
@@ -212,7 +213,15 @@ function SageParty:Unload()
 	end
 end
 
-function SageParty:UpdateMembers(event)
+function SageParty:PLAYER_REGEN_ENABLED()
+	if self:ShouldShow() then
+		self.parent:Show()
+	else
+		self.parent:Hide()
+	end
+end
+
+function SageParty:UpdateMembers()
 	if self:ShouldShow() then
 		self.parent:Show()
 		for _, frame in pairs(self.frames) do
@@ -241,4 +250,13 @@ end
 
 function SageParty:LoadOptions()
 	local panel = SageOptions:AddPanel("Party")
+end
+
+function SageParty:ShowingInRaid()
+	return HIDE_PARTY_INTERFACE == "0"
+end
+
+function SageParty:SetShowInRaid(enable)
+	HIDE_PARTY_INTERFACE = (enable and "0") or "1"
+	self:UpdateMembers()
 end
