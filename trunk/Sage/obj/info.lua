@@ -299,6 +299,7 @@ end
 
 function SageInfo:UNIT_FACTION(unit)
 	self:ForUnit(unit, "UpdatePvP")
+	self:ForUnit(unit, "UpdateNameColor")
 end
 
 function SageInfo:UNIT_NAME_UPDATE(unit)
