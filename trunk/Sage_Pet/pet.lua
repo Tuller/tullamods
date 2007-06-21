@@ -189,13 +189,13 @@ function SagePet:Unload()
 	self.frame:Destroy()
 end
 
-function SagePet:UNIT_PET(self, event, unit)
+function SagePet:UNIT_PET(event, unit)
 	if(unit == "player") then
 		self.frame:Update()
 	end
 end
 
-function SagePet:UNIT_HAPPINESS(self, event, unit)
+function SagePet:UNIT_HAPPINESS(event, unit)
 	if(unit == "pet") then
 		self.frame.happy:Update()
 	end
