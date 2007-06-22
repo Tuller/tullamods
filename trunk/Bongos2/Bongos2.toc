@@ -3,7 +3,8 @@
 ## Notes: Movable bar framework
 ## Author: Tuller
 ## Version: 1.5
-## SavedVariables: Bongos2DB
+## SavedVariables: Bongos2DB, BongosVersion
+## OptionalDeps: Dongle
 lib\FlyPaper.lua
 lib\Gooey.xml
 lib\Dongle.lua

@@ -19,7 +19,6 @@ function Bongos:Enable()
 
 	local defaults = {
 		profile = {
-			version = CURRENT_VERSION,
 			sticky = true,
 			lockButtons = true,
 			showTooltips = true,
@@ -38,14 +37,19 @@ function Bongos:Enable()
 	self.db = self:InitializeDB("Bongos2DB", defaults)
 	self.profile = self.db.profile
 
-	local cMajor, cMinor = CURRENT_VERSION:match("(%d+)%.(%d+)")
-	local major, minor = self.profile.version:match("(%d+)%.(%d+)")
-
-	if major ~= cMajor and not(self.profile.version == "0.9") then
-		self.db:ResetProfile()
-		self:Print(L.UpdatedIncompatible)
-	elseif minor ~= cMinor then
+	--handle upgrading from <= 1.5 to 1.6+ because I'm a moron sometimes
+	if(not BongosVersion) then
 		self:UpdateVersion()
+	else
+		local cMajor, cMinor = CURRENT_VERSION:match("(%d+)%.(%d+)")
+		local major, minor = BongosVersion:match("(%d+)%.(%d+)")
+
+		if major ~= cMajor then
+			self.db:ResetProfile()
+			self:Print(L.UpdatedIncompatible)
+		elseif minor ~= cMinor then
+			self:UpdateVersion()
+		end
 	end
 
 	self:RegisterSlashCommands()
@@ -53,11 +57,11 @@ function Bongos:Enable()
 end
 
 function Bongos:UpdateVersion()
-	self.profile.version = CURRENT_VERSION
 	if(BongosActionBar) then
 		BongosActionBar:ConvertBindings()
 	end
-	self:Print(format(L.Updated, self.profile.version))
+	BongosVersion = CURRENT_VERSION
+	self:Print(format(L.Updated, BongosVersion))
 end
 
 function Bongos:LoadModules()
