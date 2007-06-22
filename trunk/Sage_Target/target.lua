@@ -9,6 +9,8 @@ local BUFF_SIZE_LARGE = 30
 local BUFF_SIZE_SMALL = 16
 local class = select(2, UnitClass("player"))
 local hasCombo = (class == "DRUID" or class == "ROGUE")
+local L = SAGE_LOCALS
+L.NumericCombo = "Numeric Combo Display"
 
 
 --[[ UI Templates ]]--
@@ -277,4 +279,17 @@ end
 
 function SageTarget:LoadOptions()
 	local panel = SageOptions:AddPanel("Target")
+	
+	if(hasCombo) then
+		local frame = self.frame
+		local function Numeric_OnShow(self)
+			self:SetChecked(frame.sets.numericCombo)
+		end
+		local function Numeric_OnClick(self)
+			frame.sets.numericCombo = self:GetChecked() or nil
+			frame.combo:Update(frame.sets.numericCombo)
+		end
+		panel:AddCheckButton(L.NumericCombo, Numeric_OnClick, Numeric_OnShow)
+	end
+	panel:AddUnitOptions("target")
 end
