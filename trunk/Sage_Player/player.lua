@@ -4,6 +4,8 @@
 --]]
 
 SagePlayer = Sage:NewModule("Sage-Player")
+local L = SAGE_LOCALS
+L.ShowXP = "Show Experience"
 
 
 --Unregisters the blizzard provided player frame
@@ -124,5 +126,14 @@ function SagePlayer:OnPartyEvent()
 end
 
 function SagePlayer:LoadOptions()
-	local panel = SageOptions:AddPanel("Player", "player")
+	local panel = SageOptions:AddPanel("Player")
+	
+	local function ShowXP_OnClick(self)
+		SagePlayer:SetShowXP(self:GetChecked())
+	end
+	local function ShowXP_OnShow(self)
+		self:SetChecked(SagePlayer:ShowingXP())
+	end
+	panel:AddCheckButton(L.ShowXP, ShowXP_OnClick, ShowXP_OnShow)
+	panel:AddUnitOptions("player")
 end
