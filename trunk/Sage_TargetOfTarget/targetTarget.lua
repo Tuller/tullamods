@@ -4,6 +4,8 @@
 --]]
 
 SageTargetTarget = Sage:NewModule("Sage-TargetTarget")
+local L = SAGE_LOCALS
+L.UpdateInterval = "Update Interval"
 
 local function Frame_Update(self)
 	self.info:UpdateAll()
@@ -69,5 +71,15 @@ function SageTargetTarget:PLAYER_TARGET_CHANGED()
 end
 
 function SageTargetTarget:LoadOptions()
-	local panel = SageOptions:AddPanel("ToT")
+	local panel = SageOptions:AddPanel("ToT", "targettarget")
+	local slider = panel:AddSlider(L.UpdateInterval, 0, 3, 0.1)
+	local sets = self.frame.sets
+
+	slider:SetScript("OnShow", function(self)
+		self:SetValue(sets.updateInterval)
+	end)
+	slider:SetScript("OnValueChanged", function(self,value)
+		sets.updateInterval = value
+		getglobal(self:GetName() .. "ValText"):SetText(format("%.1f", value))
+	end)
 end
