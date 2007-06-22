@@ -5,10 +5,12 @@
 
 SageParty = Sage:NewModule("Sage-Party")
 
+local L = SAGE_LOCALS
 local RAID_CLASS_COLORS = RAID_CLASS_COLORS
 local MAX_PARTY_MEMBERS = 4
 local DEBUFF_SIZE = 32
 local BUFF_SIZE = 16
+L.ShowInRaid = "Show Party In Raid"
 
 
 --[[ Pet Frame Code ]]--
@@ -250,6 +252,16 @@ end
 
 function SageParty:LoadOptions()
 	local panel = SageOptions:AddPanel("Party")
+
+	--show party in raid
+	local function ShowInRaid_OnClick(self)
+		SageParty:SetShowInRaid(self:GetChecked())
+	end
+	local function ShowInRaid_OnShow(self)
+		self:SetChecked(SageParty:ShowingInRaid())
+	end
+	panel:AddCheckButton(L.ShowInRaid, ShowInRaid_OnClick, ShowInRaid_OnShow)
+	panel:AddUnitOptions("party")
 end
 
 function SageParty:ShowingInRaid()
