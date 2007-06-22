@@ -27,6 +27,7 @@ end
 
 --show tooltip, show text if its not always shown
 function SageClick:OnEnter()
+	self:GetParent().entered = true
 	local unit = self:GetAttribute("unit")
 
 	if SpellIsTargeting() then
@@ -50,6 +51,8 @@ end
 
 --hide tooltip, and text if its not always shown
 function SageClick:OnLeave()
+	self:GetParent().entered = nil
+		
 	if SpellIsTargeting() then
 		SetCursor("CAST_ERROR_CURSOR")
 	end
@@ -65,11 +68,11 @@ function SageClick:ShowMenu()
 	local unit = self:GetAttribute("unit")
 	local menu
 
-	if unit == "player" then
+	if "player" then
 		menu = PlayerFrameDropDown
-	elseif unit == "target" then
+	elseif "target" then
 		menu = TargetFrameDropDown
-	elseif unit == "pet" then
+	elseif "pet" then
 		menu = PetFrameDropDown
 	else
 		local partyID = unit:match("party(%d)")

@@ -160,7 +160,7 @@ function SageHealth:Update()
 		elseif not UnitIsConnected(unit) then
 			text:SetText(L.Offline)
 		else
-			self:SetText(value, maxValue, Sage:GetHealthTextMode(self.id))
+			self:SetText(value, maxValue)
 		end
 	end
 end
@@ -204,7 +204,16 @@ function SageHealth:UpdateText()
 	self:Update()
 end
 
-SageHealth.SetText = SageBar.SetText
+function SageHealth:SetText(value, max)
+	local text = self.text
+	if(self:GetParent().entered) then
+		text:SetText(format("%d / %d", value, max))
+	elseif(UnitCanAssist("player", self.id)) then
+		text:SetText((value == max and "") or max - value)
+	else
+		text:SetText((value == max and "") or format("%d / %d", value, max))
+	end
+end
 SageHealth.ShowText = SageBar.ShowText
 SageHealth.UpdateTexture = SageBar.UpdateTexture
 

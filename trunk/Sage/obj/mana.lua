@@ -54,10 +54,19 @@ end
 
 function SageMana:UpdateText()
 	local unit = self.id
-	self:SetText(UnitMana(unit), UnitManaMax(unit), Sage:GetManaTextMode(unit))
+	self:SetText(UnitMana(unit), UnitManaMax(unit))
 end
 
-SageMana.SetText = SageBar.SetText
+function SageMana:SetText(value, max)
+	local text = self.text
+	if(self:GetParent().entered) then
+		text:SetText(format("%d / %d", value, max))
+	elseif(UnitCanAssist("player", self.id)) then
+		text:SetText((value == max and "") or value)
+	else
+		text:SetText((value == max and "") or format("%d / %d", value, max))
+	end
+end
 SageMana.ShowText = SageBar.ShowText
 SageMana.UpdateTexture = SageBar.UpdateTexture
 

@@ -33,7 +33,7 @@ function Sage:Enable()
 			outlineOutsideFonts = false,
 			debuffColoring = true,
 			fontSize = 14,
-			barTexture = "skewed",
+			barTexture = "armory2",
 			frames = {}
 		}
 	}
@@ -374,8 +374,8 @@ function Sage:GetBarTexture(texID)
 		local SML = AceLibrary:HasInstance("SharedMedia-1.0") and AceLibrary("SharedMedia-1.0")
 		local texture = SML:Fetch("statusbar", texID, true)
 
-		if(texture) then 
-			return texture 
+		if(texture) then
+			return texture
 		end
 	end
 	return (texID:lower() == "blizzard" and BLIZZ_TEXTURE) or format(TEXTURE_PATH, texID)
@@ -511,22 +511,4 @@ end
 
 function Sage:GetWidth(unit)
 	return self:GetUnitSetting(unit, "minWidth") or 1
-end
-
---health text mode
-function Sage:SetHealthTextMode(unit, mode)
-	SageFrame:ForFrame(unit, "SetHealthTextMode", mode)
-end
-
-function Sage:GetHealthTextMode(unit)
-	return self:GetUnitSetting(unit, "healthTextMode") or 1
-end
-
---mana text mode
-function Sage:SetManaTextMode(unit, mode)
-	SageFrame:ForFrame(unit, "SetManaTextMode", mode)
-end
-
-function Sage:GetManaTextMode(unit)
-	return self:GetUnitSetting(unit, "manaTextMode") or 1
 end
