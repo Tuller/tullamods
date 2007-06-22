@@ -8,3 +8,4 @@ gooey.xml
 localization.lua
 menu.lua
 profiles.lua
+textures.lua
