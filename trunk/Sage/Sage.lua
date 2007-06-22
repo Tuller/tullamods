@@ -367,18 +367,14 @@ function Sage:SetBarTexture(texture)
 	SageBar:UpdateAllTextures()
 end
 
-function Sage:GetBarTexture()
-	local texID = self.profile.barTexture or "blizz"
-	if(texID:lower() == "blizz") then return BLIZZ_TEXTURE end
-
-	-- local SML = AceLibrary and AceLibrary:HasInstance("SharedMedia-1.0") and AceLibrary("SharedMedia-1.0")
-	-- if(SML) then
-		-- local texture = SML:Fetch(SML.MediaType.STATUSBAR, texID, true)
-		-- if(texture) then
-			-- return texture
-		-- end
-	-- end
-	return format(TEXTURE_PATH, texID)
+function Sage:GetBarTexture(texture)
+	local texID
+	if(texture) then
+		texID = texture
+	else
+		texID = self.profile.barTexture or "blizzard"
+	end
+	return (texID:lower() == "blizzard" and BLIZZ_TEXTURE) or format(TEXTURE_PATH, texID)
 end
 
 --font size
