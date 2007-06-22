@@ -160,7 +160,7 @@ end
 
 function SagePet:Load()
 	local defaults = {
-		x = 11, y = 691, minWidth = 70,
+		x = 11, y = 691, width = 70,
 		anchor = "playerBL",
 		combatTextSize = 18,
 		showCombatText = true
