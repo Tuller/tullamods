@@ -198,8 +198,10 @@ local function Frame_AddBars(self)
 		SageCombat:Register(self)
 	end
 
+	--Not using dynamic anchoring here to allow the npc and mana bars to move around properly
 	self.click:SetPoint("TOPLEFT", self.info)
-	self.click:SetPoint("BOTTOMRIGHT", self.npc)
+	self.click:SetPoint("TOPRIGHT", self.info)
+	self.click:SetHeight(16 + 20 + 12)
 
 	self.cast = SageCast:Create(self)
 	self.cast:SetAllPoints(self.npc)
@@ -248,7 +250,7 @@ function SageTarget:Load()
 		combatTextSize = 24,
 		showCombatText = 1,
 		anchor = "focusRT",
-		minWidth = 100,
+		width = 100,
 		x = 462,
 		y = 511
 	}
