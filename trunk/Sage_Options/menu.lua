@@ -21,7 +21,7 @@ L.ShowCastable = "Show Only Castable Buffs"
 L.ShowCurable = "Show Only Curable Debuffs"
 L.Scale = "Scale"
 L.Opacity = "Opacity"
-L.Width = "Name Width"
+L.Width = "Width"
 
 function SageOptions:Load()
 	--mother frame, used to hide and show the entire window
