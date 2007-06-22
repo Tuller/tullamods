@@ -51,15 +51,13 @@ function SageBar:SetText(value, max, mode)
 	--current
 	elseif mode == 2 then
 		text:SetText(value)
-	--deficit / max
-	elseif mode == 3 then
-		text:SetText(format("-%d / %d", max - value, max))
-	--deficit / current
-	elseif mode == 4 then
-		text:SetText(format("-%d / %d", max - value, value))
 	--deficit
-	elseif mode == 5 then
-		text:SetText(format("-%d", max - value))
+	elseif mode == 3 then
+		if(value == max) then
+			text:SetText("")
+		else
+			text:SetText(max - value)
+		end
 	end
 end
 

@@ -258,19 +258,23 @@ function SageFrame:ForFrame(id, method, ...)
 
 	if id == "all" then
 		self:ForAll(method, ...)
-	else
-		local startID, endID = id:match("(%d+)-(%d+)")
-		startID = tonumber(startID)
-		endID = tonumber(endID)
-
-		if startID and endID then
-			if startID > endID then
-				local t = startID
-				startID = endID
-				endID = t
+	elseif(id == "party") then
+		for i = 1, 4 do
+			local frame = self:Get("party"..i)
+			if(frame) then
+				local action = frame[method]
+				if(action) then
+					action(frame, ...)
+				end
 			end
+		end
+	else
+		local s, e = id:match("(%d+)-(%d+)")
+		s = tonumber(s)
+		e = tonumber(e)
 
-			for i = startID, endID do
+		if s and e then
+			for i = min(s, e), max(s, e) do
 				local frame = self:Get(i)
 				if frame then
 					local action = frame[method]
@@ -289,4 +293,29 @@ function SageFrame:ForFrame(id, method, ...)
 			end
 		end
 	end
+end
+
+--[[ Config Functions ]]--
+
+function SageFrame:SetFrameWidth(width)
+	self.sets.minWidth = width
+	local info = SageInfo:Get(self.id)
+	if(info) then info:UpdateWidth() end
+end
+
+function SageFrame:SetShowCurable(enable)
+	self.sets.showCurable = enable or nil
+	
+	local debuffs = SageBuff:Get(self.id, true)
+	if(debuffs) then debuffs:Update() end
+	
+	local health = SageHealth:Get(self.id)
+	if(health) then health:UpdateAll() end
+end
+
+function SageFrame:SetShowCastable(enable)
+	self.sets.showCastable = enable or nil
+	
+	local buffs = SageBuff:Get(self.id)
+	if(buffs) then buffs:Update() end
 end

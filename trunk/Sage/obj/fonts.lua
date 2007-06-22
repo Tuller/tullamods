@@ -8,10 +8,11 @@ local function Font_Update(self, size, outline)
 
 	if outline then
 		self:SetFont(base, size, "OUTLINE")
+		self:SetShadowOffset(0, 0)
 	else
 		self:SetFont(base, size)
 		self:SetShadowOffset(1, -1)
-		self:SetShadowColor(0, 0, 0, 1)
+		self:SetShadowColor(0, 0, 0)
 	end
 end
 

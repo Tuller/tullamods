@@ -25,29 +25,30 @@ end
 
 local function Bar_CreateStrings(self)
 	local level = self:CreateFontString(nil, "OVERLAY")
-	level:SetFontObject(SageFont:GetSmallOutsideFont())
+	level:SetFontObject(SageFont:GetLevelFont())
 	level:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 2, 0)
-	level:SetJustifyH("LEFT")
+	level:SetHeight(12)
+	level:SetJustifyH("LEFT"); level:SetJustifyV("BOTTOM")
 	self.level = level
 
 	local percent = self:CreateFontString(nil, "OVERLAY")
 	percent:SetFontObject(SageFont:GetSmallOutsideFont())
-	percent:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -1, 0)
-	percent:SetJustifyH("RIGHT")
+	percent:SetPoint("BOTTOMRIGHT", self)
+	percent:SetHeight(12)
+	percent:SetJustifyH("RIGHT"); percent:SetJustifyV("BOTTOM")
 	if not Sage:ShowingPercents() then percent:Hide() end
 	self.percent = percent
 
 	local name = self:CreateFontString(nil, "OVERLAY")
 	name:SetFontObject(SageFont:GetOutsideFont())
-	name:SetJustifyH("LEFT")
+	name:SetHeight(12)
+	name:SetJustifyH("LEFT"); name:SetJustifyV("BOTTOM")
 	name:SetPoint("BOTTOMLEFT", level, "BOTTOMRIGHT")
 	name:SetPoint("BOTTOMRIGHT", percent, "BOTTOMLEFT")
 	self.name = name
 end
 
 local function Bar_CreateIcons(self, hasPartyInfo)
-	if(not self.level) then Sage:Print("poop") end
-
 	local pvp = self:CreateTexture(nil, "OVERLAY")
 	pvp:SetWidth(48); pvp:SetHeight(48)
 	pvp:SetPoint("CENTER", self.level, "CENTER", 7, -10)
@@ -111,7 +112,7 @@ function SageInfo:UpdateAll()
 	self:UpdateNameColor()
 
 	if(GetNumPartyMembers() > 0) then
-		self:UpdatePartyLeader(IndexToUnit(GetPartyLeaderIndex()))
+		self:UpdatePartyLeader()
 		self:UpdateMasterLooter(IndexToUnit(select(2, GetLootMethod())))
 	end
 
@@ -256,19 +257,14 @@ function SageInfo:UpdateWidth()
 
 	width = width + self.level:GetStringWidth()
 
-	if Sage:ShowingPercents() then
-		self.percent:SetText("100%")
-		width = width + self.percent:GetStringWidth()
-	end
-
 	self:UpdateAll()
 	parent:SetWidth(width)
 end
 
-function SageInfo:UpdatePartyLeader(leader)
+function SageInfo:UpdatePartyLeader()
 	local leaderIcon = self.leader
 	if(leaderIcon) then
-		if(leader and UnitIsUnit(self.id, leader)) then
+		if(leader and (IsPartyLeader(self.id) or IsRaidLeader(self.id))) then
 			leaderIcon:Show()
 		else
 			leaderIcon:Hide()
@@ -320,7 +316,7 @@ function SageInfo:RAID_TARGET_UPDATE()
 end
 
 function SageInfo:PARTY_LEADER_CHANGED()
-	self:ForAll("UpdatePartyLeader", IndexToUnit(GetPartyLeaderIndex()))
+	self:ForAll("UpdatePartyLeader")
 end
 
 function SageInfo:PARTY_LOOT_METHOD_CHANGED()
