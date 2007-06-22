@@ -21,6 +21,23 @@ local textures = {
 	"Steel",
 	"XPerl7",
 }
+if(AceLibrary) then
+	local SML = AceLibrary:HasInstance("SharedMedia-1.0") and AceLibrary("SharedMedia-1.0")
+	if(SML) then
+		for _,id in pairs(SML:List("statusbar")) do
+			local found = false
+			for _,tID in pairs(textures) do
+				if(tID == id) then
+					found = true; break
+				end
+			end
+			if(not found) then
+				table.insert(textures, id)
+			end
+		end
+	end
+end
+	
 table.sort(textures)
 local BUTTON_HEIGHT = 24
 local DISPLAY_SIZE = 10
