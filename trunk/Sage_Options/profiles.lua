@@ -109,13 +109,13 @@ local function Panel_Create()
 			panel:Highlight(selected:GetText())
 		end
 	end)
-	set:SetText("Set"); set:SetWidth(42); set:SetHeight(24)
-	set:SetPoint("BOTTOMLEFT", panel, "BOTTOMLEFT", 6, 4)
+	set:SetText("Set"); set:SetWidth(48); set:SetHeight(24)
+	set:SetPoint("BOTTOMLEFT", panel, "BOTTOMLEFT", 7, 6)
 
 	local save = CreateFrame("Button", name .. "Save", panel, "GooeyButton")
 	save:SetScript("OnClick", function() StaticPopup_Show("SAGE_OPTIONS_SAVE_PROFILE") end)
-	save:SetText("Save"); save:SetWidth(42); save:SetHeight(24)
-	save:SetPoint("LEFT", set, "RIGHT", 4, 0)
+	save:SetText("Save"); save:SetWidth(48); save:SetHeight(24)
+	save:SetPoint("LEFT", set, "RIGHT", 5, 0)
 
 	local copy = CreateFrame("Button", name .. "Copy", panel, "GooeyButton")
 	copy:SetScript("OnClick", function()
@@ -124,8 +124,8 @@ local function Panel_Create()
 			Sage:CopyProfile(selected:GetText())
 		end
 	end)
-	copy:SetText("Copy"); copy:SetWidth(42); copy:SetHeight(24)
-	copy:SetPoint("LEFT", save, "RIGHT", 4, 0)
+	copy:SetText("Copy"); copy:SetWidth(48); copy:SetHeight(24)
+	copy:SetPoint("LEFT", save, "RIGHT", 5, 0)
 
 	local delete = CreateFrame("Button", name .. "Delete", panel, "GooeyButton")
 	delete:SetScript("OnClick", function()
@@ -136,15 +136,15 @@ local function Panel_Create()
 			panel:Highlight()
 		end
 	end)
-	delete:SetText("Delete"); delete:SetWidth(42); delete:SetHeight(24)
-	delete:SetPoint("LEFT", copy, "RIGHT", 4, 0)
+	delete:SetText("Delete"); delete:SetWidth(48); delete:SetHeight(24)
+	delete:SetPoint("LEFT", copy, "RIGHT", 5, 0)
 
 	--add list buttons
 	panel.buttons = {}
 	for i = 1, listSize do
 		local button = ProfileButton_Create(name .. i, panel)
 		if(i == 1) then
-			button:SetPoint("TOPLEFT", panel, "TOPLEFT", 6, -4)
+			button:SetPoint("TOPLEFT", panel, "TOPLEFT", 8, -4)
 			button:SetPoint("BOTTOMRIGHT", scroll, "TOPLEFT", -2, -20)
 		else
 			button:SetPoint("TOPLEFT", name .. i-1, "BOTTOMLEFT", 0, -1)

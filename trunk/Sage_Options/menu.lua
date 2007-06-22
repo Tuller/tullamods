@@ -16,6 +16,11 @@ L.HealthBarDebuffColoring = "Color Health When Debuffed"
 L.ShowHealthPercents = "Show Health Percents"
 L.ShowStatusBarText = "Show Statusbar Text"
 L.ShowCastBars = "Show Casting Bars"
+L.ShowCastable = "Show Only Castable Buffs"
+L.ShowCurable = "Show Only Curable Debuffs"
+L.Scale = "Scale"
+L.Opacity = "Opacity"
+L.Width = "Name Width"
 
 function SageOptions:Load()
 	--mother frame, used to hide and show the entire window
@@ -78,30 +83,30 @@ function SageOptions:AddGeneralPanel()
 	local function Sticky_OnShow(self) self:SetChecked(Sage:IsSticky()) end
 	local function Sticky_OnClick(self) Sage:SetSticky(self:GetChecked()) end
 	panel:AddCheckButton(L.SetSticky, Sticky_OnClick, Sticky_OnShow)
-	
-	local function OutlineBar_OnShow(self) self:SetChecked(Sage:OutlineBarFonts()) end
-	local function OutlineBar_OnClick(self) Sage:SetOutlineBarFonts(self:GetChecked()) end
-	panel:AddCheckButton(L.OutlineBarText, OutlineBar_OnClick, OutlineBar_OnShow)
-	
-	local function OutlineOut_OnShow(self) self:SetChecked(Sage:OutlineOutsideFonts()) end
-	local function OutlineOut_OnClick(self) Sage:SetOutlineOutsideFonts(self:GetChecked()) end
-	panel:AddCheckButton(L.OutlineOutside, OutlineOut_OnClick, OutlineOut_OnShow)
-	
-	local function DebuffColoring_OnShow(self) self:SetChecked(Sage:DebuffColoring()) end
-	local function DebuffColoring_OnClick(self) Sage:SetDebuffColoring(self:GetChecked()) end
-	panel:AddCheckButton(L.HealthBarDebuffColoring, DebuffColoring_OnClick, DebuffColoring_OnShow)
-	
-	local function Percents_OnShow(self) self:SetChecked(Sage:ShowingPercents()) end
-	local function Percents_OnClick(self) Sage:SetShowPercents(self:GetChecked()) end
-	panel:AddCheckButton(L.ShowHealthPercents, Percents_OnClick, Percents_OnShow)
-	
+
 	local function Text_OnShow(self) self:SetChecked(Sage:ShowingText()) end
 	local function Text_OnClick(self) Sage:SetShowText(self:GetChecked()) end
 	panel:AddCheckButton(L.ShowStatusBarText, Text_OnClick, Text_OnShow)
-	
+
+	local function Percents_OnShow(self) self:SetChecked(Sage:ShowingPercents()) end
+	local function Percents_OnClick(self) Sage:SetShowPercents(self:GetChecked()) end
+	panel:AddCheckButton(L.ShowHealthPercents, Percents_OnClick, Percents_OnShow)
+
 	local function CastBars_OnShow(self) self:SetChecked(Sage:ShowingCastBars()) end
 	local function CastBars_OnClick(self) Sage:SetShowCastBars(self:GetChecked()) end
 	panel:AddCheckButton(L.ShowCastBars, CastBars_OnClick, CastBars_OnShow)
+
+	local function DebuffColoring_OnShow(self) self:SetChecked(Sage:DebuffColoring()) end
+	local function DebuffColoring_OnClick(self) Sage:SetDebuffColoring(self:GetChecked()) end
+	panel:AddCheckButton(L.HealthBarDebuffColoring, DebuffColoring_OnClick, DebuffColoring_OnShow)
+
+	local function OutlineBar_OnShow(self) self:SetChecked(Sage:OutlineBarFonts()) end
+	local function OutlineBar_OnClick(self) Sage:SetOutlineBarFonts(self:GetChecked()) end
+	panel:AddCheckButton(L.OutlineBarText, OutlineBar_OnClick, OutlineBar_OnShow)
+
+	local function OutlineOut_OnShow(self) self:SetChecked(Sage:OutlineOutsideFonts()) end
+	local function OutlineOut_OnClick(self) Sage:SetOutlineOutsideFonts(self:GetChecked()) end
+	panel:AddCheckButton(L.OutlineOutside, OutlineOut_OnClick, OutlineOut_OnShow)
 end
 
 
@@ -176,19 +181,65 @@ function SageOptions:AddPanel(name, unit)
 	self.panels[name] = panel
 	self.menu:AddItem(name)
 	
-	-- if(unit) then
-		-- local function Castable_OnShow(self) self:SetChecked(Sage:IsLocked()) end
-		-- local function Castable_OnClick(self) Sage:SetLock(self:GetChecked()) end
-		-- panel:AddCheckButton(L.ShowCurable, Lock_OnClick, Lock_OnShow)
-	-- end
+	if(unit) then
+		panel:AddUnitOptions(unit)
+	end
 
 	return panel
 end
 
+--add show curable, show castable, text mode, scale, width, and opacity sliders
+local function ShowCastable_OnClick(self)
+	Sage:SetShowCastable(self:GetParent().unit, self:GetChecked())
+end
+local function ShowCastable_OnShow(self)
+	self:SetChecked(Sage:ShowingCastable(self:GetParent().unit))
+end
+
+local function ShowCurable_OnClick(self)
+	Sage:SetShowCurable(self:GetParent().unit, self:GetChecked())
+end
+local function ShowCurable_OnShow(self)
+	self:SetChecked(Sage:ShowingCurable(self:GetParent().unit))
+end
+	
+function Panel:AddUnitOptions(unit)
+	self.unit = unit
+
+	--nasty little hack
+	if(not(unit == "player" or unit == "targettarget")) then
+		self:AddCheckButton(L.ShowCastable, ShowCastable_OnClick, ShowCastable_OnShow)
+	end
+	self:AddCheckButton(L.ShowCurable, ShowCurable_OnClick, ShowCurable_OnShow)
+	self:AddWidthSlider()
+	self:AddAlphaSlider()
+	self:AddScaleSlider()
+end
+
 --slider
-function Panel:AddSlider(name)
+local function Slider_OnMouseWheel(self, direction)
+	local step = self:GetValueStep() * direction
+	local value = self:GetValue()
+	local minVal, maxVal = self:GetMinMaxValues()
+
+	if(step > 0) then
+		self:SetValue(min(value+step, maxVal))
+	else
+		self:SetValue(max(value+step, minVal))
+	end
+end
+
+function Panel:AddSlider(name, min, max, step)
 	local slider = CreateFrame("Slider", self:GetName() .. name, self, "GooeySlider")
 	slider:SetWidth(200); slider:SetHeight(18)
+	slider:SetMinMaxValues(min, max)
+	slider:SetValueStep(step)
+	slider:EnableMouseWheel(true)
+	slider:SetScript("OnMouseWheel", Slider_OnMouseWheel)
+
+	getglobal(slider:GetName() .. "Text"):SetText(name)
+	getglobal(slider:GetName() .. "Low"):SetText(min)
+	getglobal(slider:GetName() .. "High"):SetText(max)
 
 	if(self.slider) then
 		slider:SetPoint("BOTTOM", self.slider, "TOP", 0, 24)
@@ -217,6 +268,76 @@ function Panel:AddCheckButton(name, OnClick, OnShow)
 	self.button = button
 
 	return button
+end
+
+--[[ Width Slider ]]--
+
+local function WidthSlider_OnShow(self)
+	self.onShow = true
+	self:SetValue(Sage:GetWidth(self:GetParent().unit))
+	self.onShow = nil
+end
+
+local function WidthSlider_OnValueChanged(self, value)
+	if not self.onShow then
+		Sage:SetWidth(self:GetParent().unit, value)
+	end
+	getglobal(self:GetName() .. "ValText"):SetText(value)
+end
+
+function Panel:AddWidthSlider()
+	local slider = self:AddSlider(L.Width, 0, 300, 5)
+	slider:SetScript("OnShow", WidthSlider_OnShow)
+	slider:SetScript("OnValueChanged", WidthSlider_OnValueChanged)
+
+	return slider
+end
+
+--[[ Scale Slider ]]--
+
+local function ScaleSlider_OnShow(self)
+	self.onShow = true
+	self:SetValue(Sage:GetScale(self:GetParent().unit) * 100)
+	self.onShow = nil
+end
+
+local function ScaleSlider_OnValueChanged(self, value)
+	if not self.onShow then
+		Sage:SetScale(self:GetParent().unit, value/100)
+	end
+	getglobal(self:GetName() .. "ValText"):SetText(value)
+end
+
+function Panel:AddScaleSlider()
+	local slider = self:AddSlider(L.Scale, 50, 150, 1, true)
+	slider:SetScript("OnShow", ScaleSlider_OnShow)
+	slider:SetScript("OnValueChanged", ScaleSlider_OnValueChanged)
+
+	return slider
+end
+
+
+--[[ Alpha Slider ]]--
+
+local function AlphaSlider_OnShow(self)
+	self.onShow = true
+	self:SetValue(Sage:GetOpacity(self:GetParent().unit) * 100)
+	self.onShow = nil
+end
+
+local function AlphaSlider_OnValueChanged(self, value)
+	if not self.onShow then
+		Sage:SetOpacity(self:GetParent().unit, value/100)
+	end
+	getglobal(self:GetName() .. "ValText"):SetText(value)
+end
+
+function Panel:AddAlphaSlider()
+	local slider = self:AddSlider(L.Opacity, 0, 100, 1)
+	slider:SetScript("OnShow", AlphaSlider_OnShow)
+	slider:SetScript("OnValueChanged", AlphaSlider_OnValueChanged)
+
+	return slider
 end
 
 SageOptions:Load()
