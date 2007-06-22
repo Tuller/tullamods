@@ -8,9 +8,8 @@ local L = SAGE_LOCALS
 L.UpdateInterval = "Update Interval"
 
 local function Frame_Update(self)
-	self.info:UpdateAll()
 	self.info.inCombat = UnitAffectingCombat(self.id)
-	self.info:UpdateNameColor()
+	self.info:UpdateAll()
 	self.health:UpdateAll()
 	self.npc:Update()
 end
@@ -37,27 +36,27 @@ local function Frame_OnCreate(self)
 	self.click:SetPoint("BOTTOMRIGHT", self.npc)
 
 	self.nextUpdate = 0
+	self.interval = self.sets.updateInterval
 	self:SetScript("OnUpdate", function(self, elapsed)
 		self.nextUpdate = self.nextUpdate - elapsed
 		if self.nextUpdate <= 0 then
-			self.nextUpdate = self.sets.updateInterval
+			self.nextUpdate = self.interval
 			self:Update()
 		end
 	end)
+	self:SetHeight(46)
 end
 
 function SageTargetTarget:Load()
 	local defaults = {
 		x = 686, y = 503,
-		minWidth = 85,
+		width = 85,
 		updateInterval = 0.1,
 		anchor = "targetRT",
 	}
 
-	local frame = SageFrame:Create("targettarget", Frame_OnCreate, defaults)
-	frame:SetSize(frame.sets.minWidth, 46)
-	self.frame = frame
-
+	self.frame = SageFrame:Create("targettarget", Frame_OnCreate, defaults)
+	self.frame.info:UpdateWidth()
 	self:RegisterEvent("PLAYER_TARGET_CHANGED")
 end
 
@@ -73,12 +72,14 @@ end
 function SageTargetTarget:LoadOptions()
 	local panel = SageOptions:AddPanel("ToT", "targettarget")
 	local slider = panel:AddSlider(L.UpdateInterval, 0, 3, 0.1)
-	local sets = self.frame.sets
+	local frame = self.frame
+	local sets = frame.sets
 
 	slider:SetScript("OnShow", function(self)
 		self:SetValue(sets.updateInterval)
 	end)
 	slider:SetScript("OnValueChanged", function(self,value)
+		frame.interval = value
 		sets.updateInterval = value
 		getglobal(self:GetName() .. "ValText"):SetText(format("%.1f", value))
 	end)
