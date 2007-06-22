@@ -142,7 +142,7 @@ function SageParty:GetDefaults()
 	return  {
 		{
 			x = 11, y = 629,
-			minWidth = 100,
+			width = 100,
 			showCombatText = true,
 			anchor = "petBL",
 			combatTextSize = 24,
@@ -150,7 +150,7 @@ function SageParty:GetDefaults()
 		},
 		{
 			x = 20, y = 956,
-			minWidth = 100,
+			width = 100,
 			showCombatText = true,
 			anchor = "party1BL",
 			combatTextSize = 24,
@@ -158,7 +158,7 @@ function SageParty:GetDefaults()
 		},
 		{
 			x = 20, y = 904,
-			minWidth = 100,
+			width = 100,
 			showCombatText = true,
 			anchor = "party2BL",
 			combatTextSize = 24,
@@ -166,7 +166,7 @@ function SageParty:GetDefaults()
 		},
 		{
 			x = 20, y = 852,
-			minWidth = 100,
+			width = 100,
 			showCombatText = true,
 			anchor = "party3BL",
 			combatTextSize = 24,
