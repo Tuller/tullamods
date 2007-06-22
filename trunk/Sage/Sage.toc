@@ -4,6 +4,7 @@
 ## Author: Tuller
 ## Version: 0.1
 ## SavedVariables: Sage2DB
+## OptionalDeps: Dongle, SharedMedia, MobHealth
 lib\FlyPaper.lua
 lib\Dongle.lua
 localization.lua

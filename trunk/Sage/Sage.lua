@@ -367,12 +367,16 @@ function Sage:SetBarTexture(texture)
 	SageBar:UpdateAllTextures()
 end
 
-function Sage:GetBarTexture(texture)
-	local texID
-	if(texture) then
-		texID = texture
-	else
-		texID = self.profile.barTexture or "blizzard"
+function Sage:GetBarTexture(texID)
+	local texID = texID or (self.profile.barTexture or "blizzard")
+
+	if(AceLibrary) then
+		local SML = AceLibrary:HasInstance("SharedMedia-1.0") and AceLibrary("SharedMedia-1.0")
+		local texture = SML:Fetch("statusbar", texID, true)
+
+		if(texture) then 
+			return texture 
+		end
 	end
 	return (texID:lower() == "blizzard" and BLIZZ_TEXTURE) or format(TEXTURE_PATH, texID)
 end
