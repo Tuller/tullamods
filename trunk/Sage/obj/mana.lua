@@ -41,7 +41,6 @@ function SageMana:Update()
 	if not UnitIsConnected(unit) then
 		self:SetValue(maxMana)
 		self:SetStatusBarColor(0.5, 0.5, 0.5)
-		self.text:SetText("")
 	else
 		--update mana bar color
 		local info = ManaBarColor[UnitPowerType(unit)]
@@ -53,21 +52,31 @@ function SageMana:Update()
 end
 
 function SageMana:UpdateText()
-	local unit = self.id
-	self:SetText(UnitMana(unit), UnitManaMax(unit))
-end
+	local unit, mode, text, entered = self.id, self.mode, self.text, self.entered
+	local value = UnitMana(unit)
+	local max = UnitManaMax(unit)
 
-function SageMana:SetText(value, max)
-	local text = self.text
-	if(self:GetParent().entered) then
-		text:SetText(format("%d / %d", value, max))
-	elseif(UnitCanAssist("player", self.id)) then
-		text:SetText((value == max and "") or value)
+	if(mode == 1 and not entered) then
+		text:Hide()
 	else
-		text:SetText((value == max and "") or format("%d / %d", value, max))
+		if(UnitIsGhost(unit) or UnitIsDead(unit) or not UnitIsConnected(unit)) then
+			text:SetText("")
+		else
+			if(entered or mode ~= 2) then
+				text:SetText(format("%d / %d", value, max))
+			elseif(mode == 2) then
+				if(value == max) then
+					text:SetText("")
+				elseif(UnitCanAssist(unit, "player")) then
+					text:SetText(format("%d", value))
+				else
+					text:SetText(format("%d / %d", value, max))
+				end
+			end
+		end
+		text:Show()
 	end
 end
-SageMana.ShowText = SageBar.ShowText
 SageMana.UpdateTexture = SageBar.UpdateTexture
 
 

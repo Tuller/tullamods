@@ -23,7 +23,6 @@ function Sage:Enable()
 
 	local defaults = {
 		profile = {
-			version = CURRENT_VERSION,
 			locked = true,
 			sticky = true,
 			showText = false,
@@ -41,14 +40,18 @@ function Sage:Enable()
 	self.db = self:InitializeDB(self.dbName, defaults, "Default")
 	self.profile = self.db.profile
 
-	local cMajor, cMinor = CURRENT_VERSION:match("(%d+)%.(%d+)")
-	local major, minor = self.profile.version:match("(%d+)%.(%d+)")
-
-	if major ~= cMajor then
-		self.db:ResetProfile()
-		self:Print(L.UpdatedIncompatible)
-	elseif minor ~= cMinor then
+	if(not SageVersion) then
 		self:UpdateVersion()
+	else
+		local cMajor, cMinor = CURRENT_VERSION:match("(%w+)%.(%w+)")
+		local major, minor = SageVersion:match("(%w+)%.(%w+)")
+
+		if major ~= cMajor then
+			self.db:ResetProfile()
+			self:Print(L.UpdatedIncompatible)
+		elseif minor ~= cMinor then
+			self:UpdateVersion()
+		end
 	end
 
 	self:RegisterEvents()
@@ -57,8 +60,15 @@ function Sage:Enable()
 end
 
 function Sage:UpdateVersion()
-	self.profile.version = CURRENT_VERSION
-	self:Print(format(L.Updated, self.profile.version))
+	-- SageVersion = CURRENT_VERSION
+	for _,profile in pairs(self.db.sv.profiles) do
+		for _,frame in pairs(profile.frames) do
+			frame.width = frame.minWidth
+			frame.minWidth = nil
+		end
+	end
+	SageVersion = CURRENT_VERSION
+	self:Print(format(L.Updated, SageVersion))
 end
 
 function Sage:LoadModules()
@@ -209,6 +219,7 @@ end
 function Sage:DONGLE_PROFILE_CREATED(event, db, parent, sv_name, profile_key)
 	if(sv_name == self.dbName) then
 		self.profile = self.db.profile
+		db.version = CURRENT_VERSION
 		self:Print(format(L.ProfileCreated , profile_key))
 	end
 end
@@ -275,7 +286,7 @@ function Sage:RegisterSlashCommands()
 end
 
 function Sage:PrintVersion()
-	self:Print(self.profile.version)
+	self:Print(SageVersion)
 end
 
 function Sage:ShowMenu()
@@ -510,5 +521,24 @@ function Sage:SetWidth(unit, width)
 end
 
 function Sage:GetWidth(unit)
-	return self:GetUnitSetting(unit, "minWidth") or 1
+	return self:GetUnitSetting(unit, "width") or 0
 end
+
+--show castable buffs
+function Sage:SetShowCombatText(unit, enable)
+	SageFrame:ForFrame(unit, "SetShowCombatText", enable)
+end
+
+function Sage:ShowingCombatText(unit)
+	return self:GetUnitSetting(unit, "showCombatText")
+end
+
+--text display mode
+function Sage:SetTextMode(unit, mode)
+	SageFrame:ForFrame(unit, "SetTextMode", mode)
+end
+
+function Sage:GetTextMode(unit)
+	return self:GetUnitSetting(unit, "textMode") or 1
+end
+

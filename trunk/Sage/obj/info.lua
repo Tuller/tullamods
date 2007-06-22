@@ -13,6 +13,7 @@ SageInfo = CreateFrame("Frame")
 local Frame_MT = {__index = SageInfo}
 local L = SAGE_LOCALS
 
+local LEVEL_OFFSET = 2
 local RAID_CLASS_COLORS = RAID_CLASS_COLORS
 local UnitReactionColor = UnitReactionColor
 
@@ -26,7 +27,7 @@ end
 local function Bar_CreateStrings(self)
 	local level = self:CreateFontString(nil, "OVERLAY")
 	level:SetFontObject(SageFont:GetLevelFont())
-	level:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 2, 0)
+	level:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", LEVEL_OFFSET, 0)
 	level:SetHeight(12)
 	level:SetJustifyH("LEFT"); level:SetJustifyV("BOTTOM")
 	self.level = level
@@ -109,7 +110,6 @@ function SageInfo:UpdateAll()
 	self:UpdateLevel()
 	self:UpdateUnitIcon()
 	self:UpdateName()
-	self:UpdateNameColor()
 
 	if(GetNumPartyMembers() > 0) then
 		self:UpdatePartyLeader()
@@ -124,6 +124,7 @@ end
 --Updates the name of the player and resizes the unitframe, if needed.
 function SageInfo:UpdateName()
 	self.name:SetText(UnitName(self.id))
+	self:UpdateNameColor()
 end
 
 --Colors the name of the unit based on a bunch of different criteria
@@ -202,6 +203,7 @@ function SageInfo:UpdatePvP()
 			pvpIcon:Hide()
 		end
 	end
+	self:UpdateNameColor()
 end
 
 --updates the level display for the unit, colors depending on relative level to the player
@@ -250,15 +252,20 @@ end
 
 function SageInfo:UpdateWidth()
 	local parent = self:GetParent()
-	local width = (parent.sets.minWidth or 0) + (parent.extraWidth or 0)
+	local width = parent:GetFrameWidth()
 
-	self.name:SetWidth(parent.minWidth or 0)
 	self.level:SetText("00")
+	--the +2 here is from the offset of level text
+	local textWidth = self.level:GetStringWidth() + LEVEL_OFFSET
 
-	width = width + self.level:GetStringWidth()
+	if Sage:ShowingPercents() then
+		self.percent:SetText("100%")
+		textWidth = textWidth + self.percent:GetStringWidth()
+	end
+	self.name:SetWidth(max(width-textWidth, 0))
 
 	self:UpdateAll()
-	parent:SetWidth(width)
+	parent:SetWidth(max(width, textWidth) + (parent.extraWidth or 0))
 end
 
 function SageInfo:UpdatePartyLeader()
@@ -295,7 +302,6 @@ end
 
 function SageInfo:UNIT_FACTION(unit)
 	self:ForUnit(unit, "UpdatePvP")
-	self:ForUnit(unit, "UpdateNameColor")
 end
 
 function SageInfo:UNIT_NAME_UPDATE(unit)

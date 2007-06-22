@@ -152,10 +152,16 @@ function SageFrame:Attach(frame)
 end
 
 function SageFrame:SetFrameWidth(width)
-	self.sets.minWidth = width
-	if self.info then
-		self.info:UpdateWidth()
+	self.sets.width = width
+
+	local info = SageInfo:Get(self.id)
+	if info then
+		info:UpdateWidth()
 	end
+end
+
+function SageFrame:GetFrameWidth()
+	return self.sets.width or 0
 end
 
 
@@ -297,12 +303,6 @@ end
 
 --[[ Config Functions ]]--
 
-function SageFrame:SetFrameWidth(width)
-	self.sets.minWidth = width
-	local info = SageInfo:Get(self.id)
-	if(info) then info:UpdateWidth() end
-end
-
 function SageFrame:SetShowCurable(enable)
 	self.sets.showCurable = enable or nil
 	
@@ -318,4 +318,19 @@ function SageFrame:SetShowCastable(enable)
 	
 	local buffs = SageBuff:Get(self.id)
 	if(buffs) then buffs:Update() end
+end
+
+function SageFrame:SetShowCombatText(enable)
+	self.sets.showCombatText = enable or nil
+
+	if(enable) then
+		SageCombat:Register(self)
+	else
+		SageCombat:Unregister(self)
+	end
+end
+
+function SageFrame:SetTextMode(mode)
+	self.sets.textMode = mode
+	SageBar:SetTextMode(self.id, mode)
 end

@@ -149,20 +149,7 @@ function SageHealth:Update()
 	self:SetValue(value)
 
 	--Change displayed text depending on if disconnected/dead/ghost/etc
-	local text = self.text
-	if text:IsShown() then
-		if UnitIsFeignDeath(unit) then
-			text:SetText(L.FeignDeath)
-		elseif UnitIsDead(unit) then
-			text:SetText(L.Dead)
-		elseif UnitIsGhost(unit) then
-			text:SetText(L.Ghost)
-		elseif not UnitIsConnected(unit) then
-			text:SetText(L.Offline)
-		else
-			self:SetText(value, maxValue)
-		end
-	end
+	self:UpdateText()
 end
 
 function SageHealth:UpdateDebuff()
@@ -200,21 +187,37 @@ function SageHealth:UpdateHealthColor(value)
 	end
 end
 
-function SageHealth:UpdateText()	
-	self:Update()
-end
-
-function SageHealth:SetText(value, max)
-	local text = self.text
-	if(self:GetParent().entered) then
-		text:SetText(format("%d / %d", value, max))
-	elseif(UnitCanAssist("player", self.id)) then
-		text:SetText((value == max and "") or max - value)
+--mode 1 = show only on mouseover, 2 = compact, 3 = full
+function SageHealth:UpdateText()
+	local unit, mode, text, entered = self.id, self.mode, self.text, self.entered
+	local value = self:GetValue()
+	local min, max = self:GetMinMaxValues()
+	
+	if(mode == 1 and not entered) then
+		text:Hide()
 	else
-		text:SetText((value == max and "") or format("%d / %d", value, max))
+		if UnitIsFeignDeath(unit) then
+			text:SetText(L.FeignDeath)
+		elseif UnitIsDead(unit) then
+			text:SetText(L.Dead)
+		elseif UnitIsGhost(unit) then
+			text:SetText(L.Ghost)
+		elseif not UnitIsConnected(unit) then
+			text:SetText(L.Offline)
+		elseif(entered or mode ~= 2) then
+			text:SetText(format("%d / %d", value, max))
+		elseif(mode == 2) then
+			if(value == max) then
+				text:SetText("")
+			elseif(UnitCanAssist(unit, "player")) then
+				text:SetText(format("-%d", max - value))
+			else
+				text:SetText(format("%d / %d", value, max))
+			end
+		end
+		text:Show()
 	end
 end
-SageHealth.ShowText = SageBar.ShowText
 SageHealth.UpdateTexture = SageBar.UpdateTexture
 
 --[[ Utility Functions ]]--

@@ -27,7 +27,6 @@ end
 
 --show tooltip, show text if its not always shown
 function SageClick:OnEnter()
-	self:GetParent().entered = true
 	local unit = self:GetAttribute("unit")
 
 	if SpellIsTargeting() then
@@ -46,13 +45,11 @@ function SageClick:OnEnter()
 	end
 	GameTooltipTextLeft1:SetTextColor(GameTooltip_UnitColor(unit))
 
-	SageBar:UpdateAllText(unit, true)
+	SageBar:UpdateText(unit, true)
 end
 
 --hide tooltip, and text if its not always shown
 function SageClick:OnLeave()
-	self:GetParent().entered = nil
-		
 	if SpellIsTargeting() then
 		SetCursor("CAST_ERROR_CURSOR")
 	end
@@ -60,7 +57,7 @@ function SageClick:OnLeave()
 	GameTooltip:Hide()
 	self.updateTooltip = nil
 
-	SageBar:UpdateAllText(self:GetAttribute("unit"), Sage:ShowingText())
+	SageBar:UpdateText(self:GetAttribute("unit"), false)
 end
 
 --credit goes to agUF for this function

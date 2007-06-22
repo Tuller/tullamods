@@ -15,11 +15,10 @@ function SageBar:Create(parent, id, font, alwaysShow)
 	bar.bg:SetAllPoints(bar)
 
 	if(font) then
+		bar.mode = Sage:GetTextMode(bar.id)
 		bar.text = bar:CreateFontString(name .. "text", "OVERLAY")
 		bar.text:SetPoint("CENTER", bar)
 		bar.text:SetFontObject(font)
-
-		if(alwaysShow or Sage:ShowingText()) then bar.text:Show() else bar.text:Hide() end
 	end
 	self:Register(bar)
 	lastCreated = lastCreated + 1
@@ -30,35 +29,6 @@ end
 function SageBar:Register(bar)
 	if(not self.bars) then self.bars = {} end
 	self.bars[bar] = true
-end
-
-function SageBar:ShowText(enable)
-	if(self.text) then
-		if(enable) then
-			self.text:Show()
-			self:UpdateText()
-		else
-			self.text:Hide()
-		end
-	end
-end
-
-function SageBar:SetText(value, max, mode)
-	local text = self.text
-	--current / max
-	if not mode or mode == 1 then
-		text:SetText(format("%d / %d", value, max))
-	--current
-	elseif mode == 2 then
-		text:SetText(value)
-	--deficit
-	elseif mode == 3 then
-		if(value == max) then
-			text:SetText("")
-		else
-			text:SetText(max - value)
-		end
-	end
 end
 
 function SageBar:UpdateTexture()
@@ -75,12 +45,26 @@ function SageBar:UpdateAllTextures()
 	end
 end
 
-function SageBar:UpdateAllText(unit, show)
+function SageBar:SetTextMode(unit, mode)
 	if(self.bars) then
 		for bar in pairs(self.bars) do
 			if(not unit or bar.id == unit) then
-				if(bar.ShowText) then
-					bar:ShowText(show)
+				if(bar.UpdateText) then
+					bar.mode = mode
+					bar:UpdateText()
+				end
+			end
+		end
+	end
+end
+
+function SageBar:UpdateText(unit, entered)
+	if(self.bars) then
+		for bar in pairs(self.bars) do
+			if(not unit or bar.id == unit) then
+				if(bar.UpdateText) then
+					bar.entered = entered
+					bar:UpdateText()
 				end
 			end
 		end
