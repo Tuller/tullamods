@@ -94,11 +94,12 @@ local function XPBar_UpdateTexture(self)
 	self.bg:SetTexture(texture)
 end
 
-local function XPBar_ShowText(self, show)
-	if show then
-		self.text:Show()
+local function XPBar_UpdateText(self)
+	local text, mode, entered = self.text, self.mode, self.entered
+	if(mode == 3 or entered) then
+		text:Show()
 	else
-		self.text:Hide()
+		text:Hide()
 	end
 end
 
@@ -107,7 +108,7 @@ local function XPBar_Create(parent)
 	bar.WatchReputation = XPBar_WatchReputation
 	bar.WatchExperience = XPBar_WatchExperience
 	bar.UpdateTexture = XPBar_UpdateTexture
-	bar.ShowText = XPBar_ShowText
+	bar.UpdateText = XPBar_UpdateText
 	bar.id = parent.id
 
 	local bg = bar:CreateTexture(nil, "BACKGROUND")
@@ -136,7 +137,7 @@ local function XPBar_Create(parent)
 	parent:SetHeight(parent:GetHeight() + BAR_HEIGHT)
 
 	bar:UpdateTexture()
-	bar:ShowText(Sage:ShowingText())
+	bar:UpdateText()
 
 	SageBar:Register(bar)
 

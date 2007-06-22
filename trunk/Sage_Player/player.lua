@@ -83,9 +83,8 @@ end
 
 function SagePlayer:Load()
 	local defaults = {
-		y = 1098,
-		x = 10,
-		minWidth = 100,
+		x = 10, y = 1098,
+		width = 100,
 		showXP = true,
 		showCombatText = true,
 		combatTextSize = 24,
