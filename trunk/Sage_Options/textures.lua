@@ -62,7 +62,7 @@ local function TextureButton_Create(name, parent)
 	button.bg = button:CreateTexture()
 	button.bg:SetAllPoints(button)
 	local r, g, b = random(), random(), random()
-	while(r + g + b < 0.3) do
+	while(r + g + b < 0.6) do
 		r, g, b = random(), random(), random()
 	end
 	button.bg:SetVertexColor(r, g, b)
