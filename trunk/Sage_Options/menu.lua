@@ -15,6 +15,7 @@ L.OutlineOutside = "Outline Outside Text"
 L.HealthBarDebuffColoring = "Color Health When Debuffed"
 L.ShowHealthPercents = "Show Health Percents"
 L.ShowStatusBarText = "Show Statusbar Text"
+L.ShowCombatText = "Show Combat Text"
 L.ShowCastBars = "Show Casting Bars"
 L.ShowCastable = "Show Only Castable Buffs"
 L.ShowCurable = "Show Only Curable Debuffs"
@@ -202,14 +203,25 @@ end
 local function ShowCurable_OnShow(self)
 	self:SetChecked(Sage:ShowingCurable(self:GetParent().unit))
 end
+
+local function ShowCombatText_OnClick(self)
+	Sage:SetShowCombatText(self:GetParent().unit, self:GetChecked())
+end
+local function ShowCombatText_OnShow(self)
+	self:SetChecked(Sage:ShowingCombatText(self:GetParent().unit))
+end
 	
 function Panel:AddUnitOptions(unit)
 	self.unit = unit
 
 	--nasty little hack
+	if(unit ~= "targettarget") then
+		self:AddCheckButton(L.ShowCombatText, ShowCombatText_OnClick, ShowCombatText_OnShow)
+	end
 	if(not(unit == "player" or unit == "targettarget")) then
 		self:AddCheckButton(L.ShowCastable, ShowCastable_OnClick, ShowCastable_OnShow)
 	end
+
 	self:AddCheckButton(L.ShowCurable, ShowCurable_OnClick, ShowCurable_OnShow)
 	self:AddWidthSlider()
 	self:AddAlphaSlider()
