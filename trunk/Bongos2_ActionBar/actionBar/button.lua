@@ -18,23 +18,38 @@ local SIZE = 36
 
 --globals
 local buttons = {}
+local shown = {}
 
 --converts an ID into a valid action ID (between 1 and 120)
 local function toValid(id) return mod(id - 1, 120) + 1 end
 
-
 --[[ frame events ]]--
 
-local function OnUpdate(self, elapsed) self:OnUpdate(elapsed) end
 local function PostClick(self) self:PostClick() end
 local function OnDragStart(self) self:OnDragStart() end
 local function OnReceiveDrag(self) self:OnReceiveDrag() end
 local function OnEnter(self) self:OnEnter() end
 local function OnLeave(self) self:OnLeave() end
-local function OnHide(self) self.needsUpdate = true end
+
+local function OnShow(self)
+	shown[self] = true
+	if(self.needsUpdate) then
+		self.needsUpdate = nil
+		self:Update(true)
+	end
+end
+
+local function OnHide(self)
+	shown[self] = nil
+end
+
 local function OnAttributeChanged(self, var, val)
 	if(var == "state-parent" or var == "statehidden") then
-		self.needsUpdate = true
+		if self:IsShown() then
+			self:Update(true)
+		else
+			self.needsUpdate = true
+		end
 	end
 end
 
@@ -46,7 +61,7 @@ local function OnEvent(self, event, arg1)
 	if(not self:GetParent():IsShown()) then return end
 
 	if(event == "ACTIONBAR_SLOT_CHANGED") then
-		if(arg1 == self:GetPagedID()) then 
+		if(arg1 == self:GetPagedID()) then
 			self:Update()
 		end
 	end
@@ -56,7 +71,7 @@ local function OnEvent(self, event, arg1)
 	if event == "PLAYER_AURAS_CHANGED" or event == "PLAYER_TARGET_CHANGED" then
 		self:UpdateUsable()
 	elseif event == "UNIT_INVENTORY_CHANGED" then
-		if(arg1 == "player") then 
+		if(arg1 == "player") then
 			self:Update()
 		end
 	elseif event == "ACTIONBAR_UPDATE_USABLE" or event == "UPDATE_INVENTORY_ALERTS" or event == "ACTIONBAR_UPDATE_COOLDOWN" then
@@ -95,13 +110,15 @@ function BongosActionButton:Create(id)
 	button.count = getglobal(name .. "Count")
 
 	button:SetScript("OnAttributeChanged", OnAttributeChanged)
-	button:SetScript("OnUpdate", OnUpdate)
+	-- button:SetScript("OnUpdate", OnUpdate)
 	button:SetScript("PostClick", PostClick)
 	button:SetScript("OnDragStart", OnDragStart)
 	button:SetScript("OnReceiveDrag", OnReceiveDrag)
 	button:SetScript("OnEnter", OnEnter)
 	button:SetScript("OnLeave", OnLeave)
 	button:SetScript("OnEvent", OnEvent)
+
+	button:SetScript("OnShow", OnShow)
 	button:SetScript("OnHide", OnHide)
 
 	button:SetAttribute("type", "action")
@@ -114,6 +131,7 @@ function BongosActionButton:Create(id)
 	button:RegisterForClicks("AnyUp")
 
 	buttons[id] = button
+	shown[button] = true
 	return button
 end
 
@@ -171,11 +189,11 @@ local IsActionInRange = IsActionInRange
 local IsUsableAction = IsUsableAction
 
 function BongosActionButton:OnUpdate(elapsed)
-	if(self.needsUpdate) then
-		self.needsUpdate = nil
-		self:Update(true)
-		return
-	end
+	-- if(self.needsUpdate) then
+		-- self.needsUpdate = nil
+		-- self:Update(true)
+		-- return
+	-- end
 
 	if not self.icon:IsShown() then return end
 
@@ -592,3 +610,16 @@ end
 function BongosActionButton:Get(id)
 	return buttons[id]
 end
+
+local UPDATE_DELAY = 0.1
+BongosActionButton.nextUpdate = UPDATE_DELAY
+BongosActionButton:SetScript("OnUpdate", function(self, elapsed)
+	if(self.nextUpdate <= 0) then
+		self.nextUpdate = UPDATE_DELAY
+		for button in pairs(shown) do
+			button:OnUpdate(UPDATE_DELAY)
+		end
+	else
+		self.nextUpdate = self.nextUpdate - elapsed
+	end
+end)
