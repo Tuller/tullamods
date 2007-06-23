@@ -328,8 +328,15 @@ function BongosActionButton:Update(refresh)
 		self:UpdateCooldown()
 		self:UpdateFlash()
 		self:SetAlpha(1)
+		self:EnableMouse(true)
 	else
-		if self:ShowingEmpty() then self:SetAlpha(1) else self:SetAlpha(0) end
+		if self:ShowingEmpty() then 
+			self:SetAlpha(1)
+			self:EnableMouse(true) 
+		else 
+			self:SetAlpha(0)
+			self:EnableMouse(false)
+		end
 		cooldown:Hide()
 	end
 	self:UpdateCount()
