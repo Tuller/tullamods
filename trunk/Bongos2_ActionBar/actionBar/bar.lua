@@ -512,17 +512,8 @@ end
 
 function BActionBar:UpdateVisibility()
 	local s, e = self:GetStartID(), self:GetEndID()
-	local changed
-
 	for i = s, e do
-		local button = BongosActionButton:Get(i)
-		if button:UpdateVisibility() then
-			changed = true
-		end
-	end
-
-	if changed then
-		SecureStateHeader_Refresh(self)
+		BongosActionButton:Get(i):Update()
 	end
 end
 
