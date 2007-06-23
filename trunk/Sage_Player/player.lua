@@ -135,5 +135,5 @@ function SagePlayer:LoadOptions()
 		self:SetChecked(SagePlayer:ShowingXP())
 	end
 	panel:AddCheckButton(L.ShowXP, ShowXP_OnClick, ShowXP_OnShow)
-	panel:AddUnitOptions("player")
+	panel:AddUnitOptions(self.frame.id)
 end
