@@ -70,7 +70,9 @@ local function OnEvent(self, event, arg1)
 
 	if not(self:IsShown() and HasAction(self:GetPagedID())) then return end
 
-	if event == "PLAYER_AURAS_CHANGED" or event == "PLAYER_TARGET_CHANGED" then
+	if event == "PLAYER_ENTERING_WORLD" then
+		self:Update()
+	elseif event == "PLAYER_AURAS_CHANGED" or event == "PLAYER_TARGET_CHANGED" then
 		self:UpdateUsable()
 	elseif event == "UNIT_INVENTORY_CHANGED" then
 		if(arg1 == "player") then
@@ -89,37 +91,36 @@ end
 
 --[[ Constructorish ]]--
 
-local button
-function BongosActionButton:GetBlizzButton(id)
-	local button
-	if(id <= 12) then
-		button = _G[format("ActionButton%d", id)]
-	elseif id <= 24 then
-		button = _G[format("MultiBarBottomLeftButton%d", id-12)]
-	elseif id <= 36 then
-		button = _G[format("MultiBarBottomRightButton%d", id-24)]
-	elseif id <= 48 then
-		button = _G[format("MultiBarRightButton%d", id-36)]
-	elseif id <= 60 then
-		button = _G[format("MultiBarLeftButton%d", id-48)]
-	end
+-- function BongosActionButton:GetBlizzButton(id)
+	-- local button
+	-- if(id <= 12) then
+		-- button = _G[format("ActionButton%d", id)]
+	-- elseif id <= 24 then
+		-- button = _G[format("MultiBarBottomLeftButton%d", id-12)]
+	-- elseif id <= 36 then
+		-- button = _G[format("MultiBarBottomRightButton%d", id-24)]
+	-- elseif id <= 48 then
+		-- button = _G[format("MultiBarRightButton%d", id-36)]
+	-- elseif id <= 60 then
+		-- button = _G[format("MultiBarLeftButton%d", id-48)]
+	-- end
 
-	if(button) then
-		_G[format(BUTTON_NAME, id)] = button
-		button:UnregisterAllEvents()
-		button:SetScript("OnUpdate", nil)
-	end
-	return button
-end
+	-- if(button) then
+		-- _G[format(BUTTON_NAME, id)] = button
+		-- button:UnregisterAllEvents()
+		-- button:SetScript("OnUpdate", nil)
+	-- end
+	-- return button
+-- end
 
 
 --Create an Action Button with the given ID and parent
 function BongosActionButton:Create(id)
 	local button
-	if(id <= 60) then
-		button = self:GetBlizzButton(id)
-	end
-	button = button or CreateFrame("CheckButton", format(BUTTON_NAME, id), nil, "SecureActionButtonTemplate, ActionButtonTemplate")
+	-- if(id <= 60) then
+		-- button = self:GetBlizzButton(id)
+	-- end
+	local button = CreateFrame("CheckButton", format(BUTTON_NAME, id), nil, "SecureActionButtonTemplate, ActionButtonTemplate")
 	button.name = format(BUTTON_NAME, id)
 	setmetatable(button, Button_MT)
 
@@ -183,6 +184,7 @@ function BongosActionButton:RegisterEvents()
 	self:RegisterEvent("ACTIONBAR_SLOT_CHANGED")
 	self:RegisterEvent("UPDATE_BINDINGS")
 
+	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterEvent("PLAYER_AURAS_CHANGED")
 	self:RegisterEvent("PLAYER_TARGET_CHANGED")
 	self:RegisterEvent("UNIT_INVENTORY_CHANGED")
@@ -308,7 +310,7 @@ function BongosActionButton:Update(refresh)
 	local icon = self.icon
 	local cooldown = self.cooldown
 	local texture = GetActionTexture(action)
-	
+
 	if texture then
 		icon:SetTexture(texture)
 		icon:Show()
@@ -514,10 +516,8 @@ end
 
 --show if showing empty buttons, or if the slot has an action, hide otherwise
 function BongosActionButton:UpdateVisibility()
-	local showEmpty = self:ShowingEmpty()
-
 	local newstates
-	if(showEmpty) then
+	if(self:ShowingEmpty())then
 		newstates = "*"
 	else
 		local id = self:GetAttribute("action")
@@ -565,7 +565,6 @@ function BongosActionButton:UpdateVisibility()
 	local oldstates = self:GetAttribute("showstates")
 	if not oldstates or oldstates ~= newstates then
 		self:SetAttribute("showstates", newstates)
-		self:Update(true)
 		return true
 	end
 end

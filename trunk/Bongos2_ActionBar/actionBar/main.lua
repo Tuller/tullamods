@@ -27,7 +27,7 @@ function BongosActionBar:ConvertBindings()
 			key = GetBindingKey(format("ActionButton%d", i))
 		end
 	end
-	
+
 	--left side multibars
 	local k = 5
 	for i = 1, 2 do
@@ -67,7 +67,7 @@ function BongosActionBar:Load()
 	self:RegisterEvent("PLAYER_REGEN_DISABLED", "UpdateCombatStatus")
 	self:RegisterMessage("KEYBOUND_ENABLED", "UpdateVisibility")
 	self:RegisterMessage("KEYBOUND_DISABLED", "UpdateVisibility")
-	
+
 	if(hasStance) then
 		self.numForms = GetNumShapeshiftForms()
 		self:RegisterEvent("UPDATE_SHAPESHIFT_FORMS", "UpdateStanceNumbers")

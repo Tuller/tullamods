@@ -228,7 +228,7 @@ local function StanceSlider_OnShow(self)
 	self:SetValue(frame.sets[self.id] or 0)
 	getglobal(self:GetName() .. "High"):SetText(maxOffset)
 	getglobal(self:GetName() .. "ValText"):SetText(format("Bar %s", mod(frame.id+self:GetValue()-1, numBars)+1))
-	
+
 	self.onShow = nil
 end
 
