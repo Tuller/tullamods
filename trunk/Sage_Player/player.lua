@@ -135,5 +135,12 @@ function SagePlayer:LoadOptions()
 		self:SetChecked(SagePlayer:ShowingXP())
 	end
 	panel:AddCheckButton(L.ShowXP, ShowXP_OnClick, ShowXP_OnShow)
-	panel:AddUnitOptions(self.frame.id)
+	
+	panel.unit = self.frame.id
+	panel:AddCombatTextButton()
+	panel:AddShowCurableButton()
+	panel:AddTextDisplaySelector()
+	panel:AddWidthSlider()
+	panel:AddAlphaSlider()
+	panel:AddScaleSlider()
 end
