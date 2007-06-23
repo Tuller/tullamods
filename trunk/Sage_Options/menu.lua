@@ -89,9 +89,9 @@ function SageOptions:AddGeneralPanel()
 	local function Sticky_OnClick(self) Sage:SetSticky(self:GetChecked()) end
 	panel:AddCheckButton(L.SetSticky, Sticky_OnClick, Sticky_OnShow)
 
-	local function Text_OnShow(self) self:SetChecked(Sage:ShowingText()) end
-	local function Text_OnClick(self) Sage:SetShowText(self:GetChecked()) end
-	panel:AddCheckButton(L.ShowStatusBarText, Text_OnClick, Text_OnShow)
+	-- local function Text_OnShow(self) self:SetChecked(Sage:ShowingText()) end
+	-- local function Text_OnClick(self) Sage:SetShowText(self:GetChecked()) end
+	-- panel:AddCheckButton(L.ShowStatusBarText, Text_OnClick, Text_OnShow)
 
 	local function Percents_OnShow(self) self:SetChecked(Sage:ShowingPercents()) end
 	local function Percents_OnClick(self) Sage:SetShowPercents(self:GetChecked()) end
