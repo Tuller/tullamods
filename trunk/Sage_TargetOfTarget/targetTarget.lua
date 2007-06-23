@@ -71,7 +71,15 @@ function SageTargetTarget:PLAYER_TARGET_CHANGED()
 end
 
 function SageTargetTarget:LoadOptions()
-	local panel = SageOptions:AddPanel("ToT", "targettarget")
+	local panel = SageOptions:AddPanel("ToT")
+
+	panel.unit = self.frame.id
+	panel:AddShowCurableButton()
+	panel:AddTextDisplaySelector()
+	panel:AddWidthSlider()
+	panel:AddAlphaSlider()
+	panel:AddScaleSlider()
+	
 	local slider = panel:AddSlider(L.UpdateInterval, 0, 3, 0.1)
 	local frame = self.frame
 	local sets = frame.sets
