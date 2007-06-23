@@ -144,10 +144,13 @@ end
 function SageFocus:Load()
 	local defaults = {
 		combatTextSize = 24,
-		showCombatText = 1,
-		width = 100,
-		x = 159.434,
-		y = 1097.579
+		x = 15.71428298950195,
+		showCastable = true,
+		y = 999.4287719726563,
+		showCombatText = true,
+		anchor = "playerBL",
+		textMode = 2,
+		width = 120,
 	}
 
 	self.frame = SageFrame:Create("focus", Frame_AddBars, defaults)
