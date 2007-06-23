@@ -4,6 +4,8 @@
 
 BongosActionButton = CreateFrame("CheckButton")
 local Button_MT = {__index = BongosActionButton}
+local _G = getfenv(0)
+local format = format
 
 --constants
 local ATTACK_BUTTON_FLASH_TIME = 1
@@ -87,27 +89,55 @@ end
 
 --[[ Constructorish ]]--
 
+local button
+function BongosActionButton:GetBlizzButton(id)
+	local button
+	if(id <= 12) then
+		button = _G[format("ActionButton%d", id)]
+	elseif id <= 24 then
+		button = _G[format("MultiBarBottomLeftButton%d", id-12)]
+	elseif id <= 36 then
+		button = _G[format("MultiBarBottomRightButton%d", id-24)]
+	elseif id <= 48 then
+		button = _G[format("MultiBarRightButton%d", id-36)]
+	elseif id <= 60 then
+		button = _G[format("MultiBarLeftButton%d", id-48)]
+	end
+
+	if(button) then
+		_G[format(BUTTON_NAME, id)] = button
+		button:UnregisterAllEvents()
+		button:SetScript("OnUpdate", nil)
+	end
+	return button
+end
+
+
 --Create an Action Button with the given ID and parent
 function BongosActionButton:Create(id)
-	local name = format(BUTTON_NAME, id)
-	local button = CreateFrame("CheckButton", name, nil, "SecureActionButtonTemplate, ActionButtonTemplate")
+	local button
+	if(id <= 60) then
+		button = self:GetBlizzButton(id)
+	end
+	button = button or CreateFrame("CheckButton", format(BUTTON_NAME, id), nil, "SecureActionButtonTemplate, ActionButtonTemplate")
+	button.name = format(BUTTON_NAME, id)
 	setmetatable(button, Button_MT)
 
-	button.icon = getglobal(name .. "Icon")
+	local name = button:GetName()
+	button.icon = _G[name .. "Icon"]
 	button.icon:SetTexCoord(0.06, 0.94, 0.06, 0.94)
 
-	button.border = getglobal(name .. "Border")
+	button.border = _G[name .. "Border"]
 	button.border:SetVertexColor(0, 1, 0, 0.6)
 
-	button.normal = getglobal(name .. "NormalTexture")
+	button.normal = _G[name .. "NormalTexture"]
 	button.normal:SetVertexColor(1, 1, 1, 0.5)
 
-	button.cooldown = getglobal(name .. "Cooldown")
-
-	button.flash = getglobal(name .. "Flash")
-	button.hotkey = getglobal(name .. "HotKey")
-	button.macro = getglobal(name .. "Name")
-	button.count = getglobal(name .. "Count")
+	button.cooldown = _G[name .. "Cooldown"]
+	button.flash = _G[name .. "Flash"]
+	button.hotkey = _G[name .. "HotKey"]
+	button.macro = _G[name .. "Name"]
+	button.count = _G[name .. "Count"]
 
 	button:SetScript("OnAttributeChanged", OnAttributeChanged)
 	button:SetScript("PostClick", PostClick)
@@ -558,11 +588,28 @@ function BongosActionButton:UpdateHotkey()
 end
 
 function BongosActionButton:GetHotkey()
-	local key = GetBindingKey(format("CLICK %s:LeftButton", self:GetName()))
+	local key = GetBindingKey(format("CLICK %s:LeftButton", self.name))
 	if key then
 		return KeyBound:ToShortKey(key)
 	end
 end
+
+-- function BongosActionButton:GetActionName()
+	-- return self.name
+-- end
+
+-- function BongosActionButton:GetBindings()
+	-- local keys
+	-- local binding = format("CLICK %s:LeftButton", self.name)
+	-- for i = 1, select("#", GetBindingKey(binding)) do
+		-- local hotKey = select(i, GetBindingKey(binding))
+		-- if keys then
+			-- keys = keys .. ", " .. GetBindingText(hotKey,"KEY_")
+		-- else
+			-- keys = GetBindingText(hotKey,"KEY_")
+		-- end
+	-- end
+-- end
 
 
 --[[ Macro Functions ]]--
