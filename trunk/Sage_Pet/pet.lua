@@ -209,5 +209,5 @@ function SagePet:OnCombatEvent(event)
 end
 
 function SagePet:LoadOptions()
-	local panel = SageOptions:AddPanel("Pet", "pet")
+	SageOptions:AddPanel("Pet", self.frame.id)
 end
