@@ -31,7 +31,7 @@ function Sage:Enable()
 			outlineOutsideFonts = false,
 			debuffColoring = true,
 			fontSize = 14,
-			barTexture = "armory2",
+			barTexture = "Armory2",
 			frames = {}
 		}
 	}
@@ -59,14 +59,16 @@ function Sage:Enable()
 end
 
 function Sage:UpdateVersion()
-	-- SageVersion = CURRENT_VERSION
 	for _,profile in pairs(self.db.sv.profiles) do
 		profile.showText = nil
 		for _,frame in pairs(profile.frames) do
-			frame.width = frame.minWidth
-			frame.minWidth = nil
+			if(frame.minWidth) then
+				frame.width = frame.minWidth
+				frame.minWidth = nil
+			end
 		end
 	end
+
 	SageVersion = CURRENT_VERSION
 	self:Print(format(L.Updated, SageVersion))
 end
