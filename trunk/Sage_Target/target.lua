@@ -293,5 +293,5 @@ function SageTarget:LoadOptions()
 		end
 		panel:AddCheckButton(L.NumericCombo, Numeric_OnClick, Numeric_OnShow)
 	end
-	panel:AddUnitOptions("target")
+	panel:AddUnitOptions(self.frame.id)
 end
