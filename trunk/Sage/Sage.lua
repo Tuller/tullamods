@@ -32,7 +32,7 @@ function Sage:Enable()
 			debuffColoring = true,
 			fontSize = 14,
 			barTexture = "Armory2",
-			rangeSpell = L.RangeCheckSpells[select(2, UnitClass("player"))]
+			rangeSpell = L.RangeCheckSpells[select(2, UnitClass("player"))],
 			rangeCheck = true,
 			frames = {}
 		}
