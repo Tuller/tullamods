@@ -25,7 +25,6 @@ function Sage:Enable()
 		profile = {
 			locked = true,
 			sticky = true,
-			showText = false,
 			showCastBars = true,
 			showPercents = false,
 			outlineBarFonts = false,
@@ -62,6 +61,7 @@ end
 function Sage:UpdateVersion()
 	-- SageVersion = CURRENT_VERSION
 	for _,profile in pairs(self.db.sv.profiles) do
+		profile.showText = nil
 		for _,frame in pairs(profile.frames) do
 			frame.width = frame.minWidth
 			frame.minWidth = nil
@@ -363,14 +363,14 @@ function Sage:ToggleSticky()
 end
 
 --text visibility
-function Sage:SetShowText(enable)
-	self.profile.showText = enable or false
-	SageBar:UpdateAllText(nil, enable)
-end
+-- function Sage:SetShowText(enable)
+	-- self.profile.showText = enable or false
+	-- SageBar:UpdateAllText(nil, enable)
+-- end
 
-function Sage:ShowingText()
-	return self.profile.showText
-end
+-- function Sage:ShowingText()
+	-- return self.profile.showText
+-- end
 
 --bar textures
 function Sage:SetBarTexture(texture)
