@@ -1,3 +1,9 @@
+--[[ 
+	A texture picker panel
+--]]
+
+local L = SAGE_LOCALS
+
 --Texture options
 local textures = {
 	"Blizzard",
@@ -109,13 +115,17 @@ local function Panel_UpdateList()
 	end
 end
 
-local function Panel_Create()
-	local panel = SageOptions:AddPanel("Texture")
+function SageOptions:AddTexturePanel()
+	local panel = SageOptions:AddPanel(L.Texture)
 	panel.UpdateList = Panel_UpdateList
 
 	local name = panel:GetName()
 
-	panel:SetScript("OnShow", Panel_UpdateList)
+	local OnShow = panel:GetScript("OnShow")
+	panel:SetScript("OnShow", function(self)
+		if(OnShow) then OnShow(self) end
+		Panel_UpdateList()
+	end)
 
 	local scroll = CreateFrame("ScrollFrame", name .. "ScrollFrame", panel, "FauxScrollFrameTemplate")
 	scroll:SetScript("OnVerticalScroll", function() FauxScrollFrame_OnVerticalScroll(10, Panel_UpdateList) end)
@@ -145,4 +155,4 @@ local function Panel_Create()
 	panel.height = panel.height + (DISPLAY_SIZE * BUTTON_HEIGHT)
 	return panel
 end
-panel = Panel_Create()
+panel = SageOptions:AddTexturePanel()

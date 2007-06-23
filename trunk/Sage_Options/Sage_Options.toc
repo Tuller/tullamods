@@ -7,5 +7,7 @@
 gooey.xml
 localization.lua
 menu.lua
+general.lua
 profiles.lua
+style.lua
 textures.lua

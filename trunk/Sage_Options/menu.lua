@@ -1,31 +1,11 @@
 --[[
 	SageOptions.lua
-		GUI config functions for Bongos
+		GUI config functions for Sage
 --]]
 
-SageOptions = CreateFrame("Frame", "SageOptions", UIParent)
 local L = SAGE_LOCALS
-L.General = "General"
-L.Profiles = "Profiles"
-L.SetLock = "Lock Frame Positions"
-L.SetSticky = "Enable Sticky Frames"
-L.EnterName = "Enter Profile Name"
-L.OutlineBarText = "Outline Statusbar Text"
-L.OutlineOutside = "Outline Outside Text"
-L.HealthBarDebuffColoring = "Color Health When Debuffed"
-L.ShowHealthPercents = "Show Health Percents"
-L.ShowStatusBarText = "Show Statusbar Text"
-L.ShowCombatText = "Show Combat Text"
-L.ShowCastBars = "Show Casting Bars"
-L.ShowCastable = "Show Only Castable Buffs"
-L.ShowCurable = "Show Only Curable Debuffs"
-L.Scale = "Scale"
-L.Opacity = "Opacity"
-L.Width = "Width"
-L.TextDisplay = "Text Display"
-L.TextNormal = "Normal"
-L.TextSmart = "Smart"
-L.TextFull = "Full"
+
+SageOptions = CreateFrame("Frame", "SageOptions", UIParent)
 
 function SageOptions:Load()
 	--mother frame, used to hide and show the entire window
@@ -40,8 +20,6 @@ function SageOptions:Load()
 	local content = self:AddContentPane()
 	content:SetPoint("TOPLEFT", menu, "TOPRIGHT", -6, 12)
 	content:SetPoint("BOTTOMRIGHT", self)
-
-	self:AddGeneralPanel()
 end
 
 function SageOptions:Toggle()
@@ -75,43 +53,6 @@ function SageOptions:AddContentPane()
 
 	self.content = content
 	return content
-end
-
---general options
-function SageOptions:AddGeneralPanel()
-	local panel = self:AddPanel(L.General)
-
-	local function Lock_OnShow(self) self:SetChecked(Sage:IsLocked()) end
-	local function Lock_OnClick(self) Sage:SetLock(self:GetChecked()) end
-	panel:AddCheckButton(L.SetLock, Lock_OnClick, Lock_OnShow)
-
-	local function Sticky_OnShow(self) self:SetChecked(Sage:IsSticky()) end
-	local function Sticky_OnClick(self) Sage:SetSticky(self:GetChecked()) end
-	panel:AddCheckButton(L.SetSticky, Sticky_OnClick, Sticky_OnShow)
-
-	-- local function Text_OnShow(self) self:SetChecked(Sage:ShowingText()) end
-	-- local function Text_OnClick(self) Sage:SetShowText(self:GetChecked()) end
-	-- panel:AddCheckButton(L.ShowStatusBarText, Text_OnClick, Text_OnShow)
-
-	local function Percents_OnShow(self) self:SetChecked(Sage:ShowingPercents()) end
-	local function Percents_OnClick(self) Sage:SetShowPercents(self:GetChecked()) end
-	panel:AddCheckButton(L.ShowHealthPercents, Percents_OnClick, Percents_OnShow)
-
-	local function CastBars_OnShow(self) self:SetChecked(Sage:ShowingCastBars()) end
-	local function CastBars_OnClick(self) Sage:SetShowCastBars(self:GetChecked()) end
-	panel:AddCheckButton(L.ShowCastBars, CastBars_OnClick, CastBars_OnShow)
-
-	local function DebuffColoring_OnShow(self) self:SetChecked(Sage:DebuffColoring()) end
-	local function DebuffColoring_OnClick(self) Sage:SetDebuffColoring(self:GetChecked()) end
-	panel:AddCheckButton(L.HealthBarDebuffColoring, DebuffColoring_OnClick, DebuffColoring_OnShow)
-
-	local function OutlineBar_OnShow(self) self:SetChecked(Sage:OutlineBarFonts()) end
-	local function OutlineBar_OnClick(self) Sage:SetOutlineBarFonts(self:GetChecked()) end
-	panel:AddCheckButton(L.OutlineBarText, OutlineBar_OnClick, OutlineBar_OnShow)
-
-	local function OutlineOut_OnShow(self) self:SetChecked(Sage:OutlineOutsideFonts()) end
-	local function OutlineOut_OnClick(self) Sage:SetOutlineOutsideFonts(self:GetChecked()) end
-	panel:AddCheckButton(L.OutlineOutside, OutlineOut_OnClick, OutlineOut_OnShow)
 end
 
 
@@ -157,7 +98,7 @@ function SageOptions:ShowPanel(name)
 				UIFrameFadeIn(panel, 0.2)
 				getglobal(menuName .. index):LockHighlight()
 				self:SetWidth(self.menu:GetWidth() + panel.width)
-				self:SetHeight(max(panel.height, self.menu:GetHeight() + 64))
+				self:SetHeight(max(panel.height, self.menu:GetHeight() + 32))
 			end
 		elseif(panel:IsShown()) then
 			panel:Hide()
@@ -193,21 +134,41 @@ function SageOptions:AddPanel(name, unit)
 	return panel
 end
 
---add show curable, show castable, text mode, scale, width, and opacity sliders
-local function ShowCastable_OnClick(self)
-	Sage:SetShowCastable(self:GetParent().unit, self:GetChecked())
-end
-local function ShowCastable_OnShow(self)
-	self:SetChecked(Sage:ShowingCastable(self:GetParent().unit))
+function Panel:AddUnitOptions(unit)
+	self.unit = unit
+
+	self:AddCombatTextButton()
+	if(SageBuff:Get(unit)) then
+		self:AddShowCastableButton()
+	end
+	self:AddShowCurableButton()
+	self:AddTextDisplaySelector()
+	self:AddWidthSlider()
+	self:AddAlphaSlider()
+	self:AddScaleSlider()
 end
 
-local function ShowCurable_OnClick(self)
-	Sage:SetShowCurable(self:GetParent().unit, self:GetChecked())
-end
-local function ShowCurable_OnShow(self)
-	self:SetChecked(Sage:ShowingCurable(self:GetParent().unit))
+--[[ Checkbuttons ]]--
+
+--checkbutton
+function Panel:AddCheckButton(name, OnClick, OnShow)
+	local button = CreateFrame("CheckButton", self:GetName() .. name, self, "GooeyCheckButton")
+	if(self.button) then
+		button:SetPoint("TOPLEFT", self.button, "BOTTOMLEFT", 0, 2)
+	else
+		button:SetPoint("TOPLEFT", self, "TOPLEFT", 6, 0)
+	end
+	button:SetText(name)
+	button:SetScript("OnClick", OnClick)
+	button:SetScript("OnShow", OnShow)
+
+	self.height = self.height + 30
+	self.button = button
+
+	return button
 end
 
+--show combat text
 local function ShowCombatText_OnClick(self)
 	Sage:SetShowCombatText(self:GetParent().unit, self:GetChecked())
 end
@@ -215,46 +176,36 @@ local function ShowCombatText_OnShow(self)
 	self:SetChecked(Sage:ShowingCombatText(self:GetParent().unit))
 end
 
-local modes = {L.TextNormal, L.TextSmart, L.TextFull}
-local function TextMode_OnClick(self, reverse)
-	if(reverse) then
-		self.value = (self.value or 1) - 1
-		if(self.value <= 0) then
-			self.value = #self.vals
-		end
-	else
-		self.value = (self.value or 1) + 1
-		if(self.value > #self.vals) then
-			self.value = 1
-		end
-	end
-	self.text:SetText(self.vals[self.value])
-	Sage:SetTextMode(self:GetParent().unit, self.value)
+function Panel:AddCombatTextButton()
+	return self:AddCheckButton(L.ShowCombatText, ShowCombatText_OnClick, ShowCombatText_OnShow)
 end
 
-local function TextMode_OnShow(self)
-	self.value = Sage:GetTextMode(self:GetParent().unit)
-	self.text:SetText(self.vals[self.value])
+--show curable debuffs
+local function ShowCurable_OnClick(self)
+	Sage:SetShowCurable(self:GetParent().unit, self:GetChecked())
+end
+local function ShowCurable_OnShow(self)
+	self:SetChecked(Sage:ShowingCurable(self:GetParent().unit))
+end
+
+function Panel:AddShowCurableButton()
+	return self:AddCheckButton(L.ShowCurable, ShowCurable_OnClick, ShowCurable_OnShow)
+end
+
+--show castable buffs
+local function ShowCastable_OnClick(self)
+	Sage:SetShowCastable(self:GetParent().unit, self:GetChecked())
+end
+local function ShowCastable_OnShow(self)
+	self:SetChecked(Sage:ShowingCastable(self:GetParent().unit))
+end
+
+function Panel:AddShowCastableButton()
+	return self:AddCheckButton(L.ShowCastable, ShowCastable_OnClick, ShowCastable_OnShow)
 end
 
 
-function Panel:AddUnitOptions(unit)
-	self.unit = unit
-
-	--nasty little hack
-	if(unit ~= "targettarget") then
-		self:AddCheckButton(L.ShowCombatText, ShowCombatText_OnClick, ShowCombatText_OnShow)
-	end
-	if(not(unit == "player" or unit == "targettarget")) then
-		self:AddCheckButton(L.ShowCastable, ShowCastable_OnClick, ShowCastable_OnShow)
-	end
-
-	self:AddCheckButton(L.ShowCurable, ShowCurable_OnClick, ShowCurable_OnShow)
-	self:AddSelector(L.TextDisplay, modes, TextMode_OnClick, TextMode_OnShow)
-	self:AddWidthSlider()
-	self:AddAlphaSlider()
-	self:AddScaleSlider()
-end
+--[[ Sliders ]]--
 
 --slider
 local function Slider_OnMouseWheel(self, direction)
@@ -292,26 +243,7 @@ function Panel:AddSlider(name, min, max, step)
 	return slider
 end
 
---checkbutton
-function Panel:AddCheckButton(name, OnClick, OnShow)
-	local button = CreateFrame("CheckButton", self:GetName() .. name, self, "GooeyCheckButton")
-	if(self.button) then
-		button:SetPoint("TOPLEFT", self.button, "BOTTOMLEFT", 0, 2)
-	else
-		button:SetPoint("TOPLEFT", self, "TOPLEFT", 6, 0)
-	end
-	button:SetText(name)
-	button:SetScript("OnClick", OnClick)
-	button:SetScript("OnShow", OnShow)
-
-	self.height = self.height + 30
-	self.button = button
-
-	return button
-end
-
---[[ Width Slider ]]--
-
+--width slider
 local function WidthSlider_OnShow(self)
 	self.onShow = true
 	self:SetValue(Sage:GetWidth(self:GetParent().unit))
@@ -333,8 +265,7 @@ function Panel:AddWidthSlider()
 	return slider
 end
 
---[[ Scale Slider ]]--
-
+--scale slider
 local function ScaleSlider_OnShow(self)
 	self.onShow = true
 	self:SetValue(Sage:GetScale(self:GetParent().unit) * 100)
@@ -356,9 +287,7 @@ function Panel:AddScaleSlider()
 	return slider
 end
 
-
---[[ Alpha Slider ]]--
-
+--opacity slider
 local function AlphaSlider_OnShow(self)
 	self.onShow = true
 	self:SetValue(Sage:GetOpacity(self:GetParent().unit) * 100)
@@ -379,6 +308,9 @@ function Panel:AddAlphaSlider()
 
 	return slider
 end
+
+
+--[[ Selector ]]--
 
 function Panel:AddSelector(name, vals, OnClick, OnShow)
 	local fname = self:GetName() .. name
@@ -408,7 +340,7 @@ function Panel:AddSelector(name, vals, OnClick, OnShow)
 	right:SetPoint("RIGHT", selector, "RIGHT", 4, -1)
 	right:SetScript("OnClick", function() OnClick(selector) end)
 	selector.right = right
-	
+
 	local title = selector:CreateFontString()
 	title:SetFontObject("GameFontNormalSmall")
 	title:SetPoint("LEFT", selector, "RIGHT")
@@ -421,10 +353,37 @@ function Panel:AddSelector(name, vals, OnClick, OnShow)
 	end
 	self.height = self.height + 30
 	self.button = button
-	
+
 	selector:SetWidth(text:GetWidth() + 40)
 
 	return selector
+end
+
+--text display selector
+local modes = {L.TextNormal, L.TextSmart, L.TextFull}
+local function TextMode_OnClick(self, reverse)
+	if(reverse) then
+		self.value = (self.value or 1) - 1
+		if(self.value <= 0) then
+			self.value = #self.vals
+		end
+	else
+		self.value = (self.value or 1) + 1
+		if(self.value > #self.vals) then
+			self.value = 1
+		end
+	end
+	self.text:SetText(self.vals[self.value])
+	Sage:SetTextMode(self:GetParent().unit, self.value)
+end
+
+local function TextMode_OnShow(self)
+	self.value = Sage:GetTextMode(self:GetParent().unit)
+	self.text:SetText(self.vals[self.value])
+end
+
+function Panel:AddTextDisplaySelector()
+	return self:AddSelector(L.TextDisplay, modes, TextMode_OnClick, TextMode_OnShow)
 end
 
 SageOptions:Load()

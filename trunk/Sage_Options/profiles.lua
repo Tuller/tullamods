@@ -1,3 +1,9 @@
+--[[
+	A profile selector panel
+--]]
+
+local L = SAGE_LOCALS
+
 --profile options
 local listSize = 12
 local size = 19
@@ -79,14 +85,57 @@ local function Panel_Highlight(self, profile)
 	end
 end
 
-local function Panel_Create()
+--[[ Make the Panel ]]--
+
+StaticPopupDialogs["SAGE_OPTIONS_SAVE_PROFILE"] = {
+	text = TEXT(L.EnterName),
+	button1 = TEXT(ACCEPT),
+	button2 = TEXT(CANCEL),
+	hasEditBox = 1,
+	maxLetters = 24,
+	OnAccept = function()
+		local text = getglobal(this:GetParent():GetName().."EditBox"):GetText()
+		if text ~= "" then
+			Sage:SaveProfile(text)
+			panel:UpdateList()
+			panel:Highlight(text)
+		end
+	end,
+	EditBoxOnEnterPressed = function()
+		local text = getglobal(this:GetParent():GetName().."EditBox"):GetText()
+		if text ~= "" then
+			Sage:SaveProfile(text)
+			panel:UpdateList()
+			panel:Highlight(text)
+		end
+	end,
+	OnShow = function()
+		getglobal(this:GetName().."EditBox"):SetFocus()
+		getglobal(this:GetName().."EditBox"):SetText(UnitName("player"))
+		getglobal(this:GetName().."EditBox"):HighlightText()
+	end,
+	OnHide = function()
+		if ChatFrameEditBox:IsVisible() then
+			ChatFrameEditBox:SetFocus()
+		end
+		getglobal(this:GetName().."EditBox"):SetText("")
+	end,
+	timeout = 0, exclusive = 1, hideOnEscape = 1
+}
+
+function SageOptions:AddProfilePanel()
 	local panel = SageOptions:AddPanel("Profiles")
 	panel.UpdateList = Panel_UpdateList
 	panel.Highlight = Panel_Highlight
 
 	local name = panel:GetName()
 
-	panel:SetScript("OnShow", function(self) panel:UpdateList(); panel:Highlight() end)
+	local OnShow = panel:GetScript("OnShow")
+	panel:SetScript("OnShow", function(self) 
+		if(OnShow) then OnShow(self) end
+		panel:UpdateList()
+		panel:Highlight() 
+	end)
 
 	local scroll = CreateFrame("ScrollFrame", name .. "ScrollFrame", panel, "FauxScrollFrameTemplate")
 	scroll:SetScript("OnVerticalScroll", function() FauxScrollFrame_OnVerticalScroll(10, ScrollBar_Update) end)
@@ -157,40 +206,4 @@ local function Panel_Create()
 	return panel
 end
 
-local panel = Panel_Create()
-
-StaticPopupDialogs["SAGE_OPTIONS_SAVE_PROFILE"] = {
-	text = TEXT("Enter Profile Name"),
-	button1 = TEXT(ACCEPT),
-	button2 = TEXT(CANCEL),
-	hasEditBox = 1,
-	maxLetters = 24,
-	OnAccept = function()
-		local text = getglobal(this:GetParent():GetName().."EditBox"):GetText()
-		if text ~= "" then
-			Sage:SaveProfile(text)
-			panel:UpdateList()
-			panel:Highlight(text)
-		end
-	end,
-	EditBoxOnEnterPressed = function()
-		local text = getglobal(this:GetParent():GetName().."EditBox"):GetText()
-		if text ~= "" then
-			Sage:SaveProfile(text)
-			panel:UpdateList()
-			panel:Highlight(text)
-		end
-	end,
-	OnShow = function()
-		getglobal(this:GetName().."EditBox"):SetFocus()
-		getglobal(this:GetName().."EditBox"):SetText(UnitName("player"))
-		getglobal(this:GetName().."EditBox"):HighlightText()
-	end,
-	OnHide = function()
-		if ChatFrameEditBox:IsVisible() then
-			ChatFrameEditBox:SetFocus()
-		end
-		getglobal(this:GetName().."EditBox"):SetText("")
-	end,
-	timeout = 0, exclusive = 1, hideOnEscape = 1
-}
+panel = SageOptions:AddProfilePanel()
