@@ -3,6 +3,7 @@ Bongos2 Version History
 1.6
 Tooltips are now hidden on drag frames when the mouse button is held down
 The stance sliders for actionbars now list their values in bars.
+Optimized idle CPU performance
 
 1.5
 Fixed a bug causing Dongle addons to trigger Bongos profile messages
