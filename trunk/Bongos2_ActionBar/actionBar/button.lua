@@ -17,8 +17,7 @@ local BUTTON_NAME = "BongosActionButton%d"
 local SIZE = 36
 
 --globals
-local buttons = {}
-local shown = {}
+local buttons = {}; local shown = {}
 
 --converts an ID into a valid action ID (between 1 and 120)
 local function toValid(id) return mod(id - 1, 120) + 1 end
@@ -32,10 +31,10 @@ local function OnEnter(self) self:OnEnter() end
 local function OnLeave(self) self:OnLeave() end
 
 local function OnShow(self)
-	shown[self] = true
 	if(self.needsUpdate) then
 		self.needsUpdate = nil
 		self:Update(true)
+		shown[self] = (HasAction(self.id) or nil)
 	end
 end
 
@@ -47,6 +46,7 @@ local function OnAttributeChanged(self, var, val)
 	if(var == "state-parent" or var == "statehidden") then
 		if self:IsShown() then
 			self:Update(true)
+			shown[self] = (HasAction(self.id) or nil)
 		else
 			self.needsUpdate = true
 		end
@@ -110,7 +110,6 @@ function BongosActionButton:Create(id)
 	button.count = getglobal(name .. "Count")
 
 	button:SetScript("OnAttributeChanged", OnAttributeChanged)
-	-- button:SetScript("OnUpdate", OnUpdate)
 	button:SetScript("PostClick", PostClick)
 	button:SetScript("OnDragStart", OnDragStart)
 	button:SetScript("OnReceiveDrag", OnReceiveDrag)
@@ -189,14 +188,6 @@ local IsActionInRange = IsActionInRange
 local IsUsableAction = IsUsableAction
 
 function BongosActionButton:OnUpdate(elapsed)
-	-- if(self.needsUpdate) then
-		-- self.needsUpdate = nil
-		-- self:Update(true)
-		-- return
-	-- end
-
-	if not self.icon:IsShown() then return end
-
 	--update flashing
 	if self.flashing then
 		self.flashtime = self.flashtime - elapsed
@@ -287,17 +278,17 @@ function BongosActionButton:Update(refresh)
 	local icon = self.icon
 	local cooldown = self.cooldown
 	local texture = GetActionTexture(action)
-
+	
 	if texture then
 		icon:SetTexture(texture)
 		icon:Show()
-		self.rangeTimer = -1
+		self.rangeTimer = (ActionHasRange(action) and -1) or nil
 
 		self:SetNormalTexture("Interface\\Buttons\\UI-Quickslot2")
 	else
 		icon:Hide()
-		self.rangeTimer = nil
 		cooldown:Hide()
+		self.rangeTimer = nil
 
 		self:SetNormalTexture("Interface\\Buttons\\UI-Quickslot")
 		self.hotkey:SetVertexColor(0.6, 0.6, 0.6)
@@ -357,7 +348,7 @@ function BongosActionButton:UpdateUsable()
 
 	local isUsable, notEnoughMana = IsUsableAction(action)
 	if isUsable then
-		if BongosActionConfig:RangeColoring() and IsActionInRange(action) == 0 then
+		if self.rangeTimer and BongosActionConfig:RangeColoring() and IsActionInRange(action) == 0 then
 			local r,g,b = BongosActionConfig:GetRangeColor()
 			icon:SetVertexColor(r,g,b)
 		else
@@ -390,7 +381,6 @@ end
 function BongosActionButton:StopFlash()
 	self.flashing = nil
 	self.flash:Hide()
-
 	self:UpdateState()
 end
 
@@ -611,7 +601,7 @@ function BongosActionButton:Get(id)
 	return buttons[id]
 end
 
-local UPDATE_DELAY = 0.1
+local UPDATE_DELAY = 0.2
 BongosActionButton.nextUpdate = UPDATE_DELAY
 BongosActionButton:SetScript("OnUpdate", function(self, elapsed)
 	if(self.nextUpdate <= 0) then
