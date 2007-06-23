@@ -210,9 +210,9 @@ function SageHealth:UpdateText()
 			if(value == max) then
 				text:SetText("")
 			elseif(UnitCanAssist(unit, "player")) then
-				text:SetText(format("-%d", max - value))
+				text:SetText(value - max)
 			else
-				text:SetText(format("%d / %d", value, max))
+				text:SetText(value)
 			end
 		end
 		text:Show()
