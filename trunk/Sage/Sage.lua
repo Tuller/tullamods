@@ -32,6 +32,7 @@ function Sage:Enable()
 			debuffColoring = true,
 			fontSize = 14,
 			barTexture = "Armory2",
+			rangeCheck = L.RangeCheckSpells[select(2, UnitClass("player"))],
 			frames = {}
 		}
 	}
@@ -376,10 +377,11 @@ function Sage:GetBarTexture(texID)
 
 	if(AceLibrary) then
 		local SML = AceLibrary:HasInstance("SharedMedia-1.0") and AceLibrary("SharedMedia-1.0")
-		local texture = SML:Fetch("statusbar", texID, true)
-
-		if(texture) then
-			return texture
+		if(SML) then
+			local texture = SML:Fetch("statusbar", texID, true)
+			if(texture) then
+				return texture
+			end
 		end
 	end
 	return (texID:lower() == "blizzard" and BLIZZ_TEXTURE) or format(TEXTURE_PATH, texID)

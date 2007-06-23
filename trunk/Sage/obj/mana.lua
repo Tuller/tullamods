@@ -65,7 +65,9 @@ function SageMana:UpdateText()
 			if(entered or mode ~= 2) then
 				text:SetText(format("%d / %d", value, max))
 			elseif(mode == 2) then
-				if(value == max) then
+				if(UnitPowerType(unit) == 1 and value == 0) then
+					text:SetText("")
+				elseif(UnitPowerType(unit) ~= 1 and value == max) then
 					text:SetText("")
 				else
 					text:SetText(value)
