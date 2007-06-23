@@ -201,14 +201,14 @@ end
 
 function Sage:ListProfiles()
 	self:Print(L.AvailableProfiles)
-	for i, k in ipairs(self.db:GetProfiles()) do
-		self:Print(k)
+	for _,k in ipairs(self.db:GetProfiles()) do
+		DEFAULT_CHAT_FRAME:AddMessage(" - " .. k)
 	end
 end
 
 function Sage:MatchProfile(name)
 	local name = name:lower()
-	for i, k in ipairs(self.db:GetProfiles()) do
+	for _,k in ipairs(self.db:GetProfiles()) do
 		local key = k:lower()
 		if key == name then
 			return k
@@ -364,16 +364,6 @@ end
 function Sage:ToggleSticky()
 	self:SetSticky(not self:IsSticky())
 end
-
---text visibility
--- function Sage:SetShowText(enable)
-	-- self.profile.showText = enable or false
-	-- SageBar:UpdateAllText(nil, enable)
--- end
-
--- function Sage:ShowingText()
-	-- return self.profile.showText
--- end
 
 --bar textures
 function Sage:SetBarTexture(texture)
