@@ -37,7 +37,7 @@ if(AceLibrary) then
 		end
 	end
 end
-	
+
 table.sort(textures)
 local BUTTON_HEIGHT = 24
 local DISPLAY_SIZE = 10
@@ -123,7 +123,7 @@ local function Panel_Create()
 		panel.buttons[1]:SetPoint("BOTTOMRIGHT", scroll, "TOPLEFT", -20, -(BUTTON_HEIGHT+2))
 	end)
 	scroll:SetScript("OnHide", function()
-		panel.buttons[1]:SetPoint("BOTTOMRIGHT", scroll, "TOPLEFT", -2, -BUTTON_HEIGHT)
+		panel.buttons[1]:SetPoint("BOTTOMRIGHT", scroll, "TOPLEFT", 0, -(BUTTON_HEIGHT+2))
 	end)
 	scroll:SetPoint("TOPLEFT", panel, "TOPRIGHT", -8, -2)
 	scroll:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -30, 8)

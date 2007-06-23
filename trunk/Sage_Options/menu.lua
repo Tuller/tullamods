@@ -22,6 +22,10 @@ L.ShowCurable = "Show Only Curable Debuffs"
 L.Scale = "Scale"
 L.Opacity = "Opacity"
 L.Width = "Width"
+L.TextDisplay = "Text Display"
+L.TextNormal = "Normal"
+L.TextSmart = "Smart"
+L.TextFull = "Full"
 
 function SageOptions:Load()
 	--mother frame, used to hide and show the entire window
@@ -181,7 +185,7 @@ function SageOptions:AddPanel(name, unit)
 	if(not self.panels) then self.panels = {} end
 	self.panels[name] = panel
 	self.menu:AddItem(name)
-	
+
 	if(unit) then
 		panel:AddUnitOptions(unit)
 	end
@@ -210,7 +214,30 @@ end
 local function ShowCombatText_OnShow(self)
 	self:SetChecked(Sage:ShowingCombatText(self:GetParent().unit))
 end
-	
+
+local modes = {L.TextNormal, L.TextSmart, L.TextFull}
+local function TextMode_OnClick(self, reverse)
+	if(reverse) then
+		self.value = (self.value or 1) - 1
+		if(self.value <= 0) then
+			self.value = #self.vals
+		end
+	else
+		self.value = (self.value or 1) + 1
+		if(self.value > #self.vals) then
+			self.value = 1
+		end
+	end
+	self.text:SetText(self.vals[self.value])
+	Sage:SetTextMode(self:GetParent().unit, self.value)
+end
+
+local function TextMode_OnShow(self)
+	self.value = Sage:GetTextMode(self:GetParent().unit)
+	self.text:SetText(self.vals[self.value])
+end
+
+
 function Panel:AddUnitOptions(unit)
 	self.unit = unit
 
@@ -223,6 +250,7 @@ function Panel:AddUnitOptions(unit)
 	end
 
 	self:AddCheckButton(L.ShowCurable, ShowCurable_OnClick, ShowCurable_OnShow)
+	self:AddSelector(L.TextDisplay, modes, TextMode_OnClick, TextMode_OnShow)
 	self:AddWidthSlider()
 	self:AddAlphaSlider()
 	self:AddScaleSlider()
@@ -268,7 +296,7 @@ end
 function Panel:AddCheckButton(name, OnClick, OnShow)
 	local button = CreateFrame("CheckButton", self:GetName() .. name, self, "GooeyCheckButton")
 	if(self.button) then
-		button:SetPoint("TOP", self.button, "BOTTOM", 0, 2)
+		button:SetPoint("TOPLEFT", self.button, "BOTTOMLEFT", 0, 2)
 	else
 		button:SetPoint("TOPLEFT", self, "TOPLEFT", 6, 0)
 	end
@@ -350,6 +378,53 @@ function Panel:AddAlphaSlider()
 	slider:SetScript("OnValueChanged", AlphaSlider_OnValueChanged)
 
 	return slider
+end
+
+function Panel:AddSelector(name, vals, OnClick, OnShow)
+	local fname = self:GetName() .. name
+	local selector = CreateFrame("Frame", fname, self, "GooeyFrame")
+	selector:SetHeight(26)
+	selector.vals = vals
+	selector:SetScript("OnShow", OnShow)
+
+	local left = CreateFrame("Button", fname .. "Left", selector)
+	left:SetWidth(20); left:SetHeight(20)
+	left:SetNormalTexture("Interface\\MoneyFrame\\Arrow-Left-Up")
+	left:SetPushedTexture("Interface\\MoneyFrame\\Arrow-Left-Down")
+	left:SetPoint("LEFT", selector, "LEFT", 0, -1)
+	left:SetScript("OnClick", function() OnClick(selector, true) end)
+	selector.left = left
+
+	local text = selector:CreateFontString()
+	text:SetFontObject("GameFontHighlight")
+	text:SetPoint("CENTER", selector, 0, 1)
+	text:SetWidth(98 - 48); text:SetHeight(24)
+	selector.text = text
+
+	local right = CreateFrame("Button", fname .. "Right", selector)
+	right:SetWidth(20); right:SetHeight(20)
+	right:SetNormalTexture("Interface\\MoneyFrame\\Arrow-Right-Up")
+	right:SetPushedTexture("Interface\\MoneyFrame\\Arrow-Right-Down")
+	right:SetPoint("RIGHT", selector, "RIGHT", 4, -1)
+	right:SetScript("OnClick", function() OnClick(selector) end)
+	selector.right = right
+	
+	local title = selector:CreateFontString()
+	title:SetFontObject("GameFontNormalSmall")
+	title:SetPoint("LEFT", selector, "RIGHT")
+	title:SetText(name)
+
+	if(self.button) then
+		selector:SetPoint("TOPLEFT", self.button, "BOTTOMLEFT", 0, 2)
+	else
+		selector:SetPoint("TOPLEFT", self, "TOPLEFT", 6, 0)
+	end
+	self.height = self.height + 30
+	self.button = button
+	
+	selector:SetWidth(text:GetWidth() + 40)
+
+	return selector
 end
 
 SageOptions:Load()
