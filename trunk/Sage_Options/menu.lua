@@ -138,9 +138,7 @@ function Panel:AddUnitOptions(unit)
 	self.unit = unit
 
 	self:AddCombatTextButton()
-	if(SageBuff:Get(unit)) then
-		self:AddShowCastableButton()
-	end
+	self:AddShowCastableButton()
 	self:AddShowCurableButton()
 	self:AddTextDisplaySelector()
 	self:AddWidthSlider()
