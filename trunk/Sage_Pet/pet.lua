@@ -160,10 +160,12 @@ end
 
 function SagePet:Load()
 	local defaults = {
-		x = 11, y = 691, width = 70,
-		anchor = "playerBL",
+		y = 1081.4287109375,
+		x = 167.7142791748047,
 		combatTextSize = 18,
-		showCombatText = true
+		anchor = "playerRT",
+		showCombatText = true,
+		width = 100,
 	}
 
 	local frame = SageFrame:Create("pet", Frame_OnCreate, defaults)
