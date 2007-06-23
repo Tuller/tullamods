@@ -248,11 +248,11 @@ end
 function SageTarget:Load()
 	local defaults = {
 		combatTextSize = 24,
-		showCombatText = 1,
-		anchor = "focusRT",
-		width = 100,
-		x = 462,
-		y = 511
+		x = 303.7142028808594,
+		scale = 1.25,
+		showCombatText = true,
+		y = 877.7142944335938,
+		width = 120,
 	}
 
 	self.frame = SageFrame:Create("target", Frame_OnCreate, defaults)
