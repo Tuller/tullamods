@@ -141,36 +141,44 @@ end
 function SageParty:GetDefaults()
 	return  {
 		{
-			x = 11, y = 629,
-			width = 100,
-			showCombatText = true,
-			anchor = "petBL",
+			width = 120,
+			y = 916.4287109375,
+			x = 11.71428298950195,
 			combatTextSize = 24,
-			showCastable = true
+			showCombatText = true,
+			anchor = "focusBR",
+			textMode = 2,
+			showCastable = true,
 		},
 		{
-			x = 20, y = 956,
-			width = 100,
-			showCombatText = true,
-			anchor = "party1BL",
+			width = 120,
+			y = 834.4287719726563,
+			x = 11.71428298950195,
 			combatTextSize = 24,
-			showCastable = true
+			anchor = "party1BC",
+			textMode = 2,
+			showCombatText = true,
+			showCastable = true,
 		},
 		{
-			x = 20, y = 904,
-			width = 100,
-			showCombatText = true,
-			anchor = "party2BL",
+			width = 120,
+			y = 752.4287719726563,
+			x = 11.71428298950195,
 			combatTextSize = 24,
-			showCastable = true
+			anchor = "party2BC",
+			textMode = 2,
+			showCombatText = true,
+			showCastable = true,
 		},
 		{
-			x = 20, y = 852,
-			width = 100,
-			showCombatText = true,
-			anchor = "party3BL",
+			width = 120,
+			y = 670.4288330078125,
+			x = 11.71428298950195,
 			combatTextSize = 24,
-			showCastable = true
+			anchor = "party3BC",
+			textMode = 2,
+			showCombatText = true,
+			showCastable = true,
 		},
 	}
 end
