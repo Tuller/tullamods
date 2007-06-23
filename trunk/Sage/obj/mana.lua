@@ -67,10 +67,8 @@ function SageMana:UpdateText()
 			elseif(mode == 2) then
 				if(value == max) then
 					text:SetText("")
-				elseif(UnitCanAssist(unit, "player")) then
-					text:SetText(format("%d", value))
 				else
-					text:SetText(format("%d / %d", value, max))
+					text:SetText(value)
 				end
 			end
 		end
