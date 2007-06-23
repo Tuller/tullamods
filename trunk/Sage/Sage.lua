@@ -80,6 +80,7 @@ function Sage:LoadModules()
 		module:Load()
 	end
 	SageFrame:ForAll("Reanchor")
+	self:SetShowPercents(self:ShowingPercents())
 end
 
 function Sage:UnloadModules()
