@@ -3,11 +3,11 @@
 		An item button
 --]]
 
-BagnonItem = CreateFrame('Button')
+BagnonItem = CreateFrame("Button")
 BagnonItem.SIZE = 37
 
 local Item_mt = {__index = BagnonItem}
-local UPDATE_DELAY = 0.3
+local UPDATE_DELAY = 0.1
 
 local bagSearch, nameSearch, qualitySearch
 local MAX_ITEMS_PER_BAG = 36
@@ -15,12 +15,12 @@ local MAX_ITEMS_PER_BAG = 36
 local unused = {}
 local lastCreated = 1
 
---[[ this is set as the button's parent, in order to preserve compatiblity with normal bag slot functions and other mods ]]--
+--[[ this is set as the button"s parent, in order to preserve compatiblity with normal bag slot functions and other mods ]]--
 
 local function DummyBag_Get(parent, bag)
 	local bagFrame = getglobal(parent:GetName() .. bag)
 	if not bagFrame then
-		bagFrame = CreateFrame('Frame', parent:GetName() .. bag, parent)
+		bagFrame = CreateFrame("Frame", parent:GetName() .. bag, parent)
 		bagFrame:SetID(bag)
 		BagnonUtil:Attach(bagFrame, parent)
 	end
@@ -48,11 +48,13 @@ end
 local function OnEnter(self)
 	self.elapsed = nil
 	self:OnEnter()
+	self:SetScript("OnUpdate", OnUpdate)
 end
 
 local function OnLeave(self)
 	self.elapsed = nil
 	self:OnLeave()
+	self:SetScript("OnUpdate", nil)
 end
 
 local function OnHide(self)
@@ -73,32 +75,32 @@ local function Item_Create()
 	if BagnonUtil:ReusingFrames() then
 		local bag = ceil(lastCreated / MAX_ITEMS_PER_BAG)
 		local slot = mod(lastCreated - 1, MAX_ITEMS_PER_BAG) + 1
-		item = getglobal(format('ContainerFrame%dItem%d', bag, slot))
+		item = getglobal(format("ContainerFrame%dItem%d", bag, slot))
 		if item then
 			item:SetParent(nil)
 			item:SetID(0)
 		end
 	end
-	item = item or CreateFrame('Button', format('BagnonItem%s', lastCreated), nil, 'ContainerFrameItemButtonTemplate')
+	item = item or CreateFrame("Button", format("BagnonItem%s", lastCreated), nil, "ContainerFrameItemButtonTemplate")
 	item:ClearAllPoints()
 	item:Show()
 	setmetatable(item, Item_mt)
 
-	local border = item:CreateTexture(nil, 'OVERLAY')
+	local border = item:CreateTexture(nil, "OVERLAY")
 	border:SetWidth(67); border:SetHeight(67)
-	border:SetPoint('CENTER', item)
-	border:SetTexture('Interface\\Buttons\\UI-ActionButton-Border')
-	border:SetBlendMode('ADD')
+	border:SetPoint("CENTER", item)
+	border:SetTexture("Interface\\Buttons\\UI-ActionButton-Border")
+	border:SetBlendMode("ADD")
 	border:Hide()
 	item.border = border
 
 	item:UnregisterAllEvents()
-	item:SetScript('OnEvent', nil)
-	item:SetScript('OnEnter', OnEnter)
-	item:SetScript('OnLeave', OnLeave)
-	item:SetScript('OnUpdate', OnUpdate)
-	item:SetScript('OnHide', OnHide)
-	item:SetScript('PostClick', PostClick)
+	item:SetScript("OnEvent", nil)
+	item:SetScript("OnEnter", OnEnter)
+	item:SetScript("OnLeave", OnLeave)
+	-- item:SetScript("OnUpdate", OnUpdate)
+	item:SetScript("OnHide", OnHide)
+	item:SetScript("PostClick", PostClick)
 
 	lastCreated = lastCreated + 1
 
@@ -249,7 +251,7 @@ end
 function BagnonItem:UpdateSlotBorder()
 	local bag = self:GetBag()
 	local player = self:GetPlayer()
-	local normalTexture = getglobal(self:GetName() .. 'NormalTexture')
+	local normalTexture = getglobal(self:GetName() .. "NormalTexture")
 
 	if bag == KEYRING_CONTAINER then
 		normalTexture:SetVertexColor(1, 0.7, 0)
@@ -268,7 +270,7 @@ function BagnonItem:UpdateLock(locked)
 end
 
 function BagnonItem:UpdateCooldown()
-	local cooldown = getglobal(self:GetName().. 'Cooldown')
+	local cooldown = getglobal(self:GetName().. "Cooldown")
 
 	if (not self.cached) and self.hasItem then
 		local start, duration, enable = GetContainerItemCooldown(self:GetBag(), self:GetID())
@@ -285,7 +287,7 @@ function BagnonItem:PostClick(mouseButton)
 	if IsModifierKeyDown() then
 		if this.cached then
 			if this.hasItem then
-				if mouseButton == 'LeftButton' then
+				if mouseButton == "LeftButton" then
 					if IsControlKeyDown() then
 						DressUpItemLink((BagnonDB:GetItemData(self:GetBag(), self:GetID(), self:GetPlayer())))
 					elseif IsShiftKeyDown() then
@@ -318,7 +320,7 @@ function BagnonItem:OnEnter()
 			--this  is done instead of setting bank item because it allows me to hook tooltips properly, without screwing up some stuff
 			local link = self.hasItem
 			if link then
-				local count = GetInventoryItemCount('player', BankButtonIDToInvSlotID(slot))
+				local count = GetInventoryItemCount("player", BankButtonIDToInvSlotID(slot))
 				BagnonUtil:AnchorTooltip(self)
 				GameTooltip:SetHyperlink(link, count)
 			end
