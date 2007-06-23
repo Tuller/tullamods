@@ -83,11 +83,12 @@ end
 
 function SagePlayer:Load()
 	local defaults = {
-		x = 10, y = 1098,
-		width = 100,
-		showXP = true,
+		x = 12.5, y = 875.43,
+		scale = 1.25,
+		width = 120,
 		showCombatText = true,
 		combatTextSize = 24,
+		showXP = true
 	}
 
 	--Create|Load frame
