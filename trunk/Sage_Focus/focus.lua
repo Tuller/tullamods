@@ -169,5 +169,5 @@ function SageFocus:PLAYER_FOCUS_CHANGED()
 end
 
 function SageFocus:LoadOptions()
-	local panel = SageOptions:AddPanel("Focus", "focus")
+	SageOptions:AddPanel("Focus", self.frame.id)
 end
