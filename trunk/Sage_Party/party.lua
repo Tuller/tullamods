@@ -6,11 +6,12 @@
 SageParty = Sage:NewModule("Sage-Party")
 
 local L = SAGE_LOCALS
+L.ShowInRaid = "Show Party in Raid"
+
 local RAID_CLASS_COLORS = RAID_CLASS_COLORS
 local MAX_PARTY_MEMBERS = 4
 local DEBUFF_SIZE = 32
 local BUFF_SIZE = 16
-L.ShowInRaid = "Show Party In Raid"
 
 
 --[[ Pet Frame Code ]]--
@@ -105,32 +106,6 @@ end
 local function PartyParent_Create()
 	local frame = CreateFrame("Frame", nil, UIParent)
 	frame:SetFrameLevel(0); frame:Hide()
-
-	local spells = {
-		["DRUID"] = "Healing Touch",
-		["SHAMAN"] = "Healing Wave",
-		["PRIEST"] = "Lesser Heal",
-		["PALADIN"] = "Holy Light",
-	}
-
-	local spell = spells[select(2, UnitClass("player"))]
-	if(spell) then
-		frame:SetScript("OnUpdate", function(self, elapsed)
-			self.nextUpdate = (self.nextUpdate or 0) - elapsed
-			if(self.nextUpdate <= 0) then
-				self.nextUpdate = 1
-				for i = 1, MAX_PARTY_MEMBERS do
-					local frame = SageFrame:Get("party" .. i)
-					if(IsSpellInRange(spell, frame.id) == 1) then
-						frame:SetAlpha(frame:GetFrameAlpha())
-					else
-						frame:SetAlpha(0.6 * frame:GetFrameAlpha())
-					end
-				end
-			end
-		end)
-	end
-
 	return frame
 end
 
@@ -194,18 +169,18 @@ function SageParty:Enable()
 end
 
 function SageParty:Load()
-	if(not self.frames) then self.frames = {} end
-	self.parent = self.parent or PartyParent_Create()
-	self.parent:SetFrameLevel(0)
+	if(not self.motherFrames) then self.motherFrames = {} end
+	self.motherFrame = self.motherFrame or PartyParent_Create()
+	self.motherFrame:SetFrameLevel(0)
 
 	local defaults = SageParty:GetDefaults()
 	for i = 1, MAX_PARTY_MEMBERS do
 		local frame = SageFrame:Create("party" .. i, Frame_OnCreate, defaults[i])
-		frame:SetParent(self.parent)
+		frame:SetParent(self.motherFrame)
 		frame:SetFrameLevel(0)
 		frame:SetID(i)
 		frame.info:UpdateWidth()
-		self.frames[i] = frame
+		self.motherFrames[i] = frame
 	end
 
 	self:RegisterEvent("PLAYER_REGEN_ENABLED")
@@ -213,38 +188,39 @@ function SageParty:Load()
 	self:RegisterEvent("RAID_ROSTER_UPDATE", "UpdateMembers")
 	self:RegisterEvent("UNIT_DYNAMIC_FLAGS", "UpdateAggro")
 	self:RegisterEvent("UNIT_FLAGS", "UpdateAggro")
+	self:SetRangeSpell(self:GetRangeSpell())
 	self:UpdateMembers()
 end
 
 function SageParty:Unload()
 	self:UnregisterAllEvents()
-	for _,frame in pairs(self.frames) do
+	for _,frame in pairs(self.motherFrames) do
 		frame:Destroy()
 	end
 end
 
 function SageParty:PLAYER_REGEN_ENABLED()
 	if self:ShouldShow() then
-		self.parent:Show()
+		self.motherFrame:Show()
 	else
-		self.parent:Hide()
+		self.motherFrame:Hide()
 	end
 end
 
 function SageParty:UpdateMembers()
 	if self:ShouldShow() then
-		self.parent:Show()
-		for _, frame in pairs(self.frames) do
+		self.motherFrame:Show()
+		for _, frame in pairs(self.motherFrames) do
 			frame:Update()
 		end
 	else
-		self.parent:Hide()
+		self.motherFrame:Hide()
 	end
 end
 
 function SageParty:UpdateAggro(event, unit)
-	if(self.parent:IsShown()) then
-		for i in pairs(self.frames) do
+	if(self.motherFrame:IsShown()) then
+		for i in pairs(self.motherFrames) do
 			if(unit == "party" .. i) then
 				local info = SageInfo:Get(unit)
 				local inCombat = UnitAffectingCombat(unit)
@@ -279,4 +255,46 @@ end
 function SageParty:SetShowInRaid(enable)
 	HIDE_PARTY_INTERFACE = (enable and "0") or "1"
 	self:UpdateMembers()
+end
+
+
+--[[ Out of Range Checking ]]--
+
+local function RangeCheck_OnUpdate(self, elapsed)
+	self.nextUpdate = (self.nextUpdate or 0) - elapsed
+	if(self.nextUpdate <= 0) then
+		self.nextUpdate = 1
+		local spell = self.spell
+		for i = 1, MAX_PARTY_MEMBERS do
+			local frame = SageFrame:Get("party" .. i)
+			if(frame) then
+				if(IsSpellInRange(spell, frame.id) == 1) then
+					frame:SetAlpha(frame:GetFrameAlpha())
+				else
+					frame:SetAlpha(0.6 * frame:GetFrameAlpha())
+				end
+			end
+		end
+	end
+end
+
+function SageParty:SetRangeSpell(spell)
+	Sage.profile.rangeCheck = spell or ""
+
+	if(spell and spell ~= "") then
+		self.motherFrame.spell = spell
+		self.motherFrame:SetScript("OnUpdate", RangeCheck_OnUpdate)
+	else
+		self.motherFrame:SetScript("OnUpdate", nil)
+		for i = 1, MAX_PARTY_MEMBERS do
+			local frame = SageFrame:Get("party" .. i)
+			if(frame) then
+				frame:SetAlpha(frame:GetFrameAlpha())
+			end
+		end
+	end
+end
+
+function SageParty:GetRangeSpell()
+	return Sage.profile.rangeCheck
 end
