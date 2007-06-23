@@ -49,10 +49,11 @@ end
 
 function SageTargetTarget:Load()
 	local defaults = {
-		x = 686, y = 503,
-		width = 85,
+		y = 503,
+		x = 686,
 		updateInterval = 0.1,
 		anchor = "targetRT",
+		width = 90,
 	}
 
 	self.frame = SageFrame:Create("targettarget", Frame_OnCreate, defaults)
