@@ -24,6 +24,14 @@ local function IndexToUnit(index)
 	end
 end
 
+local function GetLeaderIndex()
+	local leader = GetPartyLeaderIndex()
+	if(leader == 0) then
+		leader = IsPartyLeader() and 0
+	end
+	return IndexToUnit(leader)
+end
+
 local function Bar_CreateStrings(self)
 	local level = self:CreateFontString(nil, "OVERLAY")
 	level:SetFontObject(SageFont:GetLevelFont())
@@ -112,11 +120,7 @@ function SageInfo:UpdateAll()
 	self:UpdateName()
 
 	if(GetNumPartyMembers() > 0) then
-		local leader = GetPartyLeaderIndex()
-		if(leader == 0) then
-			leader = IsPartyLeader() and 0
-		end
-		self:UpdatePartyLeader(IndexToUnit(leader))
+		self:UpdatePartyLeader(GetLeaderIndex())
 		self:UpdateMasterLooter(IndexToUnit(select(2, GetLootMethod())))
 	end
 
@@ -326,7 +330,7 @@ function SageInfo:RAID_TARGET_UPDATE()
 end
 
 function SageInfo:PARTY_LEADER_CHANGED()
-	self:ForAll("UpdatePartyLeader")
+	self:ForAll("UpdatePartyLeader", GetLeaderIndex())
 end
 
 function SageInfo:PARTY_LOOT_METHOD_CHANGED()

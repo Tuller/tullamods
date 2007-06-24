@@ -209,7 +209,7 @@ function SageHealth:UpdateText()
 		elseif(mode == 2) then
 			if(value == max) then
 				text:SetText("")
-			elseif(UnitCanAssist(unit, "player")) then
+			elseif(UnitIsFriend(unit, "player")) then
 				text:SetText(value - max)
 			else
 				text:SetText(value)
