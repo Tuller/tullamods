@@ -71,7 +71,7 @@ function SageClick:ShowMenu()
 		menu = TargetFrameDropDown
 	elseif unit == "pet" then
 		menu = PetFrameDropDown
-	elseif unit == "party" then
+	else
 		local partyID = unit:match("party(%d)")
 		if partyID then
 			menu = getglobal(format("PartyMemberFrame%sDropDown", partyID))
