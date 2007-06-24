@@ -271,7 +271,7 @@ end
 function SageInfo:UpdatePartyLeader()
 	local leaderIcon = self.leader
 	if(leaderIcon) then
-		if(leader and (IsPartyLeader(self.id) or IsRaidLeader(self.id))) then
+		if(IsPartyLeader(self.id) or IsRaidLeader(self.id)) then
 			leaderIcon:Show()
 		else
 			leaderIcon:Hide()
