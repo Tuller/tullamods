@@ -1,5 +1,8 @@
 Bagnon Version History
 
+1.4
+	Reduced CPU usage significantly when showing the bank/bags
+
 1.3b
 	Fixed a bug caussing the main options menu to not work :)
 
