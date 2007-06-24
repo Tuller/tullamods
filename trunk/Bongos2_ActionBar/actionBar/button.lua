@@ -328,14 +328,14 @@ function BongosActionButton:Update(refresh)
 		self:UpdateCooldown()
 		self:UpdateFlash()
 		self:SetAlpha(1)
-		self:EnableMouse(true)
+		-- self:EnableMouse(true)
 	else
 		if self:ShowingEmpty() then 
 			self:SetAlpha(1)
-			self:EnableMouse(true) 
+			-- self:EnableMouse(true) 
 		else 
 			self:SetAlpha(0)
-			self:EnableMouse(false)
+			-- self:EnableMouse(false)
 		end
 		cooldown:Hide()
 	end
