@@ -64,14 +64,14 @@ end
 function SageClick:ShowMenu()
 	local unit = self:GetAttribute("unit")
 	local menu
-
-	if "player" then
+	
+	if unit == "player" then
 		menu = PlayerFrameDropDown
-	elseif "target" then
+	elseif unit == "target" then
 		menu = TargetFrameDropDown
-	elseif "pet" then
+	elseif unit == "pet" then
 		menu = PetFrameDropDown
-	else
+	elseif unit == "party" then
 		local partyID = unit:match("party(%d)")
 		if partyID then
 			menu = getglobal(format("PartyMemberFrame%sDropDown", partyID))

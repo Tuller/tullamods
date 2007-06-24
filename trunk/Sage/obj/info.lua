@@ -112,7 +112,11 @@ function SageInfo:UpdateAll()
 	self:UpdateName()
 
 	if(GetNumPartyMembers() > 0) then
-		self:UpdatePartyLeader()
+		local leader = GetPartyLeaderIndex()
+		if(leader == 0) then
+			leader = IsPartyLeader() and 0
+		end
+		self:UpdatePartyLeader(IndexToUnit(leader))
 		self:UpdateMasterLooter(IndexToUnit(select(2, GetLootMethod())))
 	end
 
@@ -268,10 +272,10 @@ function SageInfo:UpdateWidth()
 	parent:SetWidth(max(width, textWidth) + (parent.extraWidth or 0))
 end
 
-function SageInfo:UpdatePartyLeader()
+function SageInfo:UpdatePartyLeader(leader)
 	local leaderIcon = self.leader
 	if(leaderIcon) then
-		if(IsPartyLeader(self.id) or IsRaidLeader(self.id)) then
+		if(leader and UnitIsUnit(self.id, leader)) then
 			leaderIcon:Show()
 		else
 			leaderIcon:Hide()
