@@ -117,6 +117,7 @@ function Sage:RegisterEvents()
 
 	self:RegisterEvent("PARTY_LEADER_CHANGED", "UpdateInfo")
 	self:RegisterEvent("PARTY_LOOT_METHOD_CHANGED", "UpdateInfo")
+	self:RegisterEvent("PARTY_MEMBERS_CHANGED", "UpdateInfo")
 
 	self:SetShowCastBars(self:ShowingCastBars())
 end

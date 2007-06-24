@@ -118,11 +118,8 @@ function SageInfo:UpdateAll()
 	self:UpdateLevel()
 	self:UpdateUnitIcon()
 	self:UpdateName()
-
-	if(GetNumPartyMembers() > 0) then
-		self:UpdatePartyLeader(GetLeaderIndex())
-		self:UpdateMasterLooter(IndexToUnit(select(2, GetLootMethod())))
-	end
+	self:UpdatePartyLeader(GetLeaderIndex())
+	self:UpdateMasterLooter(IndexToUnit(select(2, GetLootMethod())))
 
 	if Sage:ShowingPercents() then
 		self:UpdateHealthPercent()
@@ -331,6 +328,12 @@ end
 
 function SageInfo:PARTY_LEADER_CHANGED()
 	self:ForAll("UpdatePartyLeader", GetLeaderIndex())
+end
+
+function SageInfo:PARTY_MEMBERS_CHANGED()
+	if(GetNumPartyMembers() == 0) then
+		self:ForAll("UpdatePartyLeader", nil)
+	end
 end
 
 function SageInfo:PARTY_LOOT_METHOD_CHANGED()
