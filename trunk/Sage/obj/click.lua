@@ -12,6 +12,7 @@ local function Frame_OnLeave(self) self:OnLeave() end
 function SageClick:Create(parent, id)
 	local frame = CreateFrame("Button", format("SageClick%s", id or parent.id), parent, "SecureUnitButtonTemplate")
 	setmetatable(frame, Frame_mt)
+	frame.unit = id or parent.id
 
 	SecureUnitButton_OnLoad(frame, id or parent.id, function() frame:ShowMenu() end)
 	--support for click casting mods that use the clique standard
@@ -27,37 +28,14 @@ end
 
 --show tooltip, show text if its not always shown
 function SageClick:OnEnter()
-	local unit = self:GetAttribute("unit")
-
-	if SpellIsTargeting() then
-		if SpellCanTargetUnit(unit) then
-			SetCursor("CAST_CURSOR")
-		else
-			SetCursor("CAST_ERROR_CURSOR")
-		end
-	end
-
-	GameTooltip_SetDefaultAnchor(GameTooltip, self)
-	if GameTooltip:SetUnit(unit) then
-		self.updateTooltip = TOOLTIP_UPDATE_TIME
-	else
-		self.updateTooltip = nil
-	end
-	GameTooltipTextLeft1:SetTextColor(GameTooltip_UnitColor(unit))
-
-	SageBar:UpdateText(unit, true)
+	UnitFrame_OnEnter()
+	SageBar:UpdateText(self.unit, true)
 end
 
 --hide tooltip, and text if its not always shown
 function SageClick:OnLeave()
-	if SpellIsTargeting() then
-		SetCursor("CAST_ERROR_CURSOR")
-	end
-
-	GameTooltip:Hide()
-	self.updateTooltip = nil
-
-	SageBar:UpdateText(self:GetAttribute("unit"), false)
+	UnitFrame_OnLeave()
+	SageBar:UpdateText(self.unit, false)
 end
 
 --credit goes to agUF for this function
