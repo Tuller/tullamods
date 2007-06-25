@@ -5,7 +5,7 @@
 
 SageTarget = Sage:NewModule("Sage-Target")
 
-local BUFF_SIZE_LARGE = 30
+local BUFF_SIZE_LARGE = 32
 local BUFF_SIZE_SMALL = 16
 local class = select(2, UnitClass("player"))
 local hasCombo = (class == "DRUID" or class == "ROGUE")
