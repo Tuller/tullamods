@@ -39,15 +39,20 @@ function Bongos:Enable()
 
 	--handle upgrading from <= 1.5 to 1.6+ because I'm a moron sometimes
 	if(not BongosVersion) then
-		self:UpdateVersion()
+		self:UpdateSettings()
 	else
 		local cMajor, cMinor = CURRENT_VERSION:match("(%d+)%.(%d+)")
 		local major, minor = BongosVersion:match("(%d+)%.(%d+)")
 
+		--compatibility break
 		if major ~= cMajor then
 			self.db:ResetProfile()
 			self:Print(L.UpdatedIncompatible)
+		--settings change
 		elseif minor ~= cMinor then
+			self:UpdateSettings()
+		--bugfix update, just inc version
+		elseif BongosVersion ~= CURRENT_VERSION then
 			self:UpdateVersion()
 		end
 	end
@@ -57,11 +62,15 @@ function Bongos:Enable()
 end
 
 function Bongos:UpdateVersion()
+	BongosVersion = CURRENT_VERSION
+	self:Print(format(L.Updated, BongosVersion))
+end
+
+function Bongos:UpdateSettings()
 	if(BongosActionBar) then
 		BongosActionBar:ConvertBindings()
 	end
-	BongosVersion = CURRENT_VERSION
-	self:Print(format(L.Updated, BongosVersion))
+	self:UpdateVersion()
 end
 
 function Bongos:LoadModules()
@@ -308,7 +317,7 @@ function Bongos:SetBarAlpha(args, alpha)
 end
 
 function Bongos:PrintVersion()
-	self:Print(self.profile.version)
+	self:Print(BongosVersion)
 end
 
 function Bongos:ShowBars(args)
