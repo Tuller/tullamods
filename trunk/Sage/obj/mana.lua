@@ -62,8 +62,12 @@ function SageMana:UpdateText()
 		if(UnitIsGhost(unit) or UnitIsDead(unit) or not UnitIsConnected(unit)) then
 			text:SetText("")
 		else
-			if(entered or mode ~= 2) then
-				text:SetText(format("%d / %d", value, max))
+			if(entered or mode == 3) then
+				if(Sage:ShowingMaxValues()) then
+					text:SetText(format("%d / %d", value, max))
+				else
+					text:SetText(value)
+				end
 			elseif(mode == 2) then
 				if(UnitPowerType(unit) == 1 and value == 0) then
 					text:SetText("")

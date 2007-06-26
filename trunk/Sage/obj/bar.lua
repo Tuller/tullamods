@@ -70,3 +70,13 @@ function SageBar:UpdateText(unit, entered)
 		end
 	end
 end
+
+function SageBar:UpdateAll()
+	if(self.bars) then
+		for bar in pairs(self.bars) do
+			if(bar.UpdateText) then
+				bar:UpdateText()
+			end
+		end
+	end
+end

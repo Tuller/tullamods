@@ -44,7 +44,7 @@ local function Bar_UpdateHealthColor(self, value)
 end
 
 function HealthBar_OnValueChanged(value)
-	Bar_UpdateHealthColor(this, value) 
+	Bar_UpdateHealthColor(this, value)
 end
 
 
@@ -180,7 +180,6 @@ function SageHealth:UpdateHealthColor(value)
 	if(not self.debuff) then
 		if UnitIsFeignDeath(self.id) then
 			self:SetStatusBarColor(0, 0.9, 0.78)
-			-- self:SetStatusBarColor(1, 0.3, 0.6)
 		else
 			Bar_UpdateHealthColor(self, value)
 		end
@@ -192,7 +191,7 @@ function SageHealth:UpdateText()
 	local unit, mode, text, entered = self.id, self.mode, self.text, self.entered
 	local value = self:GetValue()
 	local min, max = self:GetMinMaxValues()
-	
+
 	if(mode == 1 and not entered) then
 		text:Hide()
 	else
@@ -204,8 +203,12 @@ function SageHealth:UpdateText()
 			text:SetText(L.Ghost)
 		elseif not UnitIsConnected(unit) then
 			text:SetText(L.Offline)
-		elseif(entered or mode ~= 2) then
-			text:SetText(format("%d / %d", value, max))
+		elseif(entered or mode == 3) then
+			if(Sage:ShowingMaxValues()) then
+				text:SetText(format("%d / %d", value, max))
+			else
+				text:SetText(value)
+			end
 		elseif(mode == 2) then
 			if(value == max) then
 				text:SetText("")

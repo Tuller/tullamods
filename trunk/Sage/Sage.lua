@@ -30,6 +30,7 @@ function Sage:Enable()
 			outlineBarFonts = false,
 			outlineOutsideFonts = false,
 			debuffColoring = true,
+			showMaxValues = true,
 			fontSize = 14,
 			barTexture = "Armory2",
 			rangeSpell = L.RangeCheckSpells[select(2, UnitClass("player"))],
@@ -468,6 +469,15 @@ function Sage:ShowingCastBars()
 	return self.profile.showCastBars
 end
 
+function Sage:SetShowMaxValues(enable)
+	self.profile.showMaxValues = enable or false
+	SageBar:UpdateAll()
+end
+
+function Sage:ShowingMaxValues()
+	return self.profile.showMaxValues
+end
+
 
 --[[ Per Unit Settings ]]--
 
@@ -538,4 +548,3 @@ end
 function Sage:GetTextMode(unit)
 	return self:GetUnitSetting(unit, "textMode") or 1
 end
-
