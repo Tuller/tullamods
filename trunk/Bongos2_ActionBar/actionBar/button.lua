@@ -36,6 +36,7 @@ local function OnShow(self)
 	if(self.needsUpdate) then
 		self.needsUpdate = nil
 		self:Update(true)
+		-- self:UpdateUsable()
 		shown[self] = (HasAction(self.id) or nil)
 	end
 end
@@ -48,6 +49,7 @@ local function OnAttributeChanged(self, var, val)
 	if(var == "state-parent" or var == "statehidden") then
 		if self:IsShown() then
 			self:Update(true)
+			-- self:UpdateUsable()
 			shown[self] = (HasAction(self.id) or nil)
 		else
 			self.needsUpdate = true
@@ -65,6 +67,7 @@ local function OnEvent(self, event, arg1)
 	if(event == "ACTIONBAR_SLOT_CHANGED") then
 		if(arg1 == self:GetPagedID()) then
 			self:Update()
+			-- self:UpdateUsable()
 		end
 	end
 
@@ -72,11 +75,13 @@ local function OnEvent(self, event, arg1)
 
 	if event == "PLAYER_ENTERING_WORLD" then
 		self:Update()
+		-- self:UpdateUsable()
 	elseif event == "PLAYER_AURAS_CHANGED" or event == "PLAYER_TARGET_CHANGED" then
 		self:UpdateUsable()
 	elseif event == "UNIT_INVENTORY_CHANGED" then
 		if(arg1 == "player") then
 			self:Update()
+			-- self:UpdateUsable()
 		end
 	elseif event == "ACTIONBAR_UPDATE_USABLE" or event == "UPDATE_INVENTORY_ALERTS" or event == "ACTIONBAR_UPDATE_COOLDOWN" then
 		self:UpdateCooldown()
@@ -309,14 +314,15 @@ function BongosActionButton:Update(refresh)
 
 	if texture then
 		shown[self] = true
+		self.rangeTimer = (ActionHasRange(action) and -1) or nil
 		icon:SetTexture(texture)
 		icon:Show()
-		self.rangeTimer = (ActionHasRange(action) and -1) or nil
+
 		self:SetNormalTexture("Interface\\Buttons\\UI-Quickslot2")
 	else
 		shown[self] = nil
-		icon:Hide()
 		self.rangeTimer = nil
+		icon:Hide()
 
 		self:SetNormalTexture("Interface\\Buttons\\UI-Quickslot")
 		self.hotkey:SetVertexColor(0.6, 0.6, 0.6)
@@ -328,14 +334,11 @@ function BongosActionButton:Update(refresh)
 		self:UpdateCooldown()
 		self:UpdateFlash()
 		self:SetAlpha(1)
-		-- self:EnableMouse(true)
 	else
 		if self:ShowingEmpty() then 
 			self:SetAlpha(1)
-			-- self:EnableMouse(true) 
 		else 
 			self:SetAlpha(0)
-			-- self:EnableMouse(false)
 		end
 		cooldown:Hide()
 	end

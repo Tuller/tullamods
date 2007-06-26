@@ -9,7 +9,7 @@ local hasStance = (CLASS == "DRUID" or CLASS == "ROGUE" or CLASS == "WARRIOR" or
 local DEFAULT_NUM_ACTIONBARS = 10
 
 --converts BActionButton and ActionButton bindings to their proper bongos bars, inspired from Bartender3
-function BongosActionBar:ConvertBindings()
+function BongosActionBar:ConvertBindings(convertBlizzard)
 	--baction buttons
 	for i = 1, 120 do
 		local key = GetBindingKey(format("CLICK BActionButton%d:LeftButton", i))
@@ -19,42 +19,44 @@ function BongosActionBar:ConvertBindings()
 		end
 	end
 
-	--action buttons
-	for i = 1, 12 do
-		local key = GetBindingKey(format("ActionButton%d", i))
-		while key do
-			SetBindingClick(key, format("BongosActionButton%d", i), "LeftButton")
-			key = GetBindingKey(format("ActionButton%d", i))
-		end
-	end
-
-	--left side multibars
-	local k = 5
-	for i = 1, 2 do
-		for j = 1, 12 do
-			local key = GetBindingKey(format("MULTIACTIONBAR%dBUTTON%d", i, j))
+	if(convertBlizzard) then
+		--action buttons
+		for i = 1, 12 do
+			local key = GetBindingKey(format("ActionButton%d", i))
 			while key do
-				SetBindingClick(key, format("BongosActionButton%d", j+(k*12)), "LeftButton")
+				SetBindingClick(key, format("BongosActionButton%d", i), "LeftButton")
 				key = GetBindingKey(format("ActionButton%d", i))
 			end
 		end
-		k = k - 1
-	end
 
-	--right side bars
-	for i = 4, 3, -1 do
-		for j = 1, 12 do
-			local key = GetBindingKey(format("MULTIACTIONBAR%dBUTTON%d", i, j))
-			while key do
-				SetBindingClick(key, format("BongosActionButton%d", j+(k*12)), "LeftButton")
-				key = GetBindingKey(format("ActionButton%d", i))
+		--left side multibars
+		local k = 5
+		for i = 1, 2 do
+			for j = 1, 12 do
+				local key = GetBindingKey(format("MULTIACTIONBAR%dBUTTON%d", i, j))
+				while key do
+					SetBindingClick(key, format("BongosActionButton%d", j+(k*12)), "LeftButton")
+					key = GetBindingKey(format("ActionButton%d", i))
+				end
 			end
+			k = k - 1
 		end
-		k = k - 1
+
+		--right side bars
+		for i = 4, 3, -1 do
+			for j = 1, 12 do
+				local key = GetBindingKey(format("MULTIACTIONBAR%dBUTTON%d", i, j))
+				while key do
+					SetBindingClick(key, format("BongosActionButton%d", j+(k*12)), "LeftButton")
+					key = GetBindingKey(format("ActionButton%d", i))
+				end
+			end
+			k = k - 1
+		end
 	end
 	SaveBindings(GetCurrentBindingSet())
 
-	Bongos:Print("Converted keys from the blizzard actionbars and old bongos versions")
+	Bongos:Print("Converted actionbar bindings to Bongos2")
 end
 
 function BongosActionBar:Load()
