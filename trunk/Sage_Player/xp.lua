@@ -124,14 +124,8 @@ local function XPBar_Create(parent)
 	text:SetPoint("CENTER", bar)
 	bar.text = text
 
-	local druidBar = parent.druid
-	if druidBar then
-		bar:SetPoint("TOPLEFT", druidBar, "BOTTOMLEFT")
-		bar:SetPoint("BOTTOMRIGHT", druidBar, "BOTTOMRIGHT", 0, -BAR_HEIGHT)
-	else
-		bar:SetPoint("TOPLEFT", parent.mana, "BOTTOMLEFT")
-		bar:SetPoint("BOTTOMRIGHT", parent.mana, "BOTTOMRIGHT", 0, -BAR_HEIGHT)
-	end
+	bar:SetPoint("TOPLEFT", parent.mana, "BOTTOMLEFT")
+	bar:SetPoint("BOTTOMRIGHT", parent.mana, "BOTTOMRIGHT", 0, -BAR_HEIGHT)
 
 	parent.click:SetPoint("BOTTOMRIGHT", bar)
 	parent:SetHeight(parent:GetHeight() + BAR_HEIGHT)
