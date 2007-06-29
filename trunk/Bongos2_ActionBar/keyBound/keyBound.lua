@@ -223,58 +223,54 @@ end
 function KeyBound:Enable()
 	self:RegisterEvent("PLAYER_REGEN_ENABLED")
 	self:RegisterEvent("PLAYER_REGEN_DISABLED")
-
 	self:RegisterMessage("KEYBOUND_ENABLED")
 	self:RegisterMessage("KEYBOUND_DISABLED")
 end
 
 function KeyBound:PLAYER_REGEN_ENABLED()
-	if self.wasEnabled then
-		self:Show()
+	if self.enabled then
 		UIErrorsFrame:AddMessage(L.CombatBindingsEnabled, 1, 0, 0, 1, UIERRORS_HOLD_TIME)
 	end
-	self.wasEnabled = nil
-	self.inCombat = false
 end
 
 function KeyBound:PLAYER_REGEN_DISABLED()
-	self.inCombat = true
 	if self.enabled then
-		self:Hide()
-		self.wasEnabled = true
+		self:Set(nil)
 		UIErrorsFrame:AddMessage(L.CombatBindingsDisabled, 1, 0, 0, 1, UIERRORS_HOLD_TIME)
 	end
 end
 
---usable functions
 function KeyBound:Toggle()
-	if(self.wasEnabled or self.enabled) then
-		self:Hide()
-		UIErrorsFrame:AddMessage(L.Disabled, 1, 1, 0, 1, UIERRORS_HOLD_TIME)
+	if self:IsShown() then
+		self:Deactivate()
 	else
-		if(not self.inCombat) then
-			self:Show()
-			UIErrorsFrame:AddMessage(L.Enabled, 1, 1, 0, 1, UIERRORS_HOLD_TIME)
-		else
+		self:Activate()
+	end
+end
+
+function KeyBound:Activate()
+	if(not self:IsShown()) then
+		if(InCombatLockdown()) then
 			UIErrorsFrame:AddMessage(L.CannotBindInCombat, 1, 0, 0, 1, UIERRORS_HOLD_TIME)
+		else
+			self.enabled = true
+			if not self.frame then
+				self.frame = Binder_Create()
+			end
+			self:Set(nil)
+			self:TriggerMessage("KEYBOUND_ENABLED")
+			UIErrorsFrame:AddMessage(L.Enabled, 1, 1, 0, 1, UIERRORS_HOLD_TIME)
 		end
 	end
 end
 
-function KeyBound:Show()
-	self.enabled = true
-	if not self.frame then
-		self.frame = Binder_Create()
+function KeyBound:Deactivate()
+	if(self:IsShown()) then
+		self.enabled = nil
+		self:Set(nil)
+		self:TriggerMessage("KEYBOUND_DISABLED")
+		UIErrorsFrame:AddMessage(L.Disabled, 1, 1, 0, 1, UIERRORS_HOLD_TIME)
 	end
-	self:Set(nil)
-	self:TriggerMessage("KEYBOUND_ENABLED")
-end
-
-function KeyBound:Hide()
-	self.enabled = nil
-	self.wasEnabled = nil
-	self:Set(nil)
-	self:TriggerMessage("KEYBOUND_DISABLED")
 end
 
 function KeyBound:IsShown()
@@ -284,7 +280,7 @@ end
 function KeyBound:Set(button)
 	local bindFrame = self.frame
 
-	if self.enabled and button then
+	if button and self:IsShown() and not InCombatLockdown() then
 		bindFrame.button = button
 		bindFrame:SetAllPoints(button)
 
