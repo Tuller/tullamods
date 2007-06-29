@@ -247,7 +247,7 @@ function Bongos:RegisterSlashCommands()
 	local cmdStr = "|cFF33FF99%s|r: %s"
 
 	local slash = self:InitializeSlashCommand("Bongos Commands", "BONGOS", "bongos", "bgs", "bob")
-	slash:RegisterSlashHandler(format(cmdStr, "/bob", "Toggles the option menu"), "^$", "ShowMenu")
+	slash:RegisterSlashHandler(format(cmdStr, "/bob", L.ShowOptionsDesc), "^$", "ShowMenu")
 	slash:RegisterSlashHandler(format(cmdStr, "lock", L.LockBarsDesc), "^lock$", "ToggleLockedBars")
 	slash:RegisterSlashHandler(format(cmdStr, "sticky", L.StickyBarsDesc), "^sticky$", "ToggleStickyBars")
 
@@ -258,6 +258,7 @@ function Bongos:RegisterSlashCommands()
 	slash:RegisterSlashHandler(format(cmdStr, "hide <barList>", L.HideBarsDesc), "^hide (.+)", "HideBars")
 	slash:RegisterSlashHandler(format(cmdStr, "toggle <barList>", L.ToggleBarsDesc), "^toggle (.+)", "ToggleBars")
 
+	slash:RegisterSlashHandler(format(cmdStr, "save <profle>", L.SaveDesc), "save (%w+)", "SaveProfile")
 	slash:RegisterSlashHandler(format(cmdStr, "set <profle>", L.SetDesc), "set (%w+)", "SetProfile")
 	slash:RegisterSlashHandler(format(cmdStr, "copy <profile>", L.CopyDesc), "copy (%w+)", "CopyProfile")
 	slash:RegisterSlashHandler(format(cmdStr, "delete <profile>", L.DeleteDesc), "^delete (%w+)", "DeleteProfile")
@@ -369,4 +370,13 @@ end
 
 function Bongos:GetMapCoords()
 	return self.profile.mapx, self.profile.mapy
+end
+
+function Bongos:CleanUp()
+	local bars = self.profile.bars
+	for id in pairs(self.profile.bars) do
+		if not BBar:Get(id) then
+			bars[id] = nil
+		end
+	end
 end

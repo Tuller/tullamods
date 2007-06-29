@@ -10,9 +10,9 @@ local function DragFrame_OnEnter(self)
 	GameTooltip:SetOwner(self, "ANCHOR_BOTTOMLEFT")
 
 	if tonumber(self:GetText()) then
-		GameTooltip:SetText(format("Action Bar %s", self:GetText()), 1, 1, 1)
+		GameTooltip:SetText(format("ActionBar %s", self:GetText()), 1, 1, 1)
 	else
-		GameTooltip:SetText(format("%s bar", self:GetText()), 1, 1, 1)
+		GameTooltip:SetText(format("%s Bar", self:GetText():gsub("^%l", string.upper)), 1, 1, 1)
 	end
 
 	if self.parent.ShowMenu then
@@ -24,7 +24,7 @@ local function DragFrame_OnEnter(self)
 	else
 		GameTooltip:AddLine(L.ShowBar)
 	end
-	GameTooltip:AddLine(format(L.SetAlpha, self.parent:GetAlpha()))
+	GameTooltip:AddLine(format(L.SetAlpha, ceil(self.parent:GetFrameAlpha()*100)))
 
 	GameTooltip:Show()
 end

@@ -20,6 +20,7 @@ L.ProfileReset = "Reset profile \"%s\""
 L.CantDeleteCurrentProfile = "Cannot delete the current profile"
 
 --slash command help
+L.ShowOptionsDesc = "Shows the options menu"
 L.LockBarsDesc = "Toggles locking bar positions"
 L.StickyBarsDesc = "Toggles auto anchoring bars"
 
@@ -31,8 +32,8 @@ L.HideBarsDesc = "Hides the given <barList>"
 L.ToggleBarsDesc = "Toggles the given <barList>"
 
 --slash commands for profiles
-L.ResetDesc = "Loads default settings"
 L.SetDesc = "Switches settings to <profile>"
+L.SaveDesc = "Saves current settings and switches to <profile"
 L.CopyDesc = "Copies settings from <profile>"
 L.DeleteDesc = "Deletes <profile>"
 L.ResetDesc = "Returns to default settings"
@@ -44,7 +45,7 @@ L.PrintVersionDesc = "Prints the current Bongos version"
 L.ShowConfig = "<Right Click> to configure"
 L.HideBar = "<Middle Click> to hide"
 L.ShowBar = "<Middle Click> to show"
-L.SetAlpha = "<Mousewheel> to set opacity (%.2f)"
+L.SetAlpha = "<Mousewheel> to set opacity (|cffffffff%d|r)"
 
 --Menu Stuff
 L.Scale = "Scale"

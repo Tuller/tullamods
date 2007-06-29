@@ -266,26 +266,29 @@ end
 
 function BBar:ShowMenu()
 	if not self.menu then
-		local menu = BongosMenu:Create(format("BongosMenu%s", self.id))
-		menu.text:SetText(format("%s bar", self.id))
-		menu.frame = self
+		local menu
+		if self.CreateMenu then
+			menu = self:CreateMenu()
+		else
+			menu = BongosMenu:CreateMenu(self.id)
+		end
 		self.menu = menu
 	end
 
 	local menu = self.menu
-	menu.onShow = true
+	menu:SetFrameID(self.id)
 	self:PlaceMenu(menu)
-	menu.onShow = nil
 end
 
 function BBar:PlaceMenu(menu)
 	local dragFrame = self.dragFrame
 	local ratio = UIParent:GetScale() / dragFrame:GetEffectiveScale()
-	local x = dragFrame:GetLeft()
-	local y = dragFrame:GetTop()
+	local x = dragFrame:GetLeft() / ratio
+	local y = dragFrame:GetTop() / ratio
 
+	menu:Hide()
 	menu:ClearAllPoints()
-	menu:SetPoint("TOPRIGHT", UIParent, "BOTTOMLEFT", x  / ratio, y / ratio)
+	menu:SetPoint("TOPRIGHT", UIParent, "BOTTOMLEFT", x, y)
 	menu:Show()
 end
 

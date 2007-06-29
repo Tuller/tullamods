@@ -1,137 +1,131 @@
 --[[
 	BongosMenu.lua
-		GUI config functions for Bongos
+		GUI config functions for Sage
 --]]
 
 local L = BONGOS_LOCALS
 
-BongosMenu = CreateFrame("Button")
-local Button_MT = {__index = BongosMenu}
+BongosMenu = CreateFrame("Frame", nil, UIParent)
+local Frame_MT = {__index = BongosMenu}
 
-local function Menu_OnClick(self)
-	self:Hide()
-end
+function BongosMenu:CreateMenu(name, tabbed)
+	local frame = setmetatable(CreateFrame("Frame", "BongosBarMenu" .. name, UIParent, not(tabbed) and "GooeyComponent"), Frame_MT)
 
-local function Menu_OnShow(self)
-	if(not self.panels) then
-		self:SetWidth(self.width)
-		self:SetHeight(self.height)
-	end
-end
+	--mother frame, used to hide and show the entire window
+	frame:SetMovable(true)
+	frame:SetClampedToScreen(true)
+	frame:SetFrameStrata("DIALOG")
 
-function BongosMenu:Create(name, tabbed)
-	local menu = setmetatable(CreateFrame("Button", name, UIParent, "GooeyPopup"), Button_MT)
-	self.width = 210; self.height = 38
-
-	menu:RegisterForClicks("AnyUp")
-	local titleRegion = menu:CreateTitleRegion()
-	titleRegion:SetPoint("TOPLEFT", menu)
-	titleRegion:SetPoint("BOTTOMRIGHT", menu, "TOPRIGHT", 0, -24)
-
-	menu:SetScript("OnShow", Menu_OnShow)
-	menu:SetScript("OnClick", Menu_OnClick)
-
-	menu.text = menu:CreateFontString(nil, "OVERLAY")
-	menu.text:SetPoint("TOP", menu, "TOP", 0, -10)
-	menu.text:SetFontObject("GameFontHighlightLarge")
-
-	local close = CreateFrame("Button", nil, menu, "UIPanelCloseButton")
-	close:SetPoint("TOPRIGHT", menu, "TOPRIGHT", -2, -2)
-
-	local panel = nil
 	if(tabbed) then
-		panel = menu:AddPanel(L.Layout)
-		panel:CreateAlphaSlider(name .. "Opacity")
-		panel:CreateScaleSlider(name .. "Scale")
-	else
-		menu:CreateAlphaSlider(name .. "Opacity")
-		menu:CreateScaleSlider(name .. "Scale")
+		local menu = frame:AddPanelMenu()
+		menu:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, -12)
+		frame.menu = menu
 	end
+	frame.content = frame:AddContentPane()
 
-	return menu, panel
+	local panel = frame:AddPanel(L.Layout)
+	panel:AddAlphaSlider()
+	panel:AddScaleSlider()
+
+	return frame, panel
 end
 
-function BongosMenu:SetFrame(frame)
+function BongosMenu:SetFrameID(id)
 	if(self.panels) then
-		for _,panel in pairs(self.panels) do
-			panel.frame = frame
+		for _,frame in pairs(self.panels) do
+			frame.id = id
 		end
 	end
-	self.frame = frame
+
+	if tonumber(id) then
+		self.text:SetText(format("ActionBar %s", id))
+	else
+		self.text:SetText(format("%s Bar", id:gsub("^%l", string.upper)))
+	end
 end
+
+--background frame for all the panels
+function BongosMenu:AddContentPane()
+	--content pane, where all the panels are anchored to
+	local content
+	if(self.menu) then
+		content = CreateFrame("Frame", self:GetName() .. "Panel", self, "GooeyComponent")
+		content:SetFrameLevel(content:GetFrameLevel() + 1)
+		content:SetPoint("TOPLEFT", self.menu, "TOPRIGHT", -6, 12)
+		content:SetPoint("BOTTOMRIGHT", self)
+	else
+		content = self
+	end
+	content:SetScript("OnMouseDown", function() self:StartMoving() end)
+	content:SetScript("OnMouseUp", function() self:StopMovingOrSizing() end)
+	content:EnableMouse(true)
+
+	--title text
+	local text = content:CreateFontString(nil, "OVERLAY")
+	text:SetPoint("TOP", content, "TOP", 0, -10)
+	text:SetFontObject("GameFontHighlightLarge")
+	self.text = text
+
+	--close button
+	local close = CreateFrame("Button", nil, content, "UIPanelCloseButton")
+	close:SetPoint("TOPRIGHT", content, "TOPRIGHT", -2, -2)
+	close:SetScript("OnClick", function() HideUIPanel(self) end)
+
+	self.content = content
+	return content
+end
+
 
 --[[ Tabbed Menu ]]--
 
 local function MenuItem_OnClick(self)
-	local menu = self:GetParent():GetParent()
-	menu:ShowPanel(self:GetText())
+	self:GetParent():GetParent():ShowPanel(self:GetText())
 end
 
-local function TabbedMenu_AddItem(self, name)
+local function Menu_AddItem(self, name)
 	local button = CreateFrame("Button", self:GetName() .. name, self)
-	button:SetWidth(48)
-	button:SetHeight(20)
+	button:SetWidth(52); button:SetHeight(24)
 	button:SetScript("OnClick", MenuItem_OnClick)
 
 	button:SetTextFontObject("GameFontNormalSmall")
-	button:SetText(name)
 	button:SetHighlightTextColor(1, 1, 1)
+	button:SetText(name)
 
 	if not self.button then
-		button:SetPoint("TOPLEFT", self, "TOPLEFT", 2, -2)
-		self:SetHeight(self:GetHeight() + 26)
+		button:SetPoint("TOP", self, "TOP", 0, -2)
+		self:SetHeight(self:GetHeight() + 30)
 	else
-		button:SetPoint("TOPLEFT", self.button, "BOTTOMLEFT")
-		self:SetHeight(self:GetHeight() + 20)
+		button:SetPoint("TOP", self.button, "BOTTOM")
+		self:SetHeight(self:GetHeight() + 24)
 	end
 	self.button = button
 end
 
-function BongosMenu:AddMenu()
+function BongosMenu:AddPanelMenu()
 	local menu = CreateFrame("Frame", self:GetName() .. "Menu", self, "GooeyFrame")
-	menu:SetClampedToScreen(true)
-	menu:SetWidth(52)
-	menu.AddItem = TabbedMenu_AddItem
-	menu:SetPoint("TOPRIGHT", self, "TOPLEFT", 6, -16)
-	
+	menu:SetWidth(64)
+	menu.AddItem = Menu_AddItem
+
 	self.menu = menu
 	return menu
-end
-
---[[ Panel Functions ]]--
-
-local function Panel_OnShow(self)
-	local parent = self:GetParent()
-	parent:SetWidth(self.width)
-	parent:SetHeight(self.height)
-end
-
-function BongosMenu:AddPanel(name)
-	local panel = setmetatable(CreateFrame("Frame", self:GetName() .. "Panel" .. name, self), Button_MT)
-	panel:SetScript("OnShow", Panel_OnShow)
-	panel:SetAllPoints(self)
-	panel:Hide()
-
-	panel.width = 210
-	panel.height = 38
-
-	if(not self.panels) then 
-		self.panels = {} 
-		self:AddMenu()
-	end
-	self.panels[name] = panel
-	self.menu:AddItem(name)
-	
-	return panel
 end
 
 function BongosMenu:ShowPanel(name)
 	local menuName = self.menu:GetName()
 	for index, panel in pairs(self.panels) do
 		if(index == name) then
-			panel:Show()
-			getglobal(menuName .. index):LockHighlight()
-		else
+			if(not panel:IsShown()) then
+				getglobal(menuName .. index):LockHighlight()
+				panel:Show()
+				if(self.menu) then
+					self:SetWidth(self.menu:GetWidth() + panel.width)
+					self:SetHeight(max(panel.height, self.menu:GetHeight() + 32))
+				else
+					self:SetWidth(panel.width)
+					self:SetHeight(panel.height)
+				end
+			end
+		elseif(panel:IsShown()) then
 			panel:Hide()
 			getglobal(menuName .. index):UnlockHighlight()
 		end
@@ -139,12 +133,85 @@ function BongosMenu:ShowPanel(name)
 end
 
 
---[[ General Slider ]]--
+--[[  Panels ]]--
 
-function BongosMenu:CreateSlider(name)
-	local slider = CreateFrame("Slider", name, self, "GooeySlider")
-	slider:SetWidth(200)
-	slider:SetHeight(18)
+local Panel = CreateFrame("Frame")
+local Panel_MT = {__index = Panel}
+
+local function Panel_OnShow(self)
+	local parent = self:GetParent()
+	parent:SetWidth(self.width); parent:SetHeight(self.height)
+end
+
+function BongosMenu:AddPanel(name)
+	local content = self.content
+	local panel = setmetatable(CreateFrame("Frame", content:GetName() .. name, content), Panel_MT)
+	panel:SetPoint("TOPLEFT", content, "TOPLEFT", 0, -28)
+	panel:SetPoint("BOTTOMRIGHT", content, "BOTTOMRIGHT")
+	if(not self.menu) then
+		panel:SetScript("OnShow", Panel_OnShow)
+	end
+
+	panel.width = 216
+	panel.height = 38
+
+	if(not self.panels) then self.panels = {} end
+	self.panels[name] = panel
+
+	if(self.menu) then
+		self.menu:AddItem(name)
+		panel:Hide()
+	end
+
+	return panel
+end
+
+
+--[[ Checkbuttons ]]--
+
+--checkbutton
+function Panel:AddCheckButton(name)
+	local button = CreateFrame("CheckButton", self:GetName() .. name, self, "GooeyCheckButton")
+	if(self.button) then
+		button:SetPoint("TOPLEFT", self.button, "BOTTOMLEFT", 0, 2)
+	else
+		button:SetPoint("TOPLEFT", self, "TOPLEFT", 6, 0)
+	end
+	button:SetText(name)
+
+	self.height = self.height + 30
+	self.button = button
+
+	return button
+end
+
+
+--[[ Sliders ]]--
+
+--slider
+local function Slider_OnMouseWheel(self, direction)
+	local step = self:GetValueStep() * direction
+	local value = self:GetValue()
+	local minVal, maxVal = self:GetMinMaxValues()
+
+	if(step > 0) then
+		self:SetValue(min(value+step, maxVal))
+	else
+		self:SetValue(max(value+step, minVal))
+	end
+end
+
+function Panel:AddSlider(name, min, max, step)
+	local slider = CreateFrame("Slider", self:GetName() .. name, self, "GooeySlider")
+	slider:SetWidth(200); slider:SetHeight(18)
+	slider:SetMinMaxValues(min, max)
+	slider:SetValueStep(step)
+	slider:EnableMouseWheel(true)
+	slider:SetScript("OnMouseWheel", Slider_OnMouseWheel)
+
+	getglobal(slider:GetName() .. "Text"):SetText(name)
+	getglobal(slider:GetName() .. "Low"):SetText(min)
+	getglobal(slider:GetName() .. "High"):SetText(max)
 
 	if(self.slider) then
 		slider:SetPoint("BOTTOM", self.slider, "TOP", 0, 24)
@@ -157,92 +224,66 @@ function BongosMenu:CreateSlider(name)
 	return slider
 end
 
-
---[[ Scale Slider ]]--
-
+--scale slider
 local function ScaleSlider_OnShow(self)
-	self:SetValue(self:GetParent().frame:GetScale() * 100)
+	self.onShow = true
+	local id = self:GetParent().id
+	self:SetValue(BBar:Get(id):GetScale() * 100)
+	self.onShow = nil
 end
 
 local function ScaleSlider_OnValueChanged(self, value)
-	local parent = self:GetParent()
-	if not parent.onShow then
-		parent.frame:SetFrameScale(value / 100)
+	if not self.onShow then
+		local id = self:GetParent().id
+		BBar:Get(id):SetFrameScale(value/100)
 	end
 	getglobal(self:GetName() .. "ValText"):SetText(value)
 end
 
-function BongosMenu:CreateScaleSlider(name)
-	local slider = self:CreateSlider(name)
-	slider:SetMinMaxValues(50, 150)
-	slider:SetValueStep(1)
-
-	getglobal(name .. "Text"):SetText(L.Scale)
-	getglobal(name .. "Low"):SetText("50")
-	getglobal(name .. "High"):SetText("150")
-
+function Panel:AddScaleSlider()
+	local slider = self:AddSlider(L.Scale, 50, 150, 1)
 	slider:SetScript("OnShow", ScaleSlider_OnShow)
 	slider:SetScript("OnValueChanged", ScaleSlider_OnValueChanged)
 
 	return slider
 end
 
-
---[[ Alpha Slider ]]--
-
+--opacity slider
 local function AlphaSlider_OnShow(self)
-	local alpha = self:GetParent().frame:GetFrameAlpha()
-	self:SetValue(alpha * 100)
+	self.onShow = true
+	local id = self:GetParent().id
+	self:SetValue(BBar:Get(id):GetFrameAlpha() * 100)
+	self.onShow = nil
 end
 
 local function AlphaSlider_OnValueChanged(self, value)
-	local parent = self:GetParent()
-	if not parent.onShow then
-		parent.frame:SetFrameAlpha(value / 100)
+	if not self.onShow then
+		local id = self:GetParent().id
+		BBar:Get(id):SetFrameAlpha(value/100)
 	end
 	getglobal(self:GetName() .. "ValText"):SetText(value)
 end
 
-function BongosMenu:CreateAlphaSlider(name)
-	local slider = self:CreateSlider(name)
-	slider:SetMinMaxValues(0, 100)
-	slider:SetValueStep(1)
-
-	getglobal(name .. "Text"):SetText(L.Opacity)
-	getglobal(name .. "Low"):SetText("0")
-	getglobal(name .. "High"):SetText("100")
-
+function Panel:AddAlphaSlider()
+	local slider = self:AddSlider(L.Opacity, 0, 100, 1)
 	slider:SetScript("OnShow", AlphaSlider_OnShow)
 	slider:SetScript("OnValueChanged", AlphaSlider_OnValueChanged)
 
 	return slider
 end
 
---spacing
-function BongosMenu:CreateSpacingSlider(name)
-	local slider = self:CreateSlider(name)
-	slider:SetMinMaxValues(-8, 32)
-	slider:SetValueStep(1)
-
-	getglobal(name .. "Text"):SetText(L.Spacing)
-	getglobal(name .. "Low"):SetText("-8")
-	getglobal(name .. "High"):SetText("32")
-	
-	return slider
+--spacing slider
+local function SpaceSlider_OnShow(self)
+	self.onShow = true
+	local frame = BBar:Get(self:GetParent().id)
+	self:SetValue(frame.sets.space or self.defaultSpacing)
+	self.onShow = nil
 end
 
+function Panel:AddSpacingSlider(defaultSpacing)
+	local slider = self:AddSlider(L.Spacing, -8, 32, 1)
+	slider.defaultSpacing = defaultSpacing or 0
+	slider:SetScript("OnShow", SpaceSlider_OnShow)
 
---[[ General Checkbutton ]]--
-
-function BongosMenu:CreateCheckButton(name)
-	local button = CreateFrame("CheckButton", name, self, "GooeyCheckButton")
-	if(self.button) then
-		button:SetPoint("TOP", self.button, "BOTTOM", 0, 2)
-	else
-		button:SetPoint("TOPLEFT", self, "TOPLEFT", 6, -28)
-	end
-	self.height = self.height + 30
-	self.button = button
-
-	return button
+	return slider
 end
