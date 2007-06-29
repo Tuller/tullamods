@@ -10,7 +10,7 @@ local Item_mt = {__index = BagnonItem}
 local UPDATE_DELAY = 0.1
 
 local bagSearch, nameSearch, qualitySearch
-local MAX_ITEMS_PER_BAG = 36
+local MAX_ITEMS_PER_BAG = MAX_CONTAINER_ITEMS
 
 local unused = {}
 local lastCreated = 1
@@ -73,8 +73,8 @@ local function Item_Create()
 	local item
 
 	if BagnonUtil:ReusingFrames() then
-		local bag = ceil(lastCreated / MAX_ITEMS_PER_BAG)
-		local slot = mod(lastCreated - 1, MAX_ITEMS_PER_BAG) + 1
+		local bag = ceil(lastCreated / MAX_CONTAINER_ITEMS)
+		local slot = mod(lastCreated - 1, MAX_CONTAINER_ITEMS) + 1
 		item = getglobal(format("ContainerFrame%dItem%d", bag, slot))
 		if item then
 			item:SetParent(nil)
@@ -98,7 +98,6 @@ local function Item_Create()
 	item:SetScript("OnEvent", nil)
 	item:SetScript("OnEnter", OnEnter)
 	item:SetScript("OnLeave", OnLeave)
-	-- item:SetScript("OnUpdate", OnUpdate)
 	item:SetScript("OnHide", OnHide)
 	item:SetScript("PostClick", PostClick)
 
@@ -231,7 +230,7 @@ function BagnonItem:UpdateBorder(quality)
 	local border = self.border
 	local link = self.hasItem
 
-	if BagnonUtil:ShowingBorders() and link then
+	if link and BagnonUtil:ShowingBorders() then
 		if not quality then
 			quality = select(3, GetItemInfo(link))
 		end
@@ -283,11 +282,11 @@ end
 
 --[[ OnX Functions ]]--
 
-function BagnonItem:PostClick(mouseButton)
+function BagnonItem:PostClick(button)
 	if IsModifierKeyDown() then
-		if this.cached then
-			if this.hasItem then
-				if mouseButton == "LeftButton" then
+		if self.cached then
+			if self.hasItem then
+				if button == "LeftButton" then
 					if IsControlKeyDown() then
 						DressUpItemLink((BagnonDB:GetItemData(self:GetBag(), self:GetID(), self:GetPlayer())))
 					elseif IsShiftKeyDown() then
@@ -296,7 +295,7 @@ function BagnonItem:PostClick(mouseButton)
 				end
 			end
 		else
-			ContainerFrameItemButton_OnModifiedClick(mouseButton)
+			ContainerFrameItemButton_OnModifiedClick(button)
 		end
 	end
 end
@@ -325,11 +324,7 @@ function BagnonItem:OnEnter()
 				GameTooltip:SetHyperlink(link, count)
 			end
 		else
-			--hack to prevent a ContainerFrameItemButton_OnEnter issue
-			local prethis = this
-			this = self
 			ContainerFrameItemButton_OnEnter(self)
-			this = prethis
 		end
 	end
 end
