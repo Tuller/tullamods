@@ -141,13 +141,10 @@ end
 --[[ Menu Functions ]]--
 
 local function Bar_CreateMenu(frame)
-	local name = format("BongosMenu%s", frame.id)
-	local menu = BongosMenu:Create(name)
-	menu.frame = frame
-	menu.text:SetText("XP Bar")
-	
+	local menu, panel = BongosMenu:CreateMenu(frame.id)
+
 	--checkbuttons
-	local vertical = menu:CreateCheckButton(name .. "Vertical")
+	local vertical = panel:AddCheckButton("Vertical")
 	vertical:SetScript("OnShow", function(self) self:SetChecked(frame.sets.vertical) end)
 	vertical:SetScript("OnClick",  function(self)
 		Bar_SetVertical(frame, self:GetChecked())
@@ -160,70 +157,53 @@ local function Bar_CreateMenu(frame)
 			getglobal(name .. "HeightText"):SetText("Height")
 		end
 	end)
-	vertical:SetText("Vertical")
-	
+
 	--height slider
-	local height = menu:CreateSlider(name .. "Height")
+	local height = panel:AddSlider("Height", 0, 128, 1)
 	height:SetScript("OnShow", function(self)
+		self.onShow = true
 		if(frame.sets.vertical) then
 			getglobal(self:GetName() .. "Text"):SetText("Width")
 		else
 			getglobal(self:GetName() .. "Text"):SetText("Height")
 		end
 		self:SetValue(frame.sets.height or DEFAULT_HEIGHT)
+		self.onShow = nil
 	end)
 	height:SetScript("OnValueChanged", function(self, value)
-		if not menu.onShow then
+		if not self.onShow then
 			Bar_SetHeight(frame, value)
 		end
 		getglobal(self:GetName() .. "ValText"):SetText(value)
 	end)
-	height:SetValueStep(1)
-	height:SetMinMaxValues(0, 128)
-	getglobal(name .. "HeightLow"):SetText(0)
-	getglobal(name .. "HeightHigh"):SetText(128)
 
 	--size slider
-	local size = menu:CreateSlider(name .. "Size")
+	local size = panel:AddSlider("Size", 0, 100, 1)
 	size:SetScript("OnShow", function(self)
+		self.onShow = true
 		if(frame.sets.vertical) then
 			getglobal(self:GetName() .. "Text"):SetText("Height")
 		else
 			getglobal(self:GetName() .. "Text"):SetText("Width")
 		end
 		self:SetValue((frame.sets.size or DEFAULT_SIZE) * 100)
+		self.onShow = nil
 	end)
 	size:SetScript("OnValueChanged", function(self, value)
-		if not menu.onShow then
-			Bar_SetSize(frame, value / 100)
+		if not self.onShow then
+			Bar_SetSize(frame, value/100)
 		end
 		getglobal(this:GetName() .. "ValText"):SetText(value)
 	end)
-	size:SetValueStep(1)
-	size:SetMinMaxValues(0, 100)
-	getglobal(name .. "SizeLow"):SetText("0%")
-	getglobal(name .. "SizeHigh"):SetText("100%")
 
 	return menu
-end
-
---Called when the right click menu is shown, loads the correct values to the checkbuttons/sliders/text
-local function Bar_ShowMenu(self)
-	if not self.menu then
-		self.menu = Bar_CreateMenu(self)
-	end
-
-	local menu = self.menu
-	menu.onShow = true
-	self:PlaceMenu(menu)
-	menu.onShow = nil
 end
 
 
 --[[ Startup Functions ]]--
 
 local function Bar_OnCreate(self)
-	self.ShowMenu = Bar_ShowMenu
+	self.CreateMenu = Bar_CreateMenu
 
 	restBar = CreateFrame("StatusBar", nil, self)
 	restBar:SetAllPoints(self)
@@ -256,9 +236,9 @@ function BongosXP:Load()
 
 	Bar_SetVertical(bar, bar.sets.vertical)
 
-	if GetWatchedFactionInfo() then 
-		WatchRep() 
-	else 
+	if GetWatchedFactionInfo() then
+		WatchRep()
+	else
 		WatchXP()
 	end
 
