@@ -4,7 +4,7 @@
 --]]
 
 BongosStats = Bongos:NewModule("Bongos-Stats")
-					
+
 local L = BONGOS_STATS_LOCALS
 local UPDATE_DELAY = 1
 
@@ -58,9 +58,6 @@ local function Stats_Create(self)
 	self.ping:SetPoint("LEFT", self.mem, "RIGHT", 2, 0)
 
 	frame:SetScript("OnUpdate", Stats_OnUpdate)
-	if not(GetBuildInfo() == "2.0.12") then
-		frame:SetScript("OnEnter", Stats_OnEnter)
-	end
 	frame:SetScript("OnLeave", Stats_OnLeave)
 	frame:SetScript("OnClick", Stats_OnClick)
 
@@ -70,43 +67,25 @@ end
 
 --stats bar
 local function Bar_CreateMenu(self)
-	local name = format("BongosMenu%s", self.id)
-	local menu = BongosMenu:Create(name)
-	menu.text:SetText(L.StatsBar)
+	local menu, panel = BongosMenu:CreateMenu(self.id)
 
-	local showMemory = menu:CreateCheckButton(name .. "ShowMemory")
+	local showMemory = panel:AddCheckButton(L.ShowMemory)
 	showMemory:SetScript("OnShow", function(b) b:SetChecked(self.sets.showMemory) end)
 	showMemory:SetScript("OnClick", function() BongosStats:SetShowMemory(not self.sets.showMemory) end)
-	showMemory:SetText(L.ShowMemory)
 
-	local showFPS = menu:CreateCheckButton(name .. "ShowFPS")
+	local showFPS = panel:AddCheckButton(L.ShowFPS)
 	showFPS:SetScript("OnShow", function(b) b:SetChecked(self.sets.showFPS) end)
 	showFPS:SetScript("OnClick", function() BongosStats:SetShowFPS(not self.sets.showFPS) end)
-	showFPS:SetText(L.ShowFPS)
 
-	local showPing = menu:CreateCheckButton(name .. "ShowPing")
+	local showPing = panel:AddCheckButton(L.ShowPing)
 	showPing:SetScript("OnShow", function(b) b:SetChecked(self.sets.showPing) end)
 	showPing:SetScript("OnClick", function() BongosStats:SetShowPing(not self.sets.showPing) end)
-	showPing:SetText(L.ShowPing)
-
-	menu.frame = self
 
 	return menu
 end
 
-local function Bar_ShowMenu(self)
-	if not self.menu then
-		self.menu = Bar_CreateMenu(self)
-	end
-
-	local menu = self.menu
-	menu.onShow = true
-	self:PlaceMenu(menu)
-	menu.onShow = nil
-end
-
 local function Bar_OnCreate(self)
-	self.ShowMenu = Bar_ShowMenu
+	self.CreateMenu = Bar_CreateMenu
 	self:SetSize(24)
 end
 
