@@ -220,7 +220,7 @@ end
 
 local function StanceSlider_OnShow(self)
 	self.onShow = true
-	local frame = self:GetParent().frame
+	local frame = BBar:Get(self:GetParent().id)
 
 	local numBars = BongosActionBar:GetNumber()
 	local maxOffset = numBars - 1
@@ -233,7 +233,7 @@ local function StanceSlider_OnShow(self)
 end
 
 local function StanceSlider_OnValueChanged(self, value)
-	local frame = self:GetParent().frame
+	local frame = BBar:Get(self:GetParent().id)
 	if not self.onShow then
 		frame:SetStateOffset(self.id, value)
 		getglobal(self:GetName() .. "ValText"):SetText(format("Bar %s", mod(frame.id+value-1, BongosActionBar:GetNumber())+1))
@@ -241,17 +241,15 @@ local function StanceSlider_OnValueChanged(self, value)
 end
 
 local function Panel_AddStanceSlider(self, id, title)
-	local name = self:GetName() .. "Stance" .. id
-
-	local slider = self:CreateSlider(name)
+	local slider = self:AddSlider("Stance" .. id, 0, 1, 1)
 	slider.id = id
 
 	slider:SetScript("OnShow", StanceSlider_OnShow)
 	slider:SetScript("OnValueChanged", StanceSlider_OnValueChanged)
 	slider:SetValueStep(1)
 
-	getglobal(name .. "Text"):SetText(title)
-	getglobal(name .. "Low"):SetText(0)
+	getglobal(slider:GetName() .. "Text"):SetText(title)
+	getglobal(slider:GetName() .. "Low"):SetText(0)
 
 	return slider
 end
@@ -259,67 +257,55 @@ end
 local function Panel_AddLayoutSliders(panel)
 	local name = panel:GetName()
 	--spacing
-	local spacing = panel:CreateSpacingSlider(name .. "Spacing")
-	spacing:SetScript("OnShow", function(self)
-		self.onShow = true
-		local parent = self:GetParent()
-		self:SetValue(parent.frame:GetSpacing())
-		self.onShow = nil
-	end)
+	local spacing = panel:AddSpacingSlider(DEFAULT_SPACING)
 	spacing:SetScript("OnValueChanged", function(self, value)
 		if not self.onShow then
-			local parent = self:GetParent()
-			parent.frame:SetSpacing(value)
+			local frame = BBar:Get(self:GetParent().id)
+			frame:SetSpacing(value)
 		end
 		getglobal(self:GetName() .. "ValText"):SetText(value)
 	end)
 
 	--columns
-	local cols = panel:CreateSlider(name .. "Cols")
+	local cols = panel:AddSlider(L.Columns, 1, 1, 1)
 	cols:SetScript("OnShow", function(self)
 		self.onShow = true
-		local parent = self:GetParent()
-		self:SetValue(parent.frame:GetSize() - parent.frame:GetColumns() + 1)
+		local frame = BBar:Get(self:GetParent().id)
+		self:SetValue(frame:GetSize() - frame:GetColumns() + 1)
 		self.onShow = nil
 	end)
 	cols:SetScript("OnValueChanged", function(self, value)
-		local parent = self:GetParent()
+		local frame = BBar:Get(self:GetParent().id)
 		if not self.onShow then
-			parent.frame:SetColumns(parent.frame:GetSize() - value + 1)
+			frame:SetColumns(frame:GetSize() - value + 1)
 		end
-		getglobal(self:GetName() .. "ValText"):SetText(parent.frame:GetColumns())
+		getglobal(self:GetName() .. "ValText"):SetText(frame:GetColumns())
 	end)
-	cols:SetValueStep(1)
-	getglobal(name .. "ColsText"):SetText(L.Columns)
-	getglobal(name .. "ColsHigh"):SetText(1)
+	getglobal(cols:GetName() .. "High"):SetText(1)
 
 	--size
-	local size = panel:CreateSlider(name .. "Size")
+	local size = panel:AddSlider(L.Size, 1, 1, 1)
 	size:SetScript("OnShow", function(self)
 		self.onShow = true
-		local frame = self:GetParent().frame
+		local frame = BBar:Get(self:GetParent().id)
 		getglobal(name .. "Size"):SetMinMaxValues(1, frame:GetMaxSize())
 		getglobal(name .. "Size"):SetValue(frame:GetSize())
 		getglobal(name .. "SizeHigh"):SetText(frame:GetMaxSize())
 		self.onShow = nil
 	end)
 	size:SetScript("OnValueChanged", function(self, value)
-		local parent = self:GetParent()
+		local frame = BBar:Get(self:GetParent().id)
 		if not self.onShow then
-			parent.frame:SetSize(value)
+			frame:SetSize(value)
 		end
 		getglobal(self:GetName() .. "ValText"):SetText(value)
 
-		local size = parent.frame:GetSize()
-		local cols = parent.frame:GetColumns()
-		getglobal(name .. "Cols"):SetMinMaxValues(1, size)
-		getglobal(name .. "Cols"):SetValue(size - cols + 1)
-		getglobal(name .. "ColsLow"):SetText(size)
-		getglobal(name .. "ColsValText"):SetText(cols)
+		local size, columns = frame:GetSize(), frame:GetColumns()
+		cols:SetMinMaxValues(1, size)
+		cols:SetValue(size - columns + 1)
+		getglobal(cols:GetName() .. "Low"):SetText(size)
+		getglobal(cols:GetName() .. "ValText"):SetText(columns)
 	end)
-	size:SetValueStep(1)
-	getglobal(name .. "SizeText"):SetText(L.Size)
-	getglobal(name .. "SizeLow"):SetText(1)
 end
 
 local function Panel_AddStanceSliders(panel)
@@ -347,17 +333,15 @@ local function Panel_AddStanceSliders(panel)
 						StanceSlider_OnShow(self[state])
 					end
 				end
-				OnShow(self)
+				if(OnShow) then OnShow(self) end
 			end)
 		end
 	end
 end
 
 function BActionBar:CreateMenu()
-	local name = format("BongosMenu%s", self.id)
-	local menu, panel = BongosMenu:Create(name, true)
-
 	--layout panel
+	local menu,panel = BongosMenu:CreateMenu(self.id, true)
 	Panel_AddLayoutSliders(panel)
 
 	--stances panel
@@ -375,28 +359,21 @@ function BActionBar:CreateMenu()
 	Panel_AddStanceSlider(panel, "m2", "Alt")
 	Panel_AddStanceSlider(panel, "m1", "Ctrl")
 
+	--metatable trick
+	BActionBar.menu = menu
 	return menu
 end
 
 --Called when the right click menu is shown, loads the correct values to the checkbuttons/sliders/text
 function BActionBar:ShowMenu()
-	--a metatable trickish
-	if not BActionBar.menu then
-		BActionBar.menu = self:CreateMenu()
+	if not self.menu then
+		self:CreateMenu()
 	end
 
 	local menu = self.menu
-	if menu:IsShown() then
-		menu:Hide()
-	end
-
-	menu:SetFrame(self)
-	menu.text:SetText(format(L.ActionBar, self.id))
-
-	menu.onShow = true
-	self:PlaceMenu(menu)
+	menu:SetFrameID(self.id)
 	menu:ShowPanel(L.Layout)
-	menu.onShow = nil
+	self:PlaceMenu(menu)
 end
 
 

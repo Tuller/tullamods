@@ -63,30 +63,19 @@ local function Bar_Layout(self, rows, space)
 end
 
 local function Bar_SetVertical(self, enable)
-	if enable then
-		self:Layout(5)
-	else
-		self:Layout(1)
-	end
+	self:Layout(enable and 5 or 1)
 end
 
 local function Bar_CreateMenu(frame)
-	local name = format("BongosMenu%s", frame.id)
-	local menu = BongosMenu:Create(name)
-	menu.frame = frame
-	menu.text:SetText(L.MenuBar)
+	local menu,panel = BongosMenu:CreateMenu(frame.id)
 
-	local vertical = menu:CreateCheckButton(name .. "Vertical")
+	local vertical = panel:AddCheckButton(L.Vertical)
 	vertical:SetScript("OnShow", function(self) self:SetChecked(frame.sets.rows) end)
 	vertical:SetScript("OnClick", function(self) frame:SetVertical(self:GetChecked()) end)
-	vertical:SetText(L.Vertical)
 
-	local spacing = menu:CreateSpacingSlider(name .. "Spacing")
-	spacing:SetScript("OnShow", function(self)
-		self:SetValue(frame.sets.space or DEFAULT_SPACING)
-	end)
+	local spacing = panel:AddSpacingSlider(DEFAULT_SPACING)
 	spacing:SetScript("OnValueChanged", function(self, value)
-		if not menu.onShow then
+		if not self.onShow then
 			frame:Layout(nil, value)
 		end
 		getglobal(self:GetName() .. "ValText"):SetText(value)
@@ -95,26 +84,15 @@ local function Bar_CreateMenu(frame)
 	return menu
 end
 
-local function Bar_ShowMenu(self)
-	if not self.menu then
-		self.menu = Bar_CreateMenu(self)
-	end
-
-	local menu = self.menu
-	menu.onShow = true
-	self:PlaceMenu(menu)
-	menu.onShow = nil
-end
-
 local function Bar_OnCreate(self)
-	self.ShowMenu = Bar_ShowMenu
+	self.CreateMenu = Bar_CreateMenu
 	self.Layout = Bar_Layout
 	self.SetVertical = Bar_SetVertical
 
 	for _,button in pairs(buttons) do
 		self:Attach(button)
 	end
-	
+
 	--mess with the talent button to make it hide properly, it causes layout issues otherwise
 	local function TalentButton_Update(self)
 		if UnitLevel("player") < 10 then
@@ -147,7 +125,7 @@ function BongosMenuBar:Load()
 
 	--hack to make sure all the buttons are shown properly
 	if bar:IsShown() then bar:Hide(); bar:Show() end
-	
+
 	self.bar = bar
 end
 

@@ -8,8 +8,7 @@ BongosBagBar = Bongos:NewModule("Bongos-BagBar")
 local L = BONGOS_LOCALS
 
 --constants
-local DEFAULT_SPACING = 4
-local DEFAULT_ROWS = 1
+local DEFAULT_SPACING, DEFAULT_ROWS = 4, 1
 local BAG_SIZE = 37
 local bags = {CharacterBag3Slot, CharacterBag2Slot, CharacterBag1Slot, CharacterBag0Slot, MainMenuBarBackpackButton}
 
@@ -17,18 +16,10 @@ local bags = {CharacterBag3Slot, CharacterBag2Slot, CharacterBag1Slot, Character
 
 local function Bar_Layout(self, rows, space)
 	rows = (rows or self.sets.rows or DEFAULT_ROWS)
-	if rows == DEFAULT_ROWS then
-		self.sets.rows = nil
-	else
-		self.sets.rows = rows
-	end
-	space = (space or self.sets.space or DEFAULT_SPACING)
+	self.sets.rows = (rows ~= DEFAULT_ROWS and rows) or nil
 
-	if space == DEFAULT_SPACING then
-		self.sets.space = nil
-	else
-		self.sets.space = space
-	end
+	space = (space or self.sets.space or DEFAULT_SPACING)
+	self.sets.space = (space ~= DEFAULT_SPACING and space) or nil
 
 	for _,bag in pairs(bags) do bag:ClearAllPoints() end
 
@@ -58,45 +49,28 @@ local function Bar_Layout(self, rows, space)
 end
 
 local function Bar_SetOneBag(self, enable)
-	if enable then
-		self.sets.oneBag = 1
-	else
-		self.sets.oneBag = nil
-	end
+	self.sets.oneBag = enable or nil
 	self:Layout()
 end
 
 local function Bar_SetVertical(self, enable)
-	if enable then
-		self:Layout(5)
-	else
-		self:Layout(1)
-	end
+	self:Layout(enable and 5 or 1)
 end
 
 local function Bar_CreateMenu(frame)
-	local name = format("BongosMenu%s", frame.id)
-	local menu = BongosMenu:Create(name)
-	menu.frame = frame
-	menu.text:SetText(L.BagBar)
+	local menu,panel = BongosMenu:CreateMenu(frame.id)
 
-	--checkbuttons
-	local oneBag = menu:CreateCheckButton(name .. "OneBag")
+	local oneBag = panel:AddCheckButton(L.OneBag)
 	oneBag:SetScript("OnShow", function(self) self:SetChecked(frame.sets.oneBag) end)
 	oneBag:SetScript("OnClick", function(self) frame:SetOneBag(self:GetChecked()) end)
-	oneBag:SetText(L.OneBag)
 
-	local vertical = menu:CreateCheckButton(name .. "Vertical")
+	local vertical = panel:AddCheckButton(L.Vertical)
 	vertical:SetScript("OnShow", function(self) self:SetChecked(frame.sets.rows) end)
 	vertical:SetScript("OnClick", function(self) frame:SetVertical(self:GetChecked()) end)
-	vertical:SetText(L.Vertical)
 
-	local spacing = menu:CreateSpacingSlider(name .. "Spacing")
-	spacing:SetScript("OnShow", function(self)
-		self:SetValue(frame.sets.space or DEFAULT_SPACING)
-	end)
+	local spacing = panel:AddSpacingSlider(DEFAULT_SPACING)
 	spacing:SetScript("OnValueChanged", function(self, value)
-		if not menu.onShow then
+		if not self.onShow then
 			frame:Layout(nil, value)
 		end
 		getglobal(self:GetName() .. "ValText"):SetText(value)
@@ -105,19 +79,8 @@ local function Bar_CreateMenu(frame)
 	return menu
 end
 
-local function Bar_ShowMenu(self)
-	if not self.menu then
-		self.menu = Bar_CreateMenu(self)
-	end
-
-	local menu = self.menu
-	menu.onShow = true
-	self:PlaceMenu(menu)
-	menu.onShow = nil
-end
-
 local function Bar_OnCreate(self)
-	self.ShowMenu = Bar_ShowMenu
+	self.CreateMenu = Bar_CreateMenu
 	self.Layout = Bar_Layout
 	self.SetVertical = Bar_SetVertical
 	self.SetOneBag = Bar_SetOneBag
@@ -125,6 +88,9 @@ local function Bar_OnCreate(self)
 	for _,bag in pairs(bags) do
 		self:Attach(bag)
 	end
+
+	--hack to prevent some random issue with the backpack
+	MainMenuBarBackpackButton:Show()
 end
 
 
@@ -133,10 +99,6 @@ end
 function BongosBagBar:Load()
 	local bar = BBar:Create("bags", Bar_OnCreate, nil, {["y"] = 37, ["x"] = 1241})
 	bar:Layout()
-
-	if bar:IsShown() then
-		MainMenuBarBackpackButton:Show()
-	end
 
 	self.bar = bar
 end

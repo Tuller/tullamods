@@ -44,55 +44,36 @@ local function Bar_Layout(self, cols, space)
 end
 
 local function Bar_CreateMenu(frame)
-	local name = format("BongosMenu%s", frame.id)
-	local menu = BongosMenu:Create(name)
-	menu.frame = frame
-	menu.text:SetText(L.PetBar)
+	local menu,panel = BongosMenu:CreateMenu(frame.id)
 
-	--sliders
-	local spacing = menu:CreateSpacingSlider(name .. "Spacing")
-	spacing:SetScript("OnShow", function(self)
-		self:SetValue(frame.sets.space or DEFAULT_SPACING)
-	end)
+	local spacing = panel:AddSpacingSlider(DEFAULT_SPACING)
 	spacing:SetScript("OnValueChanged", function(self, value)
-		if not menu.onShow then
+		if not self.onShow then
 			frame:Layout(nil, value)
 		end
 		getglobal(self:GetName() .. "ValText"):SetText(value)
 	end)
 
-	local cols = menu:CreateSlider(name .. "Cols")
+	local cols = panel:AddSlider(L.Columns, 1, NUM_PET_ACTION_SLOTS, 1)
 	cols:SetScript("OnShow", function(self)
-		getglobal(name .. "Cols"):SetValue(NUM_PET_ACTION_SLOTS - (frame.sets.cols or NUM_PET_ACTION_SLOTS) + 1)
+		self.onShow = true
+		self:SetValue(NUM_PET_ACTION_SLOTS - (frame.sets.cols or NUM_PET_ACTION_SLOTS) + 1)
+		self.onShow = nil
 	end)
 	cols:SetScript("OnValueChanged", function(self, value)
-		if not menu.onShow then
+		if not self.onShow then
 			frame:Layout(NUM_PET_ACTION_SLOTS - value + 1)
 		end
 		getglobal(self:GetName() .. "ValText"):SetText(NUM_PET_ACTION_SLOTS - value + 1)
 	end)
-	cols:SetValueStep(1)
-	getglobal(name .. "ColsText"):SetText(L.Columns)
-	getglobal(name .. "Cols"):SetMinMaxValues(1, NUM_PET_ACTION_SLOTS)
-	getglobal(name .. "ColsHigh"):SetText(1)
-	getglobal(name .. "ColsLow"):SetText(NUM_PET_ACTION_SLOTS)
+	getglobal(cols:GetName() .. "High"):SetText(1)
+	getglobal(cols:GetName() .. "Low"):SetText(NUM_PET_ACTION_SLOTS)
 
 	return menu
 end
 
-local function Bar_ShowMenu(self)
-	if not self.menu then
-		self.menu = Bar_CreateMenu(self)
-	end
-
-	local menu = self.menu
-	menu.onShow = true
-	self:PlaceMenu(menu)
-	menu.onShow = nil
-end
-
 local function Bar_OnCreate(self)
-	self.ShowMenu = Bar_ShowMenu
+	self.CreateMenu = Bar_CreateMenu
 	self.Layout = Bar_Layout
 
 	for i = 1, NUM_PET_ACTION_SLOTS do

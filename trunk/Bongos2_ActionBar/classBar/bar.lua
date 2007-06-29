@@ -10,8 +10,6 @@ end
 
 BongosClassBar = Bongos:NewModule("Bongos-ClassBar")
 local L = BONGOS_LOCALS
-
---constants
 local DEFAULT_SPACING = 2
 
 
@@ -23,18 +21,10 @@ local function Bar_Layout(self, cols, space)
 	local numForms = GetNumShapeshiftForms()
 
 	cols = (cols or self.sets.cols or numForms)
-	if cols == numForms then
-		self.sets.cols = nil
-	else
-		self.sets.cols = cols
-	end
+	self.sets.cols = (cols ~= numForms and cols) or nil
 
 	space = (space or self.sets.space or DEFAULT_SPACING)
-	if space == DEFAULT_SPACING then
-		self.sets.space = nil
-	else
-		self.sets.space = space
-	end
+	self.sets.space = (space ~= DEFAULT_SPACING and space) or nil
 
 	local buttonSize = 30 + space
 	local offset = space / 2
@@ -49,55 +39,37 @@ local function Bar_Layout(self, cols, space)
 end
 
 local function Bar_CreateMenu(frame)
-	local name = format("BongosMenu%s", frame.id)
-	local menu = BongosMenu:Create(name)
-	menu.frame = frame
-	menu.text:SetText(L.ClassBar)
+	local menu,panel = BongosMenu:CreateMenu(frame.id)
 
 	--sliders
-	local spacing = menu:CreateSpacingSlider(name .. "Spacing")
-	spacing:SetScript("OnShow", function(self)
-		self:SetValue(frame.sets.space or DEFAULT_SPACING)
-	end)
+	local spacing = panel:AddSpacingSlider(DEFAULT_SPACING)
 	spacing:SetScript("OnValueChanged", function(self, value)
-		if not menu.onShow then
+		if not self.onShow then
 			frame:Layout(nil, value)
 		end
 		getglobal(self:GetName() .. "ValText"):SetText(value)
 	end)
 
-	local cols = menu:CreateSlider(name .. "Cols")
+	local cols = panel:AddSlider(L.Columns, 1, 1, 1)
 	cols:SetScript("OnShow", function(self)
-		getglobal(name .. "Cols"):SetMinMaxValues(1, GetNumShapeshiftForms())
-		getglobal(name .. "ColsLow"):SetText(GetNumShapeshiftForms())
-		getglobal(name .. "Cols"):SetValue(GetNumShapeshiftForms() - (frame.sets.cols or GetNumShapeshiftForms()) + 1)
+		self.onShow = true
+		self:SetMinMaxValues(1, GetNumShapeshiftForms())
+		self:SetValue(GetNumShapeshiftForms() - (frame.sets.cols or GetNumShapeshiftForms()) + 1)
+		getglobal(self:GetName() .. "Low"):SetText(GetNumShapeshiftForms())
+		self.onShow = nil
 	end)
 	cols:SetScript("OnValueChanged", function(self, value)
-		if not menu.onShow then
+		if not self.onShow then
 			frame:Layout(GetNumShapeshiftForms() - value + 1)
 		end
 		getglobal(self:GetName() .. "ValText"):SetText(GetNumShapeshiftForms() - value + 1)
 	end)
-	cols:SetValueStep(1)
-	getglobal(name .. "ColsText"):SetText(L.Columns)
-	getglobal(name .. "ColsHigh"):SetText(1)
 
 	return menu
 end
 
-local function Bar_ShowMenu(self)
-	if not self.menu then
-		self.menu = Bar_CreateMenu(self)
-	end
-
-	local menu = self.menu
-	menu.onShow = 1
-	self:PlaceMenu(menu)
-	menu.onShow = nil
-end
-
 local function Bar_OnCreate(self)
-	self.ShowMenu = Bar_ShowMenu
+	self.CreateMenu = Bar_CreateMenu
 	self.Layout = Bar_Layout
 end
 
