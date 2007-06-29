@@ -12,6 +12,7 @@ function BongosMenu:CreateMenu(name, tabbed)
 	local frame = setmetatable(CreateFrame("Frame", "BongosBarMenu" .. name, UIParent, not(tabbed) and "GooeyComponent"), Frame_MT)
 
 	--mother frame, used to hide and show the entire window
+	frame:SetToplevel(true)
 	frame:SetMovable(true)
 	frame:SetClampedToScreen(true)
 	frame:SetFrameStrata("DIALOG")
@@ -102,7 +103,7 @@ local function Menu_AddItem(self, name)
 end
 
 function BongosMenu:AddPanelMenu()
-	local menu = CreateFrame("Frame", self:GetName() .. "Menu", self, "GooeyFrame")
+	local menu = CreateFrame("Frame", self:GetName() .. "Menu", self, "GooeyComponent")
 	menu:SetWidth(64)
 	menu.AddItem = Menu_AddItem
 
