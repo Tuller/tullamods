@@ -168,7 +168,7 @@ function Ludwig:GetItemsNamedLike(search)
 
 	local db = self:GetAllItems()
 	for id, itemName in pairs(db) do
-		if itemName == search or itemName:find(search) then
+		if itemName == search or itemName:find("^".. search) then
 			table.insert(searchList, id)
 			if itemName == search then break end
 		end
