@@ -18,26 +18,9 @@ local function Stats_OnUpdate(self, arg1)
 	end
 end
 
-local function Stats_OnEnter()
-	BongosStats:UpdateProfilingInfo()
-end
-
-local function Stats_OnLeave()
-	GameTooltip:Hide()
-end
-
 local function Stats_OnClick(self, button)
 	if IsAltKeyDown() then
-		if button == "LeftButton" then
-			ReloadUI()
-		elseif button == "RightButton" then
-			if GetCVar("scriptProfile") == "1" then
-				SetCVar("scriptProfile", "0")
-			else
-				SetCVar("scriptProfile", "1")
-			end
-			ReloadUI()
-		end
+		ReloadUI()
 	end
 end
 
@@ -58,7 +41,6 @@ local function Stats_Create(self)
 	self.ping:SetPoint("LEFT", self.mem, "RIGHT", 2, 0)
 
 	frame:SetScript("OnUpdate", Stats_OnUpdate)
-	frame:SetScript("OnLeave", Stats_OnLeave)
 	frame:SetScript("OnClick", Stats_OnClick)
 
 	self.toNextUpdate = 0
@@ -136,68 +118,6 @@ function BongosStats:Update()
 	end
 
 	self:UpdateWidth()
-
-	if GameTooltip:IsOwned(self.bar) then
-		self:UpdateProfilingInfo()
-	end
-end
-
-function BongosStats:UpdateProfilingInfo()
-	if self.bar:GetRight() >= (GetScreenWidth() / 2) then
-		GameTooltip:SetOwner(self.bar, "ANCHOR_BOTTOMLEFT")
-	else
-		GameTooltip:SetOwner(self.bar, "ANCHOR_BOTTOMRIGHT")
-	end
-
-	if IsModifierKeyDown() and GetCVar("scriptProfile") == "1" then
-		UpdateAddOnCPUUsage()
-		GameTooltip:SetText(L.CPUUsage)
-
-		local total = 0
-		for i=1, GetNumAddOns() do
-			local secs = GetAddOnCPUUsage(i) / 1000
-			local name = GetAddOnInfo(i)
-
-			if secs > 3600 then
-				GameTooltip:AddDoubleLine(name, format("%.2f h", secs/3600), 1, 1, 1, 1, 0.2, 0.2)
-			elseif secs > 60 then
-				GameTooltip:AddDoubleLine(name, format("%.2f m", secs/60), 1, 1, 1, 1, 1, 0.2)
-			elseif secs >= 1 then
-				GameTooltip:AddDoubleLine(name, format("%.1f s", secs), 1, 1, 1, 0.2, 1, 0.2)
-			elseif secs > 0 then
-				GameTooltip:AddDoubleLine(name, format("%.1f ms", secs * 1000), 1, 1, 1, 0.2, 1, 0.2)
-			end
-			total = total + secs
-		end
-
-		if total >= 60 then
-			GameTooltip:AddDoubleLine(L.Total, format("%.1f m", total/60), 0.4, 0.6, 1, 1, 1, 0.2)
-		elseif total >= 1 then
-			GameTooltip:AddDoubleLine(L.Total, format("%.1f s", total), 0.4, 0.6, 1, 1, 1, 0.2)
-		else
-			GameTooltip:AddDoubleLine(L.Total, format("%.1f ms", total * 1000), 0.4, 0.6, 1, 1, 1, 0.2)
-		end
-	else
-		UpdateAddOnMemoryUsage()
-		GameTooltip:SetText(L.MemUsage)
-
-		local total = 0
-		for i=1, GetNumAddOns() do
-			local mem = GetAddOnMemoryUsage(i)
-			local name = GetAddOnInfo(i)
-
-			if mem > 0 then
-				if mem > 1024 then
-					GameTooltip:AddDoubleLine(name, format("%.1f mb", mem/1024), 1, 1, 1, 1, 1, 0.2)
-				else
-					GameTooltip:AddDoubleLine(name, format("%.1f kb", mem), 1, 1, 1, 0.2, 1, 0.2)
-				end
-				total = total + mem
-			end
-		end
-		GameTooltip:AddDoubleLine(L.Total, format("%.2f mb", total/1024), 0.4, 0.6, 1, 1, 1, 0.2)
-	end
-	GameTooltip:Show()
 end
 
 function BongosStats:UpdateWidth()
