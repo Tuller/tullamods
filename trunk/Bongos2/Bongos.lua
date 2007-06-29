@@ -16,6 +16,7 @@ function Bongos:Enable()
 	self:RegisterMessage("DONGLE_PROFILE_DELETED")
 	self:RegisterMessage("DONGLE_PROFILE_COPIED")
 	self:RegisterMessage("DONGLE_PROFILE_RESET")
+	self:RegisterEvent("ADDON_LOADED", "LoadOptions")
 
 	local defaults = {
 		profile = {
@@ -86,6 +87,18 @@ function Bongos:UnloadModules()
 	for name, module in self:IterateModules() do
 		assert(module.Unload, format("Bongos Module %s: Missing Unload function", name))
 		module:Unload()
+	end
+end
+
+function Bongos:LoadOptions(event, addon)
+	if(addon == "Bongos2_Options") then
+		for name, module in self:IterateModules() do
+			if(module.LoadOptions) then
+				module:LoadOptions()
+			end
+		end
+		BongosOptions:ShowPanel(L.General)
+		self:UnregisterEvent(event)
 	end
 end
 
@@ -266,9 +279,6 @@ function Bongos:RegisterSlashCommands()
 	slash:RegisterSlashHandler(format(cmdStr, "list", L.ListDesc), "^list$", "ListProfiles")
 	slash:RegisterSlashHandler(format(cmdStr, "version", L.PrintVersionDesc), "^version$", "PrintVersion")
 
-	-- slash:RegisterSlashHandler(format(cmdStr, "fadealpha <barList> <opacity>", L.SetFadeAlphaDesc), "fadealpha (.+) ([%d%.]+)", "SetFadeAlpha")
-	-- slash:RegisterSlashHandler(format(cmdStr, "fademode <barList> <0 | 1 | 2>", L.SetFadeModeDesc), "fademode (.+) ([0-2])", "SetFadeMode")
-
 	self.slash = slash
 end
 
@@ -276,16 +286,12 @@ function Bongos:ShowMenu()
 	local enabled = select(4, GetAddOnInfo("Bongos2_Options"))
 	if enabled then
 		if BongosOptions then
-			if BongosOptions:IsShown() then
-				BongosOptions:Hide()
-			else
-				BongosOptions:Show()
-			end
+			BongosOptions:Toggle()
 		else
 			LoadAddOn("Bongos2_Options")
 		end
 	else
-		self:ShowHelp()
+		self.slash:PrintUsage()
 	end
 end
 
@@ -350,7 +356,7 @@ function Bongos:LoadMinimap()
 	end
 end
 
-function Bongos:ShowMinimap(enable)
+function Bongos:SetShowMinimap(enable)
 	self.profile.showMinimap = enable or false
 	if enable then
 		BongosMinimapFrame:Show()

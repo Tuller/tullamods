@@ -58,14 +58,6 @@ function BongosMinimap_OnClick(self, button)
 			Bongos:SetLock(not Bongos:IsLocked())
 		end
 	elseif button == "RightButton" then
-		if BongosOptions then
-			if BongosOptions:IsShown() then
-				BongosOptions:Hide()
-			else
-				BongosOptions:Show()
-			end
-		else
-			LoadAddOn("Bongos2_Options")
-		end
+		Bongos:ShowMenu()
 	end
 end
