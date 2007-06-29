@@ -4,6 +4,11 @@
 --]]
 
 BongosMapBar = Bongos:NewModule("Bongos-MapBar")
+local L = BONGOS_LOCALS
+L.ShowMapTitle = "Show Title"
+L.ShowMapZoom = "Show Zoom Buttons"
+L.ShowMapTime = "Show Day/Night Indicator"
+L.ShowMapButton = "Show Map Button"
 
 --[[
 	Compatibility Fixes
@@ -11,20 +16,20 @@ BongosMapBar = Bongos:NewModule("Bongos-MapBar")
 --]]
 
 --Make titan not take control of the minimap
-if IsAddOnLoaded("Titan") then
-	local oTitanMovableFrame_CheckTopFrame = TitanMovableFrame_CheckTopFrame
-	TitanMovableFrame_CheckTopFrame = function(frameTop, top, frameName)
-		if frameName ~= "MinimapCluster" then
-			oTitanMovableFrame_CheckTopFrame(frameTop, top, frameName)
-		end
-	end
-	TitanMovableData["MinimapCluster"] = nil
-end
+-- if IsAddOnLoaded("Titan") then
+	-- local oTitanMovableFrame_CheckTopFrame = TitanMovableFrame_CheckTopFrame
+	-- TitanMovableFrame_CheckTopFrame = function(frameTop, top, frameName)
+		-- if frameName ~= "MinimapCluster" then
+			-- oTitanMovableFrame_CheckTopFrame(frameTop, top, frameName)
+		-- end
+	-- end
+	-- TitanMovableData["MinimapCluster"] = nil
+-- end
 
 
 --[[ Config ]]--
 
-local function ToggleTitle(self, enable)
+local function Bar_ToggleTitle(self, enable)
 	if enable then
 		self.sets.showTitle = 1
 		self:SetHeight(MinimapCluster:GetHeight())
@@ -48,7 +53,7 @@ local function ToggleTitle(self, enable)
 	end
 end
 
-local function ToggleZoomButtons(self, enable)
+local function Bar_ToggleZoomButtons(self, enable)
 	if enable then
 		self.sets.showZoom = 1
 
@@ -62,7 +67,7 @@ local function ToggleZoomButtons(self, enable)
 	end
 end
 
-local function ToggleDayIndicator(self, enable)
+local function Bar_ToggleDayIndicator(self, enable)
 	if enable then
 		self.sets.showDay = 1
 		GameTimeFrame:Show()
@@ -72,7 +77,7 @@ local function ToggleDayIndicator(self, enable)
 	end
 end
 
-local function ToggleMap(self, enable)
+local function Bar_ToggleMap(self, enable)
 	if enable then
 		self.sets.showMap = 1
 		MiniMapWorldMapButton:Show()
@@ -83,31 +88,24 @@ local function ToggleMap(self, enable)
 end
 
 local function Bar_CreateMenu(self)
-	local name = format("BongosMenu%s", self.id)
-	local menu = BongosMenu:Create(name)
-	menu.text:SetText("Map Bar")
-	menu.frame = self
+	local menu, panel = BongosMenu:CreateMenu("Map Bar")
 
 	--checkbuttons
-	local showTitle = menu:CreateCheckButton(name .. "ShowTitle")
+	local showTitle = panel:AddCheckButton(L.ShowMapTitle)
 	showTitle:SetScript("OnShow", function(b) b:SetChecked(self.sets.showTitle) end)
-	showTitle:SetScript("OnClick", function(b) ToggleTitle(self, b:GetChecked()) end)
-	showTitle:SetText(BONGOS_MAPBAR_SHOW_TITLE)
+	showTitle:SetScript("OnClick", function(b) self:ToggleTitle(b:GetChecked()) end)
 
-	local showZoom = menu:CreateCheckButton(name .. "ShowZoom")
+	local showZoom = panel:AddCheckButton(L.ShowMapZoom)
 	showZoom:SetScript("OnShow", function(b) b:SetChecked(self.sets.showZoom) end)
-	showZoom:SetScript("OnClick", function(b) ToggleZoomButtons(self, b:GetChecked()) end)
-	showZoom:SetText(BONGOS_MAPBAR_SHOW_ZOOM)
+	showZoom:SetScript("OnClick", function(b) self:ToggleZoom(b:GetChecked()) end)
 
-	local showDayNight = menu:CreateCheckButton(name .. "ShowDay")
+	local showDayNight = panel:AddCheckButton(L.ShowMapTime)
 	showDayNight:SetScript("OnShow", function(b) b:SetChecked(self.sets.showDay) end)
-	showDayNight:SetScript("OnClick", function(b) ToggleDayIndicator(self, b:GetChecked()) end)
-	showDayNight:SetText(BONGOS_MAPBAR_SHOW_TIME)
+	showDayNight:SetScript("OnClick", function(b) self:ToggleDayIndicator(b:GetChecked()) end)
 	
-	local showMap = menu:CreateCheckButton(name .. "ShowMap")
+	local showMap = panel:AddCheckButton(L.ShowMapButton)
 	showMap:SetScript("OnShow", function(b) b:SetChecked(self.sets.showMap) end)
-	showMap:SetScript("OnClick", function(b) ToggleMap(self, b:GetChecked()) end)
-	showMap:SetText(BONGOS_MAPBAR_SHOW_MAP)
+	showMap:SetScript("OnClick", function(b) self:ToggleMap(b:GetChecked()) end)
 	
 	return menu
 end
@@ -115,19 +113,13 @@ end
 
 --[[ Startup ]]--
 
-local function Bar_ShowMenu(self)
-	if not self.menu then
-		self.menu = Bar_CreateMenu(self)
-	end
-
-	local menu = self.menu
-	menu.onShow = true
-	self:PlaceMenu(menu)
-	menu.onShow = nil
-end
-
 local function Bar_OnCreate(self)
-	self.ShowMenu = Bar_ShowMenu
+	self.CreateMenu = Bar_CreateMenu
+	self.ToggleTitle = Bar_ToggleTitle
+	self.ToggleZoom = Bar_ToggleZoomButtons
+	self.ToggleMap = Bar_ToggleMap
+	self.ToggleDayIndicator = Bar_ToggleDayIndicator
+	
 	self:EnableMouse(false)
 	self:Attach(MinimapCluster)
 	self:SetWidth(MinimapCluster:GetWidth())
@@ -152,10 +144,10 @@ function BongosMapBar:Load()
 	
 	--load settings
 	--toggle title actually places the minimap on the bar, and adjusts the bar"s height
-	ToggleTitle(bar, bar.sets.showTitle)
-	ToggleZoomButtons(bar, bar.sets.showZoom)
-	ToggleDayIndicator(bar, bar.sets.showDay)
-	ToggleMap(bar, bar.sets.showMap)
+	bar:ToggleTitle(bar.sets.showTitle)
+	bar:ToggleZoom(bar.sets.showZoom)
+	bar:ToggleDayIndicator(bar.sets.showDay)
+	bar:ToggleMap(bar.sets.showMap)
 	
 	self.bar = bar
 end
