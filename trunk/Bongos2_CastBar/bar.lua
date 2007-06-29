@@ -119,30 +119,16 @@ end
 
 --[[ Bongos Bar Methods ]]--
 
-local function Bar_CreateMenu(frame)
-	local name = format("BongosMenu%s", frame.id)
-	local menu = BongosMenu:Create(name)
-	menu.frame = frame
-	menu.text:SetText(BONGOS_CASTBAR)
+local function Bar_CreateMenu(self)
+	local menu, panel = BongosMenu:CreateMenu(BONGOS_CASTBAR)
 
 	--checkbuttons
-	local time = menu:CreateCheckButton(menu, name .. "Time")
-	time:SetScript("OnClick", function(self) frame:ToggleText(self:GetChecked()) end)
-	time:SetScript("OnShow", function(self) self:SetChecked(frame.sets.showText) end)
+	local time = panel:AddCheckButton("Time")
+	time:SetScript("OnClick", function(b) self:ToggleText(b:GetChecked()) end)
+	time:SetScript("OnShow", function(b) b:SetChecked(self.sets.showText) end)
 	time:SetText(BONGOS_CASTBAR_SHOW_TIME)
 
 	return menu
-end
-
-local function Bar_ShowMenu(self)
-	if not self.menu then
-		self.menu = Bar_CreateMenu(self)
-	end
-
-	local menu = self.menu
-	menu.onShow = true
-	self:PlaceMenu(menu)
-	menu.onShow = nil
 end
 
 local function Bar_ToggleText(self, enable)
@@ -160,7 +146,7 @@ local function Bar_OnCreate(self)
 	CastingBarFrame:UnregisterAllEvents()
 	CastingBarFrame:Hide()
 
-	self.ShowMenu = Bar_ShowMenu
+	self.CreateMenu = Bar_CreateMenu
 	self.ToggleText = Bar_ToggleText
 
 	self.castBar = CastingBar_Create(self)
