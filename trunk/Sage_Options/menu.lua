@@ -312,7 +312,7 @@ end
 
 function Panel:AddSelector(name, vals, OnClick, OnShow)
 	local fname = self:GetName() .. name
-	local selector = CreateFrame("Frame", fname, self, "GooeyFrame")
+	local selector = CreateFrame("Frame", fname, self, "GooeyComponent")
 	selector:SetHeight(26)
 	selector.vals = vals
 	selector:SetScript("OnShow", OnShow)
