@@ -176,7 +176,6 @@ local function BuffFrame_LayoutIcons(self)
 	local height = ceil(self:GetHeight())
 	local size = 36
 	local scale = min(width, height) / size
-
 	local rows = 1
 	while size * scale  * count / rows > width do
 		scale = scale - 0.01
