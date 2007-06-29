@@ -20,7 +20,12 @@ local function ParseChatMessage(text)
 	return text:gsub("([|]?[h]?)%[(.-)%]([|]?[h]?)", LinkifyName)
 end
 
-ChatFrameEditBox:SetScript("OnChar", function(self)
+local OnChar = ChatFrameEditBox:GetScript("OnChar")
+ChatFrameEditBox:SetScript("OnChar", function(self, ...)
+	if(OnChar) then
+		OnChar(self, ...)
+	end
+
 	local text = self:GetText()
 	if not(text == "" or text:sub(1,1) == "/") then
 		local query = text:match("%[([^]]-)$")
@@ -37,30 +42,3 @@ ChatFrameEditBox:SetScript("OnChar", function(self)
 		end
 	end
 end)
-
--- local function LinkifyName(head, text, tail)
-	-- if not(head == "|h" or tail == "|h") then
-		-- if(#text > 3) then
-			-- local list = Ludwig:GetItemsNamedLike(text)
-			-- if list and next(list) then 
-				-- return Ludwig:GetItemLink(list[1])
-			-- end
-		-- end
-	-- end
-	-- return format("%s[%s]%s", head, text, tail)
--- end
-
--- local function ParseChatMessage(text)
-	-- return text:gsub("([|]?[h]?)%[(.-)%]([|]?[h]?)", LinkifyName)
--- end
-
--- Hooks
--- local Orig_ChatEdit_OnTextChanged = ChatEdit_OnTextChanged;
--- ChatEdit_OnTextChanged = function()
-    -- local text = this:GetText()
-	-- if not(text == "" or text:sub(1,1) == "/") then
-		-- text = ParseChatMessage(text)
-		-- this:SetText(text)
-	-- end
-	-- Orig_ChatEdit_OnTextChanged(this)
--- end
