@@ -7,7 +7,7 @@ BongosRollBar = Bongos:NewModule("Bongos-RollBar")
 
 --[[ Startup ]]--
 
-local function OnCreate(self)
+local function Bar_OnCreate(self)
 	local frame = getglobal("GroupLootFrame"..1)
 	frame:ClearAllPoints()
 	frame:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 4, 2)
@@ -25,8 +25,7 @@ local function OnCreate(self)
 end
 
 function BongosRollBar:Load()
-	local bar = BBar:Create("roll", OnCreate, nil, nil, "DIALOG")
-
+	local bar = BBar:Create("roll", Bar_OnCreate, nil, nil, "DIALOG")
 	if not bar:IsUserPlaced() then
 		bar:SetPoint("LEFT", UIParent)
 	end
