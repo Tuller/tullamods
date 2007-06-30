@@ -1,0 +1,8 @@
+Ludwig Version History
+
+1.1
+Added autocomplete to linkerator (thanks N00bZXI)
+
+1.0
+Updated for 2.1
+Implemented some performance improvements to search (thanks Eternally777)

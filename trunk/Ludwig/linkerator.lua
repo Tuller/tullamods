@@ -22,9 +22,7 @@ end
 
 local OnChar = ChatFrameEditBox:GetScript("OnChar")
 ChatFrameEditBox:SetScript("OnChar", function(self, ...)
-	if(OnChar) then
-		OnChar(self, ...)
-	end
+	if(OnChar) then OnChar(self, ...) end
 
 	local text = self:GetText()
 	if not(text == "" or text:sub(1,1) == "/") then
