@@ -28,7 +28,6 @@ BONGOS_OPTIONS_GENERAL_SHOW_MINIMAP = "Show Minimap Button"
 
 --action bars
 BONGOS_OPTIONS_ACTIONBAR_RIGHTCLICK_SELFCAST = "Right Click Self Cast"
--- BONGOS_OPTIONS_ACTIONBAR_MIDDLECLICK_FOCUSCAST = "Middle Click Focus Cast"
 BONGOS_OPTIONS_ACTIONBAR_QUICK_MOVE = "Quick Move Key"
 BONGOS_OPTIONS_ACTIONBAR_LOCK_BUTTONS = "Lock Buttons"
 BONGOS_OPTIONS_ACTIONBAR_SHOW_EMPTY = "Show Empty Buttons"
@@ -41,4 +40,4 @@ BONGOS_OPTIONS_ACTIONBAR_SHOW_HOTKEYS = "Show Hotkeys"
 BONGOS_OPTIONS_ACTIONBARS = "action bars"
 BONGOS_OPTIONS_ALL = "all"
 
-BONGOS_BINDINGS_HELP = "Hover over a button, then press a key to set its binding.  To clear a button's current keybinding, press " .. GetBindingText('ESCAPE','KEY_') .. "."
+BONGOS_BINDINGS_HELP = "Hover over a button, then press a key to set its binding.  To clear a button's current keybinding, press " .. GetBindingText("ESCAPE","KEY_") .. "."

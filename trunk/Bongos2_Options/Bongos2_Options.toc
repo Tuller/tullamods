@@ -5,5 +5,8 @@
 ## Dependencies: Bongos2
 ## LoadOnDemand: 1
 localization.lua
-templates.xml
-menu.xml
+menu.lua
+general.lua
+profiles.lua
+binder.lua
+actionBar.lua
