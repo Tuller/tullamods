@@ -394,12 +394,14 @@ function BongosActionButton:UpdateUsable()
 		else
 			icon:SetVertexColor(1, 1, 1)
 		end
-	elseif notEnoughMana then
-		--Make the icon blue if out of mana
-		icon:SetVertexColor(0.5, 0.5, 1)
 	else
-		--Skill unusable
-		icon:SetVertexColor(0.3, 0.3, 0.3)
+		if notEnoughMana then
+			--Make the icon blue if out of mana
+			icon:SetVertexColor(0.5, 0.5, 1)
+		else
+			--Skill unusable
+			icon:SetVertexColor(0.3, 0.3, 0.3)
+		end
 	end
 end
 

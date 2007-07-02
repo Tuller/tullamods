@@ -215,7 +215,6 @@ function BActionBar:GetCurrentState()
 	return 0
 end
 
-
 --[[ Menu Functions ]]--
 
 local function StanceSlider_OnShow(self)
