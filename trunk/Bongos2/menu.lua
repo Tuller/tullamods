@@ -105,6 +105,7 @@ end
 function BongosMenu:AddPanelMenu()
 	local menu = CreateFrame("Frame", self:GetName() .. "Menu", self, "GooeyComponent")
 	menu:SetWidth(64)
+	menu:SetClampedToScreen(true)
 	menu.AddItem = Menu_AddItem
 
 	self.menu = menu
@@ -120,7 +121,8 @@ function BongosMenu:ShowPanel(name)
 				panel:Show()
 				if(self.menu) then
 					self:SetWidth(self.menu:GetWidth() + panel.width)
-					self:SetHeight(max(panel.height, self.menu:GetHeight() + 32))
+					self:SetHeight(panel.height)
+					-- self:SetHeight(max(panel.height, self.menu:GetHeight() + 32))
 				else
 					self:SetWidth(panel.width)
 					self:SetHeight(panel.height)
