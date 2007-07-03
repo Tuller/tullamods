@@ -17,6 +17,7 @@ L.Ctrl = "Control"
 L.Alt = "Alt"
 L.Shift = "Shift"
 L.NumActionBars = "Action Bars"
+L.SelfCastKey = "Selfcast Key"
 
 local info = {}
 local function AddDropdownButton(text, value, selectedValue, action)
@@ -70,10 +71,55 @@ local function Panel_CreateRangeColorPicker(self)
 	return picker
 end
 
+local function Panel_AddSelfCastDropDown(self)
+	local dropDown = CreateFrame("Frame", self:GetName() .. L.SelfCastKey, self, "GooeyDropDown")
+	getglobal(dropDown:GetName() .. "Label"):SetText(L.SelfCastKey)
+	
+	local function SelfCast_OnClick()
+		UIDropDownMenu_SetSelectedValue(dropDown, this.value)
+		if(this.value == 1) then
+			SetActionSelfCastKey(NONE:upper())
+		elseif(this.value == 2) then
+			SetActionSelfCastKey(SHIFT_KEY_TEXT:upper())
+		elseif(this.value == 3) then
+			SetActionSelfCastKey(CTRL_KEY_TEXT:upper())
+		elseif(this.value == 4) then
+			SetActionSelfCastKey("ALT")
+		end
+	end
+
+	local function SelfCast_Initialize()
+		local selected = UIDropDownMenu_GetSelectedValue(dropDown)
+		AddDropdownButton(NONE:upper(), 1, selected, SelfCast_OnClick)
+		AddDropdownButton(SHIFT_KEY_TEXT, 2, selected, SelfCast_OnClick)
+		AddDropdownButton(CTRL_KEY_TEXT, 3, selected, SelfCast_OnClick)
+		AddDropdownButton("ALT", 4, selected, SelfCast_OnClick)
+	end
+	
+	dropDown:SetScript("OnShow", function(self)
+		UIDropDownMenu_Initialize(self, SelfCast_Initialize)
+		UIDropDownMenu_SetWidth(72, self)
+		local key = GetActionSelfCastKey()
+
+		if(key == NONE:upper()) then
+			UIDropDownMenu_SetSelectedValue(self, 1)
+		elseif(key == SHIFT_KEY_TEXT) then
+			UIDropDownMenu_SetSelectedValue(self, 2)
+		elseif(key == CTRL_KEY_TEXT) then
+			UIDropDownMenu_SetSelectedValue(self, 3)
+		elseif(key == "ALT") then
+			UIDropDownMenu_SetSelectedValue(self, 4)
+		end
+	end)
+	
+	self.height = self.height + 42
+
+	return dropDown
+end
+
 local function Panel_AddQuickMoveDropDown(self)
 	local dropDown = CreateFrame("Frame", self:GetName() .. "QuickMove", self, "GooeyDropDown")
 	getglobal(dropDown:GetName() .. "Label"):SetText(L.QuickMove)
-	dropDown:SetPoint("TOPLEFT", self.button, "BOTTOMLEFT", -16, -4)
 	
 	local function QuickMove_OnClick()
 		UIDropDownMenu_SetSelectedValue(dropDown, this.value)
@@ -165,7 +211,11 @@ function BongosOptions:AddActionBarPanel()
 		BongosActionConfig:ShowHotkeys(self:GetChecked())
 	end)
 	
-	Panel_AddQuickMoveDropDown(panel)
+	local quickMove = Panel_AddQuickMoveDropDown(panel)
+	quickMove:SetPoint("TOPLEFT", panel.button, "BOTTOMLEFT", -16, -4)
+	
+	local selfCastKey = Panel_AddSelfCastDropDown(panel)
+	selfCastKey:SetPoint("TOPLEFT", quickMove, "BOTTOMLEFT", 0, 0)
 	
 	local vals = {1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 24, 30, 40, 60, 120}
 	local numBars = panel:AddSlider(L.NumActionBars, 1, #vals, 1)
