@@ -215,7 +215,8 @@ function BActionBar:GetCurrentState()
 	return 0
 end
 
---[[ Menu Functions ]]--
+
+-[[ Menu Functions ]]--
 
 local function StanceSlider_OnShow(self)
 	self.onShow = true
@@ -488,8 +489,17 @@ end
 
 function BActionBar:UpdateVisibility()
 	local s, e = self:GetStartID(), self:GetEndID()
+	local changed
+
 	for i = s, e do
-		BongosActionButton:Get(i):Update()
+		local button = BongosActionButton:Get(i)
+		if button:UpdateVisibility() then
+			changed = true
+		end
+	end
+
+	if changed then
+		SecureStateHeader_Refresh(self)
 	end
 end
 

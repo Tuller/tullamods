@@ -9,7 +9,7 @@ local hasStance = (CLASS == "DRUID" or CLASS == "ROGUE" or CLASS == "WARRIOR" or
 local DEFAULT_NUM_ACTIONBARS = 10
 
 --converts BActionButton and ActionButton bindings to their proper bongos bars, inspired from Bartender3
-function BongosActionBar:ConvertBindings(convertBlizzard)
+function BongosActionBar:ConvertBindings()
 	--baction buttons
 	for i = 1, 120 do
 		local key = GetBindingKey(format("CLICK BActionButton%d:LeftButton", i))
@@ -19,51 +19,52 @@ function BongosActionBar:ConvertBindings(convertBlizzard)
 		end
 	end
 
-	if(convertBlizzard) then
-		--action buttons
-		for i = 1, 12 do
-			local key = GetBindingKey(format("ActionButton%d", i))
+	--action buttons
+	for i = 1, 12 do
+		local key = GetBindingKey(format("ActionButton%d", i))
+		while key do
+			SetBindingClick(key, format("BongosActionButton%d", i), "LeftButton")
+			key = GetBindingKey(format("ActionButton%d", i))
+		end
+	end
+
+	--left side multibars
+	local k = 5
+	for i = 1, 2 do
+		for j = 1, 12 do
+			local key = GetBindingKey(format("MULTIACTIONBAR%dBUTTON%d", i, j))
 			while key do
-				SetBindingClick(key, format("BongosActionButton%d", i), "LeftButton")
+				SetBindingClick(key, format("BongosActionButton%d", j+(k*12)), "LeftButton")
 				key = GetBindingKey(format("ActionButton%d", i))
 			end
 		end
+		k = k - 1
+	end
 
-		--left side multibars
-		local k = 5
-		for i = 1, 2 do
-			for j = 1, 12 do
-				local key = GetBindingKey(format("MULTIACTIONBAR%dBUTTON%d", i, j))
-				while key do
-					SetBindingClick(key, format("BongosActionButton%d", j+(k*12)), "LeftButton")
-					key = GetBindingKey(format("ActionButton%d", i))
-				end
+	--right side bars
+	for i = 4, 3, -1 do
+		for j = 1, 12 do
+			local key = GetBindingKey(format("MULTIACTIONBAR%dBUTTON%d", i, j))
+			while key do
+				SetBindingClick(key, format("BongosActionButton%d", j+(k*12)), "LeftButton")
+				key = GetBindingKey(format("ActionButton%d", i))
 			end
-			k = k - 1
 		end
-
-		--right side bars
-		for i = 4, 3, -1 do
-			for j = 1, 12 do
-				local key = GetBindingKey(format("MULTIACTIONBAR%dBUTTON%d", i, j))
-				while key do
-					SetBindingClick(key, format("BongosActionButton%d", j+(k*12)), "LeftButton")
-					key = GetBindingKey(format("ActionButton%d", i))
-				end
-			end
-			k = k - 1
-		end
+		k = k - 1
 	end
 	SaveBindings(GetCurrentBindingSet())
 
-	Bongos:Print("Converted actionbar bindings to Bongos2")
+	Bongos:Print("Converted keys from the blizzard actionbars and old bongos versions")
 end
 
 function BongosActionBar:Load()
 	for i = 1, self:GetNumber() do BActionBar:Create(i) end
 
+	self:RegisterEvent("ACTIONBAR_SLOT_CHANGED", "UpdateVisibility")
 	self:RegisterEvent("ACTIONBAR_SHOWGRID", "UpdateGrid")
 	self:RegisterEvent("ACTIONBAR_HIDEGRID", "UpdateGrid")
+	self:RegisterEvent("PLAYER_REGEN_ENABLED", "UpdateCombatStatus")
+	self:RegisterEvent("PLAYER_REGEN_DISABLED", "UpdateCombatStatus")
 	self:RegisterMessage("KEYBOUND_ENABLED", "UpdateVisibility")
 	self:RegisterMessage("KEYBOUND_DISABLED", "UpdateVisibility")
 
@@ -82,6 +83,19 @@ function BongosActionBar:Unload()
 	self:UnregisterAllMessages()
 end
 
+function BongosActionBar:UpdateCombatStatus(event)
+	if(event == "PLAYER_REGEN_ENABLED") then
+		self.inCombat = nil
+
+		if(self.needToUpdate) then
+			self.needToUpdate = nil
+			self:UpdateVisibility()
+		end
+	elseif(event == "PLAYER_REGEN_DISABLED") then
+		self.inCombat = true
+	end
+end
+
 function BongosActionBar:UpdateGrid(event)
 	if(event == "ACTIONBAR_SHOWGRID") then
 		BongosActionButton.showEmpty = true
@@ -93,11 +107,15 @@ end
 
 --updates the showstates of every button on every bar
 function BongosActionBar:UpdateVisibility()
-	for i = 1, self:GetNumber() do
-		local bar = BActionBar:Get(i)
-		if bar:IsShown() then
-			bar:UpdateVisibility()
+	if(not self.inCombat) then
+		for i = 1, self:GetNumber() do
+			local bar = BActionBar:Get(i)
+			if bar:IsShown() then
+				bar:UpdateVisibility()
+			end
 		end
+	else
+		self.needToUpdate = true
 	end
 end
 

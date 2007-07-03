@@ -36,7 +36,6 @@ local function OnShow(self)
 	if(self.needsUpdate) then
 		self.needsUpdate = nil
 		self:Update(true)
-		-- self:UpdateUsable()
 		shown[self] = (HasAction(self.id) or nil)
 	end
 end
@@ -49,7 +48,6 @@ local function OnAttributeChanged(self, var, val)
 	if(var == "state-parent" or var == "statehidden") then
 		if self:IsShown() then
 			self:Update(true)
-			-- self:UpdateUsable()
 			shown[self] = (HasAction(self.id) or nil)
 		else
 			self.needsUpdate = true
@@ -67,7 +65,6 @@ local function OnEvent(self, event, arg1)
 	if(event == "ACTIONBAR_SLOT_CHANGED") then
 		if(arg1 == self:GetPagedID()) then
 			self:Update()
-			-- self:UpdateUsable()
 		end
 	end
 
@@ -75,13 +72,11 @@ local function OnEvent(self, event, arg1)
 
 	if event == "PLAYER_ENTERING_WORLD" then
 		self:Update()
-		-- self:UpdateUsable()
 	elseif event == "PLAYER_AURAS_CHANGED" or event == "PLAYER_TARGET_CHANGED" then
 		self:UpdateUsable()
 	elseif event == "UNIT_INVENTORY_CHANGED" then
 		if(arg1 == "player") then
 			self:Update()
-			-- self:UpdateUsable()
 		end
 	elseif event == "ACTIONBAR_UPDATE_USABLE" or event == "UPDATE_INVENTORY_ALERTS" or event == "ACTIONBAR_UPDATE_COOLDOWN" then
 		self:UpdateCooldown()
@@ -121,6 +116,10 @@ end
 
 --Create an Action Button with the given ID and parent
 function BongosActionButton:Create(id)
+	local button
+	-- if(id <= 60) then
+		-- button = self:GetBlizzButton(id)
+	-- end
 	local button = CreateFrame("CheckButton", format(BUTTON_NAME, id), nil, "SecureActionButtonTemplate, ActionButtonTemplate")
 	button.name = format(BUTTON_NAME, id)
 	setmetatable(button, Button_MT)
@@ -313,16 +312,15 @@ function BongosActionButton:Update(refresh)
 	local texture = GetActionTexture(action)
 
 	if texture then
-		shown[self] = true
-		self.rangeTimer = (ActionHasRange(action) and -1) or nil
 		icon:SetTexture(texture)
 		icon:Show()
+		self.rangeTimer = (ActionHasRange(action) and -1) or nil
 
 		self:SetNormalTexture("Interface\\Buttons\\UI-Quickslot2")
 	else
-		shown[self] = nil
-		self.rangeTimer = nil
 		icon:Hide()
+		cooldown:Hide()
+		self.rangeTimer = nil
 
 		self:SetNormalTexture("Interface\\Buttons\\UI-Quickslot")
 		self.hotkey:SetVertexColor(0.6, 0.6, 0.6)
@@ -333,13 +331,7 @@ function BongosActionButton:Update(refresh)
 		self:UpdateUsable()
 		self:UpdateCooldown()
 		self:UpdateFlash()
-		self:SetAlpha(1)
 	else
-		if self:ShowingEmpty() then 
-			self:SetAlpha(1)
-		else 
-			self:SetAlpha(0)
-		end
 		cooldown:Hide()
 	end
 	self:UpdateCount()
@@ -394,14 +386,12 @@ function BongosActionButton:UpdateUsable()
 		else
 			icon:SetVertexColor(1, 1, 1)
 		end
+	elseif notEnoughMana then
+		--Make the icon blue if out of mana
+		icon:SetVertexColor(0.5, 0.5, 1)
 	else
-		if notEnoughMana then
-			--Make the icon blue if out of mana
-			icon:SetVertexColor(0.5, 0.5, 1)
-		else
-			--Skill unusable
-			icon:SetVertexColor(0.3, 0.3, 0.3)
-		end
+		--Skill unusable
+		icon:SetVertexColor(0.3, 0.3, 0.3)
 	end
 end
 
@@ -520,9 +510,63 @@ function BongosActionButton:UpdateStates()
 		self:SetAttribute("*action-helps", nil)
 	end
 
-	-- self:UpdateVisibility(true)
-	self:Update()
+	self:UpdateVisibility()
 	self.needsUpdate = true
+end
+
+--show if showing empty buttons, or if the slot has an action, hide otherwise
+function BongosActionButton:UpdateVisibility()
+	local newstates
+	if(self:ShowingEmpty())then
+		newstates = "*"
+	else
+		local id = self:GetAttribute("action")
+		if HasAction(id) then newstates = 0 end
+
+		if(hasStance) then
+			local maxState = (CLASS == "PRIEST" and 1) or GetNumShapeshiftForms()
+
+			for i = 1, maxState do
+				local action = self:GetAttribute("*action-s" .. i) or id
+				if HasAction(action) then
+					newstates = (newstates and newstates .. "," .. i) or i
+				end
+			end
+
+			if(CLASS == "DRUID") then
+				local action = self:GetAttribute("*action-s" .. 7) or id
+				if HasAction(action) then
+					newstates = (newstates and newstates .. "," .. 7) or 7
+				end
+			end
+		end
+
+		for i = 1, MAX_PAGES do
+			local action = self:GetAttribute("*action-p" .. i) or id
+			if HasAction(action) then
+				newstates = (newstates and newstates .. "," .. (i+9)) or (i+9)
+			end
+		end
+
+		for i = 1, 3 do
+			local action = self:GetAttribute("*action-m" .. i) or id
+			if HasAction(action) then
+				newstates = (newstates and newstates .. "," .. (i+15)) or (i+15)
+			end
+		end
+
+		local action = self:GetAttribute("*action-help") or id
+		if HasAction(action) then
+			newstates = (newstates and newstates .. "," .. 15) or 15
+		end
+	end
+
+	newstates = newstates or "!*"
+	local oldstates = self:GetAttribute("showstates")
+	if not oldstates or oldstates ~= newstates then
+		self:SetAttribute("showstates", newstates)
+		return true
+	end
 end
 
 
@@ -548,6 +592,23 @@ function BongosActionButton:GetHotkey()
 		return KeyBound:ToShortKey(key)
 	end
 end
+
+-- function BongosActionButton:GetActionName()
+	-- return self.name
+-- end
+
+-- function BongosActionButton:GetBindings()
+	-- local keys
+	-- local binding = format("CLICK %s:LeftButton", self.name)
+	-- for i = 1, select("#", GetBindingKey(binding)) do
+		-- local hotKey = select(i, GetBindingKey(binding))
+		-- if keys then
+			-- keys = keys .. ", " .. GetBindingText(hotKey,"KEY_")
+		-- else
+			-- keys = GetBindingText(hotKey,"KEY_")
+		-- end
+	-- end
+-- end
 
 
 --[[ Macro Functions ]]--
@@ -586,7 +647,6 @@ function BongosActionButton:Get(id)
 	return buttons[id]
 end
 
---range and tooltip updating
 local UPDATE_DELAY = 0.2
 BongosActionButton.nextUpdate = UPDATE_DELAY
 BongosActionButton:SetScript("OnUpdate", function(self, elapsed)
