@@ -15,7 +15,7 @@ local function Panel_AddPerCharButton(panel)
 
 	perChar:SetScript("OnShow", function(self)
 		KeyBound:Activate()
-	
+
 		if not Bongos:IsLocked() then
 			self.unlocked = true
 			Bongos:SetLock(true)
@@ -28,7 +28,7 @@ local function Panel_AddPerCharButton(panel)
 
 	perChar:SetScript("OnHide", function(self)
 		KeyBound:Deactivate()
-		
+
 		if(self.unlocked) then
 			Bongos:SetLock(false)
 			self.unlocked = nil
