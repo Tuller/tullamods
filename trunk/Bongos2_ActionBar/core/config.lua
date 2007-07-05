@@ -113,3 +113,12 @@ end
 function BongosActionConfig:GetRightClickUnit()
 	return Bongos.profile.rightClickUnit
 end
+
+function BongosActionConfig:SetSelfCastKey(key)
+	SetActionSelfCastKey(key)
+	Bongos.profile.selfCastKey = key
+end
+
+function BongosActionConfig:GetSelfCastKey()
+	return Bongos.profile.selfCastKey
+end

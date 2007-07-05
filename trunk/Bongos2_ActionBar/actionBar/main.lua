@@ -72,6 +72,9 @@ function BongosActionBar:Load()
 		self.numForms = GetNumShapeshiftForms()
 		self:RegisterEvent("UPDATE_SHAPESHIFT_FORMS", "UpdateStanceNumbers")
 	end
+	
+	--set the selfcast key
+	BongosActionConfig:SetSelfCastKey(BongosActionConfig:GetSelfCastKey())
 end
 
 function BongosActionBar:Unload()
