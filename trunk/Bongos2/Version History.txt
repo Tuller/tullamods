@@ -1,6 +1,6 @@
 Bongos2 Version History
 
-1.6
+1.6.2
 Core: Recoded all menus
 Core: Tooltips are now hidden on drag frames when the mouse button is held down
 ActionBar: Optimized idle CPU performance
@@ -9,7 +9,6 @@ ActionBar: Stance Sliders now list their values in bars
 ActionBar: Increased the frequency of range checking updates
 Minimap: Adjusted defaults
 Minimap: Added a clock option
-
 
 1.5
 Fixed a bug causing Dongle addons to trigger Bongos profile messages
