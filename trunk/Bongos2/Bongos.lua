@@ -28,7 +28,7 @@ function Bongos:Enable()
 			rangeColoring = true,
 			showEmpty = false,
 			showMinimap = true,
-			selfCastKey = "ALT"
+			selfCastKey = "ALT",
 			rangeColor = {r = 1, g = 0.5, b = 0.5},
 			quickMoveKey = 1,
 			mapx = -24, mapy = -76,
