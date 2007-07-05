@@ -6,10 +6,10 @@
 1.6.2
   * Core: Recoded all menus
   * Core: Tooltips are now hidden on drag frames when the mouse button is held down
-  * ActionBar: Optimized idle CPU performance
-  * ActionBar: Optimized ACTIONBAR_SLOT_CHANGED performance
-  * ActionBar: Stance Sliders now list their values in bars
-  * ActionBar: Increased the frequency of range checking updates
+  * Action Bar: Optimized idle CPU performance
+  * Action Bar: Optimized ACTIONBAR_SLOT_CHANGED performance
+  * Action Bar: Stance Sliders now list their values in bars
+  * Action Bar: Increased the frequency of range checking updates
   * Minimap: Adjusted defaults
   * Minimap: Added a clock option
   * Stats: Removed memory and cpu usage for now
