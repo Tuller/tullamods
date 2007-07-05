@@ -3,9 +3,14 @@
 
 = Bongos2 Version History =
 
+1.6.3
+  * Core: Added shift right click to hide/show to the drag frame tooltips
+  * Action Bar: Fixed a bug causing keys to not be able to be bound
+  * Options: Disabled the key binding and actionbar panels if Bongos2_ActionBar is not there
+
 1.6.2
   * Core: Recoded all menus
-  * Core: Tooltips are now hidden on drag frames when the mouse button is held down
+  * Core: Tool tips are now hidden on drag frames when the mouse button is held down
   * Action Bar: Optimized idle CPU performance
   * Action Bar: Optimized ACTIONBAR_SLOT_CHANGED performance
   * Action Bar: Stance Sliders now list their values in bars
