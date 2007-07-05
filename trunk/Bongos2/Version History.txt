@@ -9,6 +9,7 @@ ActionBar: Stance Sliders now list their values in bars
 ActionBar: Increased the frequency of range checking updates
 Minimap: Adjusted defaults
 Minimap: Added a clock option
+Stats: Removed memory and cpu usage for now
 
 1.5
 Fixed a bug causing Dongle addons to trigger Bongos profile messages
