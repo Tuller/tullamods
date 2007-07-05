@@ -3,6 +3,8 @@
 		This panel does things like enabling altcast, toggling range coloring, etc
 --]]
 
+if(not IsAddOnLoaded("Bongos2_ActionBar")) then return end
+
 local L = BONGOS_LOCALS
 L.ActionBar = "ActionBar"
 L.LockButtons = "Lock Button Positions"
