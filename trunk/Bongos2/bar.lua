@@ -77,7 +77,7 @@ function BBar:CreateHeader(id, OnCreate, OnDelete, defaults, strata)
 	return self:Create(id, OnCreate, OnDelete, defaults, strata, true)
 end
 
-function BBar:Destroy()
+function BBar:Destroy(deleteSettings)
 	active[self.id] = nil
 
 	if self.OnDelete then
@@ -89,6 +89,10 @@ function BBar:Destroy()
 	self:ClearAllPoints()
 	self:SetUserPlaced(false)
 	self:Hide()
+	
+	if(deleteSettings) then
+		Bongos:SetBarSets(self.id, nil)
+	end
 
 	unused[self.id] = self
 end
