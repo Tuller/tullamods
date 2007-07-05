@@ -554,7 +554,7 @@ function BongosActionButton:UpdateHotkey()
 end
 
 function BongosActionButton:GetHotkey()
-	local key = GetBindingKey(format("CLICK %s:LeftButton", self.name))
+	local key = GetBindingKey(format("CLICK %s:LeftButton", self:GetName()))
 	if key then
 		return KeyBound:ToShortKey(key)
 	end
