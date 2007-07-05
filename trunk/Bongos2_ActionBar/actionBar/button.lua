@@ -256,13 +256,13 @@ function BongosActionButton:OnUpdate(elapsed)
 					self.icon:SetVertexColor(1, 1, 1)
 				end
 			end
-			self.rangeTimer = TOOLTIP_UPDATE_TIME
+			self.rangeTimer = TOOLTIP_UPDATE_TIME/2
 		else
 			self.rangeTimer = self.rangeTimer - elapsed
 		end
 	end
 
-	-- Tooltip stuff, probably for the cooldown timer
+	--tooltip updating
 	if self.nextTooltipUpdate then
 		self.nextTooltipUpdate = self.nextTooltipUpdate - elapsed
 		if self.nextTooltipUpdate <= 0 then
