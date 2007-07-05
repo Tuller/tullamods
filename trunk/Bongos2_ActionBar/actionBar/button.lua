@@ -4,17 +4,20 @@
 
 BongosActionButton = CreateFrame("CheckButton")
 local Button_MT = {__index = BongosActionButton}
+
+--local mappings
 local _G = getfenv(0)
 local format = format
+local IsActionInRange, IsUsableAction = IsActionInRange, IsUsableAction
 
 --constants
+local UPDATE_DELAY = 0.2
 local ATTACK_BUTTON_FLASH_TIME = 1
 local TOOLTIP_UPDATE_TIME = 1
 local MAX_BUTTONS = BONGOS_MAX_BUTTONS
 local CLASS = BONGOS_CLASS
 local MAX_PAGES = BONGOS_MAX_PAGES
 local hasStance = (CLASS == "DRUID" or CLASS == "ROGUE" or CLASS == "WARRIOR" or CLASS == "PRIEST")
-
 local BUTTON_NAME = "BongosActionButton%d"
 local SIZE = 36
 
@@ -56,28 +59,16 @@ local function OnAttributeChanged(self, var, val)
 end
 
 local function OnEvent(self, event, arg1)
-	if(event == "UPDATE_BINDINGS") then
-		self:UpdateHotkey()
-	end
+	if(event == "UPDATE_BINDINGS") then self:UpdateHotkey() end
 
-	if(not self:GetParent():IsShown()) then return end
-
-	if(event == "ACTIONBAR_SLOT_CHANGED") then
-		if(arg1 == self:GetPagedID()) then
-			self:Update()
-		end
-	end
-
-	if not(self:IsShown() and HasAction(self:GetPagedID())) then return end
+	if not(self:IsVisible() and HasAction(self:GetPagedID())) then return end
 
 	if event == "PLAYER_ENTERING_WORLD" then
 		self:Update()
 	elseif event == "PLAYER_AURAS_CHANGED" or event == "PLAYER_TARGET_CHANGED" then
 		self:UpdateUsable()
 	elseif event == "UNIT_INVENTORY_CHANGED" then
-		if(arg1 == "player") then
-			self:Update()
-		end
+		if(arg1 == "player") then self:Update() end
 	elseif event == "ACTIONBAR_UPDATE_USABLE" or event == "UPDATE_INVENTORY_ALERTS" or event == "ACTIONBAR_UPDATE_COOLDOWN" then
 		self:UpdateCooldown()
 		self:UpdateUsable()
@@ -91,37 +82,9 @@ end
 
 --[[ Constructorish ]]--
 
--- function BongosActionButton:GetBlizzButton(id)
-	-- local button
-	-- if(id <= 12) then
-		-- button = _G[format("ActionButton%d", id)]
-	-- elseif id <= 24 then
-		-- button = _G[format("MultiBarBottomLeftButton%d", id-12)]
-	-- elseif id <= 36 then
-		-- button = _G[format("MultiBarBottomRightButton%d", id-24)]
-	-- elseif id <= 48 then
-		-- button = _G[format("MultiBarRightButton%d", id-36)]
-	-- elseif id <= 60 then
-		-- button = _G[format("MultiBarLeftButton%d", id-48)]
-	-- end
-
-	-- if(button) then
-		-- _G[format(BUTTON_NAME, id)] = button
-		-- button:UnregisterAllEvents()
-		-- button:SetScript("OnUpdate", nil)
-	-- end
-	-- return button
--- end
-
-
 --Create an Action Button with the given ID and parent
 function BongosActionButton:Create(id)
-	local button
-	-- if(id <= 60) then
-		-- button = self:GetBlizzButton(id)
-	-- end
 	local button = CreateFrame("CheckButton", format(BUTTON_NAME, id), nil, "SecureActionButtonTemplate, ActionButtonTemplate")
-	button.name = format(BUTTON_NAME, id)
 	setmetatable(button, Button_MT)
 
 	local name = button:GetName()
@@ -181,7 +144,6 @@ end
 
 --load events
 function BongosActionButton:RegisterEvents()
-	self:RegisterEvent("ACTIONBAR_SLOT_CHANGED")
 	self:RegisterEvent("UPDATE_BINDINGS")
 
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
@@ -213,11 +175,16 @@ function BongosActionButton:Release()
 	self.id = nil
 end
 
+function BongosActionButton:OnSlotChanged(id)
+	for _,button in pairs(buttons) do
+		if(button:GetPagedID() == id) then
+			button:Update()
+		end
+	end
+end
+
 
 --[[ OnX Functions ]]--
-
-local IsActionInRange = IsActionInRange
-local IsUsableAction = IsUsableAction
 
 function BongosActionButton:OnUpdate(elapsed)
 	--update flashing
@@ -593,23 +560,6 @@ function BongosActionButton:GetHotkey()
 	end
 end
 
--- function BongosActionButton:GetActionName()
-	-- return self.name
--- end
-
--- function BongosActionButton:GetBindings()
-	-- local keys
-	-- local binding = format("CLICK %s:LeftButton", self.name)
-	-- for i = 1, select("#", GetBindingKey(binding)) do
-		-- local hotKey = select(i, GetBindingKey(binding))
-		-- if keys then
-			-- keys = keys .. ", " .. GetBindingText(hotKey,"KEY_")
-		-- else
-			-- keys = GetBindingText(hotKey,"KEY_")
-		-- end
-	-- end
--- end
-
 
 --[[ Macro Functions ]]--
 
@@ -647,7 +597,6 @@ function BongosActionButton:Get(id)
 	return buttons[id]
 end
 
-local UPDATE_DELAY = 0.2
 BongosActionButton.nextUpdate = UPDATE_DELAY
 BongosActionButton:SetScript("OnUpdate", function(self, elapsed)
 	if(self.nextUpdate <= 0) then
