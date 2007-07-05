@@ -32,12 +32,9 @@ end
 --[[ Frame Events ]]--
 
 local function OnUpdate(self, elapsed)
-	if not self.cached and GameTooltip:IsOwned(self) then
+	if GameTooltip:IsOwned(self) then
 		if not self.elapsed or self.elapsed < 0 then
-			local start, duration, enable = GetContainerItemCooldown(self:GetBag(), self:GetID())
-			if (start > 0 and duration > 0 and enable == 1) then
-				self:OnEnter()
-			end
+			self:OnEnter()
 			self.elapsed = UPDATE_DELAY
 		else
 			self.elapsed = self.elapsed - elapsed
