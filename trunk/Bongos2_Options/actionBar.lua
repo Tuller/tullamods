@@ -78,13 +78,13 @@ local function Panel_AddSelfCastDropDown(self)
 	local function SelfCast_OnClick()
 		UIDropDownMenu_SetSelectedValue(dropDown, this.value)
 		if(this.value == 1) then
-			SetActionSelfCastKey(NONE:upper())
+			BongosActionConfig:SetSelfCastKey(NONE:upper())
 		elseif(this.value == 2) then
-			SetActionSelfCastKey(SHIFT_KEY_TEXT:upper())
+			BongosActionConfig:SetSelfCastKey(SHIFT_KEY_TEXT:upper())
 		elseif(this.value == 3) then
-			SetActionSelfCastKey(CTRL_KEY_TEXT:upper())
+			BongosActionConfig:SetSelfCastKey(CTRL_KEY_TEXT:upper())
 		elseif(this.value == 4) then
-			SetActionSelfCastKey("ALT")
+			BongosActionConfig:SetSelfCastKey("ALT")
 		end
 	end
 
