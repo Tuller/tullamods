@@ -19,6 +19,8 @@ L.Shift = "Shift"
 L.NumActionBars = "Action Bars"
 L.SelfCastKey = "Selfcast Key"
 
+local keys = {NONE:upper(), SHIFT_KEY_TEXT:upper(), CTRL_KEY_TEXT:upper(), ("ALT"):upper()}
+
 local info = {}
 local function AddDropdownButton(text, value, selectedValue, action)
 	info.text = text
@@ -77,38 +79,26 @@ local function Panel_AddSelfCastDropDown(self)
 	
 	local function SelfCast_OnClick()
 		UIDropDownMenu_SetSelectedValue(dropDown, this.value)
-		if(this.value == 1) then
-			BongosActionConfig:SetSelfCastKey(NONE:upper())
-		elseif(this.value == 2) then
-			BongosActionConfig:SetSelfCastKey(SHIFT_KEY_TEXT:upper())
-		elseif(this.value == 3) then
-			BongosActionConfig:SetSelfCastKey(CTRL_KEY_TEXT:upper())
-		elseif(this.value == 4) then
-			BongosActionConfig:SetSelfCastKey("ALT")
-		end
+		BongosActionConfig:SetSelfCastKey(keys[this.value])
 	end
 
 	local function SelfCast_Initialize()
 		local selected = UIDropDownMenu_GetSelectedValue(dropDown)
-		AddDropdownButton(NONE:upper(), 1, selected, SelfCast_OnClick)
-		AddDropdownButton(SHIFT_KEY_TEXT, 2, selected, SelfCast_OnClick)
-		AddDropdownButton(CTRL_KEY_TEXT, 3, selected, SelfCast_OnClick)
-		AddDropdownButton("ALT", 4, selected, SelfCast_OnClick)
+		for i,key in ipairs(keys) do
+			AddDropdownButton(key, i, selected, SelfCast_OnClick)
+		end
 	end
 	
 	dropDown:SetScript("OnShow", function(self)
 		UIDropDownMenu_Initialize(self, SelfCast_Initialize)
 		UIDropDownMenu_SetWidth(72, self)
-		local key = GetActionSelfCastKey()
+		local selected = GetActionSelfCastKey()
 
-		if(key == NONE:upper()) then
-			UIDropDownMenu_SetSelectedValue(self, 1)
-		elseif(key == SHIFT_KEY_TEXT) then
-			UIDropDownMenu_SetSelectedValue(self, 2)
-		elseif(key == CTRL_KEY_TEXT) then
-			UIDropDownMenu_SetSelectedValue(self, 3)
-		elseif(key == "ALT") then
-			UIDropDownMenu_SetSelectedValue(self, 4)
+		for i,key in ipairs(keys) do
+			if(selected == key) then
+				UIDropDownMenu_SetSelectedValue(self, i)
+				break
+			end
 		end
 	end)
 	
@@ -123,21 +113,21 @@ local function Panel_AddQuickMoveDropDown(self)
 	
 	local function QuickMove_OnClick()
 		UIDropDownMenu_SetSelectedValue(dropDown, this.value)
-		BongosActionConfig:SetQuickMoveMode(this.value)
+		BongosActionConfig:SetQuickMoveMode(this.value>1 and this.value-1 or nil)
 	end
 
 	local function QuickMove_Initialize()
 		local selected = UIDropDownMenu_GetSelectedValue(dropDown)
-		AddDropdownButton(NONE, nil, selected, QuickMove_OnClick)
-		AddDropdownButton(SHIFT_KEY_TEXT, 1, selected, QuickMove_OnClick)
-		AddDropdownButton(CTRL_KEY_TEXT, 2, selected, QuickMove_OnClick)
-		AddDropdownButton("ALT", 3, selected, QuickMove_OnClick)
+		for i,key in ipairs(keys) do
+			AddDropdownButton(key, i, selected, QuickMove_OnClick)
+		end
 	end
 	
 	dropDown:SetScript("OnShow", function(self)
 		UIDropDownMenu_Initialize(self, QuickMove_Initialize)
 		UIDropDownMenu_SetWidth(72, self)
-		UIDropDownMenu_SetSelectedValue(self, BongosActionConfig:GetQuickMoveMode())
+		local mode = BongosActionConfig:GetQuickMoveMode()
+		UIDropDownMenu_SetSelectedValue(self, (mode and mode+1) or 1)
 	end)
 	
 	self.height = self.height + 42

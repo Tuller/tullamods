@@ -15,6 +15,11 @@ local function Panel_AddPerCharButton(panel)
 
 	perChar:SetScript("OnShow", function(self)
 		KeyBound:Activate()
+	
+		if not Bongos:IsLocked() then
+			self.unlocked = true
+			Bongos:SetLock(true)
+		end
 
 		self.current = GetCurrentBindingSet()
 		self:SetChecked(GetCurrentBindingSet() == CHARACTER_BINDINGS)
@@ -23,6 +28,11 @@ local function Panel_AddPerCharButton(panel)
 
 	perChar:SetScript("OnHide", function(self)
 		KeyBound:Deactivate()
+		
+		if(self.unlocked) then
+			Bongos:SetLock(false)
+			self.unlocked = nil
+		end
 
 		if InCombatLockdown() then
 			self:RegisterEvent("PLAYER_REGEN_ENABLED")
