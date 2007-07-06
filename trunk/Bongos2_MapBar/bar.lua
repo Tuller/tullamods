@@ -196,17 +196,6 @@ local function Bar_OnCreate(self)
 	end)
 end
 
--- local function Durability_OnCreate(self)
-	-- local watcher = QuestWatchFrame
-	-- if(not self:IsUserPlaced()) then
-		-- self:SetPoint("TOPRIGHT", watcher)
-	-- end
-
--- end
-
--- local function QuestWatch_OnCreate()
--- end
-
 function BongosMapBar:Load()
 	local defaults = {
 		showTitle = true,
