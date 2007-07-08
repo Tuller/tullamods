@@ -244,6 +244,7 @@ end
 function BongosActionButton:OnDragStart()
 	if not(BongosActionConfig:ButtonsLocked()) or self.showEmpty or BongosActionConfig:IsQuickMoveKeyDown() then
 		PickupAction(self:GetPagedID())
+		self:Update()
 		self:UpdateState()
 	end
 end
