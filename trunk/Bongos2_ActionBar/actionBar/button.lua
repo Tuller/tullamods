@@ -11,7 +11,7 @@ local format = format
 local IsActionInRange, IsUsableAction = IsActionInRange, IsUsableAction
 
 --constants
-local UPDATE_DELAY = 0.2
+local UPDATE_DELAY = 0.1
 local ATTACK_BUTTON_FLASH_TIME = 1
 local TOOLTIP_UPDATE_TIME = 1
 local MAX_BUTTONS = BONGOS_MAX_BUTTONS
@@ -208,24 +208,19 @@ function BongosActionButton:OnUpdate(elapsed)
 
 	-- Handle range indicator
 	if self.rangeTimer then
-		if self.rangeTimer < 0 then
-			local action = self:GetPagedID()
-			local hotkey = self.hotkey
-			if IsActionInRange(action) == 0 then
-				hotkey:SetVertexColor(1, 0.1, 0.1)
-				if BongosActionConfig:RangeColoring() and IsUsableAction(action) then
-					local r,g,b = BongosActionConfig:GetRangeColor()
-					self.icon:SetVertexColor(r,g,b)
-				end
-			else
-				hotkey:SetVertexColor(0.6, 0.6, 0.6)
-				if IsUsableAction(action) then
-					self.icon:SetVertexColor(1, 1, 1)
-				end
+		local action = self:GetPagedID()
+		local hotkey = self.hotkey
+		if IsActionInRange(action) == 0 then
+			hotkey:SetVertexColor(1, 0.1, 0.1)
+			if BongosActionConfig:RangeColoring() and IsUsableAction(action) then
+				local r,g,b = BongosActionConfig:GetRangeColor()
+				self.icon:SetVertexColor(r,g,b)
 			end
-			self.rangeTimer = TOOLTIP_UPDATE_TIME/2
 		else
-			self.rangeTimer = self.rangeTimer - elapsed
+			hotkey:SetVertexColor(0.6, 0.6, 0.6)
+			if IsUsableAction(action) then
+				self.icon:SetVertexColor(1, 1, 1)
+			end
 		end
 	end
 
