@@ -153,11 +153,11 @@ function SageInfo:UpdateNameColor()
 			r = UnitReactionColor[4].r
 			g = UnitReactionColor[4].g
 			b = UnitReactionColor[4].b
-		elseif UnitIsPVP(unit) then
+		-- elseif UnitIsPVP(unit) then
 			--friendly flagged players
-			r = UnitReactionColor[6].r
-			g = UnitReactionColor[6].g
-			b = UnitReactionColor[6].b
+			-- r = UnitReactionColor[6].r
+			-- g = UnitReactionColor[6].g
+			-- b = UnitReactionColor[6].b
 		else
 			--update the player"s name color based on their class
 			local class = select(2, UnitClass(unit))
@@ -188,25 +188,30 @@ end
 
 --adds/hides a flag if the unit is flagged for pvp
 function SageInfo:UpdatePvP()
-	if(self.target:IsShown()) then
-		self.pvp:Hide()
-	else
-		local unit = self.id
-		local pvpIcon = self.pvp
-		local factionGroup = UnitFactionGroup(unit)
-
-		if UnitIsPVPFreeForAll(unit) then
-			self.level:SetFontObject(SageFont:GetLevelFont())
-			pvpIcon:SetTexture("Interface\\TargetingFrame\\UI-PVP-FFA")
-			pvpIcon:Show()
-		elseif factionGroup and UnitIsPVP(unit) then
-			self.level:SetFontObject(SageFont:GetLevelFont())
-			pvpIcon:SetTexture("Interface\\TargetingFrame\\UI-PVP-" .. factionGroup)
-			pvpIcon:Show()
+	if Sage:ShowingPvP() then
+		if(self.target:IsShown()) then
+			self.pvp:Hide()
 		else
-			self.level:SetFontObject(SageFont:GetSmallOutsideFont())
-			pvpIcon:Hide()
+			local unit = self.id
+			local pvpIcon = self.pvp
+			local factionGroup = UnitFactionGroup(unit)
+
+			if UnitIsPVPFreeForAll(unit) then
+				self.level:SetFontObject(SageFont:GetLevelFont())
+				pvpIcon:SetTexture("Interface\\TargetingFrame\\UI-PVP-FFA")
+				pvpIcon:Show()
+			elseif factionGroup and UnitIsPVP(unit) then
+				self.level:SetFontObject(SageFont:GetLevelFont())
+				pvpIcon:SetTexture("Interface\\TargetingFrame\\UI-PVP-" .. factionGroup)
+				pvpIcon:Show()
+			else
+				self.level:SetFontObject(SageFont:GetSmallOutsideFont())
+				pvpIcon:Hide()
+			end
 		end
+	elseif self.pvp:IsShown() then
+		self.pvp:Hide()
+		self.level:SetFontObject(SageFont:GetSmallOutsideFont())
 	end
 	self:UpdateNameColor()
 end

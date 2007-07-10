@@ -31,6 +31,7 @@ function Sage:Enable()
 			outlineOutsideFonts = false,
 			debuffColoring = true,
 			showMaxValues = true,
+			showPvP = true,
 			fontSize = 14,
 			barTexture = "Armory2",
 			rangeSpell = L.RangeCheckSpells[select(2, UnitClass("player"))],
@@ -476,6 +477,16 @@ end
 
 function Sage:ShowingMaxValues()
 	return self.profile.showMaxValues
+end
+
+--show pvp icons
+function Sage:SetShowPvP(enable)
+	self.profile.showPvP = enable or false
+	SageInfo:ForAll("UpdatePvP")
+end
+
+function Sage:ShowingPvP()
+	return self.profile.showPvP
 end
 
 
