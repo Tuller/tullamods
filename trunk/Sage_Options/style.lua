@@ -23,6 +23,10 @@ function SageOptions:AddStylePanel()
 	local function DebuffColoring_OnShow(self) self:SetChecked(Sage:DebuffColoring()) end
 	local function DebuffColoring_OnClick(self) Sage:SetDebuffColoring(self:GetChecked()) end
 	panel:AddCheckButton(L.HealthBarDebuffColoring, DebuffColoring_OnClick, DebuffColoring_OnShow)
+	
+	local function PvPIcons_OnShow(self) self:SetChecked(Sage:ShowingPvP()) end
+	local function PvPIcons_OnClick(self) Sage:SetShowPvP(self:GetChecked()) end
+	panel:AddCheckButton(L.ShowPvPIcons, PvPIcons_OnClick, PvPIcons_OnShow)
 
 	local function OutlineBar_OnShow(self) self:SetChecked(Sage:OutlineBarFonts()) end
 	local function OutlineBar_OnClick(self) Sage:SetOutlineBarFonts(self:GetChecked()) end
