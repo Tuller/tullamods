@@ -6,13 +6,35 @@ local L = BONGOS_LOCALS
 
 --[[ Tooltips ]]--
 
+local menuButton = CreateFrame("Button", nil, UIParent, "GooeyButton")
+menuButton:SetFrameStrata("DIALOG")
+menuButton:SetToplevel(true)
+menuButton:SetClampedToScreen(true)
+menuButton:SetText("Options"); menuButton:SetHeight(24); menuButton:SetWidth(72)
+menuButton:SetScript("OnClick", function(self) 
+	self.parent:ShowMenu() 
+end)
+menuButton:SetScript("OnLeave", function(self) 
+	if not(MouseIsOver(self) or MouseIsOver(self.parent)) then
+		self:Hide()
+	end
+end)
+menuButton:SetScript("OnShow", function(self)
+	self:SetPoint("BOTTOMLEFT", self.parent, "TOPLEFT")
+end)
+menuButton:Hide()
+
 local function DragFrame_OnEnter(self)
+	menuButton.parent  = self.parent
+	menuButton:Show()
+
+	-- GameTooltip_SetDefaultAnchor(GameTooltip, self)
 	GameTooltip:SetOwner(self, "ANCHOR_BOTTOMLEFT")
 
 	if tonumber(self:GetText()) then
 		GameTooltip:SetText(format("ActionBar %s", self:GetText()), 1, 1, 1)
 	else
-		GameTooltip:SetText(format("%s Bar", self:GetText():gsub("^%l", string.upper)), 1, 1, 1)
+		GameTooltip:SetText(format("%s Bar", self.parent.id:gsub("^%l", string.upper)), 1, 1, 1)
 	end
 
 	if self.parent.ShowMenu then
@@ -30,6 +52,9 @@ local function DragFrame_OnEnter(self)
 end
 
 local function DragFrame_OnLeave(self)
+	if(menuButton.parent == self.parent and not MouseIsOver(menuButton)) then
+		menuButton:Hide()
+	end
 	GameTooltip:Hide()
 end
 

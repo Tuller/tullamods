@@ -262,6 +262,7 @@ function Bongos:RegisterSlashCommands()
 
 	local slash = self:InitializeSlashCommand("Bongos Commands", "BONGOS", "bongos", "bgs", "bob")
 	slash:RegisterSlashHandler(format(cmdStr, "/bob", L.ShowOptionsDesc), "^$", "ShowMenu")
+	slash:RegisterSlashHandler(format(cmdStr, "config", L.LockBarsDesc), "^config$", "ToggleLockedBars")
 	slash:RegisterSlashHandler(format(cmdStr, "lock", L.LockBarsDesc), "^lock$", "ToggleLockedBars")
 	slash:RegisterSlashHandler(format(cmdStr, "sticky", L.StickyBarsDesc), "^sticky$", "ToggleStickyBars")
 
