@@ -307,10 +307,10 @@
 
 				<Scripts>
 					<OnShow>
-						--LudwigUI_OnScrollFrameShow()
+						LudwigUI_OnScrollFrameShow()
 					</OnShow>
 					<OnHide>
-						--LudwigUI_OnScrollFrameHide()
+						LudwigUI_OnScrollFrameHide()
 					</OnHide>
 					<OnVerticalScroll>
 						FauxScrollFrame_OnVerticalScroll(LWUI_SHOWN, LudwigUI_UpdateList)

@@ -3,10 +3,10 @@
 		A UI for Ludwig
 --]]
 
-LWUI_SHOWN = 15
-LWUI_STEP = 15
+LWUI_SHOWN, LWUI_STEP = 15, 15
 
 local L = LUDWIG_LOCALS
+local ITEM_WIDTH = 300
 local display, displayChanged --all things to display on the list
 local filter = {}
 local uiFrame
@@ -37,6 +37,7 @@ function LudwigUI_OnLoad(self)
 	self.scrollFrame = getglobal(name.. "Scroll")
 	self.quality = getglobal(name .. "Quality")
 	self.type = getglobal(name .. "Type")
+	self.frame = frame
 	uiFrame = self
 end
 
@@ -47,12 +48,6 @@ end
 function LudwigUI_OnHide()
 	for i in pairs(display) do display[i] = nil end
 	LudwigUI_Reset()
-end
-
-function LudwigUI_OnMousewheel(direction)
-	local scrollBar = getglobal(uiFrame.scrollFrame:GetName() .. "ScrollBar")
-	scrollbar:SetValue(scrollbar:GetValue() - direction * (scrollbar:GetHeight() / 2))
-	LudwigUI_UpdateList()
 end
 
 function LudwigUI_Refresh()
@@ -86,6 +81,16 @@ function LudwigUI_Reset()
 	if(uiFrame:IsShown()) then
 		LudwigUI_UpdateList(changed)
 	end
+end
+
+--[[ Scroll Frame Events ]]--
+
+function LudwigUI_OnScrollFrameShow()
+	uiFrame.items[1]:SetWidth(ITEM_WIDTH)
+end
+
+function LudwigUI_OnScrollFrameHide()
+	uiFrame.items[1]:SetWidth(ITEM_WIDTH + 20)
 end
 
 
