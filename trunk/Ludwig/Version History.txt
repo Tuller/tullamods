@@ -1,5 +1,8 @@
 Ludwig Version History
 
+1.2.1
+Fixed a bug causing options to become permanently checked
+
 1.2
 Redesigned the frame to better integrate with the default frames
 Implemented the blizzard equip compare functionality

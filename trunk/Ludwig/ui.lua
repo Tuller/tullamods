@@ -219,6 +219,7 @@ local function AddItem(text, value, func, hasArrow, level, arg1, arg2)
 	info.value = value
 	info.hasArrow = (hasArrow and true) or nil
 	info.notCheckable = true
+	info.checked = false
 	info.arg1 = arg1
 	info.arg2 = arg2
 	UIDropDownMenu_AddButton(info, level)
