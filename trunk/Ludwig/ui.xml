@@ -1,292 +1,19 @@
-<Ui xmlns="http://www.blizzard.com/wow/ui/"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.blizzard.com/wow/ui/C:\Program%20Files\World%20of%20Warcraft\UI.xsd">
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
 
 	<Script file="ui.lua"/>
 
-	<!-- Templates -->
-	<Frame name="LudwigDropDown" inherits="UIDropDownMenuTemplate" enableMouse="true" virtual="true">
+	<Button name="LudwigItemButtonTemplate" enableMouseWheel="false" justifyH="LEFT" virtual="true">
+		<Size x="300" y="22"/>
+
 		<Layers>
 			<Layer level="BACKGROUND">
-				<FontString name="$parentLabel" font="GameFontNormalSmall">
-					<Anchors>
-						<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
-							<Offset x="21" y="0"/>
-						</Anchor>
-					</Anchors>
-				</FontString>
-			</Layer>
-		</Layers>
-	</Frame>
-
-	<Frame name="LudwigPanel" enableMouse="false" virtual="true">
-		<Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border">
-			<BackgroundInsets>
-				<AbsInset left="4" right="4" top="4" bottom="4"/>
-			</BackgroundInsets>
-			<EdgeSize>
-				<AbsValue val="16"/>
-			</EdgeSize>
-			<BorderColor r="0.6" g="0.6" b="0.6"/>
-		</Backdrop>
-
-		<Layers>
-			<Layer level ="BACKGROUND">
-				<Texture file="Interface\ChatFrame\ChatFrameBackground">
-					<Anchors>
-						<Anchor point="TOPLEFT">
-							<Offset x="4" y="-4"/>
-						</Anchor>
-						<Anchor point="BOTTOMRIGHT">
-							<Offset x="-4" y="4"/>
-						</Anchor>
-					</Anchors>
-					<Gradient orientation="VERTICAL">
-						<MinColor r="0" g="0" b="0" a="0.9"/>
-						<MaxColor r="0.2" g="0.2" b="0.25" a="0.9"/>
-					</Gradient>
-				</Texture>
-			</Layer>
-		</Layers>
-	</Frame>
-
-	<Button name="LudwigButton" virtual="true">
-		<Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border">
-			<BackgroundInsets>
-				<AbsInset left="4" right="4" top="4" bottom="4"/>
-			</BackgroundInsets>
-			<EdgeSize>
-				<AbsValue val="16"/>
-			</EdgeSize>
-			<BorderColor r="0.6" g="0.6" b="0.6"/>
-		</Backdrop>
-
-		<ButtonText name="$parentText">
-			<Anchors>
-				<Anchor point="CENTER">
-					<Offset x="0" y="1"/>
-				</Anchor>
-			</Anchors>
-		</ButtonText>
-
-		<NormalFont font="GameFontNormal"/>
-		<HighlightFont font="GameFontHighlight"/>
-		<DisabledFont font="GameFontDisable"/>
-
-		<NormalTexture file="Interface\ChatFrame\ChatFrameBackground">
-			<Anchors>
-				<Anchor point="TOPLEFT">
-					<Offset x="4.5" y="-4.5"/>
-				</Anchor>
-				<Anchor point="BOTTOMRIGHT">
-					<Offset x="-4.5" y="4.5"/>
-				</Anchor>
-			</Anchors>
-
-			<Gradient orientation="VERTICAL">
-				<MinColor r="0.2" g="0" b="0"/>
-				<MaxColor r="0.5" g="0" b="0"/>
-			</Gradient>
-		</NormalTexture>
-
-		<PushedTexture file="Interface\ChatFrame\ChatFrameBackground">
-			<Anchors>
-				<Anchor point="TOPLEFT">
-					<Offset x="4.5" y="-4.5"/>
-				</Anchor>
-				<Anchor point="BOTTOMRIGHT">
-					<Offset x="-4.5" y="4.5"/>
-				</Anchor>
-			</Anchors>
-
-			<Gradient orientation="VERTICAL">
-				<MinColor r="0.15" g="0" b="0"/>
-				<MaxColor r="0.375" g="0" b="0"/>
-			</Gradient>
-		</PushedTexture>
-
-		<DisabledTexture file="Interface\ChatFrame\ChatFrameBackground">
-			<Anchors>
-				<Anchor point="TOPLEFT">
-					<Offset x="4.5" y="-4.5"/>
-				</Anchor>
-				<Anchor point="BOTTOMRIGHT">
-					<Offset x="-4.5" y="4.5"/>
-				</Anchor>
-			</Anchors>
-
-			<Color r="0.5" g="0.5" b="0.5"/>
-		</DisabledTexture>
-
-		<HighlightTexture inherits="UIPanelButtonHighlightTexture"/>
-	</Button>
-
-	<!-- Search Box -->
-	<EditBox name="LudwigEditBox" autoFocus="false" virtual="true">
-		<Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border">
-			<BackgroundInsets>
-				<AbsInset left="2" right="2" top="2" bottom="2"/>
-			</BackgroundInsets>
-			<EdgeSize>
-				<AbsValue val="16"/>
-			</EdgeSize>
-			<BorderColor r="0.6" g="0.6" b="0.6"/>
-		</Backdrop>
-
-		<Layers>
-			<Layer level="OVERLAY">
-				<FontString name="$parentText" font="GameFontNormalSmall">
+				<Texture name="$parentIcon">
+					<Size x="20" y="20"/>
 					<Anchors>
 						<Anchor point="LEFT">
-							<Offset x="6" y="0"/>
+							<Offset x="4" y="0"/>
 						</Anchor>
 					</Anchors>
-				</FontString>
-			</Layer>
-
-			<Layer level ="BACKGROUND">
-				<Texture file="Interface\ChatFrame\ChatFrameBackground">
-					<Anchors>
-						<Anchor point="TOPLEFT">
-							<Offset x="4" y="-4"/>
-						</Anchor>
-						<Anchor point="BOTTOMRIGHT">
-							<Offset x="-4" y="4"/>
-						</Anchor>
-					</Anchors>
-					<Gradient orientation="VERTICAL">
-						<MinColor r="0" g="0" b="0" a="0.9"/>
-						<MaxColor r="0.2" g="0.2" b="0.2" a="0.9"/>
-					</Gradient>
-				</Texture>
-			</Layer>
-		</Layers>
-
-		<Scripts>
-			<OnEscapePressed>
-				this:ClearFocus()
-			</OnEscapePressed>
-		</Scripts>
-
-		<FontString font="GameFontHighlightSmall"/>
-	</EditBox>
-
-	<Frame name="LudwigLevelRange" virtual="true">
-		<Size x="114" y="26"/>
-
-		<Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border">
-			<BackgroundInsets>
-				<AbsInset left="2" right="2" top="2" bottom="2"/>
-			</BackgroundInsets>
-			<EdgeSize>
-				<AbsValue val="16"/>
-			</EdgeSize>
-			<BorderColor r="0.6" g="0.6" b="0.6"/>
-		</Backdrop>
-
-		<Layers>
-			<Layer level ="BACKGROUND">
-				<Texture file="Interface\ChatFrame\ChatFrameBackground">
-					<Anchors>
-						<Anchor point="TOPLEFT">
-							<Offset x="4" y="-4"/>
-						</Anchor>
-						<Anchor point="BOTTOMRIGHT">
-							<Offset x="-4" y="4"/>
-						</Anchor>
-					</Anchors>
-					<Gradient orientation="VERTICAL">
-						<MinColor r="0" g="0" b="0" a="0.9"/>
-						<MaxColor r="0.2" g="0.2" b="0.2" a="0.9"/>
-					</Gradient>
-				</Texture>
-			</Layer>
-		</Layers>
-
-		<Frames>
-			<EditBox name="$parentMinLevel" autoFocus="false" letters="2" numeric="true">
-				<Size x="62" y="24"/>
-
-				<Anchors>
-					<Anchor point="LEFT">
-						<Offset x="6" y="0"/>
-					</Anchor>
-				</Anchors>
-
-				<Layers>
-					<Layer level="OVERLAY">
-						<FontString name="$parentText" font="GameFontNormalSmall">
-							<Anchors>
-								<Anchor point="LEFT"/>
-							</Anchors>
-						</FontString>
-					</Layer>
-				</Layers>
-
-				<Scripts>
-					<OnLoad>
-						getglobal(this:GetName() .. "Text"):SetText(LUDWIG_LOCALS["Level"])
-						this:SetTextInsets(40, 4, 0, 0)
-					</OnLoad>
-					<OnTextChanged>
-						LudwigUI_SetMinLevel(tonumber(this:GetText()))
-					</OnTextChanged>
-					<OnEscapePressed>
-						this:ClearFocus()
-					</OnEscapePressed>
-				</Scripts>
-
-				<FontString font="GameFontHighlightSmall"/>
-			</EditBox>
-
-			<EditBox name="$parentMaxLevel" autoFocus="false" letters="2" numeric="true">
-				<Size x="48" y="24"/>
-
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentMinLevel" relativePoint="RIGHT"/>
-				</Anchors>
-
-				<Layers>
-					<Layer level="OVERLAY">
-						<FontString name="$parentText" font="GameFontNormalSmall">
-							<Anchors>
-								<Anchor point="LEFT"/>
-							</Anchors>
-						</FontString>
-					</Layer>
-				</Layers>
-
-				<Scripts>
-					<OnLoad>
-						getglobal(this:GetName() .. "Text"):SetText(LUDWIG_LOCALS["to"])
-						this:SetTextInsets(20, 6, 0, 0)
-					</OnLoad>
-					<OnTextChanged>
-						LudwigUI_SetMaxLevel(tonumber(this:GetText()))
-					</OnTextChanged>
-					<OnEscapePressed>
-						this:ClearFocus()
-					</OnEscapePressed>
-				</Scripts>
-
-				<FontString font="GameFontHighlightSmall"/>
-			</EditBox>
-		</Frames>
-	</Frame>
-
-	<!-- Item Link  -->
-	<Button name="LudwigItem"  justifyH="LEFT" virtual="true">
-		<Size x="280" y="20"/>
-
-		<Layers>
-			<Layer level="BACKGROUND">
-				<Texture name="$parentTexture">
-					<Size x="24" y="24"/>
-
-					<Anchors>
-						<Anchor point="LEFT"/>
-					</Anchors>
-
 					<TexCoords left="0.07" right="0.93" top="0.07" bottom="0.93"/>
 				</Texture>
 			</Layer>
@@ -295,311 +22,330 @@
 		<ButtonText>
 			<Anchors>
 				<Anchor point="TOPLEFT">
-					<Offset x="26" y="0"/>
+					<Offset x="28" y="0"/>
 				</Anchor>
 				<Anchor point="BOTTOMRIGHT"/>
 			</Anchors>
 		</ButtonText>
 
-		<NormalFont font="GameFontNormal" justifyH="LEFT"/>
-		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
-
 		<Scripts>
 			<OnClick>
-				if IsShiftKeyDown() then
-					ChatFrameEditBox:Insert(Ludwig:GetItemLink(this:GetID()))
-				elseif IsControlKeyDown() then
-					DressUpItemLink(Ludwig:GetItemLink(this:GetID()))
-				else
-					SetItemRef(Ludwig:GetItemLink(this:GetID()))
-				end
+				LudwigUIItem_OnClick(self)
 			</OnClick>
 			<OnEnter>
-				LudwigUIItem_OnEnter()
+				LudwigUIItem_OnEnter(self)
 			</OnEnter>
 			<OnLeave>
-				GameTooltip:Hide()
+				LudwigUIItem_OnLeave(self)
 			</OnLeave>
-			<OnMouseWheel>
-				LudwigUI_OnMousewheel(LudwigUIScrollFrame, arg1)
-			</OnMouseWheel>
 		</Scripts>
+
+		<NormalFont font="GameFontNormal" justifyH="LEFT"/>
+		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
 	</Button>
 
-	<!--
-		Frame that displays items and the search panel
-	-->
-	<Frame name="LudwigUIDisplayTemplate" inherits="LudwigPanel" enableMouse="false" virtual="true">
-		<Size x="320" y="408"/>
+	<Frame name="LudwigFrame" toplevel="true" movable="true" hidden="true" parent="UIParent">
+		<Size x="384" y="512"/>
+
+ 		<Anchors>
+ 			<Anchor point="TOPLEFT">
+ 				<Offset x="0" y="-104"/>
+ 			</Anchor>
+ 		</Anchors>
+
+		<Attributes>
+			<Attribute name="UIPanelLayout-defined" type="boolean" value="true"/>
+			<Attribute name="UIPanelLayout-enabled" type="boolean" value="true"/>
+			<Attribute name="UIPanelLayout-whileDead" type="boolean" value="true"/>
+			<Attribute name="UIPanelLayout-area" type="string" value="left"/>
+			<Attribute name="UIPanelLayout-pushable" type="number" value="3"/>
+		</Attributes>
+
+		<HitRectInsets>
+			<AbsInset left="0" right="35" top="0" bottom="75"/>
+		</HitRectInsets>
 
 		<Layers>
-			<Layer level = "OVERLAY">
-				<FontString name="$parentTitle" inherits="GameFontNormal" text="Ludwig">
+			<Layer level="ARTWORK">
+				<FontString name="$parentText" inherits="GameFontHighlight" text="TEXT">
+					<Size x="300" y="14"/>
 					<Anchors>
 						<Anchor point="TOP">
-							<Offset x="0" y="-12"/>
+							<Offset x="0" y="-16"/>
 						</Anchor>
 					</Anchors>
 				</FontString>
+
+				<Texture file="Interface\TaxiFrame\UI-TaxiFrame-TopLeft">
+					<Size x="256" y="256"/>
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\TaxiFrame\UI-TaxiFrame-TopRight">
+					<Size x="128" y="256"/>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset x="256" y="0"/>
+						</Anchor>
+					</Anchors>
+				</Texture>
+
+				<Texture file="Interface\PaperDollInfoFrame\SkillFrame-BotLeft">
+					<Size x="256" y="256"/>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT"/>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\PaperDollInfoFrame\SkillFrame-BotRight">
+					<Size x="128" y="256"/>
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT"/>
+					</Anchors>
+				</Texture>
 			</Layer>
 		</Layers>
 
 		<Frames>
-			<Button name="$parentClose" inherits="UIPanelCloseButton">
-				<Anchors>
-					<Anchor point="TOPRIGHT"/>
-				</Anchors>
-				<Scripts>
-					<OnClick>
-						HideUIPanel(this:GetParent():GetParent())
-					</OnClick>
-				</Scripts>
-			</Button>
-
-			<Button name="$parentFilterToggle" inherits="LudwigButton" text="LUDWIG_FILTER">
-				<Size x="46" y="24"/>
-
+	        <Button name="$parentCloseButton" inherits="UIPanelCloseButton">
 				<Anchors>
 					<Anchor point="TOPRIGHT">
-						<Offset x="-6" y="-32"/>
+						<Offset x="-29" y="-8"/>
 					</Anchor>
 				</Anchors>
+	        </Button>
 
-				<Scripts>
-					<OnLoad>
-						this:SetText(LUDWIG_LOCALS["Filter"])
-					</OnLoad>
-					<OnClick>
-						if LudwigUIFilter:IsShown()then
-							LudwigUIFilter:Hide()
-						else
-							LudwigUIFilter:Show()
-						end
-					</OnClick>
-				</Scripts>
-			</Button>
+			<Button name="$parentRefresh">
+				<Size x="64" y="64"/>
 
-			<EditBox name="$parentSearch" inherits="LudwigEditBox">
 				<Anchors>
 					<Anchor point="TOPLEFT">
-						<Offset x="6" y="-32"/>
-					</Anchor>
-					<Anchor point="BOTTOMRIGHT" relativeTo="$parentFilterToggle" relativePoint="BOTTOMLEFT">
-						<Offset x="-2" y="0"/>
+						<Offset x="4" y="-4"/>
 					</Anchor>
 				</Anchors>
 
 				<Scripts>
 					<OnLoad>
-						this:SetTextInsets(52, 8, 0, 0)
-						getglobal(this:GetName() .. "Text"):SetText(LUDWIG_LOCALS["Search"])
-					</OnLoad>
-					<OnTextChanged>
-						LudwigUIText_OnTextChanged()
-					</OnTextChanged>
-				</Scripts>
-			</EditBox>
-
-			<!--Scrollframe-->
-			<ScrollFrame name="$parentScrollFrame" inherits="FauxScrollFrameTemplate">
-				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="$parentFilterToggle" relativePoint="BOTTOMRIGHT">
-						<Offset x="-28" y="-4"/>
-					</Anchor>
-					<Anchor point="BOTTOMRIGHT">
-						<Offset x="-30" y="8"/>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnVerticalScroll>
-						FauxScrollFrame_OnVerticalScroll(LWUI_SHOWN, LudwigUIScrollBar_Update)
-					</OnVerticalScroll>
-				</Scripts>
-			</ScrollFrame>
-		</Frames>
-
-		<Scripts>
-			<OnLoad>
-				LudwigUI_OnLoad()
-			</OnLoad>
-			<OnShow>
-				LudwigUIScrollBar_Update()
-			</OnShow>
-			<OnMouseDown>
-				this:GetParent():StartMoving()
-			</OnMouseDown>
-			<OnMouseUp>
-				this:GetParent():StopMovingOrSizing()
-			</OnMouseUp>
-			<OnMouseWheel>
-				LudwigUI_OnMousewheel(LudwigUIScrollFrame, arg1)
-			</OnMouseWheel>
-			<OnShow>
-				LudwigUI_OnShow()
-			</OnShow>
-			<OnHide>
-				LudwigUI_OnHide()
-			</OnHide>
-		</Scripts>
-	</Frame>
-
-	<!--
-		Panel for Filtering Search Results
-	-->
-	<Frame name="LudwigUIFilterPanelTemplate" inherits="LudwigPanel" hidden="true" virtual="true">
-		<Size x="164" y="220"/>
-
-		<Frames>
-			<Button name="$parentClose" inherits="UIPanelCloseButton">
-				<Anchors>
-					<Anchor point="TOPRIGHT"/>
-				</Anchors>
-			</Button>
-
-			<Frame name="$parentLevelRange" inherits="LudwigLevelRange">
-				<Anchors>
-					<Anchor point="TOPLEFT">
-						<Offset x="8" y="-10"/>
-					</Anchor>
-				</Anchors>
-			</Frame>
-
-			<Frame name="$parentQuality" inherits="LudwigDropDown">
-				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="$parentLevelRange" relativePoint="BOTTOMLEFT">
-						<Offset x="-16" y="-6"/>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnShow>
-						LudwigUI_Quality_OnShow()
-					</OnShow>
-				</Scripts>
-			</Frame>
-
-			<Frame name="$parentType" inherits="LudwigDropDown">
-				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="$parentQuality" relativePoint="BOTTOMLEFT">
-						<Offset x="0" y="-6"/>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnShow>
-						LudwigUI_Type_OnShow()
-					</OnShow>
-				</Scripts>
-			</Frame>
-
-			<Frame name="$parentSubType" inherits="LudwigDropDown">
-				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="$parentType" relativePoint="BOTTOMLEFT">
-						<Offset x="0" y="-6"/>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnShow>
-						LudwigUI_SubType_OnShow()
-					</OnShow>
-				</Scripts>
-			</Frame>
-
-			<Frame name="$parentEquipSlot" inherits="LudwigDropDown">
-				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="$parentSubType" relativePoint="BOTTOMLEFT">
-						<Offset x="0" y="-6"/>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnShow>
-						LudwigUI_EquipSlot_OnShow()
-					</OnShow>
-				</Scripts>
-			</Frame>
-
-			<Button name="$parentRefresh" inherits="LudwigButton" text="LUDWIG_REFRESH">
-				<Size x="64" y="24"/>
-
-				<Anchors>
-					<Anchor point="BOTTOMLEFT">
-						<Offset>
-							<AbsDimension x="8" y="6"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-
-				<Scripts>
-					<OnLoad>
-						this:SetText(LUDWIG_LOCALS['Refresh'])
+						self:SetFrameLevel(0)
 					</OnLoad>
 					<OnClick>
 						LudwigUI_Refresh()
 					</OnClick>
 				</Scripts>
+
+				<NormalTexture file="Interface\QuestFrame\UI-QuestLog-BookIcon"/>
+
+				<PushedTexture file="Interface\QuestFrame\UI-QuestLog-BookIcon">
+					<Size x="58" y="58"/>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+					<TexCoords left="0.075" right="0.925" top="0.075" bottom="0.925"/>
+				</PushedTexture>
+
+				<HighlightTexture alphaMode="ADD" file="Interface\Minimap\UI-Minimap-ZoomButton-Highlight">
+					<Size x="78" y="78"/>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</HighlightTexture>
 			</Button>
 
-			<Button name="$parentReset" inherits="LudwigButton">
-				<Size x="48" y="24"/>
+			<EditBox name="$parentSearch" autoFocus="false" inherits="InputBoxTemplate">
+				<Size x="148" y="20"/>
 
 				<Anchors>
-					<Anchor point="BOTTOMRIGHT">
-						<Offset x="-8" y="6"/>
+					<Anchor point="TOPLEFT">
+						<Offset x="84" y="-44"/>
 					</Anchor>
 				</Anchors>
 
 				<Scripts>
-					<OnLoad>
-						this:SetText(LUDWIG_LOCALS['Reset'])
-					</OnLoad>
-					<OnClick>
-						LudwigUI_ResetFilters()
-					</OnClick>
+					<OnShow>
+						self:SetText(SEARCH)
+					</OnShow>
+					<OnEnterPressed>
+						self:ClearFocus()
+					</OnEnterPressed>
+					<OnTextChanged>
+						LudwigUI_OnSearchChanged(self,self:GetText())
+					</OnTextChanged>
+					<OnTabPressed>
+						getglobal(self:GetParent():GetName() .. "MinLevel"):SetFocus()
+					</OnTabPressed>
+					<OnEditFocusLost>
+						self:HighlightText(0, 0)
+						if (self:GetText() == "") then
+							self:SetText(SEARCH)
+						end
+					</OnEditFocusLost>
+					<OnEditFocusGained>
+						self:HighlightText()
+						if (self:GetText() == SEARCH) then
+							self:SetText("")
+						end
+					</OnEditFocusGained>
 				</Scripts>
-			</Button>
-		</Frames>
+			</EditBox>
 
-		<Scripts>
-			<OnMouseDown>
-				this:GetParent():StartMoving()
-			</OnMouseDown>
-			<OnMouseUp>
-				this:GetParent():StopMovingOrSizing()
-			</OnMouseUp>
-			<OnShow>
-				LudwigUIFilter_OnShow()
-			</OnShow>
-			<OnHide>
-				LudwigUIFilter_OnHide()
-			</OnHide>
-		</Scripts>
-	</Frame>
-
-	<Frame name="LudwigUIParent" clampedToScreen="true" toplevel="false" hidden="true" movable="true" parent="UIParent">
-		<Size x="320" y="408"/>
-
-		<Anchors>
-			<Anchor point="LEFT"/>
-		</Anchors>
-
-		<Frames>
-			<Frame name="LudwigUI" inherits="LudwigUIDisplayTemplate">
+			<EditBox name="$parentMinLevel" letters="2" numeric="true" autoFocus="false" inherits="InputBoxTemplate">
+				<Size x="25" y="16"/>
 				<Anchors>
-					<Anchor point="TOPLEFT"/>
-				</Anchors>
-			</Frame>
-
-			<Frame name="LudwigUIFilter" inherits="LudwigUIFilterPanelTemplate">
-				<Anchors>
-					<Anchor point="TOPRIGHT">
-						<Offset x="-4" y="-20"/>
+					<Anchor point="LEFT" relativeTo="$parentSearch" relativePoint="RIGHT">
+						<Offset x="12" y="0"/>
 					</Anchor>
 				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentHyphen" inherits="GameFontHighlightSmall" text="-">
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parent" relativePoint="RIGHT">
+									<Offset x="0" y="1"/>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnTabPressed>
+						getglobal(self:GetParent():GetName() .. "MaxLevel"):SetFocus()
+					</OnTabPressed>
+					<OnEnterPressed>
+						self:ClearFocus()
+					</OnEnterPressed>
+					<OnTextChanged>
+						LudwigUI_OnMinLevelChanged(self,self:GetText())
+					</OnTextChanged>
+				</Scripts>
+			</EditBox>
+
+			<EditBox name="$parentMaxLevel" letters="2" numeric="true" autoFocus="false" inherits="InputBoxTemplate">
+				<Size x="25" y="16"/>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentMinLevel" relativePoint="RIGHT">
+						<Offset x="12" y="0"/>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnTabPressed>
+						getglobal(self:GetParent():GetName() .. "Search"):SetFocus()
+					</OnTabPressed>
+					<OnEnterPressed>
+						self:ClearFocus()
+					</OnEnterPressed>
+					<OnTextChanged>
+						LudwigUI_OnMaxLevelChanged(self,self:GetText())
+					</OnTextChanged>
+				</Scripts>
+			</EditBox>
+
+			<Button name="$parentReset">
+				<Size x="39" y="39"/>
+
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentMaxLevel" relativePoint="RIGHT">
+						<Offset x="-2" y="-2"/>
+					</Anchor>
+				</Anchors>
+
+				<Scripts>
+					<OnClick>
+						LudwigUI_Reset()
+					</OnClick>
+				</Scripts>
+
+				<NormalTexture file="Interface\Buttons\CancelButton-Up"/>
+				<PushedTexture file="Interface\Buttons\CancelButton-Down"/>
+				<HighlightTexture file="Interface\Buttons\CancelButton-Highlight" alphaMode="ADD"/>
+			</Button>
+
+			<ScrollFrame name="$parentScroll" inherits="FauxScrollFrameTemplate">
+				<Size x="298" y="332"/>
+
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset x="20" y="-74"/>
+					</Anchor>
+				</Anchors>
+
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+							<Size x="31" y="256"/>
+
+							<Anchors>
+								<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+									<Offset x="-2" y="5"/>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.484375" top="0" bottom="1.0"/>
+						</Texture>
+
+						<Texture file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+							<Size x="31" y="106"/>
+
+							<Anchors>
+								<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT">
+									<Offset x="-2" y="-2"/>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.515625" right="1.0" top="0" bottom="0.4140625"/>
+						</Texture>
+					</Layer>
+				</Layers>
+
+				<Scripts>
+					<OnShow>
+						--LudwigUI_OnScrollFrameShow()
+					</OnShow>
+					<OnHide>
+						--LudwigUI_OnScrollFrameHide()
+					</OnHide>
+					<OnVerticalScroll>
+						FauxScrollFrame_OnVerticalScroll(LWUI_SHOWN, LudwigUI_UpdateList)
+					</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>
+
+			<Frame name="$parentQuality" inherits="UIDropDownMenuTemplate">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT">
+						<Offset x="0" y="72"/>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						LudwigUI_OnQualityShow(self)
+					</OnShow>
+				</Scripts>
+			</Frame>
+
+			<Frame name="$parentType" inherits="UIDropDownMenuTemplate">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT">
+						<Offset x="110" y="72"/>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						LudwigUI_OnTypeShow(self)
+					</OnShow>
+				</Scripts>
 			</Frame>
 		</Frames>
 
 		<Scripts>
 			<OnLoad>
-				tinsert(UISpecialFrames, this:GetName())
+				LudwigUI_OnLoad(self)
 			</OnLoad>
+			<OnShow>
+				LudwigUI_OnShow()
+				PlaySound("igCharacterInfoOpen")
+			</OnShow>
+			<OnHide>
+				LudwigUI_OnHide()
+				PlaySound("igCharacterInfoClose")
+			</OnHide>
 		</Scripts>
 	</Frame>
 </Ui>

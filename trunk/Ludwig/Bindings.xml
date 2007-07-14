@@ -1,10 +1,10 @@
 <Bindings>
 	<Binding name="LUDWIG_SHOW" header="LUDWIG">
 		if keystate == "down" then
-			if LudwigUIParent:IsShown() then
-				LudwigUIParent:Hide()
+			if LudwigFrame:IsShown() then
+				HideUIPanel(LudwigFrame)
 			else
-				LudwigUIParent:Show()
+				ShowUIPanel(LudwigFrame)
 			end
 		end
 	</Binding>

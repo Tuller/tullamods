@@ -1,5 +1,8 @@
 Ludwig Version History
 
+1.2
+Redesigned the frame to better integrate with the default frames
+
 1.1
 Added autocomplete to linkerator (thanks N00bZXI)
 

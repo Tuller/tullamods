@@ -2,9 +2,9 @@
 ## Title: Ludwig
 ## Author: Tuller
 ## Notes: Item Database
-## Version: 1.1
+## Version: 1.2
 localization.lua
 db.lua
 slash.lua
-ui.xml
 linkerator.lua
+ui.xml

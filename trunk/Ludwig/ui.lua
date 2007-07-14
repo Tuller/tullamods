@@ -3,409 +3,384 @@
 		A UI for Ludwig
 --]]
 
-LWUI_SHOWN = 14
-LWUI_STEP = LWUI_SHOWN
+LWUI_SHOWN = 15
+LWUI_STEP = 15
 
 local L = LUDWIG_LOCALS
-local DEFAULT_FILTER = 'any'
-local ITEM_SIZE = 24
-local displayList, displayChanged --all things to display on the list
+local display, displayChanged --all things to display on the list
 local filter = {}
+local uiFrame
 
 
---[[
-	OnX Functions
---]]
+--[[ Main Frame Functions ]]--
 
-function LudwigUI_OnLoad()
-	local frameName = this:GetName()
+function LudwigUI_OnLoad(self)
+	local name = self:GetName()
+	tinsert(UISpecialFrames, name)
+	local items = {}
 
-	local offset = -6
-	local item = CreateFrame("Button", frameName .. "Item1", this, "LudwigItem")
-	item:SetPoint("TOPLEFT", frameName .. "Search", "BOTTOMLEFT", 2, offset)
-	item:SetPoint("BOTTOMRIGHT", frameName .. "ScrollFrame", "TOPLEFT", -2, offset - ITEM_SIZE)
-	item:SetID(1)
+	local item = CreateFrame("Button", name .. 1, self, "LudwigItemButtonTemplate")
+	item:SetPoint("TOPLEFT", self, "TOPLEFT", 19, -75)
+	item.icon = getglobal(item:GetName() .. "Icon")
+	items[1] = item
 
-	offset = -2
 	for i = 2, LWUI_SHOWN do
-		item = CreateFrame("Button", frameName .. "Item" .. i, this, "LudwigItem")
-		item:SetPoint("TOPLEFT", frameName .. "Item" .. i-1, "BOTTOMLEFT", 0, offset)
-		item:SetPoint("BOTTOMRIGHT", frameName .. "Item" .. i-1, "BOTTOMRIGHT", 0, offset - ITEM_SIZE)
-		item:SetID(2)
+		item = CreateFrame("Button", name .. i, self, "LudwigItemButtonTemplate")
+		item:SetPoint("TOPLEFT", items[i-1], "BOTTOMLEFT")
+		item:SetPoint("TOPRIGHT", items[i-1], "BOTTOMRIGHT")
+		item.icon = getglobal(item:GetName() .. "Icon")
+		items[i] = item
 	end
-	this:SetHeight(72 + ((-offset) + ITEM_SIZE)*LWUI_SHOWN)
-	this:GetParent():SetHeight(72 + ((-offset) + ITEM_SIZE)*LWUI_SHOWN)
+
+	self.items = items
+	self.title = getglobal(name .. "Text")
+	self.scrollFrame = getglobal(name.. "Scroll")
+	self.quality = getglobal(name .. "Quality")
+	self.type = getglobal(name .. "Type")
+	uiFrame = self
 end
 
 function LudwigUI_OnShow()
-	displayChanged = true
-	Ludwig:ReloadDB()
+	LudwigUI_Refresh()
 end
 
 function LudwigUI_OnHide()
-	for i in pairs(displayList) do
-		displayList[i] = nil
+	for i in pairs(display) do display[i] = nil end
+	LudwigUI_Reset()
+end
+
+function LudwigUI_Refresh()
+	Ludwig:ReloadDB()
+	LudwigUI_UpdateList(true)
+end
+
+function LudwigUI_Reset()
+	local changed
+	for i in pairs(filter) do
+		if(filter[i] ~= nil) then
+			changed = true
+			filter[i] = nil
+		end
 	end
-	displayChanged = true
-end
 
-function LudwigUIFilter_OnShow()
-	this:GetParent():SetWidth(this:GetParent():GetWidth() + this:GetWidth())
-	LudwigUIFilterToggle:LockHighlight()
-end
-
-function LudwigUIFilter_OnHide()
-	this:GetParent():SetWidth(this:GetParent():GetWidth() - this:GetWidth())
-	LudwigUIFilterToggle:UnlockHighlight()
-end
-
-function LudwigUIText_OnTextChanged()
-	filter.name = this:GetText()
-	displayChanged = true
-	LudwigUIScrollBar_Update()
-end
-
-function LudwigUI_SetMinLevel(level)
-	filter.minLevel = level
-	displayChanged = true
-	LudwigUIScrollBar_Update()
-end
-
-function LudwigUI_SetMaxLevel(level)
-	filter.maxLevel = level
-	displayChanged = true
-	LudwigUIScrollBar_Update()
-end
-
-function LudwigUI_OnMousewheel(scrollframe, direction)
-	local scrollbar = getglobal(scrollframe:GetName() .. "ScrollBar")
-	scrollbar:SetValue(scrollbar:GetValue() - direction * (scrollbar:GetHeight() / 2))
-	LudwigUIScrollBar_Update()
-end
-
-function LudwigUIItem_OnEnter()
-	GameTooltip:SetOwner(this)
-	GameTooltip:SetHyperlink(Ludwig:GetItemLink(this:GetID()))
-	GameTooltip:ClearAllPoints()
-
-	if this:GetLeft() < (UIParent:GetRight() / 2) then
-		if this:GetTop() < (UIParent:GetTop() / 3) then
-			GameTooltip:SetPoint("BOTTOMLEFT", this, "BOTTOMRIGHT", -4, -3)
-		else
-			GameTooltip:SetPoint("TOPLEFT", this, "TOPRIGHT", -4, 3)
-		end
+	--reset search text
+	local search = getglobal(uiFrame:GetName() .. "Search")
+	if(search:HasFocus()) then
+		search:SetText("")
 	else
-		if this:GetTop() < (UIParent:GetTop() / 3) then
-			GameTooltip:SetPoint("BOTTOMRIGHT", this, "BOTTOMLEFT", -4, -3)
+		search:SetText(SEARCH)
+	end
+
+	getglobal(uiFrame:GetName() .. "MinLevel"):SetText("")
+	getglobal(uiFrame:GetName() .. "MaxLevel"):SetText("")
+
+	LudwigUI_UpdateTypeText()
+	LudwigUI_UpdateQualityText()
+
+	if(uiFrame:IsShown()) then
+		LudwigUI_UpdateList(changed)
+	end
+end
+
+
+--[[ List Updating ]]--
+
+function LudwigUI_UpdateList(changed)
+	--update list only if there are changes
+	if not display or changed then
+		displayChanged = nil
+		display = Ludwig:GetItems(filter.name, filter.quality, filter.type, filter.subType, filter.equipLoc, filter.minLevel, filter.maxLevel)
+	end
+
+	local size = #display
+	uiFrame.title:SetText(format(L.FrameTitle, size))
+
+	FauxScrollFrame_Update(uiFrame.scrollFrame, size, LWUI_SHOWN, LWUI_STEP)
+
+	local offset = uiFrame.scrollFrame.offset
+	for i,button in ipairs(uiFrame.items) do
+		local index = i + offset
+		if index > size then
+			button:Hide()
 		else
-			GameTooltip:SetPoint("TOPRIGHT", this, "TOPLEFT", -4, 3)
+			local id = display[index]
+			button.icon:SetTexture(Ludwig:GetItemTexture(id))
+			button:SetText(Ludwig:GetItemName(id, true))
+			button:SetID(id)
+			button:Show()
 		end
+	end
+end
+
+
+--[[ Item Button ]]--
+
+function LudwigUIItem_OnClick(self)
+	if IsShiftKeyDown() then
+		ChatFrameEditBox:Insert(Ludwig:GetItemLink(self:GetID()))
+	elseif IsControlKeyDown() then
+		DressUpItemLink(Ludwig:GetItemLink(self:GetID()))
+	else
+		SetItemRef(Ludwig:GetItemLink(self:GetID()))
+	end
+end
+
+function LudwigUIItem_OnMousewheel(direction)
+	local scrollBar = getglobal(uiFrame.scrollFrame:GetName() .. "ScrollBar")
+	scrollbar:SetValue(scrollbar:GetValue() - direction * (scrollbar:GetHeight() / 2))
+	LudwigUI_UpdateList()
+end
+
+function LudwigUIItem_OnEnter(self)
+	self.nextUpdate = 0.1
+	self:SetScript("OnUpdate", LudwigUIItem_OnUpdate)
+	LudwigUIItem_UpdateTooltip(self)
+end
+
+function LudwigUIItem_OnLeave(self)
+	self:SetScript("OnUpdate", nil)
+	GameTooltip:Hide()
+end
+
+function LudwigUIItem_OnUpdate(self, elapsed)
+	if self.nextUpdate <= 0 then
+		self.nextUpdate = 0.1
+		LudwigUIItem_UpdateTooltip(self)
+	else
+		self.nextUpdate = self.nextUpdate - elapsed
+	end
+end
+
+function LudwigUIItem_UpdateTooltip(self)
+	GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
+	GameTooltip:SetHyperlink(Ludwig:GetItemLink(self:GetID()))
+
+	if IsShiftKeyDown() then
+		GameTooltip_ShowCompareItem()
 	end
 	GameTooltip:Show()
 end
 
-function LudwigUI_Load()
-	UIDropDownMenu_Initialize(LudwigUIFilterQuality, LudwigUI_Quality_Initialize)
-	UIDropDownMenu_Initialize(LudwigUIFilterType, LudwigUI_Type_Initialize)
-	UIDropDownMenu_Initialize(LudwigUIFilterSubType, LudwigUI_SubType_Initialize)
-	UIDropDownMenu_Initialize(LudwigUIFilterEquipSlot, LudwigUI_EquipSlot_Initialize)
+
+--[[ Text Search ]]--
+
+function LudwigUI_OnSearchChanged(self, text)
+	if(self:HasFocus()) then
+		if text == "" then
+			text = nil
+		end
+		if(filter.name ~= text) then
+			filter.name = text
+			LudwigUI_UpdateList(true)
+		end
+	end
 end
 
-
---[[
-	Scrollbar Functions
---]]
-
-function LudwigUIScrollBar_Update()
-	--update list only if there are changes
-	if not displayList or displayChanged then
-		displayChanged = nil
-		displayList = Ludwig:GetItems(filter.name, filter.quality, filter.type, filter.subType, filter.loc, filter.minLevel, filter.maxLevel, filter.player)
+function LudwigUI_OnMinLevelChanged(self, text)
+	if(self:HasFocus()) then
+		if text == "" then
+			text = nil
+		end
+		if(filter.minLevel ~= tonumber(text)) then
+			filter.minLevel = tonumber(text)
+			LudwigUI_UpdateList(true)
+		end
 	end
+end
 
-	local size = #displayList
-	LudwigUITitle:SetText(format(L['Ludwig: Displaying %d Items'], size))
-	FauxScrollFrame_Update(LudwigUIScrollFrame, size, LWUI_SHOWN, LWUI_STEP)
-
-	local offset = LudwigUIScrollFrame.offset
-	for index = 1, LWUI_SHOWN, 1 do
-		local rIndex = index + offset
-		local lwb = getglobal("LudwigUIItem".. index)
-
-		if rIndex < size + 1 then
-			local id = displayList[rIndex]
-			lwb:SetText(Ludwig:GetItemName(id, true))
-			lwb:SetID(id)
-			getglobal(lwb:GetName() ..  "Texture"):SetTexture(Ludwig:GetItemTexture(id))
-			lwb:Show()
-		else
-			lwb:Hide()
+function LudwigUI_OnMaxLevelChanged(self, text)
+	if(self:HasFocus()) then
+		if text == "" then
+			text = nil
+		end
+		if(filter.maxLevel ~= tonumber(text)) then
+			filter.maxLevel = tonumber(text)
+			LudwigUI_UpdateList(true)
 		end
 	end
 end
 
 
---[[
-	Dropdown Menus
---]]
-
-function LudwigUI_Refresh()
-	Ludwig:ReloadDB()
-	displayChanged = 1
-	LudwigUIScrollBar_Update()
-end
-
---Filter reset
-function LudwigUI_ResetFilters()
-	for i in pairs(filter) do
-		filter[i] = nil
-	end
-
-	UIDropDownMenu_SetSelectedValue(LudwigUIFilterQuality, DEFAULT_FILTER)
-	UIDropDownMenu_SetSelectedValue(LudwigUIFilterType, DEFAULT_FILTER)
-	UIDropDownMenu_SetSelectedValue(LudwigUIFilterSubType, DEFAULT_FILTER)
-	UIDropDownMenu_SetSelectedValue(LudwigUIFilterEquipSlot, DEFAULT_FILTER)
-
-	UIDropDownMenu_Initialize(LudwigUIFilterQuality, LudwigUI_Quality_Initialize)
-	UIDropDownMenu_Initialize(LudwigUIFilterType, LudwigUI_Type_Initialize)
-	UIDropDownMenu_Initialize(LudwigUIFilterSubType, LudwigUI_SubType_Initialize)
-	UIDropDownMenu_Initialize(LudwigUIFilterEquipSlot, LudwigUI_EquipSlot_Initialize)
-
-	displayChanged = true
-	LudwigUIScrollBar_Update()
-end
+--[[ Dropdowns ]]--
 
 local info = {}
-local function AddItem(text, action, value, selectedValue)
+local function AddItem(text, value, func, hasArrow, level, arg1, arg2)
 	info.text = text
-	info.func = action
+	info.func = func
 	info.value = value
-	info.checked = value == selectedValue
-	UIDropDownMenu_AddButton(info)
-end
-
-local function AddDropDownButtons(selectedValue, action, ...)
-	for i = 1, select('#', ...) do
-		AddItem(select(i, ...), action, i, selectedValue)
-	end
+	info.hasArrow = (hasArrow and true) or nil
+	info.notCheckable = true
+	info.arg1 = arg1
+	info.arg2 = arg2
+	UIDropDownMenu_AddButton(info, level)
 end
 
 
 --[[ Quality ]]--
 
-function LudwigUI_Quality_OnShow()
-	UIDropDownMenu_Initialize(this, LudwigUI_Quality_Initialize)
-	UIDropDownMenu_SetWidth(88, this)
+local function Quality_GetText(index)
+	if tonumber(index) then
+		local hex = select(4, GetItemQualityColor(index))
+		return hex .. getglobal("ITEM_QUALITY" .. index .. "_DESC") .. "|r"
+	end
+	return ALL
 end
 
-function LudwigUI_Quality_OnClick()
-	UIDropDownMenu_SetSelectedValue(LudwigUIFilterQuality, this.value)
-
-	if this.value == DEFAULT_FILTER then
+local function Quality_OnClick()
+	if(this.value == ALL) then
 		filter.quality = nil
 	else
 		filter.quality = this.value
 	end
-
-	displayChanged = 1
-	LudwigUIScrollBar_Update()
+	LudwigUI_UpdateQualityText()
+	LudwigUI_UpdateList(true)
 end
 
 --add all buttons to the dropdown menu
-function LudwigUI_Quality_Initialize()
-	local selectedValue = UIDropDownMenu_GetSelectedValue(LudwigUIFilterQuality) or DEFAULT_FILTER
-
-	AddItem(L['Any'], LudwigUI_Quality_OnClick, DEFAULT_FILTER, selectedValue)
+local function Quality_Initialize()
+	AddItem(ALL, ALL, Quality_OnClick)
 	for i = 6, 0, -1 do
-		local hex = select(4, GetItemQualityColor(i))
-		AddItem(hex .. getglobal("ITEM_QUALITY" .. i .. "_DESC") .. "|r", LudwigUI_Quality_OnClick, i, selectedValue)
+		AddItem(Quality_GetText(i), i, Quality_OnClick)
 	end
+end
 
-	UIDropDownMenu_SetSelectedValue(LudwigUIFilterQuality, selectedValue)
+function LudwigUI_OnQualityShow(self)
+	UIDropDownMenu_Initialize(self, Quality_Initialize)
+	UIDropDownMenu_SetWidth(90, self)
+	LudwigUI_UpdateQualityText()
+end
+
+function LudwigUI_UpdateQualityText()
+	getglobal(uiFrame.quality:GetName() .. "Text"):SetText(Quality_GetText(filter.quality))
 end
 
 
 --[[ Type ]]--
 
-function LudwigUI_Type_OnShow()
-	UIDropDownMenu_Initialize(this, LudwigUI_Type_Initialize)
-	UIDropDownMenu_SetWidth(128, this)
+local function Types_Generate()
+	local types = {GetAuctionItemClasses()}
+	table.insert(types, L.Quest)
+
+	local subTypes = {}
+	for i in ipairs(types) do
+		if GetAuctionItemSubClasses(i) then
+			subTypes[i] = {GetAuctionItemSubClasses(i)}
+		end
+	end
+
+	local tradeGoods = subTypes[5] or {}
+	table.insert(tradeGoods, L.TradeGoods)
+	table.insert(tradeGoods, L.Devices)
+	table.insert(tradeGoods, L.Explosives)
+	table.insert(tradeGoods, L.Parts)
+	subTypes[5] = tradeGoods
+
+	local misc = subTypes[11] or {}
+	table.insert(misc, L.Junk)
+	subTypes[11] = misc
+
+	return types, subTypes
+end
+local types, subTypes = Types_Generate()
+local type, subType
+
+local function Type_UpdateText()
+	local text
+	if(filter.type) then
+		if(filter.subType) then
+			text = format("%s - %s", filter.type, filter.subType)
+			if(filter.equipLoc) then
+				text = format("%s - %s", filter.subType, getglobal(filter.equipLoc))
+			end
+		else
+			text = filter.type
+		end
+	else
+		text = ALL
+	end
+	getglobal(uiFrame.type:GetName() .. "Text"):SetText(text)
 end
 
-function LudwigUI_Type_OnClick()
-	UIDropDownMenu_SetSelectedValue(LudwigUIFilterType, this.value)
+local function Type_OnClick(arg1, arg2)
+	local type, subType = this.arg1, this.arg2
+	local text
 
-	--category change, so reset subtype
+	filter.type = nil
 	filter.subType = nil
-	if this.value == DEFAULT_FILTER then
-		filter.type = nil
-	else
-		filter.type = LudwigUI_GetType(this.value)
-	end
+	filter.equipLoc = nil
 
-	if not filter.subType then
-		UIDropDownMenu_SetSelectedValue(LudwigUIFilterSubType, DEFAULT_FILTER)
-		UIDropDownMenu_Initialize(LudwigUIFilterSubType, LudwigUI_SubType_Initialize)
-	end
-	if not filter.type then
-		UIDropDownMenu_SetSelectedValue(LudwigUIFilterEquipSlot, DEFAULT_FILTER)
-		UIDropDownMenu_Initialize(LudwigUIFilterEquipSlot, LudwigUI_EquipSlot_Initialize)
-	end
-	displayChanged = true
-
-	LudwigUIScrollBar_Update()
-end
-
-function LudwigUI_Type_Initialize()
-	local selectedValue = UIDropDownMenu_GetSelectedValue(LudwigUIFilterType) or DEFAULT_FILTER
-
-	AddItem(L['Any'], LudwigUI_Type_OnClick, DEFAULT_FILTER, selectedValue)
-	AddDropDownButtons(selectedValue, LudwigUI_Type_OnClick, GetAuctionItemClasses())
-
-	local nextI = select('#', GetAuctionItemClasses()) + 1
-	AddItem(L['Quest'], LudwigUI_Type_OnClick, nextI, selectedValue)
-	AddItem(L['Key'], LudwigUI_Type_OnClick, nextI + 1, selectedValue)
-
-
-	UIDropDownMenu_SetSelectedValue(LudwigUIFilterType, selectedValue)
-end
-
-
---[[ Subtype ]]--
-
-function LudwigUI_SubType_OnShow()
-	UIDropDownMenu_Initialize(this, LudwigUI_SubType_Initialize)
-	UIDropDownMenu_SetWidth(128, this)
-end
-
-function LudwigUI_SubType_OnClick()
-	UIDropDownMenu_SetSelectedValue(LudwigUIFilterSubType, this.value)
-
-	filter.loc = nil
-	if this.value == DEFAULT_FILTER then
-		filter.subType = nil
-	else
-		filter.subType = LudwigUI_GetSubType(this.value)
-	end
-	if not filter.loc then
-		UIDropDownMenu_SetSelectedValue(LudwigUIFilterEquipSlot, DEFAULT_FILTER)
-		UIDropDownMenu_Initialize(LudwigUIFilterEquipSlot, LudwigUI_EquipSlot_Initialize)
-	end
-
-	displayChanged = true
-	LudwigUIScrollBar_Update()
-end
-
-function LudwigUI_SubType_Initialize()
-	local selectedValue = UIDropDownMenu_GetSelectedValue(LudwigUIFilterSubType) or DEFAULT_FILTER
-
-	AddItem(L['Any'], LudwigUI_SubType_OnClick, DEFAULT_FILTER, selectedValue)
-
-	local type = UIDropDownMenu_GetSelectedValue(LudwigUIFilterType)
-	if tonumber(type) then
-		AddDropDownButtons(selectedValue, LudwigUI_SubType_OnClick, GetAuctionItemSubClasses(type))
-		if type == 5 then
-			local nextI = select('#', GetAuctionItemSubClasses(type)) + 1
-			AddItem(L['Devices'], LudwigUI_SubType_OnClick, nextI, selectedValue)
-			AddItem(L['Explosives'], LudwigUI_SubType_OnClick, nextI + 1, selectedValue)
-			AddItem(L['Gems'], LudwigUI_SubType_OnClick, nextI + 2, selectedValue)
-			AddItem(L['Parts'], LudwigUI_SubType_OnClick, nextI + 3, selectedValue)
-		elseif type == 10 then
-			local nextI = select('#', GetAuctionItemSubClasses(type)) + 1
-			AddItem(L['Junk'], LudwigUI_SubType_OnClick, nextI, selectedValue)
+	if(type) then
+		filter.type = types[type]
+		if(subType) then
+			filter.subType = subTypes[type][subType]
+			filter.equipLoc = select(this.value, GetAuctionInvTypes(type, subType))
+		else
+			filter.subType = subTypes[type][this.value]
 		end
-
-		UIDropDownMenu_SetSelectedValue(LudwigUIFilterSubType, selectedValue)
 	else
-		UIDropDownMenu_SetSelectedValue(LudwigUIFilterSubType, DEFAULT_FILTER)
+		filter.type = types[this.value]
+	end
+	LudwigUI_UpdateTypeText()
+	LudwigUI_UpdateList(true)
+end
+
+local function AddTypes(level)
+	AddItem(ALL, ALL, Type_OnClick)
+	for i,text in pairs(types) do
+		AddItem(text, i, Type_OnClick, subTypes[i], level)
 	end
 end
 
+local function AddSubTypes(level)
+	type = UIDROPDOWNMENU_MENU_VALUE
 
---[[ Equip Slot ]]--
-
-function LudwigUI_EquipSlot_OnShow()
-	UIDropDownMenu_Initialize(this, LudwigUI_EquipSlot_Initialize)
-	UIDropDownMenu_SetWidth(128, this)
-end
-
-function LudwigUI_EquipSlot_OnClick()
-	UIDropDownMenu_SetSelectedValue(LudwigUIFilterEquipSlot, this.value)
-
-	if this.value == DEFAULT_FILTER then
-		filter.loc = nil
-	else
-		filter.loc = LudwigUI_GetEquipSlot(this.value)
-	end
-
-	displayChanged = true
-	LudwigUIScrollBar_Update()
-end
-
-local function AddEqupSlotButtons(selectedValue, action, ...)
-	for i = 1, select('#', ...) do
-		AddItem(getglobal(select(i, ...)), action, i, selectedValue)
-	end
-end
-
-function LudwigUI_EquipSlot_Initialize()
-	local selectedValue = UIDropDownMenu_GetSelectedValue(LudwigUIFilterEquipSlot) or DEFAULT_FILTER
-
-	AddItem(L['Any'], LudwigUI_EquipSlot_OnClick, DEFAULT_FILTER, selectedValue)
-
-	local type = UIDropDownMenu_GetSelectedValue(LudwigUIFilterType)
-	local subType = tonumber(UIDropDownMenu_GetSelectedValue(LudwigUIFilterSubType))
-
-	if type and subType then
-		AddEqupSlotButtons(selectedValue, LudwigUI_EquipSlot_OnClick, GetAuctionInvTypes(type, subType))
-		UIDropDownMenu_SetSelectedValue(LudwigUIFilterEquipSlot, selectedValue)
-	else
-		UIDropDownMenu_SetSelectedValue(LudwigUIFilterEquipSlot, DEFAULT_FILTER)
-	end
-end
-
-
---[[ Utility Functions ]]--
-
-function LudwigUI_GetType(index)
-	local maxI = select('#', GetAuctionItemClasses())
-	if index == maxI + 1 then
-		return L['Quest']
-	elseif index == maxI + 2 then
-		return L['Key']
-	end
-	return select(index, GetAuctionItemClasses())
-end
-
-function LudwigUI_GetSubType(index)
-	local type = tonumber(UIDropDownMenu_GetSelectedValue(LudwigUIFilterType))
-	if type then
-		if type == 5 then
-			local nextI = select('#', GetAuctionItemSubClasses(type)) + 1
-			if index == nextI then
-				return L['Devices']
-			elseif index == nextI + 1 then
-				return L['Explosives']
-			elseif index == nextI + 2 then
-				return L['Gems']
-			elseif index == nextI + 2 then
-				return L['Parts']
-			end
-		elseif type == 10 then
-			local nextI = select('#', GetAuctionItemSubClasses(type)) + 1
-			if index == nextI then
-				return L['Junk']
-			end
+	if subTypes[type] then
+		for i,text in ipairs(subTypes[type]) do
+			AddItem(text, i, Type_OnClick, GetAuctionInvTypes(type, i), level, type)
 		end
-		return select(index, GetAuctionItemSubClasses(type))
 	end
 end
 
-function LudwigUI_GetEquipSlot(index)
-	local type = tonumber(UIDropDownMenu_GetSelectedValue(LudwigUIFilterType))
-	local subType = tonumber(UIDropDownMenu_GetSelectedValue(LudwigUIFilterSubType))
+local function AddEquipLocations(level)
+	subType = UIDROPDOWNMENU_MENU_VALUE
 
-	if type and subType then
-		return select(index, GetAuctionInvTypes(type, subType))
+	for i = 1, select("#", GetAuctionInvTypes(type, subType)) do
+		local equipLoc = getglobal(select(i, GetAuctionInvTypes(type, subType)))
+		AddItem(equipLoc, i, Type_OnClick, false, level, type, subType)
 	end
+end
+
+local function Type_Initialize(level)
+	local level = level or 1
+
+	if(level == 1) then
+		AddTypes(level)
+	elseif(level == 2) then
+		AddSubTypes(level)
+	elseif(level == 3) then
+		AddEquipLocations(level)
+	end
+end
+
+function LudwigUI_UpdateTypeText()
+	local text
+	if(filter.type) then
+		if(filter.subType) then
+			text = format("%s - %s", filter.type, filter.subType)
+			if(filter.equipLoc) then
+				text = format("%s - %s", filter.subType, getglobal(filter.equipLoc))
+			end
+		else
+			text = filter.type
+		end
+	else
+		text = ALL
+	end
+	getglobal(uiFrame.type:GetName() .. "Text"):SetText(text)
+end
+
+function LudwigUI_OnTypeShow(self)
+	UIDropDownMenu_Initialize(self, Type_Initialize)
+	UIDropDownMenu_SetWidth(200, self)
+	LudwigUI_UpdateTypeText()
 end

@@ -1,35 +1,33 @@
---[[ 
+--[[
 	slash.lua
 		Slash command handler for Ludwig
-		
+
 	Commands:
 		/lw or /ludwig
 			start of a command, shows the UI if its enabled
-		/lw refresh
+		/lw -refresh
 			resets the database
-		/lw minquality <value>
-			sets the minimum quality of items to be viewable
 		/lw <name>
 			prints a list of items matching <name>
 --]]
 
 local L = LUDWIG_LOCALS
+local MAX_DISPLAY = 9
 
 local function LMsg(msg)
-	ChatFrame1:AddMessage(format('|cFF00EE00Ludwig|r: %s', msg or 'nil'))
+	ChatFrame1:AddMessage(format("|cFF00EE00Ludwig|r: %s", tostring(msg)))
 end
 
 local function PrintMsg(msg)
-	ChatFrame1:AddMessage(msg or 'nil')
+	ChatFrame1:AddMessage(tostring(msg))
 end
 
 local function PrintList(name, list, startTime)
-	LMsg(format(L["There are %d items matching '%s':"], #list, name))
-	for i, link in ipairs(list) do 
-		PrintMsg(Ludwig:GetItemLink(link))
-		if i > 9 then break end
+	LMsg(format(L.NumMatching, #list, name))
+	for i = 1, min(#list, MAX_DISPLAY) do
+		PrintMsg(Ludwig:GetItemLink(list[i]))
 	end
-	PrintMsg(format(L['Generated in %.3f seconds'], GetTime() - startTime))
+	PrintMsg(format(L.GenTime, GetTime() - startTime))
 end
 
 local function ListItemsOfName(name)
@@ -38,26 +36,30 @@ local function ListItemsOfName(name)
 	if list then
 		PrintList(name, list, startTime)
 	else
-		LMsg(format(L["There are %d items matching '%s':"], name))
+		LMsg(format(L.NoMatchingItems, name))
 	end
 end
 
 SlashCmdList["LudwigSlashCOMMAND"] = function(msg)
-	if not msg or msg == "" and LudwigUIParent then
-		LudwigUIParent:Show()
+	if not msg or msg == "" then
+		if(LudwigFrame and LudwigFrame:IsShown()) then
+			HideUIPanel(LudwigFrame)
+		elseif(LudwigFrame) then
+			ShowUIPanel(LudwigFrame)
+		end
 	else
-		local cmd, arg1 = string.match(msg:lower(), "%-(%w+)")
+		local cmd, arg1 = msg:lower():match("%-(%w+)")
 		if cmd then
-			if cmd == 'refresh' then
+			if cmd == "refresh" then
 				Ludwig:ReloadDB()
-				LMsg(L['Database refreshed'])
+				LMsg(L.DBRefreshed)
 			else
-				LMsg(format(L["'%s' is an unknown command"] , cmd))
+				LMsg(format(L.UnknownCommand, cmd))
 			end
 		else
 			ListItemsOfName(msg)
 		end
 	end
 end
-SLASH_LudwigSlashCOMMAND1 = '/lw'
-SLASH_LudwigSlashCOMMAND2 = '/ludwig'
+SLASH_LudwigSlashCOMMAND1 = "/lw"
+SLASH_LudwigSlashCOMMAND2 = "/ludwig"
