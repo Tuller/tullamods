@@ -49,6 +49,12 @@ function LudwigUI_OnHide()
 	LudwigUI_Reset()
 end
 
+function LudwigUI_OnMousewheel(direction)
+	local scrollBar = getglobal(uiFrame.scrollFrame:GetName() .. "ScrollBar")
+	scrollbar:SetValue(scrollbar:GetValue() - direction * (scrollbar:GetHeight() / 2))
+	LudwigUI_UpdateList()
+end
+
 function LudwigUI_Refresh()
 	Ludwig:ReloadDB()
 	LudwigUI_UpdateList(true)
@@ -115,7 +121,17 @@ end
 
 --[[ Item Button ]]--
 
-function LudwigUIItem_OnClick(self)
+local function Item_UpdateTooltip(self)
+	GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
+	GameTooltip:SetHyperlink(Ludwig:GetItemLink(self:GetID()))
+
+	if IsShiftKeyDown() then
+		GameTooltip_ShowCompareItem()
+	end
+	GameTooltip:Show()
+end
+
+function LudwigUI_OnItemClick(self)
 	if IsShiftKeyDown() then
 		ChatFrameEditBox:Insert(Ludwig:GetItemLink(self:GetID()))
 	elseif IsControlKeyDown() then
@@ -125,40 +141,18 @@ function LudwigUIItem_OnClick(self)
 	end
 end
 
-function LudwigUIItem_OnMousewheel(direction)
-	local scrollBar = getglobal(uiFrame.scrollFrame:GetName() .. "ScrollBar")
-	scrollbar:SetValue(scrollbar:GetValue() - direction * (scrollbar:GetHeight() / 2))
-	LudwigUI_UpdateList()
+function LudwigUI_OnItemEvent(self)
+	Item_UpdateTooltip(self)
 end
 
-function LudwigUIItem_OnEnter(self)
-	self.nextUpdate = 0.1
-	self:SetScript("OnUpdate", LudwigUIItem_OnUpdate)
-	LudwigUIItem_UpdateTooltip(self)
+function LudwigUI_OnItemEnter(self)
+	self:RegisterEvent("MODIFIER_STATE_CHANGED")
+	Item_UpdateTooltip(self)
 end
 
-function LudwigUIItem_OnLeave(self)
-	self:SetScript("OnUpdate", nil)
+function LudwigUI_OnItemLeave(self)
+	self:UnregisterEvent("MODIFIER_STATE_CHANGED")
 	GameTooltip:Hide()
-end
-
-function LudwigUIItem_OnUpdate(self, elapsed)
-	if self.nextUpdate <= 0 then
-		self.nextUpdate = 0.1
-		LudwigUIItem_UpdateTooltip(self)
-	else
-		self.nextUpdate = self.nextUpdate - elapsed
-	end
-end
-
-function LudwigUIItem_UpdateTooltip(self)
-	GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
-	GameTooltip:SetHyperlink(Ludwig:GetItemLink(self:GetID()))
-
-	if IsShiftKeyDown() then
-		GameTooltip_ShowCompareItem()
-	end
-	GameTooltip:Show()
 end
 
 
@@ -260,6 +254,7 @@ end
 local function Types_Generate()
 	local types = {GetAuctionItemClasses()}
 	table.insert(types, L.Quest)
+	table.insert(types, L.Key)
 
 	local subTypes = {}
 	for i in ipairs(types) do

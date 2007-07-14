@@ -20,9 +20,9 @@ L.Key = "Key"
 L.Quest = "Quest"
 L.Junk = "Junk"
 L.Parts = "Parts"
-L.Gems = "Gems"
 L.Explosives = "Explosives"
 L.Devices = "Devices"
+L.TradeGoods = "Trade Goods"
 
 --Slash command responses
 L.DBRefreshed = "Database Refreshed"

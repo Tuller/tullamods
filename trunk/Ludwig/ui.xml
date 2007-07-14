@@ -30,13 +30,16 @@
 
 		<Scripts>
 			<OnClick>
-				LudwigUIItem_OnClick(self)
+				LudwigUI_OnItemClick(self)
 			</OnClick>
+			<OnEvent>
+				LudwigUI_OnItemEvent(self)
+			</OnEvent>
 			<OnEnter>
-				LudwigUIItem_OnEnter(self)
+				LudwigUI_OnItemEnter(self)
 			</OnEnter>
 			<OnLeave>
-				LudwigUIItem_OnLeave(self)
+				LudwigUI_OnItemLeave(self)
 			</OnLeave>
 		</Scripts>
 
@@ -67,8 +70,8 @@
 
 		<Layers>
 			<Layer level="BACKGROUND">
-				<Texture name="$parentIcon" file="Interface\QuestFrame\UI-QuestLog-BookIcon">
-					<Size x="64" y="64"/>
+				<Texture name="$parentIcon">
+					<Size x="62" y="62"/>
 				</Texture>
 			</Layer>
 
@@ -136,13 +139,14 @@
 						self.icon = getglobal(self:GetParent():GetName().."Icon")
 						self.icon:ClearAllPoints()
 						self.icon:SetPoint("CENTER", self)
+						SetPortraitToTexture(self.icon, "Interface/Icons/INV_Misc_Book_04")
 					</OnLoad>
 					<OnMouseDown>
-						self.icon:SetWidth(58); self.icon:SetHeight(58)
+						self.icon:SetWidth(56); self.icon:SetHeight(56)
 						self.icon:SetTexCoord(0.075, 0.925, 0.075, 0.925)
 					</OnMouseDown>
 					<OnMouseUp>
-						self.icon:SetWidth(64); self.icon:SetHeight(64)
+						self.icon:SetWidth(62); self.icon:SetHeight(62)
 						self.icon:SetTexCoord(0, 1, 0, 1)
 					</OnMouseUp>
 					<OnClick>
