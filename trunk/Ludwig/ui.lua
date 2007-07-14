@@ -94,6 +94,50 @@ function LudwigUI_OnScrollFrameHide()
 end
 
 
+--[[ Item Button ]]--
+
+local function Item_UpdateTooltip(self)
+	GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
+	GameTooltip:SetHyperlink(Ludwig:GetItemLink(self:GetID()))
+	GameTooltip:Show()
+
+	if IsShiftKeyDown() then
+		GameTooltip_ShowCompareItem()
+	end
+	self.nextUpdate = 0.1
+end
+
+local function Item_OnUpdate(self, elapsed)
+	if(self.nextUpdate < 0) then
+		if GameTooltip:IsOwned(self) then
+			Item_UpdateTooltip(self)
+		end
+	else
+		self.nextUpdate = self.nextUpdate - elapsed
+	end
+end
+
+function LudwigUI_OnItemClick(self)
+	if IsShiftKeyDown() then
+		ChatFrameEditBox:Insert(Ludwig:GetItemLink(self:GetID()))
+	elseif IsControlKeyDown() then
+		DressUpItemLink(Ludwig:GetItemLink(self:GetID()))
+	else
+		SetItemRef(Ludwig:GetItemLink(self:GetID()))
+	end
+end
+
+function LudwigUI_OnItemEnter(self)
+	Item_UpdateTooltip(self)
+	self:SetScript("OnUpdate", Item_OnUpdate)
+end
+
+function LudwigUI_OnItemLeave(self)
+	self:SetScript("OnUpdate", nil)
+	GameTooltip:Hide()
+end
+
+
 --[[ List Updating ]]--
 
 function LudwigUI_UpdateList(changed)
@@ -119,45 +163,11 @@ function LudwigUI_UpdateList(changed)
 			button:SetText(Ludwig:GetItemName(id, true))
 			button:SetID(id)
 			button:Show()
+			if(GameTooltip:IsOwned(button)) then
+				Item_UpdateTooltip(button)
+			end
 		end
 	end
-end
-
-
---[[ Item Button ]]--
-
-local function Item_UpdateTooltip(self)
-	GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
-	GameTooltip:SetHyperlink(Ludwig:GetItemLink(self:GetID()))
-
-	if IsShiftKeyDown() then
-		GameTooltip_ShowCompareItem()
-	end
-	GameTooltip:Show()
-end
-
-function LudwigUI_OnItemClick(self)
-	if IsShiftKeyDown() then
-		ChatFrameEditBox:Insert(Ludwig:GetItemLink(self:GetID()))
-	elseif IsControlKeyDown() then
-		DressUpItemLink(Ludwig:GetItemLink(self:GetID()))
-	else
-		SetItemRef(Ludwig:GetItemLink(self:GetID()))
-	end
-end
-
-function LudwigUI_OnItemEvent(self)
-	Item_UpdateTooltip(self)
-end
-
-function LudwigUI_OnItemEnter(self)
-	self:RegisterEvent("MODIFIER_STATE_CHANGED")
-	Item_UpdateTooltip(self)
-end
-
-function LudwigUI_OnItemLeave(self)
-	self:UnregisterEvent("MODIFIER_STATE_CHANGED")
-	GameTooltip:Hide()
 end
 
 

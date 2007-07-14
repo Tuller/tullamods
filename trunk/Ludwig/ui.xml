@@ -32,9 +32,6 @@
 			<OnClick>
 				LudwigUI_OnItemClick(self)
 			</OnClick>
-			<OnEvent>
-				LudwigUI_OnItemEvent(self)
-			</OnEvent>
 			<OnEnter>
 				LudwigUI_OnItemEnter(self)
 			</OnEnter>
