@@ -2,6 +2,7 @@ Ludwig Version History
 
 1.2
 Redesigned the frame to better integrate with the default frames
+Implemented the blizzard equip compare functionality
 
 1.1
 Added autocomplete to linkerator (thanks N00bZXI)
