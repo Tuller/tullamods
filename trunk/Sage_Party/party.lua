@@ -110,7 +110,7 @@ end
 --range checking code, taken from perfectraid
 local function PartyParent_Create()
 	local frame = CreateFrame("Frame", nil, UIParent)
-	frame:SetFrameLevel(0); frame:Hide()
+	frame:Hide()
 	return frame
 end
 
