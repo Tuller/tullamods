@@ -64,38 +64,40 @@ local function ToID(link)
 end
 
 local cache = setmetatable({}, {__index = function(t, i)
-	if SellFishDB and SellFishDB.data then
-		local c = (SellFishDB.data:match(";" .. i .. ",(%w+);")) or 0
-		t[i] = c
-		return c
-	end
+	local c = (SellFishDB.data:match(";" .. i .. ",(%w+);")) or 0
+	t[i] = c
+	return c
 end})
 
 
 --[[ Startup/Shutdown ]]--
 
 SellFish = {}
-SellFish.defaults = {style = 3, version = CURRENT_VERSION, newVals = {}, data = SellFish_GetDefaults()}
+SellFish.defaults = {style = 3, newVals = {}, data = SellFish_GetDefaults()}
 
 function SellFish:Load()
 	local tip = CreateFrame("GameTooltip", "SellFishTooltip", UIParent, "GameTooltipTemplate")
-	tip:SetScript("OnTooltipAddMoney", function()
+	tip:SetScript("OnTooltipAddMoney", function(tip, cost)
 		if not InRepairMode() then
-			tip.lastCost = arg1
+			tip.lastCost = cost
 		end
 	end)
 
 	tip:SetScript("OnEvent", function()
 		if event == "MERCHANT_SHOW" then
 			self:ScanPrices()
-		elseif event == "ADDON_LOADED" and arg1 == "SellFish" then
-			this:UnregisterEvent("ADDON_LOADED")
-			self:Initialize()
+		elseif event == "ADDON_LOADED" then
+			if(arg1 == "SellFish") then
+				this:UnregisterEvent("ADDON_LOADED")
+				self:Initialize()
+			end
+		elseif event == "PLAYER_LOGOUT" then
+			self:ClearDefaults()
 		end
 	end)
 	tip:RegisterEvent("MERCHANT_SHOW")
 	tip:RegisterEvent("ADDON_LOADED")
-
+	tip:RegisterEvent("PLAYER_LOGOUT")
 	self.tip = tip
 
 	self:LoadSlashCommands()
@@ -113,15 +115,20 @@ function SellFish:Initialize()
 			self:UpdateVersion()
 		end
 	end
-
-	if(not SellFishDB.data) then
-		self:LoadSellValues()
-	end
 end
 
 function SellFish:LoadDefaults()
-	SellFishDB = {}
+	SellFishDB = setmetatable({}, {__index = self.defaults})
 	self:LoadSellValues(true)
+end
+
+function SellFish:ClearDefaults()
+	local defaults = self.defaults
+	for i,v in pairs(SellFishDB) do
+		if(i ~= version and defaults[i] == v) then
+			SellFishDB[i] = nil
+		end
+	end
 end
 
 function SellFish:UpdateVersion()
@@ -143,16 +150,11 @@ function SellFish:ScanPrices()
 
 	for bag = 0, NUM_BAG_FRAMES do
 		for slot = 1, GetContainerNumSlots(bag) do
-			local repairCost = select(2, tip:SetBagItem(bag, slot))
-			if(not(repairCost) or repairCost == 0) then
-				local link = GetContainerItemLink(bag, slot)
-				if link then
-					local cost = self:GetItemValue(bag, slot)
-					if cost then
-						local count = (select(2, GetContainerItemInfo(bag, slot)))
-						self:SaveCost(ToID(link), cost/count)
-					end
-				end
+			local link = GetContainerItemLink(bag, slot)
+			local cost = link and self:GetItemValue(bag, slot)
+			if cost then
+				local count = (select(2, GetContainerItemInfo(bag, slot)))
+				self:SaveCost(ToID(link), cost/count)
 			end
 		end
 	end
@@ -160,9 +162,11 @@ end
 
 function SellFish:GetItemValue(bag, slot)
 	self.tip.lastCost = nil
-	self.tip:SetBagItem(bag, slot)
 
-	return self.tip.lastCost
+	local repairCost = (select(2, self.tip:SetBagItem(bag, slot)))
+	if not(repairCost) or repairCost == 0 then
+		return self.tip.lastCost or 0
+	end
 end
 
 function SellFish:SaveCost(id, cost)
@@ -191,11 +195,7 @@ function SellFish:CompressDB()
 		local prevCost = cache[id]
 		if prevCost then
 			if(cost ~= prevCost) then
-				if cost == "0" then
-					SellFishDB.data:gsub(format(";%s,%s;", id, prevCost), "");
-				else
-					SellFishDB.data:gsub(format(";%s,%s;", id, prevCost), format(";%s,%s;", id, cost))
-				end
+				SellFishDB.data:gsub(format(";%s,%s;", id, prevCost), (cost == 0 and "") or format(";%s,%s;", id, cost))
 			end
 		elseif cost ~= "0" then
 			appendString = (appendString or "") .. format(";%s,%s", id, cost)
@@ -312,7 +312,9 @@ function GetSellValue(link)
 		end
 	end
 
-	return oGetSellValue and oGetSellValue(link)
+	if oGetSellValue then
+		return oGetSellValue(link)
+	end
 end
 
 function SellFish:GetNumValues()
