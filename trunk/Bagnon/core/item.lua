@@ -310,6 +310,9 @@ function BagnonItem:OnEnter()
 
 			BagnonUtil:AnchorTooltip(self)
 			GameTooltip:SetHyperlink(link, count)
+			if IsShiftKeyDown() then
+				GameTooltip_ShowCompareItem()
+			end
 		end
 	else
 		if bag == -1 then
@@ -319,6 +322,9 @@ function BagnonItem:OnEnter()
 				local count = GetInventoryItemCount("player", BankButtonIDToInvSlotID(slot))
 				BagnonUtil:AnchorTooltip(self)
 				GameTooltip:SetHyperlink(link, count)
+				if IsShiftKeyDown() then
+					GameTooltip_ShowCompareItem()
+				end
 			end
 		else
 			ContainerFrameItemButton_OnEnter(self)
