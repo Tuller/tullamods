@@ -172,18 +172,16 @@ end
 --layout buffs in the frame
 local function BuffFrame_LayoutIcons(self)
 	local count = self.count or 0
-	local width = ceil(self:GetWidth())
-	local height = ceil(self:GetHeight())
 	local size = 36
-	local scale = min(width, height) / size
-	local rows = 1
-	while size * scale  * count / rows > width do
-		scale = scale - 0.01
-		rows = height / (size * scale)
+
+	local cols = 1
+	local scale = FRAME_WIDTH / (size*cols)
+	local rows = floor(FRAME_HEIGHT / (size*scale))
+	while(cols*rows < count) do
+		cols = cols + 1
+		scale = FRAME_WIDTH / (size*cols)
+		rows = floor(FRAME_HEIGHT / (size * scale))
 	end
-	local cols = ceil(count / rows)
-	rows = floor(rows)
-	-- size = size * scale
 
 	local buffs = self.buffs
 	for row = 0, rows-1 do
