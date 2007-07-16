@@ -73,7 +73,7 @@ end})
 --[[ Startup/Shutdown ]]--
 
 SellFish = {}
-SellFish.defaults = {style = 3, newVals = {}, data = SellFish_GetDefaults()}
+SellFish.defaults = {style = 3, newVals = {}, data = SellFish_GetDefaults(), version = CURRENT_VERSION}
 
 function SellFish:Load()
 	local tip = CreateFrame("GameTooltip", "SellFishTooltip", UIParent, "GameTooltipTemplate")
@@ -105,9 +105,6 @@ end
 
 function SellFish:Initialize()
 	SellFishDB = setmetatable(SellFishDB or {}, {__index = self.defaults})
-	if(not SellFishDB.version) then
-		SellFishDB.version = CURRENT_VERSION
-	end
 
 	if(SellFishDB.version ~= CURRENT_VERSION) then
 		local cMajor, cMinor = CURRENT_VERSION:match("(%d+)%.(%d+)")
@@ -122,16 +119,13 @@ end
 
 function SellFish:LoadDefaults()
 	SellFishDB = setmetatable({}, {__index = self.defaults})
-	if(not SellFishDB.version) then
-		SellFishDB.version = CURRENT_VERSION
-	end
 	self:LoadSellValues(true)
 end
 
 function SellFish:ClearDefaults()
 	local defaults = self.defaults
 	for i,v in pairs(SellFishDB) do
-		if(defaults[i] == v) then
+		if(i ~= "version" and defaults[i] == v) then
 			SellFishDB[i] = nil
 		end
 	end
