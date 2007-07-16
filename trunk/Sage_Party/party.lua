@@ -60,6 +60,7 @@ local function Frame_OnShow(self)
 end
 
 local function Frame_OnCreate(self)
+	self:SetFrameLevel(0)
 	self.Update = Frame_Update
 	self.UpdateNameColor = Frame_UpdateNameColor
 
