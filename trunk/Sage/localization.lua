@@ -51,7 +51,7 @@ L.Layout = "Layout"
 L.Dead = "Dead"
 L.Offline = "Offline"
 L.Ghost = "Ghost"
-L.FeignDeath = "Feigning Death"
+L.FeignDeath = "Feign"
 
 L.Boss = "Boss"
 L.Rare = "Rare"
