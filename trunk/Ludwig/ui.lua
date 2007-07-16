@@ -333,7 +333,7 @@ local function Type_OnClick(arg1, arg2)
 	end
 	LudwigUI_UpdateTypeText()
 	LudwigUI_UpdateList(true)
-	
+
 	--hack to hide the previous dropdown menu levels
 	for i = 1, UIDROPDOWNMENU_MENU_LEVEL-1 do
 		getglobal("DropDownList"..i):Hide()

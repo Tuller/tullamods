@@ -1,4 +1,4 @@
-﻿--[[
+--[[
 	Localization for Ludwig
 --]]
 
@@ -30,3 +30,29 @@ L.UnknownCommand = "\"%s\" is an unknown command"
 L.NoMatchingItems = "There are no items matching \"%s\""
 L.NumMatching = "There are %d items matching \"%s\":"
 L.GenTime = "Generated in %.3f seconds"
+
+-- Chinese translation (zhCN) by lostcup @ NGACN
+
+if ( GetLocale() == "zhCN" ) then
+
+--UI text
+L.FrameTitle = "Ludwig: %d件物品"
+
+--filters
+L.Any = "任意"
+L.Key = "钥匙"
+L.Quest = "任务"
+L.Junk = "垃圾"
+L.Parts = "零件"
+L.Explosives = "爆炸物"
+L.Devices = "设备"
+L.TradeGoods = "商品"
+
+--Slash command responses
+L.DBRefreshed = "数据库已更新"
+L.UnknownCommand = "\"%s\"命令不能被识别"
+L.NoMatchingItems = "没有物品能够匹配关键字\"%s\""
+L.NumMatching = "共有%d件物品能够匹配关键字\"%s\"："
+L.GenTime = "耗时%.3f秒"
+
+end

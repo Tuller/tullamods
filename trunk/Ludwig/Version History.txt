@@ -2,6 +2,7 @@ Ludwig Version History
 
 1.2.1
 Fixed a bug causing options to become permanently checked
+Added in Chinese translation (thanks lostcup)
 
 1.2
 Redesigned the frame to better integrate with the default frames
