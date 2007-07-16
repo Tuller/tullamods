@@ -47,12 +47,6 @@
 	<Frame name="LudwigFrame" enableMouse="true" toplevel="true" movable="true" hidden="true" parent="UIParent">
 		<Size x="384" y="512"/>
 
- 		<Anchors>
- 			<Anchor point="TOPLEFT">
- 				<Offset x="0" y="-104"/>
- 			</Anchor>
- 		</Anchors>
-
 		<Attributes>
 			<Attribute name="UIPanelLayout-defined" type="boolean" value="true"/>
 			<Attribute name="UIPanelLayout-enabled" type="boolean" value="true"/>
