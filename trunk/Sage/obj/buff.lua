@@ -173,14 +173,15 @@ end
 local function BuffFrame_LayoutIcons(self)
 	local count = self.count or 0
 	local size = 36
+	local width, height = self:GetWidth(), self:GetHeight()
 
 	local cols = 1
-	local scale = FRAME_WIDTH / (size*cols)
-	local rows = floor(FRAME_HEIGHT / (size*scale))
+	local scale = width / (size*cols)
+	local rows = floor(height / (size*scale))
 	while(cols*rows < count) do
 		cols = cols + 1
-		scale = FRAME_WIDTH / (size*cols)
-		rows = floor(FRAME_HEIGHT / (size * scale))
+		scale = width / (size*cols)
+		rows = floor(height / (size * scale))
 	end
 
 	local buffs = self.buffs
