@@ -1,4 +1,4 @@
---[[
+﻿--[[
 	Localization for Ludwig
 --]]
 
@@ -15,7 +15,6 @@ local L = LUDWIG_LOCALS
 L.FrameTitle = "Ludwig: %d Items"
 
 --filters
-L.Any = "Any"
 L.Key = "Key"
 L.Quest = "Quest"
 L.Junk = "Junk"
@@ -39,7 +38,6 @@ if ( GetLocale() == "zhCN" ) then
 L.FrameTitle = "Ludwig: %d件物品"
 
 --filters
-L.Any = "任意"
 L.Key = "钥匙"
 L.Quest = "任务"
 L.Junk = "垃圾"
