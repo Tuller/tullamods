@@ -70,7 +70,7 @@ end
 --creates an entierly new item slot, if no blizzard slots are available
 local function Item_Create()
 	local bag = ceil(lastCreated / MAX_CONTAINER_ITEMS)
-	local slot = mod(lastCreated - 1, MAX_CONTAINER_ITEMS) + 1
+	local slot = mod(lastCreated-1, MAX_CONTAINER_ITEMS) + 1
 	local item = getglobal(format("ContainerFrame%dItem%d", bag, slot))
 	if item then
 		item:SetParent(nil)
@@ -89,6 +89,10 @@ local function Item_Create()
 	border:SetBlendMode("ADD")
 	border:Hide()
 	item.border = border
+
+	local cooldown = _G[item:GetName() .. "Cooldown"]
+	cooldown:SetFrameLevel(item:GetFrameLevel() + 3)
+	item.cooldown = cooldown
 
 	item:UnregisterAllEvents()
 	item:SetScript("OnEvent", nil)
@@ -128,7 +132,6 @@ end
 function BagnonItem:Set(frame, bag, slot)
 	local item = Item_Get()
 	item:SetParent(DummyBag_Get(frame, bag))
-	-- item:SetFrameLevel(2)
 	item:SetID(slot)
 	item:Update()
 
@@ -225,13 +228,11 @@ function BagnonItem:UpdateLock(locked)
 end
 
 function BagnonItem:UpdateCooldown()
-	local cooldown = _G[self:GetName().. "Cooldown"]
-
 	if (not self.cached) and self.hasItem then
 		local start, duration, enable = GetContainerItemCooldown(self:GetBag(), self:GetID())
-		CooldownFrame_SetTimer(cooldown, start, duration, enable)
+		CooldownFrame_SetTimer(self.cooldown, start, duration, enable)
 	else
-		CooldownFrame_SetTimer(cooldown, 0, 0, 0)
+		CooldownFrame_SetTimer(self.cooldown, 0, 0, 0)
 	end
 end
 
