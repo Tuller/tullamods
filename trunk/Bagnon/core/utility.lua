@@ -133,3 +133,30 @@ function BagnonUtil:Attach(frame, parent)
 	frame:SetParent(parent)
 	frame:SetFrameLevel(1)
 end
+
+
+--[[ Settings ]]--
+
+function BagnonUtil:GetSets()
+	return Bagnon.sets
+end
+
+function BagnonUtil:ShowingOwners()
+	return Bagnon.sets.showOwners
+end
+
+function BagnonUtil:ShowingBorders()
+	return Bagnon.sets.showBorders
+end
+
+function BagnonUtil:ReusingFrames()
+	return Bagnon.sets.reuseFrames
+end
+
+function BagnonUtil:ReplacingBags()
+	return Bagnon.sets.replaceBags
+end
+
+function BagnonUtil:ReplacingBank()
+	return Bagnon.sets.replaceBank
+end
