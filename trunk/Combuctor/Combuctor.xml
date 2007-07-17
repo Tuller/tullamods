@@ -1,0 +1,264 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+
+	<Script file="Combuctor.lua"/>
+
+	<Frame name="CombuctorFrame" enableMouse="true" toplevel="true" movable="true" hidden="true" parent="UIParent">
+		<Size x="384" y="512"/>
+
+		<Attributes>
+			<Attribute name="UIPanelLayout-defined" type="boolean" value="true"/>
+			<Attribute name="UIPanelLayout-enabled" type="boolean" value="true"/>
+			<Attribute name="UIPanelLayout-whileDead" type="boolean" value="true"/>
+			<Attribute name="UIPanelLayout-area" type="string" value="right"/>
+			<Attribute name="UIPanelLayout-pushable" type="number" value="3"/>
+		</Attributes>
+
+		<HitRectInsets>
+			<AbsInset left="0" right="35" top="0" bottom="75"/>
+		</HitRectInsets>
+
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentIcon">
+					<Size x="62" y="62"/>
+				</Texture>
+			</Layer>
+
+			<Layer level="ARTWORK">
+				<FontString name="$parentText" inherits="GameFontHighlight" text="TEXT">
+					<Size x="300" y="14"/>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset x="0" y="-16"/>
+						</Anchor>
+					</Anchors>
+				</FontString>
+
+				<Texture file="Interface\TaxiFrame\UI-TaxiFrame-TopLeft">
+					<Size x="256" y="256"/>
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+					</Anchors>
+				</Texture>
+
+				<Texture file="Interface\TaxiFrame\UI-TaxiFrame-TopRight">
+					<Size x="128" y="256"/>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset x="256" y="0"/>
+						</Anchor>
+					</Anchors>
+				</Texture>
+
+				<Texture file="Interface\PaperDollInfoFrame\SkillFrame-BotLeft">
+					<Size x="256" y="256"/>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT"/>
+					</Anchors>
+				</Texture>
+
+				<Texture file="Interface\PaperDollInfoFrame\SkillFrame-BotRight">
+					<Size x="128" y="256"/>
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+
+		<Frames>
+	        <Button name="$parentCloseButton" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset x="-29" y="-8"/>
+					</Anchor>
+				</Anchors>
+	        </Button>
+
+			<Button name="$parentRefresh">
+				<Size x="64" y="64"/>
+
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset x="4" y="-4"/>
+					</Anchor>
+				</Anchors>
+
+				<Scripts>
+					<OnLoad>
+						self.icon = getglobal(self:GetParent():GetName().."Icon")
+						self.icon:ClearAllPoints()
+						self.icon:SetPoint("CENTER", self)
+					</OnLoad>
+					<OnShow>
+						SetPortraitTexture(self.icon, "player")
+					</OnShow>
+					<OnMouseDown>
+						self.icon:SetWidth(56); self.icon:SetHeight(56)
+						self.icon:SetTexCoord(0.075, 0.925, 0.075, 0.925)
+					</OnMouseDown>
+					<OnMouseUp>
+						self.icon:SetWidth(62); self.icon:SetHeight(62)
+						self.icon:SetTexCoord(0, 1, 0, 1)
+					</OnMouseUp>
+					<OnClick>
+					</OnClick>
+				</Scripts>
+
+				<HighlightTexture alphaMode="ADD" file="Interface\Minimap\UI-Minimap-ZoomButton-Highlight">
+					<Size x="78" y="78"/>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</HighlightTexture>
+			</Button>
+
+			<EditBox name="$parentSearch" autoFocus="false" inherits="InputBoxTemplate">
+				<Size x="148" y="20"/>
+
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset x="84" y="-44"/>
+					</Anchor>
+				</Anchors>
+
+				<Scripts>
+					<OnShow>
+						if (self:GetText() == "") then
+							self:SetText(SEARCH)
+						end
+					</OnShow>
+					<OnEnterPressed>
+						self:ClearFocus()
+					</OnEnterPressed>
+					<OnTextChanged>
+						Combuctor:OnSearchChanged(self, self:GetText())
+					</OnTextChanged>
+					<OnTabPressed>
+						getglobal(self:GetParent():GetName() .. "MinLevel"):SetFocus()
+					</OnTabPressed>
+					<OnEditFocusLost>
+						self:HighlightText(0, 0)
+						if (self:GetText() == "") then
+							self:SetText(SEARCH)
+						end
+					</OnEditFocusLost>
+					<OnEditFocusGained>
+						self:HighlightText()
+						if (self:GetText() == SEARCH) then
+							self:SetText("")
+						end
+					</OnEditFocusGained>
+				</Scripts>
+			</EditBox>
+
+			<EditBox name="$parentMinLevel" letters="2" numeric="true" autoFocus="false" inherits="InputBoxTemplate">
+				<Size x="25" y="16"/>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentSearch" relativePoint="RIGHT">
+						<Offset x="12" y="0"/>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentHyphen" inherits="GameFontHighlightSmall" text="-">
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parent" relativePoint="RIGHT">
+									<Offset x="0" y="1"/>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnTabPressed>
+						getglobal(self:GetParent():GetName() .. "MaxLevel"):SetFocus()
+					</OnTabPressed>
+					<OnEnterPressed>
+						self:ClearFocus()
+					</OnEnterPressed>
+					<OnTextChanged>
+						Combuctor:OnMinLevelChanged(self, self:GetText())
+					</OnTextChanged>
+				</Scripts>
+			</EditBox>
+
+			<EditBox name="$parentMaxLevel" letters="2" numeric="true" autoFocus="false" inherits="InputBoxTemplate">
+				<Size x="25" y="16"/>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentMinLevel" relativePoint="RIGHT">
+						<Offset x="12" y="0"/>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnTabPressed>
+						getglobal(self:GetParent():GetName() .. "Search"):SetFocus()
+					</OnTabPressed>
+					<OnEnterPressed>
+						self:ClearFocus()
+					</OnEnterPressed>
+					<OnTextChanged>
+						Combuctor:OnMaxLevelChanged(self, self:GetText())
+					</OnTextChanged>
+				</Scripts>
+			</EditBox>
+
+			<Button name="$parentReset">
+				<Size x="39" y="39"/>
+
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentMaxLevel" relativePoint="RIGHT">
+						<Offset x="-2" y="-2"/>
+					</Anchor>
+				</Anchors>
+
+				<Scripts>
+					<OnClick>
+						Combuctor:Reset()
+					</OnClick>
+				</Scripts>
+
+				<NormalTexture file="Interface\Buttons\CancelButton-Up"/>
+				<PushedTexture file="Interface\Buttons\CancelButton-Down"/>
+				<HighlightTexture file="Interface\Buttons\CancelButton-Highlight" alphaMode="ADD"/>
+			</Button>
+
+			<Frame name="$parentQuality" inherits="UIDropDownMenuTemplate">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT">
+						<Offset x="0" y="72"/>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						Combuctor:OnQualityShow(self)
+					</OnShow>
+				</Scripts>
+			</Frame>
+
+			<Frame name="$parentType" inherits="UIDropDownMenuTemplate">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT">
+						<Offset x="110" y="72"/>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						Combuctor:OnTypeShow(self)
+					</OnShow>
+				</Scripts>
+			</Frame>
+		</Frames>
+
+		<Scripts>
+			<OnShow>
+				Combuctor:OnShow()
+				PlaySound("igCharacterInfoOpen")
+			</OnShow>
+			<OnHide>
+				Combuctor:OnHide()
+				PlaySound("igCharacterInfoClose")
+			</OnHide>
+		</Scripts>
+	</Frame>
+</Ui>

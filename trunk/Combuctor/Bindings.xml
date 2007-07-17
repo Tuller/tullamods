@@ -1,0 +1,11 @@
+<Bindings>
+	<Binding name="COMBUCTOR_SHOW" header="COMBUCTOR">
+		if keystate == "down" then
+			if Combuctor.frame:IsShown() then
+				HideUIPanel(Combuctor.frame)
+			else
+				ShowUIPanel(Combuctor.frame)
+			end
+		end
+	</Binding>
+</Bindings>
