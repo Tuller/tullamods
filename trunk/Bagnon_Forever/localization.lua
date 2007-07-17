@@ -4,7 +4,7 @@
 --]]
 
 --[[
-	English 
+	English
 		Any gaps in the translations are filled by English words.
 --]]
 

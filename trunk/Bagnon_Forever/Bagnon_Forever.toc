@@ -5,10 +5,11 @@
 ## Author: Tuller
 ## Version: 7.3.12
 ## SavedVariables: BagnonForeverDB
+## LoadOnDemand: 1
+## LoadWith: Bagnon, Combuctor
 localization.lua
 trans\localization.de.lua
 trans\localization.fr.lua
 trans\localization.cn.lua
 ui\ui.xml
-ui\tooltips.lua
 db.lua

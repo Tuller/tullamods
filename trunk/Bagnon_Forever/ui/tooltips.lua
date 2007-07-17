@@ -20,7 +20,7 @@ local function AddOwners(frame, id)
 		end
 
 		local equipCount = BagnonDB:GetItemCount(id, 'e', player)
-		
+
 		if (invCount + bankCount + equipCount) > 0 then
 			local line = player .. ':'
 			if invCount > 0 then
