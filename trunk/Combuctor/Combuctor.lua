@@ -126,7 +126,7 @@ end
 function Combuctor:HasItem(link)
 	local f = self.filter
 	if(next(f)) then
-		if(not link) then return false end
+		if(not link) then return true end
 
 		local name, _, quality, _, level, type, subType, _, equipLoc = GetItemInfo(link)
 
