@@ -69,12 +69,15 @@ end
 
 --creates an entierly new item slot, if no blizzard slots are available
 local function Item_Create()
-	-- local bag = ceil(lastCreated / MAX_CONTAINER_ITEMS)
-	-- local slot = mod(lastCreated - 1, MAX_CONTAINER_ITEMS) + 1
-	-- local item = _G[format("ContainerFrame%dItem%d", bag, slot)]
-	-- if item then item:SetParent(nil); item:SetID(0) end
+	local bag = ceil(lastCreated / MAX_CONTAINER_ITEMS)
+	local slot = mod(lastCreated - 1, MAX_CONTAINER_ITEMS) + 1
+	local item = getglobal(format("ContainerFrame%dItem%d", bag, slot))
+	if item then
+		item:SetParent(nil)
+		item:SetID(0)
+	end
 
-	local item = CreateFrame("Button", format("BagnonItem%s", lastCreated), nil, "ContainerFrameItemButtonTemplate")
+	item = item or CreateFrame("Button", format("BagnonItem%s", lastCreated), nil, "ContainerFrameItemButtonTemplate")
 	item:ClearAllPoints()
 	item:Show()
 	setmetatable(item, Item_mt)

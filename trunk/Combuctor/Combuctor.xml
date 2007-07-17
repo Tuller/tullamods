@@ -90,9 +90,18 @@
 						self.icon:ClearAllPoints()
 						self.icon:SetPoint("CENTER", self)
 					</OnLoad>
+					<OnEvent>
+						if(self:IsShown() and arg1 == "player") then
+							SetPortraitTexture(self.icon, arg1)
+						end
+					</OnEvent>
 					<OnShow>
 						SetPortraitTexture(self.icon, "player")
+						self:RegisterEvent("UNIT_PORTRAIT_UPDATE")
 					</OnShow>
+					<OnHide>
+						self:UnregisterEvent("UNIT_PORTRAIT_UPDATE")
+					</OnHide>
 					<OnMouseDown>
 						self.icon:SetWidth(56); self.icon:SetHeight(56)
 						self.icon:SetTexCoord(0.075, 0.925, 0.075, 0.925)
