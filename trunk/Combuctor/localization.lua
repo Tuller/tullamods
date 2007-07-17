@@ -6,7 +6,7 @@
 
 --Keybinding text
 BINDING_HEADER_COMBUCTOR = "Combuctor"
-BINDING_NAME_LUDWIG_SHOW = "Toggle Combuctor"
+BINDING_NAME_COMBUCTOR_SHOW = "Toggle Combuctor"
 
 COMBUCTOR_LOCALS = {}
 local L = COMBUCTOR_LOCALS
