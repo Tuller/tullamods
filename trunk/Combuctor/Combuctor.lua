@@ -11,14 +11,14 @@ local FRAME_HEIGHT = 22 * 15
 local ITEM_SIZE = 37
 local SPACING = 2
 
-
---[[ Local Bindings ]]--
-
+--local bindings
 local _G = getfenv(0)
 local GetContainerItemLink = GetContainerItemLink
 local GetItemInfo = GetItemInfo
 local BagnonUtil = BagnonUtil
 local BagnonItem = BagnonItem
+local floor, mod, ceil = floor, mod, ceil
+local currentPlayer = UnitName("player")
 
 
 --[[ Utility Functions ]]--
@@ -27,6 +27,10 @@ local function ToIndex(bag, slot)
 	if(tonumber(bag) and tonumber(slot)) then
 		return (bag<0 and bag*100 - slot) or (bag*100 + slot)
 	end
+end
+
+local function ToBag(index)
+	return (index > 0 and floor(index/100)) or ceil(index/100)
 end
 
 
@@ -44,7 +48,7 @@ function Combuctor:Enable()
 
 	--item stuff
 	self.items = {}
-	self.bags = {0, 1, 2, 3, 4, -1, 5, 6, 7, 8, 9, 10, 11, -2}
+	self.bags = {0, 1, 2, 3, 4, -1, 5, 6, 7, 8, 9, 10, 11}
 	self.count = 0
 
 	--filtering stuff
@@ -92,7 +96,10 @@ end
 function Combuctor:BAGNON_BANK_CLOSED()
 	BagnonUtil:SetAtBank(false)
 
-	if(self.frame:IsShown()) then self:Layout() end
+	local changed = self:RemoveBankItems()
+	if(changed and self.frame:IsShown()) then
+		self:Layout()
+	end
 end
 
 function Combuctor:OnSlotChanged(msg, ...)
@@ -108,7 +115,9 @@ function Combuctor:BAGNON_SLOT_UPDATE_COOLDOWN(msg, ...)
 end
 
 function Combuctor:BAGNON_SLOT_REMOVE(msg, ...)
-	self:RemoveItem(...)
+	if self:RemoveItem(...) then
+		self:Layout()
+	end
 end
 
 
@@ -152,6 +161,7 @@ function Combuctor:AddItem(bag, slot)
 	else
 		self.items[index] = BagnonItem:Set(self.frame, bag, slot)
 		self.count = self.count + 1
+		return true
 	end
 end
 
@@ -163,12 +173,7 @@ function Combuctor:RemoveItem(bag, slot)
 		item:Release()
 		self.items[index] = nil
 		self.count = self.count - 1
-	end
-end
-
-function Combuctor:RemoveBag(bag)
-	for slot = 1, BagnonUtil:GetBagSize(bag) do
-		self:RemoveItem(bag, slot)
+		return true
 	end
 end
 
@@ -204,7 +209,6 @@ function Combuctor:Regenerate()
 	self:Layout()
 end
 
-local floor, mod, ceil = floor, mod, ceil
 function Combuctor:Layout()
 	local count = self.count
 	local size = ITEM_SIZE+2
@@ -238,12 +242,35 @@ function Combuctor:Layout()
 	end
 end
 
+--remove bank items
+function Combuctor:RemoveBankItems()
+	local items = self.items
+	local changed = false
+
+	for index,item in pairs(items) do
+		if BagnonUtil:IsBankBag(ToBag(index)) then
+			item:Release()
+			items[index] = nil
+			self.count = self.count - 1
+			changed = true
+		end
+	end
+	return changed
+end
+
 function Combuctor:GetPlayer()
-	return self.player or UnitName("player")
+	return self.player or currentPlayer
 end
 
 function Combuctor:SetPlayer(player)
-	self.player = player
+	if(player ~= self:GetPlayer()) then
+		self.player = player
+
+		self:RemoveAllItems()
+		if(self.frame:IsShown()) then
+			self.frame:Regenerate()
+		end
+	end
 end
 
 
@@ -264,18 +291,13 @@ function Combuctor:Reset()
 
 	--reset search text
 	local search = self.search
-	if(search:HasFocus()) then
-		search:SetText("")
-	else
-		search:SetText(SEARCH)
-	end
+	search:SetText(search:HasFocus() and "" or SEARCH)
 
 	self.minLevel:SetText("")
 	self.maxLevel:SetText("")
 
 	self:UpdateTypeText()
 	self:UpdateQualityText()
-
 
 	if(changed) then
 		self:Regenerate()
