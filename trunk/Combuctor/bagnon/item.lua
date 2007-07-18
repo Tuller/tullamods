@@ -111,7 +111,6 @@ local function Item_Get()
 	local item = next(unused)
 	if item then
 		unused[item] = nil
-		item:Show()
 		return item
 	end
 	return Item_Create()
@@ -134,6 +133,7 @@ function BagnonItem:Set(frame, bag, slot)
 	item:SetParent(DummyBag_Get(frame, bag))
 	item:SetID(slot)
 	item:Update()
+	item:Show()
 
 	return item
 end

@@ -124,14 +124,13 @@ function Combuctor:SetTab(index)
 				end
 
 				if(not found) then
-					local removedItems = self:RemoveBag(i)
-					changed = changed or removedItems
+					self:RemoveBag(i)
 				end
 			end
 		end
 		self.bags = newBags
 
-		if(changed and self.frame:IsShown()) then
+		if(self.frame:IsShown()) then
 			self:Regenerate()
 		end
 	end
