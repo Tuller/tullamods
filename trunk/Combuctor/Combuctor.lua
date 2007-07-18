@@ -6,8 +6,8 @@
 Combuctor = DongleStub("Dongle-1.0"):New("Combuctor")
 
 local L = COMBUCTOR_LOCALS
-local FRAME_WIDTH = 320-8
-local FRAME_HEIGHT = 324
+local FRAME_WIDTH = 312
+local FRAME_HEIGHT = 326
 local ITEM_SIZE = 37
 local SPACING = 2
 
@@ -69,6 +69,11 @@ function Combuctor:Enable()
 	self:RegisterMessage("BAGNON_BANK_OPENED")
 	self:RegisterMessage("BAGNON_BANK_CLOSED")
 	self:HookBagClicks()
+	
+	local texture = self.frame:CreateTexture(nil, "OVERLAY")
+	texture:SetWidth(FRAME_WIDTH); texture:SetHeight(FRAME_HEIGHT)
+	texture:SetPoint("TOPLEFT", self.frame, "TOPLEFT", 26, -78)
+	texture:SetTexture(0.1, 0.1, 0.1)
 
 	local prev
 	for i,title in ipairs(tabs) do
@@ -183,7 +188,7 @@ end
 function Combuctor:HasItem(link)
 	local f = self.filter
 	if(next(f)) then
-		if(not link) then return true end
+		if(not link) then return false end
 
 		local name, _, quality, _, level, type, subType, _, equipLoc = GetItemInfo(link)
 
@@ -269,7 +274,7 @@ end
 
 function Combuctor:Layout()
 	local count = self.count
-	local size = ITEM_SIZE+2
+	local size = ITEM_SIZE+SPACING
 
 	local cols = 1
 	local scale = FRAME_WIDTH / (size*cols)
@@ -283,7 +288,7 @@ function Combuctor:Layout()
 	local items = self.items
 	local frame = self.frame
 
-	local offX, offY = 28/scale, 78/scale
+	local offX, offY = (26+SPACING/2)/scale, (78+SPACING/2)/scale
 	local player = self:GetPlayer()
 	local i = 0
 	for _,bag in ipairs(self.bags) do

@@ -26,7 +26,7 @@
 			<Attribute name="UIPanelLayout-enabled" type="boolean" value="true"/>
 			<Attribute name="UIPanelLayout-whileDead" type="boolean" value="true"/>
 			<Attribute name="UIPanelLayout-area" type="string" value="right"/>
-			<Attribute name="UIPanelLayout-pushable" type="number" value="3"/>
+			<Attribute name="UIPanelLayout-pushable" type="number" value="10"/>
 		</Attributes>
 
 		<HitRectInsets>
