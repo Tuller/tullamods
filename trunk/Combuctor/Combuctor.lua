@@ -15,8 +15,7 @@ local SPACING = 2
 local _G = getfenv(0)
 local GetContainerItemLink = GetContainerItemLink
 local GetItemInfo = GetItemInfo
-local BagnonUtil = BagnonUtil
-local BagnonItem = BagnonItem
+local BagnonUtil, BagnonItem = BagnonUtil, BagnonItem
 local floor, mod, ceil = floor, mod, ceil
 local currentPlayer = UnitName("player")
 
@@ -288,8 +287,9 @@ function Combuctor:Layout()
 	local items = self.items
 	local frame = self.frame
 
-	local offX, offY = (26+SPACING/2)/scale, (78+SPACING/2)/scale
+	local offX, offY = 26/scale + SPACING/2, 78/scale + SPACING/2
 	local player = self:GetPlayer()
+
 	local i = 0
 	for _,bag in ipairs(self.bags) do
 		for slot = 1, BagnonUtil:GetBagSize(bag, player) do

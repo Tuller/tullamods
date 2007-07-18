@@ -88,53 +88,6 @@
 			</Layer>
 		</Layers>
 	
-<!--	
-		<Layers>
-			<Layer level="BACKGROUND">
-				<Texture name="$parentIcon">
-					<Size x="62" y="62"/>
-				</Texture>
-			</Layer>
-
-			<Layer level="ARTWORK">
-				<Texture name="$parentBackgroundTop" file="Interface\ContainerFrame\UI-Bag-Components">
-					<Size x="256" y="512"/>
-					<Anchors>
-						<Anchor point="TOPRIGHT"/>
-					</Anchors>
-				</Texture>
-				<Texture name="$parentBackgroundMiddle1" file="Interface\ContainerFrame\UI-Bag-Components">
-					<Size x="256" y="512"/>
-					<Anchors>
-						<Anchor point="TOP" relativeTo="$parentBackgroundTop" relativePoint="BOTTOM"/>
-					</Anchors>
-					<TexCoords left="0" right="1" top="0.3515625" bottom="0.8515625"/>
-				</Texture>
-				<Texture name="$parentBackgroundMiddle2" file="Interface\ContainerFrame\UI-Bag-Components" hidden="true">
-					<Size x="256" y="256"/>
-					<Anchors>
-						<Anchor point="TOP" relativeTo="$parentBackgroundMiddle1" relativePoint="BOTTOM"/>
-					</Anchors>
-					<TexCoords left="0" right="1" top="0.353515625" bottom="0.8515625"/>
-				</Texture>
-				<Texture name="$parentBackgroundBottom" file="Interface\ContainerFrame\UI-Bag-Components">
-					<Size x="256" y="10"/>
-					<Anchors>
-						<Anchor point="TOP" relativeTo="$parentBackgroundMiddle1" relativePoint="BOTTOM"/>
-					</Anchors>
-					<TexCoords left="0" right="1" top="0.330078125" bottom="0.349609375"/>
-				</Texture>
-				<FontString name="$parentText" inherits="GameFontHighlight">
-					<Size x="112" y="12"/>
-					<Anchors>
-						<Anchor point="TOPLEFT">
-							<Offset x="47" y="-10"/>
-						</Anchor>
-					</Anchors>
-				</FontString>
-			</Layer>
-		</Layers>
--->
 		<Frames>
 	        <Button name="$parentCloseButton" inherits="UIPanelCloseButton">
 				<Anchors>
