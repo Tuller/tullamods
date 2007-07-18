@@ -18,12 +18,15 @@ local BUFF_SIZE = 16
 --[[ Pet Frame Code ]]--
 
 local function PetFrame_OnShow(self)
-	self:GetParent().buff:SetPoint("TOPLEFT", self, "BOTTOMLEFT")
+	local buff = self:GetParent().buff
+	buff:SetPoint("TOPLEFT", self, "BOTTOMLEFT")
+	buff:SetPoint("TOPRIGHT", self, "BOTTOMRIGHT")
 end
 
 local function PetFrame_OnHide(self)
 	local parent = self:GetParent()
 	parent.buff:SetPoint("TOPLEFT", parent.mana, "BOTTOMLEFT")
+	parent.buff:SetPoint("TOPRIGHT", parent.mana, "BOTTOMRIGHT")
 end
 
 local function PetFrame_Create(parent, id)
@@ -87,7 +90,6 @@ local function Frame_OnCreate(self)
 	self.cast:SetPoint("BOTTOMRIGHT", self.mana, "TOPRIGHT", 0, -3)
 
 	self.buff = SageBuff:Create(self)
-	self.buff:SetWidth(BUFF_SIZE * 8)
 	self.buff:SetHeight(BUFF_SIZE)
 
 	self.pet = PetFrame_Create(self, "partypet" .. self.id:match("%d+"))
