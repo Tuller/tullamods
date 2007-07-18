@@ -13,17 +13,11 @@ local BUFF_SIZE_SMALL = 16
 
 --buff frame
 local function BuffFrame_PlaceLeft(self)
-	local left = self:GetParent().leftContainer
-	self:SetPoint("TOPLEFT", left)
-	self:SetWidth(left:GetWidth())
-	self:SetHeight(left:GetHeight())
+	self:SetAllPoints(self:GetParent().leftContainer)
 end
 
 local function BuffFrame_PlaceBottom(self)
-	local bottom = self:GetParent().bottomContainer
-	self:SetPoint("TOPLEFT", bottom)
-	self:SetWidth(bottom:GetWidth())
-	self:SetHeight(bottom:GetHeight())
+	self:SetAllPoints(self:GetParent().bottomContainer)
 end
 
 --main frame
@@ -120,7 +114,7 @@ local function Frame_AddBars(self)
 	--anchor point for placing buff/debuff frames
 	self.bottomContainer = CreateFrame("Frame", nil, self)
 	self.bottomContainer:SetPoint("TOPLEFT", self.npc, "BOTTOMLEFT")
-	self.bottomContainer:SetWidth(BUFF_SIZE_SMALL * 8)
+	self.bottomContainer:SetPoint("TOPRIGHT", self.npc, "BOTTOMRIGHT")
 	self.bottomContainer:SetHeight(BUFF_SIZE_SMALL)
 
 	self.buff   = SageBuff:Create(self, nil, Frame_LayoutBuffs)
