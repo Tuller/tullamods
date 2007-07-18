@@ -137,7 +137,8 @@ local function Frame_OnCreate(self)
 
 	local buff = SageBuff:Create(self)
 	buff:SetPoint("TOPLEFT", self.mana, "BOTTOMLEFT", 0, -1)
-	buff:SetWidth(BUFF_SIZE * 8); buff:SetHeight(BUFF_SIZE)
+	buff:SetPoint("TOPRIGHT", self.mana, "BOTTOMRIGHT", 0, -1)
+	buff:SetHeight(BUFF_SIZE)
 	self.buff = buff
 
 	if self.sets.showCombatText then
