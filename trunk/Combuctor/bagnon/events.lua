@@ -88,8 +88,9 @@ end
 function BagnonEvents:RemoveItem(bag, slot)
 	local data = slots[ToIndex(bag, slot)]
 	if data and next(data) then
+		local prevLink = data[1]
 		for i in pairs(data) do data[i] = nil end
-		self:TriggerMessage("BAGNON_SLOT_REMOVE", bag, slot)
+		self:TriggerMessage("BAGNON_SLOT_REMOVE", bag, slot, prevLink)
 	end
 end
 

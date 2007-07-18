@@ -6,8 +6,8 @@
 Combuctor = DongleStub("Dongle-1.0"):New("Combuctor")
 
 local L = COMBUCTOR_LOCALS
-local FRAME_WIDTH = 320-12
-local FRAME_HEIGHT = 22 * 15
+local FRAME_WIDTH = 320-8
+local FRAME_HEIGHT = 324
 local ITEM_SIZE = 37
 local SPACING = 2
 
@@ -36,6 +36,14 @@ end
 
 --[[ Main Frame Functions ]]--
 
+local tabs = {ALL, "Inventory", "Bank", "Keys"}
+local bags = {
+	{0, 1, 2, 3, 4, -1, 5, 6, 7, 8, 9, 10, 11},
+	{0, 1, 2, 3, 4},
+	{-1, 5, 6, 7, 8, 9, 10, 11},
+	{-2},
+}
+
 function Combuctor:Enable()
 	local name = "CombuctorFrame"
 
@@ -48,7 +56,6 @@ function Combuctor:Enable()
 
 	--item stuff
 	self.items = {}
-	self.bags = {0, 1, 2, 3, 4, -1, 5, 6, 7, 8, 9, 10, 11}
 	self.count = 0
 
 	--filtering stuff
@@ -61,6 +68,23 @@ function Combuctor:Enable()
 
 	self:RegisterMessage("BAGNON_BANK_OPENED")
 	self:RegisterMessage("BAGNON_BANK_CLOSED")
+	self:HookBagClicks()
+
+	local prev
+	for i,title in ipairs(tabs) do
+		local tab = CreateFrame("Button", name .. "Tab" .. i, self.frame, "CombuctorFrameTabButtonTemplate")
+		tab:SetID(i); tab:SetText(title)
+
+		if(prev) then
+			tab:SetPoint("LEFT", prev, "RIGHT", -16, 0)
+		else
+			tab:SetPoint("CENTER", self.frame, "BOTTOMLEFT", 60, 62)
+		end
+		prev = tab
+	end
+	PanelTemplates_SetNumTabs(self.frame, #tabs)
+
+	self:SetTab(2)
 end
 
 function Combuctor:OnShow()
@@ -74,11 +98,43 @@ function Combuctor:OnShow()
 end
 
 function Combuctor:OnHide()
+	self:RemoveAllItems()
+
 	self:UnregisterMessage("BAGNON_SLOT_ADD")
 	self:UnregisterMessage("BAGNON_SLOT_UPDATE")
 	self:UnregisterMessage("BAGNON_SLOT_UPDATE_LOCK")
 	self:UnregisterMessage("BAGNON_SLOT_UPDATE_COOLDOWN")
 	self:UnregisterMessage("BAGNON_SLOT_REMOVE")
+end
+
+function Combuctor:SetTab(index)
+	if(self.index ~= index) then
+		self.index = index
+		PanelTemplates_SetTab(self.frame, index)
+
+		local newBags = bags[index]
+		local changed = false
+		if(self.bags) then
+			for _,i in pairs(self.bags) do
+				local found = false
+				for _,j in pairs(newBags) do
+					if(i == j) then
+						found = true
+					end
+				end
+
+				if(not found) then
+					local removedItems = self:RemoveBag(i)
+					changed = changed or removedItems
+				end
+			end
+		end
+		self.bags = newBags
+
+		if(changed and self.frame:IsShown()) then
+			self:Regenerate()
+		end
+	end
 end
 
 --[[ Messages ]]--
@@ -96,9 +152,11 @@ end
 function Combuctor:BAGNON_BANK_CLOSED()
 	BagnonUtil:SetAtBank(false)
 
-	local changed = self:RemoveBankItems()
-	if(changed and self.frame:IsShown()) then
-		self:Layout()
+	if(not BagnonDB) then
+		local changed = self:RemoveBankItems()
+		if(changed and self.frame:IsShown()) then
+			self:Layout()
+		end
 	end
 end
 
@@ -178,7 +236,7 @@ function Combuctor:RemoveItem(bag, slot)
 end
 
 function Combuctor:UpdateSlot(bag, slot, link)
-	if(self:HasItem(link or GetContainerItemLink(bag, slot))) then
+	if(self:HasItem(link or BagnonUtil:GetItemLink(bag, slot, self:GetPlayer()))) then
 		self:AddItem(bag, slot)
 	else
 		self:RemoveItem(bag, slot)
@@ -201,8 +259,9 @@ end
 
 --layout all items
 function Combuctor:Regenerate()
+	local player = self:GetPlayer()
 	for _,bag in ipairs(self.bags) do
-		for slot = 1, BagnonUtil:GetBagSize(bag) do
+		for slot = 1, BagnonUtil:GetBagSize(bag, player) do
 			self:UpdateSlot(bag, slot)
 		end
 	end
@@ -226,9 +285,10 @@ function Combuctor:Layout()
 	local frame = self.frame
 
 	local offX, offY = 28/scale, 78/scale
+	local player = self:GetPlayer()
 	local i = 0
 	for _,bag in ipairs(self.bags) do
-		for slot = 1, BagnonUtil:GetBagSize(bag) do
+		for slot = 1, BagnonUtil:GetBagSize(bag, player) do
 			local item = items[ToIndex(bag, slot)]
 			if(item) then
 				i = i + 1
@@ -258,18 +318,37 @@ function Combuctor:RemoveBankItems()
 	return changed
 end
 
-function Combuctor:GetPlayer()
-	return self.player or currentPlayer
+function Combuctor:RemoveBag(bag)
+	local items = self.items
+	local changed = false
+
+	for index,item in pairs(items) do
+		if bag == ToBag(index) then
+			item:Release()
+			items[index] = nil
+			self.count = self.count - 1
+			changed = true
+		end
+	end
+
+	return changed
 end
 
-function Combuctor:SetPlayer(player)
-	if(player ~= self:GetPlayer()) then
-		self.player = player
+function Combuctor:RemoveAllItems()
+	local items = self.items
 
-		self:RemoveAllItems()
-		if(self.frame:IsShown()) then
-			self.frame:Regenerate()
-		end
+	for index,item in pairs(items) do
+		item:Release()
+		items[index] = nil
+	end
+	self.count = 0
+end
+
+function Combuctor:ReloadAllItems()
+	self:RemoveAllItems()
+
+	if(self.frame:IsShown()) then
+		self:Regenerate()
 	end
 end
 
@@ -277,6 +356,19 @@ end
 --[[
 	Filtering
 --]]
+
+function Combuctor:GetPlayer()
+	return self.player or currentPlayer
+end
+
+function Combuctor:SetPlayer(player)
+	if(player ~= self:GetPlayer()) then
+		self.player = player
+		self.frame.player = player
+		self:ReloadAllItems()
+		self.title:SetText(format("%s's Stuff", player))
+	end
+end
 
 --reset all filters
 function Combuctor:Reset()
@@ -544,4 +636,33 @@ function Combuctor:OnTypeShow(frame)
 	UIDropDownMenu_Initialize(frame, Type_Initialize)
 	UIDropDownMenu_SetWidth(200, frame)
 	self:UpdateTypeText()
+end
+
+
+--[[ Bag Clicks ]]--
+
+function Combuctor:Toggle()
+	if(self.frame:IsShown()) then
+		HideUIPanel(self.frame)
+	else
+		ShowUIPanel(self.frame)
+	end
+end
+
+function Combuctor:HookBagClicks()
+	BankFrame:UnregisterEvent("BANKFRAME_OPENED")
+
+	local hide = function() HideUIPanel(self.frame) end
+	local show = function() ShowUIPanel(self.frame) end
+	local toggle = function() self:Toggle() end
+	local noop = function() return end
+
+	OpenBackpack = show
+	CloseBackpack = hide
+	ToggleBackpack = toggle
+
+	OpenAllBags = function(force) if(force) then show() else toggle() end end
+	CloseAllBags = hide
+
+	ToggleBag = toggle
 end
