@@ -200,6 +200,12 @@ end
 
 local function BuffFrame_OnShow(self) self:Update() end
 
+local function BuffFrame_OnSizeChanged(self)
+	if(self:IsVisible()) then
+		BuffFrame_LayoutIcons(self)
+	end
+end
+
 
 --[[ Usable Functions ]]--
 
@@ -217,6 +223,7 @@ function SageBuff:Create(parent, id, Layout, isDebuff)
 	frame.Update = BuffFrame_Update
 	frame.UpdateBuff = BuffFrame_UpdateBuff
 	frame:SetScript("OnShow", BuffFrame_OnShow)
+	frame:SetScript("OnSizeChanged", BuffFrame_OnSizeChanged)
 
 	if(isDebuff) then
 		if(not self.debuffFrames) then self.debuffFrames = {} end
