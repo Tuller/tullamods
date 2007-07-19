@@ -75,7 +75,7 @@
 						</Anchor>
 					</Anchors>
 				</FontString>
-				
+
 				<Texture file="Interface\TaxiFrame\UI-TaxiFrame-TopLeft">
 					<Size x="256" y="256"/>
 					<Anchors>
@@ -164,7 +164,9 @@
 
 				<Scripts>
 					<OnShow>
-						self:SetText(SEARCH)
+						if (self:GetText() == "") then
+							self:SetText(SEARCH)
+						end
 					</OnShow>
 					<OnEnterPressed>
 						self:ClearFocus()

@@ -46,8 +46,8 @@ function LudwigUI_OnShow()
 end
 
 function LudwigUI_OnHide()
-	for i in pairs(display) do display[i] = nil end
-	LudwigUI_Reset()
+	display = nil
+	-- LudwigUI_Reset()
 end
 
 function LudwigUI_Refresh()
