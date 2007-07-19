@@ -8,8 +8,11 @@
 				return
 			</OnLoad>
 			<OnClick>
+				if(Combuctor.panel ~= self:GetText()) then
+					PlaySound("igCharacterInfoTab")
+				end
 				PanelTemplates_Tab_OnClick(self:GetParent())
-				Combuctor:SetTab(self:GetID())
+				Combuctor:ShowPanel(self:GetText())
 			</OnClick>
 			<OnShow>
 				PanelTemplates_TabResize(0)
@@ -97,6 +100,7 @@
 				</Anchors>
 	        </Button>
 
+			<!-- Fact: I should rename this.  The clickable portion of the portrat: used toggle the character list and bag frames -->
 			<Button name="$parentRefresh">
 				<Size x="64" y="64"/>
 
@@ -108,6 +112,7 @@
 
 				<Scripts>
 					<OnLoad>
+						self:RegisterForClicks("anyUp")
 						self.icon = getglobal(self:GetParent():GetName().."Icon")
 						self.icon:ClearAllPoints()
 						self.icon:SetPoint("CENTER", self)
@@ -133,6 +138,9 @@
 						self.icon:SetTexCoord(0, 1, 0, 1)
 					</OnMouseUp>
 					<OnClick>
+						if(arg1 == "RightButton") then
+							Combuctor:ToggleCharacterSelect(self)
+						end
 					</OnClick>
 				</Scripts>
 

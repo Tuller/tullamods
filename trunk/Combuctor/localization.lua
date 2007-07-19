@@ -13,6 +13,13 @@ local L = COMBUCTOR_LOCALS
 
 --UI text
 
+L.FrameTitle = "%s's Items"
+
+--tabs
+L.Inventory = "Inventory"
+L.Bank = "Bank"
+L.Keys = "Keys"
+
 --filters
 L.Key = "Key"
 L.Quest = "Quest"
