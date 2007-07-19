@@ -83,6 +83,7 @@ function Combuctor:OnShow()
 end
 
 function Combuctor:OnHide()
+	self:SetPlayer(currentPlayer)
 	self:UpdateEvents()
 end
 
