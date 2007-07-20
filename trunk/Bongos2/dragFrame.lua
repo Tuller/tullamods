@@ -6,55 +6,32 @@ local L = BONGOS_LOCALS
 
 --[[ Tooltips ]]--
 
-local menuButton = CreateFrame("Button", nil, UIParent, "GooeyButton")
-menuButton:SetFrameStrata("DIALOG")
-menuButton:SetToplevel(true)
-menuButton:SetClampedToScreen(true)
-menuButton:SetText("Options"); menuButton:SetHeight(24); menuButton:SetWidth(72)
-menuButton:SetScript("OnClick", function(self) 
-	self.parent:ShowMenu() 
-end)
-menuButton:SetScript("OnLeave", function(self) 
-	if not(MouseIsOver(self) or MouseIsOver(self.parent)) then
-		self:Hide()
-	end
-end)
-menuButton:SetScript("OnShow", function(self)
-	self:SetPoint("BOTTOMLEFT", self.parent, "TOPLEFT")
-end)
-menuButton:Hide()
-
 local function DragFrame_OnEnter(self)
-	menuButton.parent  = self.parent
-	menuButton:Show()
+	if(not self.scaling) then
+		GameTooltip:SetOwner(self, "ANCHOR_BOTTOMLEFT")
 
-	-- GameTooltip_SetDefaultAnchor(GameTooltip, self)
-	GameTooltip:SetOwner(self, "ANCHOR_BOTTOMLEFT")
+		if tonumber(self:GetText()) then
+			GameTooltip:SetText(format("ActionBar %s", self:GetText()), 1, 1, 1)
+		else
+			GameTooltip:SetText(format("%s Bar", self.parent.id:gsub("^%l", string.upper)), 1, 1, 1)
+		end
 
-	if tonumber(self:GetText()) then
-		GameTooltip:SetText(format("ActionBar %s", self:GetText()), 1, 1, 1)
-	else
-		GameTooltip:SetText(format("%s Bar", self.parent.id:gsub("^%l", string.upper)), 1, 1, 1)
+		if self.parent.ShowMenu then
+			GameTooltip:AddLine(L.ShowConfig)
+		end
+
+		if self.parent:IsShown() then
+			GameTooltip:AddLine(L.HideBar)
+		else
+			GameTooltip:AddLine(L.ShowBar)
+		end
+		GameTooltip:AddLine(format(L.SetAlpha, ceil(self.parent:GetFrameAlpha()*100)))
+
+		GameTooltip:Show()
 	end
-
-	if self.parent.ShowMenu then
-		GameTooltip:AddLine(L.ShowConfig)
-	end
-
-	if self.parent:IsShown() then
-		GameTooltip:AddLine(L.HideBar)
-	else
-		GameTooltip:AddLine(L.ShowBar)
-	end
-	GameTooltip:AddLine(format(L.SetAlpha, ceil(self.parent:GetFrameAlpha()*100)))
-
-	GameTooltip:Show()
 end
 
 local function DragFrame_OnLeave(self)
-	if(menuButton.parent == self.parent and not MouseIsOver(menuButton)) then
-		menuButton:Hide()
-	end
 	GameTooltip:Hide()
 end
 
@@ -121,6 +98,46 @@ local function DragFrame_UpdateColor(self)
 	end
 end
 
+local function Scale_OnEnter(self)
+	self:GetNormalTexture():SetVertexColor(1, 1, 1)
+end
+
+local function Scale_OnLeave(self)
+	self:GetNormalTexture():SetVertexColor(1, 0.82, 0)
+end
+
+--code taken from FludFrames, by AnduinLothar
+local function Scale_OnUpdate(self, elapsed)
+	local frame = self.parent
+	
+	local x, y = GetCursorPosition()
+	local UIScale = UIParent:GetEffectiveScale()
+	local currScale = frame:GetEffectiveScale()
+	x = x / currScale
+	y = y / currScale
+	local left = frame:GetLeft()
+	local top = frame:GetTop()
+	local wScale = (x-left)/frame:GetWidth() 
+	local hScale = (top-y)/frame:GetHeight()
+	local scale = max(min(max(wScale, hScale), 1.2), 0.8)
+	
+	if (scale > 1 and currScale > 1.5) then return end
+	if (scale < 1 and currScale < 0.5) then return end
+	
+	frame:SetFrameScale(frame:GetScale()*scale)
+end
+
+local function Scale_StartScaling(self)
+	self:GetParent():LockHighlight()
+	self:GetParent().scaling = true
+	self:SetScript("OnUpdate", Scale_OnUpdate)
+end
+
+local function Scale_StopScaling(self)
+	self:GetParent():UnlockHighlight()
+	self:GetParent().scaling = nil
+	self:SetScript("OnUpdate", nil)
+end
 
 --[[ Constructor ]]--
 
@@ -136,7 +153,6 @@ function BDragFrame_New(parent)
 
 	local bg = frame:CreateTexture(nil, "BACKGROUND")
 	bg:SetTexture("Interface\\Tooltips\\UI-Tooltip-Background")
-
 	bg:SetVertexColor(0, 0, 0, 0.5)
 	bg:SetAllPoints(frame)
 	frame:SetNormalTexture(bg)
@@ -152,7 +168,6 @@ function BDragFrame_New(parent)
 	frame:SetText(parent.id)
 
 	frame:RegisterForClicks("AnyUp")
-	frame:RegisterForDrag("LeftButton", "RightButton")
 	frame:EnableMouseWheel(true)
 	frame:SetScript("OnMouseDown", DragFrame_OnMouseDown)
 	frame:SetScript("OnMouseUp", DragFrame_OnMouseUp)
@@ -161,6 +176,19 @@ function BDragFrame_New(parent)
 	frame:SetScript("OnEnter", DragFrame_OnEnter)
 	frame:SetScript("OnLeave", DragFrame_OnLeave)
 	frame:Hide()
+
+	local scale = CreateFrame("Button", nil, frame)
+	scale:SetPoint("BOTTOMRIGHT", frame)
+	scale:SetHeight(16); scale:SetWidth(16)
+	
+	scale:SetNormalTexture("Interface\\AddOns\\Bongos2\\textures\\Rescale")
+	scale:GetNormalTexture():SetVertexColor(1, 0.82, 0)
+	
+	scale:SetScript("OnEnter", Scale_OnEnter)
+	scale:SetScript("OnLeave", Scale_OnLeave)
+	scale:SetScript("OnMouseDown", Scale_StartScaling)
+	scale:SetScript("OnMouseUp", Scale_StopScaling)
+	scale.parent = frame.parent
 
 	return frame
 end

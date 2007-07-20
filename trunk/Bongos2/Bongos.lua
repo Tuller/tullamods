@@ -81,7 +81,7 @@ function Bongos:LoadModules()
 		module:Load()
 	end
 	BBar:ForAll("Reanchor")
-	self:LoadMinimap()
+	-- self:LoadMinimap()
 end
 
 function Bongos:UnloadModules()
@@ -348,37 +348,37 @@ function Bongos:ToggleBars(args)
 end
 
 --minimap functions
-function Bongos:LoadMinimap()
-	local x, y = Bongos:GetMapCoords()
-	BongosMinimapFrame:ClearAllPoints()
-	BongosMinimapFrame:SetPoint("TOPLEFT", "Minimap", "TOPLEFT", x, y)
+-- function Bongos:LoadMinimap()
+	-- local x, y = Bongos:GetMapCoords()
+	-- BongosMinimapFrame:ClearAllPoints()
+	-- BongosMinimapFrame:SetPoint("TOPLEFT", "Minimap", "TOPLEFT", x, y)
 
-	if not self:ShowingMinimap() then
-		BongosMinimapFrame:Hide()
-	end
-end
+	-- if not self:ShowingMinimap() then
+		-- BongosMinimapFrame:Hide()
+	-- end
+-- end
 
-function Bongos:SetShowMinimap(enable)
-	self.profile.showMinimap = enable or false
-	if enable then
-		BongosMinimapFrame:Show()
-	else
-		BongosMinimapFrame:Hide()
-	end
-end
+-- function Bongos:SetShowMinimap(enable)
+	-- self.profile.showMinimap = enable or false
+	-- if enable then
+		-- BongosMinimapFrame:Show()
+	-- else
+		-- BongosMinimapFrame:Hide()
+	-- end
+-- end
 
-function Bongos:ShowingMinimap()
-	return self.profile.showMinimap
-end
+-- function Bongos:ShowingMinimap()
+	-- return self.profile.showMinimap
+-- end
 
-function Bongos:SetMapCoords(x, y)
-	self.profile.mapx = x
-	self.profile.mapy = y
-end
+-- function Bongos:SetMapCoords(x, y)
+	-- self.profile.mapx = x
+	-- self.profile.mapy = y
+-- end
 
-function Bongos:GetMapCoords()
-	return self.profile.mapx, self.profile.mapy
-end
+-- function Bongos:GetMapCoords()
+	-- return self.profile.mapx, self.profile.mapy
+-- end
 
 function Bongos:CleanUp()
 	local bars = self.profile.bars

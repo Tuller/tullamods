@@ -4,6 +4,7 @@
 --]]
 
 local L = BONGOS_LOCALS
+L.Show = "Show"
 
 BongosMenu = CreateFrame("Frame", nil, UIParent)
 local Frame_MT = {__index = BongosMenu}
@@ -25,6 +26,7 @@ function BongosMenu:CreateMenu(name, tabbed)
 	frame.content = frame:AddContentPane()
 
 	local panel = frame:AddPanel(L.Layout)
+	panel:AddVisibilityButton()
 	panel:AddAlphaSlider()
 	panel:AddScaleSlider()
 
@@ -184,6 +186,26 @@ function Panel:AddCheckButton(name)
 
 	self.height = self.height + 30
 	self.button = button
+
+	return button
+end
+
+local function Visibility_OnShow(self)
+	self:SetChecked(BBar:Get(self:GetParent().id):FrameIsShown())
+end
+
+local function Visibility_OnClick(self)
+	if(self:GetChecked()) then
+		BBar:Get(self:GetParent().id):ShowFrame()
+	else
+		BBar:Get(self:GetParent().id):HideFrame()
+	end
+end
+
+function Panel:AddVisibilityButton()
+	local button = self:AddCheckButton(L.Show)
+	button:SetScript("OnShow", Visibility_OnShow)
+	button:SetScript("OnClick", Visibility_OnClick)
 
 	return button
 end

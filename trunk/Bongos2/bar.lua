@@ -184,11 +184,15 @@ function BBar:HideFrame()
 	self.dragFrame:UpdateColor()
 end
 
+function BBar:FrameIsShown()
+	return not self.sets.hidden
+end
+
 function BBar:ToggleFrame()
-	if self.sets.hidden then
-		self:ShowFrame()
-	else
+	if self:FrameIsShown() then
 		self:HideFrame()
+	else
+		self:ShowFrame()
 	end
 end
 

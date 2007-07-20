@@ -5,12 +5,11 @@
 ## Version: 1.6.3
 ## SavedVariables: Bongos2DB, BongosVersion
 ## OptionalDeps: Dongle
+lib\Dongle.lua
 lib\FlyPaper.lua
 lib\Gooey.xml
-lib\Dongle.lua
 localization.lua
 dragFrame.lua
 bar.lua
 menu.lua
-minimap.xml
 Bongos.lua
