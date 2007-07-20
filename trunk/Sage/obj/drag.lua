@@ -7,10 +7,12 @@ local L = SAGE_LOCALS
 --[[ Tooltips ]]--
 
 local function DragFrame_OnEnter(self)
-	GameTooltip:SetOwner(self, "ANCHOR_BOTTOMLEFT")
-	GameTooltip:SetText(format("%s frame", self:GetText()), 1, 1, 1)
-	GameTooltip:AddLine(format(L.SetAlpha, self.parent:GetAlpha()))
-	GameTooltip:Show()
+	if(not self.scaling) then
+		GameTooltip:SetOwner(self, "ANCHOR_BOTTOMLEFT")
+		GameTooltip:SetText(format("%s frame", self:GetText()), 1, 1, 1)
+		GameTooltip:AddLine(format(L.SetAlpha, self.parent:GetAlpha()))
+		GameTooltip:Show()
+	end
 end
 
 local function DragFrame_OnLeave(self)
@@ -53,6 +55,42 @@ local function DragFrame_UpdateColor(self)
 	self.highlight:SetTexture(0, 0, 0.6, 0.5)
 end
 
+local function Scale_OnEnter(self)
+	self:GetNormalTexture():SetVertexColor(1, 1, 1)
+end
+
+local function Scale_OnLeave(self)
+	self:GetNormalTexture():SetVertexColor(1, 0.82, 0)
+end
+
+--credit goes to AnduinLothar for this code, I've only modified it to work with Bongos/Sage
+local function Scale_OnUpdate(self, elapsed)
+	local frame = self.parent
+	local x, y = GetCursorPosition()
+	local currScale = frame:GetEffectiveScale()
+	x = x / currScale
+	y = y / currScale
+
+	local left, top = frame:GetLeft(), frame:GetTop()
+	local wScale = (x-left)/frame:GetWidth()
+	local hScale = (top-y)/frame:GetHeight()
+	local scale = max(min(max(wScale, hScale), 1.2), 0.8)
+	local newScale = min(max(frame:GetScale() * scale, 0.5), 1.5)
+
+	frame:SetFrameScale(newScale)
+end
+
+local function Scale_StartScaling(self)
+	self:GetParent():LockHighlight()
+	self:GetParent().scaling = true
+	self:SetScript("OnUpdate", Scale_OnUpdate)
+end
+
+local function Scale_StopScaling(self)
+	self:GetParent():UnlockHighlight()
+	self:GetParent().scaling = nil
+	self:SetScript("OnUpdate", nil)
+end
 
 --[[ Constructor ]]--
 
@@ -92,6 +130,20 @@ function SDragFrame_New(parent)
 	frame:SetScript("OnEnter", DragFrame_OnEnter)
 	frame:SetScript("OnLeave", DragFrame_OnLeave)
 	frame:Hide()
+
+	local scale = CreateFrame("Button", nil, frame)
+	scale:SetPoint("BOTTOMRIGHT", frame)
+	scale:SetHeight(16); scale:SetWidth(16)
+	scale:SetFrameLevel(frame:GetFrameLevel() + 1)
+
+	scale:SetNormalTexture("Interface\\AddOns\\Sage\\textures\\Rescale")
+	scale:GetNormalTexture():SetVertexColor(1, 0.82, 0)
+
+	scale:SetScript("OnEnter", Scale_OnEnter)
+	scale:SetScript("OnLeave", Scale_OnLeave)
+	scale:SetScript("OnMouseDown", Scale_StartScaling)
+	scale:SetScript("OnMouseUp", Scale_StopScaling)
+	scale.parent = frame.parent
 
 	return frame
 end
