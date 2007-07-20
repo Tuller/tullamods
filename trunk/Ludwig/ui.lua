@@ -42,12 +42,11 @@ function LudwigUI_OnLoad(self)
 end
 
 function LudwigUI_OnShow()
-	LudwigUI_Refresh()
+	LudwigUI_UpdateList(true)
 end
 
 function LudwigUI_OnHide()
 	display = nil
-	-- LudwigUI_Reset()
 end
 
 function LudwigUI_Refresh()
@@ -143,7 +142,6 @@ end
 function LudwigUI_UpdateList(changed)
 	--update list only if there are changes
 	if not display or changed then
-		displayChanged = nil
 		display = Ludwig:GetItems(filter.name, filter.quality, filter.type, filter.subType, filter.equipLoc, filter.minLevel, filter.maxLevel)
 	end
 
@@ -312,8 +310,7 @@ local function Type_UpdateText()
 	getglobal(uiFrame.type:GetName() .. "Text"):SetText(text)
 end
 
-local function Type_OnClick(arg1, arg2)
-	local type, subType = this.arg1, this.arg2
+local function Type_OnClick(type, subType)
 	local text
 
 	filter.type = nil
