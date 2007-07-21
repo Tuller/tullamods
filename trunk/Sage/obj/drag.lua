@@ -48,9 +48,9 @@ end
 --updates the drag button color of a given bar if its attached to another bar
 local function DragFrame_UpdateColor(self)
 	if self.parent:GetAnchor() then
-		self:SetTextColor(0.1, 0.5, 0.1)
+		self:SetTextColor(0, 0.82*0.8, 1*0.8)
 	else
-		self:SetTextColor(0.2, 1, 0.2)
+		self:SetTextColor(1, 0.82, 0)
 	end
 	self.highlight:SetTexture(0, 0, 0.6, 0.5)
 end
@@ -106,7 +106,7 @@ function SDragFrame_New(parent)
 	frame:SetFrameLevel(parent:GetFrameLevel() + 10)
 
 	local bg = frame:CreateTexture(nil, "BACKGROUND")
-	-- bg:SetTexture("Interface\\Tooltips\\UI-Tooltip-Background")
+	bg:SetTexture("Interface\\Tooltips\\UI-Tooltip-Background")
 	bg:SetTexture(0, 0.2, 0, 0.5)
 	bg:SetAllPoints(frame)
 	frame:SetNormalTexture(bg)
@@ -134,7 +134,6 @@ function SDragFrame_New(parent)
 	local scale = CreateFrame("Button", nil, frame)
 	scale:SetPoint("BOTTOMRIGHT", frame)
 	scale:SetHeight(16); scale:SetWidth(16)
-	-- scale:SetFrameLevel(frame:GetFrameLevel() + 1)
 
 	scale:SetNormalTexture("Interface\\AddOns\\Sage\\textures\\Rescale")
 	scale:GetNormalTexture():SetVertexColor(1, 0.82, 0)
