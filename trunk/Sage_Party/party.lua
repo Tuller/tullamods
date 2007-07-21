@@ -179,13 +179,11 @@ end
 function SageParty:Load()
 	if(not self.motherFrames) then self.motherFrames = {} end
 	self.motherFrame = self.motherFrame or PartyParent_Create()
-	self.motherFrame:SetFrameLevel(0)
 
 	local defaults = SageParty:GetDefaults()
 	for i = 1, MAX_PARTY_MEMBERS do
 		local frame = SageFrame:Create("party" .. i, Frame_OnCreate, defaults[i])
 		frame:SetParent(self.motherFrame)
-		frame:SetFrameLevel(0)
 		frame:SetID(i)
 		frame.info:UpdateWidth()
 		self.motherFrames[i] = frame
