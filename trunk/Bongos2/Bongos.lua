@@ -11,13 +11,6 @@ local L = BONGOS_LOCALS
 --[[ Startup ]]--
 
 function Bongos:Enable()
-	self:RegisterMessage("DONGLE_PROFILE_CREATED")
-	self:RegisterMessage("DONGLE_PROFILE_CHANGED")
-	self:RegisterMessage("DONGLE_PROFILE_DELETED")
-	self:RegisterMessage("DONGLE_PROFILE_COPIED")
-	self:RegisterMessage("DONGLE_PROFILE_RESET")
-	self:RegisterEvent("ADDON_LOADED", "LoadOptions")
-
 	local defaults = {
 		profile = {
 			sticky = true,
@@ -48,31 +41,39 @@ function Bongos:Enable()
 
 		--compatibility break
 		if major ~= cMajor then
-			self.db:ResetProfile()
+			self.db:ResetDB()
+			self.profile = self.db.profile
 			self:Print(L.UpdatedIncompatible)
 		--settings change
 		elseif minor ~= cMinor then
 			self:UpdateSettings()
-		--bugfix update, just inc version
-		elseif BongosVersion ~= CURRENT_VERSION then
-			self:UpdateVersion()
 		end
+	end
+
+	if BongosVersion ~= CURRENT_VERSION then
+		self:UpdateVersion()
 	end
 
 	self:RegisterSlashCommands()
 	self:LoadModules()
-end
-
-function Bongos:UpdateVersion()
-	BongosVersion = CURRENT_VERSION
-	self:Print(format(L.Updated, BongosVersion))
+	
+	self:RegisterMessage("DONGLE_PROFILE_CREATED")
+	self:RegisterMessage("DONGLE_PROFILE_CHANGED")
+	self:RegisterMessage("DONGLE_PROFILE_DELETED")
+	self:RegisterMessage("DONGLE_PROFILE_COPIED")
+	self:RegisterMessage("DONGLE_PROFILE_RESET")
+	self:RegisterEvent("ADDON_LOADED", "LoadOptions")
 end
 
 function Bongos:UpdateSettings()
 	if(BongosActionBar) then
 		BongosActionBar:ConvertBindings()
 	end
-	self:UpdateVersion()
+end
+
+function Bongos:UpdateVersion()
+	BongosVersion = CURRENT_VERSION
+	self:Print(format(L.Updated, BongosVersion))
 end
 
 function Bongos:LoadModules()

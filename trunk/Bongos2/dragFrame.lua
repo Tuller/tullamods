@@ -4,10 +4,12 @@
 
 local L = BONGOS_LOCALS
 
+local scaling = false
+
 --[[ Tooltips ]]--
 
 local function DragFrame_OnEnter(self)
-	if(not self.scaling) then
+	if(not scaling) then
 		GameTooltip:SetOwner(self, "ANCHOR_BOTTOMLEFT")
 
 		if tonumber(self:GetText()) then
@@ -106,36 +108,32 @@ local function Scale_OnLeave(self)
 	self:GetNormalTexture():SetVertexColor(1, 0.82, 0)
 end
 
---code taken from FludFrames, by AnduinLothar
+--credit goes to AnduinLothar for this code, I've only modified it to work with Bongos/Sage
 local function Scale_OnUpdate(self, elapsed)
 	local frame = self.parent
-	
 	local x, y = GetCursorPosition()
-	local UIScale = UIParent:GetEffectiveScale()
 	local currScale = frame:GetEffectiveScale()
 	x = x / currScale
 	y = y / currScale
-	local left = frame:GetLeft()
-	local top = frame:GetTop()
-	local wScale = (x-left)/frame:GetWidth() 
+
+	local left, top = frame:GetLeft(), frame:GetTop()
+	local wScale = (x-left)/frame:GetWidth()
 	local hScale = (top-y)/frame:GetHeight()
+
 	local scale = max(min(max(wScale, hScale), 1.2), 0.8)
-	
-	if (scale > 1 and currScale > 1.5) then return end
-	if (scale < 1 and currScale < 0.5) then return end
-	
-	frame:SetFrameScale(frame:GetScale()*scale)
+	local newScale = min(max(frame:GetScale() * scale, 0.5), 1.5)
+	frame:SetFrameScale(newScale, IsShiftKeyDown())
 end
 
 local function Scale_StartScaling(self)
+	scaling = true
 	self:GetParent():LockHighlight()
-	self:GetParent().scaling = true
 	self:SetScript("OnUpdate", Scale_OnUpdate)
 end
 
 local function Scale_StopScaling(self)
+	scaling = nil
 	self:GetParent():UnlockHighlight()
-	self:GetParent().scaling = nil
 	self:SetScript("OnUpdate", nil)
 end
 
@@ -180,10 +178,11 @@ function BDragFrame_New(parent)
 	local scale = CreateFrame("Button", nil, frame)
 	scale:SetPoint("BOTTOMRIGHT", frame)
 	scale:SetHeight(16); scale:SetWidth(16)
-	
+	scale:SetFrameLevel(frame:GetFrameLevel() + 1)
+
 	scale:SetNormalTexture("Interface\\AddOns\\Bongos2\\textures\\Rescale")
 	scale:GetNormalTexture():SetVertexColor(1, 0.82, 0)
-	
+
 	scale:SetScript("OnEnter", Scale_OnEnter)
 	scale:SetScript("OnLeave", Scale_OnLeave)
 	scale:SetScript("OnMouseDown", Scale_StartScaling)

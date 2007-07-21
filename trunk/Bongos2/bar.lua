@@ -138,7 +138,7 @@ function BBar:SetSize(x, y)
 	self:SetHeight(y or x)
 end
 
-function BBar:SetFrameScale(scale)
+function BBar:SetFrameScale(scale, scaleAnchored)
 	local x, y = GetRelativeCoords(self, scale)
 
 	self:SetScale(scale)
@@ -146,6 +146,14 @@ function BBar:SetFrameScale(scale)
 	self:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", x, y)
 	self:Reanchor()
 	self:SavePosition()
+	
+	if(scaleAnchored and Bongos:IsSticky()) then
+		for _,frame in self:GetAll() do
+			if frame:GetAnchor() == self then
+				frame:SetFrameScale(scale, true)
+			end
+		end
+	end
 end
 
 function BBar:SetFrameAlpha(alpha)
