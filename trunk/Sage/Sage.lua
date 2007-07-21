@@ -38,7 +38,7 @@ function Sage:Enable()
 	self.profile = self.db.profile
 
 	if(not SageVersion) then
-		self:UpdateVersion()
+		self:UpdateSettings()
 	else
 		local cMajor, cMinor = CURRENT_VERSION:match("(%w+)%.(%w+)")
 		local major, minor = SageVersion:match("(%w+)%.(%w+)")
@@ -48,11 +48,11 @@ function Sage:Enable()
 			self.profile = self.db.profile
 			self:Print(L.UpdatedIncompatible)
 		elseif minor ~= cMinor then
-			self:UpdateVersion()
-		--bugfix update, just inc version
-		elseif SageVersion ~= CURRENT_VERSION then
-			self:UpdateVersion()
+			self:UpdateSettings()
 		end
+	end
+	if(SageVersion ~= CURRENT_VERSION) then
+		self:UpdateVersion()
 	end
 
 	self:RegisterEvents()
@@ -64,6 +64,9 @@ function Sage:Enable()
 	self:RegisterMessage("DONGLE_PROFILE_DELETED")
 	self:RegisterMessage("DONGLE_PROFILE_COPIED")
 	self:RegisterMessage("DONGLE_PROFILE_RESET")
+end
+
+function Sage:UpdateSettings()
 end
 
 function Sage:UpdateVersion()
