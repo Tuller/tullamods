@@ -2,7 +2,7 @@
 ## Title: Sage
 ## Notes: Lightweight unit frame framework
 ## Author: Tuller
-## Version: 0.9
+## Version: 1.0.0
 ## SavedVariables: Sage2DB, SageVersion
 ## OptionalDeps: Dongle, SharedMedia, MobHealth
 lib\FlyPaper.lua

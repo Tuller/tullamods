@@ -1,0 +1,7 @@
+Sage Version History
+
+1.0.0
+Updated for 2.1
+
+known issues:
+	Party frames are considered over the drag frame.  Not sure how to fix at the moment

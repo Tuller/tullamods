@@ -15,12 +15,6 @@ local L = SAGE_LOCALS
 --[[ Startup ]]--
 
 function Sage:Enable()
-	self:RegisterMessage("DONGLE_PROFILE_CREATED")
-	self:RegisterMessage("DONGLE_PROFILE_CHANGED")
-	self:RegisterMessage("DONGLE_PROFILE_DELETED")
-	self:RegisterMessage("DONGLE_PROFILE_COPIED")
-	self:RegisterMessage("DONGLE_PROFILE_RESET")
-
 	local defaults = {
 		profile = {
 			locked = true,
@@ -50,9 +44,13 @@ function Sage:Enable()
 		local major, minor = SageVersion:match("(%w+)%.(%w+)")
 
 		if major ~= cMajor then
-			self.db:ResetProfile()
+			self.db:ResetDB("Default")
+			self.profile = self.db.profile
 			self:Print(L.UpdatedIncompatible)
 		elseif minor ~= cMinor then
+			self:UpdateVersion()
+		--bugfix update, just inc version
+		elseif SageVersion ~= CURRENT_VERSION then
 			self:UpdateVersion()
 		end
 	end
@@ -60,19 +58,15 @@ function Sage:Enable()
 	self:RegisterEvents()
 	self:RegisterSlashCommands()
 	self:LoadModules()
+
+	self:RegisterMessage("DONGLE_PROFILE_CREATED")
+	self:RegisterMessage("DONGLE_PROFILE_CHANGED")
+	self:RegisterMessage("DONGLE_PROFILE_DELETED")
+	self:RegisterMessage("DONGLE_PROFILE_COPIED")
+	self:RegisterMessage("DONGLE_PROFILE_RESET")
 end
 
 function Sage:UpdateVersion()
-	for _,profile in pairs(self.db.sv.profiles) do
-		profile.showText = nil
-		for _,frame in pairs(profile.frames) do
-			if(frame.minWidth) then
-				frame.width = frame.minWidth
-				frame.minWidth = nil
-			end
-		end
-	end
-
 	SageVersion = CURRENT_VERSION
 	self:Print(format(L.Updated, SageVersion))
 end
