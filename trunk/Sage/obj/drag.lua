@@ -77,7 +77,7 @@ local function Scale_OnUpdate(self, elapsed)
 	local scale = max(min(max(wScale, hScale), 1.2), 0.8)
 	local newScale = min(max(frame:GetScale() * scale, 0.5), 1.5)
 
-	frame:SetFrameScale(newScale)
+	frame:SetFrameScale(newScale, IsShiftKeyDown())
 end
 
 local function Scale_StartScaling(self)
@@ -99,15 +99,15 @@ function SDragFrame_New(parent)
 	frame.parent = parent
 	frame.UpdateColor = DragFrame_UpdateColor
 
+	frame:SetToplevel(true)
 	frame:SetClampedToScreen(true)
 	frame:SetFrameStrata(parent:GetFrameStrata())
 	frame:SetAllPoints(parent)
-	frame:SetFrameLevel(6)
+	frame:SetFrameLevel(parent:GetFrameLevel() + 10)
 
 	local bg = frame:CreateTexture(nil, "BACKGROUND")
-	bg:SetTexture("Interface\\Tooltips\\UI-Tooltip-Background")
-
-	bg:SetVertexColor(0, 0.2, 0, 0.5)
+	-- bg:SetTexture("Interface\\Tooltips\\UI-Tooltip-Background")
+	bg:SetTexture(0, 0.2, 0, 0.5)
 	bg:SetAllPoints(frame)
 	frame:SetNormalTexture(bg)
 
@@ -134,7 +134,7 @@ function SDragFrame_New(parent)
 	local scale = CreateFrame("Button", nil, frame)
 	scale:SetPoint("BOTTOMRIGHT", frame)
 	scale:SetHeight(16); scale:SetWidth(16)
-	scale:SetFrameLevel(frame:GetFrameLevel() + 1)
+	-- scale:SetFrameLevel(frame:GetFrameLevel() + 1)
 
 	scale:SetNormalTexture("Interface\\AddOns\\Sage\\textures\\Rescale")
 	scale:GetNormalTexture():SetVertexColor(1, 0.82, 0)

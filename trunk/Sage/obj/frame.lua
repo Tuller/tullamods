@@ -105,10 +105,12 @@ end
 --[[ Lock/Unlock ]]--
 
 function SageFrame:Lock()
+	self.click:EnableMouse(true)
 	self.dragFrame:Hide()
 end
 
 function SageFrame:Unlock()
+	self.click:EnableMouse(false)
 	self.dragFrame:Show()
 end
 
@@ -121,7 +123,7 @@ function SageFrame:SetSize(x, y)
 	self:SetHeight(y or x)
 end
 
-function SageFrame:SetFrameScale(scale)
+function SageFrame:SetFrameScale(scale, scaleAnchored)
 	local x, y = GetRelativeCoords(self, scale)
 
 	self:SetScale(scale)
@@ -129,6 +131,14 @@ function SageFrame:SetFrameScale(scale)
 	self:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", x, y)
 	self:Reanchor()
 	self:SavePosition()
+
+	if(scaleAnchored and Sage:IsSticky()) then
+		for _,frame in self:GetAll() do
+			if frame:GetAnchor() == self then
+				frame:SetFrameScale(scale, true)
+			end
+		end
+	end
 end
 
 function SageFrame:SetFrameAlpha(alpha)
