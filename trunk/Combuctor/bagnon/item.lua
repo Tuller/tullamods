@@ -12,11 +12,13 @@ local UPDATE_DELAY = 0.1
 local bagSearch, nameSearch, qualitySearch
 local MAX_ITEMS_PER_BAG = MAX_CONTAINER_ITEMS
 
-local unused = {}
-local lastCreated = 1
-
 local _G = getfenv(0)
+local newItems = {}
+local currentPlayer = UnitName("player")
 
+local function ToIndex(bag, slot)
+	return (bag<0 and bag*100 - slot) or (bag*100 + slot)
+end
 
 --[[ this is set as the button"s parent, in order to preserve compatiblity with normal bag slot functions and other mods ]]--
 
@@ -68,14 +70,12 @@ end
 --[[ Item Creation ]]--
 
 --creates an entierly new item slot, if no blizzard slots are available
+local lastCreated = 1
 local function Item_Create()
 	local bag = ceil(lastCreated / MAX_CONTAINER_ITEMS)
 	local slot = mod(lastCreated-1, MAX_CONTAINER_ITEMS) + 1
 	local item = getglobal(format("ContainerFrame%dItem%d", bag, slot))
-	if item then
-		item:SetParent(nil)
-		item:SetID(0)
-	end
+	if item then item:SetParent(nil); item:SetID(0) end
 
 	item = item or CreateFrame("Button", format("BagnonItem%s", lastCreated), nil, "ContainerFrameItemButtonTemplate")
 	item:ClearAllPoints()
@@ -107,6 +107,8 @@ local function Item_Create()
 end
 
 --takes an item from the pool of unused items, or creates a new one
+
+local unused = {}
 local function Item_Get()
 	local item = next(unused)
 	if item then
@@ -114,15 +116,6 @@ local function Item_Get()
 		return item
 	end
 	return Item_Create()
-end
-
---places the item in the pool of unused items
-local function Item_Release(item)
-	item:ClearAllPoints()
-	item:SetParent(nil)
-	item:Hide()
-
-	unused[item] = true
 end
 
 
@@ -133,19 +126,42 @@ function BagnonItem:Set(frame, bag, slot)
 	item:SetParent(DummyBag_Get(frame, bag))
 	item:SetID(slot)
 	item:Update()
-	item:Show()
 
 	return item
 end
 
 function BagnonItem:Release()
+	unused[self] = true
+
 	self.cached = nil
 	self.hasItem = nil
-	Item_Release(self)
+
+	self:Hide()
+	self:SetParent(nil)
 end
 
 
 --[[ Update Functions ]]--
+
+function BagnonItem:SetNew(bag, slot, isNew)
+	newItems[ToIndex(bag, slot)] = isNew or nil
+end
+
+function BagnonItem:IsNew(bag, slot)
+	return self:GetPlayer() == currentPlayer and newItems[ToIndex(self:GetBag(), self:GetID())]
+end
+
+function BagnonItem:IsNewSlot(bag, slot)
+	return newItems[ToIndex(bag, slot)]
+end
+
+-- function BagnonItem:UpdateFade()
+	-- if self:IsNew() then
+		-- self:SetAlpha(1)
+	-- else
+		-- self:SetAlpha(0.5)
+	-- end
+-- end
 
 -- Update the texture, lock status, and other information about an item
 function BagnonItem:Update()
@@ -308,7 +324,7 @@ function BagnonItem:GetPlayer()
 	local bag = self:GetParent()
 	if bag then
 		local frame = bag:GetParent()
-		return frame and frame.player
+		return frame and frame.player or currentPlayer
 	end
 end
 

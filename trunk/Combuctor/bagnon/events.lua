@@ -23,11 +23,11 @@
 	BAGNON_SLOT_REMOVE
 	args:		bag, slot
 		called when an item slot is removed from being in use
-		
+
 	BAGNON_BANK_OPENED
 	args:		none
 		called when the bank has opened and we have data
-		
+
 	BAGNON_BANK_CLOSED
 	args:		none
 		called when the bank is closed
@@ -54,17 +54,7 @@ function BagnonEvents:Initialize()
 	self:RegisterEvent("PLAYERBANKSLOTS_CHANGED")
 	self:RegisterEvent("BANKFRAME_OPENED")
 	self:RegisterEvent("BANKFRAME_CLOSED")
-
-	-- self:RegisterMessage("BAGNON_SLOT_ADD", "DebugEvent")
-	-- self:RegisterMessage("BAGNON_SLOT_UPDATE", "DebugEvent")
-	-- self:RegisterMessage("BAGNON_SLOT_UPDATE_LOCK", "DebugEvent")
-	-- self:RegisterMessage("BAGNON_SLOT_UPDATE_COOLDOWN", "DebugEvent")
-	-- self:RegisterMessage("BAGNON_SLOT_REMOVE", "DebugEvent")
 end
-
--- function BagnonEvents:DebugEvent(...)
-	-- self:Print(...)
--- end
 
 
 --[[ Update Functions ]]--
@@ -193,13 +183,22 @@ end
 
 --player login
 function BagnonEvents:Enable()
+	self.loading = true
+
 	self:UpdateBagSize(KEYRING_CONTAINER)
+	self:UpdateItems(KEYRING_CONTAINER)
 	self:UpdateBagSize(0)
+	self:UpdateItems(0)
 end
 
 function BagnonEvents:BAG_UPDATE(event, bag)
 	self:UpdateBagSizes()
 	self:UpdateItems(bag)
+
+	if(self.loading and bag == (4 + GetNumBankSlots())) then
+		self.loading = nil
+		self:TriggerMessage("BAGNON_BAGS_LOADED")
+	end
 end
 
 function BagnonEvents:PLAYERBANKSLOTS_CHANGED()

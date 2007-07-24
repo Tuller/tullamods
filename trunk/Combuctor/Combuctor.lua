@@ -22,9 +22,7 @@ local currentPlayer = UnitName("player")
 
 --utility functions
 local function ToIndex(bag, slot)
-	if(tonumber(bag) and tonumber(slot)) then
-		return (bag<0 and bag*100 - slot) or (bag*100 + slot)
-	end
+	return (bag<0 and bag*100 - slot) or (bag*100 + slot)
 end
 
 local function ToBag(index)
@@ -85,6 +83,10 @@ end
 function Combuctor:OnHide()
 	self:SetPlayer(currentPlayer)
 	self:UpdateEvents()
+
+	if(BagnonUtil:AtBank()) then
+		CloseBankFrame()
+	end
 end
 
 --watch events only if we're showing the frame and looking at the current player
@@ -97,6 +99,10 @@ function Combuctor:UpdateEvents()
 			self:RegisterMessage("BAGNON_SLOT_UPDATE_LOCK")
 			self:RegisterMessage("BAGNON_SLOT_UPDATE_COOLDOWN")
 			self:RegisterMessage("BAGNON_SLOT_REMOVE")
+
+			self:RegisterMessage("BAGNON_ITEM_GAINED")
+			self:RegisterMessage("BAGNON_ITEM_LOST")
+			self:RegisterMessage("BAGNON_ITEM_SWAPPED")
 		end
 	else
 		if(self.watchingEvents) then
@@ -106,6 +112,10 @@ function Combuctor:UpdateEvents()
 			self:UnregisterMessage("BAGNON_SLOT_UPDATE_LOCK")
 			self:UnregisterMessage("BAGNON_SLOT_UPDATE_COOLDOWN")
 			self:UnregisterMessage("BAGNON_SLOT_REMOVE")
+
+			self:UnregisterMessage("BAGNON_ITEM_GAINED")
+			self:UnregisterMessage("BAGNON_ITEM_LOST")
+			self:UnregisterMessage("BAGNON_ITEM_SWAPPED")
 		end
 	end
 end
@@ -129,15 +139,28 @@ function Combuctor:BAGNON_BANK_CLOSED()
 	BagnonUtil:SetAtBank(false)
 
 	if(not BagnonDB) then
-		local changed = self:RemoveBankItems()
-		if(changed and self.frame:IsShown()) then
+		if(self:RemoveBankItems() and self.frame:IsShown()) then
 			self:Layout()
 		end
 	end
 end
 
-function Combuctor:OnSlotChanged(msg, ...)
-	self:UpdateSlot(...)
+function Combuctor:OnSlotChanged(msg, bag, slot, link)
+	if self:UpdateSlot(bag, slot, link) then
+		self:Layout()
+	end
+end
+
+function Combuctor:BAGNON_ITEM_GAINED(msg, bag, slot)
+	self:UpdateSlotNew(bag, slot, true)
+end
+
+function Combuctor:BAGNON_ITEM_LOST(msg, bag, slot)
+	self:UpdateSlotNew(bag, slot, false)
+end
+
+function Combuctor:BAGNON_ITEM_SWAPPED(msg, bag, slot)
+	self:UpdateSlotNew(bag, slot, false)
 end
 
 function Combuctor:BAGNON_SLOT_UPDATE_LOCK(msg, ...)
@@ -187,12 +210,13 @@ end
 --[[ Panels ]]--
 
 --frame tabs and their respective bags
-local PANELS = {ALL, L.Inventory, L.Bank, L.Keys}
+local PANELS = {NEW, L.Inventory, L.Bank, L.Keys, ALL}
 local PANEL_BAGS = {
-	{0, 1, 2, 3, 4, -1, 5, 6, 7, 8, 9, 10, 11},
+	{0, 1, 2, 3, 4},
 	{0, 1, 2, 3, 4},
 	{-1, 5, 6, 7, 8, 9, 10, 11},
 	{-2},
+	{0, 1, 2, 3, 4, -1, 5, 6, 7, 8, 9, 10, 11},
 }
 local DEFAULT_PANEL = L.Inventory
 
@@ -238,6 +262,7 @@ function Combuctor:ShowPanel(name)
 
 		--remove any bags that are not in the new set, then
 		self:SetBags(PANEL_BAGS[panelID])
+		self:SetShowNewItems(name == NEW)
 	end
 end
 
@@ -245,9 +270,14 @@ end
 --[[ Item Updating ]]--
 
 --returns true if the item matches the given filter, false othewise
-function Combuctor:HasItem(link, bag)
+function Combuctor:HasItem(bag, slot, link)
+	if self:ShowingNewItems() and not BagnonItem:IsNewSlot(bag, slot) then
+		return false
+	end
+
 	local f = self.filter
 	if(next(f)) then
+		local link = link or BagnonUtil:GetItemLink(bag, slot, self:GetPlayer())
 		if(not link) then return false end
 
 		local name, _, quality, _, level, type, subType, _, equipLoc = GetItemInfo(link)
@@ -274,12 +304,12 @@ function Combuctor:HasItem(link, bag)
 	return true
 end
 
-function Combuctor:AddItem(bag, slot)
+function Combuctor:AddItem(bag, slot, isNew)
 	local index = ToIndex(bag, slot)
 	local item = self.items[index]
 
 	if item then
-		item:Update()
+		item:Update(isNew)
 	else
 		self.items[index] = BagnonItem:Set(self.frame, bag, slot)
 		self.count = self.count + 1
@@ -300,8 +330,7 @@ function Combuctor:RemoveItem(bag, slot)
 end
 
 function Combuctor:UpdateSlot(bag, slot, link)
-	local link = link or BagnonUtil:GetItemLink(bag, slot, self:GetPlayer())
-	if(self:HasItem(link, bag)) then
+	if(self:HasItem(bag, slot, link)) then
 		return self:AddItem(bag, slot)
 	end
 	return self:RemoveItem(bag, slot)
@@ -321,18 +350,30 @@ function Combuctor:UpdateSlotCooldown(bag, slot)
 	end
 end
 
+function Combuctor:UpdateSlotNew(bag, slot, isNew)
+	BagnonItem:SetNew(bag, slot, isNew)
+
+	if(self:ShowingNewItems()) then
+		if self:UpdateSlot(bag, slot) then
+			self:Layout()
+		end
+	end
+end
+
 
 --[[ Mass Item Changes ]]--
 
 --update all items and layout the frame
 function Combuctor:Regenerate()
+	local changed = false
 	local player = self:GetPlayer()
 	for _,bag in ipairs(self.bags) do
 		for slot = 1, BagnonUtil:GetBagSize(bag, player) do
-			self:UpdateSlot(bag, slot)
+			local altered = self:UpdateSlot(bag, slot)
+			changed = changed or altered
 		end
 	end
-	self:Layout()
+	if(changed) then self:Layout() end
 end
 
 --set the display to use the given bag set, and remove any bags that are not in the new set
@@ -342,6 +383,7 @@ function Combuctor:SetBags(newBags)
 		self.bags = newBags
 
 		--remove any items from bags that are not in the new set
+		local changed
 		if(bags) then
 			for _,i in pairs(bags) do
 				local found = false
@@ -352,7 +394,8 @@ function Combuctor:SetBags(newBags)
 					end
 				end
 				if(not found) then
-					self:RemoveBag(i)
+					local altered = self:RemoveBag(i)
+					changed = changed or altered
 				end
 			end
 		end
@@ -371,10 +414,11 @@ function Combuctor:SetBags(newBags)
 						end
 					end
 					if(not found) then
-						self:AddBag(i)
+						local altered = self:AddBag(i)
+						changed = changed or altered
 					end
 				end
-				self:Layout()
+				if(changed) then self:Layout() end
 			end
 		end
 	end
@@ -383,15 +427,14 @@ end
 --add all items in the givem bag
 function Combuctor:AddBag(bag, layout)
 	local player = self:GetPlayer()
-	local changed
+	local changed = false
+
 	for slot = 1, BagnonUtil:GetBagSize(bag, player) do
 		local added = self:UpdateSlot(bag, slot)
 		changed = changed or added
 	end
 
-	if(layout and changed) then
-		self:Layout()
-	end
+	if(layout and changed) then self:Layout() end
 	return changed
 end
 
@@ -409,9 +452,7 @@ function Combuctor:RemoveBag(bag, layout)
 		end
 	end
 
-	if(layout and changed) then
-		self:Layout()
-	end
+	if(layout and changed) then self:Layout() end
 	return changed
 end
 
@@ -434,18 +475,21 @@ end
 --remove all items from the frame
 function Combuctor:RemoveAllItems()
 	local items = self.items
+	local changed = true
 
-	for index,item in pairs(items) do
+	for i,item in pairs(items) do
+		changed = true
 		item:Release()
-		items[index] = nil
+		items[i] = nil
 	end
 	self.count = 0
+
+	return changed
 end
 
 --completely regenerate the frame
 function Combuctor:ReloadAllItems()
-	self:RemoveAllItems()
-	if(self.frame:IsShown()) then
+	if(self:RemoveAllItems() and self.frame:IsShown()) then
 		self:Regenerate()
 	end
 end
@@ -456,9 +500,9 @@ end
 --layout all the item buttons, scaling ot fit inside the fram
 --todo: dividers for bags v bank
 function Combuctor:Layout()
+	--figure out the layout
 	local count = self.count
 	local size = ITEM_SIZE+SPACING
-
 	local cols = 1
 	local scale = FRAME_WIDTH / (size*cols)
 	local rows = floor(FRAME_HEIGHT / (size*scale))
@@ -468,11 +512,11 @@ function Combuctor:Layout()
 		rows = floor(FRAME_HEIGHT / (size * scale))
 	end
 
-	local items = self.items
-	local frame = self.frame
-
+	--layout the items
 	local offX, offY = (26 + SPACING/2)/scale, (78 + SPACING/2)/scale
 	local player = self:GetPlayer()
+	local items = self.items
+	local frame = self.frame
 
 	local i = 0
 	for _,bag in ipairs(self.bags) do
@@ -485,6 +529,7 @@ function Combuctor:Layout()
 				item:ClearAllPoints()
 				item:SetScale(scale)
 				item:SetPoint("TOPLEFT", frame, "TOPLEFT", size*row + offX, -(size*col + offY))
+				item:Show()
 			end
 		end
 	end
@@ -522,6 +567,18 @@ function Combuctor:Reset()
 	if(changed) then
 		self:Regenerate()
 	end
+end
+
+--[[ New Items ]]--
+
+--show only new items
+function Combuctor:SetShowNewItems(enable)
+	self.showingNewItems = enable or nil
+	self:Regenerate()
+end
+
+function Combuctor:ShowingNewItems()
+	return self.showingNewItems and self:GetPlayer() == currentPlayer
 end
 
 
