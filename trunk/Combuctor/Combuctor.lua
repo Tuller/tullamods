@@ -71,6 +71,10 @@ function Combuctor:Enable()
 	self:RegisterMessage("BAGNON_BANK_OPENED")
 	self:RegisterMessage("BAGNON_BANK_CLOSED")
 
+	self:RegisterMessage("BAGNON_ITEM_GAINED")
+	self:RegisterMessage("BAGNON_ITEM_LOST")
+	self:RegisterMessage("BAGNON_ITEM_SWAPPED")
+
 	--hook into the bag clicking interface
 	self:HookBagClicks()
 end
@@ -99,10 +103,6 @@ function Combuctor:UpdateEvents()
 			self:RegisterMessage("BAGNON_SLOT_UPDATE_LOCK")
 			self:RegisterMessage("BAGNON_SLOT_UPDATE_COOLDOWN")
 			self:RegisterMessage("BAGNON_SLOT_REMOVE")
-
-			self:RegisterMessage("BAGNON_ITEM_GAINED")
-			self:RegisterMessage("BAGNON_ITEM_LOST")
-			self:RegisterMessage("BAGNON_ITEM_SWAPPED")
 		end
 	else
 		if(self.watchingEvents) then
@@ -112,10 +112,6 @@ function Combuctor:UpdateEvents()
 			self:UnregisterMessage("BAGNON_SLOT_UPDATE_LOCK")
 			self:UnregisterMessage("BAGNON_SLOT_UPDATE_COOLDOWN")
 			self:UnregisterMessage("BAGNON_SLOT_REMOVE")
-
-			self:UnregisterMessage("BAGNON_ITEM_GAINED")
-			self:UnregisterMessage("BAGNON_ITEM_LOST")
-			self:UnregisterMessage("BAGNON_ITEM_SWAPPED")
 		end
 	end
 end
@@ -271,7 +267,7 @@ end
 
 --returns true if the item matches the given filter, false othewise
 function Combuctor:HasItem(bag, slot, link)
-	if self:ShowingNewItems() and not BagnonItem:IsNewSlot(bag, slot) then
+	if self:ShowingNewItems() and not(self:GetPlayer() == currentPlayer and BagnonItem:IsNewSlot(bag, slot)) then
 		return false
 	end
 
@@ -353,7 +349,7 @@ end
 function Combuctor:UpdateSlotNew(bag, slot, isNew)
 	BagnonItem:SetNew(bag, slot, isNew)
 
-	if(self:ShowingNewItems()) then
+	if(self.frame:IsShown() and self:ShowingNewItems()) then
 		if self:UpdateSlot(bag, slot) then
 			self:Layout()
 		end
@@ -578,7 +574,7 @@ function Combuctor:SetShowNewItems(enable)
 end
 
 function Combuctor:ShowingNewItems()
-	return self.showingNewItems and self:GetPlayer() == currentPlayer
+	return self.showingNewItems
 end
 
 
