@@ -31,7 +31,7 @@ local function HappyFrame_Update(self)
 	local happiness, damagePercentage, loyaltyRate = GetPetHappiness()
 	local hasPetUI, isHunterPet = HasPetUI()
 
-	if not(happiness and isHunterPet) then
+	if not(happiness or isHunterPet) then
 		self:Hide()
 	else
 		self:Show()
@@ -128,7 +128,7 @@ local function Frame_OnCreate(self)
 	mana:SetPoint("TOPLEFT", self.health, "BOTTOMLEFT")
 	mana:SetPoint("BOTTOMRIGHT", self.health, "BOTTOMRIGHT", 0, -10)
 	self.mana = mana
-	
+
 	local cast = SageCast:Create(self, nil, true)
 	cast:SetPoint("TOPLEFT", self.mana, "TOPLEFT")
 	cast:SetPoint("BOTTOMRIGHT", self.mana, "TOPRIGHT", 0, -2)
@@ -170,7 +170,6 @@ function SagePet:Load()
 	}
 
 	local frame = SageFrame:Create("pet", Frame_OnCreate, defaults)
-	frame:SetAttribute("showstates", "1")
 
 	self.frame = frame
 	frame.info:UpdateWidth()
@@ -181,7 +180,7 @@ function SagePet:Load()
 	if frame.happy then
 		self:RegisterEvent("UNIT_HAPPINESS")
 	end
-	
+
 	if(UnitExists("pet")) then
 		self.frame:Update()
 	end
