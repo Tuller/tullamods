@@ -33,7 +33,7 @@ end
 
 --If not an NPC, this returns the unit"s class.  Else, it returns the given unit"s creature type
 function SageNPC:GetClass(unit)
-	if UnitIsPlayer(unit) then
+	if UnitRace(unit) then
 		return UnitClass(unit)
 	end
 	local type = UnitCreatureType(unit)

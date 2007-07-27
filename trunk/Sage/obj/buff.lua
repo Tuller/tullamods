@@ -68,14 +68,6 @@ local function Buff_Create(parent, id, isDebuff)
 
 	if(isDebuff) then
 		buff:SetBackdrop(bg)
-
-		-- local border = buff:CreateTexture(nil, "OVERLAY")
-		-- border:SetTexture("Interface\\Buttons\\UI-Debuff-Overlays")
-		-- border:SetPoint("TOPLEFT", buff, "TOPLEFT", -1, 1)
-		-- border:SetPoint("BOTTOMRIGHT", buff, "BOTTOMRIGHT", 1, -1)
-		-- border:SetTexCoord(0.296875, 0.5703125, 0, 0.515625)
-		-- buff.border = border
-
 		buff:SetScript("OnEnter", Debuff_OnEnter)
 	else
 		buff:SetScript("OnEnter", Buff_OnEnter)
@@ -128,7 +120,6 @@ local function BuffFrame_UpdateBuff(self, unit, index, filter, isDebuff)
 		if(isDebuff) then
 			local color = DebuffTypeColor[type or "none"]
 			buff:SetBackdropColor(color.r, color.g, color.b)
-			-- buff.border:SetVertexColor(color.r, color.g, color.b)
 		end
 
 		buff:Show()
@@ -172,6 +163,8 @@ end
 --layout buffs in the frame
 local function BuffFrame_LayoutIcons(self)
 	local count = self.count or 0
+	if(count == 0) then return end
+
 	local size = 36
 	local width, height = self:GetWidth(), self:GetHeight()
 
@@ -183,6 +176,8 @@ local function BuffFrame_LayoutIcons(self)
 		scale = width / (size*cols)
 		rows = floor(height / (size * scale))
 	end
+
+	if(scale <= 0) then return end
 
 	local buffs = self.buffs
 	for row = 0, rows-1 do
