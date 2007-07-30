@@ -3,9 +3,9 @@
 		A bag button object
 --]]
 
---local msg = function(msg) ChatFrame1:AddMessage(msg or 'nil', 0.5, 0.5, 1) end
+--local msg = function(msg) ChatFrame1:AddMessage(msg or "nil", 0.5, 0.5, 1) end
 
-BagnonBag = CreateFrame('Button')
+BagnonBag = CreateFrame("Button")
 local Frame_mt = {__index = BagnonBag}
 local L = BAGNON_LOCALS
 
@@ -27,19 +27,19 @@ local function LoadScripts(bag)
 	bag:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 	bag:RegisterForDrag("LeftButton")
 
-	bag:SetScript('OnShow', OnShow)
-	bag:SetScript('OnEnter', OnEnter)
-	bag:SetScript('OnLeave', OnLeave)
-	bag:SetScript('OnClick', OnClick)
-	bag:SetScript('OnDragStart', OnDrag)
-	bag:SetScript('OnReceiveDrag', OnClick)
+	bag:SetScript("OnShow", OnShow)
+	bag:SetScript("OnEnter", OnEnter)
+	bag:SetScript("OnLeave", OnLeave)
+	bag:SetScript("OnClick", OnClick)
+	bag:SetScript("OnDragStart", OnDrag)
+	bag:SetScript("OnReceiveDrag", OnClick)
 
 	lastCreated = lastCreated + 1
 end
 
 local function Bag_Create(id)
 	local name = format("BagnonBag%s", lastCreated)
-	local bag = CreateFrame('Button', name)
+	local bag = CreateFrame("Button", name)
 	setmetatable(bag, Frame_mt)
 
 	bag:SetWidth(SIZE)
@@ -80,7 +80,7 @@ end
 
 local function Bag_CreateKey()
 	local name = format("BagnonBag%s", lastCreated)
-	local bag = CreateFrame('Button', name)
+	local bag = CreateFrame("Button", name)
 	setmetatable(bag, Frame_mt)
 
 	bag:SetWidth(KEY_WIDTH)
@@ -288,7 +288,7 @@ function BagnonBag:OnEnter()
 	if bagID == 0 then
 		GameTooltip:SetText(TEXT(BACKPACK_TOOLTIP), 1, 1, 1)
 	elseif bagID == -1 then
-		GameTooltip:SetText('Bank', 1, 1, 1)
+		GameTooltip:SetText("Bank", 1, 1, 1)
 	--keyring specific code...again
 	elseif bagID == KEYRING_CONTAINER then
 		GameTooltip:SetText(KEYRING, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
@@ -300,7 +300,7 @@ function BagnonBag:OnEnter()
 		else
 			GameTooltip:SetText(TEXT(EQUIP_CONTAINER), 1, 1, 1)
 		end
-	elseif not GameTooltip:SetInventoryItem('player', util:GetInvSlot(bagID)) then
+	elseif not GameTooltip:SetInventoryItem("player", util:GetInvSlot(bagID)) then
 		GameTooltip:SetText(TEXT(EQUIP_CONTAINER), 1, 1, 1)
 	end
 

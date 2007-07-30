@@ -315,16 +315,11 @@ function BagnonItem:OnEnter()
 			end
 		end
 	else
+		--boo for special case bank code
 		if bag == -1 then
-			--this  is done instead of setting bank item because it allows me to hook tooltips properly, without screwing up some stuff
-			local link = self.hasItem
-			if link then
-				local count = GetInventoryItemCount("player", BankButtonIDToInvSlotID(slot))
-				BagnonUtil:AnchorTooltip(self)
-				GameTooltip:SetHyperlink(link, count)
-				if IsShiftKeyDown() then
-					GameTooltip_ShowCompareItem()
-				end
+			if self.hasItem then                                                     
+				BagnonUtil:AnchorTooltip(self)                                       
+				GameTooltip:SetInventoryItem("player", BankButtonIDToInvSlotID(slot))
 			end
 		else
 			ContainerFrameItemButton_OnEnter(self)

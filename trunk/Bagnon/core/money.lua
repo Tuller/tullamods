@@ -3,10 +3,10 @@
 		Money frames for Bagnon windows
 --]]
 
-BagnonMoney = CreateFrame('Button')
+BagnonMoney = CreateFrame("Button")
 local Money_mt = {__index = BagnonMoney}
 
-local currentPlayer = UnitName('player')
+local currentPlayer = UnitName("player")
 local lastCreated = 0
 
 --[[ Constructor ]]--
@@ -17,16 +17,16 @@ local function OnEnter(self) self:GetParent():OnEnter() end
 local function OnLeave(self) self:GetParent():OnLeave() end
 
 local function MoneyFrame_Create()
-	local frame = CreateFrame('Frame', format('BagnonMoney%s', lastCreated), nil, 'SmallMoneyFrameTemplate')
+	local frame = CreateFrame("Frame", format("BagnonMoney%s", lastCreated), nil, "SmallMoneyFrameTemplate")
 	setmetatable(frame, Money_mt)
-	frame:SetScript('OnShow', OnShow)
+	frame:SetScript("OnShow", OnShow)
 
-	local clickFrame = CreateFrame('Button', nil, frame)
+	local clickFrame = CreateFrame("Button", nil, frame)
 	clickFrame:SetFrameLevel(frame:GetFrameLevel() + 2)
 	clickFrame:SetAllPoints(frame)
-	clickFrame:SetScript('OnClick', OnClick)
-	clickFrame:SetScript('OnEnter', OnEnter)
-	clickFrame:SetScript('OnLeave', OnLeave)
+	clickFrame:SetScript("OnClick", OnClick)
+	clickFrame:SetScript("OnEnter", OnEnter)
+	clickFrame:SetScript("OnLeave", OnLeave)
 	
 	lastCreated = lastCreated + 1
 

@@ -2,7 +2,7 @@
 	BagFrame.lua
 --]]
 
-BagnonBagFrame = CreateFrame('Frame')
+BagnonBagFrame = CreateFrame("Frame")
 local Frame_mt = {__index = BagnonBagFrame}
 local L = BAGNON_LOCALS
 
@@ -13,20 +13,20 @@ local function Toggle_OnClick(self)
 end
 
 local function Toggle_New(parent, shown)
-	local toggle = CreateFrame('Button', nil, parent)
-	toggle:SetPoint('BOTTOMLEFT', parent)
+	local toggle = CreateFrame("Button", nil, parent)
+	toggle:SetPoint("BOTTOMLEFT", parent)
 
 	local text = toggle:CreateFontString()
-	text:SetPoint('BOTTOMLEFT', toggle)
-	text:SetJustifyH('LEFT')
-	text:SetFontObject('GameFontNormal')
+	text:SetPoint("BOTTOMLEFT", toggle)
+	text:SetJustifyH("LEFT")
+	text:SetFontObject("GameFontNormal")
 
 	toggle:SetFontString(text)
 	toggle:SetHighlightTextColor(1, 1, 1)
 	toggle:SetTextColor(1, 0.82, 0)
-	toggle:RegisterForClicks('LeftButtonUp', 'RightButtonUp')
-	toggle:SetScript('OnClick', Toggle_OnClick)
-	toggle:SetPoint('BOTTOMLEFT', parent)
+	toggle:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+	toggle:SetScript("OnClick", Toggle_OnClick)
+	toggle:SetPoint("BOTTOMLEFT", parent)
 	toggle:SetHeight(18)
 	toggle:SetWidth(18)
 
@@ -35,23 +35,23 @@ end
 
 local function BagFrame_OnEvent()
 	if this.shown then
-		if event == 'BAG_UPDATE' or event == 'PLAYERBANKSLOTS_CHANGED' or event == 'PLAYERBANKBAGSLOTS_CHANGED' then
+		if event == "BAG_UPDATE" or event == "PLAYERBANKSLOTS_CHANGED" or event == "PLAYERBANKBAGSLOTS_CHANGED" then
 			this:Update()
-		elseif event == 'ITEM_LOCK_CHANGED' then
+		elseif event == "ITEM_LOCK_CHANGED" then
 			this:UpdateLock()
-		elseif event == 'CURSOR_UPDATE' then
+		elseif event == "CURSOR_UPDATE" then
 			this:UpdateCursor()
-		elseif event == 'BANKFRAME_OPENED' or event == 'BANKFRAME_CLOSED' then
+		elseif event == "BANKFRAME_OPENED" or event == "BANKFRAME_CLOSED" then
 			this:UpdatePurchase()
 		end
 	end
 end
 
 local function BagFrame_Create()
-	local frame = CreateFrame('Frame', format('BagnonBag%s', lastCreated))
+	local frame = CreateFrame("Frame", format("BagnonBag%s", lastCreated))
 	setmetatable(frame, Frame_mt)
 	frame.bags = {}
-	frame:SetScript('OnEvent', BagFrame_OnEvent)
+	frame:SetScript("OnEvent", BagFrame_OnEvent)
 
 	lastCreated = lastCreated + 1
 
@@ -73,16 +73,16 @@ function BagnonBagFrame.New(parent, bags, isBank, shown)
 
 	if isBank then
 		frame.purchase = BagnonPurchase.New(frame)
-		frame.purchase:SetPoint('TOPLEFT', frame, 'TOPLEFT', -2, 2)
-		frame:RegisterEvent('BANKFRAME_OPENED')
-		frame:RegisterEvent('BANKFRAME_CLOSED')
+		frame.purchase:SetPoint("TOPLEFT", frame, "TOPLEFT", -2, 2)
+		frame:RegisterEvent("BANKFRAME_OPENED")
+		frame:RegisterEvent("BANKFRAME_CLOSED")
 	end
 
-	frame:RegisterEvent('BAG_UPDATE')
-	frame:RegisterEvent('PLAYERBANKSLOTS_CHANGED')
-	frame:RegisterEvent('PLAYERBANKBAGSLOTS_CHANGED')
-	frame:RegisterEvent('ITEM_LOCK_CHANGED')
-	frame:RegisterEvent('CURSOR_UPDATE')
+	frame:RegisterEvent("BAG_UPDATE")
+	frame:RegisterEvent("PLAYERBANKSLOTS_CHANGED")
+	frame:RegisterEvent("PLAYERBANKBAGSLOTS_CHANGED")
+	frame:RegisterEvent("ITEM_LOCK_CHANGED")
+	frame:RegisterEvent("CURSOR_UPDATE")
 
 	frame:ShowBags(shown)
 
@@ -103,14 +103,14 @@ function BagnonBagFrame:Layout()
 			bag:Show()
 			bag:ClearAllPoints()
 			if i > 1 then
-				bag:SetPoint('BOTTOMLEFT', self.bags[i-1], 'BOTTOMRIGHT', 2, 0)
+				bag:SetPoint("BOTTOMLEFT", self.bags[i-1], "BOTTOMRIGHT", 2, 0)
 			else
 				height = height + bag:GetHeight()
 
 				if self.purchase and self.purchase:IsShown() then
-					bag:SetPoint('TOPLEFT', self.purchase, 'BOTTOMLEFT', 2, -4)
+					bag:SetPoint("TOPLEFT", self.purchase, "BOTTOMLEFT", 2, -4)
 				else
-					bag:SetPoint('TOPLEFT', self, 'TOPLEFT', 2, 0)
+					bag:SetPoint("TOPLEFT", self, "TOPLEFT", 2, 0)
 				end
 			end
 			bagWidth = bagWidth + bag:GetWidth() + 2

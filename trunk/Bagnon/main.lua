@@ -40,8 +40,8 @@ function Bagnon:Initialize()
 		BagnonSets = defaults
 		self:Print(L.NewUser)
 	else
-		local cMajor, cMinor = cVersion:match('(%d+)%.(%d+)')
-		local major, minor = BagnonSets.version:match('(%d+)%.(%d+)')
+		local cMajor, cMinor = cVersion:match("(%d+)%.(%d+)")
+		local major, minor = BagnonSets.version:match("(%d+)%.(%d+)")
 
 		if major ~= cMajor then
 			self:Print(L.UpdatedIncompatible)
@@ -63,27 +63,25 @@ function Bagnon:Enable()
 		StaticPopupDialogs["DISABLE_VBAGNON"] = {
 			text = L.vBagnonLoaded,
 			button1 = TEXT(ACCEPT),
-
 			OnAccept = function() DisableAddOn("vBagnon"); ReloadUI() end,
-
 			timeout = 0,
 		}
 		StaticPopup_Show("DISABLE_VBAGNON")
 	else
-		BankFrame:UnregisterEvent('BANKFRAME_OPENED')
+		BankFrame:UnregisterEvent("BANKFRAME_OPENED")
 
-		self:RegisterEvent('BANKFRAME_OPENED')
-		self:RegisterEvent('BANKFRAME_CLOSED')
-		self:RegisterEvent('TRADE_SHOW')
-		self:RegisterEvent('TRADE_CLOSED')
-		self:RegisterEvent('TRADE_SKILL_SHOW')
-		self:RegisterEvent('TRADE_SKILL_CLOSE')
-		self:RegisterEvent('AUCTION_HOUSE_SHOW')
-		self:RegisterEvent('AUCTION_HOUSE_CLOSED')
-		self:RegisterEvent('MAIL_SHOW')
-		self:RegisterEvent('MAIL_CLOSED')
-		self:RegisterEvent('MERCHANT_SHOW')
-		self:RegisterEvent('MERCHANT_CLOSED')
+		self:RegisterEvent("BANKFRAME_OPENED")
+		self:RegisterEvent("BANKFRAME_CLOSED")
+		self:RegisterEvent("TRADE_SHOW")
+		self:RegisterEvent("TRADE_CLOSED")
+		self:RegisterEvent("TRADE_SKILL_SHOW")
+		self:RegisterEvent("TRADE_SKILL_CLOSE")
+		self:RegisterEvent("AUCTION_HOUSE_SHOW")
+		self:RegisterEvent("AUCTION_HOUSE_CLOSED")
+		self:RegisterEvent("MAIL_SHOW")
+		self:RegisterEvent("MAIL_CLOSED")
+		self:RegisterEvent("MERCHANT_SHOW")
+		self:RegisterEvent("MERCHANT_CLOSED")
 
 		self:RegisterSlashCommands()
 		self:HookBagClicks()
@@ -97,20 +95,20 @@ function Bagnon:CreateInventory()
 	local bags = BagnonFrame.New(L.TitleBags, self.sets.inventory, {0, 1, 2, 3, 4, -2})
 	table.insert(UISpecialFrames, bags:GetName())
 
-	local OnShow = bags:GetScript('OnShow')
-	bags:SetScript('OnShow', function()
-		PlaySound('igBackPackOpen')
+	local OnShow = bags:GetScript("OnShow")
+	bags:SetScript("OnShow", function()
+		PlaySound("igBackPackOpen")
 		OnShow()
 	end)
 
-	local OnHide = bags:GetScript('OnHide')
-	bags:SetScript('OnHide', function()
-		PlaySound('igBackPackClose')
+	local OnHide = bags:GetScript("OnHide")
+	bags:SetScript("OnHide", function()
+		PlaySound("igBackPackClose")
 		OnHide()
 	end)
 
 	if not bags:IsUserPlaced() then
-		bags:SetPoint('RIGHT', UIParent)
+		bags:SetPoint("RIGHT", UIParent)
 	end
 
 	self.bags = bags
@@ -167,15 +165,15 @@ function Bagnon:CreateBank()
 	local bank = BagnonFrame.New(L.TitleBank, self.sets.bank, {-1, 5, 6, 7, 8, 9, 10, 11}, true)
 	table.insert(UISpecialFrames, bank:GetName())
 
-	local OnShow = bank:GetScript('OnShow')
-	bank:SetScript('OnShow', function()
-		PlaySound('igBagnonMenuOpen')
+	local OnShow = bank:GetScript("OnShow")
+	bank:SetScript("OnShow", function()
+		PlaySound("igBagnonMenuOpen")
 		OnShow()
 	end)
 
-	local OnHide = bank:GetScript('OnHide')
-	bank:SetScript('OnHide', function()
-		PlaySound('igBagnonMenuClose')
+	local OnHide = bank:GetScript("OnHide")
+	bank:SetScript("OnHide", function()
+		PlaySound("igBagnonMenuClose")
 
 		if self.atBank then
 			CloseBankFrame()
@@ -184,7 +182,7 @@ function Bagnon:CreateBank()
 	end)
 
 	if not bank:IsUserPlaced() then
-		bank:SetPoint('LEFT', UIParent, 'LEFT', 24, 100)
+		bank:SetPoint("LEFT", UIParent, "LEFT", 24, 100)
 	end
 
 	self.bank = bank
@@ -196,7 +194,11 @@ function Bagnon:ShowBank(auto)
 	if BagnonDB or self.atBank then
 		local bank = self.bank
 		if bank then
-			if not bank:IsShown() then
+			if bank:IsShown() then
+				if not bank:IsCached() then
+					bank:Regenerate()
+				end
+			else
 				bank:Show()
 				bank.manOpened = not auto
 			end
@@ -241,7 +243,7 @@ end
 
 --[[
 	Frame Hiding/Showing - bag clicks
-		These functions allow bagnon/banknon to be shown by clicking ona bag, or by using a bag's hotkey
+		These functions allow bagnon/banknon to be shown by clicking ona bag, or by using a bag"s hotkey
 --]]
 
 local function FrameOpened(id, auto)
@@ -351,8 +353,8 @@ end
 --]]
 
 local function ShowBlizBank()
-	BankFrameTitleText:SetText(UnitName('npc'))
-	SetPortraitTexture(BankPortraitTexture, 'npc')
+	BankFrameTitleText:SetText(UnitName("npc"))
+	SetPortraitTexture(BankPortraitTexture, "npc")
 	ShowUIPanel(BankFrame)
 
 	if not BankFrame:IsVisible() then
@@ -362,11 +364,11 @@ local function ShowBlizBank()
 end
 
 local function ShowAtEvent(event, showBlizBank)
-	if Bagnon.sets[format('showBagsAt%s', event)] then
+	if Bagnon.sets[format("showBagsAt%s", event)] then
 		Bagnon:ShowInventory(true)
 	end
 
-	if Bagnon.sets[format('showBankAt%s', event)] then
+	if Bagnon.sets[format("showBankAt%s", event)] then
 		Bagnon:ShowBank(true)
 	end
 
@@ -376,63 +378,63 @@ local function ShowAtEvent(event, showBlizBank)
 end
 
 local function HideAtEvent(event)
-	if Bagnon.sets[format('showBagsAt%s', event)] then
+	if Bagnon.sets[format("showBagsAt%s", event)] then
 		Bagnon:HideInventory(true)
 	end
 
-	if Bagnon.sets[format('showBankAt%s', event)] then
+	if Bagnon.sets[format("showBankAt%s", event)] then
 		Bagnon:HideBank(true)
 	end
 end
 
 function Bagnon:BANKFRAME_OPENED()
 	self.atBank = true
-	ShowAtEvent('Bank', not(BagnonUtil:ReplacingBank() or BagnonUtil:ReusingFrames()))
+	ShowAtEvent("Bank", not(BagnonUtil:ReplacingBank() or BagnonUtil:ReusingFrames()))
 end
 
 function Bagnon:BANKFRAME_CLOSED()
 	self.atBank = false
-	HideAtEvent('Bank')
+	HideAtEvent("Bank")
 end
 
 function Bagnon:TRADE_SHOW()
-	ShowAtEvent('Trade')
+	ShowAtEvent("Trade")
 end
 
 function Bagnon:TRADE_CLOSED()
-	HideAtEvent('Trade')
+	HideAtEvent("Trade")
 end
 
 function Bagnon:TRADE_SKILL_SHOW()
-	ShowAtEvent('Craft')
+	ShowAtEvent("Craft")
 end
 
 function Bagnon:TRADE_SKILL_CLOSE()
-	HideAtEvent('Craft')
+	HideAtEvent("Craft")
 end
 
 function Bagnon:AUCTION_HOUSE_SHOW()
-	ShowAtEvent('AH')
+	ShowAtEvent("AH")
 end
 
 function Bagnon:AUCTION_HOUSE_CLOSED()
-	HideAtEvent('AH')
+	HideAtEvent("AH")
 end
 
 function Bagnon:MAIL_SHOW()
-	ShowAtEvent('Mail')
+	ShowAtEvent("Mail")
 end
 
 function Bagnon:MAIL_CLOSED()
-	HideAtEvent('Mail')
+	HideAtEvent("Mail")
 end
 
 function Bagnon:MERCHANT_SHOW()
-	ShowAtEvent('Vendor')
+	ShowAtEvent("Vendor")
 end
 
 function Bagnon:MERCHANT_CLOSED()
-	HideAtEvent('Vendor')
+	HideAtEvent("Vendor")
 end
 
 

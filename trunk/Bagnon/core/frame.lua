@@ -6,16 +6,16 @@
 	The index, bag slot 0 is used to store size information about each bag.
 --]]
 
-BagnonFrame = CreateFrame('Frame')
+BagnonFrame = CreateFrame("Frame")
 local Frame_mt = {__index = BagnonFrame}
 local L = BAGNON_LOCALS
 
 local DEFAULT_COLS = 8
 local DEFAULT_SPACING = 1
-local DEFAULT_STRATA = 'HIGH'
+local DEFAULT_STRATA = "HIGH"
 local ITEM_SIZE = BagnonItem.SIZE
 
-local currentPlayer = UnitName('player')
+local currentPlayer = UnitName("player")
 local lastCreated = 0
 local util = BagnonUtil
 
@@ -46,41 +46,37 @@ local function HideAttachedMenus(frame)
 	if BagnonSpot:GetAnchor() == frame then
 		BagnonSpot:Hide()
 	end
-
-	if BagnonDBUICharacterList and BagnonDBUICharacterList.frame == frame then
-		BagnonDBUICharacterList:Hide()
-	end
 end
 
 
 --[[ stuff for creating a new frame ]]--
 
 local function CreateTitle(parent)
-	local title = CreateFrame('Button', parent:GetName() .. 'Title', parent)
+	local title = CreateFrame("Button", parent:GetName() .. "Title", parent)
 
 	local text = title:CreateFontString()
 	text:SetAllPoints(title)
-	text:SetJustifyH('LEFT')
-	text:SetFontObject('GameFontNormal')
+	text:SetJustifyH("LEFT")
+	text:SetFontObject("GameFontNormal")
 	title:SetFontString(text)
 
 	title:SetHighlightTextColor(1, 1, 1)
 	title:SetTextColor(1, 0.82, 0)
-	title:RegisterForClicks('LeftButtonUp', 'LeftButtonDown', 'RightButtonUp', 'RightButtonDown')
+	title:RegisterForClicks("LeftButtonUp", "LeftButtonDown", "RightButtonUp", "RightButtonDown")
 
-	title:SetScript('OnClick', function(self, arg1) self:GetParent():OnClick(arg1) end)
-	title:SetScript('OnDoubleClick', function(self, arg1) self:GetParent():OnDoubleClick(arg1) end)
-	title:SetScript('OnEnter', function(self) self:GetParent():OnEnter(this) end)
-	title:SetScript('OnLeave', function(self) self:GetParent():OnLeave(this) end)
-	title:SetScript('OnMouseUp', function(self) self:GetParent():OnMouseUp() end)
-	title:SetScript('OnMouseDown', function(self) self:GetParent():OnMouseDown() end)
+	title:SetScript("OnClick", function(self, arg1) self:GetParent():OnClick(arg1) end)
+	title:SetScript("OnDoubleClick", function(self, arg1) self:GetParent():OnDoubleClick(arg1) end)
+	title:SetScript("OnEnter", function(self) self:GetParent():OnEnter(this) end)
+	title:SetScript("OnLeave", function(self) self:GetParent():OnLeave(this) end)
+	title:SetScript("OnMouseUp", function(self) self:GetParent():OnMouseUp() end)
+	title:SetScript("OnMouseDown", function(self) self:GetParent():OnMouseDown() end)
 
 	return title
 end
 
 local function Frame_Create()
-	local name = format('BagnonFrame%d', lastCreated)
-	local frame = CreateFrame('Frame', name, UIParent)
+	local name = format("BagnonFrame%d", lastCreated)
+	local frame = CreateFrame("Frame", name, UIParent)
 	setmetatable(frame, Frame_mt)
 
 	frame.slots = {}
@@ -88,29 +84,29 @@ local function Frame_Create()
 	frame:SetClampedToScreen(true)
 	frame:SetMovable(true)
 	frame:SetBackdrop({
-	  bgFile = 'Interface\\ChatFrame\\ChatFrameBackground',
-	  edgeFile = 'Interface\\Tooltips\\UI-Tooltip-Border',
+	  bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
+	  edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
 	  edgeSize = 16,
 	  tile = true, tileSize = 16,
 	  insets = {left = 4, right = 4, top = 4, bottom = 4}
 	})
 	frame.borderSize = 16
 
-	local close = CreateFrame('Button', name .. 'Close', frame, 'UIPanelCloseButton')
-	close:SetPoint('TOPRIGHT', frame, 'TOPRIGHT', 6 - frame.borderSize/2, 6 - frame.borderSize/2)
+	local close = CreateFrame("Button", name .. "Close", frame, "UIPanelCloseButton")
+	close:SetPoint("TOPRIGHT", frame, "TOPRIGHT", 6 - frame.borderSize/2, 6 - frame.borderSize/2)
 
 	if BagnonDB then
-		local playerDropdown = CreateFrame('Button', name .. 'DropDown', frame, 'BagnonDBUIDropDownButton')
-		playerDropdown:SetPoint('TOPLEFT', frame, 'TOPLEFT', frame.borderSize/2 -2, -6)
+		local playerDropdown = CreateFrame("Button", name .. "DropDown", frame, "BagnonDBUIDropDownButton")
+		playerDropdown:SetPoint("TOPLEFT", frame, "TOPLEFT", frame.borderSize/2 -2, -6)
 	end
 
 	local title = CreateTitle(frame)
 	if BagnonDB then
-		title:SetPoint('TOPLEFT', frame, 'TOPLEFT', 26 + frame.borderSize/2, -10)
+		title:SetPoint("TOPLEFT", frame, "TOPLEFT", 26 + frame.borderSize/2, -10)
 	else
-		title:SetPoint('TOPLEFT', frame, 'TOPLEFT', 6 + frame.borderSize/2, -10)
+		title:SetPoint("TOPLEFT", frame, "TOPLEFT", 6 + frame.borderSize/2, -10)
 	end
-	title:SetPoint('BOTTOMRIGHT', frame, 'TOPRIGHT', -24, -16 - frame.borderSize/2)
+	title:SetPoint("BOTTOMRIGHT", frame, "TOPRIGHT", -24, -16 - frame.borderSize/2)
 	frame.paddingY = 24
 
 	frame:Hide()
@@ -137,7 +133,7 @@ end
 
 local function PlaceAndUpdate(frame)
 	if not frame:IsUserPlaced() then
-		frame:SetPoint('CENTER', UIParent)
+		frame:SetPoint("CENTER", UIParent)
 	end
 
 	frame:SortBags()
@@ -168,15 +164,15 @@ function BagnonFrame.New(name, sets, bags, isBank)
 
 	frame:SetTitleText(name)
 
-	frame:SetScript('OnShow', function() frame:OnShow() end)
-	frame:SetScript('OnHide', function() frame:OnHide() end)
-	frame:SetScript('OnEvent', function() frame:OnEvent() end)
+	frame:SetScript("OnShow", function() frame:OnShow() end)
+	frame:SetScript("OnHide", function() frame:OnHide() end)
+	frame:SetScript("OnEvent", function() frame:OnEvent() end)
 
-	frame:RegisterEvent('BAG_UPDATE')
-	frame:RegisterEvent('ITEM_LOCK_CHANGED')
-	frame:RegisterEvent('BAG_UPDATE_COOLDOWN')
+	frame:RegisterEvent("BAG_UPDATE")
+	frame:RegisterEvent("ITEM_LOCK_CHANGED")
+	frame:RegisterEvent("BAG_UPDATE_COOLDOWN")
 	if isBank then
-		frame:RegisterEvent('PLAYERBANKSLOTS_CHANGED')
+		frame:RegisterEvent("PLAYERBANKSLOTS_CHANGED")
 	end
 
 	PlaceAndUpdate(frame)
@@ -189,26 +185,26 @@ end
 
 function BagnonFrame:OnEvent()
 	if self:IsShown() and not self:IsCached() then
-		if event == 'BAG_UPDATE' then
+		if event == "BAG_UPDATE" then
 			self:OnBagUpdate(arg1)
-		elseif event == 'ITEM_LOCK_CHANGED' then
+		elseif event == "ITEM_LOCK_CHANGED" then
 			self:UpdateLockedSlots()
-		elseif event == 'BAG_UPDATE_COOLDOWN' then
+		elseif event == "BAG_UPDATE_COOLDOWN" then
 			self:UpdateSlotsOnCooldown()
-		elseif event == 'PLAYERBANKSLOTS_CHANGED' then
+		elseif event == "PLAYERBANKSLOTS_CHANGED" then
 			self:OnBagUpdate(-1)
 		end
 	end
 end
 
 function BagnonFrame:OnClick(button)
-	if button == 'RightButton' then
+	if button == "RightButton" then
 		BagnonMenu:Show(self)
 	end
 end
 
 function BagnonFrame:OnDoubleClick(button)
-	if button == 'LeftButton' then
+	if button == "LeftButton" then
 		BagnonSpot:Show(self)
 	end
 end
@@ -460,8 +456,8 @@ function BagnonFrame:Layout(cols, space)
 	local bags = self.bagFrame
 	local money = self.moneyFrame
 
-	bags:SetPoint('BOTTOMLEFT', self, 'BOTTOMLEFT', borderSize/2, borderSize/2)
-	money:SetPoint('BOTTOMRIGHT', self, 'BOTTOMRIGHT', borderSize/2 - 2, borderSize/2)
+	bags:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", borderSize/2, borderSize/2)
+	money:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", borderSize/2 - 2, borderSize/2)
 
 	height = height + max(bags:GetHeight(), money:GetHeight())
 	if bags.shown then
@@ -490,7 +486,7 @@ function BagnonFrame:LayoutItems(cols, space, offX, offY)
 				i = i + 1
 				local row = mod(i - 1, cols)
 				local col = ceil(i / cols) - 1
-				item:SetPoint('TOPLEFT', self, 'TOPLEFT', itemSize * row + offX, -(itemSize * col + offY))
+				item:SetPoint("TOPLEFT", self, "TOPLEFT", itemSize * row + offX, -(itemSize * col + offY))
 			end
 		end
 	end
@@ -532,7 +528,7 @@ function BagnonFrame:Reposition()
 
 		self:ClearAllPoints()
 		self:SetScale(scale)
-		self:SetPoint('TOPLEFT', parent, 'BOTTOMLEFT', x * ratio, y * ratio)
+		self:SetPoint("TOPLEFT", parent, "BOTTOMLEFT", x * ratio, y * ratio)
 		self:SetUserPlaced(true)
 	end
 end
@@ -574,7 +570,7 @@ function BagnonFrame:SetTitleText(text)
 end
 
 function BagnonFrame:UpdateTitleText()
-	getglobal(self:GetName() .. 'Title'):SetText(self:GetTitleText())
+	getglobal(self:GetName() .. "Title"):SetText(self:GetTitleText())
 end
 
 function BagnonFrame:GetTitleText()

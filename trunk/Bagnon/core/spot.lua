@@ -6,14 +6,14 @@
 BagnonSpot = {}
 
 local function SearchBox_Create()
-	local frame = CreateFrame('EditBox', nil, UIParent, 'GooeyPopup')
+	local frame = CreateFrame("EditBox", nil, UIParent, "GooeyPopup")
 	frame:SetAutoFocus(false)
 	frame:SetTextInsets(8, 8, 0, 0)
-	frame:SetFontObject('ChatFontNormal')
+	frame:SetFontObject("ChatFontNormal")
 
-	frame:SetScript('OnShow', function(self) self:SetFocus(); self:HighlightText() end)
-	frame:SetScript('OnTextChanged', function(self) BagnonSpot:SetTextSearch(self:GetText()) end)
-	frame:SetScript('OnEscapePressed', function(self) BagnonSpot:Hide() end)
+	frame:SetScript("OnShow", function(self) self:SetFocus(); self:HighlightText() end)
+	frame:SetScript("OnTextChanged", function(self) BagnonSpot:SetTextSearch(self:GetText()) end)
+	frame:SetScript("OnEscapePressed", function(self) BagnonSpot:Hide() end)
 	
 	return frame
 end
@@ -46,7 +46,7 @@ end
 
 --sets the text search to the given text
 function BagnonSpot:SetTextSearch(text)
-	if text and text ~= '' then
+	if text and text ~= "" then
 		self.textSearch = text:lower()
 	else
 		self.textSearch = nil
@@ -91,7 +91,7 @@ function BagnonSpot:Searching()
 	return (self.textSearch or self.bagSearch)
 end
 
---returns the text of what we're searching for
+--returns the text of what we"re searching for
 function BagnonSpot:GetSearch()
 	return self.textSearch, self.bagSearch
 end
