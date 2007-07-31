@@ -10,6 +10,14 @@ local DEFAULT_SPACING = 2
 
 --[[ Bar Functions ]]--
 
+local function Bar_SetSpacing(self, spacing)
+	self:Layout(nil, spacing)
+end
+
+local function Bar_GetSpacing(self)
+	return self.sets.spacing or DEFAULT_SPACING
+end
+
 local function Bar_Layout(self, cols, space)
 	if InCombatLockdown() then return end
 
@@ -46,13 +54,7 @@ end
 local function Bar_CreateMenu(frame)
 	local menu,panel = BongosMenu:CreateMenu(frame.id)
 
-	local spacing = panel:AddSpacingSlider(DEFAULT_SPACING)
-	spacing:SetScript("OnValueChanged", function(self, value)
-		if not self.onShow then
-			frame:Layout(nil, value)
-		end
-		getglobal(self:GetName() .. "ValText"):SetText(value)
-	end)
+	panel:AddSpacingSlider()
 
 	local cols = panel:AddSlider(L.Columns, 1, NUM_PET_ACTION_SLOTS, 1)
 	cols:SetScript("OnShow", function(self)
@@ -75,6 +77,8 @@ end
 local function Bar_OnCreate(self)
 	self.CreateMenu = Bar_CreateMenu
 	self.Layout = Bar_Layout
+	self.SetSpacing = Bar_SetSpacing
+	self.GetSpacing = Bar_GetSpacing
 
 	for i = 1, NUM_PET_ACTION_SLOTS do
 		BongosPetButton:Set(i, self)

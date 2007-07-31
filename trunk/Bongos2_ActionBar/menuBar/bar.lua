@@ -22,7 +22,15 @@ local buttons = {
 
 --[[ Bar Functions ]]--
 
-local function Bar_Layout(self, rows, space)
+local function Bar_SetSpacing(self, spacing)
+	self:Layout(nil, spacing)
+end
+
+local function Bar_GetSpacing(self)
+	return self.sets.spacing or DEFAULT_SPACING
+end
+
+local function Bar_Layout(self, rows, spacing)
 	rows = (rows or self.sets.rows or DEFAULT_ROWS)
 	if rows == DEFAULT_ROWS then
 		self.sets.rows = nil
@@ -30,34 +38,34 @@ local function Bar_Layout(self, rows, space)
 		self.sets.rows = rows
 	end
 
-	space = (space or self.sets.space or DEFAULT_SPACING)
-	if space == DEFAULT_SPACING then
-		self.sets.space = nil
+	spacing = (spacing or self.sets.spacing or DEFAULT_SPACING)
+	if spacing == DEFAULT_SPACING then
+		self.sets.spacing = nil
 	else
-		self.sets.space = space
+		self.sets.spacing = spacing
 	end
 
 	for _,button in pairs(buttons) do button:ClearAllPoints() end
 	buttons[1]:SetPoint("TOPLEFT", self, "TOPLEFT", 0, 20)
 
-	local actSpace = space
+	local actspacing = spacing
 	if rows == DEFAULT_ROWS then
 		--horizontal layout
-		space = space - 4 --apparently the anchors are weird on the micro buttons, and need to be adjusted
+		spacing = spacing - 4 --apparently the anchors are weird on the micro buttons, and need to be adjusted
 		for i = 2, #buttons do
-			buttons[i]:SetPoint("LEFT", buttons[i-1], "RIGHT", space, 0)
+			buttons[i]:SetPoint("LEFT", buttons[i-1], "RIGHT", spacing, 0)
 		end
 
 		self:SetHeight(39)
-		self:SetWidth(14 + (24 + actSpace) * #buttons - actSpace)
+		self:SetWidth(14 + (24 + actspacing) * #buttons - actspacing)
 	else
 		--vertical layoute
-		space = space - 24 --apparently the anchors are weird on the micro buttons, and need to be adjusted
+		spacing = spacing - 24 --apparently the anchors are weird on the micro buttons, and need to be adjusted
 		for i = 2, #buttons do
-			buttons[i]:SetPoint("TOP", buttons[i-1], "BOTTOM", 0, -space)
+			buttons[i]:SetPoint("TOP", buttons[i-1], "BOTTOM", 0, -spacing)
 		end
 
-		self:SetHeight(12 + (33 + actSpace) * #buttons - actSpace)
+		self:SetHeight(12 + (33 + actspacing) * #buttons - actspacing)
 		self:SetWidth(28)
 	end
 end
@@ -73,13 +81,7 @@ local function Bar_CreateMenu(frame)
 	vertical:SetScript("OnShow", function(self) self:SetChecked(frame.sets.rows) end)
 	vertical:SetScript("OnClick", function(self) frame:SetVertical(self:GetChecked()) end)
 
-	local spacing = panel:AddSpacingSlider(DEFAULT_SPACING)
-	spacing:SetScript("OnValueChanged", function(self, value)
-		if not self.onShow then
-			frame:Layout(nil, value)
-		end
-		getglobal(self:GetName() .. "ValText"):SetText(value)
-	end)
+	panel:AddSpacingSlider()
 
 	return menu
 end
@@ -88,6 +90,8 @@ local function Bar_OnCreate(self)
 	self.CreateMenu = Bar_CreateMenu
 	self.Layout = Bar_Layout
 	self.SetVertical = Bar_SetVertical
+	self.SetSpacing = Bar_SetSpacing
+	self.GetSpacing = Bar_GetSpacing
 
 	for _,button in pairs(buttons) do
 		self:Attach(button)

@@ -256,15 +256,9 @@ end
 
 local function Panel_AddLayoutSliders(panel)
 	local name = panel:GetName()
+
 	--spacing
-	local spacing = panel:AddSpacingSlider(DEFAULT_SPACING)
-	spacing:SetScript("OnValueChanged", function(self, value)
-		if not self.onShow then
-			local frame = BBar:Get(self:GetParent().id)
-			frame:SetSpacing(value)
-		end
-		getglobal(self:GetName() .. "ValText"):SetText(value)
-	end)
+	panel:AddSpacingSlider()
 
 	--columns
 	local cols = panel:AddSlider(L.Columns, 1, 1, 1)
