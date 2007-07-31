@@ -177,6 +177,7 @@ function BBar:SetFrameScale(scale, scaleAnchored)
 	local x, y = GetRelativeCoords(self, scale)
 
 	self:SetScale(scale)
+	self.dragFrame:SetScale(scale)
 	self:ClearAllPoints()
 	self:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", x, y)
 	self:Reanchor()
@@ -313,6 +314,7 @@ end
 
 function BBar:Rescale()
 	self:SetScale(self.sets.scale or 1)
+	self.dragFrame:SetScale(self.sets.scale or 1)
 end
 
 --try to reanchor the frame
