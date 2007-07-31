@@ -56,7 +56,7 @@ function Bongos:Enable()
 
 	self:RegisterSlashCommands()
 	self:LoadModules()
-	
+
 	self:RegisterMessage("DONGLE_PROFILE_CREATED")
 	self:RegisterMessage("DONGLE_PROFILE_CHANGED")
 	self:RegisterMessage("DONGLE_PROFILE_DELETED")
@@ -68,6 +68,13 @@ end
 function Bongos:UpdateSettings()
 	if(BongosActionBar) then
 		BongosActionBar:ConvertBindings()
+	end
+	
+	for profile,sets in pairs(self.db.sv.profiles) do
+		for barID,barSets in pairs(sets.bars) do
+			barSets.spacing = barSets.space
+			barSets.space = nil
+		end
 	end
 end
 
@@ -82,7 +89,6 @@ function Bongos:LoadModules()
 		module:Load()
 	end
 	BBar:ForAll("Reanchor")
-	-- self:LoadMinimap()
 end
 
 function Bongos:UnloadModules()
@@ -347,39 +353,6 @@ function Bongos:ToggleBars(args)
 		BBar:ForBar(barList, "ToggleFrame")
 	end
 end
-
---minimap functions
--- function Bongos:LoadMinimap()
-	-- local x, y = Bongos:GetMapCoords()
-	-- BongosMinimapFrame:ClearAllPoints()
-	-- BongosMinimapFrame:SetPoint("TOPLEFT", "Minimap", "TOPLEFT", x, y)
-
-	-- if not self:ShowingMinimap() then
-		-- BongosMinimapFrame:Hide()
-	-- end
--- end
-
--- function Bongos:SetShowMinimap(enable)
-	-- self.profile.showMinimap = enable or false
-	-- if enable then
-		-- BongosMinimapFrame:Show()
-	-- else
-		-- BongosMinimapFrame:Hide()
-	-- end
--- end
-
--- function Bongos:ShowingMinimap()
-	-- return self.profile.showMinimap
--- end
-
--- function Bongos:SetMapCoords(x, y)
-	-- self.profile.mapx = x
-	-- self.profile.mapy = y
--- end
-
--- function Bongos:GetMapCoords()
-	-- return self.profile.mapx, self.profile.mapy
--- end
 
 function Bongos:CleanUp()
 	local bars = self.profile.bars

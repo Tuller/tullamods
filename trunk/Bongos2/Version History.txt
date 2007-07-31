@@ -1,11 +1,12 @@
 Bongos2 Version History
 
-1.6.4
+1.7.0
 Core: Added in intuitive frame scaling (credit goes to AduinLothar)
+Core: Added in mouseover fading
 Core: Added in checkboxes to the right click menu for frame hiding/showing
 Core: Removed the minimap button
+ActionBar: Fixed a bug causing the spacing sliders to not display proper values
 ActionBar: Altered range scaling to update even more frequently
-
 
 1.6.3
 Core: Added shift right click to hide/show to the dragFrame tooltips

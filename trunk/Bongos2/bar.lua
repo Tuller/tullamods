@@ -9,6 +9,31 @@ local STICKY_TOLERANCE = 16 --how close one frame must be to another to trigger 
 local PADDING = 2
 local active = {}
 local unused = {}
+local ceil = math.ceil
+
+--fade and unfade mouseover frames
+local fadeChecker = CreateFrame("Frame")
+fadeChecker.bars = {}
+fadeChecker.nextUpdate = 0.1
+fadeChecker:Hide()
+fadeChecker:SetScript("OnUpdate", function(self, elapsed)
+	if(self.nextUpdate < 0) then
+		self.nextUpdate = 0.1
+		for bar in pairs(self.bars) do
+			if MouseIsOver(bar) then
+				if(ceil(bar:GetAlpha()*100) == ceil(bar:GetFadeAlpha()*100)) then
+					UIFrameFadeIn(bar, 0.1, bar:GetAlpha(), bar:GetFrameAlpha())
+				end
+			else
+				if(ceil(bar:GetAlpha()*100) == ceil(bar:GetFrameAlpha()*100)) then
+					UIFrameFadeOut(bar, 0.1, bar:GetAlpha(), bar:GetFadeAlpha())
+				end
+			end
+		end
+	else
+		self.nextUpdate = self.nextUpdate - elapsed
+	end
+end)
 
 
 --[[ Local Functions ]]--
@@ -67,7 +92,7 @@ function BBar:Create(id, OnCreate, OnDelete, defaults, strata, secure)
 		end
 		bar.isNew = nil
 	end
-	
+
 	active[id] = bar
 
 	return bar
@@ -89,9 +114,14 @@ function BBar:Destroy(deleteSettings)
 	self:ClearAllPoints()
 	self:SetUserPlaced(false)
 	self:Hide()
-	
+
 	if(deleteSettings) then
 		Bongos:SetBarSets(self.id, nil)
+	end
+
+	fadeChecker.bars[self] = nil
+	if not next(fadeChecker.bars) then
+		fadeChecker:Hide()
 	end
 
 	unused[self.id] = self
@@ -102,7 +132,6 @@ end
 
 function BBar:LoadSettings(defaults)
 	self.sets = Bongos:GetBarSets(self.id) or Bongos:SetBarSets(self.id, defaults or {})
-	self:SetFrameAlpha(self.sets.alpha)
 	self:Reposition()
 
 	if self.sets.hidden then
@@ -116,6 +145,11 @@ function BBar:LoadSettings(defaults)
 	else
 		self:Unlock()
 	end
+
+	self:UpdateAlpha()
+	self:UpdateFadeChecker()
+	-- self:SetFrameAlpha(self.sets.alpha)
+	-- self:SetFadeAlpha(self:GetFadeAlpha())
 end
 
 
@@ -138,6 +172,7 @@ function BBar:SetSize(x, y)
 	self:SetHeight(y or x)
 end
 
+--scale
 function BBar:SetFrameScale(scale, scaleAnchored)
 	local x, y = GetRelativeCoords(self, scale)
 
@@ -146,7 +181,7 @@ function BBar:SetFrameScale(scale, scaleAnchored)
 	self:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", x, y)
 	self:Reanchor()
 	self:SavePosition()
-	
+
 	if(scaleAnchored and Bongos:IsSticky()) then
 		for _,frame in self:GetAll() do
 			if frame:GetAnchor() == self then
@@ -156,25 +191,49 @@ function BBar:SetFrameScale(scale, scaleAnchored)
 	end
 end
 
+--opacity
+function BBar:UpdateAlpha()
+	self:SetAlpha((MouseIsOver(self) and self:GetFrameAlpha()) or self:GetFadeAlpha())
+end
+
 function BBar:SetFrameAlpha(alpha)
 	if alpha == 1 then
 		self.sets.alpha = nil
 	else
 		self.sets.alpha = alpha
 	end
-
-	self:SetAlpha(alpha or 1)
+	self:UpdateAlpha()
 end
 
 function BBar:GetFrameAlpha()
 	return self.sets.alpha or 1
 end
 
+
+--faded opacity (mouse not over the frame)
+function BBar:SetFadeAlpha(alpha)
+	local alpha = alpha or 1
+	if(alpha == 1) then
+		self.sets.fadeAlpha = nil
+	else
+		self.sets.fadeAlpha = alpha
+	end
+
+	self:UpdateFadeChecker()
+	self:UpdateAlpha()
+end
+
+function BBar:GetFadeAlpha(alpha)
+	return (self.sets.fadeAlpha or 1) * self:GetFrameAlpha()
+end
+
+
+--[[ Attach an object to the frame ]]--
+
 function BBar:Attach(frame)
 	frame:SetFrameStrata(self:GetFrameStrata())
 	frame:SetParent(self)
-	frame:SetAlpha(1)
-	frame:SetFrameLevel(0)
+	frame:SetFrameLevel(1)
 end
 
 
@@ -183,12 +242,14 @@ end
 function BBar:ShowFrame()
 	self.sets.hidden = nil
 	self:Show()
+	self:UpdateFadeChecker()
 	self.dragFrame:UpdateColor()
 end
 
 function BBar:HideFrame()
 	self.sets.hidden = true
 	self:Hide()
+	self:UpdateFadeChecker()
 	self.dragFrame:UpdateColor()
 end
 
@@ -365,5 +426,24 @@ function BBar:ForBar(id, method, ...)
 				end
 			end
 		end
+	end
+end
+
+--run the fade onupdate checker if only if there are mouseover frames to check
+function BBar:UpdateFadeChecker()
+	if(self.sets.hidden) then
+		fadeChecker.bars[self] = nil
+	else
+		if(self:GetFadeAlpha() == 1) then
+			fadeChecker.bars[self] = nil
+		else
+			fadeChecker.bars[self] = true
+		end
+	end
+
+	if next(fadeChecker.bars) then
+		fadeChecker:Show()
+	else
+		fadeChecker:Hide()
 	end
 end

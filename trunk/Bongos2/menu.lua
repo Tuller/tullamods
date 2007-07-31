@@ -5,6 +5,7 @@
 
 local L = BONGOS_LOCALS
 L.Show = "Show"
+L.FadedOpacity = "Faded Opacity"
 
 BongosMenu = CreateFrame("Frame", nil, UIParent)
 local Frame_MT = {__index = BongosMenu}
@@ -28,6 +29,7 @@ function BongosMenu:CreateMenu(name, tabbed)
 	local panel = frame:AddPanel(L.Layout)
 	panel:AddVisibilityButton()
 	panel:AddAlphaSlider()
+	panel:AddFadeSlider()
 	panel:AddScaleSlider()
 
 	return frame, panel
@@ -297,18 +299,50 @@ function Panel:AddAlphaSlider()
 	return slider
 end
 
+--faded opacity slider
+local function FadeSlider_OnShow(self)
+	self.onShow = true
+	local id = self:GetParent().id
+	self:SetValue(BBar:Get(id):GetFadeAlpha() * 100)
+	self.onShow = nil
+end
+
+local function FadeSlider_OnValueChanged(self, value)
+	if not self.onShow then
+		local id = self:GetParent().id
+		BBar:Get(id):SetFadeAlpha(value/100)
+	end
+	getglobal(self:GetName() .. "ValText"):SetText(value)
+end
+
+function Panel:AddFadeSlider()
+	local slider = self:AddSlider(L.FadedOpacity, 0, 100, 1)
+	slider:SetScript("OnShow", FadeSlider_OnShow)
+	slider:SetScript("OnValueChanged", FadeSlider_OnValueChanged)
+
+	return slider
+end
+
 --spacing slider
 local function SpaceSlider_OnShow(self)
 	self.onShow = true
 	local frame = BBar:Get(self:GetParent().id)
-	self:SetValue(frame.sets.space or self.defaultSpacing)
+	self:SetValue(frame:GetSpacing())
 	self.onShow = nil
+end
+
+local function SpaceSlider_OnValueChanged(self, value)
+	if not self.onShow then
+		BBar:Get(self:GetParent().id):SetSpacing(value)
+	end
+	getglobal(self:GetName() .. "ValText"):SetText(value)
 end
 
 function Panel:AddSpacingSlider(defaultSpacing)
 	local slider = self:AddSlider(L.Spacing, -8, 32, 1)
 	slider.defaultSpacing = defaultSpacing or 0
 	slider:SetScript("OnShow", SpaceSlider_OnShow)
+	slider:SetScript("OnValueChanged", SpaceSlider_OnValueChanged)
 
 	return slider
 end
