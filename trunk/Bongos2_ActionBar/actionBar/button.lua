@@ -68,7 +68,9 @@ local function OnEvent(self, event, arg1)
 	elseif event == "PLAYER_AURAS_CHANGED" or event == "PLAYER_TARGET_CHANGED" then
 		self:UpdateUsable()
 	elseif event == "UNIT_INVENTORY_CHANGED" then
-		if(arg1 == "player") then self:Update() end
+		if(arg1 == "player") then 
+			self:Update() 
+		end
 	elseif event == "ACTIONBAR_UPDATE_USABLE" or event == "UPDATE_INVENTORY_ALERTS" or event == "ACTIONBAR_UPDATE_COOLDOWN" then
 		self:UpdateCooldown()
 		self:UpdateUsable()
