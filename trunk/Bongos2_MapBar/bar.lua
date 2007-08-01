@@ -12,15 +12,15 @@ local L = BONGOS_LOCALS
 --]]
 
 --Make titan not take control of the minimap
--- if IsAddOnLoaded("Titan") then
-	-- local oTitanMovableFrame_CheckTopFrame = TitanMovableFrame_CheckTopFrame
-	-- TitanMovableFrame_CheckTopFrame = function(frameTop, top, frameName)
-		-- if frameName ~= "MinimapCluster" then
-			-- oTitanMovableFrame_CheckTopFrame(frameTop, top, frameName)
-		-- end
-	-- end
-	-- TitanMovableData["MinimapCluster"] = nil
--- end
+if IsAddOnLoaded("Titan") then
+	local oTitanMovableFrame_CheckTopFrame = TitanMovableFrame_CheckTopFrame
+	TitanMovableFrame_CheckTopFrame = function(frameTop, top, frameName)
+		if frameName ~= "MinimapCluster" then
+			oTitanMovableFrame_CheckTopFrame(frameTop, top, frameName)
+		end
+	end
+	TitanMovableData["MinimapCluster"] = nil
+end
 
 --[[ Clock Functions ]]--
 
