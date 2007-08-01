@@ -6,6 +6,7 @@
 local L = BONGOS_LOCALS
 
 BongosOptions = CreateFrame("Frame", "BongosOptions", UIParent)
+BongosOptions:Hide()
 
 function BongosOptions:Load()
 	--mother frame, used to hide and show the entire window
@@ -20,13 +21,15 @@ function BongosOptions:Load()
 	local content = self:AddContentPane()
 	content:SetPoint("TOPLEFT", menu, "TOPRIGHT", -6, 12)
 	content:SetPoint("BOTTOMRIGHT", self)
+
+	UIFrameFadeIn(self, 0.2)
 end
 
 function BongosOptions:Toggle()
 	if(self:IsShown()) then
 		self:Hide()
 	else
-		self:Show()
+		UIFrameFadeIn(self, 0.2)
 	end
 end
 
@@ -138,7 +141,7 @@ function Panel:CreateCheckButton(name, OnClick, OnShow)
 	button:SetText(name)
 	button:SetScript("OnClick", OnClick)
 	button:SetScript("OnShow", OnShow)
-	
+
 	return button
 end
 
@@ -177,15 +180,15 @@ function Panel:CreateSlider(name, min, max, step)
 	slider:SetValueStep(step)
 	slider:EnableMouseWheel(true)
 	slider:SetScript("OnMouseWheel", Slider_OnMouseWheel)
-	
+
 	slider.title = getglobal(slider:GetName() .. "Text")
 	slider.high = getglobal(slider:GetName() .. "High")
 	slider.low = getglobal(slider:GetName() .. "Low")
 	slider.text = getglobal(slider:GetName() .. "ValText")
-	
+
 	slider.title:SetText(name)
 	slider.low:SetText(min); slider.high:SetText(max)
-	
+
 	return slider
 end
 
@@ -238,9 +241,9 @@ function Panel:CreateSelector(name, vals, OnClick, OnShow)
 	title:SetFontObject("GameFontNormalSmall")
 	title:SetPoint("LEFT", selector, "RIGHT")
 	title:SetText(name)
-	
+
 	selector:SetWidth(text:GetWidth() + 40)
-	
+
 	return selector
 end
 
@@ -262,7 +265,7 @@ function Panel:CreateButton(name, width, height)
 	local button = CreateFrame("Button", self:GetName() .. name, self, "GooeyButton")
 	button:SetText(name)
 	button:SetWidth(width); button:SetHeight(height or width)
-	
+
 	return button
 end
 
