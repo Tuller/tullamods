@@ -7,6 +7,8 @@ Core: Added in checkboxes to the right click menu for frame hiding/showing
 Core: Removed the minimap button
 ActionBar: Fixed a bug causing the spacing sliders to not display proper values
 ActionBar: Altered range scaling to update even more frequently
+CastBar: Resizing code should work properly :)
+CastBar: Implemented basic target coloring
 
 1.6.3
 Core: Added shift right click to hide/show to the dragFrame tooltips
