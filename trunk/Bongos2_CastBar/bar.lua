@@ -159,6 +159,7 @@ local function Bar_OnCreate(self)
 
 	self.castBar = CastingBar_Create(self)
 	self.castBar:SetPoint("CENTER", self)
+	self.castBar:RegisterEvent("UNIT_SPELLCAST_SENT")
 	self:Attach(self.castBar)
 
 	self:SetSize(self.castBar:GetWidth() + 4, 24)
@@ -178,23 +179,23 @@ function BongosCastBar:Unload()
 	self.bar:Destroy()
 end
 
+function BongosCastBar:SetUnit(unit)
+	if not(unit and UnitExists(unit)) then
+		self.targetType = nil
+	else
+		self.targetType = (UnitIsEnemy("player", unit) and "enemy") or "friend"
+	end	
+end
+
 function BongosCastBar:UpdateColor(failed)
 	local castBar = self.bar.castBar
 	if failed then
 		castBar:SetStatusBarColor(1, 0, 0)
+	elseif self.targetType == "friend" then
+		castBar:SetStatusBarColor(0, 1, 1)
+	elseif self.targetType == "enemy" then
+		castBar:SetStatusBarColor(1, 0, 1)
 	else
-		if UnitCastingInfo("player") then
-			self.targetType = (UnitIsEnemy("player", "playertarget") and "enemy") or "friend"
-		else
-			self.targetType = nil
-		end
-
-		if self.targetType == "friend" then
-			castBar:SetStatusBarColor(0, 1, 1)
-		elseif self.targetType == "enemy" then
-			castBar:SetStatusBarColor(1, 0, 1)
-		else
-			castBar:SetStatusBarColor(1, 0.7, 0)
-		end
+		castBar:SetStatusBarColor(1, 0.7, 0)
 	end
 end
