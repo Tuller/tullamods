@@ -2,63 +2,56 @@
 
 	<!--  Bongos CastBar - Puts the casting bar in a movable bar -->
 	<Script file="bar.lua"/>
-	
+
 	<StatusBar name="BongosCastingBarTemplate" drawLayer="BORDER" hidden="true" virtual="true">
-		<Size x="195" y="18"/>
-		
+		<Size x="210" y="14"/>
+
 		<Layers>
 			<Layer level="BACKGROUND">
 				<Texture setAllPoints="true">
 					<Color r="0" g="0" b="0" a="0.5"/>
-				</Texture>		
+				</Texture>
 			</Layer>
 
 			<Layer level="ARTWORK">
-				<FontString name="$parentText" inherits="GameFontHighlight">
+				<FontString name="$parentText" font="GameFontHighlight">
 					<Anchors>
 						<Anchor point="CENTER">
 							<Offset x="0" y="1"/>
 						</Anchor>
 					</Anchors>
 				</FontString>
-				
-				<FontString name="$parentTime" font="GameFontHighlight">
+
+				<FontString name="$parentTime" font="GameFontHighlight" hidden="true">
 					<Anchors>
 						<Anchor point="RIGHT">
-							<Offset x="0" y="1"/>
+							<Offset x="-4" y="1"/>
 						</Anchor>
 					</Anchors>
 				</FontString>
-				
+
 				<Texture name="$parentBorder" file="Interface\CastingBar\UI-CastingBar-Border-Small">
+					<Size x="275" y="68"/>
 					<Anchors>
-						<Anchor point="TOPLEFT">
-							<Offset x="-34" y="28"/>
-						</Anchor>
-						<Anchor point="BOTTOMRIGHT">
-							<Offset x="34" y="-26"/>
-						</Anchor>
+						<Anchor point="CENTER"/>
 					</Anchors>
 				</Texture>
 			</Layer>
 
 			<Layer level="OVERLAY">
 				<Texture name="$parentSpark" file="Interface\CastingBar\UI-CastingBar-Spark" alphaMode="ADD">
-					<Size x="36" y="36"/>
-	
+					<Size x="32" y="32"/>
 					<Anchors>
-						<Anchor point="CENTER"/>
+						<Anchor point="CENTER">
+							<Offset x="0" y="-4"/>
+						</Anchor>
 					</Anchors>
 				</Texture>
-		
+
 				<Texture name="$parentFlash" file="Interface\CastingBar\UI-CastingBar-Flash-Small" alphaMode="ADD">
+					<Size x="275" y="78"/>
 					<Anchors>
-						<Anchor point="TOPLEFT">
-							<Offset x="-34" y="28"/>
-						</Anchor>
-						<Anchor point="BOTTOMRIGHT">
-							<Offset x="34" y="-26"/>
-						</Anchor>
+						<Anchor point="CENTER"/>
 					</Anchors>
 				</Texture>
 			</Layer>
@@ -69,7 +62,9 @@
 				CastingBarFrame_OnLoad("player", true);
 			</OnLoad>
 			<OnEvent>
-				CastingBarFrame_OnEvent(event, arg1);
+				CastingBarFrame_OnEvent(event, arg1)
+				local failed = (event == "UNIT_SPELLCAST_FAILED" or event == "UNIT_SPELLCAST_INTERRUPTED")
+				BongosCastBar:UpdateColor(failed)
 			</OnEvent>
 		</Scripts>
 

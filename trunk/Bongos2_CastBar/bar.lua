@@ -4,36 +4,38 @@
 --]]
 
 BongosCastBar = Bongos:NewModule("Bongos-CastBar")
+local borderScale = 197 / 150
 
 --[[ CastingBar Stuff ]]--
 
 local function CastingBar_AdjustWidth(self)
 	local name = self:GetName()
-	local textWidth = getglobal(name .. "Text"):GetStringWidth()
+	local textWidth = self.text:GetStringWidth()
+	local timeWidth = (self.time:IsShown() and (self.time:GetStringWidth() + 8)*2) or 0
+	local width = textWidth + timeWidth
 
-	local time = getglobal(name .. "Time")
-	if time:IsShown() then
-		textWidth = textWidth + 64
-	end
-
-	local diff = textWidth - self.normalWidth
+	local diff = width - self.normalWidth
 	if diff > 0 then
-		diff = textWidth - self:GetWidth()
+		diff = width - self:GetWidth()
 	else
 		diff = self.normalWidth - self:GetWidth()
 	end
 
 	if diff ~= 0 then
 		self:GetParent():SetWidth(self:GetParent():GetWidth() + diff)
-		self:SetWidth(self:GetWidth() + diff)
+
+		local newWidth = self:GetWidth() + diff
+		self:SetWidth(newWidth)
+		self.borderTexture:SetWidth(newWidth * borderScale)
+		self.flashTexture:SetWidth(newWidth * borderScale)
 	end
 end
 
 local function CastingBar_OnUpdate(self, arg1)
 	local name = self:GetName()
-	local barSpark = getglobal(name.."Spark")
-	local barFlash = getglobal(name.."Flash")
-	local barTime = getglobal(name.."Time")
+	local barSpark = self.sparkTexture
+	local barFlash = self.flashTexture
+	local barTime = self.time
 
 	if self.casting then
 		local status = GetTime()
@@ -42,7 +44,6 @@ local function CastingBar_OnUpdate(self, arg1)
 		end
 		if status == self.maxValue then
 			self:SetValue(self.maxValue)
-			self:SetStatusBarColor(0.0, 1.0, 0.0)
 			barSpark:Hide()
 			barFlash:SetAlpha(0)
 			barFlash:Show()
@@ -57,7 +58,7 @@ local function CastingBar_OnUpdate(self, arg1)
 		if sparkPosition < 0 then
 			sparkPosition = 0
 		end
-		barSpark:SetPoint("CENTER", self, "LEFT", sparkPosition, 2)
+		barSpark:SetPoint("CENTER", self, "LEFT", sparkPosition, 0)
 
 		--time display
 		barTime:SetText(format("%.1f", self.maxValue - status))
@@ -68,7 +69,6 @@ local function CastingBar_OnUpdate(self, arg1)
 			time = self.endTime
 		end
 		if time == self.endTime then
-			self:SetStatusBarColor(0.0, 1.0, 0.0)
 			barSpark:Hide()
 			barFlash:SetAlpha(0)
 			barFlash:Show()
@@ -81,7 +81,7 @@ local function CastingBar_OnUpdate(self, arg1)
 		self:SetValue(barValue)
 		barFlash:Hide()
 		local sparkPosition = ((barValue - self.startTime) / (self.endTime - self.startTime)) * self:GetWidth()
-		barSpark:SetPoint("CENTER", self, "LEFT", sparkPosition, 2)
+		barSpark:SetPoint("CENTER", self, "LEFT", sparkPosition, 0)
 
 		--time display
 		barTime:SetText(format("%.1f", self.endTime - time))
@@ -108,9 +108,17 @@ local function CastingBar_OnUpdate(self, arg1)
 end
 
 local function CastingBar_Create(parent)
-	local bar = CreateFrame("StatusBar", "BongosCastBar", parent, "BongosCastingBarTemplate")
-	bar.AdjustWidth = CastingBar_AdjustWidth
+	local name = "BongosCastBar"
+	local bar = CreateFrame("StatusBar", name, parent, "BongosCastingBarTemplate")
+	bar.sparkTexture = getglobal(name .. "Spark")
+	bar.flashTexture = getglobal(name .. "Flash")
+	bar.borderTexture = getglobal(name .. "Border")
+	bar.time = getglobal(name .. "Time")
+	bar.text = getglobal(name .. "Text")
+
 	bar.normalWidth = bar:GetWidth()
+	bar.AdjustWidth = CastingBar_AdjustWidth
+
 	bar:SetScript("OnUpdate", CastingBar_OnUpdate)
 
 	return bar
@@ -150,10 +158,10 @@ local function Bar_OnCreate(self)
 	self.ToggleText = Bar_ToggleText
 
 	self.castBar = CastingBar_Create(self)
-	self.castBar:SetPoint("TOPLEFT", self, "TOPLEFT", 6, -2)
+	self.castBar:SetPoint("CENTER", self)
 	self:Attach(self.castBar)
 
-	self:SetSize(207, 24)
+	self:SetSize(self.castBar:GetWidth() + 4, 24)
 end
 
 
@@ -168,4 +176,25 @@ end
 
 function BongosCastBar:Unload()
 	self.bar:Destroy()
+end
+
+function BongosCastBar:UpdateColor(failed)
+	local castBar = self.bar.castBar
+	if failed then
+		castBar:SetStatusBarColor(1, 0, 0)
+	else
+		if UnitCastingInfo("player") then
+			self.targetType = (UnitIsEnemy("player", "playertarget") and "enemy") or "friend"
+		else
+			self.targetType = nil
+		end
+
+		if self.targetType == "friend" then
+			castBar:SetStatusBarColor(0, 1, 1)
+		elseif self.targetType == "enemy" then
+			castBar:SetStatusBarColor(1, 0, 1)
+		else
+			castBar:SetStatusBarColor(1, 0.7, 0)
+		end
+	end
 end
