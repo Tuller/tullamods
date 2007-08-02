@@ -19,9 +19,9 @@ function BongosOptions:AddGeneralPanel()
 	sticky:SetScript("OnShow", function(self) self:SetChecked(Bongos:IsSticky()) end)
 	sticky:SetScript("OnClick", function(self) Bongos:SetSticky(self:GetChecked()) end)
 
-	-- local minmap = panel:AddCheckButton(L.ShowMinimap)
-	-- minmap:SetScript("OnShow", function(self) self:SetChecked(Bongos:ShowingMinimap()) end)
-	-- minmap:SetScript("OnClick", function(self) Bongos:SetShowMinimap(self:GetChecked()) end)
+	local minmap = panel:AddCheckButton(L.ShowMinimap)
+	minmap:SetScript("OnShow", function(self) self:SetChecked(Bongos:ShowingMinimap()) end)
+	minmap:SetScript("OnClick", function(self) Bongos:SetShowMinimap(self:GetChecked()) end)
 
 	local opacity = panel:AddSlider(L.Opacity, 0, 100, 1)
 	opacity:SetScript("OnShow", function(self)
