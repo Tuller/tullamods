@@ -159,7 +159,6 @@ local function Bar_OnCreate(self)
 
 	self.castBar = CastingBar_Create(self)
 	self.castBar:SetPoint("CENTER", self)
-	self.castBar:RegisterEvent("UNIT_SPELLCAST_SENT")
 	self:Attach(self.castBar)
 
 	self:SetSize(self.castBar:GetWidth() + 4, 24)
