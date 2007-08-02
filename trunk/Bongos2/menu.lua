@@ -27,7 +27,7 @@ function BongosMenu:CreateMenu(name, tabbed)
 	frame.content = frame:AddContentPane()
 
 	local panel = frame:AddPanel(L.Layout)
-	panel:AddVisibilityButton()
+--	panel:AddVisibilityButton()
 	panel:AddAlphaSlider()
 	panel:AddFadeSlider()
 	panel:AddScaleSlider()

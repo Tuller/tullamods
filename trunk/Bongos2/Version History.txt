@@ -1,8 +1,10 @@
 Bongos2 Version History
 
 1.7.1
+Core: Reimplemented the minimap button
 Core: Fixed a layering issue causing things to not be clickable
 ActionBar: Fixed a bug causing action button slots to not properly update when switching actions
+MapBar: Reimplemented titan compatibility code
 
 1.7.0
 Core: Added in intuitive frame scaling (credit goes to AduinLothar)

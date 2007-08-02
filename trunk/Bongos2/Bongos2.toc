@@ -2,7 +2,7 @@
 ## Title: Bongos2
 ## Notes: Movable bar framework
 ## Author: Tuller
-## Version: 1.7.0
+## Version: 1.7.1
 ## SavedVariables: Bongos2DB, BongosVersion
 ## OptionalDeps: Dongle
 lib\Dongle.lua
@@ -13,3 +13,4 @@ dragFrame.lua
 bar.lua
 menu.lua
 Bongos.lua
+minimap.xml

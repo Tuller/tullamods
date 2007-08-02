@@ -88,6 +88,7 @@ function Bongos:LoadModules()
 		assert(module.Load, format("Bongos Module %s: Missing Load function", name))
 		module:Load()
 	end
+	Bongos:LoadMinimap()
 	BBar:ForAll("Reanchor")
 end
 
@@ -361,4 +362,38 @@ function Bongos:CleanUp()
 			bars[id] = nil
 		end
 	end
+end
+
+
+--minimap functions
+function Bongos:LoadMinimap()
+	local x, y = Bongos:GetMapCoords()
+	BongosMinimapFrame:ClearAllPoints()
+	BongosMinimapFrame:SetPoint("TOPLEFT", "Minimap", "TOPLEFT", x, y)
+
+	if not self:ShowingMinimap() then
+		BongosMinimapFrame:Hide()
+	end
+end
+
+function Bongos:SetShowMinimap(enable)
+	self.profile.showMinimap = enable or false
+	if enable then
+		BongosMinimapFrame:Show()
+	else
+		BongosMinimapFrame:Hide()
+	end
+end
+
+function Bongos:ShowingMinimap()
+	return self.profile.showMinimap
+end
+
+function Bongos:SetMapCoords(x, y)
+	self.profile.mapx = x
+	self.profile.mapy = y
+end
+
+function Bongos:GetMapCoords()
+	return self.profile.mapx, self.profile.mapy
 end
