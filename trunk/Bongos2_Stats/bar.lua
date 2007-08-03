@@ -5,7 +5,7 @@
 
 BongosStats = Bongos:NewModule("Bongos-Stats")
 
-local L = BONGOS_STATS_LOCALS
+local L = BONGOS_LOCALS
 local NUM_ADDONS_TO_DISPLAY = 15
 local UPDATE_DELAY = 1
 local topAddOns
