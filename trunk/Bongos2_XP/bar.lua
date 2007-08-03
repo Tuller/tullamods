@@ -5,11 +5,16 @@
 
 BongosXP = Bongos:NewModule("Bongos-XP")
 
-local DEFAULT_HEIGHT = 14
-local DEFAULT_SIZE = 0.75
+local L = BONGOS_LOCALS
+
+local HORIZONTAL_TEXTURE = "Interface/Addons/Bongos2_XP/img/Smooth"
+local VERTICAL_TEXTURE = "Interface/Addons/Bongos2_XP/img/SmoothV"
 local REP_FORMAT = "%s:  %s / %s"
 local REST_FORMAT = "%s / %s (+%s)"
 local XP_FORMAT = "%s / %s"
+
+local DEFAULT_HEIGHT = 14
+local DEFAULT_SIZE = 0.75
 
 local xpBar, restBar, text, bg
 local WatchRep, WatchXP
@@ -117,19 +122,19 @@ end
 local function Bar_SetVertical(self, vertical)
 	if vertical then
 		xpBar:SetOrientation("VERTICAL")
-		xpBar:SetStatusBarTexture(BONGOS_XP_VERTICAL_TEXTURE)
+		xpBar:SetStatusBarTexture(VERTICAL_TEXTURE)
 
 		restBar:SetOrientation("VERTICAL")
-		restBar:SetStatusBarTexture(BONGOS_XP_VERTICAL_TEXTURE)
-		bg:SetTexture(BONGOS_XP_VERTICAL_TEXTURE)
+		restBar:SetStatusBarTexture(VERTICAL_TEXTURE)
+		bg:SetTexture(VERTICAL_TEXTURE)
 		self.sets.vertical = 1
 	else
 		xpBar:SetOrientation("HORIZONTAL")
-		xpBar:SetStatusBarTexture(BONGOS_XP_HORIZONTAL_TEXTURE)
+		xpBar:SetStatusBarTexture(HORIZONTAL_TEXTURE)
 
 		restBar:SetOrientation("HORIZONTAL")
-		restBar:SetStatusBarTexture(BONGOS_XP_HORIZONTAL_TEXTURE)
-		bg:SetTexture(BONGOS_XP_HORIZONTAL_TEXTURE)
+		restBar:SetStatusBarTexture(HORIZONTAL_TEXTURE)
+		bg:SetTexture(HORIZONTAL_TEXTURE)
 		self.sets.vertical = nil
 	end
 
@@ -142,30 +147,31 @@ end
 
 local function Bar_CreateMenu(frame)
 	local menu, panel = BongosMenu:CreateMenu(frame.id)
+	local size, height
 
 	--checkbuttons
-	local vertical = panel:AddCheckButton("Vertical")
+	local vertical = panel:AddCheckButton(L.Vertical)
 	vertical:SetScript("OnShow", function(self) self:SetChecked(frame.sets.vertical) end)
 	vertical:SetScript("OnClick",  function(self)
 		Bar_SetVertical(frame, self:GetChecked())
 
 		if self:GetChecked() then
-			getglobal(name .. "SizeText"):SetText("Height")
-			getglobal(name .. "HeightText"):SetText("Width")
+			getglobal(size:GetName() .. "Text"):SetText(L.Height)
+			getglobal(height:GetName() .. "Text"):SetText(L.Width)
 		else
-			getglobal(name .. "SizeText"):SetText("Width")
-			getglobal(name .. "HeightText"):SetText("Height")
+			getglobal(size:GetName() .. "Text"):SetText(L.Width)
+			getglobal(height:GetName() .. "Text"):SetText(L.Height)
 		end
 	end)
 
 	--height slider
-	local height = panel:AddSlider("Height", 0, 128, 1)
+	height = panel:AddSlider("Height", 0, 128, 1)
 	height:SetScript("OnShow", function(self)
 		self.onShow = true
 		if(frame.sets.vertical) then
-			getglobal(self:GetName() .. "Text"):SetText("Width")
+			getglobal(self:GetName() .. "Text"):SetText(L.Width)
 		else
-			getglobal(self:GetName() .. "Text"):SetText("Height")
+			getglobal(self:GetName() .. "Text"):SetText(L.Height)
 		end
 		self:SetValue(frame.sets.height or DEFAULT_HEIGHT)
 		self.onShow = nil
@@ -178,13 +184,13 @@ local function Bar_CreateMenu(frame)
 	end)
 
 	--size slider
-	local size = panel:AddSlider("Size", 0, 100, 1)
+	size = panel:AddSlider("Size", 0, 100, 1)
 	size:SetScript("OnShow", function(self)
 		self.onShow = true
 		if(frame.sets.vertical) then
-			getglobal(self:GetName() .. "Text"):SetText("Height")
+			getglobal(self:GetName() .. "Text"):SetText(L.Height)
 		else
-			getglobal(self:GetName() .. "Text"):SetText("Width")
+			getglobal(self:GetName() .. "Text"):SetText(L.Width)
 		end
 		self:SetValue((frame.sets.size or DEFAULT_SIZE) * 100)
 		self.onShow = nil
