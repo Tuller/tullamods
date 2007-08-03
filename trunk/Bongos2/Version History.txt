@@ -1,5 +1,10 @@
 Bongos2 Version History
 
+1.7.2
+Core: Fixed a bug causing the fade slider to display incorrect values when a bar has a normal opacity of less than 100%
+Stats: Fixed a bug causing setting options to not work
+Stats: Implemented sorted displays for memory and CPU usage
+
 1.7.1
 Core: Reimplemented the minimap button
 Core: Fixed a layering issue causing things to not be clickable

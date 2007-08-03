@@ -4,8 +4,6 @@
 --]]
 
 local L = BONGOS_LOCALS
-L.Show = "Show"
-L.FadedOpacity = "Faded Opacity"
 
 BongosMenu = CreateFrame("Frame", nil, UIParent)
 local Frame_MT = {__index = BongosMenu}
@@ -192,25 +190,25 @@ function Panel:AddCheckButton(name)
 	return button
 end
 
-local function Visibility_OnShow(self)
-	self:SetChecked(BBar:Get(self:GetParent().id):FrameIsShown())
-end
+-- local function Visibility_OnShow(self)
+	-- self:SetChecked(BBar:Get(self:GetParent().id):FrameIsShown())
+-- end
 
-local function Visibility_OnClick(self)
-	if(self:GetChecked()) then
-		BBar:Get(self:GetParent().id):ShowFrame()
-	else
-		BBar:Get(self:GetParent().id):HideFrame()
-	end
-end
+-- local function Visibility_OnClick(self)
+	-- if(self:GetChecked()) then
+		-- BBar:Get(self:GetParent().id):ShowFrame()
+	-- else
+		-- BBar:Get(self:GetParent().id):HideFrame()
+	-- end
+-- end
 
-function Panel:AddVisibilityButton()
-	local button = self:AddCheckButton(L.Show)
-	button:SetScript("OnShow", Visibility_OnShow)
-	button:SetScript("OnClick", Visibility_OnClick)
+-- function Panel:AddVisibilityButton()
+	-- local button = self:AddCheckButton(L.Show)
+	-- button:SetScript("OnShow", Visibility_OnShow)
+	-- button:SetScript("OnClick", Visibility_OnClick)
 
-	return button
-end
+	-- return button
+-- end
 
 
 --[[ Sliders ]]--
@@ -303,7 +301,7 @@ end
 local function FadeSlider_OnShow(self)
 	self.onShow = true
 	local id = self:GetParent().id
-	self:SetValue(BBar:Get(id):GetFadeAlpha() * 100)
+	self:SetValue(select(2, BBar:Get(id):GetFadeAlpha()) * 100)
 	self.onShow = nil
 end
 
