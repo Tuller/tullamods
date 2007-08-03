@@ -20,7 +20,7 @@ fadeChecker:SetScript("OnUpdate", function(self, elapsed)
 	if(self.nextUpdate < 0) then
 		self.nextUpdate = 0.1
 		for bar in pairs(self.bars) do
-			if MouseIsOver(bar) then
+			if MouseIsOver(bar, 1, 1, 1, 1) then
 				if(ceil(bar:GetAlpha()*100) == ceil(bar:GetFadeAlpha()*100)) then
 					UIFrameFadeIn(bar, 0.1, bar:GetAlpha(), bar:GetFrameAlpha())
 				end
@@ -34,6 +34,8 @@ fadeChecker:SetScript("OnUpdate", function(self, elapsed)
 		self.nextUpdate = self.nextUpdate - elapsed
 	end
 end)
+fadeChecker:SetScript("OnShow", function() Bongos:Print("fade enabled") end)
+fadeChecker:SetScript("OnHide", function() Bongos:Print("fade disabled") end)
 
 
 --[[ Local Functions ]]--
@@ -148,8 +150,6 @@ function BBar:LoadSettings(defaults)
 
 	self:UpdateAlpha()
 	self:UpdateFadeChecker()
-	-- self:SetFrameAlpha(self.sets.alpha)
-	-- self:SetFadeAlpha(self:GetFadeAlpha())
 end
 
 
@@ -224,8 +224,12 @@ function BBar:SetFadeAlpha(alpha)
 	self:UpdateAlpha()
 end
 
+--returns fadedOpacity, fadePercentage
+--fadedOpacity is what opacity the bar will be at when faded
+--fadedPercentage is what modifier we use on normal opacity
 function BBar:GetFadeAlpha(alpha)
-	return (self.sets.fadeAlpha or 1) * self:GetFrameAlpha()
+	local fadeAlpha = self.sets.fadeAlpha or 1
+	return fadeAlpha * self:GetFrameAlpha(), fadeAlpha
 end
 
 
@@ -436,7 +440,7 @@ function BBar:UpdateFadeChecker()
 	if(self.sets.hidden) then
 		fadeChecker.bars[self] = nil
 	else
-		if(self:GetFadeAlpha() == 1) then
+		if(select(2, self:GetFadeAlpha()) == 1) then
 			fadeChecker.bars[self] = nil
 		else
 			fadeChecker.bars[self] = true
