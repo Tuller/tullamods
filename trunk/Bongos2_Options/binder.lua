@@ -5,9 +5,6 @@
 if(not IsAddOnLoaded("Bongos2_ActionBar")) then return end
 
 local L = BONGOS_LOCALS
-L.Bindings = "Bindings"
-L.BindingsHelp = "Hover over a button, then press a key to set its binding.  To clear a button's current keybinding, press %s."
-
 local DEFAULT_BINDINGS = 0
 local ACCOUNT_BINDINGS = 1
 local CHARACTER_BINDINGS = 2

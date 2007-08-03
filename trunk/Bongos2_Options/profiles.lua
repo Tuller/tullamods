@@ -3,12 +3,6 @@
 --]]
 
 local L = BONGOS_LOCALS
-L.Profiles = "Profiles"
-L.Set = "Set"
-L.Save = "Save"
-L.Copy = "Copy"
-L.Delete = "Delete"
-L.EnterName = "Enter Profile Name"
 
 --profile options
 local listSize = 12

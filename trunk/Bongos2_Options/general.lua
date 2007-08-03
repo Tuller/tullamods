@@ -3,10 +3,6 @@
 --]]
 
 local L = BONGOS_LOCALS
-L.General = "General"
-L.SetLock = "Lock Bars"
-L.SetSticky = "Enable Sticky Bars"
-L.ShowMinimap = "Show Minimap Button"
 
 function BongosOptions:AddGeneralPanel()
 	local panel = self:AddPanel(L.General)

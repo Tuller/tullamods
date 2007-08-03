@@ -6,21 +6,6 @@
 if(not IsAddOnLoaded("Bongos2_ActionBar")) then return end
 
 local L = BONGOS_LOCALS
-L.ActionBar = "ActionBar"
-L.LockButtons = "Lock Button Positions"
-L.RightClickSelfCast = "Enable Right Click Selfcast"
-L.RangeCheck = "Enable Range Checking"
-L.ShowGrid = "Show Empty Buttons"
-L.ShowTooltips = "Show ActionButton Tooltips"
-L.ShowMacros = "Show Macro Text"
-L.ShowHotkeys = "Show Hotkeys"
-L.QuickMove = "Quick Move Key"
-L.Ctrl = "Control"
-L.Alt = "Alt"
-L.Shift = "Shift"
-L.NumActionBars = "Action Bars"
-L.SelfCastKey = "Selfcast Key"
-
 local keys = {NONE:upper(), SHIFT_KEY_TEXT:upper(), CTRL_KEY_TEXT:upper(), ("ALT"):upper()}
 
 local info = {}
