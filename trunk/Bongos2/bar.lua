@@ -34,8 +34,8 @@ fadeChecker:SetScript("OnUpdate", function(self, elapsed)
 		self.nextUpdate = self.nextUpdate - elapsed
 	end
 end)
-fadeChecker:SetScript("OnShow", function() Bongos:Print("fade enabled") end)
-fadeChecker:SetScript("OnHide", function() Bongos:Print("fade disabled") end)
+-- fadeChecker:SetScript("OnShow", function() Bongos:Print("fade enabled") end)
+-- fadeChecker:SetScript("OnHide", function() Bongos:Print("fade disabled") end)
 
 
 --[[ Local Functions ]]--
