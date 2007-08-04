@@ -5,6 +5,7 @@ Core: Fixed a bug causing the fade slider to display incorrect values when a bar
 Core: Fixed a bug causing mouseover detection to be enabled when it shouldn't be
 Stats: Fixed a bug causing setting options to not work
 Stats: Implemented sorted displays for memory and CPU usage
+XP: Fixed a error when setting the vertical option
 
 1.7.1
 Core: Reimplemented the minimap button
