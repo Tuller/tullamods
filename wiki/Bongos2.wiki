@@ -1,48 +1,33 @@
-#summary The Bongos2 readme
-#labels Featured
+#summary The Bongos2 Readme
 
-===Description===
-Bongos is an action bar replacement designed to be both low memory, and easy to setup. It is not as feature rich as other bar mods, but should include the features most commonly used.
-You must bind your keys via Bongos' key bindings menu. If you do not, there will be issues with stances.
-Bear form work, but not cat form? Learn aquatic form!
+= So what the heck is Bongos? =
 
-Included Addons
-    * Bongos2: The core addon.
-    * Bongos2 ActionBar: Breaks up the main action bar into movable parts.
-    * Bongos2 Stats: A display for latency, framerate, and memory usage
-    * Bongos2 RollBar: Makes the frame for rolling on items movable
-    * Bongos2 CastBar: A movable casting bar, with the ability to show cast time.
-    * Bongos2 Options: A dynamically loaded options menu for Bongos. 
+Bongos is a main action bar replacement.  The main action bar, as you know, is that thing at the bottom of the screen that acts as your main interface for accessing your inventory, opening a few panels, making your pet do things, and of course using spells and ability.
 
-Features
-    * Every Bongos bar can be moved, hidden, and have its scale and opacity altered
-    * Sticky bars - Each bar can be anchored to any other bar
-    * 120 action buttons, which can be setup in any number of bars.
-    * Both macro and key binding text on action buttons can be hidden
-    * Customizable stance transitions for each bar 
+What Bongos does is it takes that interface, splits it up into a series of customizable "bars" (a bar for your bags, one for your pet, an experience bar, etc), and adds a few more features, like more action buttons and a better bindings system.
+
+Bongos has been designed for three audiences: Myself, my friends, and the majority.  The result has been an action bar addon that is relatively easy to use and quick to setup, but also one that does not offer every feature under the sun.
 
 
-===Usage===
+= Great, now how do I use it? =
 
-General
-    * To bring up the options menu: type /bongos menu
-    * To unlock bars: uncheck the lock bars option in the main options menu
-    * To hide or show a bar: unlock bars, then middle click or shift right click it
-    * To move a bar: unlock bars, and then click and drag it with the left mouse button
-    * To bring up a bar's configuration menu, right click it 
+There are four main things you should know about when using Bongos:  The minimap button, the main options menu, locking and unlocking bars, and per bar configuration.
 
-Key Bindings
-    * *Bindings for the Bongos action bar should only be done via the bindings menu in Bongos*
-    * To bind keys, open the main options panel, and select the bindings option. Hover over a button, then press a key to bind it to that button
+== The Minimap Button ==
 
-Action Bars
-    * Accessing general action bar options:  open up the main options window (_/bongos menu_) and select the action bars panel
-    * Adjusting the layout of a given bar:  unlock bars and right click the bar you want to adjust to bring up its configuration menu
-    * Moving buttons: Hold down the key for moving buttons (shift by default), and drag a button. Alternatively, unlock button positions by shift right clicking the mini map button, or unchecking the option in the main options menu
-    * Making a bar bigger: You can increase the maximum size of a given bar by reducing the number of action bars. To do so, adjust the action bars slider on the action bar panel of the main options menu. This option will reset the settings of your actionbars 
+On your minimap, you'll find a button with a bongos icon.  This is your Bongos minimap button, an object which provides you quick access to two common functions: Toggling the main options menu and locking and unlocking bar positions.
 
-Stances and Paging
-    * Stances and paging are configured via a bar's right click menu.  Select the stances or paging panel and adjust the offsets to change what buttons are displayed for an actionbar in a given state.
+You can toggle locking bar positions simply by left clicking the minimap button.  Right clicking will toggle the main options menu.
+
+If you don't like the button, there's a checkbox to turn it off in the options menu.
+
+
+== The Main Options Menu ==
+
+The main options window is where you can configure *general* settings:  You'll find things like saving and loading profiles, hiding and showing hotkeys, locking and unlocking bar positions, a color picker for out of range coloring, etc.
+
+There's two ways to get to it.  You can either use the slash command /bongos, or you can click the minimap button.
+
 
 Slash Commands
    * All commands start with either /bongos, /bob, or /bgs
@@ -64,3 +49,4 @@ Slash Commands
 || /bongos reset || Loads default settings ||
 || /bongos version || Prints version information ||
 || /keybound || Toggles keybinding mode ||
+
