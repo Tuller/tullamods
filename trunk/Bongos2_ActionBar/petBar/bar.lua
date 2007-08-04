@@ -103,9 +103,33 @@ function BongosPetBar:Load()
 	petBar:RegisterEvent("PET_BAR_UPDATE_COOLDOWN")
 	petBar:RegisterEvent("PET_BAR_SHOWGRID")
 	petBar:RegisterEvent("PET_BAR_HIDEGRID")
+	
+	self:RegisterMessage("KEYBOUND_ENABLED")
+	self:RegisterMessage("KEYBOUND_DISABLED")
 end
 
 function BongosPetBar:Unload()
 	self.bar:Destroy()
+	self:UnregisterAllMessages()
 	PetActionBarFrame:UnregisterAllEvents()
+end
+
+function BongosPetBar:KEYBOUND_ENABLED()
+	for i = 1, NUM_PET_ACTION_SLOTS do
+		local button = BongosPetButton:Get(i)
+		button:Show()
+		button:UpdateHotkey()
+	end
+end
+
+function BongosPetBar:KEYBOUND_DISABLED()
+	local petBarShown = PetHasActionBar()
+	for i = 1, NUM_PET_ACTION_SLOTS do
+		local button = BongosPetButton:Get(i)
+		if(petBarShown and GetPetActionInfo(i)) then
+			button:Show()
+		else
+			button:Hide()
+		end
+	end
 end
