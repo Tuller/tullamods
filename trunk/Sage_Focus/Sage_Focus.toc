@@ -3,5 +3,4 @@
 ## Notes: A focus frame
 ## Author: Tuller
 ## Dependencies: Sage
-localization.lua
 focus.lua
