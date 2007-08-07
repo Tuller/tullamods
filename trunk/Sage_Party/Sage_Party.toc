@@ -3,5 +3,4 @@
 ## Notes: Party frames
 ## Author: Tuller
 ## Dependencies: Sage
-localization.lua
 party.lua
