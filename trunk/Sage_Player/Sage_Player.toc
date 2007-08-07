@@ -3,6 +3,5 @@
 ## Notes: A player frame
 ## Author: Tuller
 ## Dependencies: Sage
-localization.lua
 player.lua
 xp.lua
