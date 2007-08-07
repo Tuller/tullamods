@@ -3,5 +3,4 @@
 ## Notes: A target of target frame
 ## Author: Tuller
 ## Dependencies: Sage
-localization.lua
 targetTarget.lua
