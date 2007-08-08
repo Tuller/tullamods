@@ -8,5 +8,6 @@ localization.lua
 menu.lua
 general.lua
 profiles.lua
+visibility.lua
 binder.lua
 actionBar.lua

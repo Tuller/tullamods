@@ -32,7 +32,7 @@ L.ShowGrid = "Show Empty Buttons"
 L.ShowTooltips = "Show ActionButton Tooltips"
 L.ShowMacros = "Show Macro Text"
 L.ShowHotkeys = "Show Hotkeys"
-L.QuickMove = "Quick Move Key"
+L.QuickMove = "Button Pickup Key"
 L.Ctrl = "Control"
 L.Alt = "Alt"
 L.Shift = "Shift"
@@ -42,3 +42,7 @@ L.SelfCastKey = "Selfcast Key"
 --bindings panel
 L.Bindings = "Bindings"
 L.BindingsHelp = "Hover over a button, then press a key to set its binding.  To clear a button's current keybinding, press %s."
+
+--visibility panel
+L.Visibility = "Visibility"
+L.ActionBars = "Action Bars"

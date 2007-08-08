@@ -6,7 +6,7 @@ local L = BONGOS_LOCALS
 
 --profile options
 local listSize = 12
-local size = 19
+local width, height, offset = 188, 18, 1
 
 
 --[[ Profile Button ]]--
@@ -30,6 +30,7 @@ end
 
 local function ProfileButton_Create(name, parent)
 	local button = CreateFrame("Button", name, parent)
+	button:SetWidth(width) button:SetHeight(height)
 	button:SetScript("OnClick", ProfileButton_OnClick)
 	button:SetScript("OnMouseWheel", ProfileButton_OnMouseWheel)
 
@@ -40,7 +41,7 @@ local function ProfileButton_Create(name, parent)
 
 	local highlight = button:CreateTexture()
 	highlight:SetAllPoints(button)
-	highlight:SetTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight")
+	highlight:SetTexture("Interface/QuestFrame/UI-QuestTitleHighlight")
 	button:SetHighlightTexture(highlight)
 
 	return button
@@ -131,22 +132,18 @@ function BongosOptions:AddProfilePanel()
 	local name = panel:GetName()
 
 	local OnShow = panel:GetScript("OnShow")
-	panel:SetScript("OnShow", function(self) 
+	panel:SetScript("OnShow", function(self)
 		if(OnShow) then OnShow(self) end
 		panel:UpdateList()
-		panel:Highlight() 
+		panel:Highlight()
 	end)
 
 	local scroll = CreateFrame("ScrollFrame", name .. "ScrollFrame", panel, "FauxScrollFrameTemplate")
-	scroll:SetScript("OnVerticalScroll", function() FauxScrollFrame_OnVerticalScroll(10, ScrollBar_Update) end)
-	scroll:SetScript("OnShow", function(self)
-		panel.buttons[1]:SetPoint("BOTTOMRIGHT", scroll, "TOPLEFT", -24, -20)
-	end)
-	scroll:SetScript("OnHide", function()
-		panel.buttons[1]:SetPoint("BOTTOMRIGHT", scroll, "TOPLEFT", -2, -20)
-	end)
-	scroll:SetPoint("TOPLEFT", panel, "TOPRIGHT", -4, -2)
-	scroll:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -26, 42)
+	scroll:SetScript("OnVerticalScroll", function() FauxScrollFrame_OnVerticalScroll(10, function() panel:UpdateList() panel:Highlight() end) end)
+	scroll:SetScript("OnShow", function(self) panel.buttons[1]:SetWidth(width) end)
+	scroll:SetScript("OnHide", function() panel.buttons[1]:SetWidth(width + 20) end)
+	scroll:SetPoint("TOPLEFT", panel, "TOPLEFT", 6, -6)
+	scroll:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -30, 32)
 	panel.scrollFrame = scroll
 
 	local set = panel:CreateButton(L.Set, 48, 24)
@@ -189,16 +186,15 @@ function BongosOptions:AddProfilePanel()
 	for i = 1, listSize do
 		local button = ProfileButton_Create(name .. i, panel)
 		if(i == 1) then
-			button:SetPoint("TOPLEFT", panel, "TOPLEFT", 8, -4)
-			button:SetPoint("BOTTOMRIGHT", scroll, "TOPLEFT", -2, -20)
+			button:SetPoint("TOPLEFT", panel, "TOPLEFT", 8, -8)
 		else
-			button:SetPoint("TOPLEFT", name .. i-1, "BOTTOMLEFT", 0, -1)
-			button:SetPoint("BOTTOMRIGHT", name .. i-1, "BOTTOMRIGHT", 0, -size)
+			button:SetPoint("TOPLEFT", name .. i-1, "BOTTOMLEFT", 0, -offset)
+			button:SetPoint("TOPRIGHT", name .. i-1, "BOTTOMRIGHT", 0, -offset)
 		end
 		panel.buttons[i] = button
 	end
 
-	panel.height = panel.height + 24 + size * listSize
+	panel.height = panel.height + 32 + (height+offset)*listSize - offset
 	return panel
 end
 
