@@ -39,8 +39,8 @@ local function OnShow(self)
 	if(self.needsUpdate) then
 		self.needsUpdate = nil
 		self:Update(true)
-		shown[self] = (HasAction(self.id) or nil)
 	end
+	shown[self] = (HasAction(self.id) or nil)
 end
 
 local function OnHide(self)
@@ -68,8 +68,8 @@ local function OnEvent(self, event, arg1)
 	elseif event == "PLAYER_AURAS_CHANGED" or event == "PLAYER_TARGET_CHANGED" then
 		self:UpdateUsable()
 	elseif event == "UNIT_INVENTORY_CHANGED" then
-		if(arg1 == "player") then 
-			self:Update() 
+		if(arg1 == "player") then
+			self:Update()
 		end
 	elseif event == "ACTIONBAR_UPDATE_USABLE" or event == "UPDATE_INVENTORY_ALERTS" or event == "ACTIONBAR_UPDATE_COOLDOWN" then
 		self:UpdateCooldown()
@@ -214,7 +214,7 @@ function BongosActionButton:OnUpdate(elapsed)
 		local hotkey = self.hotkey
 		if IsActionInRange(action) == 0 then
 			hotkey:SetVertexColor(1, 0.1, 0.1)
-			if BongosActionConfig:RangeColoring() and IsUsableAction(action) then
+			if IsUsableAction(action) and BongosActionConfig:RangeColoring() then
 				local r,g,b = BongosActionConfig:GetRangeColor()
 				self.icon:SetVertexColor(r,g,b)
 			end
@@ -279,15 +279,16 @@ function BongosActionButton:Update(refresh)
 	if texture then
 		icon:SetTexture(texture)
 		icon:Show()
+		--self.rangeTimer = -1
 		self.rangeTimer = (ActionHasRange(action) and -1) or nil
 
-		self:SetNormalTexture("Interface\\Buttons\\UI-Quickslot2")
+		self:SetNormalTexture("Interface/Buttons/UI-Quickslot2")
 	else
 		icon:Hide()
 		cooldown:Hide()
 		self.rangeTimer = nil
 
-		self:SetNormalTexture("Interface\\Buttons\\UI-Quickslot")
+		self:SetNormalTexture("Interface/Buttons/UI-Quickslot")
 		self.hotkey:SetVertexColor(0.6, 0.6, 0.6)
 	end
 
@@ -345,7 +346,7 @@ function BongosActionButton:UpdateUsable()
 
 	local isUsable, notEnoughMana = IsUsableAction(action)
 	if isUsable then
-		if self.rangeTimer and BongosActionConfig:RangeColoring() and IsActionInRange(action) == 0 then
+		if BongosActionConfig:RangeColoring() and IsActionInRange(action) == 0 then
 			local r,g,b = BongosActionConfig:GetRangeColor()
 			icon:SetVertexColor(r,g,b)
 		else
