@@ -6,7 +6,7 @@
 1.7.3
   * Core: Implemented a theoretical fix for bad profile initialization
   * Options: Reimplemented the visibility panel
-  * ActionBar: Implemented a fix for the range coloring issue
+  * Action Bar: Implemented a fix for the range coloring issue
 
 1.7.2
   * Core: Fixed a bug causing the fade slider to display incorrect values when a bar has a normal opacity of less than 100%
