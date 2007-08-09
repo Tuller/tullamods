@@ -1,0 +1,28 @@
+#summary Advanced Bongos configuration
+#labels Featured
+
+So, you've figured out what right click menus are, you can move and scale things like a champ, and you know how to get to the options window.  But, you're still a little lost on how to do a few advanced things.  
+
+
+== Configuring things Faster (Slash Commands) ==
+
+The slash command handler in Bongos is there to do two things:  Configure things fast, and Configure things precisely.  Need the bags to be faded to exactly 30.5%?  `/bob setalpha bags 0.305`  Need to hide bars 7 to 120?  `/bob hide 7-120`  Also need to hide the bags?  `/bob hide 7-120 bags` will do it.
+
+All bar specific slash commands take a barList.  A bar list is an individual bar id (ex, bags), all for all bars, a range (1-120 for bars 1-120), or any combination of those separated by a space (ex, menu bags 1-10 for the menu and bag bars, as well as actionbars 1-10).  If you understand that syntax, you can configure things *very* quickly.
+
+Now, for the commands:
+|| *Command Syntax* || *Description* ||
+|| /bongos || Shows the options menu, if present, else displays slash commands ||
+|| /bongos lock || Toggles locking bars positions ||
+|| /bongos show <barList> || Shows <barList> ||
+|| /bongos hide <barList> || Hides <barList> ||
+|| /bongos toggle <barList> || Toggles <barList> ||
+|| /bongos scale <barList> <scale> || Sets the scale of <barList> to <scale>.  1 is normal  size, 2 is double, etc ||
+|| /bongos setalpha <barList> <opacity> || Sets the opacity of <barList> to <opacity>. 0 is completely invisible, 1 is completely opaque ||
+|| /bongos set <profile> || Sets the current character to use <profile> ||
+|| /bongos save <profile> || Saves current settings as and switches to <profile> ||
+|| /bongos copy <profile> || Copies all settings from <profile> ||
+|| /bongos delete <profile> || Deletes <profile> ||
+|| /bongos reset || Loads default settings ||
+|| /bongos version || Prints version information ||
+|| /keybound || Toggles keybinding mode ||
