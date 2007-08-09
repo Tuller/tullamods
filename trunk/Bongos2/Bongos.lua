@@ -10,7 +10,7 @@ local L = BONGOS_LOCALS
 
 --[[ Startup ]]--
 
-function Bongos:Enable()
+function Bongos:Initialize()
 	local defaults = {
 		profile = {
 			sticky = true,
@@ -28,14 +28,12 @@ function Bongos:Enable()
 			bars = {}
 		}
 	}
-
 	self.db = self:InitializeDB("Bongos2DB", defaults)
 	self.profile = self.db.profile
+end
 
-	--handle upgrading from <= 1.5 to 1.6+ because I'm a moron sometimes
-	if(not BongosVersion) then
-		self:UpdateSettings()
-	else
+function Bongos:Enable()
+	if(BongosVersion) then
 		local cMajor, cMinor = CURRENT_VERSION:match("(%d+)%.(%d+)")
 		local major, minor = BongosVersion:match("(%d+)%.(%d+)")
 
@@ -48,6 +46,9 @@ function Bongos:Enable()
 		elseif minor ~= cMinor then
 			self:UpdateSettings()
 		end
+	--handle upgrading from <= 1.5 to 1.6+ because I'm a moron sometimes
+	else
+		self:UpdateSettings()
 	end
 
 	if BongosVersion ~= CURRENT_VERSION then
@@ -72,7 +73,7 @@ function Bongos:UpdateSettings()
 	
 	for profile,sets in pairs(self.db.sv.profiles) do
 		for barID,barSets in pairs(sets.bars) do
-			barSets.spacing = barSets.space
+			barSets.spacing = (barSets.spacing or barSets.space)
 			barSets.space = nil
 		end
 	end
@@ -176,14 +177,11 @@ function Bongos:MatchProfile(name)
 end
 
 
---[[ Events ]]--
+--[[ Messages ]]--
 
 function Bongos:DONGLE_PROFILE_CREATED(event, db, parent, sv_name, profile_key)
 	if(sv_name == "Bongos2DB") then
 		self.profile = self.db.profile
-		if(BongosActionBar) then
-			BongosActionBar:ConvertBindings()
-		end
 		self:Print(format(L.ProfileCreated , profile_key))
 	end
 end
