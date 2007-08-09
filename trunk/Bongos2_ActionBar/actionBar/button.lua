@@ -40,7 +40,7 @@ local function OnShow(self)
 		self.needsUpdate = nil
 		self:Update(true)
 	end
-	shown[self] = (HasAction(self.id) or nil)
+	shown[self] = (self.id and HasAction(self.id) or nil)
 end
 
 local function OnHide(self)
@@ -51,7 +51,7 @@ local function OnAttributeChanged(self, var, val)
 	if(var == "state-parent" or var == "statehidden") then
 		if self:IsShown() then
 			self:Update(true)
-			shown[self] = (HasAction(self.id) or nil)
+			shown[self] = (self.id and HasAction(self.id) or nil)
 		else
 			self.needsUpdate = true
 		end
