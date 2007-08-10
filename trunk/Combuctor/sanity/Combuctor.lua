@@ -65,9 +65,8 @@ function Combuctor:Enable()
 	--frame stuff
 	local frame = _G[name]
 	frame.player = currentPlayer
-	self.frame.GetPlayer = function(self) return Combuctor:GetPlayer() end
-	self.frame.SetPlayer = function(self, player) Combuctor:SetPlayer(player) end
-
+	frame.GetPlayer = function(self) return Combuctor:GetPlayer() end
+	frame.SetPlayer = function(self, player) Combuctor:SetPlayer(player) end
 	self.frame = frame
 
 	self.dummyItem = DummyItem_Create(name .. "DummyItem", frame)
@@ -112,8 +111,6 @@ function Combuctor:Enable()
 	self.maxLevel = _G[name .. "MaxLevel"]
 	self.minLevel = _G[name .. "MinLevel"]
 	self.scrollFrame = 	_G[name.. "Scroll"]
-	--character select dropdown
-	-- self.charList = (BagnonDB and self:AddCharSelect()) or nil
 
 	--add panels to the frame
 	self:AddPanels()
@@ -467,14 +464,14 @@ end
 local tinsert, tremove = tinsert, tremove
 
 function Combuctor:AddLink(link)
-	self:Print("add", (select(2, GetItemInfo(link))))
+	--self:Print("add", (select(2, GetItemInfo(link))))
 	tinsert(self.display, link)
 end
 
 function Combuctor:RemoveLink(link)
 	for i,v in pairs(self.display) do
 		if v == link then
-			self:Print("remove", (select(2, GetItemInfo(tremove(self.display, i)))))
+			--self:Print("remove", (select(2, GetItemInfo(tremove(self.display, i)))))
 			-- tremove(self.display, i)
 			break
 		end
