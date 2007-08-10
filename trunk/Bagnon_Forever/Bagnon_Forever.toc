@@ -3,13 +3,14 @@
 ## Notes: Stores inventory information about your characters
 ## Notes-zhCN: 保存角色背包与银行内物品的信息
 ## Author: Tuller
-## Version: 7.3.12
+## Version: 1.0.0
 ## SavedVariables: BagnonForeverDB
 ## LoadOnDemand: 1
-## LoadWith: Bagnon, Combuctor
+## LoadWith: Bagnon
 localization.lua
 trans\localization.de.lua
 trans\localization.fr.lua
 trans\localization.cn.lua
-ui\ui.xml
 db.lua
+ui.xml
+tooltips.lua

@@ -9,8 +9,13 @@
 --]]
 
 BAGNON_FOREVER_LOCALS = {}
-
 local L = BAGNON_FOREVER_LOCALS
+
+--system messages
+L.Updated = "Updated to v%s"
+L.UpdatedIncompatible = "Updating from an incompatible version.  Database reset"
+
+--tooltip messages
 L.Bags = " %s Bags"
 L.Bank = " %s Bank"
 L.Equipped = " Equipped"
