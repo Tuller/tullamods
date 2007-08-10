@@ -38,6 +38,8 @@ function Combuctor:Enable()
 	--frame stuff
 	self.frame = _G[name]
 	self.frame.player = currentPlayer
+	self.frame.GetPlayer = function(self) return Combuctor:GetPlayer() end
+	self.frame.SetPlayer = function(self, player) Combuctor:SetPlayer(player) end
 
 	--set the frame title
 	self.title = _G[name .. "Text"]
@@ -61,8 +63,6 @@ function Combuctor:Enable()
 	self.search = _G[name .. "Search"]
 	self.maxLevel = _G[name .. "MaxLevel"]
 	self.minLevel = _G[name .. "MinLevel"]
-	--character select dropdown
-	self.charList = (BagnonDB and self:AddCharSelect()) or nil
 
 	--add panels to the frame
 	self:AddPanels()
@@ -509,7 +509,8 @@ function Combuctor:Layout()
 	end
 
 	--layout the items
-	local offX, offY = (26 + SPACING/2)/scale, (78 + SPACING/2)/scale
+	local offX, offY = 26/scale + SPACING/scale, 78/scale + SPACING/scale
+	--local offX, offY = (26 + SPACING/2)/scale, (78 + SPACING/2)/scale
 	local player = self:GetPlayer()
 	local items = self.items
 	local frame = self.frame
@@ -851,96 +852,4 @@ function Combuctor:OnTypeShow(frame)
 	UIDropDownMenu_Initialize(frame, Type_Initialize)
 	UIDropDownMenu_SetWidth(200, frame)
 	self:UpdateTypeText()
-end
-
-
---[[ Player ]]--
-
-local chars
-local function Char_GetList()
-	local list = {}
-
-	for player in BagnonDB:GetPlayers() do
-		table.insert(list, player)
-	end
-
-	--sort by currentPlayer first, then alphabetically
-	local function SexySort(a, b)
-		if(a == currentPlayer) then
-			return true
-		end
-		if(b == currentPlayer) then
-			return false
-		end
-		return a < b
-	end
-	table.sort(list, SexySort)
-
-	return list
-end
-
-local function Char_OnClick(player, delete)
-	local playerToShow
-	if(delete) then
-		--remove the selected player
-		BagnonDB:RemovePlayer(player)
-
-		--remove them from the dropdown's sorted list
-		for i,character in pairs(chars) do
-			if(character == player) then
-				table.remove(chars, i)
-				break
-			end
-		end
-
-		--select the current player
-		playerToShow = currentPlayer
-	else
-		--select the clicked player
-		playerToShow = player
-	end
-
-	--show the given player, and check the selected one
-	Combuctor:SetPlayer(playerToShow)
-	UIDropDownMenu_SetSelectedName(Combuctor.charList, playerToShow)
-
-	--hide the previous dropdown menus (hack)
-	for i = 1, UIDROPDOWNMENU_MENU_LEVEL-1 do
-		_G["DropDownList"..i]:Hide()
-	end
-end
-
---populate the list, add a delete button to all characters that aren't the current player
-local function Char_Initialize(level)
-	if(not chars) then
-		chars = Char_GetList()
-	end
-
-	local level = level or 1
-	if(level == 1) then
-		local selected = Combuctor:GetPlayer()
-		for i,player in ipairs(chars) do
-			AddCheckItem(player, i, Char_OnClick, selected, player ~= currentPlayer, level, player)
-		end
-	elseif(level == 2) then
-		AddItem(REMOVE, nil, Char_OnClick, false, level, chars[UIDROPDOWNMENU_MENU_VALUE], true)
-	end
-end
-
---toggle the character select dropdown at the given frame
-function Combuctor:ToggleCharacterSelect(anchorFrame)
-	if self.charList then
-		ToggleDropDownMenu(1, nil, self.charList, anchorFrame, 20, 32)
-	end
-end
-
---add the character select dropdown
-function Combuctor:AddCharSelect()
-	local parent = self.frame
-	local frame = CreateFrame("Frame", parent:GetName() .. "CharSelect", parent, "UIDropDownMenuTemplate")
-	frame:SetID(1)
-
-	UIDropDownMenu_Initialize(frame, Char_Initialize, "MENU")
-
-	return frame
 end

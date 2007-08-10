@@ -6,5 +6,5 @@
 ## OptionalDeps: Dongle
 lib\Dongle.lua
 localization.lua
-bagnon\Bagnon.xml
-Combuctor.xml
+## sanity\load.xml
+bagnon\load.xml

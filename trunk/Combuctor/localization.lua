@@ -12,10 +12,11 @@ COMBUCTOR_LOCALS = {}
 local L = COMBUCTOR_LOCALS
 
 --UI text
-
 L.FrameTitle = "%s's Items"
 
 --tabs
+L.New = NEW
+L.All = ALL
 L.Inventory = "Inventory"
 L.Bank = "Bank"
 L.Keys = "Keys"

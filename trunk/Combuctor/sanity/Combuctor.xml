@@ -2,6 +2,54 @@
 
 	<Script file="Combuctor.lua"/>
 
+	<Button name="CombuctorItemButtonTemplate" enableMouseWheel="false" justifyH="LEFT" virtual="true">
+		<Size x="300" y="22"/>
+
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentIcon">
+					<Size x="20" y="20"/>
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset x="6" y="0"/>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0.09" right="0.91" top="0.09" bottom="0.91"/>
+				</Texture>
+			</Layer>
+
+			<Layer level="OVERLAY">
+				<Fontstring name="$parentCount" font="GameFontHighlight" justifyH="RIGHT">
+					<Anchors>
+						<Anchor point="RIGHT">
+							<Offset x="-2" y="0"/>
+						</Anchor>
+					</Anchors>
+				</Fontstring>
+			</Layer>
+		</Layers>
+
+		<ButtonText>
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset x="28" y="0"/>
+				</Anchor>
+				<Anchor point="BOTTOMRIGHT">
+					<Offset x="-28" y="0"/>
+				</Anchor>
+			</Anchors>
+		</ButtonText>
+
+		<Scripts>
+			<OnEnter>
+				Combuctor:OnItemEnter(self)
+			</OnEnter>
+		</Scripts>
+
+		<NormalFont font="GameFontNormal" justifyH="LEFT"/>
+		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
+	</Button>
+
 	<Button name="CombuctorFrameTabButtonTemplate" inherits="CharacterFrameTabButtonTemplate" virtual="true">
 		<Scripts>
 			<OnLoad>
@@ -163,7 +211,10 @@
 					</OnMouseUp>
 					<OnClick>
 						if(arg1 == "RightButton") then
-							Combuctor:ToggleCharacterSelect(self)
+							if(BagnonDB) then
+								BagnonDB:SetDropdownFrame(self:GetParent())
+								BagnonDB:ToggleDropdown(self, 20, 32)
+							end
 						end
 					</OnClick>
 				</Scripts>
@@ -311,6 +362,54 @@
 					</OnShow>
 				</Scripts>
 			</Frame>
+			
+			<ScrollFrame name="$parentScroll" inherits="FauxScrollFrameTemplate">
+				<Size x="298" y="332"/>
+
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset x="20" y="-74"/>
+					</Anchor>
+				</Anchors>
+
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+							<Size x="31" y="256"/>
+
+							<Anchors>
+								<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+									<Offset x="-2" y="5"/>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.484375" top="0" bottom="1.0"/>
+						</Texture>
+
+						<Texture file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+							<Size x="31" y="106"/>
+
+							<Anchors>
+								<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT">
+									<Offset x="-2" y="-2"/>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.515625" right="1.0" top="0" bottom="0.4140625"/>
+						</Texture>
+					</Layer>
+				</Layers>
+
+				<Scripts>
+					<OnShow>
+						Combuctor:OnScrollShow()
+					</OnShow>
+					<OnHide>
+						Combuctor:OnScrollHide()
+					</OnHide>
+					<OnVerticalScroll>
+						FauxScrollFrame_OnVerticalScroll(Combuctor.numShown, Combuctor.UpdateList)
+					</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>
 		</Frames>
 
 		<Scripts>
