@@ -6,7 +6,7 @@
 ## Version: 1.0.0
 ## SavedVariables: BagnonForeverDB
 ## LoadOnDemand: 1
-## LoadWith: Bagnon
+## LoadWith: Bagnon, Combuctor
 localization.lua
 trans\localization.de.lua
 trans\localization.fr.lua

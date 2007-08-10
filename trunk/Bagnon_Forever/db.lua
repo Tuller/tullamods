@@ -4,7 +4,7 @@
 --]]
 
 if not BagnonDB then
-	BagnonDB = (Bagnon and Bagnon:NewModule("Bagnon-DB"))
+	BagnonDB = (Bagnon and Bagnon:NewModule("Bagnon-DB")) or (Combuctor and Combuctor:NewModule("Combuctor-DB"))
 	BagnonDB.addon = "Bagnon_Forever"
 else
 	error(format("Already using %s to view cached data", BagnonDB.addon or "<Unknown Addon>"))
