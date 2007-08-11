@@ -206,7 +206,7 @@ local function CheckUnit(unit, name)
 	end
 end
 
-local majorUnits = {"player", "target", "focus", "pet", "mouseover"}
+local majorUnits = {"target", "player", "focus", "pet", "mouseover"}
 
 local function NameToUnit(name)
 	--check the major units

@@ -71,10 +71,12 @@
 				else
 					CastingBarFrame_OnEvent(event, arg1)
 
-					if(event == "UNIT_SPELLCAST_FAILED" or event == "UNIT_SPELLCAST_INTERRUPTED") then
-						self.failed = true
+					if(arg1 == "player") then
+						if(event == "UNIT_SPELLCAST_FAILED" or event == "UNIT_SPELLCAST_INTERRUPTED") then
+							self.failed = true
+						end
+						BongosCastBar:UpdateColor()
 					end
-					BongosCastBar:UpdateColor()
 				end
 			</OnEvent>
 		</Scripts>
