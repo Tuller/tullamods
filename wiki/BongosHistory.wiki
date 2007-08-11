@@ -4,7 +4,7 @@
 = Bongos2 Version History =
 
 1.7.4
-  * CastBar: Modified coloring. Implemented a better algorithm for target detection
+  * Cast Bar: Modified coloring. Implemented a better algorithm for target detection
 
 1.7.3
   * Core: Implemented a theoretical fix for bad profile initialization
