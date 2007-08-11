@@ -268,9 +268,9 @@ function BongosCastBar:GetSpellTargetType(name)
 	return "none"
 end
 
-function BongosCastBar:UpdateColor(failed)
+function BongosCastBar:UpdateColor()
 	local castBar = self.bar.castBar
-	if failed then
+	if castBar.failed then
 		castBar:SetStatusBarColor(0.86, 0.08, 0.24)
 	elseif castBar.targetType == "friend" then
 		castBar:SetStatusBarColor(0.31, 0.78, 0.47)
