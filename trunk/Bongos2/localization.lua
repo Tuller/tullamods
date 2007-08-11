@@ -50,7 +50,7 @@ L.SetAlpha = "<Mousewheel> to set opacity (|cffffffff%d|r)"
 --Menu Stuff
 L.Scale = "Scale"
 L.Opacity = "Opacity"
-L.FadedOpacity = "Faded Opacity"
+L.FadedOpacity = "AutoFade Opacity"
 L.Visibility = "Visibility"
 L.Spacing = "Spacing"
 L.Layout = "Layout"
