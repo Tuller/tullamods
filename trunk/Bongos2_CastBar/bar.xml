@@ -62,10 +62,16 @@
 				CastingBarFrame_OnLoad("player", true);
 			</OnLoad>
 			<OnEvent>
-				BongosCastBar:SetUnit("target")
-				CastingBarFrame_OnEvent(event, arg1)
-				local failed = (event == "UNIT_SPELLCAST_FAILED" or event == "UNIT_SPELLCAST_INTERRUPTED")
-				BongosCastBar:UpdateColor(failed)
+				if(event == "UNIT_SPELLCAST_SENT") then
+					if(arg1 == "player") then
+						self.targetType = BongosCastBar:GetSpellTargetType(arg4)
+						BongosCastBar:UpdateColor()
+					end
+				else
+					CastingBarFrame_OnEvent(event, arg1)
+					local failed = (event == "UNIT_SPELLCAST_FAILED" or event == "UNIT_SPELLCAST_INTERRUPTED")
+					BongosCastBar:UpdateColor(failed)
+				end
 			</OnEvent>
 		</Scripts>
 

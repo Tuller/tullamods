@@ -120,6 +120,7 @@ local function CastingBar_Create(parent)
 	bar.AdjustWidth = CastingBar_AdjustWidth
 
 	bar:SetScript("OnUpdate", CastingBar_OnUpdate)
+	bar:RegisterEvent("UNIT_SPELLCAST_SENT")
 
 	return bar
 end
@@ -178,22 +179,103 @@ function BongosCastBar:Unload()
 	self.bar:Destroy()
 end
 
-function BongosCastBar:SetUnit(unit)
-	if not(unit and UnitExists(unit)) then
-		self.targetType = nil
+--[[
+	Unit Target Checking
+		Basically, UNIT_SPELLCAST_SENT sends me the name of the unit that the spell is targeting, but not a unitID
+		So, I take that name and match it against the subset of units that the player is most likely to target
+--]]
+
+local UnitName = UnitName
+local format = format
+
+local function CheckUnit(unit, name)
+	if UnitName(unit) == name then
+		return unit
+	end
+
+	local target = unit .. "target"
+	if UnitName(target) == name then
+		return target
+	end
+
+	local tot = target .. "target"
+	if UnitName(tot) == name then
+		return tot
+	end
+end
+
+local majorUnits = {"player", "target", "focus", "pet", "mouseover"}
+
+local function NameToUnit(name)
+	for _,unit in ipairs(majorUnits) do
+		local match = CheckUnit(unit, name)
+		if(match) then
+			return match
+		end
+	end
+
+	if GetNumRaidMembers() > 0 then
+		for i = 1, GetNumRaidMembers() do
+			local unit = format("raid%d", i)
+			if UnitExists(unit) then
+				local match = CheckUnit(unit, name)
+				if match then
+					return match
+				end
+
+				local unit = format("raidpet%d", i)
+				if UnitExists(unit) then
+					local match = CheckUnit(unit, name)
+					if match then
+						return match
+					end
+				end
+			end
+		end
 	else
-		self.targetType = (UnitIsEnemy("player", unit) and "enemy") or "friend"
-	end	
+		if GetNumPartyMembers() > 0 then
+			for i = 1, GetNumPartyMembers() do
+				local unit = format("party%d", i)
+				if UnitExists(unit) then
+					local match = CheckUnit(unit, name)
+					if match then
+						return match
+					end
+
+					local unit = format("partypet%d", i)
+					if UnitExists(unit) then
+						local match = CheckUnit(unit, name)
+						if match then
+							return match
+						end
+					end
+				end
+			end
+		end
+	end
+
+	return nil
+end
+
+--returns if a unit is a friend, foe, or does not exist
+function BongosCastBar:GetSpellTargetType(name)
+	if(name) then
+		local unit = NameToUnit(name)
+		if unit and UnitExists(unit) then
+			return (UnitIsFriend("player", unit) and "friend") or "enemy"
+		end
+	end
+	return "none"
 end
 
 function BongosCastBar:UpdateColor(failed)
 	local castBar = self.bar.castBar
 	if failed then
-		castBar:SetStatusBarColor(1, 0, 0)
-	elseif self.targetType == "friend" then
-		castBar:SetStatusBarColor(0, 1, 1)
-	elseif self.targetType == "enemy" then
-		castBar:SetStatusBarColor(1, 0, 1)
+		castBar:SetStatusBarColor(0.86, 0.08, 0.24)
+	elseif castBar.targetType == "friend" then
+		castBar:SetStatusBarColor(0.31, 0.78, 0.47)
+	elseif castBar.targetType == "enemy" then
+		castBar:SetStatusBarColor(0.63, 0.36, 0.94)
 	else
 		castBar:SetStatusBarColor(1, 0.7, 0)
 	end
