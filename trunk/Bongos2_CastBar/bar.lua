@@ -189,31 +189,35 @@ local UnitName = UnitName
 local format = format
 
 local function CheckUnit(unit, name)
-	if UnitName(unit) == name then
-		return unit
-	end
+	if UnitExists(unit) then
+		if UnitName(unit) == name then
+			return unit
+		end
 
-	local target = unit .. "target"
-	if UnitName(target) == name then
-		return target
-	end
+		local target = unit .. "target"
+		if UnitName(target) == name then
+			return target
+		end
 
-	local tot = target .. "target"
-	if UnitName(tot) == name then
-		return tot
+		local tot = target .. "target"
+		if UnitName(tot) == name then
+			return tot
+		end
 	end
 end
 
 local majorUnits = {"player", "target", "focus", "pet", "mouseover"}
 
 local function NameToUnit(name)
+	--check the major units
 	for _,unit in ipairs(majorUnits) do
 		local match = CheckUnit(unit, name)
-		if(match) then
+		if match then
 			return match
 		end
 	end
 
+	--check raid members and their pets
 	if GetNumRaidMembers() > 0 then
 		for i = 1, GetNumRaidMembers() do
 			local unit = format("raid%d", i)
@@ -223,16 +227,14 @@ local function NameToUnit(name)
 					return match
 				end
 
-				local unit = format("raidpet%d", i)
-				if UnitExists(unit) then
-					local match = CheckUnit(unit, name)
-					if match then
-						return match
-					end
+				local match = CheckUnit(format("raidpet%d", i), name)
+				if match then
+					return match
 				end
 			end
 		end
 	else
+		--check party members and their pets
 		if GetNumPartyMembers() > 0 then
 			for i = 1, GetNumPartyMembers() do
 				local unit = format("party%d", i)
@@ -242,12 +244,9 @@ local function NameToUnit(name)
 						return match
 					end
 
-					local unit = format("partypet%d", i)
-					if UnitExists(unit) then
-						local match = CheckUnit(unit, name)
-						if match then
-							return match
-						end
+					local match = CheckUnit(format("partypet%d", i), name)
+					if match then
+						return match
 					end
 				end
 			end
@@ -259,9 +258,9 @@ end
 
 --returns if a unit is a friend, foe, or does not exist
 function BongosCastBar:GetSpellTargetType(name)
-	if(name) then
+	if name then
 		local unit = NameToUnit(name)
-		if unit and UnitExists(unit) then
+		if unit then
 			return (UnitIsFriend("player", unit) and "friend") or "enemy"
 		end
 	end
