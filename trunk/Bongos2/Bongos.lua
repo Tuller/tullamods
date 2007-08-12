@@ -70,7 +70,7 @@ function Bongos:UpdateSettings()
 	if(BongosActionBar) then
 		BongosActionBar:ConvertBindings()
 	end
-	
+
 	for profile,sets in pairs(self.db.sv.profiles) do
 		for barID,barSets in pairs(sets.bars) do
 			barSets.spacing = (barSets.spacing or barSets.space)
@@ -167,13 +167,17 @@ function Bongos:MatchProfile(name)
 
 	local name = name:lower()
 	local nameRealm = format("%s - %s", name, GetRealmName():lower())
+	local match
 
 	for i, k in ipairs(profileList) do
 		local key = k:lower()
-		if key == name or key == nameRealm then
+		if key == name then
 			return k
+		elseif key == nameRealm then
+			match = k
 		end
 	end
+	return match
 end
 
 
