@@ -72,9 +72,11 @@ function Bongos:UpdateSettings()
 	end
 
 	for profile,sets in pairs(self.db.sv.profiles) do
-		for barID,barSets in pairs(sets.bars) do
-			barSets.spacing = (barSets.spacing or barSets.space)
-			barSets.space = nil
+		if sets and sets.bars then
+			for barID,barSets in pairs(sets.bars) do
+				barSets.spacing = (barSets.spacing or barSets.space)
+				barSets.space = nil
+			end
 		end
 	end
 end
