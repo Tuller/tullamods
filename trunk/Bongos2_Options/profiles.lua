@@ -73,7 +73,7 @@ local function Panel_UpdateList(self)
 end
 
 local function Panel_Highlight(self, profile)
-	profile = profile or Bongos.db:GetCurrentProfile()
+	local profile = profile or Bongos.db:GetCurrentProfile()
 
 	for _,button in pairs(self.buttons) do
 		if(button:GetText() == profile) then
@@ -88,41 +88,43 @@ end
 
 --[[ Make the Panel ]]--
 
-StaticPopupDialogs["BONGOS_OPTIONS_SAVE_PROFILE"] = {
-	text = TEXT(L.EnterName),
-	button1 = TEXT(ACCEPT),
-	button2 = TEXT(CANCEL),
-	hasEditBox = 1,
-	maxLetters = 24,
-	OnAccept = function()
-		local text = getglobal(this:GetParent():GetName().."EditBox"):GetText()
-		if text ~= "" then
-			Bongos:SaveProfile(text)
-			panel:UpdateList()
-			panel:Highlight(text)
-		end
-	end,
-	EditBoxOnEnterPressed = function()
-		local text = getglobal(this:GetParent():GetName().."EditBox"):GetText()
-		if text ~= "" then
-			Bongos:SaveProfile(text)
-			panel:UpdateList()
-			panel:Highlight(text)
-		end
-	end,
-	OnShow = function()
-		getglobal(this:GetName().."EditBox"):SetFocus()
-		getglobal(this:GetName().."EditBox"):SetText(UnitName("player"))
-		getglobal(this:GetName().."EditBox"):HighlightText()
-	end,
-	OnHide = function()
-		if ChatFrameEditBox:IsVisible() then
-			ChatFrameEditBox:SetFocus()
-		end
-		getglobal(this:GetName().."EditBox"):SetText("")
-	end,
-	timeout = 0, exclusive = 1, hideOnEscape = 1
-}
+local function Panel_CreatePopupDialog(panel)
+	return {
+		text = TEXT(L.EnterName),
+		button1 = TEXT(ACCEPT),
+		button2 = TEXT(CANCEL),
+		hasEditBox = 1,
+		maxLetters = 24,
+		OnAccept = function()
+			local text = getglobal(this:GetParent():GetName().."EditBox"):GetText()
+			if text ~= "" then
+				Bongos:SaveProfile(text)
+				panel:UpdateList()
+				panel:Highlight(text)
+			end
+		end,
+		EditBoxOnEnterPressed = function()
+			local text = getglobal(this:GetParent():GetName().."EditBox"):GetText()
+			if text ~= "" then
+				Bongos:SaveProfile(text)
+				panel:UpdateList()
+				panel:Highlight(text)
+			end
+		end,
+		OnShow = function()
+			getglobal(this:GetName().."EditBox"):SetFocus()
+			getglobal(this:GetName().."EditBox"):SetText(UnitName("player"))
+			getglobal(this:GetName().."EditBox"):HighlightText()
+		end,
+		OnHide = function()
+			if ChatFrameEditBox:IsVisible() then
+				ChatFrameEditBox:SetFocus()
+			end
+			getglobal(this:GetName().."EditBox"):SetText("")
+		end,
+		timeout = 0, exclusive = 1, hideOnEscape = 1
+	}
+end
 
 function BongosOptions:AddProfilePanel()
 	local panel = BongosOptions:AddPanel(L.Profiles)
@@ -193,9 +195,10 @@ function BongosOptions:AddProfilePanel()
 		end
 		panel.buttons[i] = button
 	end
+	
+	StaticPopupDialogs["BONGOS_OPTIONS_SAVE_PROFILE"] = Panel_CreatePopupDialog(panel)
 
 	panel.height = panel.height + 32 + (height+offset)*listSize - offset
 	return panel
 end
-
-panel = BongosOptions:AddProfilePanel()
+BongosOptions:AddProfilePanel()
