@@ -26,7 +26,9 @@ function BongosActionBar:Load()
 	end
 	
 	--set the selfcast key
-	BongosActionConfig:SetSelfCastKey(BongosActionConfig:GetSelfCastKey())
+	if(GetBuildInfo() ~= "0.2.0") then
+		BongosActionConfig:SetSelfCastKey(BongosActionConfig:GetSelfCastKey())
+	end
 end
 
 function BongosActionBar:Unload()
