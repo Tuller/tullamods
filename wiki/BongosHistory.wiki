@@ -3,6 +3,12 @@
 
 = Bongos2 Version History =
 
+1.7.5
+  * All: Implemented chinese localization (thanks ondh (http://www.ondh.cn))
+  * Core: Fixed an error when saving a profile
+  * Core: Fixed a bug casuing profiles to be matched inaccurately
+  * Core: Hopefully fixed a bug when upgrading Bongos
+
 1.7.4
   * Cast Bar: Modified coloring. Implemented a better algorithm for target detection
 
