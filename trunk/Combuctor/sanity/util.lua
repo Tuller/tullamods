@@ -73,7 +73,7 @@ end
 
 --returns true if the given bag is cached AND we have a way of reading data for it
 function BagnonUtil:IsCachedBag(bag, player)
-	return currentPlayer ~= (player or currentPlayer) or (not self:AtBank() and self:IsBankBag(bag))
+	return currentPlayer ~= (player or currentPlayer) or (self:IsBankBag(bag) and not self:AtBank())
 end
 
 function BagnonUtil:IsInventoryBag(bag)

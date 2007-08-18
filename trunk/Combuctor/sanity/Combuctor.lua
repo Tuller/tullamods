@@ -24,13 +24,13 @@ local function ToIndex(bag, slot)
 	return (bag<0 and bag*100 - slot) or (bag*100 + slot)
 end
 
-local function ToBag(index)
-	return (index > 0 and floor(index/100)) or ceil(index/100)
-end
-
 local function ToSlot(index)
-	local bag = ToBag(index)
-	return bag, index - bag*100
+	local sign = index > 0 and 1 or -1
+	local index = abs(index)
+	local bag = floor(index/100)
+	local slot = index % 100
+
+	return bag*sign, slot
 end
 
 --returns the full item link
@@ -49,12 +49,33 @@ end
 
 local function DummyItem_Create(name, parent)
 	local dummy = CreateFrame("Button", name, parent, "ContainerFrameItemButtonTemplate")
-	dummy:SetScript("OnLeave", function(self) GameTooltip:Hide() self:Hide() end)
-	dummy:SetNormalTexture(nil)
-	dummy:SetPushedTexture(nil)
+	dummy:SetNormalTexture(nil); dummy:SetPushedTexture(nil)
 	dummy:SetHighlightTexture("Interface/QuestFrame/UI-QuestTitleHighlight")
 	dummy:SetToplevel(true)
 	dummy:Hide()
+
+	dummy:SetScript("OnEnter", function(self)
+		local bag = self:GetParent():GetID()
+		local slot = self:GetID()
+		local player = Combuctor:GetPlayer()
+
+		if BagnonUtil:IsCachedBag(bag, player) then
+			local link, count = BagnonDB:GetItemData(bag, slot, player)
+
+			BagnonUtil:AnchorTooltip(self)
+			GameTooltip:SetHyperlink(link, count)
+		else
+			--boo for special case bank code
+			if bag == BANKFRAME_CONTAINER then
+				BagnonUtil:AnchorTooltip(self)
+				GameTooltip:SetInventoryItem("player", BankButtonIDToInvSlotID(slot))
+			else
+				ContainerFrameItemButton_OnEnter(self)
+			end
+		end
+	end)
+	dummy:SetScript("OnUpdate", nil)
+	dummy:SetScript("OnLeave", function(self) GameTooltip:Hide() self:Hide() end)
 
 	return dummy
 end
@@ -150,10 +171,6 @@ function Combuctor:UpdateEvents()
 			self:RegisterMessage("BAGNON_ITEM_LOST")
 			self:RegisterMessage("BAGNON_ITEM_SWAPPED")
 			self:RegisterMessage("BAGNON_ITEM_COUNT_CHANGED")
-			-- self:RegisterMessage("BAGNON_SLOT_ADD", "OnSlotChanged")
-			-- self:RegisterMessage("BAGNON_SLOT_UPDATE", "OnSlotChanged")
-			-- self:RegisterMessage("BAGNON_SLOT_UPDATE_LOCK")
-			-- self:RegisterMessage("BAGNON_SLOT_UPDATE_COOLDOWN")
 			self:RegisterMessage("BAGNON_SLOT_REMOVE")
 		end
 	else
@@ -163,10 +180,6 @@ function Combuctor:UpdateEvents()
 			self:UnregisterMessage("BAGNON_ITEM_LOST")
 			self:UnregisterMessage("BAGNON_ITEM_SWAPPED")
 			self:UnregisterMessage("BAGNON_ITEM_COUNT_CHANGED")
-			-- self:UnregisterMessage("BAGNON_SLOT_ADD")
-			-- self:UnregisterMessage("BAGNON_SLOT_UPDATE")
-			-- self:UnregisterMessage("BAGNON_SLOT_UPDATE_LOCK")
-			-- self:UnregisterMessage("BAGNON_SLOT_UPDATE_COOLDOWN")
 			self:UnregisterMessage("BAGNON_SLOT_REMOVE")
 		end
 	end
@@ -196,12 +209,6 @@ function Combuctor:BAGNON_BANK_CLOSED()
 		end
 	end
 end
-
--- function Combuctor:OnSlotChanged(msg, bag, slot, link)
-	-- if self:UpdateSlot(bag, slot, link) then
-		-- self:Layout(true)
-	-- end
--- end
 
 function Combuctor:BAGNON_SLOT_REMOVE(msg, ...)
 	if self:RemoveItem(...) then
@@ -244,7 +251,7 @@ end
 --[[ Bag Clicks ]]--
 
 function Combuctor:Toggle()
-	if(self.frame:IsShown()) then
+	if self.frame:IsShown() then
 		HideUIPanel(self.frame)
 	else
 		ShowUIPanel(self.frame)
@@ -324,7 +331,6 @@ function Combuctor:ShowPanel(name)
 		if(self:SetBags(PANEL_BAGS[panelID]) and self.frame:IsShown()) then
 			self:Layout(true)
 		end
-		-- self:SetShowNewItems(name == L.New)
 	end
 end
 
@@ -355,12 +361,8 @@ end
 
 --returns true if the item matches the given filter, false othewise
 function Combuctor:HasItem(bag, slot, link)
-	-- if self:ShowingNewItems() and not(self:GetPlayer() == currentPlayer and self.newItems[ToIndex(bag, slot)]) then
-		-- return false
-	-- end
-
 	local f = self.filter
-	if(next(f)) then
+	if next(f) then
 		if(not link) then return false end
 
 		local name, _, quality, _, level, type, subType, _, equipLoc = GetItemInfo(link)
@@ -388,7 +390,7 @@ function Combuctor:HasItem(bag, slot, link)
 end
 
 function Combuctor:AddItem(bag, slot, link)
-	if(link) then
+	if link then
 		local index = ToIndex(bag, slot)
 		local link = ToShortLink(link)
 		local count = BagnonUtil:GetItemCount(bag, slot, self:GetPlayer())
@@ -414,10 +416,10 @@ function Combuctor:RemoveItem(bag, slot, prevLink)
 		local items = self.links[link]
 		if items then
 			items[index] = nil
-			if(next(items)) then
+			if next(items) then
+				--self:Print(next(items))
 				self:UpdateLink(link)
 			else
-				self.links[link] = nil
 				self:RemoveLink(link)
 				return true
 			end
@@ -464,15 +466,17 @@ end
 local tinsert, tremove = tinsert, tremove
 
 function Combuctor:AddLink(link)
-	--self:Print("add", (select(2, GetItemInfo(link))))
+--	self:Print("add link", (select(2, GetItemInfo(link))))
 	tinsert(self.display, link)
 end
 
 function Combuctor:RemoveLink(link)
+	self.links[link] = nil
+
 	for i,v in pairs(self.display) do
 		if v == link then
 			--self:Print("remove", (select(2, GetItemInfo(tremove(self.display, i)))))
-			-- tremove(self.display, i)
+			tremove(self.display, i)
 			break
 		end
 	end
@@ -519,8 +523,12 @@ function Combuctor.UpdateList()
 end
 
 function Combuctor:Layout(shouldSort)
+--	self:Print("layout", shouldSort)
+
 	local display = self.display
-	if(shouldSort) then table.sort(display, Ludwig_Sort) end
+	if shouldSort then
+		table.sort(display, Ludwig_Sort)
+	end
 
 	local size = #display
 	FauxScrollFrame_Update(self.scrollFrame, size, self.numShown, self.step)
@@ -551,15 +559,20 @@ end
 
 --update all items and layout the frame
 function Combuctor:Regenerate()
-	local changed = false
 	local player = self:GetPlayer()
-	for _,bag in ipairs(self.bags) do
+	local changed = false
+
+	for _,bag in pairs(self.bags) do
 		for slot = 1, BagnonUtil:GetBagSize(bag, player) do
-			local altered = self:UpdateSlot(bag, slot)
-			changed = changed or altered
+			if self:UpdateSlot(bag, slot) then
+				changed = true
+			end
 		end
 	end
-	if(changed) then self:Layout(true) end
+
+	if changed then
+		self:Layout(true)
+	end
 end
 
 --set the display to use the given bag set, and remove any bags that are not in the new set
@@ -570,7 +583,7 @@ function Combuctor:SetBags(newBags)
 
 		--remove any items from bags that are not in the new set
 		local changed
-		if(bags) then
+		if bags then
 			for _,i in pairs(bags) do
 				local found = false
 				for _,j in pairs(newBags) do
@@ -580,14 +593,15 @@ function Combuctor:SetBags(newBags)
 					end
 				end
 				if(not found) then
-					local altered = self:RemoveBag(i)
-					changed = changed or altered
+					if self:RemoveBag(i) then
+						changed = true
+					end
 				end
 			end
 		end
 
 		--add in any items from bags that were not in the old set
-		if(self.frame:IsShown()) then
+		if self.frame:IsShown() then
 			if(not bags) then
 				self:Regenerate()
 			else
@@ -600,11 +614,15 @@ function Combuctor:SetBags(newBags)
 						end
 					end
 					if(not found) then
-						local altered = self:AddBag(i)
-						changed = changed or altered
+						if(self:AddBag(i)) then
+							changed = true
+						end
 					end
 				end
-				if(changed) then self:Layout(true) end
+
+				if changed then
+					self:Layout(true)
+				end
 			end
 		end
 	end
@@ -612,37 +630,45 @@ end
 
 --add all items in the givem bag
 function Combuctor:AddBag(bag, layout)
-	local player = self:GetPlayer()
-	local changed = false
+--	self:Print("add bag", bag)
 
-	for slot = 1, BagnonUtil:GetBagSize(bag, player) do
-		local added = self:UpdateSlot(bag, slot)
-		changed = changed or added
+	local changed = false
+	for slot = 1, BagnonUtil:GetBagSize(bag, self:GetPlayer()) do
+		if self:UpdateSlot(bag, slot) then
+--			self:Print("add", bag, slot)
+			changed = true
+		end
 	end
 
-	if(layout and changed) then self:Layout(true) end
+	if(layout and changed) then
+		self:Layout(true)
+	end
 	return changed
 end
 
 --remove all items in the given bag
 function Combuctor:RemoveBag(bag, layout)
+--	self:Print("remove bag", bag)
+
 	local changed = false
 
 	local links = self.links
 	for link in pairs(links) do
 		local items = self.links[link]
 		for index in pairs(items) do
-			if(bag == ToBag(index)) then
+			if bag == ToSlot(index) then
 				items[index] = nil
 				changed = true
 			end
 		end
-		if(not next(items)) then
+		if not next(items) then
 			self:RemoveLink(link)
 		end
 	end
 
-	if(layout and changed) then self:Layout(true) end
+	if(layout and changed) then
+		self:Layout(true)
+	end
 	return changed
 end
 
@@ -654,17 +680,19 @@ function Combuctor:RemoveBankItems(layout)
 	for link in pairs(links) do
 		local items = self.links[link]
 		for index in pairs(items) do
-			if BagnonUtil:IsBankBag(ToBag(index)) then
+			if BagnonUtil:IsBankBag(ToSlot(index)) then
 				items[index] = nil
 				changed = true
 			end
 		end
-		if(not next(items)) then
+		if not next(items) then
 			self:RemoveLink(link)
 		end
 	end
 
-	if(layout and changed) then self:Layout(true) end
+	if(layout and changed) then
+		self:Layout(true)
+	end
 	return changed
 end
 
@@ -713,7 +741,7 @@ function Combuctor:Reset()
 	self:UpdateTypeText()
 	self:UpdateQualityText()
 
-	if(changed) then
+	if changed then
 		self:Regenerate()
 	end
 end
@@ -735,10 +763,8 @@ end
 --[[ Player ]]--
 
 function Combuctor:SetPlayer(player)
-	if(player ~= self:GetPlayer()) then
+	if player ~= self:GetPlayer() then
 		self.player = player
-		self.frame.player = player
-
 		self:UpdateEvents()
 		self:ReloadAllItems()
 		self.title:SetText(format(L.FrameTitle, self:GetPlayer()))
