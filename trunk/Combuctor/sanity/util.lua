@@ -4,30 +4,31 @@
 --]]
 
 BagnonUtil = {}
-BagnonUtil.atBank = false
 
-
---[[ Usable Functions ]]--
 
 local currentPlayer = UnitName("player")
 local typeContainer = select(3, GetAuctionItemClasses())
 local typeQuiver = select(7, GetAuctionItemClasses())
 local subTypeBag = select(1, GetAuctionItemSubClasses(3))
 local subTypeSoulBag = select(2, GetAuctionItemSubClasses(3))
+local atBank = false
 
 
 --[[ Bank ]]--
 
-function BagnonUtil:SetAtBank(atBank)
-	self.atBank = atBank or nil
-end
+local f = CreateFrame("Frame")
+f:SetScript("OnEvent", function(self, event)
+	atBank = (event == "BANKFRAME_OPENED")
+end)
+f:RegisterEvent("BANKFRAME_OPENED")
+f:RegisterEvent("BANKFRAME_CLOSED")
 
 function BagnonUtil:AtBank()
-	return self.atBank
+	return atBank
 end
 
 
---[[ Item/Bag Info Retrieval ]]--
+--[[ Item/Bag Info Wrapper Functions ]]--
 
 function BagnonUtil:GetInvSlot(bag)
 	return bag > 0 and ContainerIDToInventoryID(bag)
@@ -69,7 +70,7 @@ function BagnonUtil:GetItemCount(bag, slot, player)
 end
 
 
---[[ Bag Type Booleans ]]--
+--[[ Bag Type Comparisons ]]--
 
 --returns true if the given bag is cached AND we have a way of reading data for it
 function BagnonUtil:IsCachedBag(bag, player)
@@ -81,52 +82,29 @@ function BagnonUtil:IsInventoryBag(bag)
 end
 
 function BagnonUtil:IsBankBag(bag)
-	return (bag == -1 or bag > 4)
+	return (bag == BANKFRAME_CONTAINER or bag > 4)
 end
 
 --returns if the given bag is an ammo bag/soul bag
 --bankslots, the main bag, and the keyring cannot be ammo slots
 function BagnonUtil:IsAmmoBag(bag, player)
-	if bag <= 0 then return nil end
-
-	local link = self:GetBagLink(bag, player)
-	if link then
-		local type, subType = select(6, GetItemInfo(link))
-		return (type == typeQuiver or subType == subTypeSoulBag)
+	if bag > 0 then
+		local link = self:GetBagLink(bag, player)
+		if link then
+			local type, subType = select(6, GetItemInfo(link))
+			return (type == typeQuiver or subType == subTypeSoulBag)
+		end
 	end
 end
 
 --returns if the given bag is a profession bag (herb bag, engineering bag, etc)
 --bankslots, the main bag, and the keyring cannot be ammo slots
 function BagnonUtil:IsProfessionBag(bag, player)
-	if bag <= 0 then return nil end
-
-	local link = self:GetBagLink(bag, player)
-	if link then
-		local type, subType = select(6, GetItemInfo(link))
-		return type == typeContainer and not(subType == subTypeBag or subType == subTypeSoulBag)
+	if bag > 0 then
+		local link = self:GetBagLink(bag, player)
+		if link then
+			local type, subType = select(6, GetItemInfo(link))
+			return type == typeContainer and not(subType == subTypeBag or subType == subTypeSoulBag)
+		end
 	end
-end
-
-
---[[ Positioning Functions ]]--
-
-function BagnonUtil:AnchorTooltip(frame)
-	if frame:GetRight() >= (GetScreenWidth() / 2) then
-		GameTooltip:SetOwner(frame, "ANCHOR_LEFT")
-	else
-		GameTooltip:SetOwner(frame, "ANCHOR_RIGHT")
-	end
-end
-
--- function BagnonUtil:AnchorAtCursor(frame)
-	-- local x,y = GetCursorPosition()
-	-- local scale = UIParent:GetScale()
-
-	-- frame:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", x/scale - 32, y/scale + 32)
--- end
-
-function BagnonUtil:Attach(frame, parent)
-	frame:SetParent(parent)
-	frame:SetFrameLevel(1)
 end
