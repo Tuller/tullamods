@@ -6,6 +6,9 @@
 BagnonUtil = {}
 BagnonUtil.atBank = false
 
+local LIBRARY_VERSION_MAJOR = "BagnonUtil"
+local LIBRARY_VERSION_MINOR = tonumber(string.match("$Revision: 44 $", "(%d+)") or 1)
+
 
 --[[ Usable Functions ]]--
 
@@ -35,7 +38,7 @@ end
 
 function BagnonUtil:GetBagSize(bag, player)
 	if self:IsCachedBag(bag, player) then
-		return (BagnonDB and BagnonDB:GetBagData(bag, player)) or 0
+		return (BagnonDB and (BagnonDB:GetBagData(bag, player))) or 0
 	end
 	return (bag == KEYRING_CONTAINER and GetKeyRingSize()) or GetContainerNumSlots(bag)
 end
@@ -51,6 +54,9 @@ function BagnonUtil:GetItemLink(bag, slot, player)
 	if self:IsCachedBag(bag, player) then
 		return BagnonDB and (BagnonDB:GetItemData(bag, slot, player))
 	end
+	if(bag == BANKFRAME_CONTAINER) then
+		GetInventoryItemLink("player", BankButtonIDToInvSlotID(slot))
+	end
 	return GetContainerItemLink(bag, slot)
 end
 
@@ -65,7 +71,7 @@ function BagnonUtil:GetItemCount(bag, slot, player)
 			return 0
 		end
 	end
-	return select(2, GetContainerItemInfo(bag, slot)) 
+	return (select(2, GetContainerItemInfo(bag, slot)))
 end
 
 
@@ -81,7 +87,7 @@ function BagnonUtil:IsInventoryBag(bag)
 end
 
 function BagnonUtil:IsBankBag(bag)
-	return (bag == -1 or bag > 4)
+	return (bag == BANKFRAME_CONTAINER or bag > 4)
 end
 
 --returns if the given bag is an ammo bag/soul bag
