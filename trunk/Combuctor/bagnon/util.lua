@@ -7,7 +7,7 @@ BagnonUtil = {}
 BagnonUtil.atBank = false
 
 local LIBRARY_VERSION_MAJOR = "BagnonUtil"
-local LIBRARY_VERSION_MINOR = tonumber(string.match("$Revision: 44 $", "(%d+)") or 1)
+local LIBRARY_VERSION_MINOR = tonumber(string.match("$Revision$", "(%d+)") or 1)
 
 
 --[[ Usable Functions ]]--
