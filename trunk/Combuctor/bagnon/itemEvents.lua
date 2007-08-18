@@ -7,7 +7,7 @@
 		called when a new item is put into a slot
 
 	BAGNON_ITEM_LOST
-	args:		bags, slot, newLink, oldLink
+	args:		bags, slot, oldLink, newLink
 		called when newLink replaces oldLink in the given slot, and the count of oldLink changes
 
 	BAGNON_ITEM_SWAPPED
@@ -51,6 +51,11 @@ function events:BAGNON_BAGS_LOADED()
 	self:RegisterEvent("BANKFRAME_CLOSED")
 	self:RegisterMessage("BAGNON_SLOT_ADD", "OnSlotChanged")
 	self:RegisterMessage("BAGNON_SLOT_UPDATE", "OnSlotChanged")
+	
+	-- self:RegisterMessage("BAGNON_ITEM_GAINED", "Print")
+	-- self:RegisterMessage("BAGNON_ITEM_LOST", "Print")
+	-- self:RegisterMessage("BAGNON_ITEM_SWAPPED", "Print")
+	-- self:RegisterMessage("BAGNON_ITEM_COUNT_CHANGED", "Print")
 end
 
 function events:BANKFRAME_OPENED()
