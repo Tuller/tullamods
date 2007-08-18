@@ -317,8 +317,8 @@ function BagnonItem:OnEnter()
 	else
 		--boo for special case bank code
 		if bag == -1 then
-			if self.hasItem then                                                     
-				BagnonUtil:AnchorTooltip(self)                                       
+			if self.hasItem then
+				BagnonUtil:AnchorTooltip(self)
 				GameTooltip:SetInventoryItem("player", BankButtonIDToInvSlotID(slot))
 			end
 		else
