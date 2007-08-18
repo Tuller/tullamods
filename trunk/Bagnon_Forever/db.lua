@@ -217,8 +217,8 @@ end
 		returns:
 			size (number)
 				How many items the bag can hold (number)
-			link (string)
-				The itemlink of the bag, in the format item:w:x:y:z (string)
+			hyperlink (string)
+				The hyperlink of the bag
 			count (number)
 				How many items are in the bag.  This is used by ammo and soul shard bags
 --]]
@@ -248,12 +248,14 @@ end
 				the specific item slot we"re looking at
 
 		returns:
-			itemLink (string)
-				The itemlink of the item, in the format item:w:x:y:z
+			hyperLink (string)
+				The hyperLink of the item
 			count (number)
 				How many of there are of the specific item
 			texture (string)
 				The filepath of the item"s texture
+			quality (number)
+				The numeric representaiton of the item's quality: from 0 (poor) to 7 (artifcat)
 --]]
 function BagnonDB:GetItemData(bag, slot, player)
 	local playerDB = self.rdb[player]
