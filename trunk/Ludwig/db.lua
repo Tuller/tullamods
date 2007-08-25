@@ -3,7 +3,7 @@
 		The database portion Of Ludwig
 --]]
 
-local MAXID = 50000
+local MAXID = 40000
 local MAXIMUM_LEVEL = 70
 
 local lastSearch --this is a hack to allow for 3 variables when sorting.  Its used to give the name filter
