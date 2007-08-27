@@ -1,0 +1,5 @@
+## Interface: 20100
+## Title: OmniCC
+## Notes: Cooldown count for everything
+## Author: Tuller
+basic.lua
