@@ -42,6 +42,7 @@ local function msg(message, showAddon)
 end
 
 --converts a base 10 integer into base<base>
+
 local function ToBase(num, base)
 	local newNum = ""
 	while num > 0 do
@@ -73,7 +74,7 @@ end})
 --[[ Startup/Shutdown ]]--
 
 SellFish = {}
-SellFish.defaults = {style = 3, newVals = {}, data = SellFish_GetDefaults(), version = CURRENT_VERSION}
+SellFish.defaults = {style = 3, newVals = {}, data = SellFish_GetDefaults()}
 
 function SellFish:Load()
 	local tip = CreateFrame("GameTooltip", "SellFishTooltip", UIParent, "GameTooltipTemplate")
@@ -297,7 +298,7 @@ end
 
 --[[ Usable Functions ]]--
 
--- cost = GetSellValue(itemID | "name" | "link" [, count])
+-- cost = GetSellValue(itemID | "name" | "link")
 local oGetSellValue = GetSellValue
 function GetSellValue(link)
 	assert(link, "Usage: GetSellValue(itemID|\"name\"|\"itemLink\")")

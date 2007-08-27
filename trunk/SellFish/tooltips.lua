@@ -89,78 +89,84 @@ local function AddMoneyToTooltip(tip, id, count)
 	end
 end
 
-local function hookTip(action, method)
-	return function(tip, ...)
-		local arg = action(tip, ...)
-
-		if (tip == GameTooltip or tip == ItemRefTooltip) then
-			local link, count = method(...)
-			AddMoneyToTooltip(tip, link, count)
-		end
-		return arg;
-	end
-end
-
-ItemRefTooltip.SetHyperlink = hookTip(ItemRefTooltip.SetHyperlink, function(link, count)
-	return link, count
+local SetItem = GameTooltip:GetScript("OnTooltipSetItem")
+GameTooltip:SetScript("OnTooltipSetItem", function(self, ...)
+	if(SetItem) then SetItem(self, ...) end
+	AddMoneyToTooltip(self, select(2, self:GetItem()))
 end)
 
-GameTooltip.SetBagItem = hookTip(GameTooltip.SetBagItem, function(bag, slot)
-	if not MerchantFrame:IsVisible() then
-		return GetContainerItemLink(bag, slot), select(2, GetContainerItemInfo(bag, slot))
-	end
-end)
+-- local function hookTip(action, method)
+	-- return function(tip, ...)
+		-- local arg = action(tip, ...)
 
-GameTooltip.SetLootItem = hookTip(GameTooltip.SetLootItem, function(slot)
-	return GetLootSlotLink(slot), select(3, GetLootSlotInfo(slot))
-end)
+		-- if (tip == GameTooltip or tip == ItemRefTooltip) then
+			-- local link, count = method(...)
+			-- AddMoneyToTooltip(tip, link, count)
+		-- end
+		-- return arg;
+	-- end
+-- end
 
-GameTooltip.SetLootRollItem = hookTip(GameTooltip.SetLootRollItem, function(slot)
-	return GetLootRollItemLink(slot), select(3, GetLootRollItemInfo(slot))
-end)
+-- ItemRefTooltip.SetHyperlink = hookTip(ItemRefTooltip.SetHyperlink, function(link, count)
+	-- return link, count
+-- end)
 
-GameTooltip.SetHyperlink = hookTip(GameTooltip.SetHyperlink, function(link, count)
-	return link, count
-end)
+-- GameTooltip.SetBagItem = hookTip(GameTooltip.SetBagItem, function(bag, slot)
+	-- if not MerchantFrame:IsVisible() then
+		-- return GetContainerItemLink(bag, slot), select(2, GetContainerItemInfo(bag, slot))
+	-- end
+-- end)
 
-GameTooltip.SetAuctionItem = hookTip(GameTooltip.SetAuctionItem , function(type, index)
-	return GetAuctionItemLink(type, index), select(3, GetAuctionItemInfo(type, index))
-end)
+-- GameTooltip.SetLootItem = hookTip(GameTooltip.SetLootItem, function(slot)
+	-- return GetLootSlotLink(slot), select(3, GetLootSlotInfo(slot))
+-- end)
 
-GameTooltip.SetQuestItem = hookTip(GameTooltip.SetQuestItem, function(type, index)
-	return GetQuestItemLink(type, index), select(3, GetQuestItemInfo(type, index))
-end)
+-- GameTooltip.SetLootRollItem = hookTip(GameTooltip.SetLootRollItem, function(slot)
+	-- return GetLootRollItemLink(slot), select(3, GetLootRollItemInfo(slot))
+-- end)
 
-GameTooltip.SetCraftItem = hookTip(GameTooltip.SetCraftItem, function(skill, id)
-	if id then
-		return GetCraftReagentItemLink(skill, id), select(3, GetCraftReagentInfo(skill, id))
-	end
-	return GetCraftItemLink(skill)
-end)
+-- GameTooltip.SetHyperlink = hookTip(GameTooltip.SetHyperlink, function(link, count)
+	-- return link, count
+-- end)
 
-GameTooltip.SetInventoryItem = hookTip(GameTooltip.SetInventoryItem , function(unit, slot)
-	return GetInventoryItemLink(unit, slot), GetInventoryItemCount(unit, slot)
-end)
+-- GameTooltip.SetAuctionItem = hookTip(GameTooltip.SetAuctionItem , function(type, index)
+	-- return GetAuctionItemLink(type, index), select(3, GetAuctionItemInfo(type, index))
+-- end)
 
-GameTooltip.SetTradeSkillItem = hookTip(GameTooltip.SetTradeSkillItem, function(skill, id)
-	if id then
-		return GetTradeSkillReagentItemLink(skill, id), select(3, GetTradeSkillReagentInfo(skill, id))
-	end
-	return GetTradeSkillItemLink(skill)
-end)
+-- GameTooltip.SetQuestItem = hookTip(GameTooltip.SetQuestItem, function(type, index)
+	-- return GetQuestItemLink(type, index), select(3, GetQuestItemInfo(type, index))
+-- end)
 
-GameTooltip.SetQuestLogItem = hookTip(GameTooltip.SetQuestLogItem, function(index, slot)
-	return GetQuestLogItemLink(index, slot), select(3, GetQuestLogRewardInfo(slot))
-end)
+-- GameTooltip.SetCraftItem = hookTip(GameTooltip.SetCraftItem, function(skill, id)
+	-- if id then
+		-- return GetCraftReagentItemLink(skill, id), select(3, GetCraftReagentInfo(skill, id))
+	-- end
+	-- return GetCraftItemLink(skill)
+-- end)
 
-GameTooltip.SetTradePlayerItem = hookTip(GameTooltip.SetTradePlayerItem, function(id)
-	return GetTradePlayerItemLink(id), select(3, GetTradeTargetItemInfo(id))
-end)
+-- GameTooltip.SetInventoryItem = hookTip(GameTooltip.SetInventoryItem , function(unit, slot)
+	-- return GetInventoryItemLink(unit, slot), GetInventoryItemCount(unit, slot)
+-- end)
 
-GameTooltip.SetTradeTargetItem = hookTip(GameTooltip.SetTradeTargetItem, function(id)
-	return GetTradeTargetItemLink(id), select(3, GetTradeTargetItemInfo(id))
-end)
+-- GameTooltip.SetTradeSkillItem = hookTip(GameTooltip.SetTradeSkillItem, function(skill, id)
+	-- if id then
+		-- return GetTradeSkillReagentItemLink(skill, id), select(3, GetTradeSkillReagentInfo(skill, id))
+	-- end
+	-- return GetTradeSkillItemLink(skill)
+-- end)
 
-GameTooltip.SetInboxItem = hookTip(GameTooltip.SetInboxItem, function(id)
-	return GetInboxItemLink(id), select(3, GetInboxItem(id))
-end)
+-- GameTooltip.SetQuestLogItem = hookTip(GameTooltip.SetQuestLogItem, function(index, slot)
+	-- return GetQuestLogItemLink(index, slot), select(3, GetQuestLogRewardInfo(slot))
+-- end)
+
+-- GameTooltip.SetTradePlayerItem = hookTip(GameTooltip.SetTradePlayerItem, function(id)
+	-- return GetTradePlayerItemLink(id), select(3, GetTradeTargetItemInfo(id))
+-- end)
+
+-- GameTooltip.SetTradeTargetItem = hookTip(GameTooltip.SetTradeTargetItem, function(id)
+	-- return GetTradeTargetItemLink(id), select(3, GetTradeTargetItemInfo(id))
+-- end)
+
+-- GameTooltip.SetInboxItem = hookTip(GameTooltip.SetInboxItem, function(id)
+	-- return GetInboxItemLink(id), select(3, GetInboxItem(id))
+-- end)
