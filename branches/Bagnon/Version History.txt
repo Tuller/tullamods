@@ -1,0 +1,27 @@
+Bagnon Version History
+
+1.4
+	Reduced CPU usage significantly when showing the bank/bags
+
+1.3b
+	Fixed a bug caussing the main options menu to not work :)
+
+1.3
+	Updated for 2.1
+
+1.2
+	Rewrote the code for hooking the bag slots, and automatic display
+
+1.1
+	Clicking on the keyring button will now properly show the inventory window
+	Added a check to disable vBagnon if Bagnon is running
+
+1.0
+	Initial release
+
+
+Known Bugs:
+
+
+Todo:
+	views
