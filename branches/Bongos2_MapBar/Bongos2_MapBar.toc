@@ -1,0 +1,11 @@
+## Interface: 20100
+## Title: Bongos2 MapBar
+## Title-zhCN: |cFF0099FF[Bongos2]|r 小地图
+## Notes: A customizable, movable minimap
+## Notes-zhCN: Bongos2 系列 小地图。
+## Author: Tuller
+## Dependencies: Bongos2
+## OptionalDeps: Titan
+localization.lua
+localization.cn.lua
+bar.lua
