@@ -1,0 +1,6 @@
+## Interface: 20100
+## Title: Sage Target of Target
+## Notes: A target of target frame
+## Author: Tuller
+## Dependencies: Sage
+targetTarget.lua
