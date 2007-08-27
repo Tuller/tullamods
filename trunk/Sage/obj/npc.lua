@@ -36,7 +36,8 @@ function SageNPC:GetClass(unit)
 	if UnitRace(unit) then
 		return UnitClass(unit)
 	end
-	local type = UnitCreatureType(unit)
+
+	local type = UnitCreatureFamily(unit) or UnitCreatureType(unit)
 	return (type == L.UnknownCreature and "") or type
 end
 
