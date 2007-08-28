@@ -134,6 +134,7 @@ function SellFish:LoadDefaults()
 end
 
 function SellFish:UpdateVersion()
+	SellFishDB.data = SellFish_GetDefaultData()
 	SellFishDB.version = CURRENT_VERSION
 	msg(format(L.Updated, SellFishDB.version), true)
 end
@@ -199,13 +200,13 @@ function SellFish:CompressDB(newVals)
 				SellFishDB.data:gsub(format(";%s,%s;", id, prevCost), (cost == 0 and "") or format(";%s,%s;", id, cost))
 			end
 		elseif cost ~= "0" then
-			appendString = (appendString or "") .. format(";%s,%s", id, cost)
+			appendString = (appendString or "") .. format("%s,%s;", id, cost)
 		end
 		SellFishDB.newVals[id] = nil
 	end
 
 	if appendString ~= "" then
-		SellFishDB.data = (SellFishDB.data or "") .. appendString
+		SellFishDB.data = (SellFishDB.data or ";") .. appendString
 	end
 end
 
@@ -234,7 +235,7 @@ end
 
 function SellFish:GetNumValues()
 	local count = 0
-	for word in SellFishDB.data:gmatch("%w+,%w+;") do
+	for word in SellFishDB.data:gmatch(";%w+,%w+;") do
 		count = count + 1
 	end
 	return count
