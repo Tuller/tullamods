@@ -28,13 +28,13 @@ end
 
 --show tooltip, show text if its not always shown
 function SageClick:OnEnter()
-	UnitFrame_OnEnter()
+	UnitFrame_OnEnter(self)
 	SageBar:UpdateText(self.unit, true)
 end
 
 --hide tooltip, and text if its not always shown
 function SageClick:OnLeave()
-	UnitFrame_OnLeave()
+	UnitFrame_OnLeave(self)
 	SageBar:UpdateText(self.unit, false)
 end
 
