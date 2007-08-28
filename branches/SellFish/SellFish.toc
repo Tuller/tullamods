@@ -2,7 +2,7 @@
 ## Title: SellFish
 ## Author: Tuller
 ## Notes: Lets you view sell value data about items from anywhere
-## SavedVariables: SellFishDB, SellFishVersion
+## SavedVariables: SellFishDB
 ## Version: 1.7
 localization.lua
 localization.de.lua

@@ -84,22 +84,12 @@ local function AddMoneyToTooltip(tip, id, count)
 			else
 				SetTooltipMoney(tip, cost)
 			end
-			tip:Show()
+			--tip:Show()
 		end
 	end
 end
 
-local function HookScript(frame, event, action)
-	local script = frame:GetScript(event)
-	frame:SetScript(event, function(...)
-		if script then
-			script(...)
-		end
-		action(...)
-	end)
-end
-
-local function AddSellFishCost(self)
+local function AddSellFishCost(self, ...)
 	if not MerchantFrame:IsVisible() then
 		local owner = self:GetOwner()
 		local count
@@ -113,5 +103,5 @@ local function AddSellFishCost(self)
 	end
 end
 
-HookScript(GameTooltip, "OnTooltipSetItem", AddSellFishCost)
-HookScript(ItemRefTooltip, "OnTooltipSetItem", AddSellFishCost)
+GameTooltip:HookScript("OnTooltipSetItem", AddSellFishCost)
+ItemRefTooltip:HookScript("OnTooltipSetItem", AddSellFishCost)
