@@ -3,7 +3,7 @@
 		The database portion Of Ludwig
 --]]
 
-local MAXID = 40000
+local MAXID = 35000 --probably need to increase this to 40k by Wrath
 local MAXIMUM_LEVEL = 70
 
 local lastSearch --this is a hack to allow for 3 variables when sorting.  Its used to give the name filter
@@ -99,6 +99,8 @@ function Ludwig:GetAllItems(refresh)
 			local name = itemInfo[1][i]
 			if not db[i] and name then
 				db[i] = name:lower()
+			-- elseif not name then
+				-- SetItemRef(format("item:%d", i))
 			end
 		end
 	end
@@ -203,3 +205,24 @@ end
 function Ludwig:ReloadDB()
 	self:GetAllItems(true)
 end
+
+-- Use this code at own risk
+-- local f = CreateFrame("Frame")
+-- f.id = 1;
+-- f.nextUpdate = 0
+-- f:SetScript("OnUpdate", function(self, elapsed)
+	-- if self.nextUpdate < 0 then
+		-- self.nextUpdate = 0.05
+
+		-- local id = self.id
+		-- while GetItemInfo(id) do id = id+1 end
+		-- SetItemRef(format("item:%d", id))
+
+		-- self.id = id +1
+		-- if self.id > MAXID then
+			-- self:Hide()
+		-- end
+	-- else
+		-- self.nextUpdate = self.nextUpdate - elapsed
+	-- end
+-- end)
