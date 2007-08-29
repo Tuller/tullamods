@@ -25,14 +25,13 @@
 
 local CURRENT_VERSION = GetAddOnMetadata("SellFish", "Version")
 local L = SELLFISH_LOCALS
-local base36 = {"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"}
-local maxBase = 10 + #base36
 
-local tonumber, tostring, mod, floor = tonumber, tostring, mod, floor
+local tonumber, tostring, floor, format = tonumber, tostring, math.floor, string.format
 local GetItemInfo = GetItemInfo
 
 --[[ Local Functions ]]--
 
+--prints a message, optionally with addon text
 local function msg(message, showAddon)
 	if showAddon then
 		ChatFrame1:AddMessage(format("|cFF33FF99SellFish|r: %s", tostring(message)))
@@ -42,11 +41,13 @@ local function msg(message, showAddon)
 end
 
 --converts a base 10 integer into base<base>
+local base36 = {"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"}
+local maxBase = 10 + #base36
 
 local function ToBase(num, base)
 	local newNum = ""
 	while num > 0 do
-		local remain = mod(num, base)
+		local remain = num % base
 		num = floor(num / base)
 		if remain > 9 then
 			newNum = base36[remain-9] .. newNum
@@ -64,8 +65,9 @@ local function ToID(link)
 	end
 end
 
+--gets a value from the
 local cache = setmetatable({}, {__index = function(t, i)
-	local c = (SellFishDB.data:match(";" .. i .. ",(%w+);")) or 0
+	local c = SellFishDB.newVals[i] or (SellFishDB.data:match(";" .. i .. ",(%w+);")) or 0
 	t[i] = c
 	return c
 end})
@@ -74,7 +76,6 @@ end})
 --[[ Startup/Shutdown ]]--
 
 SellFish = {}
-SellFish.defaults = {style = 3, newVals = {}, data = SellFish_GetDefaults()}
 
 function SellFish:Load()
 	local tip = CreateFrame("GameTooltip", "SellFishTooltip", UIParent, "GameTooltipTemplate")
@@ -105,46 +106,41 @@ function SellFish:Load()
 end
 
 function SellFish:Initialize()
-	SellFishDB = setmetatable(SellFishDB or {}, {__index = self.defaults})
+	if not(SellFishDB and SellFishDB.version) then
+		SellFish:LoadDefaults()
+	else
+		local version = SellFishDB.version
+		if(version ~= CURRENT_VERSION) then
+			local cMajor = CURRENT_VERSION:match("(%w+)%.")
+			local major = version:match("(%w+)%.")
 
-	if(SellFishDB.version ~= CURRENT_VERSION) then
-		local cMajor, cMinor = CURRENT_VERSION:match("(%d+)%.(%d+)")
-		local major, minor = SellFishDB.version:match("(%d+)%.(%d+)")
-		if major ~= cMajor then
-			self:LoadDefaults()
-		elseif minor ~= cMinor then
-			self:UpdateVersion()
+			--a major version change, reset the database
+			if major ~= cMajor then
+				self:LoadDefaults()
+			else
+				self:UpdateVersion()
+			end
 		end
 	end
 end
 
 function SellFish:LoadDefaults()
-	SellFishDB = setmetatable({}, {__index = self.defaults})
-	self:LoadSellValues(true)
-end
-
-function SellFish:ClearDefaults()
-	local defaults = self.defaults
-	for i,v in pairs(SellFishDB) do
-		if(i ~= "version" and defaults[i] == v) then
-			SellFishDB[i] = nil
-		end
-	end
+	SellFishDB = {
+		style = 3,
+		newVals = {},
+		data = SellFish_GetDefaultData(),
+		version = CURRENT_VERSION
+	}
 end
 
 function SellFish:UpdateVersion()
-	if(SellFishDB.short) then
-		SellFishDB.short = nil
-		SellFishDB.style = 2
-	end
-	self:LoadSellValues(true)
-
+	SellFishDB.data = SellFish_GetDefaultData()
 	SellFishDB.version = CURRENT_VERSION
 	msg(format(L.Updated, SellFishDB.version), true)
 end
 
 
---[[ Data Stuff ]]--
+--[[ Item Price Scanning ]]--
 
 function SellFish:ScanPrices()
 	local tip = self.tip
@@ -152,10 +148,12 @@ function SellFish:ScanPrices()
 	for bag = 0, NUM_BAG_FRAMES do
 		for slot = 1, GetContainerNumSlots(bag) do
 			local link = GetContainerItemLink(bag, slot)
-			local cost = link and self:GetItemValue(bag, slot)
-			if cost then
-				local count = (select(2, GetContainerItemInfo(bag, slot)))
-				self:SaveCost(ToID(link), cost/count)
+			if link then
+				local cost = self:GetItemValue(bag, slot)
+				if cost then
+					local count = (select(2, GetContainerItemInfo(bag, slot)))
+					self:SaveCost(ToID(link), cost/count)
+				end
 			end
 		end
 	end
@@ -170,6 +168,7 @@ function SellFish:GetItemValue(bag, slot)
 	end
 end
 
+--save the price, only if its not the same as in the main database
 function SellFish:SaveCost(id, cost)
 	local id = ToBase(id, maxBase)
 	local cost = ToBase(cost, maxBase)
@@ -179,18 +178,20 @@ function SellFish:SaveCost(id, cost)
 	end
 end
 
+--get the price by checking newVals, then the main database
 function SellFish:GetCost(id, count)
 	local id = ToBase(id, maxBase)
-	local cost = SellFishDB.newVals[id] or cache[id]
+	local cost = cache[id]
 
 	if cost and cost ~= "" then
 		return tonumber(cost, maxBase) * (count or 1)
 	end
 end
 
-function SellFish:CompressDB()
+-- Takes all the values in the list newVals, and replaces/adds entries in the big sellfish string
+function SellFish:CompressDB(newVals)
 	local appendString = ""
-	for id, cost in pairs(SellFishDB.newVals) do
+	for id, cost in pairs(newVals) do
 		if cost == "" then cost = "0" end
 
 		local prevCost = cache[id]
@@ -199,100 +200,14 @@ function SellFish:CompressDB()
 				SellFishDB.data:gsub(format(";%s,%s;", id, prevCost), (cost == 0 and "") or format(";%s,%s;", id, cost))
 			end
 		elseif cost ~= "0" then
-			appendString = (appendString or "") .. format(";%s,%s", id, cost)
+			appendString = (appendString or "") .. format("%s,%s;", id, cost)
 		end
 		SellFishDB.newVals[id] = nil
 	end
 
 	if appendString ~= "" then
-		SellFishDB.data = (SellFishDB.data or "") .. appendString
+		SellFishDB.data = (SellFishDB.data or ";") .. appendString
 	end
-end
-
-
---[[ Converters ]]--
-
-function SellFish:LoadSellValues(reset)
-	if reset or SellFish_GetDefaults then
-		SellFishDB.data = nil
-	end
-
-	local changed = false
-	if CompletePrices then
-		changed = changed or self:ConvertPriceMaster(CompletePrices)
-	end
-	if ColaLight and ColaLight.db.account.SellValues then
-		changed = changed or self:ConvertColaLight(ColaLight.db.account.SellValues)
-	end
-	if self.ConvertItemPrice then
-		changed = changed or self:ConvertItemPrice()
-	end
-	if(changed) then self:CompressDB() end
-
-	msg(format(L.Loaded, self:GetNumValues()), true)
-end
-
--- function SellFish:ConvertItemPrice()
-	-- local prices = ""
-
-	-- local byte = string.byte
-	-- function get(id)
-		-- if id and id <= 33052 and id > 0 then
-			-- local index = id * 3
-			-- local a, b, c = byte(prices, index - 2, index)
-			-- if b == 0 then
-				-- if c == 0 then
-					-- if a == 0 then return else return a * 65536 end
-				-- else
-					-- return a * 65536 + c
-				-- end
-			-- else
-				-- return a * 65536 + b * 256 + c
-			-- end
-		-- end
-	-- end
-
-	-- local newVals = SellFishDB.newVals
-	-- for i = 1, 33052 do
-		-- local price = get(i)
-		-- if(price) then
-			-- newVals[ToBase(i, maxBase)] = ToBase(price, maxBase)
-			-- changed = true
-		-- end
-	-- end
-
-	-- return changed
--- end
-
---adds all of cola light"s sellvalue data to the list of new values, then compresses if new data has been added
-function SellFish:ConvertColaLight(t)
-	local changed = false
-	for id, cost in pairs(t) do
-		local cost = ToBase(tonumber(cost), maxBase)
-		local id = ToBase(tonumber(id), maxBase)
-		if SellFishDB.newVals[id] ~= cost then
-			changed = true
-		end
-		SellFishDB.newVals[id] = cost
-	end
-	return changed
-end
-
-function SellFish:ConvertPriceMaster(t)
-	local changed = false
-	for id, data in pairs(t) do
-		local price = data.p
-		if price then
-			local cost = ToBase(tonumber(price), maxBase)
-			local id = ToBase(tonumber(id), maxBase)
-			if SellFishDB.newVals[id] ~= cost then
-				changed = true
-			end
-			SellFishDB.newVals[id] = cost
-		end
-	end
-
-	return changed
 end
 
 
@@ -301,7 +216,7 @@ end
 -- cost = GetSellValue(itemID | "name" | "link")
 local oGetSellValue = GetSellValue
 function GetSellValue(link)
-	assert(link, "Usage: GetSellValue(itemID|\"name\"|\"itemLink\")")
+	assert(link, 'Usage: GetSellValue(itemID|"name"|"itemLink")')
 
 	local id = tonumber(link)
 	if id then
@@ -320,7 +235,7 @@ end
 
 function SellFish:GetNumValues()
 	local count = 0
-	for word in SellFishDB.data:gmatch("%w+,%w+;") do
+	for word in SellFishDB.data:gmatch(";%w+,%w+;") do
 		count = count + 1
 	end
 	return count
@@ -342,12 +257,13 @@ function SellFish:LoadSlashCommands()
 			elseif cmd == "style" then
 				self:ToggleStyle()
 			elseif cmd == "compress" then
-				self:CompressDB()
+				self:CompressDB(self.sets.newVals)
 			else
 				msg(format(L.UnknownCommand, cmd), true)
 			end
 		end
 	end
+
 	SLASH_SellFishCOMMAND1 = "/sellfish"
 	if(GetLocale() ~= "deDE") then
 		SLASH_SellFishCOMMAND2 = "/sf"

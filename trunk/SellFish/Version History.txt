@@ -1,5 +1,11 @@
 SellFish Version History
 
+1.7
+	Updated for 2.2
+	Implemented a new method for adding item prices to tooltips
+		Please test this for compatibility with other addons.
+	Removed code for importing data from other item price addons
+
 1.6
 	Updated the database (credit goes to ItemPrice)
 	Disabled the /sf slash command for German locales
