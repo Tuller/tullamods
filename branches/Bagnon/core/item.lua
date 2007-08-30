@@ -10,13 +10,10 @@ local Item_mt = {__index = BagnonItem}
 local UPDATE_DELAY = 0.1
 
 local bagSearch, nameSearch, qualitySearch
-local MAX_ITEMS_PER_BAG = MAX_CONTAINER_ITEMS
-
+local MAX_CONTAINER_ITEMS = MAX_CONTAINER_ITEMS
 local unused = {}
-local lastCreated = 1
 
---[[ this is set as the button"s parent, in order to preserve compatiblity with normal bag slot functions and other mods ]]--
-
+-- this is set as teh button's parent, in order to preserve compatibility with normal bag slot functions/other mods
 local function DummyBag_Get(parent, bag)
 	local bagFrame = getglobal(parent:GetName() .. bag)
 	if not bagFrame then
@@ -29,43 +26,10 @@ local function DummyBag_Get(parent, bag)
 end
 
 
---[[ Frame Events ]]--
-
-local function OnUpdate(self, elapsed)
-	if GameTooltip:IsOwned(self) then
-		if not self.elapsed or self.elapsed < 0 then
-			self:OnEnter()
-			self.elapsed = UPDATE_DELAY
-		else
-			self.elapsed = self.elapsed - elapsed
-		end
-	end
-end
-
-local function OnEnter(self)
-	self.elapsed = nil
-	self:OnEnter()
-	self:SetScript("OnUpdate", OnUpdate)
-end
-
-local function OnLeave(self)
-	self.elapsed = nil
-	self:OnLeave()
-	self:SetScript("OnUpdate", nil)
-end
-
-local function OnHide(self)
-	self:OnHide()
-end
-
-local function PostClick(self, button)
-	self:PostClick(button)
-end
-
-
 --[[ Item Creation ]]--
 
 --creates an entierly new item slot, if no blizzard slots are available
+local lastCreated = 0
 local function Item_Create()
 	local item
 
@@ -78,7 +42,10 @@ local function Item_Create()
 			item:SetID(0)
 		end
 	end
-	item = item or CreateFrame("Button", format("BagnonItem%s", lastCreated), nil, "ContainerFrameItemButtonTemplate")
+
+	if not item then
+		item = CreateFrame("Button", format("BagnonItem%d", lastCreated), nil, "ContainerFrameItemButtonTemplate")
+	end
 	item:ClearAllPoints()
 	item:Show()
 	setmetatable(item, Item_mt)
@@ -86,17 +53,18 @@ local function Item_Create()
 	local border = item:CreateTexture(nil, "OVERLAY")
 	border:SetWidth(67); border:SetHeight(67)
 	border:SetPoint("CENTER", item)
-	border:SetTexture("Interface\\Buttons\\UI-ActionButton-Border")
+	border:SetTexture("Interface/Buttons/UI-ActionButton-Border")
 	border:SetBlendMode("ADD")
 	border:Hide()
 	item.border = border
 
 	item:UnregisterAllEvents()
 	item:SetScript("OnEvent", nil)
-	item:SetScript("OnEnter", OnEnter)
-	item:SetScript("OnLeave", OnLeave)
-	item:SetScript("OnHide", OnHide)
-	item:SetScript("PostClick", PostClick)
+	item:SetScript("OnUpdate", nil)
+	item:SetScript("OnEnter", BagnonItem.OnEnter)
+	item:SetScript("OnHide", BagnonItem.OnHide)
+	item:SetScript("PostClick", BagnonItem.PostClick)
+	item.UpdateTooltip = nil
 
 	lastCreated = lastCreated + 1
 
@@ -175,11 +143,6 @@ function BagnonItem:Update()
 	self:UpdateSlotBorder()
 	self:UpdateBorder(quality)
 	self:UpdateCooldown()
-
-	if GameTooltip:IsOwned(self) then
-		self.elapsed = nil
-		self:OnEnter()
-	end
 
 	if BagnonSpot:Searching() then
 		self:UpdateSearch()
@@ -280,57 +243,39 @@ end
 --[[ OnX Functions ]]--
 
 function BagnonItem:PostClick(button)
-	if IsModifierKeyDown() then
-		if self.cached then
-			if self.hasItem then
-				if button == "LeftButton" then
-					if IsControlKeyDown() then
-						DressUpItemLink((BagnonDB:GetItemData(self:GetBag(), self:GetID(), self:GetPlayer())))
-					elseif IsShiftKeyDown() then
-						ChatFrameEditBox:Insert(BagnonDB:GetItemData(self:GetBag(), self:GetID(), self:GetPlayer()))
-					end
+	if self.cached then
+		if self.hasItem then
+			if button == "LeftButton" then
+				if IsModifiedClick("DRESSUP") then
+					DressUpItemLink((BagnonDB:GetItemData(self:GetBag(), self:GetID(), self:GetPlayer())))
+				elseif IsModifiedClick("CHATLINK") then
+					ChatFrameEditBox:Insert(BagnonDB:GetItemData(self:GetBag(), self:GetID(), self:GetPlayer()))
 				end
 			end
-		else
-			ContainerFrameItemButton_OnModifiedClick(button)
 		end
 	end
 end
 
 function BagnonItem:OnEnter()
-	if not self:GetParent() then return end
-
-	local bag = self:GetBag()
-	local slot = self:GetID()
-
+	local bag, slot = self:GetBag(), self:GetID()
 	if self.cached then
 		if self.hasItem then
-			local player = self:GetPlayer()
-			local link, count = BagnonDB:GetItemData(bag, slot, player)
-
 			BagnonUtil:AnchorTooltip(self)
-			GameTooltip:SetHyperlink(link, count)
-			if IsShiftKeyDown() then
-				GameTooltip_ShowCompareItem()
-			end
+			GameTooltip:SetHyperlink(BagnonDB:GetItemData(bag, slot, self:GetPlayer()))
+			GameTooltip:Show()
 		end
 	else
 		--boo for special case bank code
-		if bag == -1 then
+		if bag == BANK_CONTAINER then
 			if self.hasItem then
 				BagnonUtil:AnchorTooltip(self)
 				GameTooltip:SetInventoryItem("player", BankButtonIDToInvSlotID(slot))
+				GameTooltip:Show()
 			end
 		else
 			ContainerFrameItemButton_OnEnter(self)
 		end
 	end
-end
-
-function BagnonItem:OnLeave()
-	self.updateTooltip = nil
-	GameTooltip:Hide()
-	ResetCursor()
 end
 
 function BagnonItem:OnHide()

@@ -17,38 +17,16 @@ local lastCreated = 0
 
 --[[ Bag Constructor ]]--
 
-local function OnEnter(self) self:OnEnter() end
-local function OnLeave(self) self:OnLeave() end
-local function OnShow(self)  self:OnShow()  end
-local function OnClick(self) self:OnClick(arg1) end
-local function OnDrag(self)  self:OnDrag()  end
-
-local function LoadScripts(bag)
-	bag:RegisterForClicks("LeftButtonUp", "RightButtonUp")
-	bag:RegisterForDrag("LeftButton")
-
-	bag:SetScript("OnShow", OnShow)
-	bag:SetScript("OnEnter", OnEnter)
-	bag:SetScript("OnLeave", OnLeave)
-	bag:SetScript("OnClick", OnClick)
-	bag:SetScript("OnDragStart", OnDrag)
-	bag:SetScript("OnReceiveDrag", OnClick)
-
-	lastCreated = lastCreated + 1
-end
-
 local function Bag_Create(id)
-	local name = format("BagnonBag%s", lastCreated)
-	local bag = CreateFrame("Button", name)
-	setmetatable(bag, Frame_mt)
-
+	local name = format("BagnonBag%d", lastCreated)
+	local bag = setmetatable(CreateFrame("Button", name), Frame_mt)
 	bag:SetWidth(SIZE)
 	bag:SetHeight(SIZE)
 
 	local icon = bag:CreateTexture(name .. "IconTexture", "BORDER")
 	icon:SetAllPoints(bag)
 	if id == 0 or id == -1 then
-		icon:SetTexture("Interface\\Buttons\\Button-Backpack-Up")
+		icon:SetTexture("Interface/Buttons/Button-Backpack-Up")
 	end
 
 	local count = bag:CreateFontString(name .. "Count", "BORDER")
@@ -73,7 +51,17 @@ local function Bag_Create(id)
 	highlightTexture:SetAllPoints(bag)
 	bag:SetHighlightTexture(highlightTexture)
 
-	LoadScripts(bag)
+	bag:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+	bag:RegisterForDrag("LeftButton")
+
+	bag:SetScript("OnShow", BagnonBag.OnShow)
+	bag:SetScript("OnEnter", BagnonBag.OnEnter)
+	bag:SetScript("OnLeave", BagnonBag.OnLeave)
+	bag:SetScript("OnClick", BagnonBag.OnClick)
+	bag:SetScript("OnDragStart", BagnonBag.OnDrag)
+	bag:SetScript("OnReceiveDrag", BagnonBag.OnClick)
+
+	lastCreated = lastCreated + 1
 
 	return bag
 end
@@ -104,7 +92,17 @@ local function Bag_CreateKey()
 	highlightTexture:SetTexCoord(0, 0.5625, 0, 0.609375)
 	bag:SetHighlightTexture(highlightTexture)
 
-	LoadScripts(bag)
+	bag:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+	bag:RegisterForDrag("LeftButton")
+
+	bag:SetScript("OnShow", BagnonBag.OnShow)
+	bag:SetScript("OnEnter", BagnonBag.OnEnter)
+	bag:SetScript("OnLeave", BagnonBag.OnLeave)
+	bag:SetScript("OnClick", BagnonBag.OnClick)
+	bag:SetScript("OnDragStart", BagnonBag.OnDrag)
+	bag:SetScript("OnReceiveDrag", BagnonBag.OnClick)
+
+	lastCreated = lastCreated + 1
 
 	return bag
 end
@@ -317,3 +315,5 @@ function BagnonBag:OnLeave()
 	GameTooltip:Hide()
 	BagnonSpot:SetBagSearch(nil)
 end
+
+BagnonBag.updateTooltip = BagnonBag.OnEnter

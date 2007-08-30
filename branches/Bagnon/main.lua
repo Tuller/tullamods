@@ -465,3 +465,14 @@ function Bagnon:ShowMenu()
 		self:ShowHelp()
 	end
 end
+
+
+--[[ Tooltips ]]--
+
+function Bagnon:SetShowOwners(enable)
+	self.sets.showOwners = (enable and 1) or nil
+end
+
+function Bagnon:ShowingOwners()
+	return self.sets.showOwners
+end
