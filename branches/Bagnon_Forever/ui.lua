@@ -44,7 +44,7 @@ end
 
 local function CharSelect_OnClick(player, delete)
 	local playerToShow
-	if(delete) then
+	if delete then
 		--remove the selected player
 		BagnonDB:RemovePlayer(player)
 
@@ -84,6 +84,7 @@ local function CharSelect_Create()
 	local dropdown = CreateFrame("Frame", "BagnonDBCharSelect", UIParent, "UIDropDownMenuTemplate")
 	dropdown:SetID(1)
 	UIDropDownMenu_Initialize(dropdown, CharSelect_Initialize, "MENU")
+	UIDropDownMenu_SetSelectedName(dropdown, currentPlayer)
 
 	return dropdown
 end

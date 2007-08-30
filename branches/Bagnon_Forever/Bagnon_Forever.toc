@@ -1,4 +1,4 @@
-﻿## Interface: 20100
+﻿## Interface: 20200
 ## Title: Bagnon Forever
 ## Notes: Stores inventory information about your characters
 ## Notes-zhCN: 保存角色背包与银行内物品的信息
@@ -6,11 +6,6 @@
 ## Version: 1.0.0
 ## SavedVariables: BagnonForeverDB
 ## LoadOnDemand: 1
-## LoadWith: Bagnon, Combuctor
-localization.lua
-trans\localization.de.lua
-trans\localization.fr.lua
-trans\localization.cn.lua
+## LoadWith: Bagnon, Combuctor_MKII
 db.lua
 ui.xml
-tooltips.lua

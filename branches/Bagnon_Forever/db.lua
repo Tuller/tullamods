@@ -6,6 +6,10 @@
 if not BagnonDB then
 	BagnonDB = (Bagnon and Bagnon:NewModule("Bagnon-DB")) or (Combuctor and Combuctor:NewModule("Combuctor-DB"))
 	BagnonDB.addon = "Bagnon_Forever"
+
+	if BagnonDB then
+		BagnonDB:Print("bam!")
+	end
 else
 	error(format("Already using %s to view cached data", BagnonDB.addon or "<Unknown Addon>"))
 	return
@@ -17,15 +21,10 @@ local CURRENT_VERSION = GetAddOnMetadata("Bagnon_Forever", "Version")
 local NUM_EQUIPMENT_SLOTS = 19
 
 --locals
-local tonumber = tonumber
-local format = string.format
-local strsplit = string.split
-local strjoin = string.join
-
-local BagnonUtil = BagnonUtil
 local currentPlayer = UnitName("player") --the name of the current player that"s logged on
 local currentRealm = GetRealmName() --what currentRealm we"re on
 local playerList --a sorted list of players
+
 
 --[[ Local Functions ]]--
 
@@ -72,7 +71,6 @@ function BagnonDB:Initialize()
 		local major, minor = BagnonForeverDB.version:match("(%d+)%.(%d+)")
 
 		if major ~= cMajor then
-			self:Print(L.UpdatedIncompatible)
 			BagnonForeverDB = {version = cVersion}
 		elseif minor ~= cMinor then
 			self:UpdateSettings()
@@ -102,11 +100,12 @@ end
 
 function BagnonDB:UpdateVersion()
 	BagnonForeverDB.version = CURRENT_VERSION
-	self:Print(format(L.Updated, BagnonForeverDB.version))
+	self:Print(format("Updated to v%s", BagnonForeverDB.version))
 end
 
 function BagnonDB:Enable()
 	self:RegisterEvent("BANKFRAME_OPENED")
+	self:RegisterEvent("BANKFRAME_CLOSED")
 	self:RegisterEvent("PLAYER_MONEY")
 	self:RegisterEvent("BAG_UPDATE")
 	self:RegisterEvent("PLAYERBANKSLOTS_CHANGED")
@@ -126,7 +125,7 @@ function BagnonDB:PLAYER_MONEY()
 end
 
 function BagnonDB:BAG_UPDATE(event, bag)
-	if not(BagnonUtil:IsCachedBag(bag)) or BagnonUtil:AtBank() then
+	if not(bag == BANK_CONTAINER or bag > 4) or self.atBank then
 		self:OnBagUpdate(bag)
 	end
 end
@@ -136,10 +135,15 @@ function BagnonDB:PLAYERBANKSLOTS_CHANGED()
 end
 
 function BagnonDB:BANKFRAME_OPENED()
+	self.atBank = true
 	self:SaveBagAll(-1)
 	for bag = 5, 11 do
 		self:SaveBagAll(bag)
 	end
+end
+
+function BagnonDB:BANKFRAME_CLOSED()
+	self.atBank = nil
 end
 
 function BagnonDB:UNIT_INVENTORY_CHANGED(event, unit)
@@ -349,12 +353,11 @@ function BagnonDB:SaveBag(bag)
 	local index = ToBagIndex(bag)
 
 	if size > 0 then
-		local link
-		if(bag > 0) then
-			link = ToShortLink(GetInventoryItemLink("player", BagnonUtil:GetInvSlot(bag)))
-		end
+		local link = bag > 0 and ToShortLink(GetInventoryItemLink("player", ContainerIDToInventoryID(bag)))
 		local count =  GetInventoryItemCount("player", slot)
-		count = count > 1 and count or nil
+		if count < 1 then
+			count = nil
+		end
 
 		if(size and link and count) then
 			self.pdb[index] = format("%s,%s,%d", size, link, count)
@@ -377,7 +380,7 @@ function BagnonDB:SaveBagAll(bag)
 end
 
 function BagnonDB:OnBagUpdate(bag)
-	if BagnonUtil:AtBank() then
+	if self.atBank then
 		for i = 1, 11 do
 			self:SaveBag(i)
 		end
