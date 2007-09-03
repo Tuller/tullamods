@@ -95,7 +95,7 @@ local function AddSellFishCost(self, ...)
 		local count
 		if owner then
 			local countText = (owner:GetName() and getglobal(owner:GetName() .. "Count")) or owner.count
-			if countText then
+			if countText and countText:IsShown() then
 				count = tonumber(countText:GetText()) or 1
 			end
 		end

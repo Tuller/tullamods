@@ -228,9 +228,7 @@ function GetSellValue(link)
 		end
 	end
 
-	if oGetSellValue then
-		return oGetSellValue(link)
-	end
+	return oGetSellValue and oGetSellValue(link)
 end
 
 function SellFish:GetNumValues()
@@ -257,7 +255,7 @@ function SellFish:LoadSlashCommands()
 			elseif cmd == "style" then
 				self:ToggleStyle()
 			elseif cmd == "compress" then
-				self:CompressDB(self.sets.newVals)
+				self:CompressDB(SellFishDB.newVals)
 			else
 				msg(format(L.UnknownCommand, cmd), true)
 			end
@@ -265,7 +263,7 @@ function SellFish:LoadSlashCommands()
 	end
 
 	SLASH_SellFishCOMMAND1 = "/sellfish"
-	if(GetLocale() ~= "deDE") then
+	if GetLocale() ~= "deDE" then
 		SLASH_SellFishCOMMAND2 = "/sf"
 	end
 end
