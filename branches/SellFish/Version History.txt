@@ -5,6 +5,7 @@ SellFish Version History
 	Implemented a new method for adding item prices to tooltips
 		Please test this for compatibility with other addons.
 	Removed code for importing data from other item price addons
+	Removed the /sf compress command
 
 1.6
 	Updated the database (credit goes to ItemPrice)

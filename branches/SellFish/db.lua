@@ -41,11 +41,17 @@ local function msg(message, showAddon)
 end
 
 --converts a base 10 integer into base<base>
-local base36 = {"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"}
+local base36 = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'}
 local maxBase = 10 + #base36
 
 local function ToBase(num, base)
-	local newNum = ""
+	if num == 0 then
+		return tostring(num)
+	end
+
+	local base = base or maxBase
+	local newNum = ''
+
 	while num > 0 do
 		local remain = num % base
 		num = floor(num / base)
@@ -65,9 +71,10 @@ local function ToID(link)
 	end
 end
 
---gets a value from the
+--gets a value from the big string
+local db = SellFish_GetDefaultData()
 local cache = setmetatable({}, {__index = function(t, i)
-	local c = SellFishDB.newVals[i] or (SellFishDB.data:match(";" .. i .. ",(%w+);")) or 0
+	local c = tonumber(db:match(";" .. ToBase(i) .. ",(%w+);") or 0, maxBase)
 	t[i] = c
 	return c
 end})
@@ -75,31 +82,24 @@ end})
 
 --[[ Startup/Shutdown ]]--
 
-SellFish = {}
+local SellFish = {}
 
 function SellFish:Load()
 	local tip = CreateFrame("GameTooltip", "SellFishTooltip", UIParent, "GameTooltipTemplate")
-	tip:SetScript("OnTooltipAddMoney", function(tip, cost)
-		if not InRepairMode() then
-			tip.lastCost = cost
-		end
-	end)
+	tip:SetScript("OnTooltipAddMoney", function(self, cost) self.lastCost = cost end)
 
-	tip:SetScript("OnEvent", function()
+	tip:SetScript("OnEvent", function(self, event, arg1)
 		if event == "MERCHANT_SHOW" then
-			self:ScanPrices()
+			SellFish:ScanPrices()
 		elseif event == "ADDON_LOADED" then
 			if(arg1 == "SellFish") then
-				this:UnregisterEvent("ADDON_LOADED")
-				self:Initialize()
+				self:UnregisterEvent("ADDON_LOADED")
+				SellFish:Initialize()
 			end
-		elseif event == "PLAYER_LOGOUT" then
-			self:ClearDefaults()
 		end
 	end)
 	tip:RegisterEvent("MERCHANT_SHOW")
 	tip:RegisterEvent("ADDON_LOADED")
-	tip:RegisterEvent("PLAYER_LOGOUT")
 	self.tip = tip
 
 	self:LoadSlashCommands()
@@ -128,13 +128,14 @@ function SellFish:LoadDefaults()
 	SellFishDB = {
 		style = 3,
 		newVals = {},
-		data = SellFish_GetDefaultData(),
-		version = CURRENT_VERSION
+		version = CURRENT_VERSION,
 	}
 end
 
 function SellFish:UpdateVersion()
-	SellFishDB.data = SellFish_GetDefaultData()
+	SellFishDB.data = nil
+	SellFishDB.newVals = {}
+
 	SellFishDB.version = CURRENT_VERSION
 	msg(format(L.Updated, SellFishDB.version), true)
 end
@@ -163,51 +164,22 @@ function SellFish:GetItemValue(bag, slot)
 	self.tip.lastCost = nil
 
 	local repairCost = (select(2, self.tip:SetBagItem(bag, slot)))
-	if not(repairCost) or repairCost == 0 then
+	if (repairCost or 0) == 0 then
 		return self.tip.lastCost or 0
 	end
 end
 
 --save the price, only if its not the same as in the main database
 function SellFish:SaveCost(id, cost)
-	local id = ToBase(id, maxBase)
-	local cost = ToBase(cost, maxBase)
-
-	if cost ~= cache[id] then
+	if cost ~= self:GetCost(id) then
 		SellFishDB.newVals[id] = cost
 	end
 end
 
 --get the price by checking newVals, then the main database
 function SellFish:GetCost(id, count)
-	local id = ToBase(id, maxBase)
-	local cost = cache[id]
-
-	if cost and cost ~= "" then
-		return tonumber(cost, maxBase) * (count or 1)
-	end
-end
-
--- Takes all the values in the list newVals, and replaces/adds entries in the big sellfish string
-function SellFish:CompressDB(newVals)
-	local appendString = ""
-	for id, cost in pairs(newVals) do
-		if cost == "" then cost = "0" end
-
-		local prevCost = cache[id]
-		if prevCost then
-			if(cost ~= prevCost) then
-				SellFishDB.data:gsub(format(";%s,%s;", id, prevCost), (cost == 0 and "") or format(";%s,%s;", id, cost))
-			end
-		elseif cost ~= "0" then
-			appendString = (appendString or "") .. format("%s,%s;", id, cost)
-		end
-		SellFishDB.newVals[id] = nil
-	end
-
-	if appendString ~= "" then
-		SellFishDB.data = (SellFishDB.data or ";") .. appendString
-	end
+	local cost = SellFishDB.newVals[id] or cache[id]
+	return cost * (count or 1)
 end
 
 
@@ -231,14 +203,6 @@ function GetSellValue(link)
 	return oGetSellValue and oGetSellValue(link)
 end
 
-function SellFish:GetNumValues()
-	local count = 0
-	for word in SellFishDB.data:gmatch(";%w+,%w+;") do
-		count = count + 1
-	end
-	return count
-end
-
 
 --[[ Slash Commands ]]--
 
@@ -254,8 +218,6 @@ function SellFish:LoadSlashCommands()
 				self:LoadDefaults()
 			elseif cmd == "style" then
 				self:ToggleStyle()
-			elseif cmd == "compress" then
-				self:CompressDB(SellFishDB.newVals)
 			else
 				msg(format(L.UnknownCommand, cmd), true)
 			end
@@ -274,7 +236,6 @@ function SellFish:ShowCommands()
 	msg(L.CommandsHeader)
 	msg(format(cmdStr, "?", L.HelpDesc))
 	msg(format(cmdStr, "style", L.StyleDesc))
-	msg(format(cmdStr, "compress", L.CompressDesc))
 	msg(format(cmdStr, "reset", L.ResetDesc))
 end
 
