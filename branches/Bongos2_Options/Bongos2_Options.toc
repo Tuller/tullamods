@@ -1,4 +1,4 @@
-## Interface: 20100
+## Interface: 20200
 ## Title: Bongos2 Options
 ## Title-zhCN: |cFF0099FF[Bongos2]|r 设置
 ## Notes: A load on demand option menu for Bongos
