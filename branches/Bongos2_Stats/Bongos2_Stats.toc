@@ -1,4 +1,4 @@
-## Interface: 20100
+## Interface: 20200
 ## Title: Bongos2 Stats
 ## Title-zhCN: |cFF0099FF[Bongos2]|r 信息条
 ## Notes: A movable FPS, memory, and latency display
