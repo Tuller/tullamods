@@ -277,6 +277,7 @@ function BagnonItem:OnEnter()
 		end
 	end
 end
+BagnonItem.UpdateTooltip = BagnonItem.OnEnter
 
 function BagnonItem:OnHide()
 	self:Unfade()
