@@ -1,4 +1,4 @@
-## Interface: 20100
+## Interface: 20200
 ## Title: Bongos2 XP
 ## Title-zhCN: |cFF0099FF[Bongos2]|r 经验条
 ## Notes: A movable experience and reputation bar
