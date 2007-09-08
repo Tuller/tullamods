@@ -9,7 +9,7 @@ local L = BONGOS_LOCALS
 
 local HORIZONTAL_TEXTURE = "Interface\\Addons\\Bongos2_XP\\img\\Smooth"
 local VERTICAL_TEXTURE = "Interface\\Addons\\Bongos2_XP\\img\\SmoothV"
-local REP_FORMAT = "%s:  %s / %s"
+local REP_FORMAT = "%s:  %s / %s (%s)"
 local REST_FORMAT = "%s / %s (+%s)"
 local XP_FORMAT = "%s / %s"
 
@@ -17,12 +17,12 @@ local DEFAULT_HEIGHT = 14
 local DEFAULT_SIZE = 0.75
 
 local xpBar, restBar, text, bg
-local WatchRep, WatchXP
+local WatchRep, WatchXP, OnRepEvent, OnXPEvent
 
 
 --[[ OnX Functions ]]--
 
-local function OnRepEvent()
+function OnRepEvent()
 	if restBar:IsShown() then
 		local name, reaction, min, max, value = GetWatchedFactionInfo()
 		if name then
@@ -35,7 +35,8 @@ local function OnRepEvent()
 			xpBar:SetMinMaxValues(0, max)
 			xpBar:SetValue(value)
 
-			text:SetText(format(REP_FORMAT, name, value, max))
+			local repname = getglobal("FACTION_STANDING_LABEL" .. reaction)
+			text:SetText(format(REP_FORMAT, name, value, max, repname))
 		else
 			WatchXP()
 		end
@@ -52,7 +53,7 @@ function WatchRep()
 	OnRepEvent()
 end
 
-local function OnXPEvent()
+function OnXPEvent()
 	if restBar:IsShown() then
 		if GetWatchedFactionInfo() then
 			WatchRep()
@@ -98,6 +99,15 @@ end
 
 
 --[[ Configuration ]]--
+
+local function Bar_SetAlwaysShowText(self, enable)
+	self.sets.alwaysShowText = enable and 1 or nil
+	if enable then
+		text:Show()
+	elseif not MouseIsOver(self) then
+		text:Hide()
+	end
+end
 
 local function Bar_SetSize(self, percent)
 	if self.sets.vertical then
@@ -150,6 +160,10 @@ local function Bar_CreateMenu(frame)
 	local size, height
 
 	--checkbuttons
+	local alwaysShowText = panel:AddCheckButton(L.AlwaysShowText)
+	alwaysShowText:SetScript("OnShow", function(self) self:SetChecked(frame.sets.alwaysShowText) end)
+	alwaysShowText:SetScript("OnClick", function(self) Bar_SetAlwaysShowText(frame, self:GetChecked()) end)
+
 	local vertical = panel:AddCheckButton(L.Vertical)
 	vertical:SetScript("OnShow", function(self) self:SetChecked(frame.sets.vertical) end)
 	vertical:SetScript("OnClick",  function(self)
@@ -222,8 +236,14 @@ local function Bar_OnCreate(self)
 	xpBar:EnableMouse(true)
 	xpBar:SetClampedToScreen(true)
 	xpBar:SetAllPoints(restBar)
-	xpBar:SetScript("OnEnter", function() text:Show() end)
-	xpBar:SetScript("OnLeave", function() text:Hide() end)
+	xpBar:SetScript("OnEnter", function()
+		text:Show()
+	end)
+	xpBar:SetScript("OnLeave", function()
+		if not self.sets.alwaysShowText then
+			text:Hide()
+		end
+	end)
 
 	text = xpBar:CreateFontString(nil, "OVERLAY")
 	text:SetFontObject(GameFontHighlight)
@@ -231,7 +251,10 @@ local function Bar_OnCreate(self)
 	text:SetAllPoints(xpBar)
 	text:SetJustifyH("CENTER")
 	text:SetJustifyV("CENTER")
-	text:Hide()
+
+	if not self.sets.alwaysShowText then
+		text:Hide()
+	end
 end
 
 function BongosXP:Load()
