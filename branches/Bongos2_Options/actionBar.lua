@@ -66,7 +66,14 @@ local function Panel_AddSelfCastDropDown(self)
 
 	local function SelfCast_OnClick()
 		UIDropDownMenu_SetSelectedValue(dropDown, this.value)
-		BongosActionConfig:SetSelfCastKey(keys[this.value])
+		local newBinding = keys[this.value]
+
+		if newBinding == NONE then
+			SetModifiedClick('SELFCAST', nil)
+		else
+			SetModifiedClick('SELFCAST', newBinding)
+		end
+		SaveBindings(GetCurrentBindingSet())
 	end
 
 	local function SelfCast_Initialize()
@@ -76,17 +83,10 @@ local function Panel_AddSelfCastDropDown(self)
 		end
 	end
 
-	dropDown:SetScript("OnShow", function(self)
+	dropDown:SetScript('OnShow', function(self)
 		UIDropDownMenu_Initialize(self, SelfCast_Initialize)
 		UIDropDownMenu_SetWidth(72, self)
-		local selected = GetActionSelfCastKey()
-
-		for i,key in ipairs(keys) do
-			if(selected == key) then
-				UIDropDownMenu_SetSelectedValue(self, i)
-				break
-			end
-		end
+		UIDropDownMenu_SetSelectedName(self, GetModifiedClick('SELFCAST') or NONE)
 	end)
 
 	self.height = self.height + 42
@@ -100,7 +100,14 @@ local function Panel_AddQuickMoveDropDown(self)
 
 	local function QuickMove_OnClick()
 		UIDropDownMenu_SetSelectedValue(dropDown, this.value)
-		BongosActionConfig:SetQuickMoveMode(this.value>1 and this.value-1 or nil)
+		local newBinding = keys[this.value]
+
+		if newBinding == NONE then
+			SetModifiedClick('PICKUPACTION', nil)
+		else
+			SetModifiedClick('PICKUPACTION', newBinding)
+		end
+		SaveBindings(GetCurrentBindingSet())
 	end
 
 	local function QuickMove_Initialize()
@@ -113,8 +120,7 @@ local function Panel_AddQuickMoveDropDown(self)
 	dropDown:SetScript("OnShow", function(self)
 		UIDropDownMenu_Initialize(self, QuickMove_Initialize)
 		UIDropDownMenu_SetWidth(72, self)
-		local mode = BongosActionConfig:GetQuickMoveMode()
-		UIDropDownMenu_SetSelectedValue(self, (mode and mode+1) or 1)
+		UIDropDownMenu_SetSelectedName(self, GetModifiedClick('PICKUPACTION') or NONE)
 	end)
 
 	self.height = self.height + 42
@@ -127,10 +133,10 @@ function BongosOptions:AddActionBarPanel()
 
 	local lockButtons = panel:AddCheckButton(L.LockButtons)
 	lockButtons:SetScript("OnShow", function(self)
-		self:SetChecked(BongosActionConfig:ButtonsLocked())
+		self:SetChecked(LOCK_ACTIONBAR == '1')
 	end)
 	lockButtons:SetScript("OnClick", function(self)
-		BongosActionConfig:LockButtons(self:GetChecked())
+		LOCK_ACTIONBAR = self:GetChecked() and '1' or '0'
 	end)
 
 	local rightClickSelfCast = panel:AddCheckButton(L.RightClickSelfCast)
