@@ -6,7 +6,7 @@
 if(not IsAddOnLoaded("Bongos2_ActionBar")) then return end
 
 local L = BONGOS_LOCALS
-local keys = {NONE:upper(), SHIFT_KEY_TEXT:upper(), CTRL_KEY_TEXT:upper(), ("ALT"):upper()}
+local keys = {NONE, SHIFT_KEY_TEXT:upper(), CTRL_KEY_TEXT:upper(), ("ALT"):upper()}
 
 local info = {}
 local function AddDropdownButton(text, value, selectedValue, action)
