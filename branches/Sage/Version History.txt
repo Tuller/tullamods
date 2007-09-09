@@ -1,7 +1,9 @@
 Sage Version History
 
 1.0.3
+Updated for 2.2
 Gave Sage_Options the right toc number
+Beast enemies will now display their family, when possible.
 
 1.0.2
 Fixed an error that caused buffs to try to set their scale to < 0
