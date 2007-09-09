@@ -1,5 +1,11 @@
 Bongos2 Version History
 
+1.8.0
+All: Updated for 2.2
+ActionBar: Implemented some event optimizations allowed by 2.2
+ActionBar: Locking action buttons, and the key to hold down to move them now use the blizzard setting.
+XP: Implemented tanerh's changes.  Text can now be configured to always show, and the player's current reputation level is displayed
+
 1.7.5
 All: Implemented chinese localization (thanks ondh (http://www.ondh.cn))
 Core: Fixed an error when saving a profile
