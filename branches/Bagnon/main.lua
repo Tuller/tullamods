@@ -5,11 +5,12 @@
 
 Bagnon = DongleStub("Dongle-1.0"):New("Bagnon")
 local L = BAGNON_LOCALS
+local CURRENT_VERSION = GetAddOnMetadata("Bagnon", "Version")
+
 
 --[[ Startup and settings management ]]--
 
 function Bagnon:Initialize()
-	local cVersion = GetAddOnMetadata("Bagnon", "Version")
 	local defaults = {
 		inventory = {
 			bags = {0, 1, 2, 3, 4},
@@ -33,59 +34,57 @@ function Bagnon:Initialize()
 		showBagsAtAH = 1,
 		showBankAtBank = 1,
 
-		version = cVersion,
+		version = CURRENT_VERSION,
 	}
 
-	if not BagnonSets or not BagnonSets.version then
+	if not(BagnonSets and BagnonSets.version) then
 		BagnonSets = defaults
 		self:Print(L.NewUser)
 	else
-		local cMajor, cMinor = cVersion:match("(%d+)%.(%d+)")
+		local cMajor, cMinor = CURRENT_VERSION:match("(%d+)%.(%d+)")
 		local major, minor = BagnonSets.version:match("(%d+)%.(%d+)")
 
 		if major ~= cMajor then
-			self:Print(L.UpdatedIncompatible)
 			BagnonSets = defaults
+			self:Print(L.UpdatedIncompatible)
 		elseif minor ~= cMinor then
-			self:UpdateSettings(cVersion)
+			self:UpdateSettings()
+		end
+
+		if BagnonSets.version ~= CURRENT_VERSION then
+			self:UpdateVersion()
 		end
 	end
 	self.sets = BagnonSets
 end
 
-function Bagnon:UpdateSettings(cVersion)
-	BagnonSets.version = cVersion
-	self:Print(format(L.Updated, cVersion))
+function Bagnon:UpdateSettings()
+	self:UpdateVersion()
+end
+
+function Bagnon:UpdateVersion()
+	BagnonSets.version = CURRENT_VERSION
+	self:Print(format(L.Updated, BagnonSets.version))
 end
 
 function Bagnon:Enable()
-	if IsAddOnLoaded("vBagnon") then
-		StaticPopupDialogs["DISABLE_VBAGNON"] = {
-			text = L.vBagnonLoaded,
-			button1 = TEXT(ACCEPT),
-			OnAccept = function() DisableAddOn("vBagnon"); ReloadUI() end,
-			timeout = 0,
-		}
-		StaticPopup_Show("DISABLE_VBAGNON")
-	else
-		BankFrame:UnregisterEvent("BANKFRAME_OPENED")
+	BankFrame:UnregisterEvent("BANKFRAME_OPENED")
 
-		self:RegisterEvent("BANKFRAME_OPENED")
-		self:RegisterEvent("BANKFRAME_CLOSED")
-		self:RegisterEvent("TRADE_SHOW")
-		self:RegisterEvent("TRADE_CLOSED")
-		self:RegisterEvent("TRADE_SKILL_SHOW")
-		self:RegisterEvent("TRADE_SKILL_CLOSE")
-		self:RegisterEvent("AUCTION_HOUSE_SHOW")
-		self:RegisterEvent("AUCTION_HOUSE_CLOSED")
-		self:RegisterEvent("MAIL_SHOW")
-		self:RegisterEvent("MAIL_CLOSED")
-		self:RegisterEvent("MERCHANT_SHOW")
-		self:RegisterEvent("MERCHANT_CLOSED")
+	self:RegisterEvent("BANKFRAME_OPENED")
+	self:RegisterEvent("BANKFRAME_CLOSED")
+	self:RegisterEvent("TRADE_SHOW")
+	self:RegisterEvent("TRADE_CLOSED")
+	self:RegisterEvent("TRADE_SKILL_SHOW")
+	self:RegisterEvent("TRADE_SKILL_CLOSE")
+	self:RegisterEvent("AUCTION_HOUSE_SHOW")
+	self:RegisterEvent("AUCTION_HOUSE_CLOSED")
+	self:RegisterEvent("MAIL_SHOW")
+	self:RegisterEvent("MAIL_CLOSED")
+	self:RegisterEvent("MERCHANT_SHOW")
+	self:RegisterEvent("MERCHANT_CLOSED")
 
-		self:RegisterSlashCommands()
-		self:HookBagClicks()
-	end
+	self:RegisterSlashCommands()
+	self:HookBagClicks()
 end
 
 
