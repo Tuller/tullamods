@@ -99,8 +99,6 @@ function Ludwig:GetAllItems(refresh)
 			local name = itemInfo[1][i]
 			if not db[i] and name then
 				db[i] = name:lower()
-			-- elseif not name then
-				-- SetItemRef(format("item:%d", i))
 			end
 		end
 	end
@@ -170,7 +168,7 @@ function Ludwig:GetItemsNamedLike(search)
 
 	local db = self:GetAllItems()
 	for id, itemName in pairs(db) do
-		if itemName == search or itemName:find("^".. search) then
+		if itemName == search or itemName:find('^'.. search) then
 			table.insert(searchList, id)
 			if itemName == search then break end
 		end
@@ -206,23 +204,32 @@ function Ludwig:ReloadDB()
 	self:GetAllItems(true)
 end
 
--- Use this code at own risk
--- local f = CreateFrame("Frame")
--- f.id = 1;
--- f.nextUpdate = 0
--- f:SetScript("OnUpdate", function(self, elapsed)
-	-- if self.nextUpdate < 0 then
-		-- self.nextUpdate = 0.05
+--queries the server for items from startID to endID.  don't run too many of these at once, of you WILL be disconnected
+--should take about 30 minutes to run a full scan if my math is right.
+function Ludwig:Scan(startID, endID)
+	local tip = self.spider or CreateFrame('GameTooltip', 'LudwigSpiderTooltip', UIParent, 'GameTooltipTemplate')
+	self.spider = tip
 
-		-- local id = self.id
-		-- while GetItemInfo(id) do id = id+1 end
-		-- SetItemRef(format("item:%d", id))
+	local nextUpdate = 0
+	local id = startID or 1
+	local endID = endID or MAXID
 
-		-- self.id = id +1
-		-- if self.id > MAXID then
-			-- self:Hide()
-		-- end
-	-- else
-		-- self.nextUpdate = self.nextUpdate - elapsed
-	-- end
--- end)
+	CreateFrame('Frame'):SetScript('OnUpdate', function(self, elapsed)
+		if nextUpdate < 0 then
+			nextUpdate = 0.05
+
+			--skip over any items we've seen already
+			while GetItemInfo(id) do id = id+1 end
+
+			--we've reached an id that's not been 'seen', query the server for item info
+			tip:SetHyperlink(format('item:%d', id))
+
+			id = id+1
+			if id > endID then
+				self:Hide()
+			end
+		else
+			nextUpdate = nextUpdate - elapsed
+		end
+	end)
+end
