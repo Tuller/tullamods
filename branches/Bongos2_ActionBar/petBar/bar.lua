@@ -18,7 +18,7 @@ local function Bar_GetSpacing(self)
 	return self.sets.spacing or DEFAULT_SPACING
 end
 
-local function Bar_Layout(self, cols, space)
+local function Bar_Layout(self, cols, spacing)
 	if InCombatLockdown() then return end
 
 	cols = (cols or self.sets.cols or NUM_PET_ACTION_SLOTS)
@@ -28,18 +28,18 @@ local function Bar_Layout(self, cols, space)
 		self.sets.cols = cols
 	end
 
-	space = (space or self.sets.space or DEFAULT_SPACING)
-	if space == DEFAULT_SPACING then
-		self.sets.space = nil
+	spacing = (spacing or self.sets.spacing or DEFAULT_SPACING)
+	if spacing == DEFAULT_SPACING then
+		self.sets.spacing = nil
 	else
-		self.sets.space = space
+		self.sets.spacing = spacing
 	end
-	space = space + 2
+	spacing = spacing + 2
 
-	local buttonSize = 30 + space
-	local offset = space / 2
+	local buttonSize = 30 + spacing
+	local offset = spacing / 2
 
-	self:SetSize(buttonSize * cols - space, buttonSize * ceil(NUM_PET_ACTION_SLOTS/cols) - space)
+	self:SetSize(buttonSize * cols - spacing, buttonSize * ceil(NUM_PET_ACTION_SLOTS/cols) - spacing)
 
 	for i = 1, NUM_PET_ACTION_SLOTS do
 		local row = mod(i - 1, cols)
@@ -103,7 +103,8 @@ function BongosPetBar:Load()
 	petBar:RegisterEvent("PET_BAR_UPDATE_COOLDOWN")
 	petBar:RegisterEvent("PET_BAR_SHOWGRID")
 	petBar:RegisterEvent("PET_BAR_HIDEGRID")
-	
+	RegisterStateDriver(petBar, "visibility", "[pet]show;hide") 
+
 	self:RegisterMessage("KEYBOUND_ENABLED")
 	self:RegisterMessage("KEYBOUND_DISABLED")
 end
@@ -112,6 +113,8 @@ function BongosPetBar:Unload()
 	self.bar:Destroy()
 	self:UnregisterAllMessages()
 	PetActionBarFrame:UnregisterAllEvents()
+
+	UnregisterStateDriver(PetActionBarFrame, "visibility") 
 end
 
 function BongosPetBar:KEYBOUND_ENABLED()
