@@ -14,7 +14,6 @@ keyBound\spellBound.lua
 core\unreg.lua
 core\config.lua
 bagBar\bar.lua
-keyBar\bar.lua
 menuBar\bar.lua
 classBar\button.lua
 classBar\bar.lua
