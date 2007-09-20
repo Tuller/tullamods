@@ -1,5 +1,11 @@
 Bongos2 Version History
 
+1.8.1
+ActionBar: Merged the key and bag bars
+ActionBar: Fixed a bug causing the spacing slider for the pet bar display the correct value
+ActionBar: Fixed an error when attempting to bind keys to the spellbook
+MapBar: Fixed a bug causing the interface panels to not be able to properly expand across the screen
+
 1.8.0
 All: Updated for 2.2
 ActionBar: Implemented some event optimizations allowed by 2.2
@@ -12,7 +18,7 @@ All: Implemented chinese localization (thanks ondh (http://www.ondh.cn))
 Core: Fixed an error when saving a profile
 Core: Fixed a bug casuing profiles to be matched inaccurately
 Core: Hopefully fixed a bug when upgrading Bongos
-
+style
 1.7.4
 CastBar: Modified coloring. Implemented a better algorithm for target detection
 
