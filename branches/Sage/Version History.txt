@@ -2,7 +2,6 @@ Sage Version History
 
 1.0.3
 Updated for 2.2
-Gave Sage_Options the right toc number
 Beast enemies will now display their family, when possible.
 
 1.0.2
@@ -13,7 +12,6 @@ Fixed an error causing the version number to not properly update
 
 1.0.0
 Updated for 2.1
-
 
 known issues:
 Party frames are considered over the drag frame
