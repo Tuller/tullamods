@@ -3,6 +3,7 @@ Sage Version History
 1.0.3
 Updated for 2.2
 Beast enemies will now display their family, when possible.
+Durations will now properly update in buff tooltips
 
 1.0.2
 Fixed an error that caused buffs to try to set their scale to < 0

@@ -69,8 +69,10 @@ local function Buff_Create(parent, id, isDebuff)
 	if(isDebuff) then
 		buff:SetBackdrop(bg)
 		buff:SetScript("OnEnter", Debuff_OnEnter)
+		buff.UpdateTooltip = Debuff_OnEnter
 	else
 		buff:SetScript("OnEnter", Buff_OnEnter)
+		buff.UpdateTooltip = Buff_OnEnter
 	end
 	buff:SetScript("OnLeave", Buff_OnLeave)
 
