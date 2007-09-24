@@ -4,11 +4,11 @@
 = Bongos2 Version History =
 
 1.8.1
-  * ActionBar: Merged the key and bag bars
-  * ActionBar: Fixed a bug causing the spacing slider for the pet bar display the correct value
-  * ActionBar: Fixed an error when attempting to bind keys to the spellbook
-  * ActionBar: Altered the layout of stance sliders
-  * MapBar: Fixed a bug causing the interface panels to not be able to properly expand across the screen
+  * Action Bar: Merged the key and bag bars
+  * Action Bar: Fixed a bug causing the spacing slider for the pet bar display the correct value
+  * Action Bar: Fixed an error when attempting to bind keys to the spellbook
+  * Action Bar: Altered the layout of stance sliders
+  * Map Bar: Fixed a bug causing the interface panels to not be able to properly expand across the screen
 
 1.8.0
   * All: Updated for 2.2.  This version is *not* compatible with 2.1
@@ -124,5 +124,6 @@
 
 1.0
   * Updated for 2.1
+ 
  
  
