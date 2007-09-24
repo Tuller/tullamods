@@ -10,6 +10,7 @@
 local ICON_SIZE = 37 --the normal size for an icon (don't change this)
 local FONT_SIZE = 18 --the base font size to use at a scale of 1
 local MIN_SCALE = 0.5 --the minimum scale we want to show cooldown counts at, anything below this will be hidden
+local MIN_DURATION = 3 --the minimum duration to show cooldown text for
 local TEXT_FONT = STANDARD_TEXT_FONT --what font to use
 local DAY, HOUR, MINUTE = 86400, 3600, 60
 
@@ -62,6 +63,8 @@ local function Timer_Create(self)
 		self.text = text
 		self:SetScript('OnUpdate', Timer_OnUpdate)
 		return text
+	else
+		self.noOCC = true
 	end
 end
 
@@ -70,14 +73,14 @@ local function Timer_Start(self, start, duration)
 	self.duration = duration
 	self.nextUpdate = 0
 
-	local text = self.text or Timer_Create(self)
+	local text = self.text or (not self.noOCC and Timer_Create(self))
 	if text then
 		text:Show()
 	end
 end
 
 hooksecurefunc('CooldownFrame_SetTimer', function(self, start, duration, enable)
-	if start > 0 and duration > 3 and enable == 1 then
+	if start > 0 and duration > MIN_DURATION and enable > 0 then
 		Timer_Start(self, start, duration)
 	else
 		local text = self.text

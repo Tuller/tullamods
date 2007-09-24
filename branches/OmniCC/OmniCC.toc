@@ -2,7 +2,7 @@
 ## Title: OmniCC
 ## Author: Tuller
 ## Notes: Cooldown count for everything
-## Version: 1.2
+## Version: 1.3
 ## SavedVariables: OmniCC2DB
 localization.lua
 main.lua

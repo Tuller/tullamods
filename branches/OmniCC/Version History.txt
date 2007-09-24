@@ -3,6 +3,7 @@ OmniCC Version History, in the format mmddyy:
 1.3
 Update for 2.2
 Basic: Modified the hiding behavior for buffs
+Basic: Cleaned up and commented code
 
 1.2
 Fixed a bug causing cooldown text to be transparent on Bartender3
