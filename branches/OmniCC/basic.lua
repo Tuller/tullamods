@@ -1,17 +1,19 @@
 --[[
-	basic.lua
-		A featureless version of OmniCC,
+	OmniCC Basic
+		A featureless, 'pure' version of OmniCC.
+		This version should work on absolutely everything, but I've removed pretty much all of the options
 
-	To use it, change the file listings in OmniCC.toc to only the name of this file.
-	You can also remove the saved variables line.
+	To use it, replace OmniCC.toc with OmniCC.basic.toc located in the tocs folder
+	To stop using it, replace OmniCC.toc with OmniCC.full.toc located in the tocs folder
 --]]
 
-local ICON_SIZE = 37 --the normal size for an icon
+local ICON_SIZE = 37 --the normal size for an icon (don't change this)
 local FONT_SIZE = 18 --the base font size to use at a scale of 1
-local MIN_SCALE = 0.5 --the minimum scale we want to show cooldown counts at
+local MIN_SCALE = 0.5 --the minimum scale we want to show cooldown counts at, anything below this will be hidden
 local TEXT_FONT = STANDARD_TEXT_FONT --what font to use
 local DAY, HOUR, MINUTE = 86400, 3600, 60
 
+--local bindings for omg speed
 local format, floor = string.format, math.floor
 local GetTime = GetTime
 
