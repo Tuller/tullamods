@@ -79,7 +79,7 @@ function OmniCC:LoadDefaults(current)
 end
 
 function OmniCC:UpdateSettings(current)
-	OmniCC2DB.useBlacklist = 1
+	-- OmniCC2DB.useBlacklist = 1
 	OmniCC2DB.version = current
 	msg(format(L.Updated, OmniCC2DB.version), true)
 end
