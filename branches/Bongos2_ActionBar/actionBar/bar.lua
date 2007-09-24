@@ -226,7 +226,7 @@ local function StanceSlider_OnShow(self)
 	local maxOffset = numBars - 1
 	self:SetMinMaxValues(0, maxOffset)
 	self:SetValue(frame.sets[self.id] or 0)
-	getglobal(self:GetName() .. "High"):SetText(maxOffset)
+
 	getglobal(self:GetName() .. "ValText"):SetText(format("Bar %s", mod(frame.id+self:GetValue()-1, numBars)+1))
 
 	self.onShow = nil
@@ -248,8 +248,18 @@ local function Panel_AddStanceSlider(self, id, title)
 	slider:SetScript("OnValueChanged", StanceSlider_OnValueChanged)
 	slider:SetValueStep(1)
 
-	getglobal(slider:GetName() .. "Text"):SetText(title)
-	getglobal(slider:GetName() .. "Low"):SetText(0)
+	getglobal(slider:GetName() .. "Low"):SetText('')
+	getglobal(slider:GetName() .. "High"):SetText('')
+
+	local titleText = getglobal(slider:GetName() .. 'Text')
+	titleText:SetText(title)
+	titleText:ClearAllPoints()
+	titleText:SetPoint('TOPLEFT', slider, 'TOPLEFT', 8, 10)
+
+	local valText = getglobal(slider:GetName() .. 'ValText')
+	valText:ClearAllPoints()
+	valText:SetPoint('TOPRIGHT', slider, 'TOPRIGHT', -8, 10)
+	valText:SetVertexColor(1, 1, 1)
 
 	return slider
 end

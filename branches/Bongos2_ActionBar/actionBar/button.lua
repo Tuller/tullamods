@@ -548,7 +548,7 @@ function BongosActionButton:GetPagedID(refresh)
 	if refresh or not self.id then
 		self.id = SecureButton_GetModifiedAttribute(self, "action", SecureStateChild_GetEffectiveButton(self))
 	end
-	return self.id
+	return self.id or 0
 end
 
 function BongosActionButton:ForAll(method, ...)
