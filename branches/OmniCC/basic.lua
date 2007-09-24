@@ -6,17 +6,22 @@
 	You can also remove the saved variables line.
 --]]
 
-local ICON_SCALE = 37
-local FONT_SIZE = 18
-local TEXT_FONT = STANDARD_TEXT_FONT
+local ICON_SIZE = 37 --the normal size for an icon
+local FONT_SIZE = 18 --the base font size to use at a scale of 1
+local MIN_SCALE = 0.5 --the minimum scale we want to show cooldown counts at
+local TEXT_FONT = STANDARD_TEXT_FONT --what font to use
+local DAY, HOUR, MINUTE = 86400, 3600, 60
+
+local format, floor = string.format, math.floor
+local GetTime = GetTime
 
 local function GetFormattedTime(s)
-	if s >= 86400 then
-		return floor(s / 86400 + 0.5) .. "d", mod(s, 86400)
-	elseif s >= 3600 then
-		return floor(s / 3600 + 0.5) .. "h", mod(s, 3600)
-	elseif s >= 60 then
-		return floor(s / 60 + 0.5) .. "m", mod(s, 60)
+	if s >= DAY then
+		return format('%dd', floor(s/DAY + 0.5)), s % DAY
+	elseif s >= HOUR then
+		return format('%dh', floor(s/HOUR + 0.5)), s % HOUR
+	elseif s >= MINUTE then
+		return format('%dm', floor(s/MINUTE + 0.5)), s % MINUTE
 	end
 	return floor(s + 0.5), s - floor(s)
 end
@@ -24,13 +29,18 @@ end
 local function Timer_OnUpdate(self, elapsed)
 	if self.text:IsShown() then
 		if self.nextUpdate <= 0 then
-			local remain = self.duration - (GetTime() - self.start)
-			if floor(remain + 0.5) > 0 then
-				local time, toNextUpdate = GetFormattedTime(remain)
-				self.text:SetText(time)
-				self.toNextUpdate = toNextUpdate
+			if self:GetEffectiveScale() < MIN_SCALE then
+				self.text:SetText('')
+				self.toNextUpdate = 1
 			else
-				self.text:Hide()
+				local remain = self.duration - (GetTime() - self.start)
+				if floor(remain + 0.5) > 0 then
+					local time, toNextUpdate = GetFormattedTime(remain)
+					self.text:SetText(time)
+					self.toNextUpdate = toNextUpdate
+				else
+					self.text:Hide()
+				end
 			end
 		else
 			self.nextUpdate = self.nextUpdate - elapsed
@@ -39,19 +49,18 @@ local function Timer_OnUpdate(self, elapsed)
 end
 
 local function Timer_Create(self)
-	local scale = min(self:GetParent():GetWidth() / ICON_SCALE, 1)
+	local fontScale = min(self:GetParent():GetWidth() / ICON_SIZE, 1)
 
-	local text
-	if (FONT_SIZE * scale) > 8 then
-		text = self:CreateFontString(nil, "OVERLAY")
-		text:SetPoint("CENTER", self, "CENTER", 0, 1)
-		text:SetFont(TEXT_FONT, FONT_SIZE * scale, "OUTLINE")
+	if fontScale >= MIN_SCALE then
+		local text = self:CreateFontString(nil, 'OVERLAY')
+		text:SetPoint('CENTER', self, 'CENTER', 0, 1)
+		text:SetFont(TEXT_FONT, FONT_SIZE * fontScale, 'OUTLINE')
 		text:SetTextColor(1, 0.9, 0)
 
 		self.text = text
-		self:SetScript("OnUpdate", Timer_OnUpdate)
+		self:SetScript('OnUpdate', Timer_OnUpdate)
+		return text
 	end
-	return text
 end
 
 local function Timer_Start(self, start, duration)
@@ -65,7 +74,7 @@ local function Timer_Start(self, start, duration)
 	end
 end
 
-hooksecurefunc("CooldownFrame_SetTimer", function(self, start, duration, enable)
+hooksecurefunc('CooldownFrame_SetTimer', function(self, start, duration, enable)
 	if start > 0 and duration > 3 and enable == 1 then
 		Timer_Start(self, start, duration)
 	else
