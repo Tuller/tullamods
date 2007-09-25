@@ -149,8 +149,8 @@ GameTooltip.SetTradeSkillItem = hookTip(GameTooltip.SetTradeSkillItem, function(
 	return GetTradeSkillItemLink(skill)
 end)
 
-GameTooltip.SetQuestLogItem = hookTip(GameTooltip.SetQuestLogItem, function(index, slot)
-	return GetQuestLogItemLink(index, slot), select(3, GetQuestLogRewardInfo(index, slot))
+GameTooltip.SetQuestLogItem = hookTip(GameTooltip.SetQuestLogItem, function(type, index)
+	return GetQuestLogItemLink(type, index), select(3, GetQuestLogRewardInfo(index))
 end)
 
 GameTooltip.SetTradePlayerItem = hookTip(GameTooltip.SetTradePlayerItem, function(id)
