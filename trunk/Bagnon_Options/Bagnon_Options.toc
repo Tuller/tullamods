@@ -1,4 +1,4 @@
-﻿## Interface: 20100
+﻿## Interface: 20200
 ## Title: Bagnon Options
 ## Notes: A configuration menu for Bagnon
 ## Notes-zhCN: Bagnon 的设置菜单
