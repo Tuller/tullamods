@@ -1,7 +1,11 @@
 Sage Version History
 
 1.0.3
-Gave Sage_Options the right toc number
+Updated for 2.2
+Beast enemies will now display their family, when possible.
+Durations will now properly update in buff tooltips
+Target: Increased the sizes of buffs and debuffs on the bottom row
+Focus: Increased the sizes of buffs and debuffs on the bottom row
 
 1.0.2
 Fixed an error that caused buffs to try to set their scale to < 0
@@ -11,7 +15,6 @@ Fixed an error causing the version number to not properly update
 
 1.0.0
 Updated for 2.1
-
 
 known issues:
 Party frames are considered over the drag frame
