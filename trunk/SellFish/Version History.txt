@@ -1,10 +1,12 @@
 SellFish Version History
 
+1.7.1
+	Fixed a bug with tooltip hooking
+
 1.7
 	Updated for 2.2
-	Implemented a new method for adding item prices to tooltips
-		Please test this for compatibility with other addons.
 	Removed code for importing data from other item price addons
+	Removed the /sf compress command
 
 1.6
 	Updated the database (credit goes to ItemPrice)

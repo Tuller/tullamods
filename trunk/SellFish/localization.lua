@@ -16,9 +16,8 @@ L.CommandsHeader = "|cFF33FF99SellFish commands|r: (/sf or /sellfish)"
 L.UnknownCommand = "'|cffffd700%s|r' is an unknown command"
 
 L.HelpDesc = "Shows commands"
-L.ResetDesc = "Resets sell value database"
+L.ResetDesc = "Returns to default settings"
 L.StyleDesc = "Toggles sell value display style"
-L.CompressDesc = "Compresses the sell value database"
 
 --tooltips
 L.SellsFor = "Sells for:"
