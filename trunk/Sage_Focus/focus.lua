@@ -6,7 +6,7 @@
 SageFocus = Sage:NewModule("Sage-Focus")
 
 local BUFF_SIZE_LARGE = 32
-local BUFF_SIZE_SMALL = 16
+local BUFF_SIZE_SMALL = 18
 
 
 --[[ UI Templates ]]--
