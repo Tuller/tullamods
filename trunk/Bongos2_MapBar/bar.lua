@@ -216,6 +216,11 @@ function BongosMapBar:Load()
 	bar:ToggleZoom(bar.sets.showZoom)
 	bar:ToggleDayIndicator(bar.sets.showDay)
 	bar:ToggleMap(bar.sets.showMap)
+	
+	--override GetMaxUIPanelsWidth
+	function GetMaxUIPanelsWidth()
+		return UIParent:GetRight() - UIParent:GetAttribute("RIGHT_OFFSET_BUFFER")
+	end
 
 	self.bar = bar
 end
