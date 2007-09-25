@@ -14,16 +14,13 @@ function Bongos:Initialize()
 	local defaults = {
 		profile = {
 			sticky = true,
-			lockButtons = true,
 			showTooltips = true,
 			showHotkeys = true,
 			showMacros = true,
 			rangeColoring = true,
 			showEmpty = false,
 			showMinimap = true,
-			selfCastKey = "ALT",
 			rangeColor = {r = 1, g = 0.5, b = 0.5},
-			quickMoveKey = 1,
 			mapx = -24, mapy = -76,
 			bars = {}
 		}
@@ -33,7 +30,7 @@ function Bongos:Initialize()
 end
 
 function Bongos:Enable()
-	if(BongosVersion) then
+	if BongosVersion then
 		local cMajor, cMinor = CURRENT_VERSION:match("(%d+)%.(%d+)")
 		local major, minor = BongosVersion:match("(%d+)%.(%d+)")
 
@@ -67,18 +64,29 @@ function Bongos:Enable()
 end
 
 function Bongos:UpdateSettings()
-	if(BongosActionBar) then
+	--convert keybindings
+	if BongosActionBar then
 		BongosActionBar:ConvertBindings()
 	end
 
+	--run the spacing change (1.5 -> 1.7)
 	for profile,sets in pairs(self.db.sv.profiles) do
-		if sets and sets.bars then
+		if sets.bars then
+			--run the spacing converter
 			for barID,barSets in pairs(sets.bars) do
 				barSets.spacing = (barSets.spacing or barSets.space)
 				barSets.space = nil
 			end
 		end
 	end
+
+	--remove the old things for selfCast and quickMove (1.8/2.2)
+	self.profile.selfCastKey = nil
+	self.profile.quickMoveKey = nil
+	self.profile.lockButtons = nil
+
+	--enable lock actionbar (1.8/2.2)
+	LOCK_ACTIONBAR = '1'
 end
 
 function Bongos:UpdateVersion()
