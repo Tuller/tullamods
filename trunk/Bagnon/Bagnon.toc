@@ -1,10 +1,10 @@
-﻿## Interface: 20100
+﻿## Interface: 20200
 ## Title: Bagnon
 ## Author: Tuller
 ## Notes: Single window displays for the inventory and bank
 ## Notes-zhCN: 在单一框架内显示背包或银行中的物品
 ## SavedVariablesPerCharacter: BagnonSets
-## Version: 1.3
+## Version: 1.4.0
 ## OptionalDeps: Dongle
 lib\Gooey.xml
 lib\Dongle.lua
@@ -23,3 +23,4 @@ core\frame.lua
 core\spot.lua
 core\menu.lua
 main.lua
+tooltips.lua
