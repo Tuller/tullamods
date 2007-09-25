@@ -24,11 +24,6 @@ function BongosActionBar:Load()
 		self.numForms = GetNumShapeshiftForms()
 		self:RegisterEvent("UPDATE_SHAPESHIFT_FORMS", "UpdateStanceNumbers")
 	end
-	
-	--set the selfcast key
-	if(GetBuildInfo() ~= "0.2.0") then
-		BongosActionConfig:SetSelfCastKey(BongosActionConfig:GetSelfCastKey())
-	end
 end
 
 function BongosActionBar:Unload()
@@ -47,7 +42,7 @@ function BongosActionBar:OnSlotChanged(event, id)
 		actions[id] = HasAction(id) or nil
 		self:UpdateVisibility()
 	end
-	BongosActionButton:OnSlotChanged(id)
+	BongosActionButton:UpdateButtonsWithID(id)
 end
 
 function BongosActionBar:OnLeaveCombat()

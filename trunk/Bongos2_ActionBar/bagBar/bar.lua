@@ -10,7 +10,48 @@ local L = BONGOS_LOCALS
 --constants
 local DEFAULT_SPACING, DEFAULT_ROWS = 4, 1
 local BAG_SIZE = 37
-local bags = {CharacterBag3Slot, CharacterBag2Slot, CharacterBag1Slot, CharacterBag0Slot, MainMenuBarBackpackButton}
+
+--create the keyring button
+do
+	local button = CreateFrame('CheckButton', 'BongosKeyRingButton', nil, 'ItemButtonTemplate')
+	button:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+
+	button:SetScript('OnClick', function()
+		if CursorHasItem() then
+			PutKeyInKeyRing()
+		else
+			ToggleKeyRing()
+		end
+	end)
+
+	button:SetScript('OnReceiveDrag', function()
+		if CursorHasItem() then
+			PutKeyInKeyRing()
+		end
+	end)
+
+	button:SetScript('OnEnter', function(self)
+		GameTooltip:SetOwner(self, "ANCHOR_LEFT")
+		GameTooltip:SetText(KEYRING, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
+		GameTooltip:AddLine()
+	end)
+
+	button:SetScript('OnLeave', function()
+		GameTooltip:Hide()
+	end)
+
+	local icon = getglobal(button:GetName() .. 'IconTexture')
+	icon:SetTexture('Interface/Icons/INV_Misc_Key_13')
+end
+
+local bags = {
+	BongosKeyRingButton,
+	CharacterBag3Slot,
+	CharacterBag2Slot,
+	CharacterBag1Slot,
+	CharacterBag0Slot,
+	MainMenuBarBackpackButton,
+}
 
 
 --[[ Bar Functions ]]--

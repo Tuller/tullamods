@@ -1,4 +1,4 @@
-﻿## Interface: 20100
+﻿## Interface: 20200
 ## Title: Bongos2 ActionBar
 ## Title-zhCN: |cFF0099FF[Bongos2]|r 动作条
 ## Notes: A main actionbar replacement
@@ -14,7 +14,6 @@ keyBound\spellBound.lua
 core\unreg.lua
 core\config.lua
 bagBar\bar.lua
-keyBar\bar.lua
 menuBar\bar.lua
 classBar\button.lua
 classBar\bar.lua
