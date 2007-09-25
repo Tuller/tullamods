@@ -1,5 +1,5 @@
-## Interface: 20100
-## Title: Sage_Options
+## Interface: 20200
+## Title: Sage Options
 ## Notes: Sage's options menu
 ## Author: Tuller
 ## Dependencies: Sage
