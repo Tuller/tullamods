@@ -3,7 +3,7 @@
 = Bagnon Version History =
 
 1.4.0
-  * Updated for 2.2
+  * Updated for 2.2.  This version *will not* work with 2.1
   * Reduced CPU usage significantly when showing the bank/bags
   * Recoded Bagnon Forever to get a bit better compression.  Bag data has been reset
 
@@ -23,5 +23,6 @@
 1.0
   * Initial release
 
+ 
  
  
