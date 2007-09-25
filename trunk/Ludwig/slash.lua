@@ -48,11 +48,15 @@ SlashCmdList["LudwigSlashCOMMAND"] = function(msg)
 			ShowUIPanel(LudwigFrame)
 		end
 	else
-		local cmd, arg1 = msg:lower():match("%-(%w+)")
+		local cmd = msg:lower():match("%-%-(%w+)")
 		if cmd then
 			if cmd == "refresh" then
 				Ludwig:ReloadDB()
 				LMsg(L.DBRefreshed)
+			elseif cmd == "scan" then
+				Ludwig:Scan()
+			elseif tonumber(cmd) then
+				SetItemRef(format("item:%d", tonumber(cmd)))
 			else
 				LMsg(format(L.UnknownCommand, cmd))
 			end
