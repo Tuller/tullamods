@@ -268,6 +268,7 @@ function BongosActionButton:Update(refresh)
 	else
 		cooldown:Hide()
 	end
+
 	self:UpdateCount()
 
 	-- Add a green border if button is an equipped item
@@ -280,7 +281,12 @@ function BongosActionButton:Update(refresh)
 	end
 
 	-- Update Macro Text
-	self.macro:SetText(GetActionText(action))
+	local macroText = self.macro
+	if not(IsConsumableAction(action) or IsStackableAction(action)) then
+		macroText:SetText(GetActionText(action))
+	else
+		macroText:SetText('')
+	end
 end
 
 --Update the cooldown timer
@@ -308,7 +314,7 @@ function BongosActionButton:UpdateUsable()
 
 	local isUsable, notEnoughMana = IsUsableAction(action)
 	if isUsable then
-		if BongosActionConfig:RangeColoring() and IsActionInRange(action) == 0 then
+		if IsActionInRange(action) == 0 and BongosActionConfig:RangeColoring() then
 			local r,g,b = BongosActionConfig:GetRangeColor()
 			icon:SetVertexColor(r,g,b)
 		else
