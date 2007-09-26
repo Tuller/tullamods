@@ -6,16 +6,10 @@
 	<Button name="BagnonDBUIDropDownButton" topLevel="true" virtual="true">
 		<Size x="24" y="24"/>
 
-		<Anchors>
-			<Anchor point="TOPLEFT">
-				<Offset x="6" y="-6"/>
-			</Anchor>
-		</Anchors>
-
 		<Scripts>
 			<OnClick>
 				BagnonDB:SetDropdownFrame(self:GetParent())
-				BagnonDB:ToggleDropdown(self)
+				BagnonDB:ToggleDropdown(self, 0, 2)
 			</OnClick>
 		</Scripts>
 		<NormalTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Up" setAllPoints="true"/>

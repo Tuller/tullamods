@@ -6,6 +6,7 @@
 if not BagnonDB then
 	BagnonDB = (Bagnon and Bagnon:NewModule("Bagnon-DB")) or (Combuctor and Combuctor:NewModule("Combuctor-DB"))
 	BagnonDB.addon = "Bagnon_Forever"
+	BagnonDB.tip = CreateFrame("GameTooltip", "BagnonDBTooltip", UIParent, "GameTooltipTemplate")
 else
 	error(format("Already using %s to view cached data", BagnonDB.addon or "<Unknown Addon>"))
 	return
@@ -231,6 +232,9 @@ function BagnonDB:GetBagData(bag, player)
 			local _, hyperLink, quality, texture
 			if(link) then
 				_,hyperLink,_,_,_,_,_,_,_, texture = GetItemInfo(link)
+				if not hyperLink then
+					self:QueryLink(link)
+				end
 			end
 			return tonumber(size), hyperLink, tonumber(count) or 1, texture
 		end
@@ -265,6 +269,9 @@ function BagnonDB:GetItemData(bag, slot, player)
 			local link, count = strsplit(",", itemInfo)
 			if(link) then
 				local _,hyperLink, quality,_,_,_,_,_,_, texture = GetItemInfo(link)
+				if not hyperLink then
+					self:QueryLink(link)
+				end
 				return hyperLink, tonumber(count) or 1, texture, tonumber(quality)
 			end
 		end
@@ -410,4 +417,8 @@ function BagnonDB:RemovePlayer(player, realm)
 			end
 		end
 	end
+end
+
+function BagnonDB:QueryLink(link)
+	self.tip:SetHyperlink(tonumber(link) and format("item:%d", link) or link)
 end
