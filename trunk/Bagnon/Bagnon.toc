@@ -4,7 +4,7 @@
 ## Notes: Single window displays for the inventory and bank
 ## Notes-zhCN: 在单一框架内显示背包或银行中的物品
 ## SavedVariablesPerCharacter: BagnonSets
-## Version: 1.4.0
+## Version: 1.4.1
 ## OptionalDeps: Dongle
 lib\Gooey.xml
 lib\Dongle.lua

@@ -1,5 +1,9 @@
 Bagnon Version History
 
+1.4.1
+Fixed an error when clicking trade skill item links
+Fixed a bug where linking a cached item would sometimes produce double links
+
 1.4.0
 Updated for 2.2
 Reduced CPU usage significantly when showing the bank/bags

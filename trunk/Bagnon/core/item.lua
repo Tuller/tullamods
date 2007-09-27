@@ -25,6 +25,53 @@ local function DummyBag_Get(parent, bag)
 	return bagFrame
 end
 
+--create a dummy item slot for tooltips and modified clicks of cached items
+do
+	local slot = CreateFrame('Button')
+	slot:RegisterForClicks('anyUp')
+	slot:Hide()
+
+	local function Slot_OnEnter(self)
+		local parent = self:GetParent()
+		if parent.cached and parent.hasItem then
+			parent:LockHighlight()
+
+			BagnonUtil:AnchorTooltip(parent)
+			GameTooltip:SetHyperlink(BagnonDB:GetItemData(parent:GetBag(), parent:GetID(), parent:GetPlayer()))
+			GameTooltip:Show()
+		else
+			self:Hide()
+		end
+	end
+
+	local function Slot_OnLeave(self)
+		local parent = self:GetParent()
+		if parent then
+			parent:UnlockHighlight()
+		end
+
+		GameTooltip:Hide()
+		self:Hide()
+	end
+
+	local function Slot_OnHide(self)
+		local parent = self:GetParent()
+		if parent then
+			parent:UnlockHighlight()
+		end
+	end
+
+	local function Slot_OnClick(self, button)
+		self:GetParent():OnModifiedClick(button)
+	end
+
+	slot:SetScript('OnEnter', Slot_OnEnter)
+	slot:SetScript('OnLeave', Slot_OnLeave)
+	slot:SetScript('OnClick', Slot_OnClick)
+
+	BagnonItem.dummySlot = slot
+end
+
 
 --[[ Item Creation ]]--
 
@@ -63,7 +110,6 @@ local function Item_Create()
 	item:SetScript("OnUpdate", nil)
 	item:SetScript("OnEnter", BagnonItem.OnEnter)
 	item:SetScript("OnHide", BagnonItem.OnHide)
-	item:SetScript("PostClick", BagnonItem.PostClick)
 	item.UpdateTooltip = nil
 
 	lastCreated = lastCreated + 1
@@ -242,7 +288,7 @@ end
 
 --[[ OnX Functions ]]--
 
-function BagnonItem:PostClick(button)
+function BagnonItem:OnModifiedClick(button)
 	if self.cached then
 		if self.hasItem then
 			if button == "LeftButton" then
@@ -260,11 +306,13 @@ function BagnonItem:OnEnter()
 	local bag, slot = self:GetBag(), self:GetID()
 	if self.cached then
 		if self.hasItem then
-			BagnonUtil:AnchorTooltip(self)
-			GameTooltip:SetHyperlink(BagnonDB:GetItemData(bag, slot, self:GetPlayer()))
-			GameTooltip:Show()
+			self.dummySlot:SetParent(self)
+			self.dummySlot:SetAllPoints(self)
+			self.dummySlot:Show()
 		end
 	else
+		self.dummySlot:Hide()
+
 		--boo for special case bank code
 		if bag == BANK_CONTAINER then
 			if self.hasItem then

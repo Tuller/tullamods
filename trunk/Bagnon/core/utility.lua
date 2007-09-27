@@ -131,7 +131,7 @@ end
 
 function BagnonUtil:Attach(frame, parent)
 	frame:SetParent(parent)
-	frame:SetFrameLevel(1)
+	frame:SetFrameLevel(parent:GetFrameLevel() + 1)
 end
 
 

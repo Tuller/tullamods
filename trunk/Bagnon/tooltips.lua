@@ -48,7 +48,10 @@ GameTooltip:SetScript("OnTooltipSetItem", function(self, ...)
 	end
 
 	if BagnonDB and Bagnon:ShowingOwners() then
-		AddOwners(self, select(2, self:GetItem()))
+		local itemLink = select(2, self:GetItem())
+		if itemLink then
+			AddOwners(self, itemLink)
+		end
 	end
 end)
 
@@ -59,6 +62,9 @@ ItemRefTooltip:SetScript("OnTooltipSetItem", function(self, ...)
 	end
 
 	if BagnonDB and Bagnon:ShowingOwners() then
-		AddOwners(self, select(2, self:GetItem()))
+		local itemLink = select(2, self:GetItem())
+		if itemLink then
+			AddOwners(self, itemLink)
+		end
 	end
 end)
