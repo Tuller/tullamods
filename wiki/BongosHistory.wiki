@@ -2,10 +2,13 @@
 
 = Bongos2 Version History =
 
+1.8.2
+  * XP: Fixed a bug causing the bar to become too large after sizing it with the slider
+
 1.8.1
   * Action Bar: Merged the key and bag bars
   * Action Bar: Fixed a bug causing the spacing slider for the pet bar display the correct value
-  * Action Bar: Fixed an error when attempting to bind keys to the spellbook
+  * Action Bar: Fixed an error when attempting to bind keys to the spell book
   * Action Bar: Altered the layout of stance sliders
   * Map Bar: Fixed a bug causing the interface panels to not be able to properly expand across the screen
 
