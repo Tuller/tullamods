@@ -260,7 +260,7 @@ local function Bar_CreateMenu(frame)
 
 	size:SetScript('OnValueChanged', function(self, value)
 		if not self.onShow then
-			frame.sets.size = value
+			frame.sets.size = value / 100
 			frame.xp:UpdateSize()
 		end
 		getglobal(self:GetName() .. 'ValText'):SetText(value)
