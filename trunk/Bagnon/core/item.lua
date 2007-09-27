@@ -36,7 +36,7 @@ do
 		if parent.cached and parent.hasItem then
 			parent:LockHighlight()
 
-			BagnonUtil:AnchorTooltip(parent)
+			BagnonUtil:AnchorTooltip(self)
 			GameTooltip:SetHyperlink(BagnonDB:GetItemData(parent:GetBag(), parent:GetID(), parent:GetPlayer()))
 			GameTooltip:Show()
 		else
@@ -45,11 +45,6 @@ do
 	end
 
 	local function Slot_OnLeave(self)
-		local parent = self:GetParent()
-		if parent then
-			parent:UnlockHighlight()
-		end
-
 		GameTooltip:Hide()
 		self:Hide()
 	end
@@ -65,9 +60,12 @@ do
 		self:GetParent():OnModifiedClick(button)
 	end
 
+	slot.UpdateTooltip = Slot_OnEnter
+	slot:SetScript('OnClick', Slot_OnClick)
 	slot:SetScript('OnEnter', Slot_OnEnter)
 	slot:SetScript('OnLeave', Slot_OnLeave)
-	slot:SetScript('OnClick', Slot_OnClick)
+	slot:SetScript('OnShow', Slot_OnEnter)
+	slot:SetScript('OnHide', Slot_OnHide)
 
 	BagnonItem.dummySlot = slot
 end
