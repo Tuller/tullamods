@@ -1,5 +1,8 @@
 Bongos2 Version History
 
+1.8.2
+XP: Fixed a bug causing the bar to become too large after sizing it with the slider
+
 1.8.1
 ActionBar: Merged the key and bag bars
 ActionBar: Fixed a bug causing the spacing slider for the pet bar display the correct value
