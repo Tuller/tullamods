@@ -2,6 +2,7 @@ SellFish Version History
 
 1.7.2
 	Fixed some more tooltip hooking issues and added a few more hooks (thanks Polarina)
+	Cleaned up the code a bit
 
 1.7.1
 	Fixed a bug with tooltip hooking
