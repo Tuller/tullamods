@@ -167,10 +167,6 @@ local hooks = {
 	SetInboxItem = function(id)
 		return GetInboxItemLink(id), select(3, GetInboxItem(id))
 	end,
-	
-	SetSendMailItem = function()
-		return select(2, GetItemInfo(GetSendMailItem())), select(3, GetSendMailItem())
-	end,
 }
 
 hookTip(ItemRefTooltip, 'SetHyperlink', hooks.SetHyperlink)
