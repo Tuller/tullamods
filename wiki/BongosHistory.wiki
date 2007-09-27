@@ -1,5 +1,4 @@
 #summary Bongos2 version history
-#labels Featured
 
 = Bongos2 Version History =
 
