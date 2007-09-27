@@ -23,7 +23,7 @@
 	02110-1301, USA.
 --]]
 
-local CURRENT_VERSION = GetAddOnMetadata("SellFish", "Version")
+local CURRENT_VERSION = GetAddOnMetadata('SellFish', 'Version')
 local L = SELLFISH_LOCALS
 
 local tonumber, tostring, floor, format = tonumber, tostring, math.floor, string.format
@@ -34,7 +34,7 @@ local GetItemInfo = GetItemInfo
 --prints a message, optionally with addon text
 local function msg(message, showAddon)
 	if showAddon then
-		ChatFrame1:AddMessage(format("|cFF33FF99SellFish|r: %s", tostring(message)))
+		ChatFrame1:AddMessage(format('|cFF33FF99SellFish|r: %s', tostring(message)))
 	else
 		ChatFrame1:AddMessage(tostring(message))
 	end
@@ -67,14 +67,14 @@ end
 --returns the numeric code of an item link
 local function ToID(link)
 	if link then
-		return tonumber(link) or tonumber(link:match("item:(%d+)") or tonumber(select(2, GetItemInfo(link)):match("item:(%d+)")))
+		return tonumber(link) or tonumber(link:match('item:(%d+)') or tonumber(select(2, GetItemInfo(link)):match('item:(%d+)')))
 	end
 end
 
 --gets a value from the big string
 local db = SellFish_GetDefaultData()
 local cache = setmetatable({}, {__index = function(t, i)
-	local c = tonumber(db:match(";" .. ToBase(i) .. ",(%w+);") or 0, maxBase)
+	local c = tonumber(db:match(';' .. ToBase(i) .. ',(%w+);') or 0, maxBase)
 	t[i] = c
 	return c
 end})
@@ -85,21 +85,21 @@ end})
 local SellFish = {}
 
 function SellFish:Load()
-	local tip = CreateFrame("GameTooltip", "SellFishTooltip", UIParent, "GameTooltipTemplate")
-	tip:SetScript("OnTooltipAddMoney", function(self, cost) self.lastCost = cost end)
+	local tip = CreateFrame('GameTooltip', 'SellFishTooltip', UIParent, 'GameTooltipTemplate')
+	tip:SetScript('OnTooltipAddMoney', function(self, cost) self.lastCost = cost end)
 
-	tip:SetScript("OnEvent", function(self, event, arg1)
-		if event == "MERCHANT_SHOW" then
+	tip:SetScript('OnEvent', function(self, event, arg1)
+		if event == 'MERCHANT_SHOW' then
 			SellFish:ScanPrices()
-		elseif event == "ADDON_LOADED" then
-			if(arg1 == "SellFish") then
-				self:UnregisterEvent("ADDON_LOADED")
+		elseif event == 'ADDON_LOADED' then
+			if(arg1 == 'SellFish') then
+				self:UnregisterEvent('ADDON_LOADED')
 				SellFish:Initialize()
 			end
 		end
 	end)
-	tip:RegisterEvent("MERCHANT_SHOW")
-	tip:RegisterEvent("ADDON_LOADED")
+	tip:RegisterEvent('MERCHANT_SHOW')
+	tip:RegisterEvent('ADDON_LOADED')
 	self.tip = tip
 
 	self:LoadSlashCommands()
@@ -111,8 +111,8 @@ function SellFish:Initialize()
 	else
 		local version = SellFishDB.version
 		if(version ~= CURRENT_VERSION) then
-			local cMajor = CURRENT_VERSION:match("(%w+)%.")
-			local major = version:match("(%w+)%.")
+			local cMajor = CURRENT_VERSION:match('(%w+)%.')
+			local major = version:match('(%w+)%.')
 
 			--a major version change, reset the database
 			if major ~= cMajor then
@@ -185,10 +185,10 @@ end
 
 --[[ Usable Functions ]]--
 
--- cost = GetSellValue(itemID | "name" | "link")
+-- cost = GetSellValue(itemID | 'name' | 'link')
 local oGetSellValue = GetSellValue
 function GetSellValue(link)
-	assert(link, 'Usage: GetSellValue(itemID|"name"|"itemLink")')
+	assert(link, "Usage: GetSellValue(itemID|'name'|'itemLink')")
 
 	local id = tonumber(link)
 	if id then
@@ -207,16 +207,16 @@ end
 --[[ Slash Commands ]]--
 
 function SellFish:LoadSlashCommands()
-	SlashCmdList["SellFishCOMMAND"] = function(cmd)
-		if cmd == "" then
+	SlashCmdList['SellFishCOMMAND'] = function(cmd)
+		if cmd == '' then
 			self:ShowCommands()
 		else
 			cmd = cmd:lower()
-			if cmd == "help" or cmd == "?" then
+			if cmd == 'help' or cmd == '?' then
 				self:ShowCommands()
-			elseif cmd == "reset" then
+			elseif cmd == 'reset' then
 				self:LoadDefaults()
-			elseif cmd == "style" then
+			elseif cmd == 'style' then
 				self:ToggleStyle()
 			else
 				msg(format(L.UnknownCommand, cmd), true)
@@ -224,32 +224,32 @@ function SellFish:LoadSlashCommands()
 		end
 	end
 
-	SLASH_SellFishCOMMAND1 = "/sellfish"
-	if GetLocale() ~= "deDE" then
-		SLASH_SellFishCOMMAND2 = "/sf"
+	SLASH_SellFishCOMMAND1 = '/sellfish'
+	if GetLocale() ~= 'deDE' then
+		SLASH_SellFishCOMMAND2 = '/sf'
 	end
 end
 
 function SellFish:ShowCommands()
-	local cmdStr = " - |cffffd700%s|r: %s"
+	local cmdStr = ' - |cffffd700%s|r: %s'
 
 	msg(L.CommandsHeader)
-	msg(format(cmdStr, "?", L.HelpDesc))
-	msg(format(cmdStr, "style", L.StyleDesc))
-	msg(format(cmdStr, "reset", L.ResetDesc))
+	msg(format(cmdStr, '?', L.HelpDesc))
+	msg(format(cmdStr, 'style', L.StyleDesc))
+	msg(format(cmdStr, 'reset', L.ResetDesc))
 end
 
 function SellFish:ToggleStyle()
 	local style = SellFishDB.style or 1
 	if(style == 1) then
 		SellFishDB.style  = 2
-		msg(format(L.SetStyle, "Compact"), true)
+		msg(format(L.SetStyle, 'Compact'), true)
 	elseif(style == 2) then
 		SellFishDB.style  = 3
-		msg(format(L.SetStyle, "Short"), true)
+		msg(format(L.SetStyle, 'Short'), true)
 	elseif(style == 3) then
 		SellFishDB.style = 1
-		msg(format(L.SetStyle, "Blizzard"), true)
+		msg(format(L.SetStyle, 'Blizzard'), true)
 	end
 end
 
