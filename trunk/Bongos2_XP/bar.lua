@@ -286,6 +286,8 @@ function BongosXP:Load()
 	bar.xp:Update()
 	bar.xp:UpdateText()
 
+	bar.sets.size = min(bar.sets.size or DEFAULT_SIZE, 1)
+
 	self.bar = bar
 end
 
