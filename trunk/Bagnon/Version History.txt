@@ -1,5 +1,8 @@
 Bagnon Version History
 
+1.4.2
+Fixed an issue with using equip compare on cached item slots introduced by 1.4.1
+
 1.4.1
 Fixed an error when clicking trade skill item links
 Fixed a bug where linking a cached item would sometimes produce double links
