@@ -52,8 +52,8 @@ local function AddMoneyToTooltip(tip, id, count)
 		--item price
 		elseif(style == 3) then
 			local gold = floor(cost / 10000)
-			local silver = mod(cost, 10000)/100
-			local copper = mod(cost, 100)
+			local silver = cost % 10000 / 100
+			local copper = cost % 100
 			local text
 
 			if(gold > 0) then
@@ -96,6 +96,7 @@ local function hookTip(tooltip, method, action)
 	end)
 end
 
+--tooltip hooking code, inherited from Valuation (Polarina)
 local hooks = {
 	SetHyperlink = function(link, count)
 		return link, count
@@ -133,14 +134,14 @@ local hooks = {
 		if id then
 			return GetCraftReagentItemLink(skill, id), select(3, GetCraftReagentInfo(skill, id))
 		end
-		return GetCraftItemLink(skill)
+		return GetCraftItemLink(skill), GetCraftItemNumMade(skill)
 	end,
 
 	SetTradeSkillItem = function(skill, id)
 		if id then
 			return GetTradeSkillReagentItemLink(skill, id), select(3, GetTradeSkillReagentInfo(skill, id))
 		end
-		return GetTradeSkillItemLink(skill)
+		return GetTradeSkillItemLink(skill), GetTradeSkillNumMade(skill)
 	end,
 
 	SetQuestItem = function(type, index)
