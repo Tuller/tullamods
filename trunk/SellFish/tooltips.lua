@@ -105,6 +105,10 @@ end
 		From Ludwig_SellValue + ColaLight + ItemPrice + Valuation
 --]]
 
+local function IsBagSlot(slot)
+	return slot >= 20 and slot <= 23 or slot >= 68
+end
+
 local hooks = {
 	SetHyperlink = function(link, count)
 		return link, count
@@ -117,7 +121,7 @@ local hooks = {
 	end,
 
 	SetInventoryItem = function(unit, slot)
-		return GetInventoryItemLink(unit, slot), GetInventoryItemCount(unit, slot)
+		return GetInventoryItemLink(unit, slot), not(IsBagSlot(slot)) and GetInventoryItemCount(unit, slot)
 	end,
 
 	SetLootItem = function(slot)

@@ -105,8 +105,8 @@ function SellFish:LoadDefaults()
 end
 
 function SellFish:UpdateSettings()
-	SellFishDB.data = nil
-	SellFishDB.newVals = {}
+	-- SellFishDB.data = nil
+	-- SellFishDB.newVals = {}
 end
 
 function SellFish:UpdateVersion()
