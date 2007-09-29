@@ -1,5 +1,9 @@
 SellFish Version History:
 
+2.0.1
+	Cleaned up the TOC a bit
+	Fixed a bug causing ammo bags to display inaccurate item counts
+	
 2.0.0
 	Now using ItemPrice-1.1 as the database backend
 	Fixed some more tooltip hooking issues and added a few more hooks (thanks Polarina)
