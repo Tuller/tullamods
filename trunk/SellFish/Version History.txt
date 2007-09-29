@@ -1,6 +1,7 @@
-SellFish Version History
+SellFish Version History:
 
-1.7.2
+2.0.0
+	Now using ItemPrice-1.1 as the database backend
 	Fixed some more tooltip hooking issues and added a few more hooks (thanks Polarina)
 	Cleaned up the code a bit
 

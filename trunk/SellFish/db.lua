@@ -23,8 +23,11 @@
 	02110-1301, USA.
 --]]
 
+assert(LibStub, 'SellFish requires LibStub')
+
 local CURRENT_VERSION = GetAddOnMetadata('SellFish', 'Version')
 local L = SELLFISH_LOCALS
+local ItemPrice = LibStub:GetLibrary('ItemPrice-1.1')
 
 local tonumber, tostring, floor, format = tonumber, tostring, math.floor, string.format
 local GetItemInfo = GetItemInfo
@@ -40,45 +43,12 @@ local function msg(message, showAddon)
 	end
 end
 
---converts a base 10 integer into base<base>
-local base36 = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'}
-local maxBase = 10 + #base36
-
-local function ToBase(num, base)
-	if num == 0 then
-		return tostring(num)
-	end
-
-	local base = base or maxBase
-	local newNum = ''
-
-	while num > 0 do
-		local remain = num % base
-		num = floor(num / base)
-		if remain > 9 then
-			newNum = base36[remain-9] .. newNum
-		else
-			newNum = remain .. newNum
-		end
-	end
-	return newNum
-end
-
 --returns the numeric code of an item link
 local function ToID(link)
 	if link then
 		return tonumber(link) or tonumber(link:match('item:(%d+)') or tonumber(select(2, GetItemInfo(link)):match('item:(%d+)')))
 	end
 end
-
---gets a value from the big string
-local db = SellFish_GetDefaultData()
-local cache = setmetatable({}, {__index = function(t, i)
-	local c = tonumber(db:match(';' .. ToBase(i) .. ',(%w+);') or 0, maxBase)
-	t[i] = c
-	return c
-end})
-
 
 --[[ Startup/Shutdown ]]--
 
@@ -107,21 +77,23 @@ end
 
 function SellFish:Initialize()
 	if not(SellFishDB and SellFishDB.version) then
-		SellFish:LoadDefaults()
+		self:LoadDefaults()
 	else
-		local version = SellFishDB.version
-		if(version ~= CURRENT_VERSION) then
-			local cMajor = CURRENT_VERSION:match('(%w+)%.')
-			local major = version:match('(%w+)%.')
+		local cMajor, cMinor = CURRENT_VERSION:match("(%d+)%.(%d+)")
+		local major, minor = SellFishDB.version:match("(%d+)%.(%d+)")
 
-			--a major version change, reset the database
-			if major ~= cMajor then
-				self:LoadDefaults()
-			else
-				self:UpdateVersion()
-			end
+		if major ~= cMajor then
+			self:LoadDefaults()
+		elseif minor ~= cMinor then
+			self:UpdateSettings()
+		end
+
+		if SellFishDB.version ~= CURRENT_VERSION then
+			self:UpdateVersion()
 		end
 	end
+
+	self.db = SellFishDB
 end
 
 function SellFish:LoadDefaults()
@@ -132,10 +104,12 @@ function SellFish:LoadDefaults()
 	}
 end
 
-function SellFish:UpdateVersion()
+function SellFish:UpdateSettings()
 	SellFishDB.data = nil
 	SellFishDB.newVals = {}
+end
 
+function SellFish:UpdateVersion()
 	SellFishDB.version = CURRENT_VERSION
 	msg(format(L.Updated, SellFishDB.version), true)
 end
@@ -172,13 +146,13 @@ end
 --save the price, only if its not the same as in the main database
 function SellFish:SaveCost(id, cost)
 	if cost ~= self:GetCost(id) then
-		SellFishDB.newVals[id] = cost
+		self.db.newVals[id] = cost
 	end
 end
 
 --get the price by checking newVals, then the main database
 function SellFish:GetCost(id, count)
-	local cost = SellFishDB.newVals[id] or cache[id]
+	local cost = self.db.newVals[id] or ItemPrice:GetPriceById(id)
 	return cost * (count or 1)
 end
 
@@ -218,6 +192,8 @@ function SellFish:LoadSlashCommands()
 				self:LoadDefaults()
 			elseif cmd == 'style' then
 				self:ToggleStyle()
+			elseif cmd == 'version' then
+				self:PrintVersion()
 			else
 				msg(format(L.UnknownCommand, cmd), true)
 			end
@@ -240,17 +216,21 @@ function SellFish:ShowCommands()
 end
 
 function SellFish:ToggleStyle()
-	local style = SellFishDB.style or 1
+	local style = self.db.style or 1
 	if(style == 1) then
-		SellFishDB.style  = 2
+		self.db.style  = 2
 		msg(format(L.SetStyle, 'Compact'), true)
 	elseif(style == 2) then
-		SellFishDB.style  = 3
+		self.db.style  = 3
 		msg(format(L.SetStyle, 'Short'), true)
 	elseif(style == 3) then
-		SellFishDB.style = 1
+		self.db.style = 1
 		msg(format(L.SetStyle, 'Blizzard'), true)
 	end
+end
+
+function SellFish:PrintVersion()
+	msg(self.db.version, true)
 end
 
 --Load the thing
