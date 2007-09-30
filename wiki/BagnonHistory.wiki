@@ -2,6 +2,9 @@
 
 = Bagnon Version History =
 
+1.4.3
+  * Fixed an issue causing all item data to not be saved for some items in Bagnon_Forever
+
 1.4.2
   * Fixed an issue with using equip compare on cached item slots introduced by 1.4.1
 
