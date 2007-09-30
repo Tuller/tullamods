@@ -31,11 +31,19 @@ local GOLD_TEXT = format("|cffffd700%s|r", "g")
 local SILVER_TEXT = format("|cffc7c7cf%s|r", "s")
 local COPPER_TEXT = format("|cffeda55f%s|r", "c")
 
+--taken from ShowItemPrice, its a nice function for converting copper into gold, silver, and copper
+local function MoneyToGSC(money)
+	local gold = floor(money / (COPPER_PER_SILVER * SILVER_PER_GOLD))
+	local silver = floor((money - (gold * COPPER_PER_SILVER * SILVER_PER_GOLD)) / COPPER_PER_SILVER)
+	local copper = money % COPPER_PER_SILVER
+
+	return gold, silver, copper
+end
+
+
 --short style: shows gold, silver, and copper in full precision, hides gold if 0, silver if 0, copper if 0
 local function AddMoneyToTooltip_Short(tip, cost, count)
-	local gold = floor(cost / 10000)
-	local silver = cost % 10000 / 100
-	local copper = cost % 100
+	local gold, silver, copper = MoneyToGSC(cost)
 	local text
 
 	if gold > 0 then

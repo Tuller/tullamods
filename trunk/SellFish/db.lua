@@ -23,11 +23,9 @@
 	02110-1301, USA.
 --]]
 
-assert(LibStub, 'SellFish requires LibStub')
-
 local CURRENT_VERSION = GetAddOnMetadata('SellFish', 'Version')
 local L = SELLFISH_LOCALS
-local ItemPrice = LibStub:GetLibrary('ItemPrice-1.1')
+local ItemPrice = LibStub and LibStub:GetLibrary('ItemPrice-1.1', true)
 
 local tonumber, tostring, floor, format = tonumber, tostring, math.floor, string.format
 local GetItemInfo = GetItemInfo
@@ -152,7 +150,7 @@ end
 
 --get the price by checking newVals, then the main database
 function SellFish:GetCost(id, count)
-	local cost = self.db.newVals[id] or ItemPrice:GetPriceById(id) or 0
+	local cost = self.db.newVals[id] or (ItemPrice and ItemPrice:GetPriceById(id)) or 0
 	return cost * (count or 1)
 end
 
