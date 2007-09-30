@@ -1,5 +1,8 @@
 SellFish Version History:
 
+2.0.2
+	Fixed a nil value error
+
 2.0.1
 	Cleaned up the TOC a bit
 	Fixed a bug causing ammo bags to display inaccurate item counts

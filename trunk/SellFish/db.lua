@@ -152,7 +152,7 @@ end
 
 --get the price by checking newVals, then the main database
 function SellFish:GetCost(id, count)
-	local cost = self.db.newVals[id] or ItemPrice:GetPriceById(id)
+	local cost = self.db.newVals[id] or ItemPrice:GetPriceById(id) or 0
 	return cost * (count or 1)
 end
 
