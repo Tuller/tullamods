@@ -33,11 +33,13 @@ do
 
 	local function Slot_OnEnter(self)
 		local parent = self:GetParent()
-		if parent.cached and parent.hasItem then
+		local link = parent.hasItem
+
+		if parent.cached and link then
 			parent:LockHighlight()
 
 			BagnonUtil:AnchorTooltip(self)
-			GameTooltip:SetHyperlink(BagnonDB:GetItemData(parent:GetBag(), parent:GetID(), parent:GetPlayer()))
+			GameTooltip:SetHyperlink(link)
 			GameTooltip:Show()
 		else
 			self:Hide()
