@@ -1,25 +1,28 @@
 --[[
 	Database.lua
-		BagnonForever"s implementation of BagnonDB
+		BagnonForever's implementation of BagnonDB
 --]]
 
 if not BagnonDB then
-	BagnonDB = (Bagnon and Bagnon:NewModule("Bagnon-DB")) or (Combuctor and Combuctor:NewModule("Combuctor-DB"))
-	BagnonDB.addon = "Bagnon_Forever"
-	BagnonDB.tip = CreateFrame("GameTooltip", "BagnonDBTooltip", UIParent, "GameTooltipTemplate")
+	BagnonDB = CreateFrame('Frame')
+	BagnonDB:SetScript('OnEvent', function(self) self:Enable() end)
+	BagnonDB:RegisterEvent('PLAYER_LOGIN')
+
+	BagnonDB.addon = 'Bagnon_Forever'
+	BagnonDB.tip = CreateFrame('GameTooltip', 'BagnonDBTooltip', UIParent, 'GameTooltipTemplate')
 else
-	error(format("Already using %s to view cached data", BagnonDB.addon or "<Unknown Addon>"))
+	error(format('Already using %s to view cached data', BagnonDB.addon or '<Unknown Addon>'))
 	return
 end
 
 --constants
 local L = BAGNON_FOREVER_LOCALS
-local CURRENT_VERSION = GetAddOnMetadata("Bagnon_Forever", "Version")
+local CURRENT_VERSION = GetAddOnMetadata('Bagnon_Forever', 'Version')
 local NUM_EQUIPMENT_SLOTS = 19
 
 --locals
-local currentPlayer = UnitName("player") --the name of the current player that"s logged on
-local currentRealm = GetRealmName() --what currentRealm we"re on
+local currentPlayer = UnitName('player') --the name of the current player that's logged on
+local currentRealm = GetRealmName() --what currentRealm we're on
 local playerList --a sorted list of players
 
 
@@ -39,11 +42,11 @@ end
 --returns the full item link only for items that have enchants/suffixes, otherwise returns the item's ID
 local function ToShortLink(link)
 	if link then
-		local a,b,c,d,e,f,g,h = link:match("(%-?%d+):(%-?%d+):(%-?%d+):(%-?%d+):(%-?%d+):(%-?%d+):(%-?%d+):(%-?%d+)")
+		local a,b,c,d,e,f,g,h = link:match('(%-?%d+):(%-?%d+):(%-?%d+):(%-?%d+):(%-?%d+):(%-?%d+):(%-?%d+):(%-?%d+)')
 		if(b == c and c == d and d == e and e == f and f == g) then
 			return a
 		end
-		return format("item:%s:%s:%s:%s:%s:%s:%s:%s", a, b, c, d, e, f, g, h)
+		return format('item:%s:%s:%s:%s:%s:%s:%s:%s', a, b, c, d, e, f, g, h)
 	end
 end
 
@@ -51,21 +54,43 @@ local function GetBagSize(bag)
 	if bag == KEYRING_CONTAINER then
 		return GetKeyRingSize()
 	end
-	if bag == "e" then
+	if bag == 'e' then
 		return NUM_EQUIPMENT_SLOTS
 	end
 	return GetContainerNumSlots(bag)
 end
 
 
---[[ Startup Functions ]]--
+--[[ Addon Loading ]]--
 
-function BagnonDB:Initialize()
+function BagnonDB:Enable()
+	self:LoadSettings()
+	
+	self:SetScript('OnEvent', function(self, event, ...)
+		if self[event] then
+			self[event](self, event, ...)
+		end
+	end)
+
+	self:RegisterEvent('BANKFRAME_OPENED')
+	self:RegisterEvent('BANKFRAME_CLOSED')
+	self:RegisterEvent('PLAYER_MONEY')
+	self:RegisterEvent('BAG_UPDATE')
+	self:RegisterEvent('PLAYERBANKSLOTS_CHANGED')
+	self:RegisterEvent('UNIT_INVENTORY_CHANGED')
+
+	self:SaveMoney()
+	self:SaveBagAll(0)
+	self:SaveBagAll(-2)
+	self:SaveEquipment()
+end
+
+function BagnonDB:LoadSettings()
 	if not(BagnonForeverDB and BagnonForeverDB.version) then
 		BagnonForeverDB = {version = CURRENT_VERSION}
 	else
-		local cMajor, cMinor = CURRENT_VERSION:match("(%d+)%.(%d+)")
-		local major, minor = BagnonForeverDB.version:match("(%d+)%.(%d+)")
+		local cMajor, cMinor = CURRENT_VERSION:match('(%d+)%.(%d+)')
+		local major, minor = BagnonForeverDB.version:match('(%d+)%.(%d+)')
 
 		if major ~= cMajor then
 			BagnonForeverDB = {version = cVersion}
@@ -85,7 +110,7 @@ function BagnonDB:Initialize()
 	end
 	self.rdb = self.db[realm]
 
-	local player = UnitName("player")
+	local player = UnitName('player')
 	if not self.rdb[player] then
 		self.rdb[player] = {}
 	end
@@ -97,21 +122,7 @@ end
 
 function BagnonDB:UpdateVersion()
 	BagnonForeverDB.version = CURRENT_VERSION
-	self:Print(format("Updated to v%s", BagnonForeverDB.version))
-end
-
-function BagnonDB:Enable()
-	self:RegisterEvent("BANKFRAME_OPENED")
-	self:RegisterEvent("BANKFRAME_CLOSED")
-	self:RegisterEvent("PLAYER_MONEY")
-	self:RegisterEvent("BAG_UPDATE")
-	self:RegisterEvent("PLAYERBANKSLOTS_CHANGED")
-	self:RegisterEvent("UNIT_INVENTORY_CHANGED")
-
-	self:SaveMoney()
-	self:SaveBagAll(0)
-	self:SaveBagAll(-2)
-	self:SaveEquipment()
+	self:Print(format('Updated to v%s', BagnonForeverDB.version))
 end
 
 
@@ -144,7 +155,7 @@ function BagnonDB:BANKFRAME_CLOSED()
 end
 
 function BagnonDB:UNIT_INVENTORY_CHANGED(event, unit)
-	if unit == "player" then
+	if unit == 'player' then
 		self:SaveEquipment()
 	end
 end
@@ -193,7 +204,7 @@ end
 	BagnonDB:GetMoney(player)
 		args:
 			player (string)
-				the name of the player we"re looking at.  This is specific to the current realm we"re on
+				the name of the player we're looking at.  This is specific to the current realm we're on
 
 		returns:
 			(number) How much money, in copper, the given player has
@@ -211,9 +222,9 @@ end
 	BagnonDB:GetBagData(bag, player)
 		args:
 			player (string)
-				the name of the player we"re looking at.  This is specific to the current realm we"re on
+				the name of the player we're looking at.  This is specific to the current realm we're on
 			bag (number)
-				the number of the bag we"re looking at.
+				the number of the bag we're looking at.
 
 		returns:
 			size (number)
@@ -228,7 +239,7 @@ function BagnonDB:GetBagData(bag, player)
 	if playerDB then
 		local bagInfo = playerDB[ToBagIndex(bag)]
 		if bagInfo then
-			local size, link, count = strsplit(",", bagInfo)
+			local size, link, count = strsplit(',', bagInfo)
 			local _, hyperLink, quality, texture
 			if(link) then
 				_,hyperLink,_,_,_,_,_,_,_, texture = GetItemInfo(link)
@@ -245,11 +256,11 @@ end
 	BagnonDB:GetItemData(bag, slot, player)
 		args:
 			player (string)
-				the name of the player we"re looking at.  This is specific to the current realm we"re on
+				the name of the player we're looking at.  This is specific to the current realm we're on
 			bag (number)
-				the number of the bag we"re looking at.
+				the number of the bag we're looking at.
 			itemSlot (number)
-				the specific item slot we"re looking at
+				the specific item slot we're looking at
 
 		returns:
 			hyperLink (string)
@@ -257,7 +268,7 @@ end
 			count (number)
 				How many of there are of the specific item
 			texture (string)
-				The filepath of the item"s texture
+				The filepath of the item's texture
 			quality (number)
 				The numeric representaiton of the item's quality: from 0 (poor) to 7 (artifcat)
 --]]
@@ -266,7 +277,7 @@ function BagnonDB:GetItemData(bag, slot, player)
 	if playerDB then
 		local itemInfo = playerDB[ToIndex(bag, slot)]
 		if itemInfo then
-			local link, count = strsplit(",", itemInfo)
+			local link, count = strsplit(',', itemInfo)
 			if(link) then
 				local _,hyperLink, quality,_,_,_,_,_,_, texture = GetItemInfo(link)
 				if not hyperLink then
@@ -307,19 +318,19 @@ function BagnonDB:SaveMoney()
 	self.pdb.g = GetMoney()
 end
 
---saves all the player"s equipment data information
+--saves all the player's equipment data information
 function BagnonDB:SaveEquipment()
 	for slot = 0, NUM_EQUIPMENT_SLOTS do
-		local link = GetInventoryItemLink("player", slot)
-		local index = ToIndex("e", slot)
+		local link = GetInventoryItemLink('player', slot)
+		local index = ToIndex('e', slot)
 
 		if link then
 			local link = ToShortLink(link)
-			local count =  GetInventoryItemCount("player", slot)
+			local count =  GetInventoryItemCount('player', slot)
 			count = count > 1 and count or nil
 
 			if(link and count) then
-				self.pdb[index] = format("%s,%d", link, count)
+				self.pdb[index] = format('%s,%d', link, count)
 			else
 				self.pdb[index] = link
 			end
@@ -340,7 +351,7 @@ function BagnonDB:SaveItem(bag, slot)
 		count = count > 1 and count or nil
 
 		if(link and count) then
-			self.pdb[index] = format("%s,%d", link, count)
+			self.pdb[index] = format('%s,%d', link, count)
 		else
 			self.pdb[index] = link
 		end
@@ -349,23 +360,23 @@ function BagnonDB:SaveItem(bag, slot)
 	end
 end
 
---saves all information about the given bag, EXCEPT the bag"s contents
+--saves all information about the given bag, EXCEPT the bag's contents
 function BagnonDB:SaveBag(bag)
 	local data = self.pdb
 	local size = GetBagSize(bag)
 	local index = ToBagIndex(bag)
 
 	if size > 0 then
-		local link = bag > 0 and ToShortLink(GetInventoryItemLink("player", ContainerIDToInventoryID(bag)))
-		local count =  GetInventoryItemCount("player", slot)
+		local link = bag > 0 and ToShortLink(GetInventoryItemLink('player', ContainerIDToInventoryID(bag)))
+		local count =  GetInventoryItemCount('player', slot)
 		if count < 1 then
 			count = nil
 		end
 
 		if(size and link and count) then
-			self.pdb[index] = format("%s,%s,%d", size, link, count)
+			self.pdb[index] = format('%s,%s,%d', size, link, count)
 		elseif(size and link) then
-			self.pdb[index] = format("%s,%s", size, link)
+			self.pdb[index] = format('%s,%s', size, link)
 		else
 			self.pdb[index] = size
 		end
@@ -420,5 +431,5 @@ function BagnonDB:RemovePlayer(player, realm)
 end
 
 function BagnonDB:QueryLink(link)
-	self.tip:SetHyperlink(tonumber(link) and format("item:%d", link) or link)
+	self.tip:SetHyperlink(tonumber(link) and format('item:%d', link) or link)
 end

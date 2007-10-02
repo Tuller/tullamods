@@ -6,6 +6,5 @@
 ## Version: 1.0.0
 ## SavedVariables: BagnonForeverDB
 ## LoadOnDemand: 1
-## LoadWith: Bagnon, Combuctor
 db.lua
 ui.xml
