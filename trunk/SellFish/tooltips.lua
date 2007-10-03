@@ -27,9 +27,9 @@
 	Tooltip style code: effectively from ColaLight + Abacus
 --]]
 
-local GOLD_TEXT = format("|cffffd700%s|r", "g")
-local SILVER_TEXT = format("|cffc7c7cf%s|r", "s")
-local COPPER_TEXT = format("|cffeda55f%s|r", "c")
+local GOLD_TEXT = format('|cffffd700%s|r', 'g')
+local SILVER_TEXT = format('|cffc7c7cf%s|r', 's')
+local COPPER_TEXT = format('|cffeda55f%s|r', 'c')
 
 --taken from ShowItemPrice, its a nice function for converting copper into gold, silver, and copper
 local function MoneyToGSC(money)
@@ -47,22 +47,22 @@ local function AddMoneyToTooltip_Short(tip, cost, count)
 	local text
 
 	if gold > 0 then
-		text = format("|cffffffff%d|r%s", gold, GOLD_TEXT)
+		text = format('|cffffffff%d|r%s', gold, GOLD_TEXT)
 	end
 
 	if silver > 0 then
 		if text then
-			text = text .. format(" |cffffffff%d|r%s", silver, SILVER_TEXT)
+			text = text .. format(' |cffffffff%d|r%s', silver, SILVER_TEXT)
 		else
-			text = format("|cffffffff%d|r%s", silver, SILVER_TEXT)
+			text = format('|cffffffff%d|r%s', silver, SILVER_TEXT)
 		end
 	end
 
 	if copper > 0 then
 		if text then
-			text = text .. format(" |cffffffff%d|r%s", copper, COPPER_TEXT)
+			text = text .. format(' |cffffffff%d|r%s', copper, COPPER_TEXT)
 		else
-			text = format("|cffffffff%d|r%s", copper, COPPER_TEXT)
+			text = format('|cffffffff%d|r%s', copper, COPPER_TEXT)
 		end
 	end
 
@@ -77,11 +77,11 @@ end
 local function AddMoneyToTooltip_Compact(tip, cost, count)
 	local costText
 	if cost >= 10000 then
-		costText = format("|cffffffff%.2f|r%s", cost/10000, GOLD_TEXT)
+		costText = format('|cffffffff%.2f|r%s', cost/10000, GOLD_TEXT)
 	elseif cost >= 100 then
-		costText = format("|cffffffff%.2f|r%s", cost/100, SILVER_TEXT)
+		costText = format('|cffffffff%.2f|r%s', cost/100, SILVER_TEXT)
 	else
-		costText = format("|cffffffff%d|r%s", cost, COPPER_TEXT)
+		costText = format('|cffffffff%d|r%s', cost, COPPER_TEXT)
 	end
 
 	if count and count > 1 then
@@ -91,8 +91,8 @@ local function AddMoneyToTooltip_Compact(tip, cost, count)
 	end
 end
 
-local function AddMoneyToTooltip(tip, id, count)
-	local cost = (GetSellValue(id) or 0) * (count or 1)
+local function AddMoneyToTooltip(tip, link, count)
+	local cost = (GetSellValue(link) or 0) * (count or 1)
 	if cost > 0 then
 		local style = SellFishDB.style
 
