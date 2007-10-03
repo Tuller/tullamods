@@ -1,0 +1,14 @@
+﻿## Interface: 20200
+
+## Title: LibSharedMedia-2.0
+## Notes: Shared handling of media data (fonts, sounds, textures, ...) between addons.
+## Author: Elkano
+## X-Website: http://elkano.wowinterface.com/
+## X-Email: elkano@gmx.de
+## X-Category: Library
+
+## X-WoWIPortal: elkano
+## X-Embeds: Ace2
+## LoadOnDemand: 1
+
+lib.xml
