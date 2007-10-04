@@ -3,8 +3,8 @@
 2.0.0
   * Full: Completely rewritten to be more compatible.  Settings have been reset
   * Full: The blacklist option has been replaced with minimum scale option. This option controls how big a frame must be for cooldown text to be displayed.
-  * Full: Replaced slash commands with an options window, accessable via /omnicc or /occ
-  * Full: Implemented SharedMedia support
+  * Full: Replaced slash commands with an options window, accessible via /omnicc or /occ
+  * Full: Implemented Shared Media support
 
 1.3
   * Updated for 2.2
