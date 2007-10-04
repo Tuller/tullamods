@@ -45,6 +45,7 @@ function OmniCC:Enable()
 
 	--enable the addon
 	self:HookCooldown()
+	self:LoadSlashCommands()
 end
 
 function OmniCC:LoadDefaults()
@@ -383,7 +384,7 @@ function OmniCC:SetDurationColor(duration, r, g, b)
 end
 
 function OmniCC:SetDurationScale(duration, scale)
-	local style = sets.style
+	local style = self.sets.style
 	if duration and style[duration] then
 		style[duration].s = scale
 		self:UpdateAllTimers()
@@ -427,11 +428,11 @@ function OmniCC:ShowingPulse()
 	return self.sets.usePulse
 end
 
-function OmniCC:SetShowModel(enable)
+function OmniCC:SetShowModels(enable)
 	self.sets.showModel = enable
 end
 
-function OmniCC:ShowingModel()
+function OmniCC:ShowingModels()
 	return self.sets.showModel
 end
 
@@ -442,4 +443,29 @@ end
 
 function OmniCC:UsingMMSS()
 	return self.sets.useMMSS
+end
+
+
+--[[ Slash Commands ]]--
+
+function OmniCC:LoadSlashCommands()
+	SlashCmdList['OmniCCCOMMAND'] = function(cmd)
+		local enabled = select(4, GetAddOnInfo('OmniCC_Options'))
+		if enabled then
+			if OmniCCOptionsFrame then
+				if OmniCCOptionsFrame:IsShown() then
+					OmniCCOptionsFrame:Hide()
+				else
+					UIFrameFadeIn(OmniCCOptionsFrame, 0.2)
+				end
+			else
+				LoadAddOn('OmniCC_Options')
+			end
+		else
+			self:Print('Options menu addon not present', true)
+		end
+	end
+
+	SLASH_OmniCCCOMMAND1 = '/omnicc'
+	SLASH_OmniCCCOMMAND2 = '/occ'
 end
