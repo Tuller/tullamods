@@ -1,7 +1,7 @@
-OmniCC Version History, in the format mmddyy:
+OmniCC Version History
 
 2.0.0
-Full: Completely rewritten to be more compatible.  Your settings have been reset
+Full: Completely rewritten to be more compatible.  Settings have been reset
 Full: The blacklist option has been replaced with minimum scale option. This option controls how big a frame must be for cooldown text to be displayed.
 Full: Replaced slash commands with an options window, accessable via /omnicc or /occ
 Full: Implemented SharedMedia support
@@ -33,5 +33,6 @@ Removed the shine option
 Removed support for Discord Action Bars
 
 
-TODO:
-Make a load on demand options menu.
+Known Issues:
+* Does not work on CT_BottomBar
+* CT calls Cooldown:SetCooldown directly, which I cannot directly hook
