@@ -84,7 +84,7 @@
 						getglobal(parent:GetName() .. 'High'):SetText('')
 						getglobal(parent:GetName() .. 'Low'):SetText('')
 
-						OmniCCOptions.LoadColorPicker(self)
+						OmniCCOptions:LoadColorPicker(self)
 					</OnLoad>
 					<OnEnter>
 						local color = NORMAL_FONT_COLOR
@@ -487,6 +487,7 @@
 			<OnLoad>
 				table.insert(UISpecialFrames, self:GetName())
 				UIFrameFadeIn(self, 0.2)
+				OmniCCOptions:LoadColorDragger(self)
 			</OnLoad>
 		</Scripts>
 	</Frame>

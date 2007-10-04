@@ -8,7 +8,21 @@ local L = OMNICC_LOCALS
 
 OmniCCOptions = {}
 
-function OmniCCOptions.LoadColorPicker(frame)
+local function ColorPicker_CopyColor(self)
+	local dragger = OmniCCOptions.dragger
+	dragger.bg:SetVertexColor(self:GetNormalTexture():GetVertexColor())
+	dragger:Show()
+end
+
+local function ColorPicker_PasteColor(self, dragger)
+	local r, g, b = dragger.bg:GetVertexColor()
+	dragger:Hide()
+
+	self:GetNormalTexture():SetVertexColor(r, g, b)
+	OmniCC:SetDurationColor(self:GetParent().duration, r, g, b)
+end
+
+function OmniCCOptions:LoadColorPicker(frame)
 	local function SetColor(r, g, b)
 		frame:GetNormalTexture():SetVertexColor(r, g, b)
 		OmniCC:SetDurationColor(frame:GetParent().duration, r, g, b)
@@ -35,6 +49,48 @@ function OmniCCOptions.LoadColorPicker(frame)
 			ColorPickerFrame:Raise()
 		end
 	end)
+
+	frame:RegisterForDrag('LeftButton')
+	frame:SetScript('OnDragStart', ColorPicker_CopyColor)
+
+	self.pickers = self.pickers or {}
+	table.insert(self.pickers, frame)
+end
+
+function OmniCCOptions:LoadColorDragger(parent)
+	local dragger = CreateFrame('Frame')
+	dragger:SetFrameStrata('TOOLTIP')
+	dragger:SetToplevel(true)
+	dragger:SetMovable(true)
+	dragger:SetHeight(24)
+	dragger:SetWidth(24)
+	dragger:Hide()
+	dragger:EnableMouse(true)
+	dragger:RegisterForDrag('LeftButton')
+
+	dragger:SetScript('OnUpdate', function(self)
+		local x, y = GetCursorPosition()
+		self:SetPoint('TOPLEFT', UIParent, 'BOTTOMLEFT', x - 8, y + 8)
+	end)
+
+	dragger:SetScript('OnMouseUp', function(self)
+		self:Hide()
+	end)
+
+	dragger:SetScript('OnReceiveDrag', function(self)
+		for _,picker in pairs(OmniCCOptions.pickers) do
+			if MouseIsOver(picker, 8, -8, -8, 8) then
+				ColorPicker_PasteColor(picker, dragger)
+			end
+		end
+		self:Hide()
+	end)
+
+	dragger.bg = dragger:CreateTexture()
+	dragger.bg:SetTexture('Interface/ChatFrame/ChatFrameColorSwatch')
+	dragger.bg:SetAllPoints(dragger)
+
+	self.dragger = dragger
 end
 
 --[[ Dropdowns ]]--
@@ -69,7 +125,7 @@ function OmniCC.OnFontFaceLoad(frame)
 end
 
 function OmniCC.OnFontOutlineLoad(frame)
-	local styles = {NONE, 'Thin', 'Thick'}
+	local styles = {NONE, L.Thin, L.Thick}
 	local outlines = {nil, 'OUTLINE', 'THICKOUTLINE'}
 
 	function frame.OnClick()
