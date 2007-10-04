@@ -164,6 +164,16 @@
 		</Layers>
 
 		<Frames>
+			<Button name="$parentCloseButton" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-5" y="-5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
 			<Frame name="$parentGeneral" inherits="OptionFrameBoxTemplate">
 				<Size x="180" y="198"/>
 
