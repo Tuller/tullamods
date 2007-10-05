@@ -1,5 +1,8 @@
 OmniCC Version History
 
+2.0.1
+Full: Fixed an error on cooldowns of an hour in duration
+
 2.0.0
 Full: Completely rewritten to be more compatible.  Settings have been reset
 Full: The blacklist option has been replaced with minimum scale option. This option controls how big a frame must be for cooldown text to be displayed.

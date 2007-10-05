@@ -231,7 +231,7 @@ function OmniCC:GetFormattedFont(s)
 	if s > DAY then
 		style = style.days
 	elseif s > HOUR then
-		style = style.hours
+		style = style.hrs
 	elseif s > MINUTE then
 		style = style.mins
 	elseif s > SHORT then
