@@ -73,7 +73,10 @@ function OmniCC:LoadDefaults()
 	}
 end
 
-function OmniCC:LoadSettings()
+function OmniCC:UpdateSettings()
+end
+
+function OmniCC:UpdateVersion()
 	OmniCCDB.version = CURRENT_VERSION
 	self:Print(L.Updated, true)
 end
