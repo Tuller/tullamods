@@ -78,7 +78,7 @@ end
 
 function OmniCC:UpdateVersion()
 	OmniCCDB.version = CURRENT_VERSION
-	self:Print(L.Updated, true)
+	self:Print(L.Updated:format(OmniCCDB.version), true)
 end
 
 --hook the cooldown function (effectively enable the addon)
