@@ -23,9 +23,11 @@
 	02110-1301, USA.
 --]]
 
+assert('LibStub', 'SellFish requires LibStub')
+
+local ItemPrice, IP_REVISION = LibStub:GetLibrary('ItemPrice-1.1', true)
 local CURRENT_VERSION = GetAddOnMetadata('SellFish', 'Version')
 local L = SELLFISH_LOCALS
-local ItemPrice = LibStub and LibStub:GetLibrary('ItemPrice-1.1', true)
 
 local tonumber, tostring, floor, format = tonumber, tostring, math.floor, string.format
 local GetItemInfo = GetItemInfo
@@ -91,6 +93,10 @@ function SellFish:Initialize()
 		end
 	end
 
+	if SellFishDB.ipRevision ~= IP_REVISION then
+		self:UpdateDatabase()
+	end
+
 	self.db = SellFishDB
 end
 
@@ -98,18 +104,23 @@ function SellFish:LoadDefaults()
 	SellFishDB = {
 		style = 3,
 		newVals = {},
+		ipRevision = IP_REVISION,
 		version = CURRENT_VERSION,
 	}
 end
 
 function SellFish:UpdateSettings()
-	-- SellFishDB.data = nil
-	-- SellFishDB.newVals = {}
+	--update settings
 end
 
 function SellFish:UpdateVersion()
 	SellFishDB.version = CURRENT_VERSION
 	msg(format(L.Updated, SellFishDB.version), true)
+end
+
+function SellFish:UpdateDatabase()
+	SellFishDB.newVals = {}
+	SellFishDB.ipRevision = IP_REVISION
 end
 
 
@@ -141,7 +152,7 @@ function SellFish:GetItemValue(bag, slot)
 	end
 end
 
---save the price, only if its not the same as in the main database
+--saves the price to newVals if its not the same as the one in the database
 function SellFish:SaveCost(id, cost)
 	if cost ~= self:GetCost(id) then
 		self.db.newVals[id] = cost
@@ -150,8 +161,8 @@ end
 
 --get the price by checking newVals, then the main database
 function SellFish:GetCost(id, count)
-	local cost = self.db.newVals[id] or (ItemPrice and ItemPrice:GetPriceById(id)) or 0
-	return cost * (count or 1)
+	local ipCost = (ItemPrice and ItemPrice:GetPriceById(id)) or 0
+	return (self.db.newVals[id] or ipCost) * (count or 1)
 end
 
 
