@@ -2,7 +2,7 @@
 ## Title: OmniCC
 ## Notes: Cooldown count for everything
 ## Author: Tuller
-## Version: 2.0.1
+## Version: 2.0.2
 ## SavedVariables: OmniCCDB
 ## OptionalDeps: LibStub, LibSharedMedia-2.0
 embeds.xml
