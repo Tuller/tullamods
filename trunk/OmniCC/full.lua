@@ -58,7 +58,7 @@ function OmniCC:LoadDefaults()
 		useMMSS = false, --use MM:SS format for cooldowns under 3 minutes
 		usePulse = false, --pulse at end of cooldown
 
-		minScale = 0.5, --the minimum scale we want to show cooldown counts at, anything below will be hidden
+		minScale = 0, --the minimum scale we want to show cooldown counts at, anything below will be hidden
 		minDuration = 3, --the minimum duration we want to show cooldowns for, anything below will not show a timer
 
 		style = {
