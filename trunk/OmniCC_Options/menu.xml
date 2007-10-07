@@ -327,7 +327,7 @@
 						<Scripts>
 							<OnLoad>
 								getglobal(self:GetName() .. "Label"):SetText(OMNICC_LOCALS.FontFace)
-								OmniCC.OnFontFaceLoad(self)
+								OmniCC.LoadFontSelector(self)
 							</OnLoad>
 						</Scripts>
 					</Frame>
