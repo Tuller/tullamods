@@ -149,7 +149,7 @@ function OmniCC:CreateTimer(cooldown)
 	shower:SetScript('OnHide', Shower_OnHide)
 
 	local timer = CreateFrame('Frame', nil, cooldown:GetParent())
-	timer:SetFrameLevel(cooldown:GetFrameLevel() + 1) --make sure the timer is on top of things like the cooldown model
+	timer:SetFrameLevel(cooldown:GetFrameLevel() + 5) --make sure the timer is on top of things like the cooldown model
 	timer:SetAllPoints(cooldown)
 --	timer:SetToplevel(true)
 	timer:Hide()
