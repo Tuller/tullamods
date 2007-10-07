@@ -267,7 +267,7 @@
 						</Scripts>
 					</Slider>
 
-					<Slider name="$parentMinSize" inherits="OmniCCSliderTemplate" minValue="0" maxValue="3" valueStep="0.1">
+					<Slider name="$parentMinSize" inherits="OmniCCSliderTemplate" minValue="0" maxValue="2" valueStep="0.05">
 						<Anchors>
 							<Anchor point="TOPLEFT" relativeTo="$parentMinDuration" relativePoint="BOTTOMLEFT">
 								<Offset x="0" y="-20"/>
@@ -286,7 +286,7 @@
 								self.onShow = nil
 							</OnShow>
 							<OnValueChanged>
-								getglobal(self:GetName() .. 'ValueText'):SetText(format("%.1f", value))
+								getglobal(self:GetName() .. 'ValueText'):SetText(floor(value * 100 + 0.5) .. '%')
 
 								if not self.onShow then
 									OmniCC:SetMinScale(value)
