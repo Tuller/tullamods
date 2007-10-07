@@ -1,5 +1,8 @@
 OmniCC Version History
 
+2.0.4
+Full: Made the minimum scale check independent of UIScale
+
 2.0.3
 Full: Fixed a bug with LibSharedMedia that caused some Ace addons to not work
 Full: Fixed a bug causing cooldown text to sometimes appear below cooldown models

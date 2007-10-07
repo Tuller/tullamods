@@ -9,7 +9,7 @@ local CURRENT_VERSION = GetAddOnMetadata('OmniCC', 'Version') --the addon's curr
 local L = OMNICC_LOCALS --localized strings
 
 local DAY, HOUR, MINUTE, SHORT = 86400, 3600, 60, 5 --values for time
-local ICON_SIZE = 37 --the normal size of an icon
+local ICON_SIZE = 36 --the normal size of an icon
 
 --[[
 	Addon Loading
@@ -178,9 +178,10 @@ function OmniCC:CreateTimer(cooldown)
 end
 
 function OmniCC:UpdateTimer(timer)
-	local scale = min(timer:GetWidth() / ICON_SIZE, 1)
+	local rScale = timer:GetEffectiveScale() / UIParent:GetEffectiveScale()
+	local iconScale = floor(timer:GetWidth() + 0.5) / ICON_SIZE --icon sizes seem to vary a little bit, so this takes care of making them round to whole numbers
 
-	if min(timer:GetEffectiveScale(), scale) < self:GetMinScale() then
+	if iconScale*rScale < self:GetMinScale() then
 		timer.toNextUpdate = 1
 		timer.text:Hide()
 	else
@@ -190,7 +191,7 @@ function OmniCC:UpdateTimer(timer)
 			local font, size, r, g, b, outline = self:GetFormattedFont(remain)
 			local text = timer.text
 
-			text:SetFont(font, size*scale, outline)
+			text:SetFont(font, size * iconScale, outline)
 			text:SetText(time)
 			text:SetTextColor(r, g, b)
 			text:Show()
