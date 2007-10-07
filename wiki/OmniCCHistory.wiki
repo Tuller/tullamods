@@ -1,7 +1,7 @@
 #summary Version History for OmniCC
 
 2.0.3
-  * Full: Fixed a bug with LibSharedMedia that caused some Ace addons to not work
+  * Full: Fixed a bug with Shared Media that caused some Ace addons to not work
   * Full: Fixed a bug causing cooldown text to sometimes appear below cooldown models
   * Full: Set default minimum scale setting to 0
 
