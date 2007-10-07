@@ -1,5 +1,8 @@
 #summary Version History for OmniCC
 
+2.0.2
+  * Options: Implemented a better font selector
+
 2.0.1
   * Full: Fixed an error on cooldowns of an hour in duration
 
