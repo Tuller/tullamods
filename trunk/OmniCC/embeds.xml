@@ -1,3 +1,4 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Include file="libs\LibStub\LibStub.lua"/>
 	<Include file="libs\LibSharedMedia-2.0\lib.xml"/>
 </Ui>

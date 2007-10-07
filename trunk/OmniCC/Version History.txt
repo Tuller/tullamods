@@ -1,5 +1,9 @@
 OmniCC Version History
 
+2.0.3
+Full: Fixed a bug with LibSharedMedia that caused some Ace addons to not work
+Full: Fixed a bug causing cooldown text to sometimes appear below cooldown models
+
 2.0.2
 Options: Implemented a better font selector
 

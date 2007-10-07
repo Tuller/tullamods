@@ -149,8 +149,9 @@ function OmniCC:CreateTimer(cooldown)
 	shower:SetScript('OnHide', Shower_OnHide)
 
 	local timer = CreateFrame('Frame', nil, cooldown:GetParent())
-	timer:SetToplevel(true)
+	timer:SetFrameLevel(cooldown:GetFrameLevel() + 1) --make sure the timer is on top of things like the cooldown model
 	timer:SetAllPoints(cooldown)
+--	timer:SetToplevel(true)
 	timer:Hide()
 	timer:SetScript('OnUpdate', Timer_OnUpdate)
 
@@ -177,9 +178,9 @@ function OmniCC:CreateTimer(cooldown)
 end
 
 function OmniCC:UpdateTimer(timer)
-	local iconScale = min(timer:GetWidth() / ICON_SIZE, 1)
+	local scale = min(timer:GetWidth() / ICON_SIZE, 1)
 
-	if min(timer:GetEffectiveScale(), iconScale) < self:GetMinScale() then
+	if min(timer:GetEffectiveScale(), scale) < self:GetMinScale() then
 		timer.toNextUpdate = 1
 		timer.text:Hide()
 	else
@@ -187,7 +188,6 @@ function OmniCC:UpdateTimer(timer)
 		if floor(remain + 0.5) > 0 then
 			local time, nextUpdate = self:GetFormattedTime(remain)
 			local font, size, r, g, b, outline = self:GetFormattedFont(remain)
-			local scale = min(timer:GetWidth() / ICON_SIZE, 1)
 			local text = timer.text
 
 			text:SetFont(font, size*scale, outline)
