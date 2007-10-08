@@ -83,13 +83,13 @@ end
 
 --hook the cooldown function (effectively enable the addon)
 function OmniCC:HookCooldown()
+	--use the old hooking method for mac clients to prevent a crash issue
 	if IsMacClient() then
-		--use the old hooking method for mac clients to prevent a crash issue
-		hooksecurefunc('CooldownFrame_SetTimer', function(cooldown, start, duration, enable)
-			cooldown:SetAlpha(self.sets.showModel and 1 or 0)
+		hooksecurefunc('CooldownFrame_SetTimer', function(self, start, duration, enable)
+			self:SetAlpha(OmniCC.sets.showModel and 1 or 0)
 
-			if start > 0 and duration > self.sets.minDuration and enable > 0 then
-				self:StartTimer(cooldown, start, duration)
+			if start > 0 and duration > OmniCC.sets.minDuration and enable > 0 then
+				OmniCC:StartTimer(self, start, duration)
 			else
 				local timer = cooldown.timer
 				if timer then
@@ -99,13 +99,13 @@ function OmniCC:HookCooldown()
 		end)
 	else
 		local methods = getmetatable(CreateFrame('Cooldown')).__index
-		hooksecurefunc(methods, 'SetCooldown', function(cooldown, start, duration)
-			cooldown:SetAlpha(self.sets.showModel and 1 or 0)
+		hooksecurefunc(methods, 'SetCooldown', function(self, start, duration)
+			self:SetAlpha(OmniCC.sets.showModel and 1 or 0)
 
-			if start > 0 and duration > self.sets.minDuration then
-				self:StartTimer(cooldown, start, duration)
+			if start > 0 and duration > OmniCC.sets.minDuration then
+				OmniCC:StartTimer(self, start, duration)
 			else
-				local timer = cooldown.timer
+				local timer = self.timer
 				if timer then
 					timer:Hide()
 				end
@@ -342,14 +342,6 @@ function OmniCC:Print(msg, showAddon)
 		ChatFrame1:AddMessage(format('|cFF33FF99OmniCC|r: %s', tostring(msg)))
 	else
 		ChatFrame1:AddMessage(tostring(msg))
-	end
-end
-
-function OmniCC:ListFonts()
-	self:Print('Available Fonts', true)
-
-	for _,font in ipairs(SML:List(SML.MediaType.FONT)) do
-		self:Print(' - ' .. font)
 	end
 end
 
