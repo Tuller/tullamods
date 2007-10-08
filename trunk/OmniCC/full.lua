@@ -83,10 +83,24 @@ end
 
 --hook the cooldown function (effectively enable the addon)
 function OmniCC:HookCooldown()
-	hooksecurefunc('CooldownFrame_SetTimer', function(cooldown, start, duration, enable)
+	-- hooksecurefunc('CooldownFrame_SetTimer', function(cooldown, start, duration, enable)
+		-- cooldown:SetAlpha(self.sets.showModel and 1 or 0)
+
+		-- if start > 0 and duration > self.sets.minDuration and enable > 0 then
+			-- self:StartTimer(cooldown, start, duration)
+		-- else
+			-- local timer = cooldown.timer
+			-- if timer then
+				-- timer:Hide()
+			-- end
+		-- end
+	-- end)
+
+	local frameMethods = getmetatable(CreateFrame('Cooldown')).__index
+	hooksecurefunc(frameMethods, 'SetCooldown', function(cooldown, start, duration)
 		cooldown:SetAlpha(self.sets.showModel and 1 or 0)
 
-		if start > 0 and duration > self.sets.minDuration and enable > 0 then
+		if start > 0 and duration > self.sets.minDuration then
 			self:StartTimer(cooldown, start, duration)
 		else
 			local timer = cooldown.timer
@@ -151,7 +165,7 @@ function OmniCC:CreateTimer(cooldown)
 	local timer = CreateFrame('Frame', nil, cooldown:GetParent())
 	timer:SetFrameLevel(cooldown:GetFrameLevel() + 5) --make sure the timer is on top of things like the cooldown model
 	timer:SetAllPoints(cooldown)
---	timer:SetToplevel(true)
+	timer:SetToplevel(true)
 	timer:Hide()
 	timer:SetScript('OnUpdate', Timer_OnUpdate)
 
