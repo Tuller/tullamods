@@ -79,8 +79,9 @@ local function Timer_Start(self, start, duration)
 	end
 end
 
-hooksecurefunc('CooldownFrame_SetTimer', function(self, start, duration, enable)
-	if start > 0 and duration > MIN_DURATION and enable > 0 then
+local methods = getmetatable(CreateFrame('Cooldown')).__index
+hooksecurefunc(methods, 'SetCooldown', function(cooldown, start, duration)
+	if start > 0 and duration > MIN_DURATION then
 		Timer_Start(self, start, duration)
 	else
 		local text = self.text

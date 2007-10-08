@@ -1,5 +1,9 @@
 OmniCC Version History
 
+2.0.5
+Both: Changed the hooking code to increase significantly increase compatibility.
+Full: Tweaked the layering of cooldown text
+
 2.0.4
 Full: Made the minimum scale check independent of UIScale
 

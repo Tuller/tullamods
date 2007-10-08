@@ -41,7 +41,7 @@ function OmniCC:Enable()
 
 	self.sets = OmniCCDB
 	self.activePulses = {}
-	self.timers = {}
+	self.activeTimers = {}
 
 	--enable the addon
 	self:HookCooldown()
@@ -68,7 +68,7 @@ function OmniCC:LoadDefaults()
 			hrs = {r = 0.8, g = 0.8, b = 0.9, s = 0.6}, -- >= 1 hr
 			days = {r = 0.8, g = 0.8, b = 0.9, s = 0.6}, -- >= 1 day
 		},
-		
+
 		version = CURRENT_VERSION,
 	}
 end
@@ -83,21 +83,8 @@ end
 
 --hook the cooldown function (effectively enable the addon)
 function OmniCC:HookCooldown()
-	-- hooksecurefunc('CooldownFrame_SetTimer', function(cooldown, start, duration, enable)
-		-- cooldown:SetAlpha(self.sets.showModel and 1 or 0)
-
-		-- if start > 0 and duration > self.sets.minDuration and enable > 0 then
-			-- self:StartTimer(cooldown, start, duration)
-		-- else
-			-- local timer = cooldown.timer
-			-- if timer then
-				-- timer:Hide()
-			-- end
-		-- end
-	-- end)
-
-	local frameMethods = getmetatable(CreateFrame('Cooldown')).__index
-	hooksecurefunc(frameMethods, 'SetCooldown', function(cooldown, start, duration)
+	local methods = getmetatable(CreateFrame('Cooldown')).__index
+	hooksecurefunc(methods, 'SetCooldown', function(cooldown, start, duration)
 		cooldown:SetAlpha(self.sets.showModel and 1 or 0)
 
 		if start > 0 and duration > self.sets.minDuration then
@@ -186,7 +173,7 @@ function OmniCC:CreateTimer(cooldown)
 		end
 	end
 
-	self.timers[timer] = true
+	self.activeTimers[timer] = true
 
 	return timer
 end
@@ -222,7 +209,7 @@ function OmniCC:UpdateTimer(timer)
 end
 
 function OmniCC:UpdateAllTimers()
-	for timer in pairs(self.timers) do
+	for timer in pairs(self.activeTimers) do
 		timer.nextUpdate = 0
 	end
 end
