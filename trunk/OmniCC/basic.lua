@@ -32,7 +32,7 @@ end
 local function Timer_OnUpdate(self, elapsed)
 	if self.text:IsShown() then
 		if self.nextUpdate <= 0 then
-			if self:GetEffectiveScale() < MIN_SCALE then
+			if self:GetEffectiveScale()/UIParent:GetEffectiveScale() < MIN_SCALE then
 				self.text:SetText('')
 				self.toNextUpdate = 1
 			else
@@ -56,7 +56,7 @@ local function Timer_Create(self)
 
 	if fontScale >= MIN_SCALE then
 		local text = self:CreateFontString(nil, 'OVERLAY')
-		text:SetPoint('CENTER', self, 'CENTER', 0, 1)
+		text:SetPoint('CENTER', 0, 1)
 		text:SetFont(TEXT_FONT, FONT_SIZE * fontScale, 'OUTLINE')
 		text:SetTextColor(1, 0.9, 0)
 
@@ -80,7 +80,7 @@ local function Timer_Start(self, start, duration)
 end
 
 local methods = getmetatable(CreateFrame('Cooldown')).__index
-hooksecurefunc(methods, 'SetCooldown', function(cooldown, start, duration)
+hooksecurefunc(methods, 'SetCooldown', function(self, start, duration)
 	if start > 0 and duration > MIN_DURATION then
 		Timer_Start(self, start, duration)
 	else

@@ -10,6 +10,9 @@ local L = OMNICC_LOCALS --localized strings
 
 local DAY, HOUR, MINUTE, SHORT = 86400, 3600, 60, 5 --values for time
 local ICON_SIZE = 36 --the normal size of an icon
+local timers = {}
+local pulses = {}
+local activePulses = {}
 
 --[[
 	Addon Loading
@@ -40,8 +43,6 @@ function OmniCC:Enable()
 	end
 
 	self.sets = OmniCCDB
-	self.activePulses = {}
-	self.activeTimers = {}
 
 	--enable the addon
 	self:HookCooldown()
@@ -91,7 +92,7 @@ function OmniCC:HookCooldown()
 			if start > 0 and duration > OmniCC.sets.minDuration and enable > 0 then
 				OmniCC:StartTimer(self, start, duration)
 			else
-				local timer = cooldown.timer
+				local timer = timers[self]
 				if timer then
 					timer:Hide()
 				end
@@ -105,7 +106,7 @@ function OmniCC:HookCooldown()
 			if start > 0 and duration > OmniCC.sets.minDuration then
 				OmniCC:StartTimer(self, start, duration)
 			else
-				local timer = self.timer
+				local timer = timers[self]
 				if timer then
 					timer:Hide()
 				end
@@ -121,14 +122,14 @@ end
 
 --shower: a frame used to properly show and hide timer text without forcing the timer to be parented to the cooldown frame (needed for hiding the cooldown frame)
 local function Shower_OnShow(self)
-	local timer = self:GetParent().timer
+	local timer = timers[self:GetParent()]
 	if timer.wasShown then
 		timer:Show()
 	end
 end
 
 local function Shower_OnHide(self)
-	local timer = self:GetParent().timer
+	local timer = timers[self:GetParent()]
 	if timer:IsShown() then
 		timer.wasShown = true
 		timer:Hide()
@@ -145,12 +146,7 @@ local function Timer_OnUpdate(self, elapsed)
 end
 
 function OmniCC:StartTimer(cooldown, start, duration)
-	local timer = cooldown.timer
-	if not timer then
-		timer = self:CreateTimer(cooldown)
-		cooldown.timer = timer
-	end
-
+	local timer = timers[cooldown] or self:CreateTimer(cooldown)
 	if timer then
 		timer.start = start
 		timer.duration = duration
@@ -189,7 +185,7 @@ function OmniCC:CreateTimer(cooldown)
 		end
 	end
 
-	self.activeTimers[timer] = true
+	timers[cooldown] = timer
 
 	return timer
 end
@@ -198,7 +194,7 @@ function OmniCC:UpdateTimer(timer)
 	local rScale = timer:GetEffectiveScale() / UIParent:GetEffectiveScale()
 	local iconScale = floor(timer:GetWidth() + 0.5) / ICON_SIZE --icon sizes seem to vary a little bit, so this takes care of making them round to whole numbers
 
-	if iconScale*rScale < self:GetMinScale() then
+	if iconScale*rScale < self:GetMinScale() or iconScale == 0 then
 		timer.toNextUpdate = 1
 		timer.text:Hide()
 	else
@@ -225,7 +221,7 @@ function OmniCC:UpdateTimer(timer)
 end
 
 function OmniCC:UpdateAllTimers()
-	for timer in pairs(self.activeTimers) do
+	for _,timer in pairs(timers) do
 		timer.nextUpdate = 0
 	end
 end
@@ -270,8 +266,8 @@ end
 
 function OmniCC:CreatePulse(parent)
 	local frame = CreateFrame('Frame', nil, parent)
-	frame:SetToplevel(true)
 	frame:SetAllPoints(parent)
+	frame:SetToplevel(true)
 
 	local icon = frame:CreateTexture(nil, 'OVERLAY')
 	icon:SetPoint('CENTER')
@@ -279,6 +275,8 @@ function OmniCC:CreatePulse(parent)
 	icon:SetHeight(frame:GetHeight())
 	icon:SetWidth(frame:GetWidth())
 	frame.icon = icon
+
+	pulses[parent] = frame
 
 	return frame
 end
@@ -288,18 +286,16 @@ function OmniCC:StartPulse(timer)
 	local parent = timer:GetParent()
 
 	if icon and parent:IsVisible() then
-		local pulse = timer.pulse
-		if not pulse then
-			pulse = self:CreatePulse(parent)
-			timer.pulse = pulse
-		end
-
-		if pulse then
+		local pulse = pulses[parent] or self:CreatePulse(parent)
+		if pulse and not activePulses[pulse] then
 			pulse.scale = 1
 			pulse.icon:SetTexture(icon:GetTexture())
+			local r, g, b = icon:GetVertexColor()
+			pulse.icon:SetVertexColor(r, g, b, 0.5)
 			pulse:Show()
 
-			self.activePulses[pulse] = true
+			--enable the pulse updater
+			activePulses[pulse] = true
 			self:Show()
 		end
 	end
@@ -313,8 +309,7 @@ function OmniCC:UpdatePulse(pulse, elapsed)
 	pulse.scale = max(min(pulse.scale + (pulse.dec and -1 or 1) * pulse.scale * (elapsed/0.5), 2), 1)
 
 	if pulse.scale <= 1 then
-		self.activePulses[pulse] = nil
-
+		activePulses[pulse] = nil
 		pulse:Hide()
 		pulse.dec = nil
 	else
@@ -324,8 +319,8 @@ function OmniCC:UpdatePulse(pulse, elapsed)
 end
 
 function OmniCC:UpdateAllPulses(elapsed)
-	if next(self.activePulses) then
-		for pulse in pairs(self.activePulses) do
+	if next(activePulses) then
+		for pulse in pairs(activePulses) do
 			self:UpdatePulse(pulse, elapsed)
 		end
 	else

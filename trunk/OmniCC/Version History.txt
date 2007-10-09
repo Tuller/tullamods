@@ -3,6 +3,7 @@ OmniCC Version History
 2.0.5
 Both: Changed the hooking code to increase significantly increase compatibility.
 Full: Tweaked the layering of cooldown text
+Full: Fixed a bug that caused a font not set error
 
 2.0.4
 Full: Made the minimum scale check independent of UIScale
