@@ -290,8 +290,9 @@ function OmniCC:StartPulse(timer)
 		if pulse and not activePulses[pulse] then
 			pulse.scale = 1
 			pulse.icon:SetTexture(icon:GetTexture())
+
 			local r, g, b = icon:GetVertexColor()
-			pulse.icon:SetVertexColor(r, g, b, 0.5)
+			pulse.icon:SetVertexColor(r, g, b, 0.7)
 			pulse:Show()
 
 			--enable the pulse updater
