@@ -19,24 +19,24 @@ function LudwigUI_OnLoad(self)
 	tinsert(UISpecialFrames, name)
 	local items = {}
 
-	local item = CreateFrame("Button", name .. 1, self, "LudwigItemButtonTemplate")
-	item:SetPoint("TOPLEFT", self, "TOPLEFT", 19, -75)
-	item.icon = getglobal(item:GetName() .. "Icon")
+	local item = CreateFrame('Button', name .. 1, self, 'LudwigItemButtonTemplate')
+	item:SetPoint('TOPLEFT', self, 'TOPLEFT', 19, -75)
+	item.icon = getglobal(item:GetName() .. 'Icon')
 	items[1] = item
 
 	for i = 2, LWUI_SHOWN do
-		item = CreateFrame("Button", name .. i, self, "LudwigItemButtonTemplate")
-		item:SetPoint("TOPLEFT", items[i-1], "BOTTOMLEFT")
-		item:SetPoint("TOPRIGHT", items[i-1], "BOTTOMRIGHT")
-		item.icon = getglobal(item:GetName() .. "Icon")
+		item = CreateFrame('Button', name .. i, self, 'LudwigItemButtonTemplate')
+		item:SetPoint('TOPLEFT', items[i-1], 'BOTTOMLEFT')
+		item:SetPoint('TOPRIGHT', items[i-1], 'BOTTOMRIGHT')
+		item.icon = getglobal(item:GetName() .. 'Icon')
 		items[i] = item
 	end
 
 	self.items = items
-	self.title = getglobal(name .. "Text")
-	self.scrollFrame = getglobal(name.. "Scroll")
-	self.quality = getglobal(name .. "Quality")
-	self.type = getglobal(name .. "Type")
+	self.title = getglobal(name .. 'Text')
+	self.scrollFrame = getglobal(name.. 'Scroll')
+	self.quality = getglobal(name .. 'Quality')
+	self.type = getglobal(name .. 'Type')
 	self.frame = frame
 	uiFrame = self
 end
@@ -64,15 +64,15 @@ function LudwigUI_Reset()
 	end
 
 	--reset search text
-	local search = getglobal(uiFrame:GetName() .. "Search")
+	local search = getglobal(uiFrame:GetName() .. 'Search')
 	if(search:HasFocus()) then
-		search:SetText("")
+		search:SetText('')
 	else
 		search:SetText(SEARCH)
 	end
 
-	getglobal(uiFrame:GetName() .. "MinLevel"):SetText("")
-	getglobal(uiFrame:GetName() .. "MaxLevel"):SetText("")
+	getglobal(uiFrame:GetName() .. 'MinLevel'):SetText('')
+	getglobal(uiFrame:GetName() .. 'MaxLevel'):SetText('')
 
 	LudwigUI_UpdateTypeText()
 	LudwigUI_UpdateQualityText()
@@ -96,7 +96,7 @@ end
 --[[ Item Button ]]--
 
 local function Item_UpdateTooltip(self)
-	GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
+	GameTooltip:SetOwner(self, 'ANCHOR_BOTTOMRIGHT')
 	GameTooltip:SetHyperlink(Ludwig:GetItemLink(self:GetID()))
 	GameTooltip:Show()
 
@@ -128,11 +128,11 @@ end
 
 function LudwigUI_OnItemEnter(self)
 	Item_UpdateTooltip(self)
-	self:SetScript("OnUpdate", Item_OnUpdate)
+	self:SetScript('OnUpdate', Item_OnUpdate)
 end
 
 function LudwigUI_OnItemLeave(self)
-	self:SetScript("OnUpdate", nil)
+	self:SetScript('OnUpdate', nil)
 	GameTooltip:Hide()
 end
 
@@ -173,7 +173,7 @@ end
 
 function LudwigUI_OnSearchChanged(self, text)
 	if(self:HasFocus()) then
-		if text == "" then
+		if text == '' then
 			text = nil
 		end
 		if(filter.name ~= text) then
@@ -185,7 +185,7 @@ end
 
 function LudwigUI_OnMinLevelChanged(self, text)
 	if(self:HasFocus()) then
-		if text == "" then
+		if text == '' then
 			text = nil
 		end
 		if(filter.minLevel ~= tonumber(text)) then
@@ -197,7 +197,7 @@ end
 
 function LudwigUI_OnMaxLevelChanged(self, text)
 	if(self:HasFocus()) then
-		if text == "" then
+		if text == '' then
 			text = nil
 		end
 		if(filter.maxLevel ~= tonumber(text)) then
@@ -229,7 +229,7 @@ end
 local function Quality_GetText(index)
 	if tonumber(index) then
 		local hex = select(4, GetItemQualityColor(index))
-		return hex .. getglobal("ITEM_QUALITY" .. index .. "_DESC") .. "|r"
+		return hex .. getglobal('ITEM_QUALITY' .. index .. '_DESC') .. '|r'
 	end
 	return ALL
 end
@@ -259,129 +259,84 @@ function LudwigUI_OnQualityShow(self)
 end
 
 function LudwigUI_UpdateQualityText()
-	getglobal(uiFrame.quality:GetName() .. "Text"):SetText(Quality_GetText(filter.quality))
+	getglobal(uiFrame.quality:GetName() .. 'Text'):SetText(Quality_GetText(filter.quality))
 end
 
 
 --[[ Type ]]--
 
-local function Types_Generate()
-	local types = {GetAuctionItemClasses()}
-	table.insert(types, L.Quest)
-	table.insert(types, L.Key)
-
-	local subTypes = {}
-	for i in ipairs(types) do
-		if GetAuctionItemSubClasses(i) then
-			subTypes[i] = {GetAuctionItemSubClasses(i)}
-		end
-	end
-
-	local tradeGoods = subTypes[5] or {}
-	table.insert(tradeGoods, L.TradeGoods)
-	table.insert(tradeGoods, L.Devices)
-	table.insert(tradeGoods, L.Explosives)
-	table.insert(tradeGoods, L.Parts)
-	subTypes[5] = tradeGoods
-
-	local misc = subTypes[11] or {}
-	table.insert(misc, L.Junk)
-	subTypes[11] = misc
-
-	return types, subTypes
-end
-local types, subTypes = Types_Generate()
-local type, subType
-
-local function Type_UpdateText()
-	local text
-	if(filter.type) then
-		if(filter.subType) then
-			text = format("%s - %s", filter.type, filter.subType)
-			if(filter.equipLoc) then
-				text = format("%s - %s", filter.subType, getglobal(filter.equipLoc))
-			end
-		else
-			text = filter.type
-		end
-	else
-		text = ALL
-	end
-	getglobal(uiFrame.type:GetName() .. "Text"):SetText(text)
-end
+local selectedType
 
 local function Type_OnClick(type, subType)
-	local text
-
 	filter.type = nil
 	filter.subType = nil
 	filter.equipLoc = nil
 
-	if(type) then
-		filter.type = types[type]
-		if(subType) then
-			filter.subType = subTypes[type][subType]
-			filter.equipLoc = select(this.value, GetAuctionInvTypes(type, subType))
-		else
-			filter.subType = subTypes[type][this.value]
-		end
+	if not type then
+		filter.type = select(this.value, GetAuctionItemClasses())
 	else
-		filter.type = types[this.value]
+		filter.type = select(type, GetAuctionItemClasses())
+		if not subType then
+			filter.subType = select(this.value, GetAuctionItemSubClasses(type))
+		else
+			filter.subType = select(subType, GetAuctionItemSubClasses(type))
+			filter.equipLoc = select(this.value, GetAuctionInvTypes(type, subType))
+		end
 	end
+
 	LudwigUI_UpdateTypeText()
 	LudwigUI_UpdateList(true)
 
 	--hack to hide the previous dropdown menu levels
-	for i = 1, UIDROPDOWNMENU_MENU_LEVEL-1 do
-		getglobal("DropDownList"..i):Hide()
+	for i = 1, UIDROPDOWNMENU_MENU_LEVEL - 1 do
+		getglobal('DropDownList'..i):Hide()
 	end
 end
 
-local function AddTypes(level)
+local function AddTypes(level, ...)
 	AddItem(ALL, ALL, Type_OnClick)
-	for i,text in pairs(types) do
-		AddItem(text, i, Type_OnClick, subTypes[i], level)
+	for i = 1, select('#', ...) do
+		local hasSubTypes = GetAuctionItemSubClasses(i)
+		AddItem(select(i, ...), i, Type_OnClick, hasSubTypes, level)
 	end
 end
 
-local function AddSubTypes(level)
-	type = UIDROPDOWNMENU_MENU_VALUE
+local function AddSubTypes(level, type, ...)
+	for i = 1, select('#', ...) do
+		local hasInvTypes = GetAuctionInvTypes(type, i)
+		AddItem(select(i, ...), i, Type_OnClick, hasInvTypes, level, type)
+	end
+end
 
-	if subTypes[type] then
-		for i,text in ipairs(subTypes[type]) do
-			AddItem(text, i, Type_OnClick, GetAuctionInvTypes(type, i), level, type)
+local function AddEquipLocations(level, type, subType, ...)
+	for i = 1, select('#', ...), 2 do
+		local equipLoc, used = select(i, ...)
+		if used then
+			AddItem(getglobal(equipLoc), i, Type_OnClick, false, level, type, subType)
 		end
-	end
-end
-
-local function AddEquipLocations(level)
-	subType = UIDROPDOWNMENU_MENU_VALUE
-
-	for i = 1, select("#", GetAuctionInvTypes(type, subType)) do
-		local equipLoc = getglobal(select(i, GetAuctionInvTypes(type, subType)))
-		AddItem(equipLoc, i, Type_OnClick, false, level, type, subType)
 	end
 end
 
 local function Type_Initialize(level)
 	local level = level or 1
-
-	if(level == 1) then
-		AddTypes(level)
-	elseif(level == 2) then
-		AddSubTypes(level)
-	elseif(level == 3) then
-		AddEquipLocations(level)
+	if level == 1 then
+		AddTypes(level, GetAuctionItemClasses())
+	elseif level == 2 then
+		selectedType = UIDROPDOWNMENU_MENU_VALUE
+		AddSubTypes(level, selectedType, GetAuctionItemSubClasses(selectedType))
+	elseif level == 3 then
+		selectedSubType = UIDROPDOWNMENU_MENU_VALUE
+		AddEquipLocations(level, selectedType, selectedSubType, GetAuctionInvTypes(selectedType, selectedSubType))
 	end
 end
 
 function LudwigUI_UpdateTypeText()
 	local text
-	if(filter.type) then
-		if(filter.subType) then
-			text = format("%s - %s", filter.type, filter.subType)
-			if(filter.equipLoc) then
-				text = format("%s - %s", filter.subType, getglobal(filter.equipLoc))
+	if filter.type then
+		if filter.subType then
+			text = format('%s - %s', filter.type, filter.subType)
+			if filter.equipLoc then
+				text = format('%s - %s', filter.subType, getglobal(filter.equipLoc))
 			end
 		else
 			text = filter.type
@@ -389,7 +344,7 @@ function LudwigUI_UpdateTypeText()
 	else
 		text = ALL
 	end
-	getglobal(uiFrame.type:GetName() .. "Text"):SetText(text)
+	getglobal(uiFrame.type:GetName() .. 'Text'):SetText(text)
 end
 
 function LudwigUI_OnTypeShow(self)
