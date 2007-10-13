@@ -29,6 +29,9 @@
 		</ButtonText>
 
 		<Scripts>
+			<OnLoad>
+				self.UpdateTooltip = LudwigUI_OnItemEnter
+			</OnLoad>
 			<OnClick>
 				LudwigUI_OnItemClick(self)
 			</OnClick>

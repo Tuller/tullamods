@@ -95,27 +95,6 @@ end
 
 --[[ Item Button ]]--
 
-local function Item_UpdateTooltip(self)
-	GameTooltip:SetOwner(self, 'ANCHOR_BOTTOMRIGHT')
-	GameTooltip:SetHyperlink(Ludwig:GetItemLink(self:GetID()))
-	GameTooltip:Show()
-
-	if IsShiftKeyDown() then
-		GameTooltip_ShowCompareItem()
-	end
-	self.nextUpdate = 0.1
-end
-
-local function Item_OnUpdate(self, elapsed)
-	if(self.nextUpdate < 0) then
-		if GameTooltip:IsOwned(self) then
-			Item_UpdateTooltip(self)
-		end
-	else
-		self.nextUpdate = self.nextUpdate - elapsed
-	end
-end
-
 function LudwigUI_OnItemClick(self)
 	if IsShiftKeyDown() then
 		ChatFrameEditBox:Insert(Ludwig:GetItemLink(self:GetID()))
@@ -127,12 +106,12 @@ function LudwigUI_OnItemClick(self)
 end
 
 function LudwigUI_OnItemEnter(self)
-	Item_UpdateTooltip(self)
-	self:SetScript('OnUpdate', Item_OnUpdate)
+	GameTooltip:SetOwner(self, 'ANCHOR_BOTTOMRIGHT')
+	GameTooltip:SetHyperlink(Ludwig:GetItemLink(self:GetID()))
+	GameTooltip:Show()
 end
 
 function LudwigUI_OnItemLeave(self)
-	self:SetScript('OnUpdate', nil)
 	GameTooltip:Hide()
 end
 
