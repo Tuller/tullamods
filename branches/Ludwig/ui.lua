@@ -140,8 +140,9 @@ function LudwigUI_UpdateList(changed)
 			button:SetText(Ludwig:GetItemName(id, true))
 			button:SetID(id)
 			button:Show()
+
 			if(GameTooltip:IsOwned(button)) then
-				Item_UpdateTooltip(button)
+				LudwigUI_OnItemEnter(button)
 			end
 		end
 	end
@@ -252,7 +253,7 @@ local function Type_OnClick(type, subType)
 	filter.equipLoc = nil
 
 	if not type then
-		filter.type = select(this.value, GetAuctionItemClasses())
+		filter.type = nil
 	else
 		filter.type = select(type, GetAuctionItemClasses())
 		if not subType then
