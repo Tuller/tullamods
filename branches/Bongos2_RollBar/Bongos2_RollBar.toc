@@ -1,8 +1,0 @@
-## Interface: 20200
-## Title: Bongos2 RollBar
-## Title-zhCN: |cFF0099FF[Bongos2]|r 色子条
-## Notes: Makes the frame for rolling on items movable
-## Notes-zhCN: Bongos2 系列 色子条。
-## Author: Tuller
-## Dependencies: Bongos2
-bar.lua

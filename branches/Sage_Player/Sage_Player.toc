@@ -1,7 +1,0 @@
-## Interface: 20200
-## Title: Sage Player
-## Notes: A player frame
-## Author: Tuller
-## Dependencies: Sage
-player.lua
-xp.lua

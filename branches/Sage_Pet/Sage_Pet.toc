@@ -1,6 +1,0 @@
-## Interface: 20200
-## Title: Sage Pet
-## Notes: A pet frame
-## Author: Tuller
-## Dependencies: Sage
-pet.lua
