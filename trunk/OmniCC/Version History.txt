@@ -1,5 +1,9 @@
 OmniCC Version History
 
+2.0.6
+Fixed a crash issue on Macs in 2.2 and on the 2.3 PTR
+Removed OmniCC Basic.
+
 2.0.5
 Both: Changed the hooking code to increase significantly increase compatibility.
 Full: Tweaked the layering of cooldown text
