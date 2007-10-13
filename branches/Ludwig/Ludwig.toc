@@ -1,0 +1,10 @@
+## Interface: 20200
+## Title: Ludwig
+## Author: Tuller
+## Notes: Item Database
+## Version: 1.4
+localization.lua
+db.lua
+slash.lua
+linkerator.lua
+ui.xml
