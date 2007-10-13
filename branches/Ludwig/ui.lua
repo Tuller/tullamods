@@ -253,7 +253,11 @@ local function Type_OnClick(type, subType)
 	filter.equipLoc = nil
 
 	if not type then
-		filter.type = nil
+		if filter.type == ALL then
+			filter.type = nil
+		else
+			filter.type = select(this.value, GetAuctionItemClasses())
+		end
 	else
 		filter.type = select(type, GetAuctionItemClasses())
 		if not subType then
@@ -305,8 +309,8 @@ local function Type_Initialize(level)
 		selectedType = UIDROPDOWNMENU_MENU_VALUE
 		AddSubTypes(level, selectedType, GetAuctionItemSubClasses(selectedType))
 	elseif level == 3 then
-		selectedSubType = UIDROPDOWNMENU_MENU_VALUE
-		AddEquipLocations(level, selectedType, selectedSubType, GetAuctionInvTypes(selectedType, selectedSubType))
+		local subType = UIDROPDOWNMENU_MENU_VALUE
+		AddEquipLocations(level, selectedType, selectedSubType, GetAuctionInvTypes(selectedType, subType))
 	end
 end
 
