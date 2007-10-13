@@ -84,35 +84,19 @@ end
 
 --hook the cooldown function (effectively enable the addon)
 function OmniCC:HookCooldown()
-	--use the old hooking method for mac clients to prevent a crash issue
-	if IsMacClient() then
-		hooksecurefunc('CooldownFrame_SetTimer', function(self, start, duration, enable)
-			self:SetAlpha(OmniCC.sets.showModel and 1 or 0)
+	local methods = getmetatable(CreateFrame('Cooldown', nil, nil, 'CooldownFrameTemplate')).__index
+	hooksecurefunc(methods, 'SetCooldown', function(self, start, duration)
+		self:SetAlpha(OmniCC.sets.showModel and 1 or 0)
 
-			if start > 0 and duration > OmniCC.sets.minDuration and enable > 0 then
-				OmniCC:StartTimer(self, start, duration)
-			else
-				local timer = timers[self]
-				if timer then
-					timer:Hide()
-				end
+		if start > 0 and duration > OmniCC.sets.minDuration then
+			OmniCC:StartTimer(self, start, duration)
+		else
+			local timer = timers[self]
+			if timer then
+				timer:Hide()
 			end
-		end)
-	else
-		local methods = getmetatable(CreateFrame('Cooldown')).__index
-		hooksecurefunc(methods, 'SetCooldown', function(self, start, duration)
-			self:SetAlpha(OmniCC.sets.showModel and 1 or 0)
-
-			if start > 0 and duration > OmniCC.sets.minDuration then
-				OmniCC:StartTimer(self, start, duration)
-			else
-				local timer = timers[self]
-				if timer then
-					timer:Hide()
-				end
-			end
-		end)
-	end
+		end
+	end)
 end
 
 
