@@ -20,7 +20,7 @@ fadeChecker:SetScript("OnUpdate", function(self, elapsed)
 	if(self.nextUpdate < 0) then
 		self.nextUpdate = 0.1
 		for bar in pairs(self.bars) do
-			if MouseIsOver(bar, 1, 1, 1, 1) then
+			if MouseIsOver(bar, 1, -1, -1, 1) then
 				if(ceil(bar:GetAlpha()*100) == ceil(bar:GetFadeAlpha()*100)) then
 					UIFrameFadeIn(bar, 0.1, bar:GetAlpha(), bar:GetFrameAlpha())
 				end
