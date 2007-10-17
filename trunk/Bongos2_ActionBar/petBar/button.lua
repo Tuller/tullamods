@@ -57,7 +57,7 @@ end
 --[[ OnX Functions ]]--
 
 function BongosPetButton:OnDragStart()
-	if petBar.showgrid > 0 or not(BongosActionConfig:ButtonsLocked()) or BongosActionConfig:IsQuickMoveKeyDown() then
+	if petBar.showgrid > 0 or LOCK_ACTIONBAR ~= '1' or IsModifiedClick('PICKUPACTION') then
 		self:SetChecked(0)
 		PickupPetAction(self:GetID())
 		PetActionBar_Update()
@@ -65,7 +65,7 @@ function BongosPetButton:OnDragStart()
 end
 
 function BongosPetButton:OnReceiveDrag()
-	if petBar.showgrid > 0 or BongosActionConfig:IsQuickMoveKeyDown() then
+	if petBar.showgrid > 0 or LOCK_ACTIONBAR ~= '1' or IsModifiedClick('PICKUPACTION') then
 		self:SetChecked(0)
 		PickupPetAction(self:GetID())
 		PetActionBar_Update()
