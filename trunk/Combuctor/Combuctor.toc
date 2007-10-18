@@ -1,0 +1,10 @@
+## Interface: 20200
+## Title: Combuctor
+## Author: Tuller
+## Notes: Pants are a dangerous foe
+## Version: 0.1.0
+## OptionalDeps: Dongle, Bagnon_Forever
+## SavedVariables: CombuctorDB
+lib\Dongle.lua
+localization.lua
+load.xml
