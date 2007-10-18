@@ -3,17 +3,14 @@
 		BagnonForever's implementation of BagnonDB
 --]]
 
-if not BagnonDB then
-	BagnonDB = CreateFrame('Frame')
-	BagnonDB:SetScript('OnEvent', function(self) self:Enable() end)
-	BagnonDB:RegisterEvent('PLAYER_LOGIN')
-
-	BagnonDB.addon = 'Bagnon_Forever'
-	BagnonDB.tip = CreateFrame('GameTooltip', 'BagnonDBTooltip', UIParent, 'GameTooltipTemplate')
-else
-	error(format('Already using %s to view cached data', BagnonDB.addon or '<Unknown Addon>'))
-	return
-end
+BagnonDB = CreateFrame('GameTooltip', 'BagnonDB', nil, 'GameTooltipTemplate')
+BagnonDB:SetScript('OnEvent', function(self, event, arg1)
+	if arg1 == 'Bagnon_Forever' then
+		self:UnregisterEvent('ADDON_LOADED')
+		self:Initialize()
+	end
+end)
+BagnonDB:RegisterEvent('ADDON_LOADED')
 
 --constants
 local L = BAGNON_FOREVER_LOCALS
@@ -63,26 +60,15 @@ end
 
 --[[ Addon Loading ]]--
 
-function BagnonDB:Enable()
+function BagnonDB:Initialize()
 	self:LoadSettings()
-	
+
 	self:SetScript('OnEvent', function(self, event, ...)
 		if self[event] then
 			self[event](self, event, ...)
 		end
 	end)
-
-	self:RegisterEvent('BANKFRAME_OPENED')
-	self:RegisterEvent('BANKFRAME_CLOSED')
-	self:RegisterEvent('PLAYER_MONEY')
-	self:RegisterEvent('BAG_UPDATE')
-	self:RegisterEvent('PLAYERBANKSLOTS_CHANGED')
-	self:RegisterEvent('UNIT_INVENTORY_CHANGED')
-
-	self:SaveMoney()
-	self:SaveBagAll(0)
-	self:SaveBagAll(-2)
-	self:SaveEquipment()
+	self:RegisterEvent('PLAYER_LOGIN')
 end
 
 function BagnonDB:LoadSettings()
@@ -127,6 +113,20 @@ end
 
 
 --[[  Events ]]--
+
+function BagnonDB:PLAYER_LOGIN()
+	self:SaveMoney()
+	self:SaveBagAll(0)
+	self:SaveBagAll(-2)
+	self:SaveEquipment()
+
+	self:RegisterEvent('BANKFRAME_OPENED')
+	self:RegisterEvent('BANKFRAME_CLOSED')
+	self:RegisterEvent('PLAYER_MONEY')
+	self:RegisterEvent('BAG_UPDATE')
+	self:RegisterEvent('PLAYERBANKSLOTS_CHANGED')
+	self:RegisterEvent('UNIT_INVENTORY_CHANGED')
+end
 
 function BagnonDB:PLAYER_MONEY()
 	self:SaveMoney()
@@ -431,5 +431,5 @@ function BagnonDB:RemovePlayer(player, realm)
 end
 
 function BagnonDB:QueryLink(link)
-	self.tip:SetHyperlink(tonumber(link) and format('item:%d', link) or link)
+	self:SetHyperlink(tonumber(link) and format('item:%d', link) or link)
 end
