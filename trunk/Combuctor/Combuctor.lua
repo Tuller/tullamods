@@ -102,6 +102,6 @@ function Combuctor:HookBagEvents()
 	end
 
 	BankFrame:UnregisterAllEvents()
-	self:RegisterEvent('BANKFRAME_OPENED', function() self:Show(-1, true) end)
-	self:RegisterEvent('BANKFRAME_CLOSED', function() self:Hide(-1, true) end)
+	self:RegisterEvent('BANKFRAME_OPENED', function() self:Show(BANKFRAME_CONTAINER, true) end)
+	self:RegisterEvent('BANKFRAME_CLOSED', function() self:Hide(BANKFRAME_CONTAINER, true) end)
 end

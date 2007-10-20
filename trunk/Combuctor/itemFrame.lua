@@ -5,6 +5,7 @@
 
 CombuctorItemFrame = Combuctor:NewModule('Combuctor-ItemFrame')
 local listeners = {}
+local currentPlayer = UnitName('player')
 
 --[[
 	Module Functions
@@ -91,21 +92,27 @@ function ItemFrame:Create(parent)
 	f.filter = {}
 	f.count = 0
 	f:RegisterForClicks('anyUp')
-	-- f:RegisterForDrag('LeftButton')
+	f:RegisterForDrag('LeftButton')
 
 	f:SetScript('OnShow', self.OnShow)
-	f:SetScript('OnClick', self.OnClick)
+	f:SetScript('OnClick', self.PlaceItem)
+	f:SetScript('OnReceiveDrag', self.PlaceItem)
 	f:UpdateEvents()
 
 	return f
 end
 
-function ItemFrame:OnClick()
+--places the item in the first available slot in the current player's visible bags\
+--TODO: make this work on the tabs, too
+function ItemFrame:PlaceItem()
 	if CursorHasItem() then
-		for i = 4, 0, -1 do
-			for j = GetContainerNumSlots(i), 1, -1 do
-				if not GetContainerItemLink(i, j) then
-					PickupContainerItem(i, j)
+		local player = self:GetPlayer()
+		for _,bag in ipairs(self.bags) do
+			if not CombuctorUtil:IsCachedBag(bag, player) then
+				for slot = 1, GetContainerNumSlots(bag) do
+					if not GetContainerItemLink(bag, slot) then
+						PickupContainerItem(bag, slot)
+					end
 				end
 			end
 		end
@@ -163,7 +170,9 @@ function ItemFrame:HasItem(bag, slot, link)
 	local f = self.filter
 	if next(f) then
 		local link = link or CombuctorUtil:GetItemLink(bag, slot, self:GetPlayer())
-		if not link then return false end
+		if not link then
+			return false
+		end
 
 		local name, _, quality, _, level, type, subType, _, equipLoc = GetItemInfo(link)
 		if f.quality and quality ~= f.quality then

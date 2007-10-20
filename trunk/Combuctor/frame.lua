@@ -225,9 +225,8 @@ function CombuctorFrame:SetPlayer(player)
 	if self:GetPlayer() ~= player then
 		self.player = player
 		self:UpdateTitleText()
-
-		self.itemFrame:SetPlayer(player)
 		self:UpdateTabs()
+		self.itemFrame:SetPlayer(player)
 	end
 end
 
@@ -342,15 +341,15 @@ function CombuctorFrame:UpdateTabs()
 	end
 
 	PanelTemplates_SetNumTabs(self, #panelBags)
-	self:SetPanel(1)
+	self:SetPanel(1, true)
 end
 
 
 --[[ Panel Functions ]]--
 
 --sets the given frame to show only the given tab's bags
-function CombuctorFrame:SetPanel(id)
-	if(self.selectedTab ~= id) then
+function CombuctorFrame:SetPanel(id, forceUpdate)
+	if(self.selectedTab ~= id or forceUpdate) then
 		PanelTemplates_SetTab(self, id)
 		self.itemFrame:SetBags(self.panelBags[id])
 	end

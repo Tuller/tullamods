@@ -184,11 +184,6 @@
 							self:GetParent().itemFrame:SetFilter('name', text and text:lower() or nil)
 						end
 					</OnTextChanged>
-<!--
-					<OnTabPressed>
-						getglobal(self:GetParent():GetName() .. "MinLevel"):SetFocus()
-					</OnTabPressed>
--->
 					<OnEditFocusLost>
 						self:HighlightText(0, 0)
 						if (self:GetText() == "") then
@@ -232,6 +227,41 @@
 						</Offset>
 					</Anchor>
 				</Anchors>
+				<Frames>
+					<Button name="$parentClick" setAllPoints="true" topLevel="true">
+						<OnClick>
+							local parent = self:GetParent()
+							local name = parent:GetName()
+							if MouseIsOver(getglobal(name .. "GoldButton")) then
+								OpenCoinPickupFrame(COPPER_PER_GOLD, MoneyTypeInfo[parent.moneyType].UpdateFunc(), parent)
+								parent.hasPickup = 1
+							elseif MouseIsOver(getglobal(name .. "SilverButton")) then
+								OpenCoinPickupFrame(COPPER_PER_SILVER, MoneyTypeInfo[parent.moneyType].UpdateFunc(), parent)
+								parent.hasPickup = 1
+							elseif MouseIsOver(getglobal(name .. "CopperButton")) then
+								OpenCoinPickupFrame(1, MoneyTypeInfo[parent.moneyType].UpdateFunc(), parent)
+								parent.hasPickup = 1
+							end
+						</OnClick>
+						<OnEnter>
+							if BagnonDB then
+								GameTooltip:SetOwner(self, "ANCHOR_TOPRIGHT")
+								GameTooltip:SetText(format("Total on %s", GetRealmName()))
+
+								local money = 0
+								for player in BagnonDB:GetPlayers() do
+									money = money + BagnonDB:GetMoney(player)
+								end
+
+								SetTooltipMoney(GameTooltip, money)
+								GameTooltip:Show()
+							end
+						</OnEnter>
+						<OnLeave>
+							GameTooltip:Hide()
+						</OnLeave>
+					</Button>
+				</Frames>
 			</Frame>
 		</Frames>
 
