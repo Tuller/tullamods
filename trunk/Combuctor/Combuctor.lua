@@ -66,8 +66,9 @@ function Combuctor:Toggle(bag, auto)
 end
 
 function Combuctor:HookBagEvents()
-	local backpack = 0
+	local backpack = BACKPACK_CONTAINER
 	local keyring = KEYRING_CONTAINER
+	local bank = BANK_CONTAINER
 
 	OpenBackpack = function()
 		Combuctor:Show(backpack, true)
@@ -102,6 +103,6 @@ function Combuctor:HookBagEvents()
 	end
 
 	BankFrame:UnregisterAllEvents()
-	self:RegisterEvent('BANKFRAME_OPENED', function() self:Show(BANK_CONTAINER, true) end)
-	self:RegisterEvent('BANKFRAME_CLOSED', function() self:Hide(BANK_CONTAINER, true) end)
+	self:RegisterMessage('COMBUCTOR_BANK_OPENED', function() self:Show(bank, true) end)
+	self:RegisterMessage('COMBUCTOR_BANK_CLOSED', function() self:Hide(bank, true) end)
 end

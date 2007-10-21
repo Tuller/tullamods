@@ -14,7 +14,7 @@
 			</OnClick>
 		</Scripts>
 	</Button>
-	
+
 	<CheckButton name="CombuctorFrameSideButtonTemplate" inherits="SpellBookSkillLineTabTemplate" virtual="true"/>
 
 	<Frame name="CombuctorFrameTemplate" enableMouse="true" movable="true" sizable="true" toplevel="true" parent="UIParent" hidden="true" virtual="true">
@@ -61,7 +61,7 @@
 						<Anchor point="TOPLEFT"/>
 					</Anchors>
 				</Texture>
-				
+
 				<Texture file="Interface\MerchantFrame\UI-Merchant-TopRight">
 					<Size>
 						<AbsDimension x="128" y="256"/>
@@ -158,7 +158,7 @@
 			</Button>
 
 			<EditBox name="$parentSearch" autoFocus="false" inherits="InputBoxTemplate">
-				<Size x="218" y="20"/>
+				<Size x="186" y="20"/>
 
 				<Anchors>
 					<Anchor point="TOPLEFT">
@@ -168,7 +168,7 @@
 
 				<Scripts>
 					<OnShow>
-						if (self:GetText() == "") then
+						if self:GetText() == '' then
 							self:SetText(SEARCH)
 						end
 					</OnShow>
@@ -178,22 +178,22 @@
 					<OnTextChanged>
 						if self:HasFocus() then
 							local text = self:GetText()
-							if text == '' then 
-								text = nil 
+							if text == '' then
+								text = nil
 							end
 							self:GetParent().itemFrame:SetFilter('name', text and text:lower() or nil)
 						end
 					</OnTextChanged>
 					<OnEditFocusLost>
 						self:HighlightText(0, 0)
-						if (self:GetText() == "") then
+						if self:GetText() == '' then
 							self:SetText(SEARCH)
 						end
 					</OnEditFocusLost>
 					<OnEditFocusGained>
 						self:HighlightText()
-						if (self:GetText() == SEARCH) then
-							self:SetText("")
+						if self:GetText() == SEARCH then
+							self:SetText('')
 						end
 					</OnEditFocusGained>
 				</Scripts>
@@ -210,13 +210,75 @@
 
 				<Scripts>
 					<OnClick>
-						-- Combuctor:Reset()
+						local parent = self:GetParent()
+						local searchBox = getglobal(parent:GetName() .. 'Search')
+						if searchBox:HasFocus() then
+							searchBox:SetText('')
+						else
+							searchBox:SetText(SEARCH)
+							self:GetParent().itemFrame:SetFilter('name', nil)
+						end
 					</OnClick>
 				</Scripts>
 
 				<NormalTexture file="Interface\Buttons\CancelButton-Up"/>
 				<PushedTexture file="Interface\Buttons\CancelButton-Down"/>
 				<HighlightTexture file="Interface\Buttons\CancelButton-Highlight" alphaMode="ADD"/>
+			</Button>
+
+			<Button name="$parentBagToggle">
+				<Size x="32" y="32"/>
+
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentReset" relativePoint="RIGHT"/>
+				</Anchors>
+
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentIcon" file="Interface\Buttons\Button-Backpack-Up">
+							<Size x="20" y="20"/>
+
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset x="7" y="-6"/>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.075" right="0.925" top="0.075" bottom="0.925"/>
+						</Texture>
+					</Layer>
+
+					<Layer level="OVERLAY">
+						<Texture file="Interface\Minimap\MiniMap-TrackingBorder">
+							<Size x="54" y="54"/>
+
+							<Anchors>
+								<Anchor point="TOPLEFT"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+
+				<Scripts>
+					<OnLoad>
+						self:RegisterForClicks("anyUp")
+					</OnLoad>
+					<OnClick>
+						getglobal(self:GetName() .. "Icon"):SetTexCoord(0.075,0.925,0.075,0.925)
+						self:GetParent():ToggleBagFrame()
+					</OnClick>
+					<OnMouseDown>
+						getglobal(self:GetName() .. "Icon"):SetTexCoord(0,1,0,1)
+					</OnMouseDown>
+					<OnMouseUp>
+						getglobal(self:GetName() .. "Icon"):SetTexCoord(0.075,0.925,0.075,0.925)
+					</OnMouseUp>
+					<OnEnter>
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide()
+					</OnLeave>
+				</Scripts>
+				<HighlightTexture alphaMode="ADD" file="Interface\Minimap\UI-Minimap-ZoomButton-Highlight"/>
 			</Button>
 		</Frames>
 	</Frame>

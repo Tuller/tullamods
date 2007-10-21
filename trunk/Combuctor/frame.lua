@@ -3,6 +3,9 @@
 		A combuctor frame
 --]]
 
+local ITEM_FRAME_WIDTH = 312
+local ITEM_FRAME_HEIGHT = 346
+
 
 --[[
 	Quality Filter Widget
@@ -132,7 +135,7 @@ CombuctorFrame = CombuctorUtil:CreateWidgetClass('Frame')
 
 --frame constructor
 local lastID = 0
-function CombuctorFrame:Create(titleText, settings, isBank)
+function CombuctorFrame:Create(titleText, settings)
 	local f = self:New(CreateFrame('Frame', format('CombuctorFrame%d', lastID), UIParent, 'CombuctorFrameTemplate'))
 	f:SetScript('OnShow', f.OnShow)
 	f:SetScript('OnHide', f.OnHide)
@@ -151,7 +154,7 @@ function CombuctorFrame:Create(titleText, settings, isBank)
 	f.itemFrame:SetPoint('TOPLEFT', 24, -78)
 	f.itemFrame:SetWidth(312)
 	f.itemFrame:SetHeight(346)
-	
+
 	f.moneyFrame = CombuctorMoneyFrame:Create(f)
 	f.moneyFrame:SetPoint('BOTTOMRIGHT', -40, 67)
 
@@ -163,7 +166,6 @@ function CombuctorFrame:Create(titleText, settings, isBank)
 
 	f:UpdateTitleText()
 	f:UpdateTabs()
-	f.isBank = isBank
 
 	lastID = lastID + 1
 
@@ -336,7 +338,9 @@ end
 function CombuctorFrame:SetPanel(id, forceUpdate)
 	if(self.selectedTab ~= id or forceUpdate) then
 		PanelTemplates_SetTab(self, id)
-		self.itemFrame:SetBags(self.panelBags[id])
+		self.currentBags = self.panelBags[id]
+		self.itemFrame:SetBags(self.currentBags)
+		self:UpdateBagFrame()
 	end
 end
 
@@ -361,6 +365,66 @@ function CombuctorFrame:TogglePanel(id)
 		end
 	else
 		self:ShowPanel(id)
+	end
+end
+
+
+--[[ Bag Frame Functions ]]--
+
+function CombuctorFrame:ToggleBagFrame()
+	if self.showBags then
+		self.showBags = nil
+		getglobal(self:GetName() .. 'BagToggle'):UnlockHighlight()
+	else
+		self.showBags = true
+		getglobal(self:GetName() .. 'BagToggle'):LockHighlight()
+	end
+	self:UpdateBagFrame()
+end
+
+function CombuctorFrame:UpdateBagFrame()
+	if self.bagButtons then
+		for i,bag in pairs(self.bagButtons) do
+			self.bagButtons[i] = nil
+			bag:Release()
+		end
+	end
+
+	if self.showBags then
+		self.bagButtons = self.bagButtons or {}
+
+		for _,bagID in ipairs(self.currentBags) do
+			if bagID ~= KEYRING_CONTAINER then
+				local bag = CombuctorBag:Get()
+				bag:Set(self, bagID)
+				table.insert(self.bagButtons, bag)
+			end
+		end
+
+		if #self.bagButtons > 0 then
+			local bag = self.bagButtons[1]
+			bag:ClearAllPoints()
+			bag:SetPoint('TOPLEFT', 340 - 36, -82)
+			bag:Show()
+
+			for i = 2, #self.bagButtons do
+				local bag = self.bagButtons[i]
+				bag:ClearAllPoints()
+				bag:SetPoint('TOP', self.bagButtons[i-1], 'BOTTOM', 0, -6)
+				bag:Show()
+			end
+		end
+	end
+
+	local prevWidth = self.itemFrame:GetWidth()
+	if self.bagButtons and next(self.bagButtons) then
+		self.itemFrame:SetWidth(ITEM_FRAME_WIDTH - 36)
+	else
+		self.itemFrame:SetWidth(ITEM_FRAME_WIDTH)
+	end
+
+	if prevWidth ~= self.itemFrame:GetWidth() then
+		self.itemFrame:Layout()
 	end
 end
 

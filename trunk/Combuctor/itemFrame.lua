@@ -329,7 +329,7 @@ function ItemFrame:AddBag(bag, layout)
 		changed = changed or added
 	end
 
-	if(layout and changed) then
+	if layout and changed then
 		self:Layout()
 	end
 	return changed
@@ -388,7 +388,7 @@ end
 
 --completely regenerate the frame
 function ItemFrame:ReloadAllItems()
-	if(self:RemoveAllItems() and self:IsShown()) then
+	if self:RemoveAllItems() and self:IsShown() then
 		self:Regenerate()
 	end
 end
