@@ -1,24 +1,7 @@
 --[[
-	Combuctor.lua
-		The combuctor frame
+	frame.lua
+		A combuctor frame
 --]]
-
---creates a new class of objects that inherits from objects of <type>, ex 'Frame', 'Button', 'StatusBar'
---does not chain inheritance
-local function CreateWidgetClass(type)
-	local class = CreateFrame(type)
-	local mt = {__index = class}
-
-	function class:New(o)
-		if o then
-			local type, cType = o:GetFrameType(), self:GetFrameType()
-			assert(type == cType, format('\'%s\' expected, got \'%s\'', cType, type))
-		end
-		return setmetatable(o or CreateFrame(type), mt)
-	end
-
-	return class
-end
 
 
 --[[
@@ -143,11 +126,9 @@ end
 
 --[[
 	Inventory Frame Widget
-		is container object!
 --]]
 
-CombuctorFrame = CreateWidgetClass('Frame')
-
+CombuctorFrame = CombuctorUtil:CreateWidgetClass('Frame')
 
 --frame constructor
 local lastID = 0
@@ -167,9 +148,12 @@ function CombuctorFrame:Create(titleText, settings, isBank)
 	f.qualityFilter:SetPoint('BOTTOMLEFT', 24, 65)
 
 	f.itemFrame = CombuctorItemFrame:Create(f)
-	f.itemFrame:SetPoint('TOPLEFT', f, 'TOPLEFT', 24, -78)
+	f.itemFrame:SetPoint('TOPLEFT', 24, -78)
 	f.itemFrame:SetWidth(312)
 	f.itemFrame:SetHeight(346)
+	
+	f.moneyFrame = CombuctorMoneyFrame:Create(f)
+	f.moneyFrame:SetPoint('BOTTOMRIGHT', -40, 67)
 
 	--[[
 		TODO:
@@ -227,6 +211,7 @@ function CombuctorFrame:SetPlayer(player)
 		self:UpdateTitleText()
 		self:UpdateTabs()
 		self.itemFrame:SetPlayer(player)
+		self.moneyFrame:Update()
 	end
 end
 

@@ -1,28 +1,58 @@
 --[[
 	item.lua
 		An item button
-		
+
 	TODO:
 		Need to import some of the bagnon changes in respect to clicking cached items
 --]]
 
-local _G = getfenv(0)
+CombuctorItem = CombuctorUtil:CreateWidgetClass('Button')
+CombuctorItem.SIZE = 37
 
---creates a new class of objects that inherits from objects of <type>, ex 'Frame', 'Button', 'StatusBar'
---does not chain inheritance
-local function CreateWidgetClass(type)
-	local class = CreateFrame(type)
-	local mt = {__index = class}
+--create a dummy item slot for tooltips and modified clicks of cached items
+do
+	local slot = CreateFrame('Button')
+	slot:RegisterForClicks('anyUp')
+	slot:Hide()
 
-	function class:New(o)
-		if o then
-			local type, cType = o:GetFrameType(), self:GetFrameType()
-			assert(type == cType, format("'%s' expected, got '%s'", cType, type))
+	local function Slot_OnEnter(self)
+		local parent = self:GetParent()
+		local link = parent.hasItem
+
+		if parent.cached and link then
+			parent:LockHighlight()
+			CombuctorItem.AnchorTooltip(self)
+			GameTooltip:SetHyperlink(link)
+			GameTooltip:Show()
+		else
+			self:Hide()
 		end
-		return setmetatable(o or CreateFrame(type), mt)
 	end
 
-	return class
+	local function Slot_OnLeave(self)
+		GameTooltip:Hide()
+		self:Hide()
+	end
+
+	local function Slot_OnHide(self)
+		local parent = self:GetParent()
+		if parent then
+			parent:UnlockHighlight()
+		end
+	end
+
+	local function Slot_OnClick(self, button)
+		self:GetParent():OnModifiedClick(button)
+	end
+
+	slot.UpdateTooltip = Slot_OnEnter
+	slot:SetScript('OnClick', Slot_OnClick)
+	slot:SetScript('OnEnter', Slot_OnEnter)
+	slot:SetScript('OnLeave', Slot_OnLeave)
+	slot:SetScript('OnShow', Slot_OnEnter)
+	slot:SetScript('OnHide', Slot_OnHide)
+
+	CombuctorItem.dummySlot = slot
 end
 
 local function DummyBag_Get(parent, id)
@@ -44,15 +74,17 @@ end
 	The item widget
 --]]
 
-CombuctorItem = CreateWidgetClass('Button')
-CombuctorItem.SIZE = 37
-
+local _G = getfenv(0)
 local itemID = 1
 local unused = {}
 
 function CombuctorItem:Create()
-	local item = self:New(CreateFrame('Button', format('CombuctorItem%d', itemID), nil, 'ContainerFrameItemButtonTemplate'))
-	--local item = self:New(self:GetBlizzard(itemID) or CreateFrame('Button', format('CombuctorItem%d', itemID), nil, 'ContainerFrameItemButtonTemplate'))
+	local item
+	if IsAddOnLoaded('Bagnon') then
+		item = self:New(CreateFrame('Button', format('CombuctorItem%d', itemID), nil, 'ContainerFrameItemButtonTemplate'))
+	else
+		item = self:New(self:GetBlizzard(itemID) or CreateFrame('Button', format('CombuctorItem%d', itemID), nil, 'ContainerFrameItemButtonTemplate'))
+	end
 	item:ClearAllPoints()
 	item:Show()
 
@@ -188,14 +220,14 @@ end
 
 --[[ Frame Events ]]--
 
-function CombuctorItem:PostClick(button)
+function CombuctorItem:OnModifiedClick(button)
 	if self.cached then
 		if self.hasItem then
 			if button == 'LeftButton' then
 				if IsModifiedClick('DRESSUP') then
-					DressUpItemLink((BagnonDB:GetItemData(self:GetBag(), self:GetID(), self:GetPlayer())))
+					DressUpItemLink((CombuctorItem:GetItemData(self:GetBag(), self:GetID(), self:GetPlayer())))
 				elseif IsModifiedClick('CHATLINK') then
-					ChatFrameEditBox:Insert(BagnonDB:GetItemData(self:GetBag(), self:GetID(), self:GetPlayer()))
+					ChatFrameEditBox:Insert(CombuctorItem:GetItemData(self:GetBag(), self:GetID(), self:GetPlayer()))
 				end
 			end
 		end
@@ -206,16 +238,20 @@ function CombuctorItem:OnEnter()
 	local bag, slot = self:GetBag(), self:GetID()
 	if self.cached then
 		if self.hasItem then
-			self:AnchorTooltip()
-			GameTooltip:SetHyperlink(BagnonDB:GetItemData(bag, slot, self:GetPlayer()))
-			GameTooltip:Show()
+			self.dummySlot:SetParent(self)
+			self.dummySlot:SetAllPoints(self)
+			self.dummySlot:Show()
+		else
+			self.dummySlot:Hide()
 		end
 	else
+		self.dummySlot:Hide()
+
 		--boo for special case bank code
 		if bag == BANK_CONTAINER then
 			if self.hasItem then
-				self:AnchorTooltip()
-				GameTooltip:SetInventoryItem('player', BankButtonIDToInvSlotID(slot))
+				BagnonUtil:AnchorTooltip(self)
+				GameTooltip:SetInventoryItem("player", BankButtonIDToInvSlotID(slot))
 				GameTooltip:Show()
 			end
 		else
