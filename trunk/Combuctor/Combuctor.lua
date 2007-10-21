@@ -15,11 +15,11 @@ function Combuctor:Enable()
 		frames = {
 			inventory = {
 				bags = {0, 1, 2, 3, 4, -2},
-				pushable = 2,
+				pushable = 1,
 			},
 			bank = {
 				bags = {-1, 5, 6, 7, 8, 9, 10, 11},
-				pushable = 1,
+				pushable = 2,
 			}
 		}
 	}
@@ -102,6 +102,6 @@ function Combuctor:HookBagEvents()
 	end
 
 	BankFrame:UnregisterAllEvents()
-	self:RegisterEvent('BANKFRAME_OPENED', function() self:Show(BANKFRAME_CONTAINER, true) end)
-	self:RegisterEvent('BANKFRAME_CLOSED', function() self:Hide(BANKFRAME_CONTAINER, true) end)
+	self:RegisterEvent('BANKFRAME_OPENED', function() self:Show(BANK_CONTAINER, true) end)
+	self:RegisterEvent('BANKFRAME_CLOSED', function() self:Hide(BANK_CONTAINER, true) end)
 end

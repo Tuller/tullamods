@@ -225,9 +225,9 @@ function CombuctorItem:OnModifiedClick(button)
 		if self.hasItem then
 			if button == 'LeftButton' then
 				if IsModifiedClick('DRESSUP') then
-					DressUpItemLink((CombuctorItem:GetItemData(self:GetBag(), self:GetID(), self:GetPlayer())))
+					DressUpItemLink((BagnonDB:GetItemData(self:GetBag(), self:GetID(), self:GetPlayer())))
 				elseif IsModifiedClick('CHATLINK') then
-					ChatFrameEditBox:Insert(CombuctorItem:GetItemData(self:GetBag(), self:GetID(), self:GetPlayer()))
+					ChatFrameEditBox:Insert(BagnonDB:GetItemData(self:GetBag(), self:GetID(), self:GetPlayer()))
 				end
 			end
 		end
@@ -250,7 +250,7 @@ function CombuctorItem:OnEnter()
 		--boo for special case bank code
 		if bag == BANK_CONTAINER then
 			if self.hasItem then
-				BagnonUtil:AnchorTooltip(self)
+				self:AnchorTooltip()
 				GameTooltip:SetInventoryItem("player", BankButtonIDToInvSlotID(slot))
 				GameTooltip:Show()
 			end
