@@ -18,6 +18,9 @@ function CombuctorItemFrame:Enable()
 	self:RegisterMessage('COMBUCTOR_SLOT_UPDATE', 'UpdateSlot')
 	self:RegisterMessage('COMBUCTOR_SLOT_UPDATE_LOCK', 'UpdateSlotLock')
 	self:RegisterMessage('COMBUCTOR_SLOT_UPDATE_COOLDOWN', 'UpdateSlotCooldown')
+
+	self:RegisterMessage('COMBUCTOR_BANK_OPENED', 'UpdateBankFrames')
+	self:RegisterMessage('COMBUCTOR_BANK_CLOSED', 'UpdateBankFrames')
 end
 
 function CombuctorItemFrame:Create(parent)
@@ -52,8 +55,16 @@ function CombuctorItemFrame:RemoveItem(msg, ...)
 	end
 end
 
+function CombuctorItemFrame:UpdateBankFrames()
+	for frame in pairs(listeners) do
+		if frame.isBank then
+			frame:ReloadAllItems()
+		end
+	end
+end
 
---[[ 
+
+--[[
 	ItemFrame Widget
 --]]
 
@@ -191,7 +202,7 @@ function ItemFrame:AddItem(bag, slot)
 		local item = CombuctorItem:Get()
 		item:Set(self, bag, slot)
 		self.items[index] = item
-		
+
 		self.count = self.count + 1
 		return true
 	end
@@ -254,6 +265,14 @@ function ItemFrame:SetBags(newBags)
 	local bags = self.bags
 	if bags ~= newBags then
 		self.bags = newBags
+		self.isBank = nil
+
+		for _,bag in pairs(self.bags) do
+			if CombuctorUtil:IsBankBag(bag) then
+				self.isBank = true
+				break
+			end
+		end
 
 		--remove any items from bags that are not in the new set
 		local changed
@@ -395,7 +414,7 @@ function ItemFrame:Layout(spacing)
 		scale = width / (size*cols)
 		rows = floor(height / (size*scale))
 	until(cols*rows >= count)
-		
+
 
 	--layout the items
 	local player = self:GetPlayer()
