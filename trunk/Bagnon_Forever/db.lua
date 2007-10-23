@@ -119,6 +119,7 @@ function BagnonDB:PLAYER_LOGIN()
 	self:SaveBagAll(0)
 	self:SaveBagAll(-2)
 	self:SaveEquipment()
+	self:SaveNumBankSlots()
 
 	self:RegisterEvent('BANKFRAME_OPENED')
 	self:RegisterEvent('BANKFRAME_CLOSED')
@@ -126,6 +127,7 @@ function BagnonDB:PLAYER_LOGIN()
 	self:RegisterEvent('BAG_UPDATE')
 	self:RegisterEvent('PLAYERBANKSLOTS_CHANGED')
 	self:RegisterEvent('UNIT_INVENTORY_CHANGED')
+	self:RegisterEvent('PLAYERBANKBAGSLOTS_CHANGED')
 end
 
 function BagnonDB:PLAYER_MONEY()
@@ -140,6 +142,10 @@ end
 
 function BagnonDB:PLAYERBANKSLOTS_CHANGED()
 	self:OnBagUpdate(-1)
+end
+
+function BagnonDB:PLAYERBANKBAGSLOTS_CHANGED()
+	self:SaveNumBankSlots()
 end
 
 function BagnonDB:BANKFRAME_OPENED()
@@ -215,6 +221,25 @@ function BagnonDB:GetMoney(player)
 		return playerData.g or 0
 	end
 	return 0
+end
+
+
+
+--[[
+	BagnonDB:GetNumBankSlots(player)
+		args:
+			player (string)
+				the name of the player we're looking at.  This is specific to the current realm we're on
+		
+		returns:
+			(number or nil) How many bank slots the current player has purchased
+--]]
+
+function BagnonDB:GetNumBankSlots(player)
+	local playerData = self.rdb[player]
+	if playerData then
+		return playerData.numBankSlots
+	end
 end
 
 
@@ -316,6 +341,10 @@ end
 
 function BagnonDB:SaveMoney()
 	self.pdb.g = GetMoney()
+end
+
+function BagnonDB:SaveNumBankSlots()
+	self.pdb.numBankSlots = GetNumBankSlots()
 end
 
 --saves all the player's equipment data information
