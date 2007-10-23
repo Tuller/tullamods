@@ -90,13 +90,13 @@ do
 	local types = {'All', 'Weapon', 'Armor', 'Quest', 'Consumable', 'Trade Goods', 'Miscellaneous'}
 
 	local typeIcons = {
-		'INV_Misc_Bag_08',
-		'INV_Sword_23',
-		'INV_Chest_Chain_04',
-		'INV_Torch_Lit',
-		'INV_Potion_91',
-		'INV_Fabric_Silk_02',
-		'Ability_Mount_RidingHorse',
+		'Interface/Icons/INV_Misc_Bag_08',
+		'Interface/Icons/INV_Sword_23',
+		'Interface/Icons/INV_Chest_Chain_04',
+		'Interface/GossipFrame/ActiveQuestIcon',
+		'Interface/Icons/INV_Potion_91',
+		'Interface/Icons/INV_Fabric_Silk_02',
+		'Interface/Icons/Ability_Mount_RidingHorse',
 	}
 
 	local nextID = 0
@@ -106,11 +106,11 @@ do
 		local prev
 		for i,type in ipairs(types) do
 			local button = CreateFrame('CheckButton', format('CombuctorItemFilter', nextID), f, 'CombuctorFrameSideButtonTemplate')
-			button:SetNormalTexture('Interface/Icons/' .. typeIcons[i])
+			button:SetNormalTexture(typeIcons[i])
 			button:GetNormalTexture():SetTexCoord(0.06, 0.94, 0.06, 0.94)
 			button:SetScript('OnClick', self.OnClick)
-			button:SetScript('OnEnter', nil)
-			button:SetScript('OnLeave', nil)
+			button:SetScript('OnEnter', self.OnEnter)
+			button:SetScript('OnLeave', self.OnLeave)
 			button:Show()
 
 			if type ~= 'All' then
@@ -136,6 +136,16 @@ do
 			local child = select(i, self:GetParent():GetChildren())
 			child:SetChecked(child == self)
 		end
+	end
+	
+	function TypeFilter:OnEnter()
+		GameTooltip:SetOwner(self, 'ANCHOR_RIGHT')
+		GameTooltip:SetText(self.type or ALL, 1, 1, 1)
+		GameTooltip:Show()
+	end
+	
+	function TypeFilter:OnLeave()
+		GameTooltip:Hide()
 	end
 end
 
