@@ -93,7 +93,7 @@ do
 		'Interface/Icons/INV_Misc_Bag_08',
 		'Interface/Icons/INV_Sword_23',
 		'Interface/Icons/INV_Chest_Chain_04',
-		'Interface/GossipFrame/ActiveQuestIcon',
+		'Interface/QuestFrame/UI-QuestLog-BookIcon',
 		'Interface/Icons/INV_Potion_91',
 		'Interface/Icons/INV_Fabric_Silk_02',
 		'Interface/Icons/Ability_Mount_RidingHorse',
@@ -228,8 +228,9 @@ function CombuctorFrame:SetPlayer(player)
 		self.player = player
 		self:UpdateTitleText()
 		self:UpdateTabs()
-		self.itemFrame:SetPlayer(player)
+
 		self.moneyFrame:Update()
+		self.itemFrame:SetPlayer(player)
 	end
 end
 
