@@ -49,6 +49,7 @@ function CombuctorBag:Create()
 	bag:SetScript('OnClick', self.OnClick)
 	bag:SetScript('OnDragStart', self.OnDrag)
 	bag:SetScript('OnReceiveDrag', self.OnClick)
+	bag:SetScript('OnEvent', self.OnEvent)
 
 	id = id + 1
 	return bag
@@ -69,8 +70,19 @@ function CombuctorBag:Set(parent, id)
 
 	if id == BACKPACK_CONTAINER or id == BANK_CONTAINER then
 		SetItemButtonTexture(self, 'Interface/Buttons/Button-Backpack-Up')
+	else
+		self:Update()
+
+		self:RegisterEvent('ITEM_LOCK_CHANGED')
+		self:RegisterEvent('CURSOR_UPDATE')
+		self:RegisterEvent('BAG_UPDATE')
+		self:RegisterEvent('PLAYERBANKSLOTS_CHANGED')
+
+		if CombuctorUtil:IsBankBag(self:GetID()) then
+			self:RegisterEvent('BANKFRAME_OPENED')
+			self:RegisterEvent('BANKFRAME_CLOSED')
+		end
 	end
-	self:Update()
 end
 
 function CombuctorBag:Release()
@@ -80,7 +92,24 @@ function CombuctorBag:Release()
 	self.hasItem = nil
 	self:SetParent(nil)
 	self:Hide()
+	self:UnregisterAllEvents()
 	getglobal(self:GetName() .. 'Count'):Hide()
+end
+
+--[[ Events ]]--
+
+function CombuctorBag:OnEvent(event)
+	if event == 'BANKFRAME_OPENED' or event == 'BANKFRAME_CLOSED' then
+		self:Update()
+	elseif not CombuctorUtil:IsCachedBag(self:GetID(), self:GetParent():GetPlayer()) then
+		if event == 'ITEM_LOCK_CHANGED' then
+			self:UpdateLock()
+		elseif event == 'CURSOR_UPDATE' then
+			self:UpdateCursor()
+		elseif event == 'BAG_UPDATE' or event == 'PLAYERBANKSLOTS_CHANGED' then
+			self:Update()
+		end
+	end
 end
 
 
@@ -209,6 +238,9 @@ function CombuctorBag:OnClick(button)
 			end
 		elseif bagID > (GetNumBankSlots() + 4) then
 			self:PurchaseSlot()
+		elseif bagID > 0 then
+			PlaySound('BAGMENUBUTTONPRESS')
+			PickupBagFromSlot(CombuctorUtil:GetInvSlot(bagID))
 		end
 	end
 end
@@ -249,16 +281,22 @@ function CombuctorBag:OnEnter()
 		GameTooltip:SetText(KEYRING, 1, 1, 1)
 	--cached bags
 	elseif CombuctorUtil:IsCachedBag(bagID, player) then
-		local link = select(2, BagnonDB:GetBagData(bagID, player))
-		if link then
-			GameTooltip:SetHyperlink(link)
-		else
-			GameTooltip:SetText(EQUIP_CONTAINER, 1, 1, 1)
+		if BagnonDB then
+			local link = select(2, BagnonDB:GetBagData(bagID, player))
+			if link then
+				GameTooltip:SetHyperlink(link)
+			else
+				GameTooltip:SetText(EQUIP_CONTAINER, 1, 1, 1)
+			end
 		end
+	--non cached bags
 	else
+		--if we don't set a tooltip (meaning there's an item) then determine if the slot is just empty, or an unpurchased bank slot
+		--show the purchase cost if its unpurchased
 		if not GameTooltip:SetInventoryItem('player', CombuctorUtil:GetInvSlot(bagID)) then
 			if bagID > (GetNumBankSlots() + 4) then
 				GameTooltip:SetText(BANK_BAG_PURCHASE, 1, 1, 1)
+				GameTooltip:AddLine('Click to purchase')
 				SetTooltipMoney(GameTooltip, GetBankSlotCost(GetNumBankSlots()))
 			else
 				GameTooltip:SetText(EQUIP_CONTAINER, 1, 1, 1)
@@ -273,6 +311,10 @@ function CombuctorBag:OnLeave()
 	GameTooltip:Hide()
 end
 
+
+--[[ Utility Functions ]]--
+
+--place the tooltip
 function CombuctorBag:AnchorTooltip()
 	if self:GetRight() > (GetScreenWidth()/2) then
 		GameTooltip:SetOwner(self, 'ANCHOR_LEFT')
@@ -281,7 +323,7 @@ function CombuctorBag:AnchorTooltip()
 	end
 end
 
-
+--show the purchase slot dialog
 function CombuctorBag:PurchaseSlot()
 	if not StaticPopupDialogs['CONFIRM_BUY_BANK_SLOT_COMBUCTOR'] then
 		StaticPopupDialogs['CONFIRM_BUY_BANK_SLOT_COMBUCTOR'] = {

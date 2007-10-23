@@ -213,34 +213,6 @@ function CombuctorFrame:UpdateTitleText()
 	self.title:SetText(self.titleText:format(self:GetPlayer()))
 end
 
-
---position stuff
-function CombuctorFrame:SavePosition()
-	if self:GetPoint() then
-		self.sets.position = {self:GetPoint()}
-	else
-		self.sets.position = nil
-	end
-end
-
-function CombuctorFrame:LoadPosition()
-	self:ClearAllPoints()
-
-	local pushable = self.sets.pushable
-	if pushable then
-		self:SetUserPlaced(false)
-		self:SetAttribute('UIPanelLayout-pushable', pushable)
-	else
-		local position = self.sets.position
-		if position then
-			self:SetPoint(unpack(position))
-		else
-			self:SetPoint('CENTER')
-		end
-	end
-end
-
-
 --player filtering
 function CombuctorFrame:SetPlayer(player)
 	if self:GetPlayer() ~= player then
