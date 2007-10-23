@@ -174,7 +174,7 @@ function CombuctorItem:Update()
 	self.hasItem = texture and (link or GetContainerItemLink(bag, slot))
 
 	SetItemButtonDesaturated(self, locked)
-	SetItemButtonTexture(self, texture)
+	SetItemButtonTexture(self, texture or 'Interface/PaperDoll/UI-Backpack-EmptySlot')
 	SetItemButtonCount(self, count)
 
 	self:UpdateBorder(quality)

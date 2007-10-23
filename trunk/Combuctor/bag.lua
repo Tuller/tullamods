@@ -143,22 +143,28 @@ function CombuctorBag:UpdateTexture()
 					self.hasItem = true
 					SetItemButtonTexture(self, select(10, GetItemInfo(link)))
 				else
-					SetItemButtonTexture(self, nil)
+					SetItemButtonTexture(self, 'Interface/PaperDoll/UI-PaperDoll-Slot-Bag')
 					self.hasItem = nil
 				end
-
-				if count then
-					self:SetCount(count)
-				end
+				SetItemButtonTextureVertexColor(self, 1, 1, 1)
+				self:SetCount(count)
 			end
 		else
 			local texture = GetInventoryItemTexture('player', CombuctorUtil:GetInvSlot(self:GetID()))
 			if texture then
-				SetItemButtonTexture(self, texture)
 				self.hasItem = true
+
+				SetItemButtonTexture(self, texture)
+				SetItemButtonTextureVertexColor(self, 1, 1, 1)
 			else
-				SetItemButtonTexture(self, nil)
 				self.hasItem = nil
+
+				SetItemButtonTexture(self, 'Interface/PaperDoll/UI-PaperDoll-Slot-Bag')
+				if bagID > (GetNumBankSlots() + 4) then
+					SetItemButtonTextureVertexColor(self, 1, 0.1, 0.1)
+				else
+					SetItemButtonTextureVertexColor(self, 1, 1, 1)
+				end
 			end
 			self:SetCount(GetInventoryItemCount('player', CombuctorUtil:GetInvSlot(self:GetID())))
 		end
@@ -192,13 +198,17 @@ function CombuctorBag:OnClick(button)
 	local player = parent:GetPlayer()
 	local bagID = self:GetID()
 
-	if CursorHasItem() and not CombuctorUtil:IsCachedBag(bagID, player) then
-		if bagID == KEYRING_CONTAINER then
-			PutKeyInKeyRing()
-		elseif bagID == BACKPACK_CONTAINER then
-			PutItemInBackpack()
-		else
-			PutItemInBag(ContainerIDToInventoryID(bagID))
+	if not CombuctorUtil:IsCachedBag(bagID, player) then
+		if CursorHasItem() and not CombuctorUtil:IsCachedBag(bagID, player) then
+			if bagID == KEYRING_CONTAINER then
+				PutKeyInKeyRing()
+			elseif bagID == BACKPACK_CONTAINER then
+				PutItemInBackpack()
+			else
+				PutItemInBag(ContainerIDToInventoryID(bagID))
+			end
+		elseif bagID > (GetNumBankSlots() + 4) then
+			self:PurchaseSlot()
 		end
 	end
 end
@@ -230,24 +240,29 @@ function CombuctorBag:OnEnter()
 
 	--backpack tooltip
 	if bagID == BACKPACK_CONTAINER then
-		GameTooltip:SetText(TEXT(BACKPACK_TOOLTIP), 1, 1, 1)
+		GameTooltip:SetText(BACKPACK_TOOLTIP, 1, 1, 1)
 	--bank specific code
 	elseif bagID == BANK_CONTAINER then
 		GameTooltip:SetText('Bank', 1, 1, 1)
 	--keyring specific code...again
 	elseif bagID == KEYRING_CONTAINER then
-		GameTooltip:SetText(KEYRING, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
+		GameTooltip:SetText(KEYRING, 1, 1, 1)
 	--cached bags
 	elseif CombuctorUtil:IsCachedBag(bagID, player) then
 		local link = select(2, BagnonDB:GetBagData(bagID, player))
 		if link then
 			GameTooltip:SetHyperlink(link)
 		else
-			GameTooltip:SetText(TEXT(EQUIP_CONTAINER), 1, 1, 1)
+			GameTooltip:SetText(EQUIP_CONTAINER, 1, 1, 1)
 		end
 	else
 		if not GameTooltip:SetInventoryItem('player', CombuctorUtil:GetInvSlot(bagID)) then
-			GameTooltip:SetText(TEXT(EQUIP_CONTAINER), 1, 1, 1)
+			if bagID > (GetNumBankSlots() + 4) then
+				GameTooltip:SetText(BANK_BAG_PURCHASE, 1, 1, 1)
+				SetTooltipMoney(GameTooltip, GetBankSlotCost(GetNumBankSlots()))
+			else
+				GameTooltip:SetText(EQUIP_CONTAINER, 1, 1, 1)
+			end
 		end
 	end
 	GameTooltip:Show()
@@ -264,4 +279,26 @@ function CombuctorBag:AnchorTooltip()
 	else
 		GameTooltip:SetOwner(self, 'ANCHOR_RIGHT')
 	end
+end
+
+
+function CombuctorBag:PurchaseSlot()
+	if not StaticPopupDialogs['CONFIRM_BUY_BANK_SLOT_COMBUCTOR'] then
+		StaticPopupDialogs['CONFIRM_BUY_BANK_SLOT_COMBUCTOR'] = {
+			text = TEXT(CONFIRM_BUY_BANK_SLOT),
+			button1 = TEXT(YES),
+			button2 = TEXT(NO),
+
+			OnAccept = function() PurchaseSlot() end,
+
+			OnShow = function() MoneyFrame_Update(this:GetName().. 'MoneyFrame', GetBankSlotCost(GetNumBankSlots())) end,
+
+			hasMoneyFrame = 1,
+			timeout = 0,
+			hideOnEscape = 1,
+		}
+	end
+
+	PlaySound('igMainMenuOption')
+	StaticPopup_Show('CONFIRM_BUY_BANK_SLOT_COMBUCTOR')
 end
