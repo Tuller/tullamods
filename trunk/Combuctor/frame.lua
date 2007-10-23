@@ -33,6 +33,8 @@ function QualityFilter:Create(parent)
 		end
 
 		button:SetScript('OnClick', self.OnClick)
+		button:SetScript('OnEnter', self.OnEnter)
+		button:SetScript('OnLeave', self.OnLeave)
 		button:SetWidth(size); button:SetHeight(size)
 		button:SetID(i)
 
@@ -77,6 +79,22 @@ function QualityFilter:OnClick()
 			end
 		end
 	end
+end
+
+function QualityFilter:OnEnter()
+	GameTooltip:SetOwner(self, 'ANCHOR_RIGHT')
+	local quality = self:GetID()
+	if quality > -1 then
+		local r,g,b = GetItemQualityColor(quality)
+		GameTooltip:SetText(getglobal(format('ITEM_QUALITY%d_DESC', quality)), r, g, b)
+	else
+		GameTooltip:SetText(ALL)
+	end
+	GameTooltip:Show()
+end
+
+function QualityFilter:OnLeave()
+	GameTooltip:Hide()
 end
 
 
@@ -140,7 +158,7 @@ do
 	
 	function TypeFilter:OnEnter()
 		GameTooltip:SetOwner(self, 'ANCHOR_RIGHT')
-		GameTooltip:SetText(self.type or ALL, 1, 1, 1)
+		GameTooltip:SetText(self.type or ALL)
 		GameTooltip:Show()
 	end
 	
@@ -157,7 +175,7 @@ CombuctorFrame = CombuctorUtil:CreateWidgetClass('Frame')
 
 --frame constructor
 local lastID = 0
-function CombuctorFrame:Create(titleText, settings)
+function CombuctorFrame:Create(titleText, settings, isBank)
 	local f = self:New(CreateFrame('Frame', format('CombuctorFrame%d', lastID), UIParent, 'CombuctorFrameTemplate'))
 	f:SetScript('OnShow', f.OnShow)
 	f:SetScript('OnHide', f.OnHide)
@@ -182,6 +200,7 @@ function CombuctorFrame:Create(titleText, settings)
 
 	f:UpdateTitleText()
 	f:UpdateTabs()
+	f.isBank = isBank
 
 	lastID = lastID + 1
 
