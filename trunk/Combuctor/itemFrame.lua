@@ -198,9 +198,11 @@ function ItemFrame:AddItem(bag, slot)
 
 	if item then
 		item:Update()
+		item:Highlight(self.highlightBag == bag)
 	else
 		local item = CombuctorItem:Get()
 		item:Set(self, bag, slot)
+		item:Highlight(self.highlightBag == bag)
 		self.items[index] = item
 
 		self.count = self.count + 1
@@ -437,6 +439,10 @@ function ItemFrame:Layout(spacing)
 	end
 end
 
+function ItemFrame:HighlightBag(bag)
+	self.highlightBag = bag
+	self:Regenerate()
+end
 
 --[[
 	Filtering

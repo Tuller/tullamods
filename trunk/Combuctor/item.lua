@@ -267,6 +267,14 @@ function CombuctorItem:OnHide()
 	end
 end
 
+function CombuctorItem:Highlight(enable)
+	if enable then
+		self:LockHighlight()
+	else
+		self:UnlockHighlight()
+	end
+end
+
 
 --[[ Convenience Functions ]]--
 

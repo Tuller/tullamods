@@ -311,11 +311,14 @@ function CombuctorBag:OnEnter()
 		end
 	end
 	GameTooltip:Show()
+	
+	self:GetParent().itemFrame:HighlightBag(bagID)
 end
 CombuctorBag.UpdateTooltip = CombuctorBag.OnEnter
 
 function CombuctorBag:OnLeave()
 	GameTooltip:Hide()
+	self:GetParent().itemFrame:HighlightBag(nil)
 end
 
 
