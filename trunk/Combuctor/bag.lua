@@ -43,7 +43,6 @@ function CombuctorBag:Create()
 	bag:RegisterForClicks('anyUp')
 	bag:RegisterForDrag('LeftButton')
 
-	bag:SetScript('OnShow', self.OnShow)
 	bag:SetScript('OnEnter', self.OnEnter)
 	bag:SetScript('OnLeave', self.OnLeave)
 	bag:SetScript('OnClick', self.OnClick)
@@ -70,6 +69,7 @@ function CombuctorBag:Set(parent, id)
 
 	if id == BACKPACK_CONTAINER or id == BANK_CONTAINER then
 		SetItemButtonTexture(self, 'Interface/Buttons/Button-Backpack-Up')
+		SetItemButtonTextureVertexColor(self, 1, 1, 1)
 	else
 		self:Update()
 
@@ -81,6 +81,7 @@ function CombuctorBag:Set(parent, id)
 		if CombuctorUtil:IsBankBag(self:GetID()) then
 			self:RegisterEvent('BANKFRAME_OPENED')
 			self:RegisterEvent('BANKFRAME_CLOSED')
+			self:RegisterEvent('PLAYERBANKBAGSLOTS_CHANGED')
 		end
 	end
 end
@@ -108,6 +109,8 @@ function CombuctorBag:OnEvent(event)
 			self:UpdateCursor()
 		elseif event == 'BAG_UPDATE' or event == 'PLAYERBANKSLOTS_CHANGED' then
 			self:Update()
+		elseif event == 'PLAYERBANKBAGSLOTS_CHANGED' then
+			self:Update()
 		end
 	end
 end
@@ -116,14 +119,8 @@ end
 --[[ Update ]]--
 
 function CombuctorBag:Update()
-	self:UpdateTexture()
 	self:UpdateLock()
-
-	--update tooltip
-	if GameTooltip:IsOwned(self) then
-		self:OnEnter()
-		self:UpdateCursor()
-	end
+	self:UpdateTexture()
 
 	-- Update repair all button status
 	if MerchantRepairAllIcon then
@@ -143,9 +140,9 @@ function CombuctorBag:UpdateLock()
 	local player = self:GetParent():GetPlayer()
 
 	if IsInventoryItemLocked(CombuctorUtil:GetInvSlot(bagID)) and not CombuctorUtil:IsCachedBag(bagID, player) then
-		SetItemButtonDesaturated(self, true)
+		getglobal(self:GetName() .. 'IconTexture'):SetDesaturated(true)
 	else
-		SetItemButtonDesaturated(self, nil)
+		getglobal(self:GetName() .. 'IconTexture'):SetDesaturated(false)
 	end
 end
 
@@ -171,11 +168,20 @@ function CombuctorBag:UpdateTexture()
 				if link then
 					self.hasItem = true
 					SetItemButtonTexture(self, select(10, GetItemInfo(link)))
+					SetItemButtonTextureVertexColor(self, 1, 1, 1)
 				else
 					SetItemButtonTexture(self, 'Interface/PaperDoll/UI-PaperDoll-Slot-Bag')
+
+					--color red if the bag can be purchased
+					local numBankSlots = BagnonDB:GetNumBankSlots(player)
+					if numBankSlots and bagID > (numBankSlots + 4) then
+						SetItemButtonTextureVertexColor(self, 1, 0.1, 0.1)
+					else
+						SetItemButtonTextureVertexColor(self, 1, 1, 1)
+					end
+
 					self.hasItem = nil
 				end
-				SetItemButtonTextureVertexColor(self, 1, 1, 1)
 				self:SetCount(count)
 			end
 		else
@@ -188,6 +194,7 @@ function CombuctorBag:UpdateTexture()
 			else
 				self.hasItem = nil
 
+				--color red if the bag can be purchased
 				SetItemButtonTexture(self, 'Interface/PaperDoll/UI-PaperDoll-Slot-Bag')
 				if bagID > (GetNumBankSlots() + 4) then
 					SetItemButtonTextureVertexColor(self, 1, 0.1, 0.1)
@@ -256,12 +263,6 @@ function CombuctorBag:OnDrag()
 	end
 end
 
-function CombuctorBag:OnShow()
-	if self:GetID() > 0 and self:GetParent() then
-		self:UpdateTexture()
-	end
-end
-
 --tooltip functions
 function CombuctorBag:OnEnter()
 	local frame = self:GetParent()
@@ -286,7 +287,13 @@ function CombuctorBag:OnEnter()
 			if link then
 				GameTooltip:SetHyperlink(link)
 			else
-				GameTooltip:SetText(EQUIP_CONTAINER, 1, 1, 1)
+				local numBankSlots = BagnonDB:GetNumBankSlots(player)
+				if numBankSlots and bagID > (numBankSlots + 4) then
+					GameTooltip:SetText(BANK_BAG_PURCHASE, 1, 1, 1)
+					SetTooltipMoney(GameTooltip, GetBankSlotCost(GetNumBankSlots()))
+				else
+					GameTooltip:SetText(EQUIP_CONTAINER, 1, 1, 1)
+				end
 			end
 		end
 	--non cached bags
