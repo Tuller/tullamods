@@ -23,11 +23,13 @@ function QualityFilter:Create(parent)
 		local button = CreateFrame('Button', nil, f, 'UIRadioButtonTemplate')
 		if i > -1 then
 			local bg = button:CreateTexture(nil, 'BACKGROUND')
-			bg:SetWidth(size/2); bg:SetHeight(size/2)
+			bg:SetWidth(size/2)
+			bg:SetHeight(size/2)
 			bg:SetPoint('CENTER')
 
 			local r,g,b = GetItemQualityColor(i)
-			bg:SetTexture(r,g,b, 0.5)
+			bg:SetTexture(r,g,b)
+			button.bg = bg
 		end
 
 		button:SetScript('OnClick', self.OnClick)
@@ -36,15 +38,19 @@ function QualityFilter:Create(parent)
 
 		if prev then
 			button:SetPoint('LEFT', prev, 'RIGHT', 1, 0)
+			if button.bg then
+				button.bg:SetAlpha(0.5)
+			end
 		else
 			button:SetPoint('LEFT')
-			button:GetNormalTexture():SetVertexColor(1, 0.82, 0)
+			button:GetNormalTexture():SetVertexColor(1, 1, 0)
 			button:LockHighlight()
 		end
 		prev = button
 	end
 
-	f:SetWidth(size * 5); f:SetHeight(size)
+	f:SetWidth(size * 5)
+	f:SetHeight(size)
 
 	return f
 end
@@ -60,9 +66,15 @@ function QualityFilter:OnClick()
 		if child == self then
 			child:GetNormalTexture():SetVertexColor(1, 0.82, 0)
 			child:LockHighlight()
+			if child.bg then
+				child.bg:SetAlpha(1)
+			end
 		else
 			child:GetNormalTexture():SetVertexColor(1, 1, 1)
 			child:UnlockHighlight()
+			if child.bg then
+				child.bg:SetAlpha(0.5)
+			end
 		end
 	end
 end
@@ -158,12 +170,6 @@ function CombuctorFrame:Create(titleText, settings)
 	f.moneyFrame = CombuctorMoneyFrame:Create(f)
 	f.moneyFrame:SetPoint('BOTTOMRIGHT', -40, 67)
 
-	--[[
-		TODO:
-		- clear filters button
-		- bagFrame + bagFrame toggle
-	--]]
-
 	f:UpdateTitleText()
 	f:UpdateTabs()
 
@@ -228,9 +234,9 @@ function CombuctorFrame:OnShow()
 end
 
 function CombuctorFrame:OnHide()
-	self:SetPlayer(nil)
-
 	PlaySound('igMainMenuClose')
+
+	self:SetPlayer(nil)
 	if self.isBank then
 		CloseBankFrame()
 	end
@@ -264,7 +270,8 @@ end
 
 --update visible tabs based on what bags we have. should be run whenever bags change, basically
 function CombuctorFrame:UpdateTabs()
-	local tradeBags, normalBags, ammoBags, keyBags
+	local tradeBags, normalBags, ammoBags, shardBags, keyBags
+	local player = self:GetPlayer()
 
 	for _,bag in ipairs(self.sets.bags) do
 		if bag == KEYRING_CONTAINER then
@@ -272,12 +279,17 @@ function CombuctorFrame:UpdateTabs()
 				keyBags = {}
 			end
 			table.insert(keyBags, bag)
-		elseif CombuctorUtil:IsAmmoBag(bag, self:GetPlayer()) then
+		elseif CombuctorUtil:IsAmmoBag(bag, player) then
 			if not ammoBags then
 				ammoBags = {}
 			end
 			table.insert(ammoBags, bag)
-		elseif CombuctorUtil:IsProfessionBag(bag, self:GetPlayer()) then
+		elseif CombuctorUtil:IsShardBag(bag, player) then
+			if not shardBags then
+				shardBags = {}
+			end
+			table.insert(shardBags, bag)
+		elseif CombuctorUtil:IsProfessionBag(bag, player) then
 			if not tradeBags then
 				tradeBags = {}
 			end
@@ -308,8 +320,12 @@ function CombuctorFrame:UpdateTabs()
 
 	if ammoBags and next(ammoBags) then
 		table.insert(panelBags, ammoBags)
-		local text = (select(2, UnitClass('player')) == 'WARLOCK' and 'Shards') or 'Ammo'
-		self:SetTab(#panelBags, text)
+		self:SetTab(#panelBags, 'Ammo')
+	end
+
+	if shardBags and next(shardBags) then
+		table.insert(panelBags, shardBags)
+		self:SetTab(#panelBags, 'Shards')
 	end
 
 	if keyBags and next(keyBags) then

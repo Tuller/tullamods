@@ -84,21 +84,31 @@ function CombuctorUtil:IsBankBag(bag)
 	return (bag == BANK_CONTAINER or bag > 4)
 end
 
---returns if the given bag is an ammo bag/soul bag
---bankslots, the main bag, and the keyring cannot be ammo slots
+--returns true if the given bag is an ammo bag/soul bag
 function CombuctorUtil:IsAmmoBag(bag, player)
+	--bankslots, the main bag, and the keyring cannot be ammo slots
 	if bag > 0 then
 		local link = self:GetBagLink(bag, player)
 		if link then
-			local type, subType = select(6, GetItemInfo(link))
-			return (type == typeQuiver or subType == subTypeSoulBag)
+			return select(6, GetItemInfo(link)) == typeQuiver
 		end
 	end
 end
 
---returns if the given bag is a profession bag (herb bag, engineering bag, etc)
---bankslots, the main bag, and the keyring cannot be ammo slots
+--returns true if the given bag is a soul bag
+function CombuctorUtil:IsShardBag(bag, player)
+	--bankslots, the main bag, and the keyring cannot be shard slots
+	if bag > 0 then
+		local link = self:GetBagLink(bag, player)
+		if link then
+			return select(7, GetItemInfo(link)) == subTypeSoulBag
+		end
+	end
+end
+
+--returns true if the given bag is a profession bag (herb bag, engineering bag, etc)
 function CombuctorUtil:IsProfessionBag(bag, player)
+	--bankslots, the main bag, and the keyring cannot be profession bag slots
 	if bag > 0 then
 		local link = self:GetBagLink(bag, player)
 		if link then

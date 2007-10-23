@@ -79,8 +79,8 @@ function CombuctorBag:Release()
 	self.cached = nil
 	self.hasItem = nil
 	self:SetParent(nil)
-	getglobal(self:GetName() .. 'Count'):Hide()
 	self:Hide()
+	getglobal(self:GetName() .. 'Count'):Hide()
 end
 
 
@@ -103,14 +103,21 @@ function CombuctorBag:Update()
 			SetDesaturation(MerchantRepairAllIcon, nil)
 			MerchantRepairAllButton:Enable()
 		else
-			SetDesaturation(MerchantRepairAllIcon, 1)
+			SetDesaturation(MerchantRepairAllIcon, true)
 			MerchantRepairAllButton:Disable()
 		end
 	end
 end
 
 function CombuctorBag:UpdateLock()
-	SetItemButtonDesaturated(self, IsInventoryItemLocked(CombuctorUtil:GetInvSlot(self:GetID())))
+	local bagID = self:GetID()
+	local player = self:GetParent():GetPlayer()
+
+	if IsInventoryItemLocked(CombuctorUtil:GetInvSlot(bagID)) and not CombuctorUtil:IsCachedBag(bagID, player) then
+		SetItemButtonDesaturated(self, true)
+	else
+		SetItemButtonDesaturated(self, nil)
+	end
 end
 
 function CombuctorBag:UpdateCursor()
@@ -125,47 +132,42 @@ end
 --actually, update texture and count
 function CombuctorBag:UpdateTexture()
 	local bagID = self:GetID()
-	if bagID < 1 then return end
+	if bagID > 0 then
+		local parent = self:GetParent()
+		local player = parent:GetPlayer()
 
-	local parent = self:GetParent()
-	local player = parent:GetPlayer()
-
-	if CombuctorUtil:IsCachedBag(bagID, player) then
-		if BagnonDB then
-			local link, count = select(2, BagnonDB:GetBagData(self:GetID(), player))
-			if link then
-				local texture = select(10, GetItemInfo(link))
-				if texture then
+		if CombuctorUtil:IsCachedBag(bagID, player) then
+			if BagnonDB then
+				local link, count = select(2, BagnonDB:GetBagData(self:GetID(), player))
+				if link then
 					self.hasItem = true
+					SetItemButtonTexture(self, select(10, GetItemInfo(link)))
+				else
+					SetItemButtonTexture(self, nil)
+					self.hasItem = nil
 				end
+
+				if count then
+					self:SetCount(count)
+				end
+			end
+		else
+			local texture = GetInventoryItemTexture('player', CombuctorUtil:GetInvSlot(self:GetID()))
+			if texture then
 				SetItemButtonTexture(self, texture)
+				self.hasItem = true
 			else
 				SetItemButtonTexture(self, nil)
 				self.hasItem = nil
 			end
-
-			if count then
-				self:SetCount(count)
-			end
+			self:SetCount(GetInventoryItemCount('player', CombuctorUtil:GetInvSlot(self:GetID())))
 		end
-	else
-		local texture = GetInventoryItemTexture('player', CombuctorUtil:GetInvSlot(self:GetID()))
-		if texture then
-			SetItemButtonTexture(self, texture)
-			self.hasItem = true
-		else
-			SetItemButtonTexture(self, nil)
-			self.hasItem = nil
-		end
-		self:SetCount(GetInventoryItemCount('player', CombuctorUtil:GetInvSlot(self:GetID())))
 	end
 end
 
 function CombuctorBag:SetCount(count)
 	local text = getglobal(self:GetName() .. 'Count')
-	if self:GetID() <= 0 then
-		text:Hide()
-	else
+	if self:GetID() > 0 then
 		local count = count or 0
 		if count > 1 then
 			if count > 999 then
@@ -177,6 +179,8 @@ function CombuctorBag:SetCount(count)
 		else
 			text:Hide()
 		end
+	else
+		text:Hide()
 	end
 end
 
@@ -188,10 +192,10 @@ function CombuctorBag:OnClick(button)
 	local player = parent:GetPlayer()
 	local bagID = self:GetID()
 
-	if CursorHasItem() and not CombuctorUtil:IsCachedBag(bagID, player)then
+	if CursorHasItem() and not CombuctorUtil:IsCachedBag(bagID, player) then
 		if bagID == KEYRING_CONTAINER then
 			PutKeyInKeyRing()
-		elseif bagID == 0 then
+		elseif bagID == BACKPACK_CONTAINER then
 			PutItemInBackpack()
 		else
 			PutItemInBag(ContainerIDToInventoryID(bagID))
@@ -224,9 +228,6 @@ function CombuctorBag:OnEnter()
 
 	self:AnchorTooltip()
 
-	--mainmenubag specific code
-	local cached = CombuctorUtil:IsCachedBag(bagID, player)
-
 	--backpack tooltip
 	if bagID == BACKPACK_CONTAINER then
 		GameTooltip:SetText(TEXT(BACKPACK_TOOLTIP), 1, 1, 1)
@@ -237,17 +238,18 @@ function CombuctorBag:OnEnter()
 	elseif bagID == KEYRING_CONTAINER then
 		GameTooltip:SetText(KEYRING, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
 	--cached bags
-	elseif cached then
-		local link = select(2, BagnonDB:GetBagData(bagID, frame:GetPlayer()))
+	elseif CombuctorUtil:IsCachedBag(bagID, player) then
+		local link = select(2, BagnonDB:GetBagData(bagID, player))
 		if link then
 			GameTooltip:SetHyperlink(link)
 		else
 			GameTooltip:SetText(TEXT(EQUIP_CONTAINER), 1, 1, 1)
 		end
-	elseif not GameTooltip:SetInventoryItem('player', CombuctorUtil:GetInvSlot(bagID)) then
-		GameTooltip:SetText(TEXT(EQUIP_CONTAINER), 1, 1, 1)
+	else
+		if not GameTooltip:SetInventoryItem('player', CombuctorUtil:GetInvSlot(bagID)) then
+			GameTooltip:SetText(TEXT(EQUIP_CONTAINER), 1, 1, 1)
+		end
 	end
-
 	GameTooltip:Show()
 end
 CombuctorBag.UpdateTooltip = CombuctorBag.OnEnter
@@ -257,7 +259,7 @@ function CombuctorBag:OnLeave()
 end
 
 function CombuctorBag:AnchorTooltip()
-	if self:GetRight() >= (GetScreenWidth() / 2) then
+	if self:GetRight() > (GetScreenWidth()/2) then
 		GameTooltip:SetOwner(self, 'ANCHOR_LEFT')
 	else
 		GameTooltip:SetOwner(self, 'ANCHOR_RIGHT')
