@@ -6,6 +6,12 @@
 Combuctor = DongleStub("Dongle-1.0"):New("Combuctor")
 
 COMBUCTOR_LOCALS = {}
+
+--bindings
+BINDING_HEADER_COMBUCTOR = "Combuctor"
+BINDING_NAME_COMBUCTOR_TOGGLE_INVENTORY = "Toggle Inventory"
+BINDING_NAME_COMBUCTOR_TOGGLE_BANK = "Toggle Bank"
+
 local L = COMBUCTOR_LOCALS
 L.InventoryTitle = "%s's Inventory"
 L.BankTitle = "%s's Bank"

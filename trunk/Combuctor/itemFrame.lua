@@ -183,9 +183,24 @@ function ItemFrame:HasItem(bag, slot, link)
 		elseif f.equipLoc and equipLoc ~= f.equipLoc then
 			return false
 		elseif f.name then
+			--smart text search: will attempt to match type, subtype, and equip locations in addition to names
 			local name = name:lower()
 			if not(f.name == name or name:find(f.name)) then
-				return false
+				local type = type:lower()
+				if not(f.name == type or type:find(f.name)) then
+					local subType = subType:lower()
+					if not(f.name == subType or subType:find(f.name)) then
+						local equipLoc = getglobal(equipLoc)
+						if equipLoc then
+							equipLoc = equipLoc:lower()
+							if not(f.name == equipLoc or equipLoc:find(f.name)) then
+								return false
+							end
+						else
+							return false
+						end
+					end
+				end
 			end
 		end
 	end
