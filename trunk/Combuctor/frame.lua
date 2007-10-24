@@ -83,6 +83,7 @@ end
 
 function QualityFilter:OnEnter()
 	GameTooltip:SetOwner(self, 'ANCHOR_RIGHT')
+
 	local quality = self:GetID()
 	if quality > -1 then
 		local r,g,b = GetItemQualityColor(quality)
@@ -90,6 +91,7 @@ function QualityFilter:OnEnter()
 	else
 		GameTooltip:SetText(ALL)
 	end
+
 	GameTooltip:Show()
 end
 
@@ -155,17 +157,18 @@ do
 			child:SetChecked(child == self)
 		end
 	end
-	
+
 	function TypeFilter:OnEnter()
 		GameTooltip:SetOwner(self, 'ANCHOR_RIGHT')
 		GameTooltip:SetText(self.type or ALL)
 		GameTooltip:Show()
 	end
-	
+
 	function TypeFilter:OnLeave()
 		GameTooltip:Hide()
 	end
 end
+
 
 --[[
 	Inventory Frame Widget
@@ -177,15 +180,19 @@ CombuctorFrame = CombuctorUtil:CreateWidgetClass('Frame')
 local lastID = 0
 function CombuctorFrame:Create(titleText, settings, isBank)
 	local f = self:New(CreateFrame('Frame', format('CombuctorFrame%d', lastID), UIParent, 'CombuctorFrameTemplate'))
-	f:SetScript('OnShow', f.OnShow)
-	f:SetScript('OnHide', f.OnHide)
+	f:SetScript('OnShow', self.OnShow)
+	f:SetScript('OnHide', self.OnHide)
 
 	f.sets = settings
+	f.isBank = isBank
 	f.titleText = titleText
+
+	f.panelBags = {}
+	f.bagButtons = {}
 
 	f.title = getglobal(f:GetName() .. 'Title')
 
-	TypeFilter:Create(f)
+	f.typeFilter = TypeFilter:Create(f)
 
 	f.qualityFilter = QualityFilter:Create(f)
 	f.qualityFilter:SetPoint('BOTTOMLEFT', 24, 65)
@@ -200,7 +207,6 @@ function CombuctorFrame:Create(titleText, settings, isBank)
 
 	f:UpdateTitleText()
 	f:UpdateTabs()
-	f.isBank = isBank
 
 	lastID = lastID + 1
 
@@ -217,9 +223,7 @@ end
 function CombuctorFrame:SetPlayer(player)
 	if self:GetPlayer() ~= player then
 		self.player = player
-		self:UpdateTitleText()
 		self:UpdateTabs()
-
 		self.moneyFrame:Update()
 		self.itemFrame:SetPlayer(player)
 	end
@@ -236,12 +240,12 @@ function CombuctorFrame:OnShow()
 end
 
 function CombuctorFrame:OnHide()
-	PlaySound('igMainMenuClose')
+	self:SetPlayer(UnitName('player'))
 
-	self:SetPlayer(nil)
 	if self.isBank then
 		CloseBankFrame()
 	end
+	PlaySound('igMainMenuClose')
 end
 
 
@@ -335,6 +339,7 @@ function CombuctorFrame:UpdateTabs()
 		self:SetTab(#panelBags, 'Keys')
 	end
 
+	--hide all tabs if there's only one category to display
 	if #panelBags == 1 then
 		for _,tab in ipairs(self.tabs) do
 			tab:Hide()
@@ -356,9 +361,12 @@ end
 function CombuctorFrame:SetPanel(id, forceUpdate)
 	if(self.selectedTab ~= id or forceUpdate) then
 		PanelTemplates_SetTab(self, id)
+
 		self.currentBags = self.panelBags[id]
 		self.itemFrame:SetBags(self.currentBags)
-		self:UpdateBagFrame()
+		if self:IsShown() then
+			self:UpdateBagFrame()
+		end
 	end
 end
 
@@ -390,27 +398,27 @@ end
 --[[ Bag Frame Functions ]]--
 
 function CombuctorFrame:ToggleBagFrame()
-	if self.showBags then
-		self.showBags = nil
-		getglobal(self:GetName() .. 'BagToggle'):UnlockHighlight()
-	else
-		self.showBags = true
-		getglobal(self:GetName() .. 'BagToggle'):LockHighlight()
-	end
+	self.sets.showBags = not self.sets.showBags
+	self:UpdateBagToggleHighlight()
 	self:UpdateBagFrame()
 end
 
+function CombuctorFrame:UpdateBagToggleHighlight()
+	if self.sets.showBags then
+		getglobal(self:GetName() .. 'BagToggle'):LockHighlight()
+	else
+		getglobal(self:GetName() .. 'BagToggle'):UnlockHighlight()
+	end
+end
+
 function CombuctorFrame:UpdateBagFrame()
-	if self.bagButtons then
-		for i,bag in pairs(self.bagButtons) do
-			self.bagButtons[i] = nil
-			bag:Release()
-		end
+	--remove all the current bags
+	for i,bag in pairs(self.bagButtons) do
+		self.bagButtons[i] = nil
+		bag:Release()
 	end
 
-	if self.showBags then
-		self.bagButtons = self.bagButtons or {}
-
+	if self.sets.showBags then
 		for _,bagID in ipairs(self.currentBags) do
 			if bagID ~= KEYRING_CONTAINER then
 				local bag = CombuctorBag:Get()
@@ -419,23 +427,19 @@ function CombuctorFrame:UpdateBagFrame()
 			end
 		end
 
-		if #self.bagButtons > 0 then
-			local bag = self.bagButtons[1]
+		for i,bag in ipairs(self.bagButtons) do
 			bag:ClearAllPoints()
-			bag:SetPoint('TOPLEFT', 340 - 36, -82)
-			bag:Show()
-
-			for i = 2, #self.bagButtons do
-				local bag = self.bagButtons[i]
-				bag:ClearAllPoints()
+			if i > 1 then
 				bag:SetPoint('TOP', self.bagButtons[i-1], 'BOTTOM', 0, -6)
-				bag:Show()
+			else
+				bag:SetPoint('TOPLEFT', 340 - 36, -82)
 			end
+			bag:Show()
 		end
 	end
 
 	local prevWidth = self.itemFrame:GetWidth()
-	if self.bagButtons and next(self.bagButtons) then
+	if next(self.bagButtons) then
 		self.itemFrame:SetWidth(ITEM_FRAME_WIDTH - 36)
 	else
 		self.itemFrame:SetWidth(ITEM_FRAME_WIDTH)

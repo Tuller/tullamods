@@ -55,26 +55,11 @@ do
 	CombuctorItem.dummySlot = slot
 end
 
-local function DummyBag_Get(parent, id)
-	local frame = parent['bag' .. id]
-	if not frame then
-		frame = CreateFrame('Frame', nil, parent)
-		frame:SetID(id)
-		parent['bag' .. id] = frame
-	end
-	return frame
-end
-
-local function ToIndex(bag, slot)
-	return (bag<0 and bag*100 - slot) or (bag*100 + slot)
-end
-
 
 --[[
 	The item widget
 --]]
 
-local _G = getfenv(0)
 local itemID = 1
 local unused = {}
 
@@ -96,14 +81,14 @@ function CombuctorItem:Create()
 	border:Hide()
 	item.border = border
 
-	item.cooldown = _G[item:GetName() .. 'Cooldown']
+	item.cooldown = getglobal(item:GetName() .. 'Cooldown')
 	item.cooldown:SetFrameLevel(item:GetFrameLevel() + 4)
 
 	item:UnregisterAllEvents()
 	item:SetScript('OnEvent', nil)
-	item:SetScript('OnEnter', CombuctorItem.OnEnter)
-	item:SetScript('OnHide', CombuctorItem.OnHide)
-	item:SetScript('PostClick', CombuctorItem.PostClick)
+	item:SetScript('OnEnter', self.OnEnter)
+	item:SetScript('OnHide', self.OnHide)
+	item:SetScript('PostClick', self.PostClick)
 	item.UpdateTooltip = nil
 
 	itemID = itemID + 1
@@ -114,7 +99,7 @@ end
 function CombuctorItem:GetBlizzard(id)
 	local bag = ceil(id / MAX_CONTAINER_ITEMS)
 	local slot = (id-1) % MAX_CONTAINER_ITEMS + 1
-	local item = _G[format('ContainerFrame%dCombuctorItem%d', bag, slot)]
+	local item = getglobal(format('ContainerFrame%dItem%d', bag, slot))
 
 	if item then
 		item:SetParent(nil)
@@ -133,7 +118,7 @@ function CombuctorItem:Get()
 end
 
 function CombuctorItem:Set(parent, bag, slot)
-	self:SetParent(DummyBag_Get(parent, bag))
+	self:SetParent(self:GetDummyBag(parent, bag))
 	self:SetID(slot)
 	self:Update()
 
@@ -147,6 +132,21 @@ function CombuctorItem:Release()
 	self.hasItem = nil
 	self:SetParent(nil)
 	self:Hide()
+end
+
+function CombuctorItem:GetDummyBag(parent, id)
+	if not parent.dummyBags then
+		parent.dummyBags = {}
+	end
+
+	local frame = parent.dummyBags[id]
+	if not frame then
+		frame = CreateFrame('Frame', nil, parent)
+		frame:SetID(id)
+		parent.dummyBags[id] = frame
+	end
+
+	return frame
 end
 
 

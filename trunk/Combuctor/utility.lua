@@ -12,15 +12,17 @@ local subTypeBag = select(1, GetAuctionItemSubClasses(3))
 local subTypeSoulBag = select(2, GetAuctionItemSubClasses(3))
 local atBank = false
 
+do
+	local f = CreateFrame('Frame')
+	f:SetScript('OnEvent', function(self, event)
+		atBank = (event == 'BANKFRAME_OPENED')
+	end)
+	f:RegisterEvent('BANKFRAME_OPENED')
+	f:RegisterEvent('BANKFRAME_CLOSED')
+end
+
 
 --[[ Bank ]]--
-
-local f = CreateFrame('Frame')
-f:SetScript('OnEvent', function(self, event)
-	atBank = (event == 'BANKFRAME_OPENED')
-end)
-f:RegisterEvent('BANKFRAME_OPENED')
-f:RegisterEvent('BANKFRAME_CLOSED')
 
 function CombuctorUtil:AtBank()
 	return atBank

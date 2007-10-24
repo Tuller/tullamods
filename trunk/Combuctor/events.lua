@@ -34,7 +34,6 @@
 --]]
 
 local BagEvents = Combuctor:NewModule('Combuctor-BagEvents')
-
 local atBank = false
 local loading = true
 local firstVisit = true
@@ -62,22 +61,29 @@ function BagEvents:AddItem(bag, slot)
 	local start, duration, enable = GetContainerItemCooldown(bag, slot)
 	local onCooldown = (start > 0 and duration > 0 and enable > 0)
 
-	data[1] = link; data[2] = count; data[3] = locked; data[4] = onCooldown
+	data[1] = link
+	data[2] = count
+	data[3] = locked
+	data[4] = onCooldown
 
 	self:TriggerMessage('COMBUCTOR_SLOT_ADD', bag, slot, link, count, locked, onCooldown)
 end
 
 function BagEvents:RemoveItem(bag, slot)
 	local data = slots[ToIndex(bag, slot)]
+
 	if data and next(data) then
 		local prevLink = data[1]
-		for i in pairs(data) do data[i] = nil end
+		for i in pairs(data) do
+			data[i] = nil
+		end
 		self:TriggerMessage('COMBUCTOR_SLOT_REMOVE', bag, slot, prevLink)
 	end
 end
 
 function BagEvents:UpdateItem(bag, slot)
 	local data = slots[ToIndex(bag, slot)]
+
 	if data then
 		local prevLink = data[1]
 		local prevCount = data[2]
@@ -85,10 +91,14 @@ function BagEvents:UpdateItem(bag, slot)
 		local link = GetContainerItemLink(bag, slot)
 		local count, locked = select(2, GetContainerItemInfo(bag, slot))
 		local start, duration, enable = GetContainerItemCooldown(bag, slot)
-		local onCooldown = (start > 0 and duration > 0 and enable == 1)
+		local onCooldown = (start > 0 and duration > 0 and enable > 0)
 
-		if prevLink ~= link or prevCount ~= count then
-			data[1] = link; data[2] = count; data[3] = locked; data[4] = onCooldown
+		if not(prevLink == link and prevCount == count) then
+			data[1] = link
+			data[2] = count
+			data[3] = locked
+			data[4] = onCooldown
+
 			self:TriggerMessage('COMBUCTOR_SLOT_UPDATE', bag, slot, link, count, locked, onCooldown)
 		end
 	end
@@ -103,10 +113,10 @@ end
 --lock
 function BagEvents:UpdateLock(bag, slot)
 	local data = slots[ToIndex(bag,slot)]
+
 	if data and data[1] then
-		local prevLocked = data[3]
 		local locked = select(3, GetContainerItemInfo(bag, slot))
-		if prevLocked ~= locked then
+		if data[3] ~= locked then
 			data[3] = locked
 			self:TriggerMessage('COMBUCTOR_SLOT_UPDATE_LOCK', bag, slot, locked)
 		end
@@ -122,12 +132,12 @@ end
 --cooldowns
 function BagEvents:UpdateCooldown(bag, slot)
 	local data = slots[ToIndex(bag,slot)]
-	if data and data[1] then
-		local prevOnCooldown = data[4]
-		local start, duration, enable = GetContainerItemCooldown(bag, slot)
-		local onCooldown = (start > 0 and duration > 0 and enable == 1)
 
-		if prevOnCooldown ~= onCooldown then
+	if data and data[1] then
+		local start, duration, enable = GetContainerItemCooldown(bag, slot)
+		local onCooldown = (start > 0 and duration > 0 and enable > 0)
+
+		if data[4] ~= onCooldown then
 			data[4] = onCooldown
 			self:TriggerMessage('COMBUCTOR_SLOT_UPDATE_COOLDOWN', bag, slot, onCooldown)
 		end
@@ -184,6 +194,7 @@ function BagEvents:Enable()
 
 	self:UpdateBagSize(KEYRING_CONTAINER)
 	self:UpdateItems(KEYRING_CONTAINER)
+
 	self:UpdateBagSize(BACKPACK_CONTAINER)
 	self:UpdateItems(BACKPACK_CONTAINER)
 end

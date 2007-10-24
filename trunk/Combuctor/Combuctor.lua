@@ -22,10 +22,12 @@ function Combuctor:Enable()
 			inventory = {
 				bags = {0, 1, 2, 3, 4, -2},
 				pushable = 1,
+				showBags = false,
 			},
 			bank = {
 				bags = {-1, 5, 6, 7, 8, 9, 10, 11},
 				pushable = 2,
+				showBags = false,
 			}
 		}
 	}
