@@ -179,6 +179,10 @@ function CombuctorItem:Update()
 
 	self:UpdateBorder(quality)
 	self:UpdateCooldown()
+
+	if GameTooltip:IsOwned(self) then
+		self:UpdateTooltip()
+	end
 end
 
 --colors the item border based on the quality of the item.  hides it for common/poor items

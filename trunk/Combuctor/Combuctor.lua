@@ -111,6 +111,10 @@ function Combuctor:HookBagEvents()
 	end
 
 	BankFrame:UnregisterAllEvents()
-	self:RegisterMessage('COMBUCTOR_BANK_OPENED', function() self:Show(bank, true) end)
-	self:RegisterMessage('COMBUCTOR_BANK_CLOSED', function() self:Hide(bank, true) end)
+	self:RegisterMessage('COMBUCTOR_BANK_OPENED', function() 
+		self:Show(bank, true) 
+	end)
+	self:RegisterMessage('COMBUCTOR_BANK_CLOSED', function() 
+		self:Hide(bank, true) 
+	end)
 end
