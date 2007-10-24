@@ -223,6 +223,7 @@ end
 function CombuctorFrame:SetPlayer(player)
 	if self:GetPlayer() ~= player then
 		self.player = player
+		self:UpdateTitleText()
 		self:UpdateTabs()
 		self.moneyFrame:Update()
 		self.itemFrame:SetPlayer(player)
