@@ -110,13 +110,13 @@ do
 	local types = {'All', 'Weapon', 'Armor', 'Quest', 'Consumable', 'Trade Goods', 'Miscellaneous'}
 
 	local typeIcons = {
-		'Interface/Icons/INV_Misc_Bag_08',
+		'Interface/Icons/INV_Misc_EngGizmos_17',
 		'Interface/Icons/INV_Sword_23',
 		'Interface/Icons/INV_Chest_Chain_04',
 		'Interface/QuestFrame/UI-QuestLog-BookIcon',
-		'Interface/Icons/INV_Potion_91',
+		'Interface/Icons/INV_Potion_93',
 		'Interface/Icons/INV_Fabric_Silk_02',
-		'Interface/Icons/Ability_Mount_RidingHorse',
+		'Interface/Icons/INV_Misc_Rune_01',
 	}
 
 	local nextID = 0
