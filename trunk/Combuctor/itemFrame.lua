@@ -145,7 +145,6 @@ end
 function ItemFrame:SetPlayer(player)
 	self.player = player
 	self:ReloadAllItems()
-	self:UpdateEvents()
 end
 
 function ItemFrame:GetPlayer()
