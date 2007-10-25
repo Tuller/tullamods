@@ -83,13 +83,14 @@ local function Frame_Create()
 
 	frame:SetClampedToScreen(true)
 	frame:SetMovable(true)
-	frame:SetBackdrop({
-	  bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
-	  edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+	frame:EnableMouse(true)
+	frame:SetBackdrop{
+	  bgFile = "Interface/ChatFrame/ChatFrameBackground",
+	  edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
 	  edgeSize = 16,
 	  tile = true, tileSize = 16,
 	  insets = {left = 4, right = 4, top = 4, bottom = 4}
-	})
+	}
 	frame.borderSize = 16
 
 	local close = CreateFrame("Button", name .. "Close", frame, "UIPanelCloseButton")
