@@ -17,7 +17,7 @@ function Combuctor:Enable()
 			bank = {
 				bags = {-1, 5, 6, 7, 8, 9, 10, 11},
 				pushable = 2,
-				showBags = true,
+				showBags = false,
 			}
 		}
 	}
@@ -102,9 +102,9 @@ function Combuctor:HookBagEvents()
 
 	BankFrame:UnregisterAllEvents()
 	self:RegisterMessage('COMBUCTOR_BANK_OPENED', function()
-		self:Show(bank, true) 
+		self:Show(bank, true)
 	end)
-	self:RegisterMessage('COMBUCTOR_BANK_CLOSED', function() 
-		self:Hide(bank, true) 
+	self:RegisterMessage('COMBUCTOR_BANK_CLOSED', function()
+		self:Hide(bank, true)
 	end)
 end
