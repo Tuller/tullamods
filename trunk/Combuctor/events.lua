@@ -31,6 +31,10 @@
 	COMBUCTOR_BANK_CLOSED
 	args:		none
 		called when the bank is closed and all of the bagnon events have fired
+
+	COMBUCTOR_BAG_TYPE_CHANGED
+	args:		bag, bagType, bagSubType
+		called when a bag is gained/lost or changes from one type to another
 --]]
 
 local BagEvents = Combuctor:NewModule('Combuctor-BagEvents')
@@ -38,6 +42,7 @@ local atBank = false
 local loading = true
 local firstVisit = true
 local slots = {}
+local bagSubTypes = {}
 
 local function ToIndex(bag, slot)
 	return (bag < 0 and bag*100 - slot) or bag*100 + slot
@@ -167,18 +172,34 @@ function BagEvents:UpdateBagSize(bag)
 	end
 end
 
-function BagEvents:UpdateBagSizes()
+function BagEvents:UpdateBagType(bag)
+	local link = GetInventoryItemLink('player', ContainerIDToInventoryID(bag))
+	local type, subType
+	if link then
+		type, subType = select(6, GetItemInfo(link))
+	end
+
+	if subType ~= bagSubTypes[bag] then
+		bagSubTypes[bag] = subType
+		self:TriggerMessage('COMBUCTOR_BAG_TYPE_CHANGED', bag, type, subType)
+	end
+end
+
+function BagEvents:UpdateBagSizesAndTypes()
 	if atBank then
 		for bag = 1, GetNumBankSlots() + 4 do
 			self:UpdateBagSize(bag)
+			self:UpdateBagType(bag)
 		end
 	else
 		for bag = 1, 4 do
 			self:UpdateBagSize(bag)
+			self:UpdateBagType(bag)
 		end
 	end
 	self:UpdateBagSize(KEYRING_CONTAINER)
 end
+
 
 
 --[[ Events ]]--
@@ -200,12 +221,13 @@ function BagEvents:Enable()
 end
 
 function BagEvents:BAG_UPDATE(event, bag)
-	self:UpdateBagSizes()
+	self:UpdateBagSizesAndTypes()
 	self:UpdateItems(bag)
 end
 
 function BagEvents:PLAYERBANKSLOTS_CHANGED()
-	self:UpdateBagSizes()
+	self:UpdateBagSizesAndTypes()
+
 	self:UpdateItems(BANK_CONTAINER)
 end
 
@@ -214,7 +236,7 @@ function BagEvents:BANKFRAME_OPENED()
 	if firstVisit then
 		firstVisit = false
 		self:UpdateBagSize(BANK_CONTAINER)
-		self:UpdateBagSizes()
+		self:UpdateBagSizesAndTypes()
 	end
 	self:TriggerMessage('COMBUCTOR_BANK_OPENED')
 end

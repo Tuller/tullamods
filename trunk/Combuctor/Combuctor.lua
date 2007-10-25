@@ -4,30 +4,20 @@
 --]]
 
 Combuctor = DongleStub("Dongle-1.0"):New("Combuctor")
-
-COMBUCTOR_LOCALS = {}
-
---bindings
-BINDING_HEADER_COMBUCTOR = "Combuctor"
-BINDING_NAME_COMBUCTOR_TOGGLE_INVENTORY = "Toggle Inventory"
-BINDING_NAME_COMBUCTOR_TOGGLE_BANK = "Toggle Bank"
-
 local L = COMBUCTOR_LOCALS
-L.InventoryTitle = "%s's Inventory"
-L.BankTitle = "%s's Bank"
 
 function Combuctor:Enable()
 	CombuctorDB = {
 		frames = {
 			inventory = {
-				bags = {0, 1, 2, 3, 4, -2},
+				bags = {-2, 0, 1, 2, 3, 4},
 				pushable = 1,
 				showBags = false,
 			},
 			bank = {
 				bags = {-1, 5, 6, 7, 8, 9, 10, 11},
 				pushable = 2,
-				showBags = false,
+				showBags = true,
 			}
 		}
 	}
@@ -111,7 +101,7 @@ function Combuctor:HookBagEvents()
 	end
 
 	BankFrame:UnregisterAllEvents()
-	self:RegisterMessage('COMBUCTOR_BANK_OPENED', function() 
+	self:RegisterMessage('COMBUCTOR_BANK_OPENED', function()
 		self:Show(bank, true) 
 	end)
 	self:RegisterMessage('COMBUCTOR_BANK_CLOSED', function() 

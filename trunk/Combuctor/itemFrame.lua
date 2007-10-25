@@ -284,62 +284,75 @@ end
 
 --set the display to use the given bag set, and remove any bags that are not in the new set
 function ItemFrame:SetBags(newBags)
-	local bags = self.bags
-	if bags ~= newBags then
-		self.bags = newBags
-
-		--determine if we have bank bags or not
-		self.isBank = false
-		for _,bag in pairs(self.bags) do
-			if CombuctorUtil:IsBankBag(bag) then
-				self.isBank = true
+	for _,i in pairs(self.bags) do
+		local found = false
+		for _,j in pairs(newBags) do
+			if i == j then
+				found = true
 				break
 			end
-		end
-
-		--remove any items from bags that are not in the new set
-		local changed = false
-
-		if bags then
-			for _,i in pairs(bags) do
-				local found = false
-				for _,j in pairs(newBags) do
-					if(i == j) then
-						found = true
-						break
-					end
-				end
-
-				if not found and self:RemoveBag(i) then
-					changed = true
-				end
+			if not found and self:RemoveBag(i) then
+				changed = true
 			end
 		end
+	end
+end
 
-		--add in any items from bags that were not in the old set
-		if self:IsVisible() then
-			if not bags then
-				self:Regenerate()
+function ItemFrame:SetBags(newBags)
+	local visible = self:IsVisible()
+	local bags = self.bags
+	local changed = false
+
+	--go through newbags and determine if we have bank slots or not
+	self.isBank = false
+	for _,bag in pairs(newBags) do
+		if CombuctorUtil:IsBankBag(bag) then
+			self.isBank = true
+			break
+		end
+	end
+
+	--go through all bags in newBags, inserting and removing when necessary
+	--requires that both bag sets be sorted
+	local i = 1
+	repeat
+		local bag, newBag = bags[i], newBags[i]
+		if bag then
+			if bag < newBag then
+				table.remove(bags, i)
+				if self:RemoveBag(bag) then
+					changed = true
+				end
 			else
-				for _,i in pairs(newBags) do
-					local found = false
-					for _,j in pairs(bags) do
-						if(i == j) then
-							found = true
-							break
-						end
-					end
-
-					if not found and self:AddBag(i) then
+				if bag > newBag then
+					table.insert(bags, i, newBag)
+					if visible and self:AddBag(newBag) then
 						changed = true
 					end
 				end
-
-				if changed then
-					self:Layout()
-				end
+				i = i + 1
 			end
+		else
+			bags[i] = newBag
+			if visible and self:AddBag(newBag) then
+				changed = true
+			end
+			i = i + 1
 		end
+	until i > #newBags
+
+	--remove any extra bags from newBags
+	local size = #bags
+	for i = #newBags + 1, size do
+		if self:RemoveBag(bags[i]) then
+			changed = true
+		end
+		bags[i] = nil
+	end
+
+	--layout the frame if we're shown and the bag set changed
+	if visible and changed then
+		self:Layout()
 	end
 end
 

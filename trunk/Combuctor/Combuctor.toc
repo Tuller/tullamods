@@ -6,5 +6,4 @@
 ## OptionalDeps: Dongle, Bagnon_Forever
 ## SavedVariables: CombuctorDB
 lib\Dongle.lua
-localization.lua
 load.xml
