@@ -8,7 +8,10 @@
 ## X-Category: Library
 
 ## X-WoWIPortal: elkano
-## X-Embeds: Ace2
+## OptionalDeps: LibStub
+## X-Embeds: LibStub
 ## LoadOnDemand: 1
+
+embeds.xml
 
 lib.xml

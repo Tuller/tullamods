@@ -1,6 +1,6 @@
 ﻿--[[
 Name: LibSharedMedia-2.0
-Revision: $Revision: 49616 $
+Revision: $Revision: 53142 $
 Author: Elkano (elkano@gmx.de)
 Inspired By: SurfaceLib by Haste/Otravi (troeks@gmail.com)
 Website: http://
@@ -11,7 +11,7 @@ Dependencies: None
 License: LGPL v2.1
 ]]
 
-local vmajor, vminor = "LibSharedMedia-2.0", "$Revision: 49616 $"
+local vmajor, vminor = "LibSharedMedia-2.0", "$Revision: 53142 $"
 
 local lib, oldMinor = LibStub:NewLibrary(vmajor, vminor)
 if not lib then
