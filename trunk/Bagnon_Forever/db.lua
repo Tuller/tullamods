@@ -40,7 +40,7 @@ end
 local function ToShortLink(link)
 	if link then
 		local a,b,c,d,e,f,g,h = link:match('(%-?%d+):(%-?%d+):(%-?%d+):(%-?%d+):(%-?%d+):(%-?%d+):(%-?%d+):(%-?%d+)')
-		if(b == c and c == d and d == e and e == f and f == g) then
+		if(b == '0' and b == c and c == d and d == e and e == f and f == g) then
 			return a
 		end
 		return format('item:%s:%s:%s:%s:%s:%s:%s:%s', a, b, c, d, e, f, g, h)
