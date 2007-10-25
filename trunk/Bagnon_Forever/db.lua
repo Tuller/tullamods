@@ -230,7 +230,7 @@ end
 		args:
 			player (string)
 				the name of the player we're looking at.  This is specific to the current realm we're on
-		
+
 		returns:
 			(number or nil) How many bank slots the current player has purchased
 --]]
@@ -268,9 +268,9 @@ function BagnonDB:GetBagData(bag, player)
 			local _, hyperLink, quality, texture
 			if(link) then
 				_,hyperLink,_,_,_,_,_,_,_, texture = GetItemInfo(link)
-				if not hyperLink then
-					self:QueryLink(link)
-				end
+				-- if not hyperLink then
+					-- self:QueryLink(link)
+				-- end
 			end
 			return tonumber(size), hyperLink, tonumber(count) or 1, texture
 		end
@@ -305,9 +305,9 @@ function BagnonDB:GetItemData(bag, slot, player)
 			local link, count = strsplit(',', itemInfo)
 			if(link) then
 				local _,hyperLink, quality,_,_,_,_,_,_, texture = GetItemInfo(link)
-				if not hyperLink then
-					self:QueryLink(link)
-				end
+				-- if not hyperLink then
+					-- self:QueryLink(link)
+				-- end
 				return hyperLink, tonumber(count) or 1, texture, tonumber(quality)
 			end
 		end
