@@ -5,6 +5,9 @@
 
 CombuctorItemFrame = Combuctor:NewModule('Combuctor-ItemFrame')
 CombuctorItemFrame.obj = CombuctorUtil:CreateWidgetClass('Button')
+CombuctorItemFrame.obj:Hide()
+CombuctorItemFrame.obj:SetScript('OnUpdate', function(self) CombuctorItemFrame:LayoutFrames() self:Hide() end)
+
 local listeners = {}
 local currentPlayer = UnitName('player')
 
@@ -14,11 +17,12 @@ local currentPlayer = UnitName('player')
 --]]
 
 function CombuctorItemFrame:Enable()
+	self:RegisterEvent('BAG_UPDATE_COOLDOWN', 'UpdateSlotCooldowns')
+
 	self:RegisterMessage('COMBUCTOR_SLOT_ADD', 'UpdateSlot')
 	self:RegisterMessage('COMBUCTOR_SLOT_REMOVE', 'RemoveItem')
 	self:RegisterMessage('COMBUCTOR_SLOT_UPDATE', 'UpdateSlot')
 	self:RegisterMessage('COMBUCTOR_SLOT_UPDATE_LOCK', 'UpdateSlotLock')
-	self:RegisterMessage('COMBUCTOR_SLOT_UPDATE_COOLDOWN', 'UpdateSlotCooldown')
 
 	self:RegisterMessage('COMBUCTOR_BANK_OPENED', 'UpdateBankFrames')
 	self:RegisterMessage('COMBUCTOR_BANK_CLOSED', 'UpdateBankFrames')
@@ -32,7 +36,19 @@ function CombuctorItemFrame:UpdateSlot(msg, ...)
 	for frame in pairs(listeners) do
 		if frame:GetPlayer() == currentPlayer then
 			if frame:UpdateSlot(...) then
-				frame:Layout()
+				frame.needsLayout = true
+				self.obj:Show()
+			end
+		end
+	end
+end
+
+function CombuctorItemFrame:RemoveItem(msg, ...)
+	for frame in pairs(listeners) do
+		if frame:GetPlayer() == currentPlayer then
+			if frame:RemoveItem(...) then
+				frame.needsLayout = true
+				self.obj:Show()
 			end
 		end
 	end
@@ -46,20 +62,10 @@ function CombuctorItemFrame:UpdateSlotLock(msg, ...)
 	end
 end
 
-function CombuctorItemFrame:UpdateSlotCooldown(msg, ...)
+function CombuctorItemFrame:UpdateSlotCooldowns(msg, ...)
 	for frame in pairs(listeners) do
 		if frame:GetPlayer() == currentPlayer then
-			frame:UpdateSlotCooldown(...)
-		end
-	end
-end
-
-function CombuctorItemFrame:RemoveItem(msg, ...)
-	for frame in pairs(listeners) do
-		if frame:GetPlayer() == currentPlayer then
-			if frame:RemoveItem(...) then
-				frame:Layout()
-			end
+			frame:UpdateSlotCooldowns()
 		end
 	end
 end
@@ -68,6 +74,15 @@ function CombuctorItemFrame:UpdateBankFrames()
 	for frame in pairs(listeners) do
 		if frame.isBank then
 			frame:ReloadAllItems()
+		end
+	end
+end
+
+function CombuctorItemFrame:LayoutFrames()
+	for frame in pairs(listeners) do
+		if frame.needsLayout then
+			frame.needsLayout = nil
+			frame:Layout()
 		end
 	end
 end
@@ -261,6 +276,12 @@ function ItemFrame:UpdateSlotCooldown(bag, slot)
 	end
 end
 
+function ItemFrame:UpdateSlotCooldowns()
+	for _,item in pairs(self.items) do
+		item:UpdateCooldown()
+	end
+end
+
 
 --[[ Mass Item Changes ]]--
 
@@ -392,24 +413,6 @@ function ItemFrame:RemoveBag(bag, layout)
 	end
 	return changed
 end
-
---remove bank items from the frame
--- function ItemFrame:RemoveBankItems()
-	-- CombuctorItemFrame:Print('removing bank items', bag)
-
-	-- local items = self.items
-	-- local changed = false
-
-	-- for index,item in pairs(items) do
-		-- if CombuctorUtil:IsBankBag(ToBag(index)) then
-			-- item:Release()
-			-- items[index] = nil
-			-- self.count = self.count - 1
-			-- changed = true
-		-- end
-	-- end
-	-- return changed
--- end
 
 --remove all items from the frame
 function ItemFrame:RemoveAllItems()

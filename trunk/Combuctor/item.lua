@@ -1,9 +1,6 @@
 --[[
 	item.lua
 		An item button
-
-	TODO:
-		Need to import some of the bagnon changes in respect to clicking cached items
 --]]
 
 CombuctorItem = CombuctorUtil:CreateWidgetClass('Button')
@@ -64,12 +61,7 @@ local itemID = 1
 local unused = {}
 
 function CombuctorItem:Create()
-	local item
-	if IsAddOnLoaded('Bagnon') then
-		item = self:New(CreateFrame('Button', format('CombuctorItem%d', itemID), nil, 'ContainerFrameItemButtonTemplate'))
-	else
-		item = self:New(self:GetBlizzard(itemID) or CreateFrame('Button', format('CombuctorItem%d', itemID), nil, 'ContainerFrameItemButtonTemplate'))
-	end
+	local item = self:New(self:GetBlizzard(itemID) or CreateFrame('Button', format('CombuctorItem%d', itemID), nil, 'ContainerFrameItemButtonTemplate'))
 	item:ClearAllPoints()
 	item:Show()
 
@@ -82,7 +74,7 @@ function CombuctorItem:Create()
 	item.border = border
 
 	item.cooldown = getglobal(item:GetName() .. 'Cooldown')
-	item.cooldown:SetFrameLevel(item:GetFrameLevel() + 4)
+	item.cooldown:SetFrameLevel(4)
 
 	item:UnregisterAllEvents()
 	item:SetScript('OnEvent', nil)
@@ -102,7 +94,6 @@ function CombuctorItem:GetBlizzard(id)
 	local item = getglobal(format('ContainerFrame%dItem%d', bag, slot))
 
 	if item then
-		item:SetParent(nil)
 		item:SetID(0)
 		return item
 	end
@@ -217,7 +208,7 @@ function CombuctorItem:UpdateCooldown()
 		local start, duration, enable = GetContainerItemCooldown(self:GetBag(), self:GetID())
 		CooldownFrame_SetTimer(self.cooldown, start, duration, enable)
 	else
-		CooldownFrame_SetTimer(self.cooldown, 0, 0, 0)
+		self.cooldown:Hide()
 	end
 end
 
