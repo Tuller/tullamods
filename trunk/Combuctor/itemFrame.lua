@@ -303,22 +303,6 @@ function ItemFrame:Regenerate()
 	end
 end
 
---set the display to use the given bag set, and remove any bags that are not in the new set
-function ItemFrame:SetBags(newBags)
-	for _,i in pairs(self.bags) do
-		local found = false
-		for _,j in pairs(newBags) do
-			if i == j then
-				found = true
-				break
-			end
-			if not found and self:RemoveBag(i) then
-				changed = true
-			end
-		end
-	end
-end
-
 function ItemFrame:SetBags(newBags)
 	local visible = self:IsVisible()
 	local bags = self.bags
