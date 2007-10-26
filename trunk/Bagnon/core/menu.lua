@@ -35,7 +35,7 @@ local function Slider_OnValueChanged(self, value)
 			self.OnChange(parent.anchor, value)
 		end
 	end
-	
+
 	if values then
 		getglobal(self:GetName() .. "ValText"):SetText(values[value])
 	else
@@ -51,11 +51,11 @@ local function Slider_Create(parent, suffix, minVal, maxVal, step, title, OnChan
 	slider.OnChange = OnChange
 	slider.isPercent = isPercent
 	slider.values = values
-	
+
 	slider:SetValueStep(step)
 	slider:SetMinMaxValues(minVal, maxVal)
 	slider:SetScript("OnValueChanged", Slider_OnValueChanged)
-	
+
 	getglobal(name .. "Text"):SetText(title)
 	if values then
 		getglobal(name .. "Low"):SetText(values[minVal])
@@ -76,11 +76,11 @@ local function BGColor_OnColorChange()
 	local frame = ColorPickerFrame.frame
 	local bgSets = frame.sets.bg
 	local a = bgSets.a
-	
+
 	bgSets.r = r
 	bgSets.g = g
 	bgSets.b = b
-	
+
 	frame:SetBackdropColor(r, g, b, a)
 	frame:SetBackdropBorderColor(1, 1, 1, a)
 	getglobal(MENU_NAME .. "BGColorNormalTexture"):SetVertexColor(r, g, b, a)
@@ -98,16 +98,16 @@ local function BGColor_OnAlphaChange()
 	getglobal(MENU_NAME .. "BGColorNormalTexture"):SetVertexColor(bgSets.r, bgSets.g, bgSets.b, alpha)
 end
 
-local function BGColor_CancelChanges() 
+local function BGColor_CancelChanges()
 	local prevValues = ColorPickerFrame.previousValues
 	local frame = ColorPickerFrame.frame
-	
-	local bgSets = frame.sets.bg	
+
+	local bgSets = frame.sets.bg
 	bgSets.r = prevValues.r
 	bgSets.g = prevValues.g
 	bgSets.b = prevValues.b
 	bgSets.a = prevValues.opacity
-	
+
 	frame:SetBackdropColor(prevValues.r, prevValues.g, prevValues.b, prevValues.opacity)
 	frame:SetBackdropBorderColor(1, 1, 1, prevValues.opacity)
 	getglobal(MENU_NAME .. "BGColorNormalTexture"):SetVertexColor(prevValues.r, prevValues.g, prevValues.b, prevValues.opacity)
@@ -118,20 +118,20 @@ local function BGColor_OnClick(frame)
 		ColorPickerFrame:Hide()
 	else
 		local bgSets = frame.sets.bg
-		
-		ColorPickerFrame.frame = frame	
+
+		ColorPickerFrame.frame = frame
 		ColorPickerFrame.hasOpacity = 1
 		ColorPickerFrame.opacity = 1 - bgSets.a
 		ColorPickerFrame.previousValues = {r = bgSets.r, g = bgSets.g, b = bgSets.b, opacity = bgSets.a}
-		
+
 		ColorPickerFrame.func = BGColor_OnColorChange
 		ColorPickerFrame.opacityFunc = BGColor_OnAlphaChange
 		ColorPickerFrame.cancelFunc = BGColor_CancelChanges
-		
+
 		ColorPickerFrame:SetColorRGB(bgSets.r, bgSets.g, bgSets.b)
-		
+
 		getglobal(MENU_NAME .. "BGColorNormalTexture"):SetVertexColor(bgSets.r, bgSets.g, bgSets.b, bgSets.a)
-		
+
 		ShowUIPanel(ColorPickerFrame)
 	end
 end
@@ -163,7 +163,7 @@ end
 
 local function SetFrameScale(frame, scale)
 	frame.sets.scale = scale
-	
+
 	local x, y = GetRelativeCoords(frame, scale)
 
 	frame:SetScale(scale)
@@ -204,31 +204,31 @@ local function CreateMenu(name)
 	menu:SetScript("OnHide", function(self) self.anchor = nil; end)
 	menu:SetScript("OnClick", function(self) self:Hide() end)
 	menu:RegisterForClicks("anyUp")
-	
+
 	local title = menu:CreateFontString(name .. "Title", "ARTWORK")
 	title:SetFontObject("GameFontHighlightLarge")
 	title:SetPoint("TOP", menu, "TOP", 0, -8)
 	title:SetText(L.FrameSettings)
-	
+
 	local close = CreateFrame("Button", name .. "Close", menu, "UIPanelCloseButton")
 	close:SetPoint("TOPRIGHT", menu, "TOPRIGHT", -1, -1)
-	
+
 	--checkbuttons
 	local lock = CreateFrame("CheckButton", name .. "Lock", menu, "GooeyCheckButton")
 	lock:SetPoint("TOPLEFT", menu, "TOPLEFT", 6, -30)
 	lock:SetScript("OnClick", function(self) menu.anchor:Lock(self:GetChecked()) end)
 	lock:SetText(L.Lock)
-	
+
 	local reverse = CreateFrame("CheckButton", name .. "Reverse", menu, "GooeyCheckButton")
 	reverse:SetPoint("TOPLEFT", lock, "BOTTOMLEFT")
 	reverse:SetScript("OnClick", function(self) SetReverseSort(menu.anchor, self:GetChecked()) end)
 	reverse:SetText(L.ReverseSort)
-	
+
 	local topLevel = CreateFrame("CheckButton", name .. "TopLevel", menu, "GooeyCheckButton")
 	topLevel:SetPoint("TOPLEFT", reverse, "BOTTOMLEFT")
 	topLevel:SetScript("OnClick", function(self) SetToplevel(menu.anchor, self:GetChecked()) end)
 	topLevel:SetText(L.Toplevel)
-	
+
 	local colorPicker = CreateFrame("Button", name .. "BGColor", menu, "GooeyColorPicker")
 	colorPicker:SetPoint("TOPLEFT", topLevel, "BOTTOMLEFT", 4, 2)
 	colorPicker:SetScript("OnClick", function() BGColor_OnClick(menu.anchor) end)
@@ -237,19 +237,19 @@ local function CreateMenu(name)
 	--sliders
 	local strata = Slider_Create(menu, "Level", 1, 3, 1, L.FrameLevel, SetFrameStrata, nil, STRATAS)
 	strata:SetPoint("BOTTOM", menu, "BOTTOM", 0, 20)
-	
+
 	local alpha = Slider_Create(menu, "Opacity", 0, 100, 1, L.Opacity, SetFrameAlpha, true)
 	alpha:SetPoint("BOTTOM", strata, "BOTTOM", 0, 40)
-	
+
 	local scale = Slider_Create(menu, "Scale", 50, 150, 1, L.Scale, SetFrameScale, true)
 	scale:SetPoint("BOTTOM", alpha, "BOTTOM", 0, 40)
-	
+
 	local space = Slider_Create(menu, "Spacing", 0, 32, 1, L.Spacing, SetFrameSpacing)
 	space:SetPoint("BOTTOM", scale, "BOTTOM", 0, 40)
-	
+
 	local cols = Slider_Create(menu, "Cols", 4, 40, 1, L.Cols, SetFrameColumns)
 	cols:SetPoint("BOTTOM", space, "BOTTOM", 0, 40)
-	
+
 	return menu
 end
 
@@ -260,16 +260,16 @@ BagnonMenu = {}
 
 function BagnonMenu:Show(frame)
 	if self.frame and self.frame.anchor == frame then
-		return 
+		return
 	elseif not self.frame then
 		self.frame = CreateMenu(MENU_NAME)
 	end
-		
+
 	local menu = self.frame
 	menu.anchor = frame
-	
+
 	menu.onShow = 1
-	
+
 	local sets = frame.sets
 
 	--Set values
@@ -294,13 +294,15 @@ function BagnonMenu:Show(frame)
 
 	menu:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", x - 32, y + 48)
 	menu:Show()
-	
+
 	menu.onShow = nil
 end
 
 function BagnonMenu:Hide()
-	self.frame.anchor = nil
-	self.frame:Hide()
+	if self.frame then
+		self.frame.anchor = nil
+		self.frame:Hide()
+	end
 end
 
 function BagnonMenu:GetAnchor()

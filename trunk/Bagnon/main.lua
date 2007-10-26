@@ -91,23 +91,23 @@ end
 --[[ Inventory Frame Display ]]--
 
 function Bagnon:CreateInventory()
-	local bags = BagnonFrame.New(L.TitleBags, self.sets.inventory, {0, 1, 2, 3, 4, -2})
+	local bags = BagnonFrame:Create(L.TitleBags, self.sets.inventory, {0, 1, 2, 3, 4, -2})
 	table.insert(UISpecialFrames, bags:GetName())
 
 	local OnShow = bags:GetScript("OnShow")
-	bags:SetScript("OnShow", function()
+	bags:SetScript("OnShow", function(self)
 		PlaySound("igBackPackOpen")
-		OnShow()
+		OnShow(self)
 	end)
 
 	local OnHide = bags:GetScript("OnHide")
-	bags:SetScript("OnHide", function()
+	bags:SetScript("OnHide", function(self)
 		PlaySound("igBackPackClose")
-		OnHide()
+		OnHide(self)
 	end)
 
 	if not bags:IsUserPlaced() then
-		bags:SetPoint("RIGHT", UIParent)
+		bags:SetPoint('RIGHT', UIParent)
 	end
 
 	self.bags = bags
@@ -161,27 +161,27 @@ end
 --[[ Bank Frame Display ]]--
 
 function Bagnon:CreateBank()
-	local bank = BagnonFrame.New(L.TitleBank, self.sets.bank, {-1, 5, 6, 7, 8, 9, 10, 11}, true)
+	local bank = BagnonFrame:Create(L.TitleBank, self.sets.bank, {-1, 5, 6, 7, 8, 9, 10, 11}, true)
 	table.insert(UISpecialFrames, bank:GetName())
 
 	local OnShow = bank:GetScript("OnShow")
-	bank:SetScript("OnShow", function()
+	bank:SetScript("OnShow", function(self)
 		PlaySound("igBagnonMenuOpen")
-		OnShow()
+		OnShow(self)
 	end)
 
 	local OnHide = bank:GetScript("OnHide")
-	bank:SetScript("OnHide", function()
+	bank:SetScript("OnHide", function(self)
 		PlaySound("igBagnonMenuClose")
 
-		if self.atBank then
+		if BagnonUtil:AtBank() then
 			CloseBankFrame()
 		end
-		OnHide()
+		OnHide(self)
 	end)
 
 	if not bank:IsUserPlaced() then
-		bank:SetPoint("LEFT", UIParent, "LEFT", 24, 100)
+		bank:SetPoint('LEFT', 24, 100)
 	end
 
 	self.bank = bank
@@ -193,11 +193,7 @@ function Bagnon:ShowBank(auto)
 	if BagnonDB or self.atBank then
 		local bank = self.bank
 		if bank then
-			if bank:IsShown() then
-				if not bank:IsCached() then
-					bank:Regenerate()
-				end
-			else
+			if not bank:IsVisible() then
 				bank:Show()
 				bank.manOpened = not auto
 			end

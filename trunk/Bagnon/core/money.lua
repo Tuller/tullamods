@@ -1,83 +1,59 @@
 --[[
-	vBagnon\moneyFrame.lua
+	money.lua
 		Money frames for Bagnon windows
 --]]
 
-BagnonMoney = CreateFrame("Button")
-local Money_mt = {__index = BagnonMoney}
+BagnonMoneyFrame = {}
 
-local currentPlayer = UnitName("player")
-local lastCreated = 0
-
---[[ Constructor ]]--
-
-local function OnShow(self) self:OnShow() end
-local function OnClick(self, arg1) self:GetParent():OnClick(arg1) end
-local function OnEnter(self) self:GetParent():OnEnter() end
-local function OnLeave(self) self:GetParent():OnLeave() end
-
-local function MoneyFrame_Create()
-	local frame = CreateFrame("Frame", format("BagnonMoney%s", lastCreated), nil, "SmallMoneyFrameTemplate")
-	setmetatable(frame, Money_mt)
-	frame:SetScript("OnShow", OnShow)
-
-	local clickFrame = CreateFrame("Button", nil, frame)
-	clickFrame:SetFrameLevel(frame:GetFrameLevel() + 2)
-	clickFrame:SetAllPoints(frame)
-	clickFrame:SetScript("OnClick", OnClick)
-	clickFrame:SetScript("OnEnter", OnEnter)
-	clickFrame:SetScript("OnLeave", OnLeave)
-	
-	lastCreated = lastCreated + 1
-
-	return frame
-end
-
-function BagnonMoney.New(parent)
-	local frame = MoneyFrame_Create()
-	BagnonUtil:Attach(frame, parent)
-
+local id = 0
+function BagnonMoneyFrame:Create(parent)
+	local frame = CreateFrame('Frame', format('BagnonMoney%s', id), parent, 'SmallMoneyFrameTemplate')
+	frame:SetScript('OnShow', self.Update)
+	frame.Update = self.Update
 	frame:Update()
-	
+
+	local click = CreateFrame('Button', nil, frame)
+	click:SetFrameLevel(frame:GetFrameLevel() + 3)
+	click:SetAllPoints(frame)
+
+	click:SetScript('OnClick', self.OnClick)
+	click:SetScript('OnEnter', self.OnEnter)
+	click:SetScript('OnLeave', self.OnLeave)
+
+	id = id + 1
 	return frame
 end
 
---[[ Update ]]--
+function BagnonMoneyFrame:Update()
+	local player = self:GetParent():GetPlayer()
+	if player == UnitName('player') or not BagnonDB then
+		MoneyFrame_Update(self:GetName(), GetMoney())
+	else
+		MoneyFrame_Update(self:GetName(), BagnonDB:GetMoney(player))
+	end
+end
 
-function BagnonMoney:Update()
+--frame events
+function BagnonMoneyFrame:OnClick()
 	local parent = self:GetParent()
-	if parent then
-		local player = parent:GetPlayer()
-		if player == currentPlayer or not BagnonDB then
-			MoneyFrame_Update(self:GetName(), GetMoney())
-		else
-			MoneyFrame_Update(self:GetName(), BagnonDB:GetMoney(player))
-		end
+	local name = parent:GetName()
+
+	if MouseIsOver(getglobal(name .. 'GoldButton')) then
+		OpenCoinPickupFrame(COPPER_PER_GOLD, MoneyTypeInfo[parent.moneyType].UpdateFunc(), parent)
+		parent.hasPickup = 1
+	elseif MouseIsOver(getglobal(name .. 'SilverButton')) then
+		OpenCoinPickupFrame(COPPER_PER_SILVER, MoneyTypeInfo[parent.moneyType].UpdateFunc(), parent)
+		parent.hasPickup = 1
+	elseif MouseIsOver(getglobal(name .. 'CopperButton')) then
+		OpenCoinPickupFrame(1, MoneyTypeInfo[parent.moneyType].UpdateFunc(), parent)
+		parent.hasPickup = 1
 	end
 end
 
---[[ Frame Events ]]--
-
-function BagnonMoney:OnClick(button)
-	local name = self:GetName()
-
-	if MouseIsOver(getglobal(name .. "GoldButton")) then
-		OpenCoinPickupFrame(COPPER_PER_GOLD, MoneyTypeInfo[self.moneyType].UpdateFunc(), self)
-		self.hasPickup = 1
-	elseif MouseIsOver(getglobal(name .. "SilverButton")) then
-		OpenCoinPickupFrame(COPPER_PER_SILVER, MoneyTypeInfo[self.moneyType].UpdateFunc(), self)
-		self.hasPickup = 1
-	elseif MouseIsOver(getglobal(name .. "CopperButton")) then
-		OpenCoinPickupFrame(1, MoneyTypeInfo[self.moneyType].UpdateFunc(), self)
-		self.hasPickup = 1
-	end
-end
-
---Alters the tooltip of bagnon moneyframes to show total gold across all characters on the current realm
-function BagnonMoney:OnEnter()
+function BagnonMoneyFrame:OnEnter()
 	if BagnonDB then
-		GameTooltip:SetOwner(self, "ANCHOR_TOPRIGHT")
-		GameTooltip:SetText(format(BAGNON_LOCALS.TipGoldOnRealm, GetRealmName()))
+		GameTooltip:SetOwner(self, 'ANCHOR_TOPRIGHT')
+		GameTooltip:SetText(format('Total on %s', GetRealmName()))
 
 		local money = 0
 		for player in BagnonDB:GetPlayers() do
@@ -89,10 +65,6 @@ function BagnonMoney:OnEnter()
 	end
 end
 
-function BagnonMoney:OnLeave()
+function BagnonMoneyFrame:OnLeave()
 	GameTooltip:Hide()
-end
-
-function BagnonMoney:OnShow()
-	self:Update()
 end

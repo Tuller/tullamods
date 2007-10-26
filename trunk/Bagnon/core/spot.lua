@@ -14,7 +14,7 @@ local function SearchBox_Create()
 	frame:SetScript("OnShow", function(self) self:SetFocus(); self:HighlightText() end)
 	frame:SetScript("OnTextChanged", function(self) BagnonSpot:SetTextSearch(self:GetText()) end)
 	frame:SetScript("OnEscapePressed", function(self) BagnonSpot:Hide() end)
-	
+
 	return frame
 end
 
@@ -29,8 +29,8 @@ function BagnonSpot:Show(anchor)
 
 		self.frame.anchor = anchor
 		self.frame:Show()
-		self.frame:SetPoint("TOPLEFT", anchor:GetName() .. "Title", "TOPLEFT", -8, 6)
-		self.frame:SetPoint("BOTTOMRIGHT", anchor:GetName() .. "Title", "BOTTOMRIGHT", -4, -6)
+		self.frame:SetPoint("TOPLEFT", anchor.title, "TOPLEFT", -8, 6)
+		self.frame:SetPoint("BOTTOMRIGHT", anchor.title, "BOTTOMRIGHT", -4, -6)
 		self:SetTextSearch(self.frame:GetText())
 	end
 end
@@ -72,12 +72,12 @@ function BagnonSpot:ClearAllSearches()
 end
 
 --updates all highlighting for frames
-function BagnonSpot:UpdateFrames()	
+function BagnonSpot:UpdateFrames()
 	local bags = Bagnon:GetInventory()
 	if bags and bags:IsShown() then
 		bags:UpdateSearch()
 	end
-	
+
 	local bank = Bagnon:GetBank()
 	if bank and bank:IsShown() then
 		bank:UpdateSearch()

@@ -3,12 +3,8 @@
 		A library of functions for accessing bag data
 --]]
 
-BagnonUtil = {}
-
-
---[[ Usable Functions ]]--
-
-local currentPlayer = UnitName("player")
+BagnonUtil = CreateFrame('Frame')
+local currentPlayer = UnitName('player')
 local typeContainer = select(3, GetAuctionItemClasses())
 local typeQuiver = select(7, GetAuctionItemClasses())
 local subTypeBag = select(1, GetAuctionItemSubClasses(3))
@@ -17,12 +13,14 @@ local subTypeSoulBag = select(2, GetAuctionItemSubClasses(3))
 
 --[[ Bank ]]--
 
-function BagnonUtil:SetAtBank(atBank)
-	self.atBank = atBank or nil
-end
+BagnonUtil:SetScript('OnEvent', function(self, event)
+	self.atBank = (event == 'BANKFRAME_OPENED')
+end)
+BagnonUtil:RegisterEvent('BANKFRAME_OPENED')
+BagnonUtil:RegisterEvent('BANKFRAME_CLOSED')
 
 function BagnonUtil:AtBank()
-	return Bagnon.atBank
+	return self.atBank
 end
 
 
@@ -35,26 +33,22 @@ end
 function BagnonUtil:GetBagSize(bag, player)
 	if self:IsCachedBag(bag, player) then
 		return (BagnonDB and BagnonDB:GetBagData(bag, player)) or 0
-	else
-		return (bag == KEYRING_CONTAINER and GetKeyRingSize()) or GetContainerNumSlots(bag)
 	end
-	return 0
+	return (bag == KEYRING_CONTAINER and GetKeyRingSize()) or GetContainerNumSlots(bag)
 end
 
 function BagnonUtil:GetBagLink(bag, player)
 	if self:IsCachedBag(bag, player) then
 		return BagnonDB and (select(2, BagnonDB:GetBagData(bag, player)))
-	else
-		return GetInventoryItemLink("player", self:GetInvSlot(bag))
 	end
+	return GetInventoryItemLink('player', self:GetInvSlot(bag))
 end
 
 function BagnonUtil:GetItemLink(bag, slot, player)
 	if self:IsCachedBag(bag, player) then
 		return BagnonDB and (BagnonDB:GetItemData(bag, slot, player))
-	else
-		return GetContainerItemLink(bag, slot)
 	end
+	return GetContainerItemLink(bag, slot)
 end
 
 function BagnonUtil:GetItemCount(bag, slot, player)
@@ -64,15 +58,15 @@ function BagnonUtil:GetItemCount(bag, slot, player)
 			if link then
 				return count or 1
 			end
+		else
+			return 0
 		end
-		return 0
-	else
-		return select(2, GetContainerItemInfo(bag, slot)) or 0
 	end
+	return select(2, GetContainerItemInfo(bag, slot))
 end
 
 
---[[ Bag Type Booleans ]]--
+--[[ Bag Type Checks ]]--
 
 --returns true if the given bag is cached AND we have a way of reading data for it
 function BagnonUtil:IsCachedBag(bag, player)
@@ -84,7 +78,7 @@ function BagnonUtil:IsInventoryBag(bag)
 end
 
 function BagnonUtil:IsBankBag(bag)
-	return (bag == -1 or bag > 4)
+	return (bag == BANK_CONTAINER or bag > 4)
 end
 
 --returns if the given bag is an ammo bag/soul bag
@@ -112,26 +106,29 @@ function BagnonUtil:IsProfessionBag(bag, player)
 end
 
 
---[[ Positioning Functions ]]--
+--[[ Non bag related stuff ]]--
 
-function BagnonUtil:AnchorTooltip(frame)
-	if frame:GetRight() >= (GetScreenWidth() / 2) then
-		GameTooltip:SetOwner(frame, "ANCHOR_LEFT")
-	else
-		GameTooltip:SetOwner(frame, "ANCHOR_RIGHT")
+--creates a new class of objects that inherits from objects of <type>, ex 'Frame', 'Button', 'StatusBar'
+--does not chain inheritance
+function BagnonUtil:CreateWidgetClass(type)
+	local class = CreateFrame(type)
+	local mt = {__index = class}
+
+	function class:New(o)
+		if o then
+			local type, cType = o:GetFrameType(), self:GetFrameType()
+			assert(type == cType, format("'%s' expected, got '%s'", cType, type))
+		end
+		return setmetatable(o or CreateFrame(type), mt)
 	end
+
+	return class
 end
 
 function BagnonUtil:AnchorAtCursor(frame)
 	local x,y = GetCursorPosition()
 	local scale = UIParent:GetScale()
-
-	frame:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", x/scale - 32, y/scale + 32)
-end
-
-function BagnonUtil:Attach(frame, parent)
-	frame:SetParent(parent)
-	frame:SetFrameLevel(parent:GetFrameLevel() + 1)
+	frame:SetPoint('TOPLEFT', UIParent, 'BOTTOMLEFT', x/scale - 32, y/scale + 32)
 end
 
 
