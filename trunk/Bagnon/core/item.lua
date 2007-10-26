@@ -113,6 +113,7 @@ function BagnonItem:Get()
 	local item = next(unused)
 	if item then
 		unused[item] = nil
+		item:Show()
 		return item
 	end
 	return self:Create()

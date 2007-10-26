@@ -38,7 +38,7 @@ do
 		title:SetScript('OnMouseDown', self.OnMouseDown)
 		title:SetScript('OnEnter', self.OnEnter)
 		title:SetScript('OnLeave', self.OnLeave)
-		
+
 		return title
 	end
 
@@ -103,6 +103,7 @@ function BagnonFrame:Create(name, sets, bags, isBank)
 	frame:EnableMouse(true)
 
 	frame.slots = {}
+	frame.bags = bags
 	frame.showBags = sets.showBags
 	frame.visibleBags = sets.bags
 	frame.borderSize = 16
@@ -116,7 +117,7 @@ function BagnonFrame:Create(name, sets, bags, isBank)
 	  tile = true, tileSize = 16,
 	  insets = {left = 4, right = 4, top = 4, bottom = 4}
 	}
-	
+
 	frame:LoadSettings(sets)
 	frame:SetScript('OnShow', self.OnShow)
 	frame:SetScript('OnHide', self.OnHide)
@@ -245,7 +246,7 @@ end
 --[[ item updating ]]--
 
 function BagnonFrame:AddItem(bag, slot)
-	local item = BagnonItem:Create()
+	local item = BagnonItem:Get()
 	item:Set(self, bag, slot)
 
 	self.slots[ToIndex(bag, slot)] = item
@@ -301,15 +302,14 @@ function BagnonFrame:OnBagUpdate(updatedBag)
 	local sizeChanged = false
 	local slots = self.slots
 
-	for _, bag in pairs(self:GetVisibleBags()) do
+	for _,bag in pairs(self:GetVisibleBags()) do
 		local prevSize = slots[bag*100] or 0
 		local size = BagnonUtil:GetBagSize(bag, self:GetPlayer())
-		slots[bag * 100] = size
+		slots[bag*100] = size
 
 		if bag == updatedBag then
 			for slot = 1, min(prevSize, size) do
-				local item = self.slots[ToIndex(bag, slot)]
-				item:Update()
+				self.slots[ToIndex(bag, slot)]:Update()
 			end
 		end
 
@@ -382,9 +382,9 @@ end
 function BagnonFrame:SetPlayer(player)
 	if player ~= self:GetPlayer() then
 		self.player = player
-
 		self:UpdateTitleText()
 		self.moneyFrame:Update()
+
 		if self:IsShown() then
 			self:Regenerate()
 		end

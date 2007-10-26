@@ -270,9 +270,12 @@ end
 function BagnonBag:OnClick()
 	local player = self:GetPlayer()
 	local bagID = self:GetID()
-
-	if not BagnonUtil:IsCachedBag(bagID, player) then
-		if CursorHasItem() and not BagnonUtil:IsCachedBag(bagID, player) then
+	
+	if BagnonUtil:IsCachedBag(bagID, player) then
+		local frame = self:GetParent():GetParent()
+		frame:ShowBag(bagID, not frame:ShowingBag(bagID))
+	else
+		if CursorHasItem() then
 			if bagID == KEYRING_CONTAINER then
 				PutKeyInKeyRing()
 			elseif bagID == BACKPACK_CONTAINER then
