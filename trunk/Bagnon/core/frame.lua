@@ -102,7 +102,8 @@ function BagnonFrame:Create(name, sets, bags, isBank)
 	frame:SetMovable(true)
 	frame:EnableMouse(true)
 
-	frame.slots = {}
+	frame.items = {}
+	frame.bagSizes = {}
 	frame.bags = bags
 	frame.showBags = sets.showBags
 	frame.visibleBags = sets.bags
@@ -159,13 +160,13 @@ function BagnonFrame:OnEvent(event, bag)
 		self:Regenerate()
 	elseif self:GetPlayer() == UnitName('player') then
 		if event == 'BAG_UPDATE' then
-			self:OnBagUpdate(bag)
+			self:OnBagChanged(bag)
+		elseif event == 'PLAYERBANKSLOTS_CHANGED' then
+			self:OnBagChanged(BANK_CONTAINER)
 		elseif event == 'ITEM_LOCK_CHANGED' then
 			self:UpdateLockedSlots()
 		elseif event == 'BAG_UPDATE_COOLDOWN' then
 			self:UpdateSlotsOnCooldown()
-		elseif event == 'PLAYERBANKSLOTS_CHANGED' then
-			self:OnBagUpdate(BANK_CONTAINER)
 		end
 	end
 end
@@ -246,138 +247,178 @@ end
 --[[ item updating ]]--
 
 function BagnonFrame:AddItem(bag, slot)
-	local item = BagnonItem:Get()
-	item:Set(self, bag, slot)
+	local index = ToIndex(bag, slot)
+	local item = self.items[index]
 
-	self.slots[ToIndex(bag, slot)] = item
+	if item then
+		item:Update()
+	else
+		local item = BagnonItem:Get()
+		item:Set(self, bag, slot)
+
+		self.items[index] = item
+		return true
+	end
 end
 
 function BagnonFrame:RemoveItem(bag, slot)
-	local item = self.slots[ToIndex(bag, slot)]
+	local index = ToIndex(bag, slot)
+	local item = self.items[index]
+
 	if item then
-		self.slots[ToIndex(bag, slot)] = nil
 		item:Release()
+		self.items[index] = nil
+		return true
 	end
 end
 
 
 --[[ Frame Updating ]]--
 
---add any added slots, removed any removed slots, update the rest of the slots held by the bag
+--update all visible slots in the given frame
 function BagnonFrame:Regenerate()
 	self.bagFrame:Update()
 
-	local sizeChanged = false
-	local slots = self.slots
-
+	local changed = false
 	for _,bag in pairs(self:GetVisibleBags()) do
-		local prevSize = slots[bag*100] or 0
-		local size = BagnonUtil:GetBagSize(bag, self:GetPlayer())
-		slots[bag*100] = size
-
-		for slot = 1, min(prevSize, size) do
-			self.slots[ToIndex(bag, slot)]:Update()
-		end
-
-		if size > prevSize then
-			for slot = prevSize + 1, size do
-				self:AddItem(bag, slot)
-			end
-			sizeChanged = true
-		elseif size < prevSize then
-			for slot = size + 1, prevSize do
-				self:RemoveItem(bag, slot)
-			end
-			sizeChanged = true
+		if self:UpdateBag(bag) then
+			changed = true
 		end
 	end
 
-	if sizeChanged then
+	if changed then
 		self:Layout()
 	end
 end
 
---add any added slots, removed any removed slots, update all the slots of the bag being updated
-function BagnonFrame:OnBagUpdate(updatedBag)
-	local sizeChanged = false
-	local slots = self.slots
+--update all slots of a bag, adding and removing as necessary
+function BagnonFrame:UpdateBag(bag, layout)
+	local prevSize = self.bagSizes[bag] or 0
+	local newSize = BagnonUtil:GetBagSize(bag, self:GetPlayer())
+	self.bagSizes[bag] = newSize
 
-	for _,bag in pairs(self:GetVisibleBags()) do
-		local prevSize = slots[bag*100] or 0
-		local size = BagnonUtil:GetBagSize(bag, self:GetPlayer())
-		slots[bag*100] = size
-
-		if bag == updatedBag then
-			for slot = 1, min(prevSize, size) do
-				self.slots[ToIndex(bag, slot)]:Update()
-			end
-		end
-
-		if size > prevSize then
-			for slot = prevSize + 1, size do
-				self:AddItem(bag, slot)
-			end
-			sizeChanged = true
-		elseif size < prevSize then
-			for slot = size + 1, prevSize do
-				self:RemoveItem(bag, slot)
-			end
-			sizeChanged = true
+	local changed = false
+	for slot = 1, newSize do
+		if self:AddItem(bag, slot) then
+			changed = true
 		end
 	end
 
-	if sizeChanged then
+	for slot = newSize + 1, prevSize do
+		if self:RemoveItem(bag, slot) then
+			changed = true
+		end
+	end
+
+	if changed and layout then
+		self:Layout()
+	end
+	return changed
+end
+
+--update the size of a bag, adding and removing slots if necessary
+function BagnonFrame:UpdateBagSize(bag, layout)
+	local prevSize = self.bagSizes[bag] or 0
+	local newSize = BagnonUtil:GetBagSize(bag, self:GetPlayer())
+	self.bagSizes[bag] = newSize
+
+	local changed = false
+	if prevSize > newSize then
+		for slot = newSize + 1, prevSize do
+			if self:RemoveItem(bag, slot) then
+				changed = true
+			end
+		end
+	elseif prevSize < newSize then
+		for slot = prevSize + 1, newSize do
+			if self:AddItem(bag, slot) then
+				changed = true
+			end
+		end
+	end
+
+	if changed and layout then
+		self:Layout()
+	end
+	return changed
+end
+
+--update slots if the bag is the one that changed, otherwise update the bag size
+function BagnonFrame:OnBagChanged(changedBag)
+	for _,bag in pairs(self:GetVisibleBags()) do
+		if bag == changedBag then
+			if self:UpdateBag(bag) then
+				changed = true
+			end
+		else
+			if self:UpdateBagSize(bag) then
+				changed = true
+			end
+		end
+	end
+
+	if changed then
 		self:Layout()
 	end
 end
+
+
+--[[ Bag Add/Removal ]]--
 
 function BagnonFrame:AddBag(bag)
-	local prevSize = self.slots[bag*100] or 0
-	local size = BagnonUtil:GetBagSize(bag, self:GetPlayer())
-	self.slots[bag*100] = size
+	local newSize = BagnonUtil:GetBagSize(bag, self:GetPlayer())
+	self.bagSizes[bag] = newSize
 
-	for slot = 1, size do
-		self:AddItem(bag, slot)
+	local changed = false
+	for slot = 1, newSize do
+		if self:AddItem(bag, slot) then
+			changed = true
+		end
 	end
-	self:Layout()
+
+	if changed then
+		self:Layout()
+	end
+	return changed
 end
 
 function BagnonFrame:RemoveBag(bag)
-	for slot = 1, BagnonUtil:GetBagSize(bag, self:GetPlayer()) do
-		self:RemoveItem(bag, slot)
+	local changed = false
+	for slot = 1, self.bagSizes[bag] or 0 do
+		if self:RemoveItem(bag, slot) then
+			changed = true
+		end
 	end
-	self:Layout()
+
+	if changed then
+		self:Layout()
+	end
+	return changed
 end
 
+
+--[[ Other Slot Updating Stuff ]]--
+
 function BagnonFrame:UpdateLockedSlots()
-	for _,item in pairs(self.slots) do
-		if not tonumber(item) then
-			item:UpdateLock()
-		end
+	for _,item in pairs(self.items) do
+		item:UpdateLock()
 	end
 end
 
 function BagnonFrame:UpdateSlotsOnCooldown()
-	for _,item in pairs(self.slots) do
-		if not tonumber(item) then
-			item:UpdateLock()
-		end
+	for _,item in pairs(self.items) do
+		item:UpdateCooldown()
 	end
 end
-
-
---[[ spot searching ]]--
 
 function BagnonFrame:UpdateSearch()
-	for _, item in pairs(self.slots) do
-		if not tonumber(item) then
-			item:UpdateSearch()
-		end
+	for _,item in pairs(self.items) do
+		item:UpdateSearch()
 	end
 end
 
 
---[[ cached data viewing ]]--
+--[[ Player Selection ]]--
 
 function BagnonFrame:SetPlayer(player)
 	if player ~= self:GetPlayer() then
@@ -396,7 +437,7 @@ function BagnonFrame:GetPlayer()
 end
 
 
---[[ layout ]]--
+--[[ Frame Layout ]]--
 
 function BagnonFrame:Layout(cols, space)
 	cols = cols or self.sets.cols or DEFAULT_COLS
@@ -429,7 +470,7 @@ function BagnonFrame:Layout(cols, space)
 end
 
 function BagnonFrame:LayoutItems(cols, space, offX, offY)
-	if not next(self.slots) then return 0, 0 end
+	if not next(self.items) then return 0, 0 end
 
 	local itemSize = ITEM_SIZE + space
 	local slots = self.slots
@@ -437,13 +478,14 @@ function BagnonFrame:LayoutItems(cols, space, offX, offY)
 
 	local i = 0
 	for _,bag in ipairs(self:GetVisibleBags()) do
-		for slot = 1, BagnonUtil:GetBagSize(bag, player) do
-			local item = slots[ToIndex(bag, slot)]
+		for slot = 1, (self.bagSizes[bag] or 0) do
+			local item = self.items[ToIndex(bag, slot)]
 			if item then
 				i = i + 1
 				local row = mod(i - 1, cols)
 				local col = ceil(i / cols) - 1
 				item:SetPoint('TOPLEFT', self, 'TOPLEFT', itemSize * row + offX, -(itemSize * col + offY))
+				item:Show()
 			end
 		end
 	end
@@ -473,6 +515,7 @@ function BagnonFrame:SortBags()
 		table.sort(self.sets.bags, NormalSort)
 	end
 end
+
 
 --[[ Settings Loading ]]--
 

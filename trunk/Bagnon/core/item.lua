@@ -73,7 +73,6 @@ function BagnonItem:Create()
 		item = self:New(button)
 	end
 	item:ClearAllPoints()
-	item:Show()
 
 	local border = item:CreateTexture(nil, 'OVERLAY')
 	border:SetWidth(67); border:SetHeight(67)
@@ -113,7 +112,6 @@ function BagnonItem:Get()
 	local item = next(unused)
 	if item then
 		unused[item] = nil
-		item:Show()
 		return item
 	end
 	return self:Create()
@@ -123,8 +121,6 @@ function BagnonItem:Set(parent, bag, slot)
 	self:SetParent(self:GetDummyBag(parent, bag))
 	self:SetID(slot)
 	self:Update()
-
-	return item
 end
 
 function BagnonItem:Release()
@@ -181,6 +177,7 @@ function BagnonItem:Update()
 	SetItemButtonCount(self, count)
 
 	self:UpdateBorder(quality)
+	self:UpdateSlotBorder()
 	self:UpdateCooldown()
 
 	if GameTooltip:IsOwned(self) then
@@ -210,6 +207,22 @@ function BagnonItem:UpdateBorder(quality)
 		end
 	else
 		border:Hide()
+	end
+end
+
+function BagnonItem:UpdateSlotBorder()
+	local bag = self:GetBag()
+	local player = self:GetPlayer()
+	local normalTexture = getglobal(self:GetName() .. "NormalTexture")
+
+	if bag == KEYRING_CONTAINER then
+		normalTexture:SetVertexColor(1, 0.7, 0)
+	elseif BagnonUtil:IsAmmoBag(bag, player) then
+		normalTexture:SetVertexColor(1, 1, 0)
+	elseif BagnonUtil:IsProfessionBag(bag , player) then
+		normalTexture:SetVertexColor(0, 1, 0)
+	else
+		normalTexture:SetVertexColor(1, 1, 1)
 	end
 end
 
@@ -255,8 +268,9 @@ function BagnonItem:UpdateSearch()
 						local subType = subType:lower()
 						if not(text == subType or subType:find(text)) then
 							local equipLoc = getglobal(equipLoc) and getglobal(equipLoc):lower()
-							if equipLoc and not(text == equipLoc or equipLoc:find(text)) then
+							if not(equipLoc and (text == equipLoc or equipLoc:find(text))) then
 								self:Fade()
+								return
 							end
 						end
 					end
