@@ -63,7 +63,6 @@ local unused = {}
 function CombuctorItem:Create()
 	local item = self:New(self:GetBlizzard(itemID) or CreateFrame('Button', format('CombuctorItem%d', itemID), nil, 'ContainerFrameItemButtonTemplate'))
 	item:ClearAllPoints()
-	item:Show()
 
 	local border = item:CreateTexture(nil, 'OVERLAY')
 	border:SetWidth(67); border:SetHeight(67)
