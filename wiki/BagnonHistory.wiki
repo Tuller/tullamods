@@ -11,6 +11,7 @@ Gave empty bag slots a texture
   * Purchasable bag slots are now colored red
   * Clicking on a purchasable bag will now bring up the purchase dialog
   * Removed the old purchase frame
+  * Allowed partial matching in spot searches
   * Added zhTW localization (thanks to matini)
 
 1.4.3
