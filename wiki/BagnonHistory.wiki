@@ -2,6 +2,17 @@
 
 = Bagnon Version History =
 
+1.4.4
+  * Bagnon_Forever has been changed to be load on demand, with Bagnon listing it as an optional dependency.
+  * Rewrote a good portion of the code.
+  * Fixed a bug causing cooldowns to not properly update.
+  * Fixed some layering issues.
+Gave empty bag slots a texture
+  * Purchasable bag slots are now colored red
+  * Clicking on a purchasable bag will now bring up the purchase dialog
+  * Removed the old purchase frame
+  * Added zhTW localization (thanks to matini)
+
 1.4.3
   * Fixed an issue causing all item data to not be saved for some items in Bagnon_Forever
 
