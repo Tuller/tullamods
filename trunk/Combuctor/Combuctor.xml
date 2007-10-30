@@ -306,7 +306,7 @@
 	        </Button>
 
 			<Button name="$parentDrag" inherits="CombuctorDragFrameTemplate">
-				<Size x="300" y="14"/>
+				<Size x="262" y="14"/>
 				<Anchors>
 					<Anchor point="TOP">
 						<Offset x="0" y="-16"/>
