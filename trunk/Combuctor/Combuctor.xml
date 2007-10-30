@@ -185,7 +185,7 @@
 		<HighlightTexture file="Interface\Buttons\CancelButton-Highlight" alphaMode="ADD"/>
 	</Button>
 
-	<Button name="CombuctorDragFrameTemplate" topLevel="true" virtual="true">
+	<Button name="CombuctorDragFrameTemplate" topLevel="true" virtual="true" text="TEXT">
 		<Scripts>
 			<OnLoad>
 				self:RegisterForClicks('anyUp')
@@ -227,6 +227,9 @@
 				end
 			</OnMouseUp>
 		</Scripts>
+
+		<NormalFont font="GameFontNormal"/>
+		<HighlightFont font="GameFontHighlight"/>
 	</Button>
 
 
@@ -257,15 +260,6 @@
 			</Layer>
 
 			<Layer level="ARTWORK">
-				<FontString name="$parentTitle" inherits="GameFontHighlight" text="TEXT">
-					<Size x="300" y="14"/>
-					<Anchors>
-						<Anchor point="TOP">
-							<Offset x="0" y="-16"/>
-						</Anchor>
-					</Anchors>
-				</FontString>
-
 				<Texture file="Interface\MerchantFrame\UI-Merchant-TopLeft">
 					<Size x="256" y="256"/>
 					<Anchors>
@@ -305,7 +299,7 @@
 				</Anchors>
 	        </Button>
 
-			<Button name="$parentDrag" inherits="CombuctorDragFrameTemplate">
+			<Button name="$parentTitle" inherits="CombuctorDragFrameTemplate">
 				<Size x="262" y="14"/>
 				<Anchors>
 					<Anchor point="TOP">
