@@ -7,7 +7,7 @@ Combuctor = DongleStub("Dongle-1.0"):New("Combuctor")
 local L = COMBUCTOR_LOCALS
 
 function Combuctor:Enable()
-	CombuctorDB = {
+	CombuctorDB = CombuctorDB or {
 		frames = {
 			inventory = {
 				bags = {-2, 0, 1, 2, 3, 4},

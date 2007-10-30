@@ -143,14 +143,10 @@ end
 --reset all filters
 function ItemFrame:ResetFilters()
 	local f = self.filter
-
-	local changed
-	for k in pairs(f) do
-		changed = true
-		f[k] = nil
-	end
-
-	if changed then
+	if next(f) then
+		for k in pairs(f) do
+			f[k] = nil
+		end
 		self:Regenerate()
 	end
 end

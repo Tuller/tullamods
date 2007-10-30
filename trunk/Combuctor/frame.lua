@@ -4,7 +4,7 @@
 --]]
 
 local L = COMBUCTOR_LOCALS
-local ITEM_FRAME_WIDTH = 312
+local ITEM_FRAME_WIDTH = 312 --+ 448
 local ITEM_FRAME_HEIGHT = 346
 
 CombuctorFrame = Combuctor:NewModule('Combuctor-Frame')
@@ -173,7 +173,7 @@ do
 
 		local prev
 		for i,type in ipairs(types) do
-			local button = CreateFrame('CheckButton', format('CombuctorItemFilter', nextID), f, 'CombuctorFrameSideButtonTemplate')
+			local button = CreateFrame('CheckButton', format('CombuctorItemFilter', nextID), f, 'SpellBookSkillLineTabTemplate')
 			button:SetNormalTexture(typeIcons[i])
 			button:GetNormalTexture():SetTexCoord(0.06, 0.94, 0.06, 0.94)
 			button:SetScript('OnClick', self.OnClick)
@@ -257,6 +257,7 @@ function InventoryFrame:Create(titleText, settings, isBank)
 	f:UpdateTitleText()
 	f:GenerateBagSets()
 	f:UpdateBagFrame()
+	f:LoadPosition()
 
 	lastID = lastID + 1
 
@@ -542,5 +543,40 @@ function InventoryFrame:ToggleBag(bag, auto)
 				end
 			end
 		end
+	end
+end
+
+--[[ Settings Loading ]]--
+
+function InventoryFrame:SavePosition(...)
+	if self:IsUserPlaced() then
+		if self.sets.position then
+			local numPoints = select('#', ...)
+			for i = 1, numPoints do
+				self.sets.position[i] = select(i, ...)
+			end
+			for i = numPoints + 1, #self.sets.position do
+				self.sets.position[i] = nil
+			end
+		else
+			self.sets.position = {...}
+		end
+	else	
+		self.sets.position = nil
+	end
+end
+
+function InventoryFrame:LoadPosition()
+	if self.sets.position then
+		self:SetPoint(unpack(self.sets.position))
+		self:SetUserPlaced(true)
+		self:SetAttribute('UIPanelLayout-enabled', nil)
+	else
+		self:SetUserPlaced(false)
+		self:SetAttribute('UIPanelLayout-enabled', true)
+	end
+	if self:IsShown() then
+		HideUIPanel(self)
+		ShowUIPanel(self)
 	end
 end

@@ -1,5 +1,9 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
 
+	<!--
+		Widget Templates
+	-->
+
 	<Button name="CombuctorFrameTabButtonTemplate" inherits="CharacterFrameTabButtonTemplate" virtual="true">
 		<Scripts>
 			<OnLoad>
@@ -15,9 +19,222 @@
 		</Scripts>
 	</Button>
 
-	<CheckButton name="CombuctorFrameSideButtonTemplate" inherits="SpellBookSkillLineTabTemplate" virtual="true"/>
+	<Button name="CombuctorIconButtonTemplate" virtual="true">
+		<Size x="64" y="64"/>
 
-	<Frame name="CombuctorFrameTemplate" enableMouse="true" movable="true" sizable="true" toplevel="true" parent="UIParent" hidden="true" virtual="true">
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset x="4" y="-4"/>
+			</Anchor>
+		</Anchors>
+
+		<Scripts>
+			<OnLoad>
+				self:RegisterForClicks("anyUp")
+				self.icon = getglobal(self:GetParent():GetName().."Icon")
+				self.icon:ClearAllPoints()
+				self.icon:SetPoint("CENTER", self)
+			</OnLoad>
+			<OnEvent>
+				if(self:IsShown() and arg1 == "player") then
+					SetPortraitTexture(self.icon, arg1)
+				end
+			</OnEvent>
+			<OnShow>
+				SetPortraitTexture(self.icon, "player")
+				self:RegisterEvent("UNIT_PORTRAIT_UPDATE")
+			</OnShow>
+			<OnHide>
+				self:UnregisterEvent("UNIT_PORTRAIT_UPDATE")
+			</OnHide>
+			<OnMouseDown>
+				self.icon:SetWidth(56)
+				self.icon:SetHeight(56)
+				self.icon:SetTexCoord(0.075, 0.925, 0.075, 0.925)
+			</OnMouseDown>
+			<OnMouseUp>
+				self.icon:SetWidth(62)
+				self.icon:SetHeight(62)
+				self.icon:SetTexCoord(0, 1, 0, 1)
+			</OnMouseUp>
+			<OnClick>
+				if(arg1 == "LeftButton") then
+					if BagnonDB then
+						BagnonDB:SetDropdownFrame(self:GetParent())
+						BagnonDB:ToggleDropdown(self, 20, 32)
+					end
+				end
+			</OnClick>
+		</Scripts>
+
+		<HighlightTexture alphaMode="ADD" file="Interface\Minimap\UI-Minimap-ZoomButton-Highlight">
+			<Size x="78" y="78"/>
+			<Anchors>
+				<Anchor point="CENTER"/>
+			</Anchors>
+		</HighlightTexture>
+	</Button>
+
+	<Button name="CombuctorBagToggleTemplate" virtual="true">
+		<Size x="32" y="32"/>
+
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentIcon" file="Interface\Buttons\Button-Backpack-Up">
+					<Size x="20" y="20"/>
+
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset x="7" y="-6"/>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0.075" right="0.925" top="0.075" bottom="0.925"/>
+				</Texture>
+			</Layer>
+
+			<Layer level="OVERLAY">
+				<Texture name="$parentBorder" file="Interface\Minimap\MiniMap-TrackingBorder">
+					<Size x="54" y="54"/>
+
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+
+		<Scripts>
+			<OnLoad>
+				self:RegisterForClicks("anyUp")
+				getglobal(self:GetName() .. "Border"):SetDesaturated(true)
+				getglobal(self:GetName() .. "Border"):SetAlpha(0.6)
+			</OnLoad>
+			<OnClick>
+				getglobal(self:GetName() .. "Icon"):SetTexCoord(0.075,0.925,0.075,0.925)
+				self:GetParent():ToggleBagFrame()
+			</OnClick>
+			<OnMouseDown>
+				getglobal(self:GetName() .. "Icon"):SetTexCoord(0,1,0,1)
+			</OnMouseDown>
+			<OnMouseUp>
+				getglobal(self:GetName() .. "Icon"):SetTexCoord(0.075,0.925,0.075,0.925)
+			</OnMouseUp>
+			<OnEnter>
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide()
+			</OnLeave>
+		</Scripts>
+		<HighlightTexture alphaMode="ADD" file="Interface\Minimap\UI-Minimap-ZoomButton-Highlight"/>
+	</Button>
+
+	<EditBox name="CombuctorSearchBoxTemplate" autoFocus="false" inherits="InputBoxTemplate" virtual="true">
+		<Size x="186" y="20"/>
+
+		<Scripts>
+			<OnShow>
+				if self:GetText() == '' then
+					self:SetText(SEARCH)
+				end
+			</OnShow>
+			<OnEnterPressed>
+				self:ClearFocus()
+			</OnEnterPressed>
+			<OnTextChanged>
+				if self:HasFocus() then
+					local text = self:GetText()
+					if text == '' then
+						text = nil
+					end
+					self:GetParent().itemFrame:SetFilter('name', text and text:lower() or nil)
+				end
+			</OnTextChanged>
+			<OnEditFocusLost>
+				self:HighlightText(0, 0)
+				if self:GetText() == '' then
+					self:SetText(SEARCH)
+				end
+			</OnEditFocusLost>
+			<OnEditFocusGained>
+				self:HighlightText()
+				if self:GetText() == SEARCH then
+					self:SetText('')
+				end
+			</OnEditFocusGained>
+		</Scripts>
+	</EditBox>
+
+	<Button name="CombuctorResetButtonTemplate" virtual="true">
+		<Size x="39" y="39"/>
+
+		<Scripts>
+			<OnClick>
+				local parent = self:GetParent()
+				local searchBox = getglobal(parent:GetName() .. 'Search')
+				if searchBox:HasFocus() then
+					searchBox:SetText('')
+				else
+					searchBox:SetText(SEARCH)
+					self:GetParent().itemFrame:SetFilter('name', nil)
+				end
+			</OnClick>
+		</Scripts>
+
+		<NormalTexture file="Interface\Buttons\CancelButton-Up"/>
+		<PushedTexture file="Interface\Buttons\CancelButton-Down"/>
+		<HighlightTexture file="Interface\Buttons\CancelButton-Highlight" alphaMode="ADD"/>
+	</Button>
+
+	<Button name="CombuctorDragFrameTemplate" topLevel="true" virtual="true">
+		<Scripts>
+			<OnLoad>
+				self:RegisterForClicks('anyUp')
+			</OnLoad>
+			<OnClick>
+				if IsAltKeyDown() then
+					if arg1 == 'RightButton' then
+						local parent = self:GetParent()
+						if not parent:GetAttribute('UIPanelLayout-enabled') then
+							parent:SetAttribute('UIPanelLayout-enabled', true)
+							parent:SetUserPlaced(false)
+							HideUIPanel(parent)
+							ShowUIPanel(parent)
+							parent:SavePosition()
+						end
+					end
+				end
+			</OnClick>
+			<OnMouseDown>
+				if IsAltKeyDown() then
+					if arg1 == 'LeftButton' then
+						self.isMoving = true
+						self:GetParent():StartMoving()
+					end
+				end
+			</OnMouseDown>
+			<OnMouseUp>
+				if self.isMoving then
+					self.isMoving = nil
+
+					local parent = self:GetParent()
+					parent:StopMovingOrSizing()
+					if parent:GetAttribute('UIPanelLayout-enabled') then
+						parent:SetAttribute('UIPanelLayout-enabled', nil)
+						HideUIPanel(parent)
+						ShowUIPanel(parent)
+						parent:SavePosition()
+					end
+				end
+			</OnMouseUp>
+		</Scripts>
+	</Button>
+
+
+	<!--
+		Frame Templates
+	-->
+
+	<Frame name="CombuctorFrameTemplate" clampedToScreen="true" enableMouse="true" movable="true" sizable="true" frameStrata="HIGH" parent="UIParent" hidden="true" virtual="true">
 		<Size x="384" y="512"/>
 
 		<Attributes>
@@ -33,7 +250,7 @@
 		</HitRectInsets>
 
 		<ClampRectInsets>
-			<AbsInset left="0" right="35" top="0" bottom="75"/>
+			<AbsInset left="0" right="38" top="0" bottom="0"/>
 		</ClampRectInsets>
 
 		<Layers>
@@ -54,36 +271,28 @@
 				</FontString>
 
 				<Texture file="Interface\MerchantFrame\UI-Merchant-TopLeft">
-					<Size>
-						<AbsDimension x="256" y="256"/>
-					</Size>
+					<Size x="256" y="256"/>
 					<Anchors>
 						<Anchor point="TOPLEFT"/>
 					</Anchors>
 				</Texture>
 
 				<Texture file="Interface\MerchantFrame\UI-Merchant-TopRight">
-					<Size>
-						<AbsDimension x="128" y="256"/>
-					</Size>
+					<Size x="128" y="256"/>
 					<Anchors>
 						<Anchor point="TOPRIGHT"/>
 					</Anchors>
 				</Texture>
 
 				<Texture file="Interface\MerchantFrame\UI-Merchant-BotLeft">
-					<Size>
-						<AbsDimension x="256" y="256"/>
-					</Size>
+					<Size x="256" y="256"/>
 					<Anchors>
 						<Anchor point="BOTTOMLEFT"/>
 					</Anchors>
 				</Texture>
 
 				<Texture file="Interface\MerchantFrame\UI-Merchant-BotRight">
-					<Size>
-						<AbsDimension x="128" y="256"/>
-					</Size>
+					<Size x="128" y="256"/>
 					<Anchors>
 						<Anchor point="BOTTOMRIGHT"/>
 					</Anchors>
@@ -100,187 +309,37 @@
 				</Anchors>
 	        </Button>
 
-			<!-- Fact: I should rename this.  The clickable portion of the portrat: used toggle the character list and bag frames -->
-			<Button name="$parentIconButton">
-				<Size x="64" y="64"/>
-
+			<Button name="$parentDrag" inherits="CombuctorDragFrameTemplate">
+				<Size x="300" y="14"/>
 				<Anchors>
-					<Anchor point="TOPLEFT">
-						<Offset x="4" y="-4"/>
+					<Anchor point="TOP">
+						<Offset x="0" y="-16"/>
 					</Anchor>
 				</Anchors>
-
-				<Scripts>
-					<OnLoad>
-						self:RegisterForClicks("anyUp")
-						self.icon = getglobal(self:GetParent():GetName().."Icon")
-						self.icon:ClearAllPoints()
-						self.icon:SetPoint("CENTER", self)
-					</OnLoad>
-					<OnEvent>
-						if(self:IsShown() and arg1 == "player") then
-							SetPortraitTexture(self.icon, arg1)
-						end
-					</OnEvent>
-					<OnShow>
-						SetPortraitTexture(self.icon, "player")
-						self:RegisterEvent("UNIT_PORTRAIT_UPDATE")
-					</OnShow>
-					<OnHide>
-						self:UnregisterEvent("UNIT_PORTRAIT_UPDATE")
-					</OnHide>
-					<OnMouseDown>
-						self.icon:SetWidth(56)
-						self.icon:SetHeight(56)
-						self.icon:SetTexCoord(0.075, 0.925, 0.075, 0.925)
-					</OnMouseDown>
-					<OnMouseUp>
-						self.icon:SetWidth(62)
-						self.icon:SetHeight(62)
-						self.icon:SetTexCoord(0, 1, 0, 1)
-					</OnMouseUp>
-					<OnClick>
-						if(arg1 == "LeftButton") then
-							if BagnonDB then
-								BagnonDB:SetDropdownFrame(self:GetParent())
-								BagnonDB:ToggleDropdown(self, 20, 32)
-							end
-						end
-					</OnClick>
-				</Scripts>
-
-				<HighlightTexture alphaMode="ADD" file="Interface\Minimap\UI-Minimap-ZoomButton-Highlight">
-					<Size x="78" y="78"/>
-					<Anchors>
-						<Anchor point="CENTER"/>
-					</Anchors>
-				</HighlightTexture>
 			</Button>
 
-			<EditBox name="$parentSearch" autoFocus="false" inherits="InputBoxTemplate">
-				<Size x="186" y="20"/>
+			<Button name="$parentIconButton" inherits="CombuctorIconButtonTemplate"/>
 
+			<EditBox name="$parentSearch" inherits="CombuctorSearchBoxTemplate">
 				<Anchors>
 					<Anchor point="TOPLEFT">
 						<Offset x="84" y="-44"/>
 					</Anchor>
 				</Anchors>
-
-				<Scripts>
-					<OnShow>
-						if self:GetText() == '' then
-							self:SetText(SEARCH)
-						end
-					</OnShow>
-					<OnEnterPressed>
-						self:ClearFocus()
-					</OnEnterPressed>
-					<OnTextChanged>
-						if self:HasFocus() then
-							local text = self:GetText()
-							if text == '' then
-								text = nil
-							end
-							self:GetParent().itemFrame:SetFilter('name', text and text:lower() or nil)
-						end
-					</OnTextChanged>
-					<OnEditFocusLost>
-						self:HighlightText(0, 0)
-						if self:GetText() == '' then
-							self:SetText(SEARCH)
-						end
-					</OnEditFocusLost>
-					<OnEditFocusGained>
-						self:HighlightText()
-						if self:GetText() == SEARCH then
-							self:SetText('')
-						end
-					</OnEditFocusGained>
-				</Scripts>
 			</EditBox>
 
-			<Button name="$parentReset">
-				<Size x="39" y="39"/>
-
+			<Button name="$parentReset" inherits="CombuctorResetButtonTemplate">
 				<Anchors>
 					<Anchor point="LEFT" relativeTo="$parentSearch" relativePoint="RIGHT">
 						<Offset x="-2" y="-2"/>
 					</Anchor>
 				</Anchors>
-
-				<Scripts>
-					<OnClick>
-						local parent = self:GetParent()
-						local searchBox = getglobal(parent:GetName() .. 'Search')
-						if searchBox:HasFocus() then
-							searchBox:SetText('')
-						else
-							searchBox:SetText(SEARCH)
-							self:GetParent().itemFrame:SetFilter('name', nil)
-						end
-					</OnClick>
-				</Scripts>
-
-				<NormalTexture file="Interface\Buttons\CancelButton-Up"/>
-				<PushedTexture file="Interface\Buttons\CancelButton-Down"/>
-				<HighlightTexture file="Interface\Buttons\CancelButton-Highlight" alphaMode="ADD"/>
 			</Button>
 
-			<Button name="$parentBagToggle">
-				<Size x="32" y="32"/>
-
+			<Button name="$parentBagToggle" inherits="CombuctorBagToggleTemplate">
 				<Anchors>
 					<Anchor point="LEFT" relativeTo="$parentReset" relativePoint="RIGHT"/>
 				</Anchors>
-
-				<Layers>
-					<Layer level="BACKGROUND">
-						<Texture name="$parentIcon" file="Interface\Buttons\Button-Backpack-Up">
-							<Size x="20" y="20"/>
-
-							<Anchors>
-								<Anchor point="TOPLEFT">
-									<Offset x="7" y="-6"/>
-								</Anchor>
-							</Anchors>
-							<TexCoords left="0.075" right="0.925" top="0.075" bottom="0.925"/>
-						</Texture>
-					</Layer>
-
-					<Layer level="OVERLAY">
-						<Texture name="$parentBorder" file="Interface\Minimap\MiniMap-TrackingBorder">
-							<Size x="54" y="54"/>
-
-							<Anchors>
-								<Anchor point="TOPLEFT"/>
-							</Anchors>
-						</Texture>
-					</Layer>
-				</Layers>
-
-				<Scripts>
-					<OnLoad>
-						self:RegisterForClicks("anyUp")
-						getglobal(self:GetName() .. "Border"):SetDesaturated(true)
-						getglobal(self:GetName() .. "Border"):SetAlpha(0.6)
-					</OnLoad>
-					<OnClick>
-						getglobal(self:GetName() .. "Icon"):SetTexCoord(0.075,0.925,0.075,0.925)
-						self:GetParent():ToggleBagFrame()
-					</OnClick>
-					<OnMouseDown>
-						getglobal(self:GetName() .. "Icon"):SetTexCoord(0,1,0,1)
-					</OnMouseDown>
-					<OnMouseUp>
-						getglobal(self:GetName() .. "Icon"):SetTexCoord(0.075,0.925,0.075,0.925)
-					</OnMouseUp>
-					<OnEnter>
-					</OnEnter>
-					<OnLeave>
-						GameTooltip:Hide()
-					</OnLeave>
-				</Scripts>
-				<HighlightTexture alphaMode="ADD" file="Interface\Minimap\UI-Minimap-ZoomButton-Highlight"/>
 			</Button>
 		</Frames>
 	</Frame>
