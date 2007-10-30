@@ -2,7 +2,7 @@
 ## Title: Combuctor
 ## Author: Tuller
 ## Notes: Pants are a dangerous foe
-## Version: 0.0.Alpha1
+## Version: Alpha.1
 ## OptionalDeps: Dongle, Bagnon_Forever
 ## SavedVariables: CombuctorDB
 lib\Dongle.lua
