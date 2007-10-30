@@ -249,10 +249,6 @@
 			<AbsInset left="0" right="35" top="0" bottom="75"/>
 		</HitRectInsets>
 
-		<ClampRectInsets>
-			<AbsInset left="0" right="38" top="0" bottom="0"/>
-		</ClampRectInsets>
-
 		<Layers>
 			<Layer level="BACKGROUND">
 				<Texture name="$parentIcon">

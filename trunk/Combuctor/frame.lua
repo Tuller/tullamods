@@ -408,11 +408,13 @@ function InventoryFrame:GenerateBagSets()
 		for _,tab in ipairs(self.tabs) do
 			tab:Hide()
 		end
+		self:SetClampRectInsets(0, 0, 0, 64)
 	else
 		for i = numTabs + 1, #self.tabs do
 			self.tabs[i]:Hide()
 			self.tabs[i].unused = true
 		end
+		self:SetClampRectInsets(0, 0, 0, 37)
 	end
 
 	PanelTemplates_SetNumTabs(self, numTabs)
