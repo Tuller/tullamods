@@ -222,7 +222,7 @@
 						parent:SetAttribute('UIPanelLayout-enabled', nil)
 						HideUIPanel(parent)
 						ShowUIPanel(parent)
-						parent:SavePosition()
+						parent:SavePosition(parent:GetPoint())
 					end
 				end
 			</OnMouseUp>
