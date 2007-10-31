@@ -229,10 +229,11 @@ local InventoryFrame = CombuctorFrame.obj
 --frame constructor
 local lastID = 0
 function InventoryFrame:Create(titleText, settings, isBank)
-	local template = isBank and 'CombuctorBankTemplate' or 'CombuctorFrameTemplate'
+	local template = isBank and 'CombuctorBankTemplate' or 'CombuctorInventoryTemplate'
 	local f = self:New(CreateFrame('Frame', format('CombuctorFrame%d', lastID), UIParent, template))
 	f:SetScript('OnShow', self.OnShow)
 	f:SetScript('OnHide', self.OnHide)
+	f:SetAttribute('UIPanelLayout-pushable', settings.pushable)
 
 	f.sets = settings
 	f.isBank = isBank
