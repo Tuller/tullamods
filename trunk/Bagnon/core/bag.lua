@@ -348,6 +348,11 @@ function BagnonBag:OnEnter()
 		end
 	end
 
+	if self:GetParent():GetParent():ShowingBag(bagID) then
+		GameTooltip:AddLine(BAGNON_LOCALS.TipHideBag)
+	else
+		GameTooltip:AddLine(BAGNON_LOCALS.TipShowBag)
+	end
 	GameTooltip:Show()
 	BagnonSpot:SetBagSearch(bagID)
 end

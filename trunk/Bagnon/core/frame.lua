@@ -534,7 +534,7 @@ function BagnonFrame:LoadSettings(sets)
 	self:Reposition()
 
 	if not self:IsUserPlaced() then
-		frame:SetPoint('CENTER')
+		self:SetPoint('CENTER')
 	end
 
 	self:SortBags()
