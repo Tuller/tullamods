@@ -479,27 +479,36 @@ function InventoryFrame:SetPanel(id, forceUpdate)
 	end
 end
 
+--show if not shown, switch tabs if we've already been automatically shown, or if we're switching tabs manually
 function InventoryFrame:ShowPanel(id, auto)
-	self:SetPanel(id)
 	if not self:IsShown() then
+		self.auto = auto
+		self:SetPanel(id)
 		ShowUIPanel(self)
+	elseif self.auto or not auto then
+		self:SetPanel(id)
 	end
 end
 
+--hide if automatically shown, or if manually told to hide
 function InventoryFrame:HidePanel(id, auto)
-	HideUIPanel(self)
-	self:SetPanel(1)
+	if self.auto or not auto then
+		self.auto = nil
+		HideUIPanel(self)
+		self:SetPanel(1)
+	end
 end
 
+--if shown, and on the selected tab, then hide, else show the frame and switch to the appropiate tab
 function InventoryFrame:TogglePanel(id, auto)
 	if self:IsShown() then
 		if self.selectedTab == id then
-			self:HidePanel(id)
+			self:HidePanel(id, auto)
 		else
-			self:ShowPanel(id)
+			self:ShowPanel(id, auto)
 		end
 	else
-		self:ShowPanel(id)
+		self:ShowPanel(id, auto)
 	end
 end
 

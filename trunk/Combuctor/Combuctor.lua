@@ -11,14 +11,14 @@ function Combuctor:Enable()
 		frames = {
 			inventory = {
 				bags = {-2, 0, 1, 2, 3, 4},
-				position = {'LEFT', nil, 'LEFT', 0, 0},
+				position = {'RIGHT', nil, 'RIGHT', 0, 0},
 				pushable = 1,
 				showBags = false,
 			},
 			bank = {
 				bags = {-1, 5, 6, 7, 8, 9, 10, 11},
 				pushable = 2,
-				showBags = false,
+				showBags = true,
 			}
 		}
 	}
@@ -104,8 +104,28 @@ function Combuctor:HookBagEvents()
 	BankFrame:UnregisterAllEvents()
 	self:RegisterMessage('COMBUCTOR_BANK_OPENED', function()
 		self:Show(bank, true)
+		self:Show(backpack, true)
 	end)
 	self:RegisterMessage('COMBUCTOR_BANK_CLOSED', function()
 		self:Hide(bank, true)
+		self:Hide(backpack, true)
 	end)
+
+	--auto magic display code
+	local ShowInventory = function() self:Show(backpack, true) end
+	local HideInventory = function() self:Hide(backpack, true) end
+
+	self:RegisterEvent('MAIL_CLOSED', HideInventory)
+
+	self:RegisterEvent('TRADE_SHOW', ShowInventory)
+	self:RegisterEvent('TRADE_CLOSED', HideInventory)
+
+	self:RegisterEvent('TRADE_SKILL_SHOW', ShowInventory)
+	self:RegisterEvent('TRADE_SKILL_CLOSE', HideInventory)
+
+	self:RegisterEvent('AUCTION_HOUSE_SHOW', ShowInventory)
+	self:RegisterEvent('AUCTION_HOUSE_CLOSED', HideInventory)
+
+	self:RegisterEvent('AUCTION_HOUSE_SHOW', ShowInventory)
+	self:RegisterEvent('AUCTION_HOUSE_CLOSED', HideInventory)
 end
