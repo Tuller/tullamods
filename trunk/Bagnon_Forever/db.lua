@@ -116,8 +116,8 @@ end
 
 function BagnonDB:PLAYER_LOGIN()
 	self:SaveMoney()
-	self:SaveBagAll(0)
-	self:SaveBagAll(-2)
+	self:SaveBagAll(BACKPACK_CONTAINER)
+	self:SaveBagAll(KEYRING_CONTAINER)
 	self:SaveEquipment()
 	self:SaveNumBankSlots()
 
@@ -135,13 +135,13 @@ function BagnonDB:PLAYER_MONEY()
 end
 
 function BagnonDB:BAG_UPDATE(event, bag)
-	if not(bag == BANK_CONTAINER or bag > 4) or self.atBank then
+	if not(bag == BANK_CONTAINER or bag > NUM_BAG_SLOTS) or self.atBank then
 		self:OnBagUpdate(bag)
 	end
 end
 
 function BagnonDB:PLAYERBANKSLOTS_CHANGED()
-	self:OnBagUpdate(-1)
+	self:OnBagUpdate(BANK_CONTAINER)
 end
 
 function BagnonDB:PLAYERBANKBAGSLOTS_CHANGED()
@@ -150,9 +150,9 @@ end
 
 function BagnonDB:BANKFRAME_OPENED()
 	self.atBank = true
-	self:SaveBagAll(-1)
-	for bag = 5, 11 do
-		self:SaveBagAll(bag)
+	self:SaveBagAll(BANK_CONTAINER)
+	for i = 1, GetNumBankSlots() do
+		self:SaveBagAll(i + 4)
 	end
 end
 
@@ -173,7 +173,7 @@ end
 --]]
 
 --[[
-	BagnonDB:GetPlayers()
+	BagnonDB:GetPlayerList()
 		returns:
 			iterator of all players on this realm with data
 		usage:
@@ -191,8 +191,7 @@ function BagnonDB:GetPlayerList()
 		table.sort(playerList, function(a, b)
 			if(a == currentPlayer) then
 				return true
-			end
-			if(b == currentPlayer) then
+			elseif(b == currentPlayer) then
 				return false
 			end
 			return a < b
@@ -424,11 +423,11 @@ end
 
 function BagnonDB:OnBagUpdate(bag)
 	if self.atBank then
-		for i = 1, 11 do
+		for i = 1, (NUM_BAG_SLOTS + GetNumBankSlots()) do
 			self:SaveBag(i)
 		end
 	else
-		for i = 1, 4 do
+		for i = 1, NUM_BAG_SLOTS do
 			self:SaveBag(i)
 		end
 	end
