@@ -11,6 +11,7 @@ function Combuctor:Enable()
 		frames = {
 			inventory = {
 				bags = {-2, 0, 1, 2, 3, 4},
+				position = {'LEFT', nil, 'LEFT', 0, 0},
 				pushable = 1,
 				showBags = false,
 			},

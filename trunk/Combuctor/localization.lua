@@ -21,3 +21,6 @@ L.Trade = 'Trade'
 L.Ammo = 'Ammo'
 L.Shards = 'Shards'
 L.Keys = 'Keys'
+
+--types
+L.Quest = 'Quest'

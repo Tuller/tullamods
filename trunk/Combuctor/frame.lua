@@ -4,7 +4,8 @@
 --]]
 
 local L = COMBUCTOR_LOCALS
-local ITEM_FRAME_WIDTH = 312 --+ 448
+local ITEM_FRAME_WIDTH = 312
+local BANK_FRAME_WIDTH = 568
 local ITEM_FRAME_HEIGHT = 346
 
 CombuctorFrame = Combuctor:NewModule('Combuctor-Frame')
@@ -155,7 +156,8 @@ end
 
 local TypeFilter = {}
 do
-	local types = {'All', 'Weapon', 'Armor', 'Quest', 'Consumable', 'Trade Goods', 'Miscellaneous'}
+	local weapon, armor, _, consumable, trade, _, _, _, _, _, misc = GetAuctionItemClasses()
+	local types = {ALL, weapon, armor, L.Quest, consumable, trade, misc}
 
 	local typeIcons = {
 		'Interface/Icons/INV_Misc_EngGizmos_17',
@@ -227,7 +229,8 @@ local InventoryFrame = CombuctorFrame.obj
 --frame constructor
 local lastID = 0
 function InventoryFrame:Create(titleText, settings, isBank)
-	local f = self:New(CreateFrame('Frame', format('InventoryFrame%d', lastID), UIParent, 'CombuctorFrameTemplate'))
+	local template = isBank and 'CombuctorBankTemplate' or 'CombuctorFrameTemplate'
+	local f = self:New(CreateFrame('Frame', format('CombuctorFrame%d', lastID), UIParent, template))
 	f:SetScript('OnShow', self.OnShow)
 	f:SetScript('OnHide', self.OnHide)
 
@@ -248,8 +251,7 @@ function InventoryFrame:Create(titleText, settings, isBank)
 
 	f.itemFrame = CombuctorItemFrame:Create(f)
 	f.itemFrame:SetPoint('TOPLEFT', 24, -78)
-	f.itemFrame:SetWidth(312)
-	f.itemFrame:SetHeight(346)
+	f.itemFrame:SetHeight(ITEM_FRAME_HEIGHT)
 
 	f.moneyFrame = CombuctorMoneyFrame:Create(f)
 	f.moneyFrame:SetPoint('BOTTOMRIGHT', -40, 67)
@@ -334,17 +336,18 @@ function InventoryFrame:UpdateBagFrame()
 			if i > 1 then
 				bag:SetPoint('TOP', self.bagButtons[i-1], 'BOTTOM', 0, -6)
 			else
-				bag:SetPoint('TOPLEFT', 340 - 36, -82)
+				bag:SetPoint('TOPRIGHT', -48, -82)
 			end
 			bag:Show()
 		end
 	end
 
 	local prevWidth = self.itemFrame:GetWidth()
+	local width = self.isBank and BANK_FRAME_WIDTH or ITEM_FRAME_WIDTH
 	if next(self.bagButtons) then
-		self.itemFrame:SetWidth(ITEM_FRAME_WIDTH - 36)
+		self.itemFrame:SetWidth(width - 36)
 	else
-		self.itemFrame:SetWidth(ITEM_FRAME_WIDTH)
+		self.itemFrame:SetWidth(width)
 	end
 
 	if prevWidth ~= self.itemFrame:GetWidth() then
@@ -548,6 +551,7 @@ function InventoryFrame:ToggleBag(bag, auto)
 	end
 end
 
+
 --[[ Settings Loading ]]--
 
 function InventoryFrame:SavePosition(...)
@@ -563,7 +567,7 @@ function InventoryFrame:SavePosition(...)
 		else
 			self.sets.position = {...}
 		end
-	else	
+	else
 		self.sets.position = nil
 	end
 end

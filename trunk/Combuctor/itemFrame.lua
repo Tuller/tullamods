@@ -428,7 +428,7 @@ function ItemFrame:Layout(spacing)
 	local spacing = spacing or 2
 	local count = self.count
 	local size = 36 + spacing*2
-	local cols = MIN_COLS - 1
+	local cols = (self:GetParent().isBank and 10) or 6 - 1
 	local scale, rows
 
 	repeat

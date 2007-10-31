@@ -293,6 +293,9 @@ function CombuctorBag:OnEnter()
 				else
 					GameTooltip:SetText(EQUIP_CONTAINER, 1, 1, 1)
 				end
+				if player == UnitName('player') then
+					SetTooltipMoney(GameTooltip, GetBankSlotCost(GetNumBankSlots()))
+				end
 			end
 		end
 	--non cached bags
