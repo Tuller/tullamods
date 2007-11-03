@@ -7,4 +7,5 @@
 ## Dependencies: Bongos2
 localization.lua
 localization.cn.lua
+localization.fr.lua
 bar.xml
