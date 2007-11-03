@@ -1,6 +1,6 @@
 --[[
-	Bongos_XP\xpBar.lua
-		Scripts for the Bongos XP bar
+        Bongos_XP\xpBar.lua
+                Scripts for the Bongos XP bar
 --]]
 
 BongosXP = Bongos:NewModule('Bongos-XP')
@@ -8,11 +8,14 @@ BongosXP = Bongos:NewModule('Bongos-XP')
 local L = BONGOS_LOCALS
 local HORIZONTAL_TEXTURE = 'Interface\\Addons\\Bongos2_XP\\img\\Smooth'
 local VERTICAL_TEXTURE = 'Interface\\Addons\\Bongos2_XP\\img\\SmoothV'
-local REP_FORMAT = '%s:  %s / %s (%s)'
-local REST_FORMAT = '%s / %s (+%s)'
+
 local XP_FORMAT = '%s / %s'
+local REST_FORMAT = '%s / %s (+%s)'
+local REP_FORMAT = '%s:  %s / %s (%s)'
+
 local DEFAULT_HEIGHT = 14
 local DEFAULT_SIZE = 0.75
+local DEFAULT_TEXT_POSITION = 0.5
 
 
 --[[ XPBar, a statusbar that displays reputation or experience ]]--
@@ -42,16 +45,16 @@ function XPBar:New(parent)
 
 	local text = overlay:CreateFontString(nil, 'OVERLAY')
 	text:SetFontObject('GameFontHighlight')
-	text:SetPoint('CENTER', bar)
 	bar.text = text
 
-	bar:SetScript('OnShow', bar.OnShow)
-	bar:SetScript('OnHide', bar.OnHide)
-	bar:SetScript('OnEnter', bar.OnEnter)
-	bar:SetScript('OnLeave', bar.OnLeave)
+	bar:SetScript('OnShow', self.OnShow)
+	bar:SetScript('OnHide', self.OnHide)
+	bar:SetScript('OnEnter', self.OnEnter)
+	bar:SetScript('OnLeave', self.OnLeave)
 
 	bar:Update()
 	bar:UpdateText()
+	bar:UpdateTextPosition()
 
 	return bar
 end
@@ -161,6 +164,18 @@ function XPBar:UpdateText()
 	end
 end
 
+function XPBar:UpdateTextPosition()
+	self.text:ClearAllPoints()
+	if self.sets.vertical then
+		local yOff = self:GetParent():GetHeight() * (self.sets.textPosition or DEFAULT_TEXT_POSITION)
+		self.text:SetPoint('LEFT', 0, yOff)
+	else
+		local xOff = self:GetParent():GetWidth() * (self.sets.textPosition or DEFAULT_TEXT_POSITION)
+		self.text:SetPoint('CENTER', xOff, 0)
+		xoff = self.sets.textPosition or DEFAULT_TEXT_POSITION
+	end
+end
+
 function XPBar:UpdateOrientation()
 	if self.sets.vertical then
 		self:SetOrientation('VERTICAL')
@@ -180,6 +195,7 @@ function XPBar:UpdateOrientation()
 		self.bg:SetTexture(HORIZONTAL_TEXTURE)
 	end
 	self:UpdateSize()
+	self:UpdateTextPosition()
 end
 
 function XPBar:UpdateSize()
@@ -201,7 +217,7 @@ end
 --menu creation
 local function Bar_CreateMenu(frame)
 	local menu, panel = BongosMenu:CreateMenu(frame.id)
-	local size, height
+	local size, height, textPosition
 
 	--always show text checkbox
 	local alwaysShowText = panel:AddCheckButton(L.AlwaysShowText)
@@ -216,7 +232,7 @@ local function Bar_CreateMenu(frame)
 
 	--vertical orientation slider
 	local vertical = panel:AddCheckButton(L.Vertical)
-	vertical:SetScript('OnShow', function(self)
+		vertical:SetScript('OnShow', function(self)
 		self:SetChecked(frame.sets.vertical)
 	end)
 
@@ -237,7 +253,7 @@ local function Bar_CreateMenu(frame)
 	height:SetScript('OnShow', function(self)
 		self.onShow = true
 		self:SetValue(frame.sets.height or DEFAULT_HEIGHT)
-		getglobal(self:GetName() .. 'Text'):SetText(frame.sets.vertical and L.Width or L.Height)
+		getglobal(self:GetName() ..'Text'):SetText(frame.sets.vertical and L.Width or L.Height)
 		self.onShow = nil
 	end)
 
@@ -253,15 +269,31 @@ local function Bar_CreateMenu(frame)
 	size = panel:AddSlider('Size', 0, 100, 1)
 	size:SetScript('OnShow', function(self)
 		self.onShow = true
-		self:SetValue((frame.sets.size or DEFAULT_SIZE) * 100)
+		self:SetValue((frame.sets.size or DEFAULT_SIZE)*100)
 		getglobal(self:GetName() .. 'Text'):SetText(frame.sets.vertical and L.Height or L.Width)
 		self.onShow = nil
 	end)
 
 	size:SetScript('OnValueChanged', function(self, value)
 		if not self.onShow then
-			frame.sets.size = value / 100
+			frame.sets.size = value/100
 			frame.xp:UpdateSize()
+		end
+		getglobal(self:GetName() .. 'ValText'):SetText(value)
+	end)
+
+	textPosition = panel:AddSlider(L.TextPosition, -50, 50, 1)
+	textPosition:SetScript('OnShow', function(self)
+		self.onShow = true
+		self:SetValue((frame.sets.textPosition or DEFAULT_TEXT_POSITION) * 100)
+		frame.xp:UpdateTextPosition()
+		self.onShow = nil
+	end)
+
+	textPosition:SetScript('OnValueChanged', function(self, value)
+		if not self.onShow then
+			frame.sets.textPosition = value / 100
+			frame.xp:UpdateTextPosition()
 		end
 		getglobal(self:GetName() .. 'ValText'):SetText(value)
 	end)
@@ -279,14 +311,14 @@ end
 function BongosXP:Load()
 	local bar = BBar:Create('xp', Bar_OnCreate, nil, nil, 'BACKGROUND')
 	if not bar:IsUserPlaced() then
-		bar:SetPoint('TOP', UIParent, 'TOP', 0, -32)
+		bar:SetPoint('TOP', 0, -32)
 	end
 
+	bar.sets.size = min(bar.sets.size or DEFAULT_SIZE, 1)
 	bar.xp:UpdateOrientation()
 	bar.xp:Update()
 	bar.xp:UpdateText()
-
-	bar.sets.size = min(bar.sets.size or DEFAULT_SIZE, 1)
+	bar.xp:UpdateTextPosition()
 
 	self.bar = bar
 end
