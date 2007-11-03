@@ -3,10 +3,12 @@
 		Some sort of crazy visual inventory management system
 --]]
 
-Combuctor = DongleStub("Dongle-1.0"):New("Combuctor")
+Combuctor = LibStub('AceAddon-3.0'):NewAddon('Combuctor', 'AceEvent-3.0', 'AceConsole-3.0')
+Combuctor:SetDefaultModuleLibraries('AceEvent-3.0')
+
 local L = COMBUCTOR_LOCALS
 
-function Combuctor:Enable()
+function Combuctor:OnEnable()
 	CombuctorDB = CombuctorDB or {
 		frames = {
 			inventory = {
@@ -29,6 +31,9 @@ function Combuctor:Enable()
 	}
 
 	self:HookBagEvents()
+
+	self:RegisterChatCommand('combuctor', 'OnSlashCommand')
+	self:RegisterChatCommand('cbt', 'OnSlashCommand')
 end
 
 function Combuctor:Show(bag, auto)
@@ -128,4 +133,19 @@ function Combuctor:HookBagEvents()
 
 	self:RegisterEvent('AUCTION_HOUSE_SHOW', ShowInventory)
 	self:RegisterEvent('AUCTION_HOUSE_CLOSED', HideInventory)
+end
+
+function Combuctor:OnSlashCommand(msg)
+	if msg == 'bank' then
+		self:Toggle(BANK_CONTAINER)
+	elseif msg == 'bags' then
+		self:Toggle(BACKPACK_CONTAINER)
+	elseif msg == 'keys' then
+		self:Toggle(KEYRING_CONTAINER)
+	else
+		self:Print('Commands (/cbt or /combuctor)')
+		ChatFrame1:AddMessage('- bank: Toggle bank')
+		ChatFrame1:AddMessage('- bags: Toggle inventory')
+		ChatFrame1:AddMessage('- keys: Toggle keyring')
+	end
 end

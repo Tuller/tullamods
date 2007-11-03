@@ -17,7 +17,7 @@ local MIN_COLS = 6
 	Module Functions
 --]]
 
-function CombuctorItemFrame:Enable()
+function CombuctorItemFrame:OnEnable()
 	self:RegisterEvent('BAG_UPDATE_COOLDOWN', 'UpdateSlotCooldowns')
 
 	self:RegisterMessage('COMBUCTOR_SLOT_ADD', 'UpdateSlot')

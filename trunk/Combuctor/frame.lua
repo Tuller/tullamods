@@ -16,7 +16,7 @@ CombuctorFrame.obj:Hide()
 CombuctorFrame.obj:SetScript('OnUpdate', function(self) CombuctorFrame:UpdateBagSets(); self:Hide() end)
 
 
-function CombuctorFrame:Enable()
+function CombuctorFrame:OnEnable()
 	self:RegisterMessage('COMBUCTOR_BAG_TYPE_CHANGED')
 end
 

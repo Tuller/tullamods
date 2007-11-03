@@ -71,7 +71,7 @@ function BagEvents:AddItem(bag, slot)
 	data[3] = locked
 	data[4] = onCooldown
 
-	self:TriggerMessage('COMBUCTOR_SLOT_ADD', bag, slot, link, count, locked, onCooldown)
+	self:SendMessage('COMBUCTOR_SLOT_ADD', bag, slot, link, count, locked, onCooldown)
 end
 
 function BagEvents:RemoveItem(bag, slot)
@@ -82,7 +82,7 @@ function BagEvents:RemoveItem(bag, slot)
 		for i in pairs(data) do
 			data[i] = nil
 		end
-		self:TriggerMessage('COMBUCTOR_SLOT_REMOVE', bag, slot, prevLink)
+		self:SendMessage('COMBUCTOR_SLOT_REMOVE', bag, slot, prevLink)
 	end
 end
 
@@ -104,7 +104,7 @@ function BagEvents:UpdateItem(bag, slot)
 			data[3] = locked
 			data[4] = onCooldown
 
-			self:TriggerMessage('COMBUCTOR_SLOT_UPDATE', bag, slot, link, count, locked, onCooldown)
+			self:SendMessage('COMBUCTOR_SLOT_UPDATE', bag, slot, link, count, locked, onCooldown)
 		end
 	end
 end
@@ -123,7 +123,7 @@ function BagEvents:UpdateLock(bag, slot)
 		local locked = select(3, GetContainerItemInfo(bag, slot))
 		if data[3] ~= locked then
 			data[3] = locked
-			self:TriggerMessage('COMBUCTOR_SLOT_UPDATE_LOCK', bag, slot, locked)
+			self:SendMessage('COMBUCTOR_SLOT_UPDATE_LOCK', bag, slot, locked)
 		end
 	end
 end
@@ -144,7 +144,7 @@ function BagEvents:UpdateCooldown(bag, slot)
 
 		if data[4] ~= onCooldown then
 			data[4] = onCooldown
-			self:TriggerMessage('COMBUCTOR_SLOT_UPDATE_COOLDOWN', bag, slot, onCooldown)
+			self:SendMessage('COMBUCTOR_SLOT_UPDATE_COOLDOWN', bag, slot, onCooldown)
 		end
 	end
 end
@@ -181,7 +181,7 @@ function BagEvents:UpdateBagType(bag)
 
 	if subType ~= bagSubTypes[bag] then
 		bagSubTypes[bag] = subType
-		self:TriggerMessage('COMBUCTOR_BAG_TYPE_CHANGED', bag, type, subType)
+		self:SendMessage('COMBUCTOR_BAG_TYPE_CHANGED', bag, type, subType)
 	end
 end
 
@@ -205,7 +205,7 @@ end
 --[[ Events ]]--
 
 --player login
-function BagEvents:Enable()
+function BagEvents:OnEnable()
 	self:RegisterEvent('BAG_UPDATE')
 	self:RegisterEvent('ITEM_LOCK_CHANGED')
 	self:RegisterEvent('BAG_UPDATE_COOLDOWN')
@@ -238,12 +238,12 @@ function BagEvents:BANKFRAME_OPENED()
 		self:UpdateBagSize(BANK_CONTAINER)
 		self:UpdateBagSizesAndTypes()
 	end
-	self:TriggerMessage('COMBUCTOR_BANK_OPENED')
+	self:SendMessage('COMBUCTOR_BANK_OPENED')
 end
 
 function BagEvents:BANKFRAME_CLOSED()
 	atBank = false
-	self:TriggerMessage('COMBUCTOR_BANK_CLOSED')
+	self:SendMessage('COMBUCTOR_BANK_CLOSED')
 end
 
 function BagEvents:ITEM_LOCK_CHANGED()
