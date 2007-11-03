@@ -4,7 +4,7 @@
 		Cooldown text should work on absolutely everything.  Pulses will work on anything that I can determine the icon of
 --]]
 
-local SML = LibStub and LibStub:GetLibrary('LibSharedMedia-2.0') --shared media library
+local SML = LibStub and LibStub('LibSharedMedia-2.0') --shared media library
 local CURRENT_VERSION = GetAddOnMetadata('OmniCC', 'Version') --the addon's current version
 local L = OMNICC_LOCALS --localized strings
 
