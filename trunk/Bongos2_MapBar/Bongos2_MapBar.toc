@@ -8,4 +8,5 @@
 ## OptionalDeps: Titan
 localization.lua
 localization.cn.lua
+localization.fr.lua
 bar.lua
