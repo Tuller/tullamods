@@ -9,6 +9,7 @@ localization.lua
 localization.cn.lua
 keyBound\localization.lua
 keyBound\localization.cn.lua
+keyBound\localization.fr.lua
 keyBound\keyBound.lua
 keyBound\spellBound.lua
 core\unreg.lua
