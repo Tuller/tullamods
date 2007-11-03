@@ -8,6 +8,7 @@
 ## LoadOnDemand: 1
 localization.lua
 localization.cn.lua
+localization.fr.lua
 menu.lua
 general.lua
 profiles.lua
