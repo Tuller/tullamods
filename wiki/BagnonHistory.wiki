@@ -2,7 +2,10 @@
 
 = Bagnon Version History =
 
-1.4.4
+1.4.5
+  * Fixed a bug when creating a new frame with default settings
+
+1.4.4 (Beta)
   * Bagnon_Forever has been changed to be load on demand, with Bagnon listing it as an optional dependency.
   * Rewrote a good portion of the code.
   * Fixed a bug causing cooldowns to not properly update.
