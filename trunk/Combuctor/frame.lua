@@ -156,8 +156,14 @@ end
 
 local TypeFilter = {}
 do
-	local weapon, armor, _, consumable, trade, _, _, _, _, _, misc = GetAuctionItemClasses()
-	local types = {ALL, weapon, armor, L.Quest, consumable, trade, misc}
+	local types
+	if GetBuildInfo() == '2.2.3' then
+		local weapon, armor, _, consumable, trade, _, _, _, _, _, misc = GetAuctionItemClasses()
+		types = {ALL, weapon, armor, L.Quest, consumable, trade, misc}
+	else
+		local weapon, armor, _, consumable, trade, _, _, _, _, misc, quest = GetAuctionItemClasses()
+		types = {ALL, weapon, armor, quest, consumable, trade, misc}
+	end
 
 	local typeIcons = {
 		'Interface/Icons/INV_Misc_EngGizmos_17',
