@@ -12,6 +12,7 @@ lib\FlyPaper.lua
 lib\Gooey.xml
 localization.lua
 localization.cn.lua
+localization.fr.lua
 dragFrame.lua
 bar.lua
 menu.lua
