@@ -44,7 +44,7 @@ function SageCast:Create(parent, id, noText)
 end
 
 function SageCast:Update()
-	if(Sage:ShowingCastBars()) then
+	if Sage:ShowingCastBars() then
 		if UnitCastingInfo(self.id) then
 			self:OnSpellStart()
 		elseif UnitChannelInfo(self.id) then
@@ -66,7 +66,6 @@ function SageCast:OnSpellStart()
 	local name, nameSubtext, text, texture, startTime, endTime, isTradeSkill = UnitCastingInfo(self.id)
 	if not(name) or isTradeSkill then self:Hide() return end
 
-	--bar coloring, only really works for people who do not clickcast
 	if IsHelpfulSpell(name) then
 		self:SetStatusBarColor(0, 1, 1)
 		self.bg:SetVertexColor(0, 0.6, 0.6, 0.4)
@@ -112,15 +111,12 @@ function SageCast:OnChannelStart()
 	local name, nameSubtext, text, texture, startTime, endTime, isTradeSkill = UnitChannelInfo(self.id)
 	if not(name) or isTradeSkill then self:Hide() return end
 
-	local target = self.id .. "target"
-	if self.text and UnitExists(target) then
-		if UnitCanAssist(self.id,  target) then
-			self:SetStatusBarColor(0, 1, 1)
-			self.bg:SetVertexColor(0, 0.6, 0.6, 0.4)
-		else
-			self:SetStatusBarColor(1, 0, 1)
-			self.bg:SetVertexColor(0.6, 0, 0.6, 0.4)
-		end
+	if IsHelpfulSpell(name) then
+		self:SetStatusBarColor(0, 1, 1)
+		self.bg:SetVertexColor(0, 0.6, 0.6, 0.4)
+	elseif IsHarmfulSpell(name) then
+		self:SetStatusBarColor(1, 0, 1)
+		self.bg:SetVertexColor(0.6, 0, 0.6, 0.4)
 	else
 		self:SetStatusBarColor(1, 1, 0)
 		self.bg:SetVertexColor(0.6, 0.6, 0, 0.4)
