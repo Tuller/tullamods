@@ -42,16 +42,16 @@ function BongosActionButton:Create(id)
 	button.macro = _G[name .. "Name"]
 	button.count = _G[name .. "Count"]
 
-	button:SetScript("OnAttributeChanged", button.OnAttributeChanged)
-	button:SetScript("PostClick", button.PostClick)
-	button:SetScript("OnDragStart", button.OnDragStart)
-	button:SetScript("OnReceiveDrag", button.OnReceiveDrag)
-	button:SetScript("OnEnter", button.OnEnter)
-	button:SetScript("OnLeave", button.OnLeave)
-	button:SetScript("OnEvent", button.OnEvent)
+	button:SetScript("OnAttributeChanged", self.OnAttributeChanged)
+	button:SetScript("PostClick", self.PostClick)
+	button:SetScript("OnDragStart", self.OnDragStart)
+	button:SetScript("OnReceiveDrag", self.OnReceiveDrag)
+	button:SetScript("OnEnter", self.OnEnter)
+	button:SetScript("OnLeave", self.OnLeave)
+	button:SetScript("OnEvent", self.OnEvent)
 
-	button:SetScript("OnShow", button.OnShow)
-	button:SetScript("OnHide", button.OnHide)
+	button:SetScript("OnShow", self.OnShow)
+	button:SetScript("OnHide", self.OnHide)
 
 	button:SetAttribute("type", "action")
 	button:SetAttribute("action", id)
@@ -123,7 +123,7 @@ end
 --[[ OnX Functions ]]--
 
 function BongosActionButton:OnEvent(event, arg1)
-	if(event == "UPDATE_BINDINGS") then
+	if event == "UPDATE_BINDINGS" then
 		self:UpdateHotkey()
 	elseif self:IsVisible() and HasAction(self:GetPagedID()) then
 		if event == "PLAYER_ENTERING_WORLD" then
@@ -131,7 +131,7 @@ function BongosActionButton:OnEvent(event, arg1)
 		elseif event == "PLAYER_AURAS_CHANGED" or event == "PLAYER_TARGET_CHANGED" then
 			self:UpdateUsable()
 		elseif event == "UNIT_INVENTORY_CHANGED" then
-			if(arg1 == "player") then
+			if arg1 == 'player' then
 				self:Update()
 			end
 		elseif event == "ACTIONBAR_UPDATE_USABLE" or event == "UPDATE_INVENTORY_ALERTS" or event == "ACTIONBAR_UPDATE_COOLDOWN" then
@@ -370,6 +370,19 @@ end
 
 --[[ State Updating ]]--
 
+function BongosActionButton:UpdateStateAction(stateID)
+	local id = self:GetAttribute("action")
+	local offset = self:GetParent():GetStateOffset(stateID)
+
+	if offset then
+		self:SetAttribute("*action-" .. stateID, toValid(id + offset))
+		self:SetAttribute("*action-" .. stateID .. 's', toValid(id + offset))
+	else
+		self:SetAttribute("*action-" .. stateID, nil)
+		self:SetAttribute("*action-" .. stateID .. 's', nil)
+	end
+end
+
 --load up the action ID when in forms/paged from the parent action bar
 function BongosActionButton:UpdateStates()
 	local id = self:GetAttribute("action")
@@ -377,72 +390,23 @@ function BongosActionButton:UpdateStates()
 
 	if hasStance then
 		local maxState = (CLASS == "PRIEST" and 1) or GetNumShapeshiftForms()
-
 		for i = 1, maxState do
-			local state = format("s%d", i)
-			local selfState = format("s%ds", i)
-			local offset = parent:GetStateOffset(state)
-
-			if(offset) then
-				self:SetAttribute("*action-" .. state, toValid(id + offset))
-				self:SetAttribute("*action-" .. selfState, toValid(id + offset))
-			else
-				self:SetAttribute("*action-" .. state, nil)
-				self:SetAttribute("*action-" .. selfState, nil)
-			end
+			self:UpdateStateAction('s' .. i)
 		end
-
-		if(CLASS == "DRUID") then
-			local state = format("s%d", 7)
-			local selfState = format("s%ds", 7)
-			local offset = parent:GetStateOffset(state)
-
-			if(offset) then
-				self:SetAttribute("*action-" .. state, toValid(id + offset))
-				self:SetAttribute("*action-" .. selfState, toValid(id + offset))
-			else
-				self:SetAttribute("*action-" .. state, nil)
-				self:SetAttribute("*action-" .. selfState, nil)
-			end
+		if CLASS == "DRUID" then
+			self:UpdateStateAction('s7')
 		end
 	end
 
 	for i = 1, MAX_PAGES do
-		local state = format("p%d", i)
-		local selfState = format("p%ds", i)
-		local offset = parent:GetStateOffset(state)
-
-		if(offset) then
-			self:SetAttribute("*action-" .. state, toValid(id + offset))
-			self:SetAttribute("*action-" .. selfState, toValid(id + offset))
-		else
-			self:SetAttribute("*action-" .. state, nil)
-			self:SetAttribute("*action-" .. selfState, nil)
-		end
+		self:UpdateStateAction('p' .. i)
 	end
 
 	for i = 1, 3 do
-		local state = format("m%d", i)
-		local selfState = format("m%ds", i)
-		local offset = parent:GetStateOffset(state)
-
-		if(offset) then
-			self:SetAttribute("*action-" .. state, toValid(id + offset))
-			self:SetAttribute("*action-" .. selfState, toValid(id + offset))
-		else
-			self:SetAttribute("*action-" .. state, nil)
-			self:SetAttribute("*action-" .. selfState, nil)
-		end
+		self:UpdateStateAction('m' .. i)
 	end
 
-	local offset = parent:GetStateOffset("help")
-	if(offset) then
-		self:SetAttribute("*action-help", toValid(id + offset))
-		self:SetAttribute("*action-helps", toValid(id + offset))
-	else
-		self:SetAttribute("*action-help", nil)
-		self:SetAttribute("*action-helps", nil)
-	end
+	self:UpdateStateAction('help')
 
 	self:UpdateVisibility()
 	self.needsUpdate = true
@@ -457,7 +421,7 @@ function BongosActionButton:UpdateVisibility()
 		local id = self:GetAttribute("action")
 		if HasAction(id) then newstates = 0 end
 
-		if(hasStance) then
+		if hasStance then
 			local maxState = (CLASS == "PRIEST" and 1) or GetNumShapeshiftForms()
 
 			for i = 1, maxState do

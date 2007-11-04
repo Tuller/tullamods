@@ -58,10 +58,6 @@ local stateButton1, stateButton2 = GenerateStateButton()
 
 --[[ Constructor/Destructor]]--
 
-local function OnShow(self)
-	self:UpdateVisibility()
-end
-
 function BActionBar:Create(id)
 	local defaults
 	if(id == 1) then
@@ -82,7 +78,7 @@ function BActionBar:Create(id)
 
 	bar:SetRightClickUnit(BongosActionConfig:GetRightClickUnit())
 	bar:UpdateStateHeader()
-	bar:SetScript("OnShow", OnShow)
+	bar:SetScript("OnShow", self.UpdateVisibility)
 
 	--layout the bar
 	if not bar:IsUserPlaced() then
