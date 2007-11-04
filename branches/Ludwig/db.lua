@@ -206,30 +206,30 @@ end
 
 --queries the server for items from startID to endID.  don't run too many of these at once, of you WILL be disconnected
 --should take about 30 minutes to run a full scan if my math is right.
-function Ludwig:Scan(startID, endID)
-	local tip = self.spider or CreateFrame('GameTooltip', 'LudwigSpiderTooltip', UIParent, 'GameTooltipTemplate')
-	self.spider = tip
+-- function Ludwig:Scan(startID, endID)
+	-- local tip = self.spider or CreateFrame('GameTooltip', 'LudwigSpiderTooltip', UIParent, 'GameTooltipTemplate')
+	-- self.spider = tip
 
-	local nextUpdate = 0
-	local id = startID or 1
-	local endID = endID or MAXID
+	-- local nextUpdate = 0
+	-- local id = startID or 1
+	-- local endID = endID or MAXID
 
-	CreateFrame('Frame'):SetScript('OnUpdate', function(self, elapsed)
-		if nextUpdate < 0 then
-			nextUpdate = 0.05
+	-- CreateFrame('Frame'):SetScript('OnUpdate', function(self, elapsed)
+		-- if nextUpdate < 0 then
+			-- nextUpdate = 0.05
 
-			--skip over any items we've seen already
-			while GetItemInfo(id) do id = id+1 end
+			-- skip over any items we've seen already
+			-- while GetItemInfo(id) do id = id+1 end
 
-			--we've reached an id that's not been 'seen', query the server for item info
-			tip:SetHyperlink(format('item:%d', id))
+			-- we've reached an id that's not been 'seen', query the server for item info
+			-- tip:SetHyperlink(format('item:%d', id))
 
-			id = id+1
-			if id > endID then
-				self:Hide()
-			end
-		else
-			nextUpdate = nextUpdate - elapsed
-		end
-	end)
-end
+			-- id = id+1
+			-- if id > endID then
+				-- self:Hide()
+			-- end
+		-- else
+			-- nextUpdate = nextUpdate - elapsed
+		-- end
+	-- end)
+-- end

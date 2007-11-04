@@ -53,8 +53,8 @@ SlashCmdList["LudwigSlashCOMMAND"] = function(msg)
 			if cmd == "refresh" then
 				Ludwig:ReloadDB()
 				LMsg(L.DBRefreshed)
-			elseif cmd == "scan" then
-				Ludwig:Scan()
+			-- elseif cmd == "scan" then
+				-- Ludwig:Scan()
 			elseif tonumber(cmd) then
 				SetItemRef(format("item:%d", tonumber(cmd)))
 			else
