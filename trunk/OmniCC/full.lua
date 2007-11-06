@@ -83,6 +83,7 @@ function OmniCC:UpdateVersion()
 end
 
 --hook the cooldown function (effectively enable the addon)
+--we inherit CooldownFrameTemplate here to prevent a crash issue
 function OmniCC:HookCooldown()
 	local methods = getmetatable(CreateFrame('Cooldown', nil, nil, 'CooldownFrameTemplate')).__index
 	hooksecurefunc(methods, 'SetCooldown', function(self, start, duration)
@@ -188,12 +189,16 @@ function OmniCC:UpdateTimer(timer)
 			local font, size, r, g, b, outline = self:GetFormattedFont(remain)
 			local text = timer.text
 
-			text:SetFont(font, size * iconScale, outline)
-			text:SetText(time)
-			text:SetTextColor(r, g, b)
-			text:Show()
-
-			timer.nextUpdate = nextUpdate
+			--do another check for too small fonts
+			if floor(size * iconScale) > 0 then
+				text:SetFont(font, size * iconScale, outline)
+				text:SetText(time)
+				text:SetTextColor(r, g, b)
+				text:Show()
+				timer.nextUpdate = nextUpdate
+			else
+				timer.nextUpdate = 1
+			end
 		else
 			timer:Hide()
 
