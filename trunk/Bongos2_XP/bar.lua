@@ -15,7 +15,7 @@ local REP_FORMAT = '%s:  %s / %s (%s)'
 
 local DEFAULT_HEIGHT = 14
 local DEFAULT_SIZE = 0.75
-local DEFAULT_TEXT_POSITION = 0.5
+local DEFAULT_TEXT_POSITION = 0
 
 
 --[[ XPBar, a statusbar that displays reputation or experience ]]--
