@@ -1,4 +1,4 @@
-﻿## Interface: 20200
+﻿## Interface: 20300
 ## Title: Bagnon
 ## Author: Tuller
 ## Notes: Single window displays for the inventory and bank

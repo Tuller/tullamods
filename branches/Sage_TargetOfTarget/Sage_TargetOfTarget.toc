@@ -1,4 +1,4 @@
-## Interface: 20200
+## Interface: 20300
 ## Title: Sage Target of Target
 ## Notes: A target of target frame
 ## Author: Tuller

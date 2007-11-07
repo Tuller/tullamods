@@ -1,4 +1,4 @@
-## Interface: 20200
+## Interface: 20300
 ## Title: Bongos2 RollBar
 ## Title-zhCN: |cFF0099FF[Bongos2]|r 色子条
 ## Notes: Makes the frame for rolling on items movable

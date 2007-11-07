@@ -1,4 +1,4 @@
-﻿## Interface: 20200
+﻿## Interface: 20300
 ## Title: Bongos2 CastBar
 ## Title-zhCN: |cFF0099FF[Bongos2]|r 施法条
 ## Notes: A movable casting bar, with timer
