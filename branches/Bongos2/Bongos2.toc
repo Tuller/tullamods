@@ -1,0 +1,20 @@
+## Interface: 20200
+## Title: Bongos2
+## Title-zhCN: |cFF0099FF[Bongos2]|r 核心库
+## Notes: Movable bar framework
+## Notes-zhCN: Bongos2 系列 核心库
+## Author: Tuller
+## Version: 1.8.2
+## SavedVariables: Bongos2DB, BongosVersion
+## OptionalDeps: Dongle
+lib\Dongle.lua
+lib\FlyPaper.lua
+lib\Gooey.xml
+localization.lua
+localization.cn.lua
+localization.fr.lua
+dragFrame.lua
+bar.lua
+menu.lua
+Bongos.lua
+minimap.xml
