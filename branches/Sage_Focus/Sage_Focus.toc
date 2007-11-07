@@ -1,0 +1,6 @@
+## Interface: 20200
+## Title: Sage Focus
+## Notes: A focus frame
+## Author: Tuller
+## Dependencies: Sage
+focus.lua
