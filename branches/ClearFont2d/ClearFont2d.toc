@@ -1,4 +1,4 @@
-## Interface: 20200
+## Interface: 20300
 ## Title: ClearFont2d
 ## Author: Tuller
 ## Notes: A stripped down version of ClearFont2
