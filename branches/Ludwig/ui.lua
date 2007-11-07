@@ -16,7 +16,6 @@ local uiFrame
 
 function LudwigUI_OnLoad(self)
 	local name = self:GetName()
-	tinsert(UISpecialFrames, name)
 	local items = {}
 
 	local item = CreateFrame('Button', name .. 1, self, 'LudwigItemButtonTemplate')
