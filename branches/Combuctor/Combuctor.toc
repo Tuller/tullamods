@@ -1,0 +1,9 @@
+## Interface: 20200
+## Title: Combuctor
+## Author: Tuller
+## Notes: Pants are a dangerous foe
+## Version: Alpha.2.1
+## OptionalDeps: LibStub, Ace3, CallbackHandler-1.0, AceAddon-3.0, AceConsole-3.0, AceEvent-3.0, Bagnon_Forever
+## SavedVariables: CombuctorDB
+embeds.xml
+load.xml
