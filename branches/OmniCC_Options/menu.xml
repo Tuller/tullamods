@@ -1,0 +1,493 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="menu.lua"/>
+
+	<Slider name="OmniCCSliderTemplate" inherits="OptionsSliderTemplate" enableMouseWheel="true" virtual="true">
+		<Size x="132" y="18"/>
+
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString name="$parentValueText" inherits="GameFontHighlightSmall" text="100%">
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="RIGHT">
+							<Offset x="7" y="0"/>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+
+		<Scripts>
+			<OnMouseWheel>
+				local step = self:GetValueStep() * arg1
+				local value = self:GetValue()
+				local minVal, maxVal = self:GetMinMaxValues()
+
+				if(step > 0) then
+					self:SetValue(min(value+step, maxVal))
+				else
+					self:SetValue(max(value+step, minVal))
+				end
+			</OnMouseWheel>
+		</Scripts>
+	</Slider>
+
+	<Frame name="OmniCCDropdown" inherits="UIDropDownMenuTemplate" enableMouse="true" virtual="True">
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString name="$parentLabel" inherits="GameFontNormalSmall">
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="21" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Frame>
+
+	<Slider name="OmniCCFormatEditorTemplate" inherits="OmniCCSliderTemplate" minValue="0.5" maxValue="2" valueStep="0.05" virtual="true">
+		<Size x="120" y="18"/>
+
+		<Frames>
+			<Button name="$parentColorPicker">
+				<Size x="16" y="16"/>
+
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT">
+						<Offset x="0" y="0"/>
+					</Anchor>
+				</Anchors>
+
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentBG">
+							<Size x="14" y="14"/>
+
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+
+							<Color r="1" g="1" b="1"/>
+						</Texture>
+					</Layer>
+				</Layers>
+
+				<Scripts>
+					<OnLoad>
+						--a nasty hack to modify the parent without editing the parent's OnLoad script
+						local parent = self:GetParent()
+						getglobal(parent:GetName() .. 'Text'):ClearAllPoints()
+						getglobal(parent:GetName() .. 'Text'):SetPoint('BOTTOMLEFT', parent, 'TOPLEFT')
+						getglobal(parent:GetName() .. 'Text'):SetJustifyH('LEFT')
+						getglobal(parent:GetName() .. 'High'):SetText('')
+						getglobal(parent:GetName() .. 'Low'):SetText('')
+
+						OmniCCOptions:LoadColorSelect(self)
+					</OnLoad>
+					<OnEnter>
+						local color = NORMAL_FONT_COLOR
+						getglobal(self:GetName().."BG"):SetVertexColor(color.r, color.g, color.b)
+					</OnEnter>
+					<OnLeave>
+						local color = HIGHLIGHT_FONT_COLOR
+						getglobal(self:GetName().."BG"):SetVertexColor(color.r, color.g, color.b)
+					</OnLeave>
+				</Scripts>
+
+				<NormalTexture name="$parentNormalTexture" file="Interface\ChatFrame\ChatFrameColorSwatch"/>
+			</Button>
+		</Frames>
+
+		<Scripts>
+			<OnShow>
+				self.onShow = true
+
+				local r, g, b, scale = OmniCC:GetDurationFormat(self.duration)
+				self:SetValue(scale)
+				getglobal(self:GetName() .. 'ColorPicker'):GetNormalTexture():SetVertexColor(r,g,b)
+
+				self.onShow = nil
+			</OnShow>
+			<OnValueChanged>
+				getglobal(self:GetName() .. 'ValueText'):SetText(floor(value * 100 + 0.5) .. '%')
+
+				if not self.onShow then
+					OmniCC:SetDurationScale(self.duration, value)
+				end
+			</OnValueChanged>
+		</Scripts>
+	</Slider>
+
+	<Frame name="OmniCCOptionsFrame" toplevel="true" frameStrata="DIALOG" movable="true" enableMouse="true" hidden="true" parent="UIParent">
+		<Size x="400" y="408"/>
+
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentHeader" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size x="256" y="64"/>
+
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset x="0" y="12"/>
+						</Anchor>
+					</Anchors>
+				</Texture>
+
+				<FontString name="$parentTitle" inherits="GameFontNormal" text="OmniCC Options">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentHeader">
+							<Offset>
+								<AbsDimension x="0" y="-14"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+
+		<Frames>
+			<Button name="$parentCloseButton" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-5" y="-5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Frame name="$parentGeneral" inherits="OptionFrameBoxTemplate">
+				<Size x="180" y="198"/>
+
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset x="20" y="-45"/>
+					</Anchor>
+				</Anchors>
+
+				<Frames>
+					<CheckButton name="$parentShowModel" inherits="OptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset x="10" y="-8"/>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(self:GetName() .. 'Text'):SetText(OMNICC_LOCALS.ShowModels)
+							</OnLoad>
+							<OnShow>
+								self:SetChecked(OmniCC:ShowingModels())
+							</OnShow>
+							<OnClick>
+								OmniCC:SetShowModels(self:GetChecked())
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+
+					<CheckButton name="$parentShowPulse" inherits="OptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentShowModel" relativePoint="BOTTOM"/>
+						</Anchors>
+
+						<Scripts>
+							<OnLoad>
+								getglobal(self:GetName() .. 'Text'):SetText(OMNICC_LOCALS.ShowPulse)
+							</OnLoad>
+							<OnShow>
+								self:SetChecked(OmniCC:ShowingPulse())
+							</OnShow>
+							<OnClick>
+								OmniCC:SetShowPulse(self:GetChecked())
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+
+					<CheckButton name="$parentUseMMSS" inherits="OptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentShowPulse" relativePoint="BOTTOM"/>
+						</Anchors>
+
+						<Scripts>
+							<OnLoad>
+								getglobal(self:GetName() .. 'Text'):SetText(OMNICC_LOCALS.UseMMSS)
+							</OnLoad>
+							<OnShow>
+								self:SetChecked(OmniCC:UsingMMSS())
+							</OnShow>
+							<OnClick>
+								OmniCC:SetUseMMSS(self:GetChecked())
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+
+					<Slider name="$parentMinDuration" inherits="OmniCCSliderTemplate" minValue="0" maxValue="30" valueStep="0.5">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentUseMMSS" relativePoint="BOTTOMLEFT">
+								<Offset x="0" y="-15"/>
+							</Anchor>
+						</Anchors>
+
+						<Scripts>
+							<OnLoad>
+								getglobal(self:GetName() .. 'Text'):SetText(OMNICC_LOCALS.MinDuration)
+								getglobal(self:GetName() .. 'Low'):SetText('')
+								getglobal(self:GetName() .. 'High'):SetText('')
+							</OnLoad>
+							<OnShow>
+								self.onShow = true
+								self:SetValue(OmniCC:GetMinDuration())
+								self.onShow = nil
+							</OnShow>
+							<OnValueChanged>
+								getglobal(self:GetName() .. 'ValueText'):SetText(format("%.1f", value))
+
+								if not self.onShow then
+									OmniCC:SetMinDuration(value)
+								end
+							</OnValueChanged>
+						</Scripts>
+					</Slider>
+
+					<Slider name="$parentMinSize" inherits="OmniCCSliderTemplate" minValue="0" maxValue="2" valueStep="0.05">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentMinDuration" relativePoint="BOTTOMLEFT">
+								<Offset x="0" y="-20"/>
+							</Anchor>
+						</Anchors>
+
+						<Scripts>
+							<OnLoad>
+								getglobal(self:GetName() .. 'Text'):SetText(OMNICC_LOCALS.MinScale)
+								getglobal(self:GetName() .. 'Low'):SetText('')
+								getglobal(self:GetName() .. 'High'):SetText('')
+							</OnLoad>
+							<OnShow>
+								self.onShow = true
+								self:SetValue(OmniCC:GetMinScale())
+								self.onShow = nil
+							</OnShow>
+							<OnValueChanged>
+								getglobal(self:GetName() .. 'ValueText'):SetText(floor(value * 100 + 0.5) .. '%')
+
+								if not self.onShow then
+									OmniCC:SetMinScale(value)
+								end
+							</OnValueChanged>
+						</Scripts>
+					</Slider>
+				</Frames>
+
+				<Scripts>
+					<OnLoad>
+						self:SetBackdropBorderColor(0.4, 0.4, 0.4)
+						self:SetBackdropColor(0.15, 0.15, 0.15, 0.5)
+						getglobal(self:GetName().. 'Title'):SetText(OMNICC_LOCALS.Display)
+					</OnLoad>
+				</Scripts>
+			</Frame>
+
+			<Frame name="$parentFont" inherits="OptionFrameBoxTemplate">
+				<Size x="180" y="198"/>
+
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset x="-20" y="-45"/>
+					</Anchor>
+				</Anchors>
+
+				<Frames>
+					<Frame name="$parentFace" inherits="OmniCCDropdown">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="-5" y="-25"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+
+						<Scripts>
+							<OnLoad>
+								getglobal(self:GetName() .. "Label"):SetText(OMNICC_LOCALS.FontFace)
+								OmniCC.LoadFontSelector(self)
+							</OnLoad>
+						</Scripts>
+					</Frame>
+
+					<Frame name="$parentOutline" inherits="OmniCCDropdown">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentFace" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-14"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+
+						<Scripts>
+							<OnLoad>
+								getglobal(self:GetName() .. "Label"):SetText(OMNICC_LOCALS.FontOutline)
+								OmniCC.OnFontOutlineLoad(self)
+							</OnLoad>
+						</Scripts>
+					</Frame>
+
+					<Slider name="$parentSize" inherits="OmniCCSliderTemplate" minValue="8" maxValue="32" valueStep="0.5">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentOutline" relativePoint="BOTTOMLEFT">
+								<Offset x="15" y="-15"/>
+							</Anchor>
+						</Anchors>
+
+						<Scripts>
+							<OnLoad>
+								getglobal(self:GetName() .. 'Text'):SetText(OMNICC_LOCALS.FontSize)
+								getglobal(self:GetName() .. 'Low'):SetText('')
+								getglobal(self:GetName() .. 'High'):SetText('')
+							</OnLoad>
+							<OnShow>
+								self.onShow = true
+								self:SetValue(OmniCC:GetFontSize())
+								self.onShow = nil
+							</OnShow>
+							<OnValueChanged>
+								getglobal(self:GetName() .. 'ValueText'):SetText(format("%.1f", value))
+
+								if not self.onShow then
+									OmniCC:SetFontSize(value)
+								end
+							</OnValueChanged>
+						</Scripts>
+					</Slider>
+				</Frames>
+
+				<Scripts>
+					<OnLoad>
+						self:SetBackdropBorderColor(0.4, 0.4, 0.4)
+						self:SetBackdropColor(0.15, 0.15, 0.15, 0.5)
+						getglobal(self:GetName().. 'Title'):SetText(OMNICC_LOCALS.Font)
+					</OnLoad>
+				</Scripts>
+			</Frame>
+
+			<Frame name="$parentColors" inherits="OptionFrameBoxTemplate">
+				<Size x="360" y="132"/>
+
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentGeneral" relativePoint="BOTTOMLEFT">
+						<Offset x="0" y="-14"/>
+					</Anchor>
+				</Anchors>
+
+				<Scripts>
+					<OnLoad>
+						self:SetBackdropBorderColor(0.4, 0.4, 0.4)
+						self:SetBackdropColor(0.15, 0.15, 0.15, 0.5)
+						getglobal(self:GetName().. 'Title'):SetText(OMNICC_LOCALS.ColorsAndScaling)
+					</OnLoad>
+				</Scripts>
+
+				<Frames>
+					<Slider name="$parentShort" inherits="OmniCCFormatEditorTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset x="10" y="-28"/>
+							</Anchor>
+						</Anchors>
+
+						<Scripts>
+							<OnLoad>
+								self.duration = 'short'
+								getglobal(self:GetName() .. "Text"):SetText(OMNICC_LOCALS.UnderFiveSeconds)
+							</OnLoad>
+						</Scripts>
+					</Slider>
+
+					<Slider name="$parentSeconds" inherits="OmniCCFormatEditorTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentShort" relativePoint="BOTTOMLEFT">
+								<Offset x="0" y="-20"/>
+							</Anchor>
+						</Anchors>
+
+						<Scripts>
+							<OnLoad>
+								self.duration = 'secs'
+								getglobal(self:GetName() .. "Text"):SetText(SECONDS)
+							</OnLoad>
+						</Scripts>
+					</Slider>
+
+					<Slider name="$parentMinutes" inherits="OmniCCFormatEditorTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentSeconds" relativePoint="BOTTOMLEFT">
+								<Offset x="0" y="-20"/>
+							</Anchor>
+						</Anchors>
+
+						<Scripts>
+							<OnLoad>
+								self.duration = 'mins'
+								getglobal(self:GetName() .. "Text"):SetText(MINUTES)
+							</OnLoad>
+						</Scripts>
+					</Slider>
+
+					<Slider name="$parentHours" inherits="OmniCCFormatEditorTemplate">
+						<Anchors>
+							<Anchor point="TOPRIGHT">
+								<Offset x="-48" y="-28"/>
+							</Anchor>
+						</Anchors>
+
+						<Scripts>
+							<OnLoad>
+								self.duration = 'hrs'
+								getglobal(self:GetName() .. "Text"):SetText(HOURS)
+							</OnLoad>
+						</Scripts>
+					</Slider>
+
+					<Slider name="$parentDays" inherits="OmniCCFormatEditorTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentHours" relativePoint="BOTTOMLEFT">
+								<Offset x="0" y="-20"/>
+							</Anchor>
+						</Anchors>
+
+						<Scripts>
+							<OnLoad>
+								self.duration = 'days'
+								getglobal(self:GetName() .. "Text"):SetText(DAYS)
+							</OnLoad>
+						</Scripts>
+					</Slider>
+				</Frames>
+			</Frame>
+		</Frames>
+
+		<Scripts>
+			<OnLoad>
+				table.insert(UISpecialFrames, self:GetName())
+				UIFrameFadeIn(self, 0.2)
+			</OnLoad>
+		</Scripts>
+	</Frame>
+</Ui>
