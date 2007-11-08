@@ -31,7 +31,8 @@ function BongosActionButton:Create(id)
 	button.icon:SetTexCoord(0.06, 0.94, 0.06, 0.94)
 
 	button.border = _G[name .. "Border"]
-	button.border:SetVertexColor(0, 1, 0, 0.6)
+	button.border:SetVertexColor(0, 1, 0)
+--	button.border:SetFrameLevel(button.border:GetFrameLevel() + 4)
 
 	button.normal = _G[name .. "NormalTexture"]
 	button.normal:SetVertexColor(1, 1, 1, 0.5)
@@ -116,6 +117,8 @@ function BongosActionButton:UpdateEvents()
 		self:RegisterEvent("PLAYER_LEAVE_COMBAT")
 		self:RegisterEvent("START_AUTOREPEAT_SPELL")
 		self:RegisterEvent("STOP_AUTOREPEAT_SPELL")
+
+		self:RegisterEvent("UNIT_AURA")
 	end
 end
 
@@ -130,6 +133,11 @@ function BongosActionButton:OnEvent(event, arg1)
 			self:Update()
 		elseif event == "PLAYER_AURAS_CHANGED" or event == "PLAYER_TARGET_CHANGED" then
 			self:UpdateUsable()
+			self:UpdateBorder()
+		elseif event == 'UNIT_AURA' then
+			if arg1 == 'target' then
+				self:UpdateBorder()
+			end
 		elseif event == "UNIT_INVENTORY_CHANGED" then
 			if arg1 == 'player' then
 				self:Update()
@@ -271,14 +279,7 @@ function BongosActionButton:Update(refresh)
 
 	self:UpdateCount()
 
-	-- Add a green border if button is an equipped item
-	local border = self.border
-	if IsEquippedAction(action) then
-		border:SetVertexColor(0, 1, 0, 0.6)
-		border:Show()
-	else
-		border:Hide()
-	end
+	self:UpdateBorder()
 
 	-- Update Macro Text
 	local macroText = self.macro
@@ -336,6 +337,49 @@ function BongosActionButton:UpdateFlash()
 	else
 		self:StopFlash()
 	end
+end
+
+function BongosActionButton:UpdateBorder()
+	local border = self.border
+	local action = self:GetPagedID()
+
+	if IsEquippedAction(action) then
+		border:SetVertexColor(0, 1, 0)
+		border:Show()
+		return
+	else
+		local type, arg1, arg2 = GetActionInfo(action)
+		if type == 'spell' then
+			local name = GetSpellName(arg1, arg2)
+
+			local i = 1
+			local buff
+			repeat
+				buff = UnitBuff('player', i)
+				if buff == name then
+					border:SetVertexColor(0, 1, 0)
+					border:Show()
+					return
+				end
+				i = i + 1
+			until not buff
+
+			if UnitExists('target') then
+				local i = 1
+				local buff
+				repeat
+					buff = UnitDebuff('target', i)
+					if buff == name then
+						border:SetVertexColor(1, 0, 1)
+						border:Show()
+						return
+					end
+					i = i + 1
+				until not buff
+			end
+		end
+	end
+	border:Hide()
 end
 
 function BongosActionButton:StartFlash()
