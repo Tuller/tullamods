@@ -63,11 +63,11 @@ function OmniCC:LoadDefaults()
 		minDuration = 3, --the minimum duration we want to show cooldowns for, anything below will not show a timer
 
 		style = {
-			short = {r = 1, g = 0, b = 0, s = 1.3}, -- <= 5 seconds
+			short = {r = 1, g = 0, b = 0, s = 1.25}, -- <= 5 seconds
 			secs = {r = 1, g = 1, b = 0.4, s = 1}, -- < 1 minute
-			mins = {r = 0.8, g = 0.8, b = 0.9, s = 1}, -- >= 1 minute
-			hrs = {r = 0.8, g = 0.8, b = 0.9, s = 0.6}, -- >= 1 hr
-			days = {r = 0.8, g = 0.8, b = 0.9, s = 0.6}, -- >= 1 day
+			mins = {r = 0.8, g = 0.8, b = 0.9, s = 0.9}, -- >= 1 minute
+			hrs = {r = 0.8, g = 0.8, b = 0.9, s = 0.8}, -- >= 1 hr
+			days = {r = 0.8, g = 0.8, b = 0.9, s = 0.65}, -- >= 1 day
 		},
 
 		version = CURRENT_VERSION,
