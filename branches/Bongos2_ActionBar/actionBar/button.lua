@@ -398,7 +398,7 @@ do
 					return true
 				end
 			elseif IsHarmfulSpell(spell) and UnitHasDebuff('target', spell) then
-				self:GetCheckedTexture():SetVertexColor(0.1, 0.1, 1)
+				self:GetCheckedTexture():SetVertexColor(1, 0, 1)
 				return true
 			end
 		end
@@ -415,18 +415,19 @@ do
 	function BongosActionButton:UpdateSpellInUse()
 		local border = self.border
 		local action = self:GetPagedID()
-		local type, arg1, arg2 = GetActionType(GetActionInfo(action))
+		if action then
+			local type, arg1, arg2 = GetActionType(GetActionInfo(action))
 
-		if type == 'item' then
-			local spell = GetItemSpell(arg1)
-			if spell then
-				return self:UpdateBorder(spell)
+			if type == 'item' then
+				local spell = GetItemSpell(arg1)
+				if spell then
+					return self:UpdateBorder(spell)
+				end
+			elseif type == 'spell' then
+				return self:UpdateBorder(arg1)
 			end
-		elseif type == 'spell' then
-			return self:UpdateBorder(arg1)
-		else
-			self:GetCheckedTexture():SetVertexColor(1, 1, 1)
 		end
+		self:GetCheckedTexture():SetVertexColor(1, 1, 1)
 	end
 end
 
