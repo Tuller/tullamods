@@ -90,7 +90,7 @@ function Options:AddDisplayPanel()
 		self.onShow = nil
 	end)
 	minDuration:SetScript('OnValueChanged', function(self, value)
-		self.valText:SetText(format("%.1f", value))
+		self.valText:SetText(format('%.1f', value))
 		if not self.onShow then
 			OmniCC:SetMinDuration(value)
 		end
