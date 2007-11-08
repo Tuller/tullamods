@@ -183,9 +183,9 @@ function BongosCastBar:UpdateColor(spell)
 	local castBar = self.bar.castBar
 	if castBar.failed then
 		castBar:SetStatusBarColor(0.86, 0.08, 0.24)
-	elseif IsHelpfulSpell(spell) then
+	elseif spell and IsHelpfulSpell(spell) then
 		castBar:SetStatusBarColor(0.31, 0.78, 0.47)
-	elseif IsHarmfulSpell(spell) then
+	elseif spell and IsHarmfulSpell(spell) then
 		castBar:SetStatusBarColor(0.63, 0.36, 0.94)
 	else
 		castBar:SetStatusBarColor(1, 0.7, 0)
