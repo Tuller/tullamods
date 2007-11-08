@@ -31,12 +31,14 @@ function BongosActionButton:Create(id)
 	button.icon:SetTexCoord(0.06, 0.94, 0.06, 0.94)
 
 	button.border = _G[name .. "Border"]
-	button.border:SetVertexColor(0, 1, 0, 0.6)
+	button.border:SetVertexColor(0, 1, 0, 0.7)
 
 	button.normal = _G[name .. "NormalTexture"]
 	button.normal:SetVertexColor(1, 1, 1, 0.5)
 
 	button.cooldown = _G[name .. "Cooldown"]
+	button.cooldown:SetFrameLevel(button.cooldown:GetFrameLevel() - 1)
+
 	button.flash = _G[name .. "Flash"]
 	button.hotkey = _G[name .. "HotKey"]
 	button.macro = _G[name .. "Name"]
@@ -116,6 +118,8 @@ function BongosActionButton:UpdateEvents()
 		self:RegisterEvent("PLAYER_LEAVE_COMBAT")
 		self:RegisterEvent("START_AUTOREPEAT_SPELL")
 		self:RegisterEvent("STOP_AUTOREPEAT_SPELL")
+
+		self:RegisterEvent("UNIT_AURA")
 	end
 end
 
@@ -130,6 +134,11 @@ function BongosActionButton:OnEvent(event, arg1)
 			self:Update()
 		elseif event == "PLAYER_AURAS_CHANGED" or event == "PLAYER_TARGET_CHANGED" then
 			self:UpdateUsable()
+			self:UpdateState()
+		elseif event == 'UNIT_AURA' then
+			if arg1 == 'target' or arg1 == 'player' then
+				self:UpdateState()
+			end
 		elseif event == "UNIT_INVENTORY_CHANGED" then
 			if arg1 == 'player' then
 				self:Update()
@@ -201,9 +210,10 @@ end
 
 function BongosActionButton:OnDragStart()
 	if LOCK_ACTIONBAR ~= '1' or IsModifiedClick('PICKUPACTION') or self.showEmpty then
-		PickupAction(self:GetPagedID())
-		self:Update()
-		self:UpdateState()
+		if not InCombatLockdown() then
+			PickupAction(self:GetPagedID())
+			self:Update()
+		end
 	end
 end
 
@@ -271,13 +281,10 @@ function BongosActionButton:Update(refresh)
 
 	self:UpdateCount()
 
-	-- Add a green border if button is an equipped item
-	local border = self.border
 	if IsEquippedAction(action) then
-		border:SetVertexColor(0, 1, 0, 0.6)
-		border:Show()
+		self.border:Show()
 	else
-		border:Hide()
+		self.border:Hide()
 	end
 
 	-- Update Macro Text
@@ -304,7 +311,7 @@ end
 --Update if a button is checked or not
 function BongosActionButton:UpdateState()
 	local action = self:GetPagedID()
-	self:SetChecked(IsCurrentAction(action) or IsAutoRepeatAction(action))
+	self:SetChecked(self:UpdateSpellInUse() or IsCurrentAction(action) or IsAutoRepeatAction(action))
 end
 
 --colors the action button if out of mana, out of range, etc
@@ -335,6 +342,91 @@ function BongosActionButton:UpdateFlash()
 		self:StartFlash()
 	else
 		self:StopFlash()
+	end
+end
+
+do
+	local function UnitHasBuff(unit, name)
+		if name then
+			local i = 1
+			local buff
+			repeat
+				buff = UnitBuff(unit, i)
+				if buff == name then
+					return true
+				end
+				i = i + 1
+			until not buff
+		end
+	end
+
+	local function UnitHasDebuff(unit, name)
+		if name then
+			local i = 1
+			local buff, cooldown, _
+			repeat
+				buff, _, _, _, _, cooldown = UnitDebuff(unit, i)
+				if cooldown and buff == name then
+					return true
+				end
+				i = i + 1
+			until not buff
+		end
+	end
+
+	local function GetActionType(type, arg1, arg2)
+		if type == 'macro' then
+			local item, link = GetMacroItem(arg1)
+			if item then
+				return 'item', item, link
+			end
+			local spell = GetMacroSpell(arg1)
+			if spell then
+				return 'spell', spell
+			end
+		elseif type == 'spell' then
+			return 'spell', GetSpellName(arg1, arg2)
+		end
+		return type, arg1, arg2
+	end
+
+	function BongosActionButton:UpdateBorder(spell)
+		if UnitExists('target') and SpellHasRange(spell) then
+			if UnitIsFriend('player', 'target') then
+				if IsHelpfulSpell(spell) and UnitHasBuff('target', spell) then
+					self:GetCheckedTexture():SetVertexColor(0, 1, 0)
+					return true
+				end
+			elseif IsHarmfulSpell(spell) and UnitHasDebuff('target', spell) then
+				self:GetCheckedTexture():SetVertexColor(0.1, 0.1, 1)
+				return true
+			end
+		end
+
+		if UnitHasBuff('player', spell) then
+			self:GetCheckedTexture():SetVertexColor(0, 1, 0)
+			return true
+		end
+
+		self:GetCheckedTexture():SetVertexColor(1, 1, 1)
+		return false
+	end
+
+	function BongosActionButton:UpdateSpellInUse()
+		local border = self.border
+		local action = self:GetPagedID()
+		local type, arg1, arg2 = GetActionType(GetActionInfo(action))
+
+		if type == 'item' then
+			local spell = GetItemSpell(arg1)
+			if spell then
+				return self:UpdateBorder(spell)
+			end
+		elseif type == 'spell' then
+			return self:UpdateBorder(arg1)
+		else
+			self:GetCheckedTexture():SetVertexColor(1, 1, 1)
+		end
 	end
 end
 
