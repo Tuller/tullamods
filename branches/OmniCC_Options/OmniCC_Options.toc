@@ -5,4 +5,4 @@
 ## Dependencies: OmniCC
 ## LoadOnDemand: 1
 localization.lua
-menu.xml
+menu.lua
