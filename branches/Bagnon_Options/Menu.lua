@@ -98,13 +98,9 @@ local function CreateToggleFrames(parent)
 		end
 	end))
 
-	if BagnonDB then
-		table.insert(frames, Toggle_Create(parent, L.ShowOwners, 'showOwners'))
-	end
-
 	table.insert(frames, Toggle_Create(parent, L.ReplaceBags, 'replaceBags'))
 	table.insert(frames, Toggle_Create(parent, L.ReplaceBank, 'replaceBank'))
-	table.insert(frames, Toggle_Create(parent, L.ReuseFrames, 'reuseFrames', function() ReloadUI() end))
+	table.insert(frames, Toggle_Create(parent, L.ReuseFrames, 'reuseFrames', ReloadUI))
 
 	return frames
 end

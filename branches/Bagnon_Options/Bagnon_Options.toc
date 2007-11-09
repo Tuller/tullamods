@@ -6,10 +6,10 @@
 ## Author: Tuller
 ## Dependencies: Bagnon
 ## LoadOnDemand: 1
-localization.lua
-localization.es.lua
-localization.fr.lua
-localization.de.lua
-localization.cn.lua
-localization.tw.lua
+localization\localization.lua
+localization\localization.es.lua
+localization\localization.fr.lua
+localization\localization.de.lua
+localization\localization.cn.lua
+localization\localization.tw.lua
 menu.lua
