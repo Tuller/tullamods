@@ -10,11 +10,10 @@
 lib\Dongle.lua
 lib\FlyPaper.lua
 lib\Gooey.xml
-localization.lua
-localization.cn.lua
-localization.fr.lua
+localization\localization.lua
+localization\localization.cn.lua
+localization\localization.fr.lua
+Bongos.lua
 dragFrame.lua
 bar.lua
 menu.lua
-Bongos.lua
-minimap.xml

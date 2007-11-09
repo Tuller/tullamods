@@ -1,5 +1,14 @@
 Bongos2 Version History
 
+1.9.0
+All: Adjusted file structures  Delete all Bongos folders before installing
+All: Updated for 2.3
+All: Added French translation (thanks SegFault)
+Core: Profile copying now actually works
+CastBar: Spell target coloring is now more accurate
+ActionBar: Implemented FlexBar2 style buff and debuff highlighting
+XP: Added in the ability to configure the position of text (thanks SegFault)
+
 1.8.2
 XP: Fixed a bug causing the bar to become too large after sizing it with the slider
 
