@@ -1,0 +1,106 @@
+--[[
+	Bagnon Tooltips
+		Does ownership tooltips based on Bagnon_Forever data
+--]]
+
+local currentPlayer = UnitName('player')
+local itemInfo = {}
+
+local function CountsToInfoString(invCount, bankCount, equipCount)
+	local info
+	local total = invCount + bankCount + equipCount
+
+	if invCount > 0 then
+		info = BAGNON_NUM_BAGS:format(invCount)
+	end
+
+	if bankCount > 0 then
+		local count = BAGNON_NUM_BANK:format(bankCount)
+		info = info and strjoin(', ', info, count) or count
+	end
+
+	if equipCount > 0 then
+		info = info and strjoin(', ', info, BAGNON_EQUIPPED) or BAGNON_EQUIPPED
+	end
+
+	if info then
+		if not(total == invCount or total == bankCount or total == equipCount) then
+			return total .. format(' (%s)', info)
+		end
+		return info
+	end
+end
+
+--make up the self populating table
+do
+	for player in BagnonDB:GetPlayers() do
+		if player ~= currentPlayer then
+			itemInfo[player] = setmetatable({}, {__index = function(self, link)
+				local invCount = BagnonDB:GetItemCount(link, KEYRING_CONTAINER, player)
+				for bag = 0, NUM_BAG_SLOTS do
+					invCount = invCount + BagnonDB:GetItemCount(link, bag, player)
+				end
+
+				local bankCount = BagnonDB:GetItemCount(link, BANK_CONTAINER, player)
+				for i = 1, NUM_BANKBAGSLOTS do
+					bankCount = bankCount + BagnonDB:GetItemCount(link, NUM_BAG_SLOTS + i, player)
+				end
+
+				local equipCount = BagnonDB:GetItemCount(link, 'e', player)
+
+				self[link] = CountsToInfoString(invCount, bankCount, equipCount) or ''
+				return self[link]
+			end})
+		end
+	end
+end
+
+local function AddOwners(frame, link)
+	for player in BagnonDB:GetPlayers() do
+		local infoString
+		if player == currentPlayer then
+			local invCount = GetItemCount(link, false)
+
+			local bankCount = BagnonDB:GetItemCount(link, BANK_CONTAINER, player)
+			for i = 1, NUM_BANKBAGSLOTS do
+				bankCount = bankCount + BagnonDB:GetItemCount(link, NUM_BAG_SLOTS+i, player)
+			end
+
+			local equipCount = IsEquippedItem(link) and 1 or 0
+
+			infoString = CountsToInfoString(invCount, bankCount, equipCount)
+		else
+			infoString = itemInfo[player][link]
+		end
+
+		if infoString and infoString ~= '' then
+			frame:AddDoubleLine(player .. ':', infoString, 0, 0.8, 1, 0, 0.8, 1)
+		end
+	end
+	frame:Show()
+end
+
+--hook the tooltips
+local SetItem = GameTooltip:GetScript('OnTooltipSetItem')
+GameTooltip:SetScript('OnTooltipSetItem', function(self, ...)
+	if SetItem then
+		SetItem(self, ...)
+	end
+
+	local itemLink = select(2, self:GetItem())
+	if itemLink then
+		AddOwners(self, itemLink)
+	end
+end)
+
+local SetItem = ItemRefTooltip:GetScript('OnTooltipSetItem')
+ItemRefTooltip:SetScript('OnTooltipSetItem', function(self, ...)
+	if SetItem then
+		SetItem(self, ...)
+	end
+
+	local itemLink = select(2, self:GetItem())
+	if itemLink then
+		AddOwners(self, itemLink)
+	end
+end)
