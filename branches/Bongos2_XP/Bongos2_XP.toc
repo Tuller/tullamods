@@ -5,7 +5,7 @@
 ## Notes-zhCN: Bongos2 系列 经验条。
 ## Author: Tuller
 ## Dependencies: Bongos2
-localization.lua
-localization.cn.lua
-localization.fr.lua
+localization\localization.lua
+localization\localization.cn.lua
+localization\localization.fr.lua
 bar.lua
