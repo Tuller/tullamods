@@ -6,7 +6,7 @@
 ## Author: Tuller
 ## Dependencies: Bongos2
 ## OptionalDeps: Titan
-localization.lua
-localization.cn.lua
-localization.fr.lua
+localization\localization.lua
+localization\localization.cn.lua
+localization\localization.fr.lua
 bar.lua
