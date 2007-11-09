@@ -165,9 +165,11 @@ end
 function Sage:SaveProfile(profile)
 	local currentProfile = self.db:GetCurrentProfile()
 	if profile and profile ~= self.db:GetCurrentProfile() then
-		self.copyProfile = currentProfile
 		self:UnloadModules()
+		self.copying = true
 		self.db:SetProfile(profile)
+		self.db:CopyProfile(currentProfile)
+		self.copying = nil
 	end
 end
 
@@ -192,7 +194,10 @@ function Sage:CopyProfile(name)
 	local profile = self:MatchProfile(name)
 	if profile and profile ~= self.db:GetCurrentProfile() then
 		self:UnloadModules()
+		self.copying = true
+		self.db:ResetProfile()
 		self.db:CopyProfile(profile)
+		self.copying = nil
 	end
 end
 
@@ -209,13 +214,21 @@ function Sage:ListProfiles()
 end
 
 function Sage:MatchProfile(name)
+	local profileList = self.db:GetProfiles()
+
 	local name = name:lower()
-	for _,k in ipairs(self.db:GetProfiles()) do
+	local nameRealm = format('%s - %s', name, GetRealmName():lower())
+	local match
+
+	for i, k in ipairs(profileList) do
 		local key = k:lower()
 		if key == name then
 			return k
+		elseif key == nameRealm then
+			match = k
 		end
 	end
+	return match
 end
 
 
@@ -232,13 +245,10 @@ end
 function Sage:DONGLE_PROFILE_CHANGED(event, db, parent, sv_name, profile_key)
 	if(sv_name == self.dbName) then
 		self.profile = self.db.profile
-		if(self.copyProfile) then
-			self.db:CopyProfile(self.copyProfile)
-			self.copyProfile = nil
-		else
+		if not self.copying then
 			self:LoadModules()
+			self:Print(format(L.ProfileLoaded, profile_key))
 		end
-		self:Print(format(L.ProfileLoaded, profile_key))
 	end
 end
 
@@ -258,9 +268,11 @@ end
 
 function Sage:DONGLE_PROFILE_RESET(event, db, parent, sv_name, profile_key)
 	if(sv_name == self.dbName) then
-		self.profile = self.db.profile
-		self:LoadModules()
-		self:Print(format(L.ProfileReset, profile_key))
+		if not self.copying then
+			self.profile = self.db.profile
+			self:LoadModules()
+			self:Print(format(L.ProfileReset, profile_key))
+		end
 	end
 end
 
