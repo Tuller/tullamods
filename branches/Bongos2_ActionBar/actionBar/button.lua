@@ -391,7 +391,7 @@ do
 	end
 
 	function BongosActionButton:UpdateBorder(spell)
-		if UnitExists('target') and SpellHasRange(spell) then
+		if SpellHasRange(spell) and UnitExists('target') then
 			if UnitIsFriend('player', 'target') then
 				if IsHelpfulSpell(spell) and UnitHasBuff('target', spell) then
 					self:GetCheckedTexture():SetVertexColor(0, 1, 0)

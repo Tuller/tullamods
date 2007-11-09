@@ -18,7 +18,6 @@
 
 --Unregister action buttons
 local function UnregisterActionButton(button)
-	button:ClearAllPoints()
 	button:UnregisterAllEvents()
 	button:Hide()
 end

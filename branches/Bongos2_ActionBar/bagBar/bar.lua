@@ -3,7 +3,7 @@
 		Scripts used for the Bongos Bag bar
 --]]
 
-BongosBagBar = Bongos:NewModule("Bongos-BagBar")
+BongosBagBar = Bongos:NewModule('Bongos-BagBar')
 
 local L = BONGOS_LOCALS
 
@@ -14,7 +14,7 @@ local BAG_SIZE = 37
 --create the keyring button
 do
 	local button = CreateFrame('CheckButton', 'BongosKeyRingButton', nil, 'ItemButtonTemplate')
-	button:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+	button:RegisterForClicks('LeftButtonUp', 'RightButtonUp')
 
 	button:SetScript('OnClick', function()
 		if CursorHasItem() then
@@ -31,8 +31,10 @@ do
 	end)
 
 	button:SetScript('OnEnter', function(self)
-		GameTooltip:SetOwner(self, "ANCHOR_LEFT")
-		GameTooltip:SetText(KEYRING, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
+		GameTooltip:SetOwner(self, 'ANCHOR_LEFT')
+
+		local color = HIGHLIGHT_FONT_COLOR
+		GameTooltip:SetText(KEYRING, color.r, color.g, color.b)
 		GameTooltip:AddLine()
 	end)
 
@@ -41,7 +43,7 @@ do
 	end)
 
 	local icon = getglobal(button:GetName() .. 'IconTexture')
-	icon:SetTexture('Interface/Icons/INV_Misc_Key_13')
+	icon:SetTexture('Interface/Icons/INV_Misc_Bag_16')
 end
 
 local bags = {
@@ -75,23 +77,23 @@ local function Bar_Layout(self, rows, spacing)
 
 	if self.sets.oneBag then
 		for i = 1, #bags-1 do bags[i]:Hide() end
-		bags[#bags]:SetPoint("TOPLEFT", self)
+		bags[#bags]:SetPoint('TOPLEFT', self)
 
 		self:SetWidth(BAG_SIZE); self:SetHeight(BAG_SIZE)
 	else
 		for _,bag in pairs(bags) do bag:Show() end
-		bags[1]:SetPoint("TOPLEFT", self)
+		bags[1]:SetPoint('TOPLEFT', self)
 
 		--horizontal alignment
 		if rows == 1 then
 			for i = 2, #bags do
-				bags[i]:SetPoint("LEFT", bags[i-1], "RIGHT", spacing, 0)
+				bags[i]:SetPoint('LEFT', bags[i-1], 'RIGHT', spacing, 0)
 			end
 			self:SetSize((BAG_SIZE + spacing) * #bags - spacing, (BAG_SIZE + spacing) - spacing)
 		--vertical alignment
 		else
 			for i = 2, #bags do
-				bags[i]:SetPoint("TOP", bags[i-1], "BOTTOM", 0, -spacing)
+				bags[i]:SetPoint('TOP', bags[i-1], 'BOTTOM', 0, -spacing)
 			end
 			self:SetSize((BAG_SIZE + spacing) - spacing, (BAG_SIZE + spacing)*#bags - spacing)
 		end
@@ -111,12 +113,12 @@ local function Bar_CreateMenu(frame)
 	local menu,panel = BongosMenu:CreateMenu(frame.id)
 
 	local oneBag = panel:AddCheckButton(L.OneBag)
-	oneBag:SetScript("OnShow", function(self) self:SetChecked(frame.sets.oneBag) end)
-	oneBag:SetScript("OnClick", function(self) frame:SetOneBag(self:GetChecked()) end)
+	oneBag:SetScript('OnShow', function(self) self:SetChecked(frame.sets.oneBag) end)
+	oneBag:SetScript('OnClick', function(self) frame:SetOneBag(self:GetChecked()) end)
 
 	local vertical = panel:AddCheckButton(L.Vertical)
-	vertical:SetScript("OnShow", function(self) self:SetChecked(frame.sets.rows) end)
-	vertical:SetScript("OnClick", function(self) frame:SetVertical(self:GetChecked()) end)
+	vertical:SetScript('OnShow', function(self) self:SetChecked(frame.sets.rows) end)
+	vertical:SetScript('OnClick', function(self) frame:SetVertical(self:GetChecked()) end)
 
 	panel:AddSpacingSlider()
 
@@ -143,7 +145,7 @@ end
 --[[ Startup ]]--
 
 function BongosBagBar:Load()
-	local bar = BBar:Create("bags", Bar_OnCreate, nil, {["y"] = 37, ["x"] = 1241})
+	local bar = BBar:Create('bags', Bar_OnCreate, nil, {x = 1241, y = 37})
 	bar:Layout()
 
 	self.bar = bar

@@ -129,7 +129,7 @@ function BongosPetBar:KEYBOUND_DISABLED()
 	local petBarShown = PetHasActionBar()
 	for i = 1, NUM_PET_ACTION_SLOTS do
 		local button = BongosPetButton:Get(i)
-		if(petBarShown and GetPetActionInfo(i)) then
+		if petBarShown and GetPetActionInfo(i) then
 			button:Show()
 		else
 			button:Hide()
