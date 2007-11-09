@@ -6,9 +6,9 @@
 ## Author: Tuller
 ## Dependencies: Bongos2
 ## LoadOnDemand: 1
-localization.lua
-localization.cn.lua
-localization.fr.lua
+localization\localization.lua
+localization\localization.cn.lua
+localization\localization.fr.lua
 menu.lua
 general.lua
 profiles.lua
