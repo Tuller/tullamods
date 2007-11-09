@@ -127,13 +127,11 @@ function BagnonFrame:Create(name, sets, bags, isBank)
 	local close = CreateFrame('Button', name .. 'Close', frame, 'UIPanelCloseButton')
 	close:SetPoint('TOPRIGHT', 6 - frame.borderSize/2, 6 - frame.borderSize/2)
 
+	frame.title = TitleFrame:Create(frame)
 	if BagnonDB then
 		local playerDropdown = CreateFrame('Button', name .. 'DropDown', frame, 'BagnonDBUIDropDownButton')
 		playerDropdown:SetPoint('TOPLEFT', frame.borderSize/2 -2, -6)
-	end
 
-	frame.title = TitleFrame:Create(frame)
-	if BagnonDB then
 		frame.title:SetPoint('TOPLEFT', 26 + frame.borderSize/2, -10)
 	else
 		frame.title:SetPoint('TOPLEFT', 6 + frame.borderSize/2, -10)
