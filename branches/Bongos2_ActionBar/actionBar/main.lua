@@ -7,18 +7,20 @@ local DEFAULT_NUM_ACTIONBARS = 10
 local actions = {}
 
 function BongosActionBar:Load()
-	for i = 1, 120 do 
-		actions[i] = HasAction(i) 
+	for i = 1, 120 do
+		actions[i] = HasAction(i)
 	end
-	for i = 1, self:GetNumber() do 
-		BActionBar:Create(i) 
+	for i = 1, self:GetNumber() do
+		BActionBar:Create(i)
 	end
 
-	self:RegisterEvent('ACTIONBAR_SLOT_CHANGED', 'OnSlotChanged')
 	self:RegisterEvent('PLAYER_REGEN_ENABLED', 'OnLeaveCombat')
+
+	self:RegisterEvent('ACTIONBAR_SLOT_CHANGED', 'OnSlotChanged')
 
 	self:RegisterEvent('ACTIONBAR_SHOWGRID', 'UpdateGrid')
 	self:RegisterEvent('ACTIONBAR_HIDEGRID', 'UpdateGrid')
+
 	self:RegisterMessage('KEYBOUND_ENABLED', 'UpdateGrid')
 	self:RegisterMessage('KEYBOUND_DISABLED', 'UpdateGrid')
 
@@ -41,22 +43,22 @@ end
 
 --[[ Events ]]--
 
+function BongosActionBar:OnLeaveCombat()
+	if self.needsVisUpdate then
+		self:UpdateVisibility()
+	end
+	if self.needsGridUpdate then
+		self:UpdateGridVisibility()
+	end
+end
+
 function BongosActionBar:OnSlotChanged(event, id)
 	local hasAction = actions[id]
-	if(HasAction(id) ~= hasAction) then
+	if HasAction(id) ~= hasAction then
 		actions[id] = HasAction(id) or nil
 		self:UpdateVisibility()
 	end
 	BongosActionButton:UpdateButtonsWithID(id)
-end
-
-function BongosActionBar:OnLeaveCombat()
-	if self.updateVisibility then
-		self:UpdateVisibility()
-	end
-	if self.updateGrid then
-		self:UpdateGrid()
-	end
 end
 
 function BongosActionBar:UpdateGrid(event)
@@ -65,15 +67,15 @@ function BongosActionBar:UpdateGrid(event)
 	elseif(event == 'ACTIONBAR_HIDEGRID') then
 		BongosActionButton.showEmpty = nil
 	end
-	self:UpdateGrid()
+	self:UpdateGridVisibility()
 end
 
 --updates the showstates of every button on every bar
 function BongosActionBar:UpdateVisibility()
 	if InCombatLockdown() then
-		self.updateVisibility = true
+		self.needsVisUpdate = true
 	else
-		self.updateVisibility = nil
+		self.needsVisUpdate = nil
 
 		for i = 1, self:GetNumber() do
 			local bar = BActionBar:Get(i)
@@ -84,16 +86,16 @@ function BongosActionBar:UpdateVisibility()
 	end
 end
 
-function BongosActionButton:UpdateGrid()
+function BongosActionBar:UpdateGridVisibility()
 	if InCombatLockdown() then
-		self.updateGrid = true
+		self.needsGridUpdate = true
 	else
-		self.updateGrid = nil
+		self.needsGridUpdate = nil
+
 		for i = 1, self:GetNumber() do
 			local bar = BActionBar:Get(i)
 			if bar:IsShown() then
-				local s, e = bar:GetStartID(), bar:GetEndID()
-				for j = s, e do
+				for j = bar:GetStartID(), bar:GetEndID() do
 					BongosActionButton:Get(j):UpdateGrid()
 				end
 			end
@@ -102,10 +104,10 @@ function BongosActionButton:UpdateGrid()
 end
 
 function BongosActionBar:UpdateStanceNumbers()
-	local prev = self.numForms
+	local prevNumForms = self.numForms
 	self.numForms = GetNumShapeshiftForms()
 
-	if(self.numForms ~= prev) then
+	if self.numForms ~= prevNumForms then
 		for i = 1, self:GetNumber() do
 			local bar = BActionBar:Get(i)
 			bar:UpdateStateHeader()

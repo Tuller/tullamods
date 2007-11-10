@@ -213,8 +213,10 @@ function BongosActionButton:OnDragStart()
 end
 
 function BongosActionButton:OnReceiveDrag()
-	PlaceAction(self:GetPagedID())
-	self:UpdateState()
+	if not InCombatLockdown() then
+		PlaceAction(self:GetPagedID())
+		self:UpdateState()
+	end
 end
 
 function BongosActionButton:OnEnter()
@@ -509,48 +511,51 @@ end
 --returns true if the showstates have changed, false otherwise
 function BongosActionButton:UpdateVisibility()
 	local newstates
+	if self:ShowingEmpty() then
+		newstates = '*'
+	else
+		local id = self:GetAttribute('action')
+		if HasAction(id) then
+			newstates = 0
+		end
 
-	local id = self:GetAttribute('action')
-	if HasAction(id) then 
-		newstates = 0 
-	end
+		if hasStance then
+			local maxState = (CLASS == 'PRIEST' and 1) or GetNumShapeshiftForms()
 
-	if hasStance then
-		local maxState = (CLASS == 'PRIEST' and 1) or GetNumShapeshiftForms()
+			for i = 1, maxState do
+				local action = self:GetAttribute('*action-s' .. i) or id
+				if HasAction(action) then
+					newstates = (newstates and newstates .. ',' .. i) or i
+				end
+			end
 
-		for i = 1, maxState do
-			local action = self:GetAttribute('*action-s' .. i) or id
-			if HasAction(action) then
-				newstates = (newstates and newstates .. ',' .. i) or i
+			if(CLASS == 'DRUID') then
+				local action = self:GetAttribute('*action-s' .. 7) or id
+				if HasAction(action) then
+					newstates = (newstates and newstates .. ',' .. 7) or 7
+				end
 			end
 		end
 
-		if(CLASS == 'DRUID') then
-			local action = self:GetAttribute('*action-s' .. 7) or id
+		for i = 1, BONGOS_MAX_PAGES do
+			local action = self:GetAttribute('*action-p' .. i) or id
 			if HasAction(action) then
-				newstates = (newstates and newstates .. ',' .. 7) or 7
+				newstates = (newstates and newstates .. ',' .. (i+9)) or (i+9)
 			end
 		end
-	end
 
-	for i = 1, MAX_PAGES do
-		local action = self:GetAttribute('*action-p' .. i) or id
+		for i = 1, 3 do
+			local action = self:GetAttribute('*action-m' .. i) or id
+			if HasAction(action) then
+				newstates = (newstates and newstates .. ',' .. (i+15)) or (i+15)
+			end
+		end
+
+		local action = self:GetAttribute('*action-help') or id
 		if HasAction(action) then
-			newstates = (newstates and newstates .. ',' .. (i+9)) or (i+9)
+			newstates = (newstates and newstates .. ',' .. 15) or 15
 		end
 	end
-
-	for i = 1, 3 do
-		local action = self:GetAttribute('*action-m' .. i) or id
-		if HasAction(action) then
-			newstates = (newstates and newstates .. ',' .. (i+15)) or (i+15)
-		end
-	end
-
-	local action = self:GetAttribute('*action-help') or id
-	if HasAction(action) then
-		newstates = (newstates and newstates .. ',' .. 15) or 15
-	end
 
 	newstates = newstates or '!*'
 	local oldstates = self:GetAttribute('showstates')
@@ -562,7 +567,7 @@ end
 
 --[[ Showgrid Stuff ]]
 
-function BongosActionButton:UpdateShowGrid()
+function BongosActionButton:UpdateGrid()
 	if self:ShowingEmpty() or HasAction(self:GetPagedID()) then
 		self:Show()
 	else
