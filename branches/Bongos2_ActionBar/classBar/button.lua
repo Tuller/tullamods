@@ -65,11 +65,12 @@ end
 
 function BongosClassButton:UpdateEvents()
 	if self:IsShown() then
-		self:RegisterEvent("UPDATE_SHAPESHIFT_FORMS")
-		self:RegisterEvent("PLAYER_ENTERING_WORLD")
-		self:RegisterEvent("SPELL_UPDATE_COOLDOWN")
-		self:RegisterEvent("SPELL_UPDATE_USABLE")
-		self:RegisterEvent("PLAYER_AURAS_CHANGED")
+		self:RegisterEvent('UPDATE_SHAPESHIFT_FORMS')
+		self:RegisterEvent('PLAYER_ENTERING_WORLD')
+		self:RegisterEvent('SPELL_UPDATE_COOLDOWN')
+		self:RegisterEvent('SPELL_UPDATE_USABLE')
+		self:RegisterEvent('PLAYER_AURAS_CHANGED')
+		self:RegisterEvent('UPDATE_BINDINGS')
 	else
 		self:UnregisterAllEvents()
 	end
@@ -142,11 +143,9 @@ end
 
 function BongosClassButton:ShowHotkey(show)
 	if show then
-		self:RegisterEvent('UPDATE_BINDINGS')
 		getglobal(self:GetName() .. 'HotKey'):Show()
 		self:UpdateHotkey()
 	else
-		self:UnregisterEvent('UPDATE_BINDINGS')
 		getglobal(self:GetName() .. 'HotKey'):Hide()
 	end
 end
