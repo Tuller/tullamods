@@ -35,7 +35,7 @@ function BongosClassButton:Create(id, parent)
 
 	--hotkey
 	local hotkey = button:CreateFontString(name .. 'HotKey', 'ARTWORK')
-	hotkey:SetFontObject('NumberFontNormalSmall')
+	hotkey:SetFontObject('NumberFontNormalSmallGray')
 	hotkey:SetPoint('TOPRIGHT', 2, -2)
 	hotkey:SetJustifyH('RIGHT')
 	hotkey:SetWidth(BUTTON_SIZE); hotkey:SetHeight(10)
