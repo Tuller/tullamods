@@ -6,7 +6,9 @@ All: Updated for 2.3
 All: Added French translation (thanks SegFault)
 Core: Profile copying now actually works
 CastBar: Spell target coloring is now more accurate
+ActionBar: The class bar will now update properly when you get a new form/aura/stance
 ActionBar: Implemented FlexBar2 style buff and debuff highlighting
+ActionBar: You can now bind macros directly using keybound
 XP: Added in the ability to configure the position of text (thanks SegFault)
 
 1.8.2
