@@ -108,7 +108,7 @@ function Bongos:LoadModules()
 		assert(module.Load, format('Bongos Module %s: Missing Load function', name))
 		module:Load()
 	end
---	Bongos:LoadMinimap()
+	Bongos:LoadMinimap()
 	BBar:ForAll('Reanchor')
 end
 
