@@ -3,6 +3,6 @@
 		English: default language
 --]]
 
-BAGNON_NUM_BAGS = '%d bags'
-BAGNON_NUM_BANK = '%d bank'
-BAGNON_EQUIPPED = 'wearing'
+BAGNON_NUM_BAGS = 'Bags: %d'
+BAGNON_NUM_BANK = 'Bank: %d'
+BAGNON_EQUIPPED = 'Equipped'

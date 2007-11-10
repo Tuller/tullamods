@@ -5,6 +5,8 @@
 
 local currentPlayer = UnitName('player')
 local itemInfo = {}
+local SILVER = '|cffc7c7cf%s|r'
+local TEAL = '|cff00ff9a%s|r'
 
 local function CountsToInfoString(invCount, bankCount, equipCount)
 	local info
@@ -25,9 +27,9 @@ local function CountsToInfoString(invCount, bankCount, equipCount)
 
 	if info then
 		if not(total == invCount or total == bankCount or total == equipCount) then
-			return total .. format(' (%s)', info)
+			return format(TEAL, total) .. format(SILVER, format(' (%s)', info))
 		end
-		return info
+		return format(TEAL, info)
 	end
 end
 
@@ -59,14 +61,17 @@ local function AddOwners(frame, link)
 	for player in BagnonDB:GetPlayers() do
 		local infoString
 		if player == currentPlayer then
-			local invCount = GetItemCount(link, false)
+			local invCount = BagnonDB:GetItemCount(link, KEYRING_CONTAINER, player)
+			for bag = 0, NUM_BAG_SLOTS do
+				invCount = invCount + BagnonDB:GetItemCount(link, bag, player)
+			end
 
 			local bankCount = BagnonDB:GetItemCount(link, BANK_CONTAINER, player)
 			for i = 1, NUM_BANKBAGSLOTS do
-				bankCount = bankCount + BagnonDB:GetItemCount(link, NUM_BAG_SLOTS+i, player)
+				bankCount = bankCount + BagnonDB:GetItemCount(link, NUM_BAG_SLOTS + i, player)
 			end
 
-			local equipCount = IsEquippedItem(link) and 1 or 0
+			local equipCount = BagnonDB:GetItemCount(link, 'e', player)
 
 			infoString = CountsToInfoString(invCount, bankCount, equipCount)
 		else
@@ -74,7 +79,7 @@ local function AddOwners(frame, link)
 		end
 
 		if infoString and infoString ~= '' then
-			frame:AddDoubleLine(player .. ':', infoString, 0, 0.8, 1, 0, 0.8, 1)
+			frame:AddDoubleLine(format(TEAL, player), infoString)
 		end
 	end
 	frame:Show()
