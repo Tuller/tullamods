@@ -4,18 +4,9 @@
 		Should work exactly like the normal pet action buttons, but with a modified appearance
 --]]
 
-BongosPetButton = CreateFrame("CheckButton")
+BongosPetButton = CreateFrame('CheckButton')
 local Button_mt = {__index = BongosPetButton}
 local petBar = PetActionBarFrame
-
-
---[[ Frame Events ]]--
-
-local function OnDragStart(self) self:OnDragStart() end
-local function OnReceiveDrag(self) self:OnReceiveDrag() end
-local function OnEnter(self) self:OnEnter() end
-local function OnLeave(self) self:OnLeave() end
-local function OnEvent(self) self:UpdateHotkey() end
 
 
 --[[ Constructorish ]]--
@@ -34,23 +25,23 @@ end
 function BongosPetButton:Style()
 	local name = self:GetName()
 
-	local autoCast = getglobal(name .. "AutoCast")
-	autoCast:SetPoint("TOPLEFT", self, "TOPLEFT", -0.5, -1)
-	autoCast:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", 0.5, -1.5)
+	local autoCast = getglobal(name .. 'AutoCast')
+	autoCast:SetPoint('TOPLEFT', self, 'TOPLEFT', -0.5, -1)
+	autoCast:SetPoint('BOTTOMRIGHT', self, 'BOTTOMRIGHT', 0.5, -1.5)
 
-	getglobal(name .. "Icon"):SetTexCoord(0.06, 0.94, 0.06, 0.94)
-	getglobal(name .. "NormalTexture2"):SetVertexColor(1, 1, 1, 0.5)
+	getglobal(name .. 'Icon'):SetTexCoord(0.06, 0.94, 0.06, 0.94)
+	getglobal(name .. 'NormalTexture2'):SetVertexColor(1, 1, 1, 0.5)
 end
 
 function BongosPetButton:SetScripts()
-	self:RegisterForDrag("LeftButton", "RightButton")
-	self:RegisterForClicks("anyUp")
+	self:RegisterForDrag('LeftButton', 'RightButton')
+	self:RegisterForClicks('anyUp')
 
-	self:SetScript("OnDragStart", OnDragStart)
-	self:SetScript("OnReceiveDrag", OnReceiveDrag)
-	self:SetScript("OnEnter", OnEnter)
-	self:SetScript("OnEvent", OnEvent)
-	self:RegisterEvent("UPDATE_BINDINGS")
+	self:SetScript('OnDragStart', self.OnDragStart)
+	self:SetScript('OnReceiveDrag', self.OnReceiveDrag)
+	self:SetScript('OnEnter', self.OnEnter)
+	self:SetScript('OnEvent', self.UpdateHotkey)
+	self:RegisterEvent('UPDATE_BINDINGS')
 end
 
 
@@ -84,21 +75,21 @@ end
 
 function BongosPetButton:ShowHotkey(show)
 	if show then
-		getglobal(self:GetName() .. "HotKey"):Show()
+		getglobal(self:GetName() .. 'HotKey'):Show()
 		self:UpdateHotkey()
 	else
-		getglobal(self:GetName() .. "HotKey"):Hide()
+		getglobal(self:GetName() .. 'HotKey'):Hide()
 	end
 end
 
 function BongosPetButton:UpdateHotkey()
-	getglobal(self:GetName() .. "HotKey"):SetText(self:GetHotkey() or "")
+	getglobal(self:GetName() .. 'HotKey'):SetText(self:GetHotkey() or '')
 end
 
 function BongosPetButton:GetHotkey()
-	local key = GetBindingKey(format("CLICK %s:LeftButton", self:GetName()))
+	local key = GetBindingKey(format('CLICK %s:LeftButton', self:GetName()))
 	if not key then
-		key = GetBindingText(GetBindingKey("BONUSACTIONBUTTON" .. self:GetID()), "KEY_")
+		key = GetBindingText(GetBindingKey('BONUSACTIONBUTTON' .. self:GetID()), 'KEY_')
 	end
 	return KeyBound:ToShortKey(key)
 end
@@ -107,7 +98,7 @@ end
 --[[ Utility Functions ]]--
 
 function BongosPetButton:Get(id)
-	return getglobal(format("PetActionButton%d", id))
+	return getglobal(format('PetActionButton%d', id))
 end
 
 function BongosPetButton:ForAll(method, ...)
