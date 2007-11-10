@@ -154,7 +154,7 @@ local function Bar_CreateMenu(frame)
 	oneBag:SetScript('OnShow', function(self) self:SetChecked(frame.sets.oneBag) end)
 	oneBag:SetScript('OnClick', function(self) frame:SetOneBag(self:GetChecked()) end)
 
-	local showKeyRing = panel:AddCheckButton('Show Keyring')
+	local showKeyRing = panel:AddCheckButton(L.ShowKeyring)
 	showKeyRing:SetScript('OnShow', function(self) self:SetChecked(frame.sets.showKeyring) end)
 	showKeyRing:SetScript('OnClick', function(self) frame:SetShowKeyring(self:GetChecked()) end)
 
