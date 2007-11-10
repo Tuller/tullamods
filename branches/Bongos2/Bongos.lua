@@ -78,6 +78,14 @@ function Bongos:UpdateSettings()
 				barSets.spacing = (barSets.spacing or barSets.space)
 				barSets.space = nil
 			end
+
+			--update the bag frame settings (1.9)
+			local bagSets = sets.bars.bags
+			if bagSets then
+				bagSets.vertical = bagSets.rows and true or nil
+				bagSets.showKeyring = true
+				bagSets.rows = nil
+			end
 		end
 	end
 
