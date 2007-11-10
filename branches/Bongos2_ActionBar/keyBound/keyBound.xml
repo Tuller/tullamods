@@ -1,7 +1,7 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
-	<Script file="localization/localization.lua"/>
-	<Script file="localization/localization.cn.lua"/>
-	<Script file="localization/localization.fr.lua"/>
+	<Script file="localization\localization.lua"/>
+	<Script file="localization\localization.cn.lua"/>
+	<Script file="localization\localization.fr.lua"/>
 	<Script file="keyBound.lua"/>
 	<Script file="spellFrame.lua"/>
 	<Script file="macroFrame.lua"/>

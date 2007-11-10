@@ -44,6 +44,7 @@ function BongosClassButton:Create(id, parent)
 	CreateFrame('Cooldown', name .. 'Cooldown', button, 'CooldownFrameTemplate')
 
 	button:SetAttribute('type', 'spell')
+	button:SetScript('PostClick', self.PostClick)
 	button:SetScript('OnEvent', self.OnEvent)
 	button:SetScript('OnEnter', self.OnEnter)
 	button:SetScript('OnLeave', self.OnLeave)
@@ -52,6 +53,7 @@ function BongosClassButton:Create(id, parent)
 
 	button:ShowHotkey(BongosActionConfig:ShowingHotkeys())
 	button:UpdateSpell()
+	button:UpdateEvents()
 
 	buttons[id] = button
 
@@ -63,9 +65,11 @@ end
 
 function BongosClassButton:UpdateEvents()
 	if self:IsShown() then
-		self:RegisterEvent('SPELL_UPDATE_COOLDOWN')
-		self:RegisterEvent('SPELL_UPDATE_USABLE')
-		self:RegisterEvent('PLAYER_AURAS_CHANGED')
+		self:RegisterEvent("UPDATE_SHAPESHIFT_FORMS")
+		self:RegisterEvent("PLAYER_ENTERING_WORLD")
+		self:RegisterEvent("SPELL_UPDATE_COOLDOWN")
+		self:RegisterEvent("SPELL_UPDATE_USABLE")
+		self:RegisterEvent("PLAYER_AURAS_CHANGED")
 	else
 		self:UnregisterAllEvents()
 	end
@@ -74,6 +78,8 @@ end
 function BongosClassButton:OnEvent(event)
 	if event == 'UPDATE_BINDINGS' then
 		self:UpdateHotkey()
+	elseif event == 'UPDATE_SHAPESHIFT_FORMS' and (self:GetID() > GetNumShapeshiftForms()) then
+		self:Hide()
 	else
 		self:Update()
 	end
@@ -93,6 +99,10 @@ end
 
 function BongosClassButton:OnLeave()
 	GameTooltip:Hide()
+end
+
+function BongosClassButton:PostClick()
+	self:SetChecked(not self:GetChecked())
 end
 
 

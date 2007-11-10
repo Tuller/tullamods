@@ -94,6 +94,7 @@ function BongosClassBar:UpdateForms()
 	for id = 1, GetNumShapeshiftForms() do
 		local button = BongosClassButton:Get(id) or BongosClassButton:Create(id, self.bar)
 		button:UpdateSpell()
+		button:Show()
 	end
 	self.bar:Layout()
 end
