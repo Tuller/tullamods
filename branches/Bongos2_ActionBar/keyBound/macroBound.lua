@@ -1,12 +1,18 @@
-local CastButton = {}
+local MacroButton = CreateFrame('Frame')
 
-function CastButton:Load()
+function MacroButton:Load()
+	Bongos:Print('load')
+
 	local i = 1
 	local button
 	repeat
-		button = getglobal('SpellButton' .. i)
+		button = getglobal(format('MacroButton%d', i))
 		if button then
-			button:HookScript('OnEnter', self.OnEnter)
+			local OnEnter = button:GetScript('OnEnter')
+			button:SetScript('OnEnter', function(self)
+				KeyBound:Set(self)
+				return OnEnter and OnEnter(self)
+			end)
 
 			button.GetBindAction = self.GetBindAction
 			button.GetActionName = self.GetActionName
@@ -19,35 +25,26 @@ function CastButton:Load()
 	until not button
 end
 
-function CastButton:OnEnter()
-	local id = SpellBook_GetSpellID(self:GetID())
-	local bookType = SpellBookFrame.bookType
-
-	if not(bookType == BOOKTYPE_PET or IsPassiveSpell(id, bookType)) then
-		KeyBound:Set(self)
-	end
+function MacroButton:OnEnter()
+	KeyBound:Set(self)
 end
 
-function CastButton:GetActionName()
-	local name, subName = GetSpellName(SpellBook_GetSpellID(self:GetID()), SpellBookFrame.bookType)
-	if(subName and subName ~= '') then
-		return format('%s(%s)', name, subName)
-	end
-	return name
+function MacroButton:GetActionName()
+	return GetMacroInfo(MacroFrame.macroBase + self:GetID())
 end
 
 -- returns the keybind action of the given button
-function CastButton:GetBindAction()
-	return format('SPELL %s', self:GetActionName())
+function MacroButton:GetBindAction()
+	return format('MACRO %d', MacroFrame.macroBase + self:GetID())
 end
 
 -- binds the given key to the given button
-function CastButton:SetKey(key)
-	SetBindingSpell(key, self:GetActionName())
+function MacroButton:SetKey(key)
+	SetBindingMacro(key, MacroFrame.macroBase + self:GetID())
 end
 
 -- removes all keys bound to the given button
-function CastButton:ClearBindings()
+function MacroButton:ClearBindings()
 	local binding = self:GetBindAction()
 	while GetBindingKey(binding) do
 		SetBinding(GetBindingKey(binding), nil)
@@ -55,7 +52,7 @@ function CastButton:ClearBindings()
 end
 
 -- returns a string listing all bindings of the given button
-function CastButton:GetBindings()
+function MacroButton:GetBindings()
 	local keys
 	local binding = self:GetBindAction()
 	for i = 1, select('#', GetBindingKey(binding)) do
@@ -69,8 +66,16 @@ function CastButton:GetBindings()
 	return keys
 end
 
-function CastButton:GetHotkey()
+function MacroButton:GetHotkey()
 	return KeyBound:ToShortKey(GetBindingKey(self:GetBindAction()))
 end
 
-CastButton:Load()
+do
+	MacroButton:SetScript('OnEvent', function(self, event, addon)
+		if addon == 'Blizzard_MacroUI' then
+			self:UnregisterAllEvents()
+			self:Load()
+		end
+	end)
+	MacroButton:RegisterEvent('ADDON_LOADED')
+end
