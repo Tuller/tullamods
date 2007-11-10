@@ -9,6 +9,7 @@ CastBar: Spell target coloring is now more accurate
 ActionBar: The class bar will now update properly when you get a new form/aura/stance
 ActionBar: Implemented FlexBar2 style buff and debuff highlighting
 ActionBar: You can now bind macros directly using keybound
+ActionBar: Reduced the CPU usage of showing and hiding empty buttons
 XP: Added in the ability to configure the position of text (thanks SegFault)
 Bags: Added in an option to hide the keyring
 Bags: Modified the look of the keyring
@@ -142,6 +143,3 @@ Fixed a bug causing the bars for paladins to not work properly when first loaded
 
 1.0
 Updated for 2.1
-
-known issues:
-	Tainting issues from other addons
