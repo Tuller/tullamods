@@ -41,7 +41,7 @@ function BongosClassButton:Create(id, parent)
 	hotkey:SetWidth(BUTTON_SIZE); hotkey:SetHeight(10)
 
 	--cooldown model
-	CreateFrame('Cooldown', name .. 'Cooldown', button, 'CooldownFrameTemplate')
+	button.cooldown = CreateFrame('Cooldown', nil, button, 'CooldownFrameTemplate')
 
 	button:SetAttribute('type', 'spell')
 	button:SetScript('PostClick', self.PostClick)
@@ -123,13 +123,11 @@ function BongosClassButton:Update()
 	end
 
 	--update cooldown
-	local cooldown = getglobal(self:GetName() .. 'Cooldown')
 	if texture then
 		local start, duration, enable = GetShapeshiftFormCooldown(self:GetID())
-		CooldownFrame_SetTimer(cooldown, start, duration, enable)
-		cooldown:Show()
+		CooldownFrame_SetTimer(self.cooldown, start, duration, enable)
 	else
-		cooldown:Hide()
+		self.cooldown:Hide()
 	end
 end
 
