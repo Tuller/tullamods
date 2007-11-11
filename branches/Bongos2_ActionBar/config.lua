@@ -124,7 +124,7 @@ function BongosActionConfig:GetSelfCastKey()
 end
 
 function BongosActionConfig:SetHighlightBuffs(enable)
-	Bongos.profile.highlightBuffs = enable
+	Bongos.profile.highlightBuffs = enable or false
 	BongosActionButton:ForAll('UpdateState')
 end
 
