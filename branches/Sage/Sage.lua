@@ -8,7 +8,7 @@ Sage.dbName = "Sage2DB"
 
 local CURRENT_VERSION = GetAddOnMetadata("Sage", "Version")
 local TEXTURE_PATH = "Interface\\AddOns\\Sage\\textures\\%s"
-local BLIZZ_TEXTURE = "Interface\\TargetingFrame\\UI-StatusBar"
+local BLIZZ_TEXTURE = "Interface/TargetingFrame/UI-StatusBar"
 local L = SAGE_LOCALS
 
 

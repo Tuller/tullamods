@@ -333,7 +333,7 @@ end
 function SageFrame:SetShowCombatText(enable)
 	self.sets.showCombatText = enable or nil
 
-	if(enable) then
+	if enable then
 		SageCombat:Register(self)
 	else
 		SageCombat:Unregister(self)
