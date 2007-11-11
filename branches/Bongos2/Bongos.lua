@@ -21,6 +21,7 @@ function Bongos:Initialize()
 			rangeColoring = true,
 			showEmpty = false,
 			showMinimap = true,
+			highlightBuffs = true,
 			rangeColor = {r = 1, g = 0.5, b = 0.5},
 			mapx = -24, mapy = -76,
 			bars = {}
