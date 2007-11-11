@@ -10,19 +10,18 @@ CombuctorItem.SIZE = 37
 do
 	local slot = CreateFrame('Button')
 	slot:RegisterForClicks('anyUp')
+	slot:SetToplevel(true)
 	slot:Hide()
 
 	local function Slot_OnEnter(self)
 		local parent = self:GetParent()
 		local link = parent.hasItem
 
+		parent:LockHighlight()
 		if parent.cached and link then
-			parent:LockHighlight()
 			CombuctorItem.AnchorTooltip(self)
 			GameTooltip:SetHyperlink(link)
 			GameTooltip:Show()
-		else
-			self:Hide()
 		end
 	end
 
@@ -214,6 +213,12 @@ end
 
 --[[ Frame Events ]]--
 
+function CombuctorItem:OnDragStart()
+	if self.cached and CursorHasItem() then
+		ClearCursor()
+	end
+end
+
 function CombuctorItem:OnModifiedClick(button)
 	if self.cached then
 		if self.hasItem then
@@ -231,13 +236,9 @@ end
 function CombuctorItem:OnEnter()
 	local bag, slot = self:GetBag(), self:GetID()
 	if self.cached then
-		if self.hasItem then
-			self.dummySlot:SetParent(self)
-			self.dummySlot:SetAllPoints(self)
-			self.dummySlot:Show()
-		else
-			self.dummySlot:Hide()
-		end
+		self.dummySlot:SetParent(self)
+		self.dummySlot:SetAllPoints(self)
+		self.dummySlot:Show()
 	else
 		self.dummySlot:Hide()
 
