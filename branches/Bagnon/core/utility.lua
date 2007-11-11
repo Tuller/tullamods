@@ -138,10 +138,6 @@ function BagnonUtil:GetSets()
 	return Bagnon.sets
 end
 
-function BagnonUtil:ShowingOwners()
-	return Bagnon.sets.showOwners
-end
-
 function BagnonUtil:ShowingBorders()
 	return Bagnon.sets.showBorders
 end
