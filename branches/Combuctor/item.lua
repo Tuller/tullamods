@@ -207,7 +207,7 @@ function CombuctorItem:UpdateCooldown()
 		local start, duration, enable = GetContainerItemCooldown(self:GetBag(), self:GetID())
 		CooldownFrame_SetTimer(self.cooldown, start, duration, enable)
 	else
-		self.cooldown:Hide()
+		CooldownFrame_SetTimer(self.cooldown, 0, 0, 0)
 	end
 end
 
