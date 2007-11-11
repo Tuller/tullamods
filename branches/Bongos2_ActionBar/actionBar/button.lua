@@ -273,6 +273,7 @@ function BongosActionButton:Update(refresh)
 		self:UpdateCooldown()
 		self:UpdateFlash()
 	else
+		self:SetChecked(false)
 		cooldown:Hide()
 	end
 
@@ -411,18 +412,19 @@ do
 	end
 
 	function BongosActionButton:UpdateSpellInUse()
-		local border = self.border
-		local action = self:GetPagedID()
-		if action then
-			local type, arg1, arg2 = GetActionType(GetActionInfo(action))
+		if BongosActionConfig:HighlightingBuffs() then
+			local action = self:GetPagedID()
+			if action then
+				local type, arg1, arg2 = GetActionType(GetActionInfo(action))
 
-			if type == 'item' then
-				local spell = GetItemSpell(arg1)
-				if spell then
-					return self:UpdateBorder(spell)
+				if type == 'item' then
+					local spell = GetItemSpell(arg1)
+					if spell then
+						return self:UpdateBorder(spell)
+					end
+				elseif type == 'spell' then
+					return self:UpdateBorder(arg1)
 				end
-			elseif type == 'spell' then
-				return self:UpdateBorder(arg1)
 			end
 		end
 		self:GetCheckedTexture():SetVertexColor(1, 1, 1)
