@@ -68,12 +68,12 @@ local function EventFrame_Create(parent, text, type)
 
 	local bags = EventButton_Create(frame, type)
 	local bank = EventButton_Create(frame, type, true)
-	bank:SetPoint('RIGHT', frame)
+	bank:SetPoint('RIGHT')
 	bags:SetPoint('RIGHT', bank, 'LEFT', -6, 0)
 
 	local title = frame:CreateFontString('ARTWORK')
 	title:SetJustifyH('LEFT')
-	title:SetPoint('LEFT', frame)
+	title:SetPoint('LEFT')
 	title:SetFontObject('GameFontNormalSmall')
 	title:SetText(text)
 
@@ -120,14 +120,14 @@ local function CreateOptionsMenu(name)
 	local frame = CreateFrame('Frame', name, UIParent, 'GooeyFrame')
 	frame:EnableMouse(true)
 
-	frame:SetFrameStrata("DIALOG")
+	frame:SetFrameStrata('DIALOG')
 	frame:SetMovable(true)
 	frame:SetToplevel(true)
 	frame:SetClampedToScreen(true)
 
 	frame:SetWidth(254)
-	frame:SetHeight(416)
-	frame:SetPoint("LEFT", UIParent)
+	frame:SetHeight(416 - 34)
+	frame:SetPoint('LEFT')
 	local titleRegion = frame:CreateTitleRegion()
 	titleRegion:SetAllPoints(frame)
 
@@ -135,15 +135,15 @@ local function CreateOptionsMenu(name)
 	local title = frame:CreateFontString('ARTWORK')
 	title:SetFontObject('GameFontHighlightLarge')
 	title:SetText(L.Title)
-	title:SetPoint('TOP', frame, 'TOP', 0, -10)
+	title:SetPoint('TOP', 0, -10)
 
 	--close button
 	local close = CreateFrame('Button', name .. 'Close', frame, 'UIPanelCloseButton')
-	close:SetPoint('TOPRIGHT', frame, 'TOPRIGHT', -2, -2)
+	close:SetPoint('TOPRIGHT', -2, -2)
 
 	--create and layout all the toggle checkbuttons
 	local toggles = CreateToggleFrames(frame)
-	toggles[1]:SetPoint('TOPLEFT', frame, 'TOPLEFT', 6, -32)
+	toggles[1]:SetPoint('TOPLEFT', 6, -32)
 	for i = 2, #toggles do
 		toggles[i]:SetPoint('TOPLEFT', toggles[i-1], 'BOTTOMLEFT')
 	end
