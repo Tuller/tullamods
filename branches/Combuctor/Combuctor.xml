@@ -7,7 +7,7 @@
 	<Button name="CombuctorFrameTabButtonTemplate" inherits="CharacterFrameTabButtonTemplate" virtual="true">
 		<Scripts>
 			<OnLoad>
-				return
+				self:RegisterForDrag("LeftButton")
 			</OnLoad>
 			<OnClick>
 				local parent = self:GetParent()
@@ -16,6 +16,20 @@
 				end
 				parent:ShowPanel(self:GetID())
 			</OnClick>
+			<OnReceiveDrag>
+				if CursorHasItem() then
+					local player = self:GetParent():GetPlayer()
+					for _,bag in ipairs(self.bags) do
+						if not CombuctorUtil:IsCachedBag(bag, player) then
+							for slot = 1, GetContainerNumSlots(bag) do
+								if not GetContainerItemLink(bag, slot) then
+									PickupContainerItem(bag, slot)
+								end
+							end
+						end
+					end
+				end
+			</OnReceiveDrag>
 		</Scripts>
 	</Button>
 
