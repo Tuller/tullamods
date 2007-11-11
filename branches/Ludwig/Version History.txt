@@ -2,7 +2,7 @@ Ludwig Version History
 
 1.5
 Updated for 2.3
-Removed the /lw --scan command due to disconnects being reimplemented
+Removed the /lw --scan command due to disconnects
 
 1.4
 Updated for 2.2

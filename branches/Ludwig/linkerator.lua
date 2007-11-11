@@ -20,10 +20,7 @@ local function ParseChatMessage(text)
 	return text:gsub("([|]?[h]?)%[(.-)%]([|]?[h]?)", LinkifyName)
 end
 
-local OnChar = ChatFrameEditBox:GetScript("OnChar")
-ChatFrameEditBox:SetScript("OnChar", function(self, ...)
-	if(OnChar) then OnChar(self, ...) end
-
+local function Linkerator_OnChar(self, ...)
 	local text = self:GetText()
 	if not(text == "" or text:sub(1,1) == "/") then
 		local query = text:match("%[([^]]-)$")
@@ -39,4 +36,10 @@ ChatFrameEditBox:SetScript("OnChar", function(self, ...)
 			self:SetText(ParseChatMessage(text))
 		end
 	end
-end)
+end
+
+if ChatFrameEditBox:GetScript('OnChar') then
+	ChatFrameEditBox:HookScript('OnChar', Linkerator_OnChar)
+else
+	ChatFrameEditBox:SetScript('OnChar', Linkerator_OnChar)
+end
