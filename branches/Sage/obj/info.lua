@@ -1,6 +1,6 @@
 --[[
 	The Infobar component of Sage
-		Infobars display the unit"s level, name, health percentage, pvp status, targeting icon
+		Infobars display the unit's level, name, health percentage, pvp status, targeting icon
 		Infobars can also includ master looter and party leadership status
 
 		Additionally, this frame actually controls how wide its parent unitframe is, due to it being related to name width
@@ -9,7 +9,7 @@
 		The max height of an infobar with party information should be 20, and 16 without
 --]]
 
-SageInfo = CreateFrame("Frame")
+SageInfo = CreateFrame('Frame')
 local Frame_MT = {__index = SageInfo}
 local L = SAGE_LOCALS
 
@@ -20,7 +20,7 @@ local UnitReactionColor = UnitReactionColor
 --this is an exercise in
 local function IndexToUnit(index)
 	if(index) then
-		return ((index == 0) and "player") or "party" .. index
+		return ((index == 0) and 'player') or 'party' .. index
 	end
 end
 
@@ -33,56 +33,56 @@ local function GetLeaderIndex()
 end
 
 local function Bar_CreateStrings(self)
-	local level = self:CreateFontString(nil, "OVERLAY")
+	local level = self:CreateFontString(nil, 'OVERLAY')
 	level:SetFontObject(SageFont:GetLevelFont())
-	level:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", LEVEL_OFFSET, 0)
+	level:SetPoint('BOTTOMLEFT', self, 'BOTTOMLEFT', LEVEL_OFFSET, 0)
 	level:SetHeight(12)
-	level:SetJustifyH("LEFT"); level:SetJustifyV("BOTTOM")
+	level:SetJustifyH('LEFT'); level:SetJustifyV('BOTTOM')
 	self.level = level
 
-	local percent = self:CreateFontString(nil, "OVERLAY")
+	local percent = self:CreateFontString(nil, 'OVERLAY')
 	percent:SetFontObject(SageFont:GetSmallOutsideFont())
-	percent:SetPoint("BOTTOMRIGHT", self)
+	percent:SetPoint('BOTTOMRIGHT', self)
 	percent:SetHeight(12)
-	percent:SetJustifyH("RIGHT"); percent:SetJustifyV("BOTTOM")
+	percent:SetJustifyH('RIGHT'); percent:SetJustifyV('BOTTOM')
 	if not Sage:ShowingPercents() then percent:Hide() end
 	self.percent = percent
 
-	local name = self:CreateFontString(nil, "OVERLAY")
+	local name = self:CreateFontString(nil, 'OVERLAY')
 	name:SetFontObject(SageFont:GetOutsideFont())
 	name:SetHeight(12)
-	name:SetJustifyH("LEFT"); name:SetJustifyV("BOTTOM")
-	name:SetPoint("BOTTOMLEFT", level, "BOTTOMRIGHT")
-	name:SetPoint("BOTTOMRIGHT", percent, "BOTTOMLEFT")
+	name:SetJustifyH('LEFT'); name:SetJustifyV('BOTTOM')
+	name:SetPoint('BOTTOMLEFT', level, 'BOTTOMRIGHT')
+	name:SetPoint('BOTTOMRIGHT', percent, 'BOTTOMLEFT')
 	self.name = name
 end
 
 local function Bar_CreateIcons(self, hasPartyInfo)
-	local pvp = self:CreateTexture(nil, "OVERLAY")
+	local pvp = self:CreateTexture(nil, 'OVERLAY')
 	pvp:SetWidth(48); pvp:SetHeight(48)
-	pvp:SetPoint("CENTER", self.level, "CENTER", 7, -10)
+	pvp:SetPoint('CENTER', self.level, 'CENTER', 7, -10)
 	pvp:Hide()
 	self.pvp = pvp
 
-	local target = self:CreateTexture(nil, "OVERLAY")
-	target:SetTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcons")
+	local target = self:CreateTexture(nil, 'OVERLAY')
+	target:SetTexture('Interface\\TargetingFrame\\UI-RaidTargetingIcons')
 	target:SetWidth(25); target:SetHeight(26)
-	target:SetPoint("CENTER", self.level, "CENTER", -1, 0)
+	target:SetPoint('CENTER', self.level, 'CENTER', -1, 0)
 	target:Hide()
 	self.target = target
 
 	if hasPartyInfo then
-		local leader = self:CreateTexture(nil, "OVERLAY")
+		local leader = self:CreateTexture(nil, 'OVERLAY')
 		leader:SetWidth(20); leader:SetHeight(18)
-		leader:SetPoint("BOTTOM", self.level, "TOP", -0.5, -4)
-		leader:SetTexture("Interface\\GroupFrame\\UI-Group-LeaderIcon")
+		leader:SetPoint('BOTTOM', self.level, 'TOP', -0.5, -4)
+		leader:SetTexture('Interface\\GroupFrame\\UI-Group-LeaderIcon')
 		leader:Hide()
 		self.leader = leader
 
-		local masterLoot = self:CreateTexture(nil, "OVERLAY")
+		local masterLoot = self:CreateTexture(nil, 'OVERLAY')
 		masterLoot:SetWidth(16); masterLoot:SetHeight(16)
-		masterLoot:SetPoint("TOP", self.level, "BOTTOMLEFT", 0, 0)
-		masterLoot:SetTexture("Interface\\GroupFrame\\UI-Group-MasterLooter")
+		masterLoot:SetPoint('TOP', self.level, 'BOTTOMLEFT', 0, 0)
+		masterLoot:SetTexture('Interface\\GroupFrame\\UI-Group-MasterLooter')
 		masterLoot:Hide()
 		self.masterLoot = masterLoot
 	end
@@ -96,9 +96,9 @@ end
 --[[ Usable Functions ]]--
 
 function SageInfo:Create(parent, id, hasPartyInfo)
-	local bar = setmetatable(CreateFrame("Frame", nil, parent), Frame_MT)
+	local bar = setmetatable(CreateFrame('Frame', nil, parent), Frame_MT)
 	bar.id = id or parent.id
-	bar:SetScript("OnShow", Bar_OnShow)
+	bar:SetScript('OnShow', Bar_OnShow)
 
 	Bar_CreateStrings(bar)
 	Bar_CreateIcons(bar, hasPartyInfo)
@@ -143,13 +143,13 @@ function SageInfo:UpdateNameColor()
 			r = 0.6; g = 0.6; b = 1;
 		elseif self.inCombat then
 			r = 1; g = 0.4; b = 0.4;
-		elseif UnitCanAttack(unit, "player") then
+		elseif UnitCanAttack(unit, 'player') then
 			--hostile units
 			r = UnitReactionColor[2].r
 			g = UnitReactionColor[2].g + 0.3
 			b = UnitReactionColor[2].b + 0.3
-		elseif UnitCanAttack("player", unit) then
-			--pvp flagged players, when we"re not in pvp
+		elseif UnitCanAttack('player', unit) then
+			--pvp flagged players, when we're not in pvp
 			r = UnitReactionColor[4].r
 			g = UnitReactionColor[4].g
 			b = UnitReactionColor[4].b
@@ -159,7 +159,7 @@ function SageInfo:UpdateNameColor()
 			-- g = UnitReactionColor[6].g
 			-- b = UnitReactionColor[6].b
 		else
-			--update the player"s name color based on their class
+			--update the player's name color based on their class
 			local class = select(2, UnitClass(unit))
 			if class then
 				r = RAID_CLASS_COLORS[class].r
@@ -174,7 +174,7 @@ function SageInfo:UpdateNameColor()
 		r = 0.6; g = 0.6; b = 0.6
 	--all other NPCs
 	else
-		local reaction = UnitReaction(unit, "player")
+		local reaction = UnitReaction(unit, 'player')
 		if reaction then
 			r = UnitReactionColor[reaction].r + 0.3
 			g = UnitReactionColor[reaction].g + 0.3
@@ -198,11 +198,11 @@ function SageInfo:UpdatePvP()
 
 			if UnitIsPVPFreeForAll(unit) then
 				self.level:SetFontObject(SageFont:GetLevelFont())
-				pvpIcon:SetTexture("Interface\\TargetingFrame\\UI-PVP-FFA")
+				pvpIcon:SetTexture('Interface\\TargetingFrame\\UI-PVP-FFA')
 				pvpIcon:Show()
 			elseif factionGroup and UnitIsPVP(unit) then
 				self.level:SetFontObject(SageFont:GetLevelFont())
-				pvpIcon:SetTexture("Interface\\TargetingFrame\\UI-PVP-" .. factionGroup)
+				pvpIcon:SetTexture('Interface\\TargetingFrame\\UI-PVP-' .. factionGroup)
 				pvpIcon:Show()
 			else
 				self.level:SetFontObject(SageFont:GetSmallOutsideFont())
@@ -226,7 +226,7 @@ function SageInfo:UpdateLevel()
 		levelText:SetVertexColor(color.r, color.g, color.b)
 		levelText:SetText(level)
 	else
-		levelText:SetText("??")
+		levelText:SetText('??')
 		levelText:SetVertexColor(1, 1, 1)
 	end
 end
@@ -246,7 +246,7 @@ end
 
 function SageInfo:UpdateHealthPercent()
 	local unit = self.id
-	self.percent:SetText(floor(UnitHealth(unit) / UnitHealthMax(unit) * 100 + 0.5) .. "%")
+	self.percent:SetText(floor(UnitHealth(unit) / UnitHealthMax(unit) * 100 + 0.5) .. '%')
 end
 
 function SageInfo:UpdatePercents()
@@ -254,7 +254,7 @@ function SageInfo:UpdatePercents()
 		self.percent:Show()
 		self:UpdateHealthPercent()
 	else
-		self.percent:SetText("")
+		self.percent:SetText('')
 		self.percent:Hide()
 	end
 	self:UpdateWidth()
@@ -264,12 +264,12 @@ function SageInfo:UpdateWidth()
 	local parent = self:GetParent()
 	local width = parent:GetFrameWidth()
 
-	self.level:SetText("00")
+	self.level:SetText('00')
 	--the +2 here is from the offset of level text
 	local textWidth = self.level:GetStringWidth() + LEVEL_OFFSET
 
 	if Sage:ShowingPercents() then
-		self.percent:SetText("100%")
+		self.percent:SetText('100%')
 		textWidth = textWidth + self.percent:GetStringWidth()
 	end
 	self.name:SetWidth(max(width-textWidth, 0))
@@ -311,38 +311,38 @@ function SageInfo:OnHealthEvent(unit)
 end
 
 function SageInfo:UNIT_FACTION(unit)
-	self:ForUnit(unit, "UpdatePvP")
+	self:ForUnit(unit, 'UpdatePvP')
 end
 
 function SageInfo:UNIT_NAME_UPDATE(unit)
-	self:ForUnit(unit, "UpdateName")
-	self:ForUnit(unit, "UpdateNameColor")
+	self:ForUnit(unit, 'UpdateName')
+	self:ForUnit(unit, 'UpdateNameColor')
 end
 
 function SageInfo:UNIT_CLASSIFICATION_CHANGED(unit)
-	self:ForUnit(unit, "UpdateNameColor")
+	self:ForUnit(unit, 'UpdateNameColor')
 end
 
 function SageInfo:UNIT_LEVEL(unit)
-	self:ForUnit(unit, "UpdateLevel")
+	self:ForUnit(unit, 'UpdateLevel')
 end
 
 function SageInfo:RAID_TARGET_UPDATE()
-	self:ForAll("UpdateUnitIcon")
+	self:ForAll('UpdateUnitIcon')
 end
 
 function SageInfo:PARTY_LEADER_CHANGED()
-	self:ForAll("UpdatePartyLeader", GetLeaderIndex())
+	self:ForAll('UpdatePartyLeader', GetLeaderIndex())
 end
 
 function SageInfo:PARTY_MEMBERS_CHANGED()
 	if(GetNumPartyMembers() == 0) then
-		self:ForAll("UpdatePartyLeader", nil)
+		self:ForAll('UpdatePartyLeader', nil)
 	end
 end
 
 function SageInfo:PARTY_LOOT_METHOD_CHANGED()
-	self:ForAll("UpdateMasterLooter", IndexToUnit(select(2, GetLootMethod())))
+	self:ForAll('UpdateMasterLooter', IndexToUnit(select(2, GetLootMethod())))
 end
 
 

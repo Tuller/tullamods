@@ -5,10 +5,10 @@
 
 local DebuffTypeColor = DebuffTypeColor
 local bg = {
-	bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+	bgFile = 'Interface\\Tooltips\\UI-Tooltip-Background',
 	tile = true,
 	tileSize = 1,
-	edgeFile = "",
+	edgeFile = '',
 	edgeSize = 0,
 	insets = {left = 0, right = 0, top = 0, bottom = 0}
 }
@@ -20,8 +20,8 @@ local function Debuff_OnEnter(self)
 	local unit = self:GetParent().id
 	local sets = Sage:GetFrameSets(unit)
 
-	local filter = (sets and sets.showCurable and UnitIsFriend("player", unit)) or false
-	GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
+	local filter = (sets and sets.showCurable and UnitIsFriend('player', unit)) or false
+	GameTooltip:SetOwner(self, 'ANCHOR_BOTTOMRIGHT')
 	GameTooltip:SetUnitDebuff(unit, self:GetID(), filter)
 end
 
@@ -29,8 +29,8 @@ local function Buff_OnEnter(self)
 	local unit = self:GetParent().id
 	local sets = Sage:GetFrameSets(unit)
 
-	local filter = (sets and sets.showCastable and UnitIsFriend("player", unit)) or false
-	GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
+	local filter = (sets and sets.showCastable and UnitIsFriend('player', unit)) or false
+	GameTooltip:SetOwner(self, 'ANCHOR_BOTTOMRIGHT')
 	GameTooltip:SetUnitBuff(unit, self:GetID(), filter)
 end
 
@@ -39,28 +39,28 @@ local function Buff_OnLeave()
 end
 
 local function Buff_Create(parent, id, isDebuff)
-	local buff = CreateFrame("Frame", format("Sage%sBuff%d", parent.id, id), parent)
+	local buff = CreateFrame('Frame', format('Sage%sBuff%d', parent.id, id), parent)
 	buff:EnableMouse(true)
 	buff:SetID(id)
 	buff:SetWidth(36); buff:SetHeight(36)
 
-	local icon = buff:CreateTexture(format("Sage%sBuff%dIcon", parent.id, id))
+	local icon = buff:CreateTexture(format('Sage%sBuff%dIcon', parent.id, id))
 	if(isDebuff) then
 		icon:SetTexCoord(0.09, 0.91, 0.09, 0.91)
-		icon:SetPoint("TOPLEFT", buff, "TOPLEFT", 4, -4)
-		icon:SetPoint("BOTTOMRIGHT", buff, "BOTTOMRIGHT", -4, 4)
+		icon:SetPoint('TOPLEFT', buff, 'TOPLEFT', 4, -4)
+		icon:SetPoint('BOTTOMRIGHT', buff, 'BOTTOMRIGHT', -4, 4)
 	else
 		icon:SetTexCoord(0.06,0.94,0.06,0.94)
 		icon:SetAllPoints(buff)
 	end
 	buff.icon = icon
 
-	local count = buff:CreateFontString(nil, "OVERLAY")
+	local count = buff:CreateFontString(nil, 'OVERLAY')
 	count:SetFontObject(GameFontHighlightLarge)
-	count:SetPoint("BOTTOMRIGHT", buff, "BOTTOMRIGHT")
+	count:SetPoint('BOTTOMRIGHT', buff, 'BOTTOMRIGHT')
 	buff.count = count
 
-	local cooldown = CreateFrame("Cooldown", format("Sage%sBuff%dCooldown", parent.id, id), buff, "CooldownFrameTemplate")
+	local cooldown = CreateFrame('Cooldown', format('Sage%sBuff%dCooldown', parent.id, id), buff, 'CooldownFrameTemplate')
 	cooldown:SetAllPoints(buff)
 	cooldown:SetReverse(true)
 	cooldown:Hide()
@@ -68,13 +68,13 @@ local function Buff_Create(parent, id, isDebuff)
 
 	if(isDebuff) then
 		buff:SetBackdrop(bg)
-		buff:SetScript("OnEnter", Debuff_OnEnter)
+		buff:SetScript('OnEnter', Debuff_OnEnter)
 		buff.UpdateTooltip = Debuff_OnEnter
 	else
-		buff:SetScript("OnEnter", Buff_OnEnter)
+		buff:SetScript('OnEnter', Buff_OnEnter)
 		buff.UpdateTooltip = Buff_OnEnter
 	end
-	buff:SetScript("OnLeave", Buff_OnLeave)
+	buff:SetScript('OnLeave', Buff_OnLeave)
 
 	return buff
 end
@@ -120,7 +120,7 @@ local function BuffFrame_UpdateBuff(self, unit, index, filter, isDebuff)
 
 		--set the debuff border color
 		if(isDebuff) then
-			local color = DebuffTypeColor[type or "none"]
+			local color = DebuffTypeColor[type or 'none']
 			buff:SetBackdropColor(color.r, color.g, color.b)
 		end
 
@@ -137,7 +137,7 @@ local function BuffFrame_Update(self)
 	local isDebuff = self.isDebuff
 
 	local filter
-	if(UnitIsFriend("player", unit)) then
+	if(UnitIsFriend('player', unit)) then
 		local sets = Sage:GetFrameSets(unit)
 		if(isDebuff) then
 			filter = sets and sets.showCurable
@@ -189,7 +189,7 @@ local function BuffFrame_LayoutIcons(self)
 				local buff = buffs[index]
 				buff:ClearAllPoints()
 				buff:SetScale(scale)
-				buff:SetPoint("TOPLEFT", self, "TOPLEFT", (size * col), -(size * row))
+				buff:SetPoint('TOPLEFT', self, 'TOPLEFT', (size * col), -(size * row))
 			else return end
 		end
 	end
@@ -209,7 +209,7 @@ end
 SageBuff = {}
 
 function SageBuff:Create(parent, id, Layout, isDebuff)
-	local frame = CreateFrame("Frame", nil, parent)
+	local frame = CreateFrame('Frame', nil, parent)
 	local id = id or parent.id
 
 	frame.id = id
@@ -219,8 +219,8 @@ function SageBuff:Create(parent, id, Layout, isDebuff)
 	frame.Layout = Layout or BuffFrame_LayoutIcons
 	frame.Update = BuffFrame_Update
 	frame.UpdateBuff = BuffFrame_UpdateBuff
-	frame:SetScript("OnShow", BuffFrame_OnShow)
-	frame:SetScript("OnSizeChanged", BuffFrame_OnSizeChanged)
+	frame:SetScript('OnShow', BuffFrame_OnShow)
+	frame:SetScript('OnSizeChanged', BuffFrame_OnSizeChanged)
 
 	if(isDebuff) then
 		if(not self.debuffFrames) then self.debuffFrames = {} end

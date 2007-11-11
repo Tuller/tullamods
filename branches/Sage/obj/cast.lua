@@ -3,7 +3,7 @@
 		Unit casting bars
 --]]
 
-SageCast = CreateFrame("StatusBar")
+SageCast = CreateFrame('StatusBar')
 local Bar_MT = {__index = SageCast}
 
 --[[ Constructor ]]--
@@ -12,10 +12,10 @@ local function Frame_Update(self) self.bar:Update() end
 local function Bar_OnUpdate(self) self:OnUpdate() end
 
 function SageCast:Create(parent, id, noText)
-	local frame = CreateFrame("Frame", nil, parent)
+	local frame = CreateFrame('Frame', nil, parent)
 	frame.id = id or parent.id
 	frame.Update = Frame_Update
-	frame:SetScript("OnShow", Frame_Update)
+	frame:SetScript('OnShow', Frame_Update)
 
 	local bar
 	if(noText) then
@@ -24,18 +24,18 @@ function SageCast:Create(parent, id, noText)
 		bar = setmetatable(SageBar:Create(frame, id, SageFont:GetSmallBarFont(), true), Bar_MT)
 	end
 	bar:Hide()
-	bar:SetScript("OnUpdate", Bar_OnUpdate)
+	bar:SetScript('OnUpdate', Bar_OnUpdate)
 	bar:UpdateTexture()
 	frame.bar = bar
 
-	local icon = bar:CreateTexture(nil, "OVERLAY")
+	local icon = bar:CreateTexture(nil, 'OVERLAY')
 	icon:SetTexCoord(0.06, 0.94, 0.06, 0.94)
 	icon:SetWidth(12); icon:SetHeight(12)
 	bar.icon = icon
 
-	icon:SetPoint("TOPLEFT", frame)
-	bar:SetPoint("TOPLEFT", icon, "TOPRIGHT")
-	bar:SetPoint("BOTTOMRIGHT", frame)
+	icon:SetPoint('TOPLEFT', frame)
+	bar:SetPoint('TOPLEFT', icon, 'TOPRIGHT')
+	bar:SetPoint('BOTTOMRIGHT', frame)
 
 	if(not self.bars) then self.bars = {} end
 	self.bars[bar.id] = bar
@@ -161,7 +161,7 @@ function SageCast:OnUpdate()
 		else
 			self:SetValue(value)
 			if(self.text) then
-				self.text:SetText(format("%.1fs", self.maxValue - value))
+				self.text:SetText(format('%.1fs', self.maxValue - value))
 			end
 		end
 	elseif self.channeling then
@@ -172,7 +172,7 @@ function SageCast:OnUpdate()
 		else
 			self:SetValue(self.startTime + (self.endTime - value))
 			if(self.text) then
-				self.text:SetText(format("%.1fs", self.endTime - value))
+				self.text:SetText(format('%.1fs', self.endTime - value))
 			end
 		end
 	end
@@ -220,38 +220,38 @@ end
 --[[ Events ]]--
 
 function SageCast:PLAYER_ENTERING_WORLD()
-	self:ForAll("Update")
+	self:ForAll('Update')
 end
 
 function SageCast:UNIT_SPELLCAST_START(unit)
-	self:ForUnit(unit, "OnSpellStart")
+	self:ForUnit(unit, 'OnSpellStart')
 end
 
 function SageCast:UNIT_SPELLCAST_DELAYED(unit)
-	self:ForUnit(unit, "OnSpellDelayed")
+	self:ForUnit(unit, 'OnSpellDelayed')
 end
 
 function SageCast:UNIT_SPELLCAST_CHANNEL_START(unit)
-	self:ForUnit(unit, "OnChannelStart")
+	self:ForUnit(unit, 'OnChannelStart')
 end
 
 function SageCast:UNIT_SPELLCAST_CHANNEL_UPDATE(unit)
-	self:ForUnit(unit, "OnChannelUpdate")
+	self:ForUnit(unit, 'OnChannelUpdate')
 end
 
 --finish events
 function SageCast:UNIT_SPELLCAST_STOP(unit)
-	self:ForUnit(unit, "OnSpellStop")
+	self:ForUnit(unit, 'OnSpellStop')
 end
 
 function SageCast:UNIT_SPELLCAST_FAILED(unit)
-	self:ForUnit(unit, "Finish")
+	self:ForUnit(unit, 'Finish')
 end
 
 function SageCast:UNIT_SPELLCAST_INTERRUPTED(unit)
-	self:ForUnit(unit, "Finish")
+	self:ForUnit(unit, 'Finish')
 end
 
 function SageCast:UNIT_SPELLCAST_CHANNEL_STOP(unit)
-	self:ForUnit(unit, "Finish")
+	self:ForUnit(unit, 'Finish')
 end

@@ -2,7 +2,7 @@
 	SageFrame.lua - A movable, scalable, container frame
 --]]
 
-SageFrame = CreateFrame("Frame")
+SageFrame = CreateFrame('Frame')
 local Frame_MT = {__index = SageFrame}
 
 local STICKY_TOLERANCE = 16 --how close one frame must be to another to trigger auto anchoring
@@ -20,8 +20,8 @@ local function GetRelativeCoords(frame, scale)
 end
 
 local function Frame_New(id)
-	local frame = setmetatable(CreateFrame("Frame", nil, UIParent, "SecureStateHeaderTemplate"), Frame_MT)
-	frame:SetFrameStrata("LOW")
+	local frame = setmetatable(CreateFrame('Frame', nil, UIParent, 'SecureStateHeaderTemplate'), Frame_MT)
+	frame:SetFrameStrata('LOW')
 	frame.id = id
 	frame.dragFrame = SDragFrame_New(frame)
 	frame.click = SageClick:Create(frame)
@@ -47,8 +47,8 @@ end
 
 function SageFrame:Create(id, OnCreate, defaults, hasHeader)
 	local id = tonumber(id) or id
-	assert(id, "id expected")
-	assert(not active[id], format("SageFrame \"%s\" is already in use", id))
+	assert(id, 'id expected')
+	assert(not active[id], format('SageFrame \'%s\' is already in use', id))
 
 	local frame = Frame_Restore(id) or Frame_New(id)
 
@@ -59,7 +59,7 @@ function SageFrame:Create(id, OnCreate, defaults, hasHeader)
 		end
 		frame.isNew = nil
 	end
-	frame:SetAttribute("unit", id)
+	frame:SetAttribute('unit', id)
 
 	frame.hasHeader = hasHeader
 	RegisterUnitWatch(frame)
@@ -128,7 +128,7 @@ function SageFrame:SetFrameScale(scale, scaleAnchored)
 
 	self:SetScale(scale)
 	self:ClearAllPoints()
-	self:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", x, y)
+	self:SetPoint('TOPLEFT', UIParent, 'BOTTOMLEFT', x, y)
 	self:Reanchor()
 	self:SavePosition()
 
@@ -208,14 +208,14 @@ function SageFrame:SavePosition()
 	end
 end
 
---place the frame at it"s saved position
+--place the frame at it's saved position
 function SageFrame:Reposition()
 	local x, y = self.sets.x, self.sets.y
 	self:Rescale()
 
 	if x and y then
 		self:ClearAllPoints()
-		self:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", x, y)
+		self:SetPoint('TOPLEFT', UIParent, 'BOTTOMLEFT', x, y)
 		self:SetUserPlaced(true)
 	end
 end
@@ -233,7 +233,7 @@ function SageFrame:Reanchor()
 
 		local x, y = GetRelativeCoords(self, self:GetScale())
 		self:ClearAllPoints()
-		self:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", x, y)
+		self:SetPoint('TOPLEFT', UIParent, 'BOTTOMLEFT', x, y)
 		self:SetUserPlaced(true)
 	end
 	self.dragFrame:UpdateColor()
@@ -268,15 +268,15 @@ function SageFrame:ForAll(method, ...)
 end
 
 --takes a frameID, and performs the specified action on that frame
---this adds two special IDs, "all" for all frames and number-number for a range of IDs
+--this adds two special IDs, 'all' for all frames and number-number for a range of IDs
 function SageFrame:ForFrame(id, method, ...)
-	assert(id and id ~= "", "Invalid frameID")
+	assert(id and id ~= '', 'Invalid frameID')
 
-	if id == "all" then
+	if id == 'all' then
 		self:ForAll(method, ...)
-	elseif(id == "party") then
+	elseif(id == 'party') then
 		for i = 1, 4 do
-			local frame = self:Get("party"..i)
+			local frame = self:Get('party'..i)
 			if(frame) then
 				local action = frame[method]
 				if(action) then
@@ -285,7 +285,7 @@ function SageFrame:ForFrame(id, method, ...)
 			end
 		end
 	else
-		local s, e = id:match("(%d+)-(%d+)")
+		local s, e = id:match('(%d+)-(%d+)')
 		s = tonumber(s)
 		e = tonumber(e)
 
