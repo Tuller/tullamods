@@ -1,5 +1,10 @@
 Bongos2 Version History
 
+1.9.1
+CastBar: Fixed a bug causing coloring to not work
+ActionBar: Fixed a bug causing highlighting to stick on empty buttons
+ActionBar: Made debuff and buff highlighting optional
+
 1.9.0
 All: Updated for 2.3
 All: Adjusted file structures  Delete all Bongos folders before installing
