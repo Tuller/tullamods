@@ -1,6 +1,7 @@
 SellFish Version History:
 
 2.0.3
+	Updated for 2.3
 	Updated ItemPrice
 
 2.0.2
