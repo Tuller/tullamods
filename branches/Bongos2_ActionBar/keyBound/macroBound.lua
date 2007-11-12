@@ -1,8 +1,6 @@
 local MacroButton = CreateFrame('Frame')
 
 function MacroButton:Load()
-	Bongos:Print('load')
-
 	local i = 1
 	local button
 	repeat
