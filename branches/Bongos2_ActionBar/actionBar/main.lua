@@ -47,6 +47,7 @@ function BongosActionBar:OnLeaveCombat()
 	if self.needsVisUpdate then
 		self:UpdateVisibility()
 	end
+
 	if self.needsGridUpdate then
 		self:UpdateGridVisibility()
 	end
@@ -62,11 +63,7 @@ function BongosActionBar:OnSlotChanged(event, id)
 end
 
 function BongosActionBar:UpdateGrid(event)
-	if(event == 'ACTIONBAR_SHOWGRID') then
-		BongosActionButton.showEmpty = true
-	elseif(event == 'ACTIONBAR_HIDEGRID') then
-		BongosActionButton.showEmpty = nil
-	end
+	BongosActionButton.showEmpty = (event == 'ACTIONBAR_SHOWGRID')
 	self:UpdateGridVisibility()
 end
 
@@ -95,9 +92,7 @@ function BongosActionBar:UpdateGridVisibility()
 		for i = 1, self:GetNumber() do
 			local bar = BActionBar:Get(i)
 			if bar:IsShown() then
-				for j = bar:GetStartID(), bar:GetEndID() do
-					BongosActionButton:Get(j):UpdateGrid()
-				end
+				bar:UpdateGrid()
 			end
 		end
 	end

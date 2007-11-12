@@ -215,7 +215,7 @@ end
 function BongosActionButton:OnReceiveDrag()
 	if not InCombatLockdown() then
 		PlaceAction(self:GetPagedID())
-		self:UpdateState()
+		self:Update()
 	end
 end
 
