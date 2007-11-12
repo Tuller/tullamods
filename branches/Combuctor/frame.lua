@@ -41,6 +41,7 @@ function CombuctorFrame:Create(...)
 		self.frames = {}
 	end
 	self.frames[frame] = true
+	table.insert(UISpecialFrames, frame:GetName())
 
 	return frame
 end
