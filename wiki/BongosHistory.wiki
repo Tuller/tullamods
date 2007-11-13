@@ -2,6 +2,10 @@
 
 = Bongos2 Version History =
 
+1.9.2
+  * Action Bar: Fixed some showgrid bugs
+  * Action Bar: Removed a debug message
+
 1.9.1 (Beta)
   * Cast Bar: Fixed a bug causing coloring to not work
   * Action Bar: Fixed a bug causing highlighting to stick on empty buttons
