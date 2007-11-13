@@ -38,6 +38,7 @@ L.Alt = "Alt"
 L.Shift = "Shift"
 L.NumActionBars = "Action Bars"
 L.SelfCastKey = "Selfcast Key"
+L.HighlightBuffs = "Show Casted Buffs & Debuffs"
 
 --bindings panel
 L.Bindings = "Bindings"

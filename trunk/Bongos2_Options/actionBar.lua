@@ -161,6 +161,14 @@ function BongosOptions:AddActionBarPanel()
 
 	local rangeColor = Panel_CreateRangeColorPicker(panel)
 	rangeColor:SetPoint("LEFT", rangeCheck:GetName() .. "Text", "RIGHT", 6, 0)
+	
+	local highlightBuffs = panel:AddCheckButton(L.HighlightBuffs)
+	highlightBuffs:SetScript("OnShow", function(self)
+		self:SetChecked(BongosActionConfig:HighlightingBuffs())
+	end)
+	highlightBuffs:SetScript("OnClick", function(self)
+		BongosActionConfig:SetHighlightBuffs(self:GetChecked())
+	end)
 
 	local showGrid = panel:AddCheckButton(L.ShowGrid)
 	showGrid:SetScript("OnShow", function(self)
