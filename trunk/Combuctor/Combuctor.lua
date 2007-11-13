@@ -70,69 +70,58 @@ function Combuctor:Toggle(bag, auto)
 end
 
 function Combuctor:HookBagEvents()
-	local backpack = BACKPACK_CONTAINER
-	local keyring = KEYRING_CONTAINER
-	local bank = BANK_CONTAINER
-
-	OpenBackpack = function()
-		Combuctor:Show(backpack, true)
+	local AutoShowInventory = function() 
+		self:Show(BACKPACK_CONTAINER, true) 
 	end
-
-	CloseBackpack = function()
-		Combuctor:Hide(backpack, true)
+	local AutoHideInventory = function() 
+		self:Hide(BACKPACK_CONTAINER, true) 
 	end
+	
+	--auto magic display code
+	OpenBackpack = AutoShowInventory
+	hooksecurefunc('CloseBackpack', AutoHideInventory)
+	--CloseBackpack = AutoHideInventory
 
-	ToggleBackpack = function()
-		Combuctor:Toggle(backpack)
+	ToggleBackpack = function() 
+		self:Toggle(BACKPACK_CONTAINER) 
+	end
+	
+	ToggleKeyRing = function()
+		self:Toggle(KEYRING_CONTAINER) 
 	end
 
 	OpenAllBags = function(force)
 		if force then
-			Combuctor:Show(backpack)
+			self:Show(BACKPACK_CONTAINER)
 		else
-			Combuctor:Toggle(backpack)
+			self:Toggle(BACKPACK_CONTAINER)
 		end
 	end
 
-	CloseAllBags = function()
-		Combuctor:Hide(backpack)
-	end
-
-	ToggleBag = function(bag)
-		Combuctor:Toggle(bag)
-	end
-
-	ToggleKeyRing = function()
-		Combuctor:Toggle(keyring)
-	end
+	--closing the game menu triggers this function, and can be done in combat,
+	hooksecurefunc('CloseAllBags', function() 
+		self:Hide(BACKPACK_CONTAINER) 
+	end)
 
 	BankFrame:UnregisterAllEvents()
 	self:RegisterMessage('COMBUCTOR_BANK_OPENED', function()
-		self:Show(bank, true)
-		self:Show(backpack, true)
+		self:Show(BANK_CONTAINER, true)
+		self:Show(BACKPACK_CONTAINER, true)
 	end)
 	self:RegisterMessage('COMBUCTOR_BANK_CLOSED', function()
-		self:Hide(bank, true)
-		self:Hide(backpack, true)
+		self:Hide(BANK_CONTAINER, true)
+		self:Hide(BACKPACK_CONTAINER, true)
 	end)
 
-	--auto magic display code
-	local ShowInventory = function() self:Show(backpack, true) end
-	local HideInventory = function() self:Hide(backpack, true) end
-
-	self:RegisterEvent('MAIL_CLOSED', HideInventory)
-
-	self:RegisterEvent('TRADE_SHOW', ShowInventory)
-	self:RegisterEvent('TRADE_CLOSED', HideInventory)
-
-	self:RegisterEvent('TRADE_SKILL_SHOW', ShowInventory)
-	self:RegisterEvent('TRADE_SKILL_CLOSE', HideInventory)
-
-	self:RegisterEvent('AUCTION_HOUSE_SHOW', ShowInventory)
-	self:RegisterEvent('AUCTION_HOUSE_CLOSED', HideInventory)
-
-	self:RegisterEvent('AUCTION_HOUSE_SHOW', ShowInventory)
-	self:RegisterEvent('AUCTION_HOUSE_CLOSED', HideInventory)
+	self:RegisterEvent('MAIL_CLOSED', AutoHideInventory)
+	self:RegisterEvent('TRADE_SHOW', AutoShowInventory)
+	self:RegisterEvent('TRADE_CLOSED', AutoHideInventory)
+	self:RegisterEvent('TRADE_SKILL_SHOW', AutoShowInventory)
+	self:RegisterEvent('TRADE_SKILL_CLOSE', AutoHideInventory)
+	self:RegisterEvent('AUCTION_HOUSE_SHOW', AutoShowInventory)
+	self:RegisterEvent('AUCTION_HOUSE_CLOSED', AutoHideInventory)
+	self:RegisterEvent('AUCTION_HOUSE_SHOW', AutoShowInventory)
+	self:RegisterEvent('AUCTION_HOUSE_CLOSED', AutoHideInventory)
 end
 
 function Combuctor:OnSlashCommand(msg)
