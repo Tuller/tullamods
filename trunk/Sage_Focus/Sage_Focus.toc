@@ -1,4 +1,4 @@
-## Interface: 20200
+## Interface: 20300
 ## Title: Sage Focus
 ## Notes: A focus frame
 ## Author: Tuller
