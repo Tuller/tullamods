@@ -21,6 +21,7 @@ function Bongos:Initialize()
 			rangeColoring = true,
 			showEmpty = false,
 			showMinimap = true,
+			highlightBuffs = true,
 			rangeColor = {r = 1, g = 0.5, b = 0.5},
 			mapx = -24, mapy = -76,
 			bars = {}
@@ -77,6 +78,14 @@ function Bongos:UpdateSettings()
 			for barID,barSets in pairs(sets.bars) do
 				barSets.spacing = (barSets.spacing or barSets.space)
 				barSets.space = nil
+			end
+
+			--update the bag frame settings (1.9)
+			local bagSets = sets.bars.bags
+			if bagSets then
+				bagSets.vertical = bagSets.rows and true or nil
+				bagSets.showKeyring = true
+				bagSets.rows = nil
 			end
 		end
 	end
@@ -413,4 +422,20 @@ end
 
 function Bongos:GetMapCoords()
 	return self.profile.mapx, self.profile.mapy
+end
+
+--utility function: create a widget class
+function Bongos:CreateWidgetClass(type)
+	local class = CreateFrame(type)
+	local mt = {__index = class}
+
+	function class:New(o)
+		if o then
+			local type, cType = o:GetFrameType(), self:GetFrameType()
+			assert(type == cType, format("'%s' expected, got '%s'", cType, type))
+		end
+		return setmetatable(o or CreateFrame(type), mt)
+	end
+
+	return class
 end
