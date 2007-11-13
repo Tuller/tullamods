@@ -1,5 +1,10 @@
 Bagnon Version History
 
+1.4.6
+Fixed a bug allowing your items to be picked up when viewing cached data
+Fixed a bug causing the bank frame to not be able to be viewed
+Split off ownership tooltips into the addon Bagnon Tooltips.
+
 1.4.5
 Fixed a bug when creating a new frame with default settings
 

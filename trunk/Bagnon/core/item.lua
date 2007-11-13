@@ -16,13 +16,11 @@ do
 		local parent = self:GetParent()
 		local link = parent.hasItem
 
+		parent:LockHighlight()
 		if parent.cached and link then
-			parent:LockHighlight()
 			BagnonItem.AnchorTooltip(self)
 			GameTooltip:SetHyperlink(link)
 			GameTooltip:Show()
-		else
-			self:Hide()
 		end
 	end
 
@@ -323,13 +321,9 @@ end
 function BagnonItem:OnEnter()
 	local bag, slot = self:GetBag(), self:GetID()
 	if self.cached then
-		if self.hasItem then
-			self.dummySlot:SetParent(self)
-			self.dummySlot:SetAllPoints(self)
-			self.dummySlot:Show()
-		else
-			self.dummySlot:Hide()
-		end
+		self.dummySlot:SetParent(self)
+		self.dummySlot:SetAllPoints(self)
+		self.dummySlot:Show()
 	else
 		self.dummySlot:Hide()
 

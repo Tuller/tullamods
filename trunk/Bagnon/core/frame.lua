@@ -127,13 +127,11 @@ function BagnonFrame:Create(name, sets, bags, isBank)
 	local close = CreateFrame('Button', name .. 'Close', frame, 'UIPanelCloseButton')
 	close:SetPoint('TOPRIGHT', 6 - frame.borderSize/2, 6 - frame.borderSize/2)
 
+	frame.title = TitleFrame:Create(frame)
 	if BagnonDB then
 		local playerDropdown = CreateFrame('Button', name .. 'DropDown', frame, 'BagnonDBUIDropDownButton')
 		playerDropdown:SetPoint('TOPLEFT', frame.borderSize/2 -2, -6)
-	end
 
-	frame.title = TitleFrame:Create(frame)
-	if BagnonDB then
 		frame.title:SetPoint('TOPLEFT', 26 + frame.borderSize/2, -10)
 	else
 		frame.title:SetPoint('TOPLEFT', 6 + frame.borderSize/2, -10)
@@ -146,7 +144,7 @@ function BagnonFrame:Create(name, sets, bags, isBank)
 
 	--load up the thing
 	frame:UpdateEvents()
-	frame:Regenerate()
+	frame:Regenerate(true)
 
 	id = id + 1
 	return frame
@@ -276,7 +274,7 @@ end
 --[[ Frame Updating ]]--
 
 --update all visible slots in the given frame
-function BagnonFrame:Regenerate()
+function BagnonFrame:Regenerate(forceLayout)
 	self.bagFrame:Update()
 
 	local changed = false
@@ -286,7 +284,7 @@ function BagnonFrame:Regenerate()
 		end
 	end
 
-	if changed then
+	if changed or forceLayout then
 		self:Layout()
 	end
 end

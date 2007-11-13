@@ -58,8 +58,3 @@ L.Scale = "Scale"
 L.Spacing = "Spacing"
 L.Cols = "Columns"
 L.ReverseSort = "Reverse Order"
-
---item count tooltips
-L.NumInBags = " %d Bags"
-L.NumInBank = " %d Bank"
-L.NumEquipped = " Equipped"

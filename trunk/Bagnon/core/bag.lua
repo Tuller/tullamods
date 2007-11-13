@@ -306,23 +306,28 @@ end
 function BagnonBag:OnEnter()
 	local player = self:GetPlayer()
 	local bagID = self:GetID()
+	local hasBag
 
 	self:AnchorTooltip()
 
 	--backpack tooltip
 	if bagID == BACKPACK_CONTAINER then
+		hasBag = true
 		GameTooltip:SetText(BACKPACK_TOOLTIP, 1, 1, 1)
 	--bank specific code
 	elseif bagID == BANK_CONTAINER then
+		hasBag = true
 		GameTooltip:SetText('Bank', 1, 1, 1)
 	--keyring specific code...again
 	elseif bagID == KEYRING_CONTAINER then
+		hasBag = true
 		GameTooltip:SetText(KEYRING, 1, 1, 1)
 	--cached bags
 	elseif BagnonUtil:IsCachedBag(bagID, player) then
 		if BagnonDB then
 			local link = select(2, BagnonDB:GetBagData(bagID, player))
 			if link then
+				hasBag = true
 				GameTooltip:SetHyperlink(link)
 			else
 				local numBankSlots = BagnonDB:GetNumBankSlots(player)
@@ -335,12 +340,14 @@ function BagnonBag:OnEnter()
 		end
 	--non cached bags
 	else
-		--if we don't set a tooltip (meaning there's an item) then determine if the slot is just empty, or an unpurchased bank slot
-		--show the purchase cost if its unpurchased
-		if not GameTooltip:SetInventoryItem('player', BagnonUtil:GetInvSlot(bagID)) then
+		--show the bag tooltip for filled bag slots
+		if GameTooltip:SetInventoryItem('player', BagnonUtil:GetInvSlot(bagID)) then
+			hasBag = true
+		--no bag, show the purchase thing for purchasble bag slots, otherwise show the empty container text
+		else
 			if bagID > (GetNumBankSlots() + 4) then
 				GameTooltip:SetText(BANK_BAG_PURCHASE, 1, 1, 1)
-				GameTooltip:AddLine('Click to purchase')
+				GameTooltip:AddLine('<Click> to Purchase')
 				SetTooltipMoney(GameTooltip, GetBankSlotCost(GetNumBankSlots()))
 			else
 				GameTooltip:SetText(EQUIP_CONTAINER, 1, 1, 1)
@@ -348,13 +355,15 @@ function BagnonBag:OnEnter()
 		end
 	end
 
-	if self:GetParent():GetParent():ShowingBag(bagID) then
-		GameTooltip:AddLine(BAGNON_LOCALS.TipHideBag)
-	else
-		GameTooltip:AddLine(BAGNON_LOCALS.TipShowBag)
+	if hasBag then
+		if self:GetParent():GetParent():ShowingBag(bagID) then
+			GameTooltip:AddLine(BAGNON_LOCALS.TipHideBag)
+		else
+			GameTooltip:AddLine(BAGNON_LOCALS.TipShowBag)
+		end
+		BagnonSpot:SetBagSearch(bagID)
 	end
 	GameTooltip:Show()
-	BagnonSpot:SetBagSearch(bagID)
 end
 BagnonBag.UpdateTooltip = BagnonBag.OnEnter
 
@@ -389,9 +398,13 @@ function BagnonBag:PurchaseSlot()
 			button1 = TEXT(YES),
 			button2 = TEXT(NO),
 
-			OnAccept = function() PurchaseSlot() end,
+			OnAccept = function() 
+				PurchaseSlot() 
+			end,
 
-			OnShow = function() MoneyFrame_Update(this:GetName().. 'MoneyFrame', GetBankSlotCost(GetNumBankSlots())) end,
+			OnShow = function() 
+				MoneyFrame_Update(this:GetName().. 'MoneyFrame', GetBankSlotCost(GetNumBankSlots())) 
+			end,
 
 			hasMoneyFrame = 1,
 			timeout = 0,
