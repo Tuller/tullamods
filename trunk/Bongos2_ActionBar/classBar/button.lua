@@ -2,66 +2,58 @@
 	Class Button
 --]]
 
-BongosClassButton = CreateFrame("CheckButton")
-local Button_mt = {__index = BongosClassButton}
-
-local NORMALTEX_RATIO = 1.833333334
+BongosClassButton = Bongos:CreateWidgetClass('CheckButton')
 local BUTTON_SIZE = 30
+local NT_SIZE = (66/36) * BUTTON_SIZE
 local buttons = {}
+
 
 --[[ Constructor ]]--
 
-local function PostClick(self) self:PostClick() end
-local function OnEnter(self) self:OnEnter() end
-local function OnLeave(self) self:OnLeave() end
-
 function BongosClassButton:Create(id, parent)
-	local name = format("BongosClassButton%s", id)
-	local button = setmetatable(CreateFrame("CheckButton", name, parent, "SecureActionButtonTemplate"), Button_mt)
+	local name = format('BongosClassButton%d', id)
 
+	--create the base button
+	local button = self:New(CreateFrame('CheckButton', name, parent, 'SecureActionButtonTemplate'))
+	button:SetWidth(BUTTON_SIZE); button:SetHeight(BUTTON_SIZE)
 	button:SetID(id)
-	button:SetAlpha(parent:GetAlpha())
-	button:SetHeight(BUTTON_SIZE)
-	button:SetWidth(BUTTON_SIZE)
 
 	--icon texture
-	local icon = button:CreateTexture(name .. "Icon", "BACKGROUND")
+	local icon = button:CreateTexture(name .. 'Icon', 'BACKGROUND')
 	icon:SetTexCoord(0.06, 0.94, 0.06, 0.94)
 	icon:SetAllPoints(button)
 
 	--normal, pushed, highlight, checked textures
-	local normalTexture = button:CreateTexture(name .. "NormalTexture")
-	normalTexture:SetTexture("Interface\\Buttons\\UI-Quickslot2")
-	normalTexture:SetHeight(NORMALTEX_RATIO * BUTTON_SIZE)
-	normalTexture:SetWidth(NORMALTEX_RATIO * BUTTON_SIZE)
-	normalTexture:SetPoint("CENTER", button, "CENTER", 0, -1)
+	local normalTexture = button:CreateTexture(name .. 'NormalTexture')
+	normalTexture:SetWidth(NT_SIZE); normalTexture:SetHeight(NT_SIZE)
+	normalTexture:SetTexture('Interface/Buttons/UI-Quickslot2')
+	normalTexture:SetPoint('CENTER', 0, -1)
 
-	button:SetNormalTexture(normalTexture)
-	button:SetPushedTexture("Interface\\Buttons\\UI-Quickslot-Depress")
-	button:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square")
-	button:SetCheckedTexture("Interface\\Buttons\\CheckButtonHilight")
+	button:SetPushedTexture('Interface/Buttons/UI-Quickslot-Depress')
+	button:SetHighlightTexture('Interface/Buttons/ButtonHilight-Square')
+	button:SetCheckedTexture('Interface/Buttons/CheckButtonHilight')
 
 	--hotkey
-	local hotkey = button:CreateFontString(name .. "HotKey", "ARTWORK")
-	hotkey:SetFontObject(NumberFontNormalSmallGray)
-	hotkey:SetPoint("TOPRIGHT", button, "TOPRIGHT", 2, -2)
-	hotkey:SetJustifyH("RIGHT")
+	local hotkey = button:CreateFontString(name .. 'HotKey', 'ARTWORK')
+	hotkey:SetFontObject('NumberFontNormalSmallGray')
+	hotkey:SetPoint('TOPRIGHT', 2, -2)
+	hotkey:SetJustifyH('RIGHT')
 	hotkey:SetWidth(BUTTON_SIZE); hotkey:SetHeight(10)
 
 	--cooldown model
-	CreateFrame("Cooldown", name .. "Cooldown", button, "CooldownFrameTemplate")
+	button.cooldown = CreateFrame('Cooldown', nil, button, 'CooldownFrameTemplate')
 
-	--set what spell this button casts
-	local spell = select(2, GetShapeshiftFormInfo(id))
-	button:SetAttribute("type", "spell")
-	button:SetAttribute("spell", spell)
+	button:SetAttribute('type', 'spell')
+	button:SetScript('PostClick', self.PostClick)
+	button:SetScript('OnEvent', self.OnEvent)
+	button:SetScript('OnEnter', self.OnEnter)
+	button:SetScript('OnLeave', self.OnLeave)
+	button:SetScript('OnShow', self.UpdateEvents)
+	button:SetScript('OnHide', self.UpdateEvents)
 
-	button:SetScript("PostClick", PostClick)
-	button:SetScript("OnEnter", OnEnter)
-	button:SetScript("OnLeave", OnLeave)
-
-	button:Update()
 	button:ShowHotkey(BongosActionConfig:ShowingHotkeys())
+	button:UpdateSpell()
+	button:UpdateEvents()
 
 	buttons[id] = button
 
@@ -69,18 +61,37 @@ function BongosClassButton:Create(id, parent)
 end
 
 
---[[ OnX Functions ]]--
+--[[ Frame Events ]]--
 
-function BongosClassButton:PostClick()
-	self:SetChecked(not self:GetChecked())
+function BongosClassButton:UpdateEvents()
+	if self:IsShown() then
+		self:RegisterEvent('UPDATE_SHAPESHIFT_FORMS')
+		self:RegisterEvent('PLAYER_ENTERING_WORLD')
+		self:RegisterEvent('SPELL_UPDATE_COOLDOWN')
+		self:RegisterEvent('SPELL_UPDATE_USABLE')
+		self:RegisterEvent('PLAYER_AURAS_CHANGED')
+		self:RegisterEvent('UPDATE_BINDINGS')
+	else
+		self:UnregisterAllEvents()
+	end
+end
+
+function BongosClassButton:OnEvent(event)
+	if event == 'UPDATE_BINDINGS' then
+		self:UpdateHotkey()
+	elseif event == 'UPDATE_SHAPESHIFT_FORMS' and (self:GetID() > GetNumShapeshiftForms()) then
+		self:Hide()
+	else
+		self:Update()
+	end
 end
 
 function BongosClassButton:OnEnter()
 	if BongosActionConfig:ShowingTooltips() then
-		if GetCVar("UberTooltips") == "1" then
+		if GetCVar('UberTooltips') == '1' then
 			GameTooltip_SetDefaultAnchor(GameTooltip, self)
 		else
-			GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+			GameTooltip:SetOwner(self, 'ANCHOR_RIGHT')
 		end
 		GameTooltip:SetShapeshift(self:GetID())
 	end
@@ -91,6 +102,10 @@ function BongosClassButton:OnLeave()
 	GameTooltip:Hide()
 end
 
+function BongosClassButton:PostClick()
+	self:SetChecked(not self:GetChecked())
+end
+
 
 --[[ Update Functions ]]--
 
@@ -99,9 +114,8 @@ function BongosClassButton:Update()
 	self:SetChecked(isActive)
 
 	--update icon
-	local icon = getglobal(self:GetName() .. "Icon")
+	local icon = getglobal(self:GetName() .. 'Icon')
 	icon:SetTexture(texture)
-
 	if isCastable then
 		icon:SetVertexColor(1, 1, 1)
 	else
@@ -109,15 +123,17 @@ function BongosClassButton:Update()
 	end
 
 	--update cooldown
-	local cooldown = getglobal(self:GetName() .. "Cooldown")
 	if texture then
-		cooldown:Show()
+		local start, duration, enable = GetShapeshiftFormCooldown(self:GetID())
+		CooldownFrame_SetTimer(self.cooldown, start, duration, enable)
 	else
-		cooldown:Hide()
+		self.cooldown:Hide()
 	end
+end
 
-	local start, duration, enable = GetShapeshiftFormCooldown(self:GetID())
-	CooldownFrame_SetTimer(cooldown, start, duration, enable)
+function BongosClassButton:UpdateSpell()
+	self:SetAttribute('spell', select(2, GetShapeshiftFormInfo(self:GetID())))
+	self:Update()
 end
 
 
@@ -125,21 +141,21 @@ end
 
 function BongosClassButton:ShowHotkey(show)
 	if show then
-		getglobal(self:GetName() .. "HotKey"):Show()
+		getglobal(self:GetName() .. 'HotKey'):Show()
 		self:UpdateHotkey()
 	else
-		getglobal(self:GetName() .. "HotKey"):Hide()
+		getglobal(self:GetName() .. 'HotKey'):Hide()
 	end
 end
 
 function BongosClassButton:UpdateHotkey()
-	getglobal(self:GetName() .. "HotKey"):SetText(self:GetHotkey() or "")
+	getglobal(self:GetName() .. 'HotKey'):SetText(self:GetHotkey() or '')
 end
 
 function BongosClassButton:GetHotkey()
-	local key = GetBindingKey(format("CLICK %s:LeftButton", self:GetName()))
+	local key = GetBindingKey(format('CLICK %s:LeftButton', self:GetName()))
 	if not key then
-		key = GetBindingText(GetBindingKey("SHAPESHIFTBUTTON" .. self:GetID()), "KEY_")
+		key = GetBindingText(GetBindingKey('SHAPESHIFTBUTTON' .. self:GetID()), 'KEY_')
 	end
 
 	return KeyBound:ToShortKey(key)
@@ -150,8 +166,7 @@ end
 
 function BongosClassButton:ForAll(method, ...)
 	for _, button in pairs(buttons) do
-		local action = button[method]
-		action(button, ...)
+		button[method](button, ...)
 	end
 end
 

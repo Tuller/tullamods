@@ -38,9 +38,9 @@ end
 --show hotkeys
 function BongosActionConfig:ShowHotkeys(enable)
 	Bongos.profile.showHotkeys = enable or false
-	BongosActionButton:ForAll("ShowHotkey", enable)
-	BongosPetButton:ForAll("ShowHotkey", enable)
-	BongosClassButton:ForAll("ShowHotkey", enable)
+	BongosActionButton:ForAll('ShowHotkey', enable)
+	BongosPetButton:ForAll('ShowHotkey', enable)
+	BongosClassButton:ForAll('ShowHotkey', enable)
 end
 
 function BongosActionConfig:ShowingHotkeys()
@@ -53,7 +53,7 @@ end
 --show macro text
 function BongosActionConfig:ShowMacros(enable)
 	Bongos.profile.showMacros = enable or false
-	BongosActionButton:ForAll("ShowMacro", enable)
+	BongosActionButton:ForAll('ShowMacro', enable)
 end
 
 function BongosActionConfig:ShowingMacros()
@@ -85,7 +85,7 @@ end
 --set range color
 function BongosActionConfig:SetRangeColoring(enable)
 	Bongos.profile.rangeColoring = enable or false
-	BongosActionButton:ForAll("UpdateUsable")
+	BongosActionButton:ForAll('UpdateUsable')
 end
 
 function BongosActionConfig:RangeColoring()
@@ -121,4 +121,13 @@ end
 
 function BongosActionConfig:GetSelfCastKey()
 	return Bongos.profile.selfCastKey
+end
+
+function BongosActionConfig:SetHighlightBuffs(enable)
+	Bongos.profile.highlightBuffs = enable or false
+	BongosActionButton:ForAll('UpdateState')
+end
+
+function BongosActionConfig:HighlightingBuffs()
+	return Bongos.profile.highlightBuffs
 end

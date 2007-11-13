@@ -3,7 +3,7 @@
 		A replacement for the default pet actionbar
 --]]
 
-BongosPetBar = Bongos:NewModule("Bongos-PetBar")
+BongosPetBar = Bongos:NewModule('Bongos-PetBar')
 local L = BONGOS_LOCALS
 local DEFAULT_SPACING = 2
 
@@ -47,7 +47,7 @@ local function Bar_Layout(self, cols, spacing)
 
 		local button = BongosPetButton:Get(i)
 		button:ClearAllPoints()
-		button:SetPoint("TOPLEFT", self, "TOPLEFT", buttonSize * row, -buttonSize * col)
+		button:SetPoint('TOPLEFT', self, 'TOPLEFT', buttonSize * row, -buttonSize * col)
 	end
 end
 
@@ -57,19 +57,19 @@ local function Bar_CreateMenu(frame)
 	panel:AddSpacingSlider()
 
 	local cols = panel:AddSlider(L.Columns, 1, NUM_PET_ACTION_SLOTS, 1)
-	cols:SetScript("OnShow", function(self)
+	cols:SetScript('OnShow', function(self)
 		self.onShow = true
 		self:SetValue(NUM_PET_ACTION_SLOTS - (frame.sets.cols or NUM_PET_ACTION_SLOTS) + 1)
 		self.onShow = nil
 	end)
-	cols:SetScript("OnValueChanged", function(self, value)
+	cols:SetScript('OnValueChanged', function(self, value)
 		if not self.onShow then
 			frame:Layout(NUM_PET_ACTION_SLOTS - value + 1)
 		end
-		getglobal(self:GetName() .. "ValText"):SetText(NUM_PET_ACTION_SLOTS - value + 1)
+		getglobal(self:GetName() .. 'ValText'):SetText(NUM_PET_ACTION_SLOTS - value + 1)
 	end)
-	getglobal(cols:GetName() .. "High"):SetText(1)
-	getglobal(cols:GetName() .. "Low"):SetText(NUM_PET_ACTION_SLOTS)
+	getglobal(cols:GetName() .. 'High'):SetText(1)
+	getglobal(cols:GetName() .. 'Low'):SetText(NUM_PET_ACTION_SLOTS)
 
 	return menu
 end
@@ -89,24 +89,24 @@ end
 --[[ Events ]]--
 
 function BongosPetBar:Load()
-	self.bar = BBar:CreateHeader("pet", Bar_OnCreate, nil, {["y"] = 591, ["x"] = 553})
+	self.bar = BBar:CreateHeader('pet', Bar_OnCreate, nil, {['y'] = 591, ['x'] = 553})
 	self.bar:Layout()
 
 	local petBar = PetActionBarFrame
-	petBar:RegisterEvent("PLAYER_CONTROL_LOST")
-	petBar:RegisterEvent("PLAYER_CONTROL_GAINED")
-	petBar:RegisterEvent("PLAYER_FARSIGHT_FOCUS_CHANGED")
-	petBar:RegisterEvent("UNIT_PET")
-	petBar:RegisterEvent("UNIT_FLAGS")
-	petBar:RegisterEvent("UNIT_AURA")
-	petBar:RegisterEvent("PET_BAR_UPDATE")
-	petBar:RegisterEvent("PET_BAR_UPDATE_COOLDOWN")
-	petBar:RegisterEvent("PET_BAR_SHOWGRID")
-	petBar:RegisterEvent("PET_BAR_HIDEGRID")
-	RegisterStateDriver(petBar, "visibility", "[pet]show;hide") 
+	petBar:RegisterEvent('PLAYER_CONTROL_LOST')
+	petBar:RegisterEvent('PLAYER_CONTROL_GAINED')
+	petBar:RegisterEvent('PLAYER_FARSIGHT_FOCUS_CHANGED')
+	petBar:RegisterEvent('UNIT_PET')
+	petBar:RegisterEvent('UNIT_FLAGS')
+	petBar:RegisterEvent('UNIT_AURA')
+	petBar:RegisterEvent('PET_BAR_UPDATE')
+	petBar:RegisterEvent('PET_BAR_UPDATE_COOLDOWN')
+	petBar:RegisterEvent('PET_BAR_SHOWGRID')
+	petBar:RegisterEvent('PET_BAR_HIDEGRID')
+	RegisterStateDriver(petBar, 'visibility', '[pet]show;hide') 
 
-	self:RegisterMessage("KEYBOUND_ENABLED")
-	self:RegisterMessage("KEYBOUND_DISABLED")
+	self:RegisterMessage('KEYBOUND_ENABLED')
+	self:RegisterMessage('KEYBOUND_DISABLED')
 end
 
 function BongosPetBar:Unload()
@@ -114,7 +114,7 @@ function BongosPetBar:Unload()
 	self:UnregisterAllMessages()
 	PetActionBarFrame:UnregisterAllEvents()
 
-	UnregisterStateDriver(PetActionBarFrame, "visibility") 
+	UnregisterStateDriver(PetActionBarFrame, 'visibility') 
 end
 
 function BongosPetBar:KEYBOUND_ENABLED()
@@ -129,7 +129,7 @@ function BongosPetBar:KEYBOUND_DISABLED()
 	local petBarShown = PetHasActionBar()
 	for i = 1, NUM_PET_ACTION_SLOTS do
 		local button = BongosPetButton:Get(i)
-		if(petBarShown and GetPetActionInfo(i)) then
+		if petBarShown and GetPetActionInfo(i) then
 			button:Show()
 		else
 			button:Hide()

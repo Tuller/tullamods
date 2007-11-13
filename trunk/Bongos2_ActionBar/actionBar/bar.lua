@@ -453,6 +453,8 @@ end
 --[[ Layout ]]--
 
 function BActionBar:Layout()
+	if InCombatLockdown() then return end
+
 	local startID = self:GetStartID()
 	local endID = self:GetEndID()
 	local maxID = self:GetMaxID()
@@ -498,6 +500,16 @@ function BActionBar:UpdateVisibility()
 
 	if changed then
 		SecureStateHeader_Refresh(self)
+		if not InCombatLockdown() then
+			self:UpdateGrid()
+		end
+	end
+end
+
+function BActionBar:UpdateGrid()
+	local s, e = self:GetStartID(), self:GetEndID()
+	for i = s, e do
+		BongosActionButton:Get(i):UpdateGrid()
 	end
 end
 

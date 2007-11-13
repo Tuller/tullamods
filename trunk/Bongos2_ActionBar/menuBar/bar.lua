@@ -3,7 +3,7 @@
 		A movable bar for the micro buttons
 --]]
 
-BongosMenuBar = Bongos:NewModule("Bongos-MenuBar")
+BongosMenuBar = Bongos:NewModule('Bongos-MenuBar')
 local L = BONGOS_LOCALS
 
 local DEFAULT_SPACING = 2
@@ -46,14 +46,14 @@ local function Bar_Layout(self, rows, spacing)
 	end
 
 	for _,button in pairs(buttons) do button:ClearAllPoints() end
-	buttons[1]:SetPoint("TOPLEFT", self, "TOPLEFT", 0, 20)
+	buttons[1]:SetPoint('TOPLEFT', self, 'TOPLEFT', 0, 20)
 
 	local actspacing = spacing
 	if rows == DEFAULT_ROWS then
 		--horizontal layout
 		spacing = spacing - 4 --apparently the anchors are weird on the micro buttons, and need to be adjusted
 		for i = 2, #buttons do
-			buttons[i]:SetPoint("LEFT", buttons[i-1], "RIGHT", spacing, 0)
+			buttons[i]:SetPoint('LEFT', buttons[i-1], 'RIGHT', spacing, 0)
 		end
 
 		self:SetHeight(39)
@@ -62,7 +62,7 @@ local function Bar_Layout(self, rows, spacing)
 		--vertical layoute
 		spacing = spacing - 24 --apparently the anchors are weird on the micro buttons, and need to be adjusted
 		for i = 2, #buttons do
-			buttons[i]:SetPoint("TOP", buttons[i-1], "BOTTOM", 0, -spacing)
+			buttons[i]:SetPoint('TOP', buttons[i-1], 'BOTTOM', 0, -spacing)
 		end
 
 		self:SetHeight(12 + (33 + actspacing) * #buttons - actspacing)
@@ -78,8 +78,8 @@ local function Bar_CreateMenu(frame)
 	local menu,panel = BongosMenu:CreateMenu(frame.id)
 
 	local vertical = panel:AddCheckButton(L.Vertical)
-	vertical:SetScript("OnShow", function(self) self:SetChecked(frame.sets.rows) end)
-	vertical:SetScript("OnClick", function(self) frame:SetVertical(self:GetChecked()) end)
+	vertical:SetScript('OnShow', function(self) self:SetChecked(frame.sets.rows) end)
+	vertical:SetScript('OnClick', function(self) frame:SetVertical(self:GetChecked()) end)
 
 	panel:AddSpacingSlider()
 
@@ -99,23 +99,23 @@ local function Bar_OnCreate(self)
 
 	--mess with the talent button to make it hide properly, it causes layout issues otherwise
 	local function TalentButton_Update(self)
-		if UnitLevel("player") < 10 then
+		if UnitLevel('player') < 10 then
 			self:Hide()
-		elseif BBar:Get("menu") then
+		elseif BBar:Get('menu') then
 			self:Show()
 		end
 	end
 
-	TalentMicroButton:SetScript("OnEvent", function(self, event)
-		if event == "PLAYER_LEVEL_UP" then
+	TalentMicroButton:SetScript('OnEvent', function(self, event)
+		if event == 'PLAYER_LEVEL_UP' then
 			TalentButton_Update(self)
 			if not CharacterFrame:IsShown() then
 				SetButtonPulse(self, 60, 1)
 			end
-		elseif event == "UNIT_LEVEL" or event == "PLAYER_ENTERING_WORLD" then
+		elseif event == 'UNIT_LEVEL' or event == 'PLAYER_ENTERING_WORLD' then
 			TalentButton_Update(self)
-		elseif event == "UPDATE_BINDINGS" then
-			self.tooltipText =  MicroButtonTooltipText(TALENTS_BUTTON, "TOGGLETALENTS")
+		elseif event == 'UPDATE_BINDINGS' then
+			self.tooltipText =  MicroButtonTooltipText(TALENTS_BUTTON, 'TOGGLETALENTS')
 		end
 	end)
 end
@@ -124,13 +124,15 @@ end
 --[[ Startup ]]--
 
 function BongosMenuBar:Load()
-	local bar = BBar:Create("menu", Bar_OnCreate, nil, {["y"] = 39, ["x"] = 988})
-	bar:Layout()
+	local bar = BBar:Create('menu', Bar_OnCreate, nil, {['y'] = 39, ['x'] = 988})
+	self.bar = bar
 
 	--hack to make sure all the buttons are shown properly
-	if bar:IsShown() then bar:Hide(); bar:Show() end
-
-	self.bar = bar
+	if bar:IsShown() then
+		bar:Hide()
+		bar:Show()
+	end
+	bar:Layout()
 end
 
 function BongosMenuBar:Unload()

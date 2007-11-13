@@ -16,9 +16,10 @@
 
 --[[ Unregistering Functions ]]--
 
+local function noop() end
+
 --Unregister action buttons
 local function UnregisterActionButton(button)
-	button:ClearAllPoints()
 	button:UnregisterAllEvents()
 	button:Hide()
 end
@@ -60,3 +61,9 @@ ExhaustionTick:UnregisterAllEvents()
 UnregisterActionBars()
 UnregisterShapeshiftBar()
 UnregisterPetBar()
+
+MultiActionBar_UpdateGridVisibility = noop
+MultiActionBar_Update = noop
+for i in pairs(VIEWABLE_ACTION_BAR_PAGES) do
+	VIEWABLE_ACTION_BAR_PAGES[i] = 1
+end

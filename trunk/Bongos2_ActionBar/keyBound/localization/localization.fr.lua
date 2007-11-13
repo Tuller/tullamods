@@ -1,9 +1,9 @@
 --[[
 	KeyBound localization file
-		English (default)
+		French
 --]]
 
-KEYBOUND_LOCALS = {}
+if GetLocale() ~= 'frFR' then return end
 
 local L = KEYBOUND_LOCALS
 L.Enabled = "Bindings mode enabled"
