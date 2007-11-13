@@ -1,6 +1,4 @@
-#summary Bongos2 version history
-
-= Bongos2 Version History =
+#summary Version History for Bongos2
 
 1.9.2
   * Action Bar: Fixed some showgrid bugs
