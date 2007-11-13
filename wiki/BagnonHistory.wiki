@@ -1,4 +1,4 @@
-#summary Version history for Bagnon and Bagnon_Forever
+#summary Version History for Bagnon
 
 = Bagnon Version History =
 
