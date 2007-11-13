@@ -3,6 +3,8 @@
 = Bagnon Version History =
 
 1.4.6
+  * Updated for 2.3
+  * Altered file structures.  Delete all folders before installing.
   * Fixed a bug allowing your items to be picked up when viewing cached data
   * Fixed a bug causing the bank frame to not be able to be viewed
   * Split off ownership tooltips into the addon Bagnon Tooltips.
