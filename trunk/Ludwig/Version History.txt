@@ -1,5 +1,9 @@
 Ludwig Version History
 
+1.5
+Updated for 2.3
+Removed the /lw --scan command due to disconnects
+
 1.4
 Updated for 2.2
 Changed /lw -refresh to /lw --refresh
