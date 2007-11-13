@@ -26,7 +26,6 @@ function Bagnon:Initialize()
 		replaceBank = 1,
 		reuseFrames = 1,
 
-		showOwners = 1,
 		showBorders = 1,
 		showBagsAtMail = 1,
 		showBagsAtVendor = 1,
@@ -181,7 +180,7 @@ function Bagnon:CreateBank()
 	end)
 
 	if not bank:IsUserPlaced() then
-		bank:SetPoint('LEFT', 24, 100)
+		bank:SetPoint('LEFT', 0, 100)
 	end
 
 	self.bank = bank
@@ -190,7 +189,7 @@ function Bagnon:CreateBank()
 end
 
 function Bagnon:ShowBank(auto)
-	if BagnonDB or self.atBank then
+	if BagnonDB or BagnonUtil:AtBank() then
 		local bank = self.bank
 		if bank then
 			if not bank:IsVisible() then
@@ -383,12 +382,10 @@ local function HideAtEvent(event)
 end
 
 function Bagnon:BANKFRAME_OPENED()
-	self.atBank = true
 	ShowAtEvent("Bank", not(BagnonUtil:ReplacingBank() or BagnonUtil:ReusingFrames()))
 end
 
 function Bagnon:BANKFRAME_CLOSED()
-	self.atBank = false
 	HideAtEvent("Bank")
 end
 
