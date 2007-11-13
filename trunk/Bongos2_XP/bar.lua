@@ -292,7 +292,7 @@ local function Bar_CreateMenu(frame)
 
 	textPosition:SetScript('OnValueChanged', function(self, value)
 		if not self.onShow then
-			frame.sets.textPosition = value / 100
+			frame.sets.textPosition = value/100
 			frame.xp:UpdateTextPosition()
 		end
 		getglobal(self:GetName() .. 'ValText'):SetText(value)
@@ -318,7 +318,6 @@ function BongosXP:Load()
 	bar.xp:UpdateOrientation()
 	bar.xp:Update()
 	bar.xp:UpdateText()
-	bar.xp:UpdateTextPosition()
 
 	self.bar = bar
 end
