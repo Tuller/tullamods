@@ -1,5 +1,9 @@
 Bongos2 Version History
 
+1.9.2
+ActionBar: Fixed some showgrid bugs
+ActionBar: Removed a debug message
+
 1.9.1
 CastBar: Fixed a bug causing coloring to not work
 ActionBar: Fixed a bug causing highlighting to stick on empty buttons
