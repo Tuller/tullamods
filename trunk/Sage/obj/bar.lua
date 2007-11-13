@@ -7,17 +7,17 @@ SageBar = {}
 
 local lastCreated = 0
 function SageBar:Create(parent, id, font, alwaysShow)
-	local name = format("SageBar%s", tonumber(lastCreated, 36))
-	local bar = CreateFrame("StatusBar", name, parent)
+	local name = format('SageBar%s', tonumber(lastCreated, 36))
+	local bar = CreateFrame('StatusBar', name, parent)
 	bar.id = id or parent.id
 
-	bar.bg = bar:CreateTexture(name .. "bg", "BACKGROUND")
+	bar.bg = bar:CreateTexture(name .. 'bg', 'BACKGROUND')
 	bar.bg:SetAllPoints(bar)
 
 	if(font) then
 		bar.mode = Sage:GetTextMode(bar.id)
-		bar.text = bar:CreateFontString(name .. "text", "OVERLAY")
-		bar.text:SetPoint("CENTER", bar)
+		bar.text = bar:CreateFontString(name .. 'text', 'OVERLAY')
+		bar.text:SetPoint('CENTER', bar)
 		bar.text:SetFontObject(font)
 	end
 	self:Register(bar)

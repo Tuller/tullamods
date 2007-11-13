@@ -1,5 +1,10 @@
 Sage Version History
 
+1.0.4
+Updated for 2.3
+Made cast bar coloring more accurate
+Fixed a bug causing profile copying to not work
+
 1.0.3
 Updated for 2.2
 Beast enemies will now display their family, when possible.

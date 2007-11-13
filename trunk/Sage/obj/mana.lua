@@ -3,7 +3,7 @@
 		Handles mana/rage/energy/focus bars
 --]]
 
-SageMana = CreateFrame("StatusBar")
+SageMana = CreateFrame('StatusBar')
 local Bar_MT = {__index = SageMana}
 
 local ManaBarColor = ManaBarColor
@@ -19,7 +19,7 @@ end
 
 function SageMana:Create(parent, id)
 	local bar = setmetatable(SageBar:Create(parent, id, SageFont:GetSmallBarFont()), Bar_MT)
-	bar:SetScript("OnShow", Bar_OnShow)
+	bar:SetScript('OnShow', Bar_OnShow)
 	bar:Update()
 	bar:UpdateTexture()
 	
@@ -60,19 +60,19 @@ function SageMana:UpdateText()
 		text:Hide()
 	else
 		if(UnitIsGhost(unit) or UnitIsDead(unit) or not UnitIsConnected(unit)) then
-			text:SetText("")
+			text:SetText('')
 		else
 			if(entered or mode == 3) then
 				if(Sage:ShowingMaxValues()) then
-					text:SetText(format("%d / %d", value, max))
+					text:SetText(format('%d / %d', value, max))
 				else
 					text:SetText(value)
 				end
 			elseif(mode == 2) then
 				if(UnitPowerType(unit) == 1 and value == 0) then
-					text:SetText("")
+					text:SetText('')
 				elseif(UnitPowerType(unit) ~= 1 and value == max) then
-					text:SetText("")
+					text:SetText('')
 				else
 					text:SetText(value)
 				end

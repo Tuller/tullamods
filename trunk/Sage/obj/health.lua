@@ -3,19 +3,19 @@
 		Handles healthbars
 
 	MobHealth Versions Supported:
-		Telos" MobHealth (preferred)
+		Telos' MobHealth (preferred)
 		MobInfo2
 		MobInfo3
 --]]
 
-SageHealth = CreateFrame("StatusBar")
+SageHealth = CreateFrame('StatusBar')
 local Bar_MT = {__index = SageHealth}
 local L = SAGE_LOCALS
 
 
 --[[ Local Functions ]]--
 
---update"s the bar"s color based on how much health the bar"s parent unit has
+--update's the bar's color based on how much health the bar's parent unit has
 local function Bar_UpdateHealthColor(self, value)
 	if not value then return end
 
@@ -67,19 +67,19 @@ elseif MobHealthFrame then
 	if MobHealth_PPP then
 		--MobInfo2
 		GetMobHealth = function(unit)
-			local ppp = MobHealth_PPP(format("%s:%s", UnitName(unit), UnitLevel(unit)))
+			local ppp = MobHealth_PPP(format('%s:%s', UnitName(unit), UnitLevel(unit)))
 			if ppp and ppp ~= 0 then
 				return floor(UnitHealth(unit) * ppp + 0.5), floor(UnitHealthMax(unit) * ppp + 0.5)
 			end
 			return UnitHealth(unit), UnitHealthMax(unit)
 		end
 	else
-		--Telos" Mobhealth
+		--Telos' Mobhealth
 		GetMobHealth = function(unit)
-			local index = format("%s:%s", UnitName(unit), UnitLevel(unit))
+			local index = format('%s:%s', UnitName(unit), UnitLevel(unit))
 			local health, healthMax = UnitHealth(unit), UnitHealthMax(unit)
 			if MobHealthDB[index] then
-				local pts, pct = MobHealthDB[index]:match("^(%d+)/(%d+)$")
+				local pts, pct = MobHealthDB[index]:match('^(%d+)/(%d+)$')
 				if(tonumber(pts) and tonumber(pct)) then
 					local ppp = tonumber(pts) / tonumber(pct)
 					return floor(health * ppp + 0.5), floor(healthMax * ppp + 0.5)
@@ -126,8 +126,8 @@ function SageHealth:Create(parent, id)
 	bar:SetStatusBarColor(0, 1, 0)
 	bar.bg:SetVertexColor(0.6, 0, 0, 0.6)
 
-	bar:SetScript("OnValueChanged", Bar_OnValueChanged)
-	bar:SetScript("OnShow", Bar_OnShow)
+	bar:SetScript('OnValueChanged', Bar_OnValueChanged)
+	bar:SetScript('OnShow', Bar_OnShow)
 	bar:UpdateAll()
 	bar:UpdateTexture()
 
@@ -154,7 +154,7 @@ end
 
 function SageHealth:UpdateDebuff()
 	local unit = self.id
-	if(Sage:DebuffColoring() and UnitIsFriend("player", unit)) then
+	if(Sage:DebuffColoring() and UnitIsFriend('player', unit)) then
 		local sets = Sage:GetFrameSets(unit)
 		local showCurable = sets and sets.showCurable
 		local i = 1
@@ -169,7 +169,7 @@ function SageHealth:UpdateDebuff()
 	end
 
 	if self.debuff then
-		local color = DebuffTypeColor[self.debuff or "none"]
+		local color = DebuffTypeColor[self.debuff or 'none']
 		self:SetStatusBarColor(color.r, color.g, color.b)
 	else
 		self:UpdateHealthColor(self:GetValue())
@@ -205,14 +205,14 @@ function SageHealth:UpdateText()
 			text:SetText(L.Offline)
 		elseif(entered or mode == 3) then
 			if(Sage:ShowingMaxValues()) then
-				text:SetText(format("%d / %d", value, max))
+				text:SetText(format('%d / %d', value, max))
 			else
 				text:SetText(value)
 			end
 		elseif(mode == 2) then
 			if(value == max) then
-				text:SetText("")
-			elseif(UnitIsFriend(unit, "player")) then
+				text:SetText('')
+			elseif(UnitIsFriend(unit, 'player')) then
 				text:SetText(value - max)
 			else
 				text:SetText(value)

@@ -3,14 +3,14 @@
 		The clickable portion of a SageFrame
 --]]
 
-SageClick = CreateFrame("Button")
+SageClick = CreateFrame('Button')
 local Frame_mt = {__index = SageClick}
 
 local function Frame_OnEnter(self) self:OnEnter() end
 local function Frame_OnLeave(self) self:OnLeave() end
 
 function SageClick:Create(parent, id)
-	local frame = CreateFrame("Button", format("SageClick%s", id or parent.id), parent, "SecureUnitButtonTemplate")
+	local frame = CreateFrame('Button', format('SageClick%s', id or parent.id), parent, 'SecureUnitButtonTemplate')
 	setmetatable(frame, Frame_mt)
 	frame.unit = id or parent.id
 
@@ -19,9 +19,9 @@ function SageClick:Create(parent, id)
 	ClickCastFrames = ClickCastFrames or {}
     ClickCastFrames[frame] = true
 
-	frame:RegisterForClicks("anyUp")
-	frame:SetScript("OnEnter", Frame_OnEnter)
-	frame:SetScript("OnLeave", Frame_OnLeave)
+	frame:RegisterForClicks('anyUp')
+	frame:SetScript('OnEnter', Frame_OnEnter)
+	frame:SetScript('OnLeave', Frame_OnLeave)
 
 	return frame
 end
@@ -40,24 +40,24 @@ end
 
 --credit goes to agUF for this function
 function SageClick:ShowMenu()
-	local unit = self:GetAttribute("unit")
+	local unit = self:GetAttribute('unit')
 	local menu
 	
-	if unit == "player" then
+	if unit == 'player' then
 		menu = PlayerFrameDropDown
-	elseif unit == "target" then
+	elseif unit == 'target' then
 		menu = TargetFrameDropDown
-	elseif unit == "pet" then
+	elseif unit == 'pet' then
 		menu = PetFrameDropDown
 	else
-		local partyID = unit:match("party(%d)")
+		local partyID = unit:match('party(%d)')
 		if partyID then
-			menu = getglobal(format("PartyMemberFrame%sDropDown", partyID))
+			menu = getglobal(format('PartyMemberFrame%sDropDown', partyID))
 		end
 	end
 
 	if menu then
 		HideDropDownMenu(1)
-		ToggleDropDownMenu(1, nil, menu, "cursor")
+		ToggleDropDownMenu(1, nil, menu, 'cursor')
 	end
 end

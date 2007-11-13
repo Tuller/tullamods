@@ -7,7 +7,7 @@ local function Font_Update(self, size, outline)
 	local base = GameFontHighlight:GetFont()
 
 	if outline then
-		self:SetFont(base, size, "OUTLINE")
+		self:SetFont(base, size, 'OUTLINE')
 		self:SetShadowOffset(0, 0)
 	else
 		self:SetFont(base, size)
@@ -44,35 +44,35 @@ end
 --access
 function SageFont:GetBarFont()
 	if not self.font then
-		self.font = CreateFont("SageBarFont")
+		self.font = CreateFont('SageBarFont')
 	end
 	return self.font
 end
 
 function SageFont:GetSmallBarFont()
 	if not self.fontSmall then
-		self.fontSmall = CreateFont("SageBarFontSmall")
+		self.fontSmall = CreateFont('SageBarFontSmall')
 	end
 	return self.fontSmall
 end
 
 function SageFont:GetOutsideFont()
 	if not self.oFont then
-		self.oFont = CreateFont("SageOutsideFont")
+		self.oFont = CreateFont('SageOutsideFont')
 	end
 	return self.oFont
 end
 
 function SageFont:GetSmallOutsideFont()
 	if not self.oFontSmall then
-		self.oFontSmall = CreateFont("SageOutsideFontSmall")
+		self.oFontSmall = CreateFont('SageOutsideFontSmall')
 	end
 	return self.oFontSmall
 end
 
 function SageFont:GetLevelFont()
 	if not self.levelFont then
-		self.levelFont = CreateFont("SageLevelFont")
+		self.levelFont = CreateFont('SageLevelFont')
 	end
 	return self.levelFont
 end
