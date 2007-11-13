@@ -1,5 +1,9 @@
 OmniCC Version History
 
+2.0.7
+Updated for 2.3
+Rewrote the options menu in pure lua
+
 2.0.6
 Fixed a crash issue on Macs in 2.2 and on the 2.3 PTR
 Removed OmniCC Basic.
