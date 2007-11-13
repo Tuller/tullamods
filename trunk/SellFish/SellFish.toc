@@ -1,4 +1,4 @@
-## Interface: 20200
+## Interface: 20300
 ## Title: SellFish
 ## Author: Tuller
 ## Notes: Lets you view sell value data about items from anywhere
