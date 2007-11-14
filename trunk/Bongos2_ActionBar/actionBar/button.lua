@@ -653,41 +653,20 @@ end
 --range check/flash and buff updating
 do
 	local f = CreateFrame('Frame')
-	f.delay = 1
-	f.nextUpdate = 1
-
-	--on update script, handles throttled buff and debuff updating as well as range updating
-	f:SetScript('OnUpdate', function(self, elapsed)
-		if self.callUpdateBuffs then
-			self.callUpdateBuffs = nil
-			for button in pairs(updatable) do
-				button:UpdateState()
-			end
-		end
-
-		if(self.nextUpdate < 0) then
-			self.nextUpdate = self.delay
-			for button in pairs(updatable) do
-				button:OnUpdate(self.delay)
-			end
-		else
-			self.nextUpdate = self.nextUpdate - elapsed
-		end
-	end)
 
 	--triggers an update whenever a target gains or loses a buff or debuff
 	local function UpdateTargetBuffs()
 		local changed = false
 
+		for buff in pairs(targetBuffs) do
+			targetBuffs[buff] = nil
+		end
 		for buff in pairs(targetDebuffs) do
 			targetDebuffs[buff] = nil
 		end
 
-		for buff in pairs(targetBuffs) do
-			targetBuffs[buff] = nil
-		end
-
 		if UnitExists('target') then
+			--update buffs on friendly targets
 			if UnitIsFriend('player', 'target') then
 				local buff
 				local i = 1
@@ -716,6 +695,7 @@ do
 					end
 				end
 			else
+				--update debuffs on enemy targets
 				local buff, cooldown, _
 				local i = 1
 				repeat
@@ -729,6 +709,7 @@ do
 					i = i + 1
 				until not buff
 
+				--go through all the old debuffs, removing any that are no longer on the target
 				for buff in pairs(oldTargetDebuffs) do
 					local found = false
 					for newBuff in pairs(targetDebuffs) do
@@ -744,6 +725,7 @@ do
 				end
 			end
 		else
+			--no target, so no debuffs and buffs
 			for buff in pairs(oldTargetDebuffs) do
 				changed = true
 				oldTargetDebuffs[buff] = nil
@@ -755,8 +737,9 @@ do
 			end
 		end
 
+		--if change, mark for updating
 		if changed then
-			f.callUpdateBuffs = true
+			f.shouldUpdateBuffs = true
 		end
 	end
 
@@ -781,6 +764,7 @@ do
 			i = i + 1
 		until not buff
 
+		--go through all the old buffs, removing any that are no longer on the player
 		for buff in pairs(oldPlayerBuffs) do
 			local found = false
 			for newBuff in pairs(playerBuffs) do
@@ -795,11 +779,13 @@ do
 			end
 		end
 
+		--something changed, trigger update buffs
 		if changed then
-			f.callUpdateBuffs = true
+			f.shouldUpdateBuffs = true
 		end
 	end
 
+	--buff and debuff updating stuff
 	f:SetScript('OnEvent', function(self, event, unit)
 		if BongosActionConfig:HighlightingBuffs() then
 			if event == 'UNIT_AURA' then
@@ -813,4 +799,25 @@ do
 	end)
 	f:RegisterEvent('UNIT_AURA')
 	f:RegisterEvent('PLAYER_AURAS_CHANGED')
+
+	--on update script, handles throttled buff and debuff updating as well as range updating
+	f.delay = 1
+	f.nextUpdate = 1
+	f:SetScript('OnUpdate', function(self, elapsed)
+		if self.shouldUpdateBuffs then
+			self.shouldUpdateBuffs = nil
+			for button in pairs(updatable) do
+				button:UpdateState()
+			end
+		end
+
+		if self.nextUpdate < 0 then
+			self.nextUpdate = self.delay
+			for button in pairs(updatable) do
+				button:OnUpdate(self.delay)
+			end
+		else
+			self.nextUpdate = self.nextUpdate - elapsed
+		end
+	end)
 end
