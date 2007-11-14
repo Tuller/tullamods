@@ -26,7 +26,7 @@ local function CountsToInfoString(invCount, bankCount, equipCount)
 	end
 
 	if info then
-		if not(total == invCount or total == bankCount or total == equipCount) then
+		if total and not(total == invCount or total == bankCount or total == equipCount) then
 			return format(TEAL, total) .. format(SILVER, format(' (%s)', info))
 		end
 		return format(TEAL, info)
@@ -50,7 +50,7 @@ do
 
 				local equipCount = BagnonDB:GetItemCount(link, 'e', player)
 
-				self[link] = CountsToInfoString(invCount, bankCount, equipCount) or ''
+				self[link] = CountsToInfoString(invCount or 0, bankCount or 0, equipCount or 0) or ''
 				return self[link]
 			end})
 		end
@@ -73,7 +73,7 @@ local function AddOwners(frame, link)
 
 			local equipCount = BagnonDB:GetItemCount(link, 'e', player)
 
-			infoString = CountsToInfoString(invCount, bankCount, equipCount)
+			infoString = CountsToInfoString(invCount or 0, bankCount or 0, equipCount or 0)
 		else
 			infoString = itemInfo[player][link]
 		end
