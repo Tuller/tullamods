@@ -27,7 +27,9 @@ local function CountsToInfoString(invCount, bankCount, equipCount)
 
 	if info then
 		if total and not(total == invCount or total == bankCount or total == equipCount) then
-			return format(TEAL, total) .. format(SILVER, format(' (%s)', info))
+			--split into two steps for debugging purposes
+			local totalStr = format(TEAL, total)
+			return totalStr .. format(SILVER, format(' (%s)', info))
 		end
 		return format(TEAL, info)
 	end
