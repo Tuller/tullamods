@@ -1,5 +1,9 @@
 #summary Version History for Bongos2
 
+1.9.3
+  * Action Bar: Optimized buff and debuff highlighting
+  * Action Bar: Fixed a tainting issue in the unregistration code
+
 1.9.2
   * Action Bar: Fixed some showgrid bugs
   * Action Bar: Removed a debug message
