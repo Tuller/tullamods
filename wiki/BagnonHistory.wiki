@@ -2,6 +2,9 @@
 
 = Bagnon Version History =
 
+1.4.7
+  * Added more nil checks to Bagnon Tooltips
+
 1.4.6
   * Updated for 2.3
   * Altered file structures.  Delete all folders before installing.
