@@ -6,6 +6,9 @@ BongosActionButton = CreateFrame('CheckButton')
 local Button_MT = {__index = BongosActionButton}
 local buttons = {} --buttons that have been created
 local updatable = {} --buttons which have an action and are shown: thus we need to update based on range coloring
+local targetDebuffs, oldTargetDebuffs = {}, {}
+local targetBuffs, oldTargetBuffs = {}, {}
+local playerBuffs, oldPlayerBuffs = {}, {}
 
 --converts an ID into a valid action ID (between 1 and 120)
 local function toValid(id)
@@ -129,11 +132,9 @@ function BongosActionButton:OnEvent(event, arg1)
 			self:Update()
 		elseif event == 'PLAYER_AURAS_CHANGED' or event == 'PLAYER_TARGET_CHANGED' then
 			self:UpdateUsable()
+--			self:UpdateState()
+		elseif event == 'BONGOS_UPDATE_TARGET_BUFFS' then
 			self:UpdateState()
-		elseif event == 'UNIT_AURA' then
-			if arg1 == 'target' or arg1 == 'player' then
-				self:UpdateState()
-			end
 		elseif event == 'UNIT_INVENTORY_CHANGED' then
 			if arg1 == 'player' then
 				self:Update()
@@ -373,38 +374,22 @@ do
 		end
 	end
 
-	local function GetActionType(type, arg1, arg2)
-		if type == 'macro' then
-			local item, link = GetMacroItem(arg1)
-			if item then
-				return 'item', item, link
-			end
-			local spell = GetMacroSpell(arg1)
-			if spell then
-				return 'spell', spell
-			end
-		elseif type == 'spell' then
-			return 'spell', GetSpellName(arg1, arg2)
-		end
-		return type, arg1, arg2
-	end
-
 	function BongosActionButton:UpdateBorder(spell)
 		if SpellHasRange(spell) and UnitExists('target') then
 			if UnitIsFriend('player', 'target') then
-				if IsHelpfulSpell(spell) and UnitHasBuff('target', spell) then
+				if IsHelpfulSpell(spell) and targetBuffs[spell] then
 					self:GetCheckedTexture():SetVertexColor(0, 1, 0)
 					return true
 				end
-			elseif IsHarmfulSpell(spell) and UnitHasDebuff('target', spell) then
+			elseif IsHarmfulSpell(spell) and targetDebuffs[spell] then
 				self:GetCheckedTexture():SetVertexColor(1, 0, 1)
 				return true
 			end
-		end
-
-		if UnitHasBuff('player', spell) then
-			self:GetCheckedTexture():SetVertexColor(0, 1, 0)
-			return true
+		else
+			if IsHelpfulSpell(spell) and playerBuffs[spell] then
+				self:GetCheckedTexture():SetVertexColor(0, 1, 0)
+				return true
+			end
 		end
 
 		self:GetCheckedTexture():SetVertexColor(1, 1, 1)
@@ -415,7 +400,7 @@ do
 		if BongosActionConfig:HighlightingBuffs() then
 			local action = self:GetPagedID()
 			if action then
-				local type, arg1, arg2 = GetActionType(GetActionInfo(action))
+				local type, arg1, arg2 = self.type, self.arg1, self.arg2
 
 				if type == 'item' then
 					local spell = GetItemSpell(arg1)
@@ -624,11 +609,30 @@ function BongosActionButton:UpdateButtonsWithID(id)
 	end
 end
 
-function BongosActionButton:GetPagedID(refresh)
-	if refresh or not self.id then
-		self.id = SecureButton_GetModifiedAttribute(self, 'action', SecureStateChild_GetEffectiveButton(self))
+do
+	local function GetActionType(type, arg1, arg2)
+		if type == 'macro' then
+			local item, link = GetMacroItem(arg1)
+			if item then
+				return 'item', item, link
+			end
+			local spell = GetMacroSpell(arg1)
+			if spell then
+				return 'spell', spell
+			end
+		elseif type == 'spell' then
+			return 'spell', GetSpellName(arg1, arg2)
+		end
+		return type, arg1, arg2
 	end
-	return self.id or 0
+
+	function BongosActionButton:GetPagedID(refresh)
+		if refresh or not self.id then
+			self.id = SecureButton_GetModifiedAttribute(self, 'action', SecureStateChild_GetEffectiveButton(self))
+			self.type, self.arg1, self.arg2 = GetActionType(GetActionInfo(self.id))
+		end
+		return self.id or 0
+	end
 end
 
 function BongosActionButton:ForAll(method, ...)
@@ -650,8 +654,17 @@ end
 do
 	local f = CreateFrame('Frame')
 	f.delay = 1
-	f.nextUpdate = f.delay
+	f.nextUpdate = 1
+	
+	--on update script, handles throttled buff and debuff updating as well as range updating
 	f:SetScript('OnUpdate', function(self, elapsed)
+		if self.callUpdateBuffs then
+			self.callUpdateBuffs = nil
+			for button in pairs(updatable) do
+				button:UpdateState()
+			end
+		end
+
 		if(self.nextUpdate < 0) then
 			self.nextUpdate = self.delay
 			for button in pairs(updatable) do
@@ -661,4 +674,143 @@ do
 			self.nextUpdate = self.nextUpdate - elapsed
 		end
 	end)
+
+	--triggers an update whenever a target gains or loses a buff or debuff
+	local function UpdateTargetBuffs()
+		local changed = false
+
+		for buff in pairs(targetDebuffs) do
+			targetDebuffs[buff] = nil
+		end
+
+		for buff in pairs(targetBuffs) do
+			targetBuffs[buff] = nil
+		end
+
+		if UnitExists('target') then
+			if UnitIsFriend('player', 'target') then
+				local buff
+				local i = 1
+				repeat
+					buff = UnitBuff('target', i)
+					if buff then
+						targetBuffs[buff] = true
+						if not oldTargetBuffs[buff] then
+							changed = true
+						end
+					end
+					i = i + 1
+				until not buff
+
+				for buff in pairs(oldTargetBuffs) do
+					local found = false
+					for newBuff in pairs(targetBuffs) do
+						if buff == newBuff then
+							found = true
+							break
+						end
+					end
+					if not found then
+						changed = true
+						oldTargetBuffs[buff] = nil
+					end
+				end
+			else
+				local buff, cooldown, _
+				local i = 1
+				repeat
+					buff, _, _, _, _, cooldown = UnitDebuff('target', i)
+					if cooldown and buff then
+						targetDebuffs[buff] = true
+						if not oldTargetDebuffs[buff] then
+							changed = true
+						end
+					end
+					i = i + 1
+				until not buff
+
+				for buff in pairs(oldTargetDebuffs) do
+					local found = false
+					for newBuff in pairs(targetDebuffs) do
+						if buff == newBuff then
+							found = true
+							break
+						end
+					end
+					if not found then
+						changed = true
+						oldTargetDebuffs[buff] = nil
+					end
+				end
+			end
+		else
+			for buff in pairs(oldTargetDebuffs) do
+				changed = true
+				oldTargetDebuffs[buff] = nil
+			end
+
+			for buff in pairs(oldTargetBuffs) do
+				changed = true
+				oldTargetBuffs[buff] = nil
+			end
+		end
+
+		if changed then
+			f.callUpdateBuffs = true
+		end
+	end
+
+	--triggers an update whenever the player gains or loses a buff
+	local function UpdatePlayerBuffs()
+		local changed = true
+
+		for buff in pairs(playerBuffs) do
+			playerBuffs[buff] = nil
+		end
+
+		local buff
+		local i = 1
+		repeat
+			buff = UnitBuff('player', i)
+			if buff then
+				playerBuffs[buff] = true
+				if not oldPlayerBuffs[buff] then
+					changed = true
+				end
+			end
+			i = i + 1
+		until not buff
+
+		for buff in pairs(oldPlayerBuffs) do
+			local found = false
+			for newBuff in pairs(playerBuffs) do
+				if buff == newBuff then
+					found = true
+					break
+				end
+			end
+			if not found then
+				changed = true
+				oldPlayerBuffs[buff] = nil
+			end
+		end
+
+		if changed then
+			f.callUpdateBuffs = true
+		end
+	end
+
+	f:SetScript('OnEvent', function(self, event, arg1)
+		if BongosActionConfig:HighlightingBuffs() then
+			if event == 'UNIT_AURA' then
+				if arg1 == 'target' then
+					UpdateTargetBuffs()
+				end
+			elseif event == 'PLAYER_AURAS_CHANGED' then
+				UpdatePlayerBuffs()
+			end
+		end
+	end)
+	f:RegisterEvent('UNIT_AURA')
+	f:RegisterEvent('PLAYER_AURAS_CHANGED')
 end

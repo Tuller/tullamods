@@ -64,6 +64,6 @@ UnregisterPetBar()
 
 MultiActionBar_UpdateGridVisibility = noop
 MultiActionBar_Update = noop
-for i in pairs(VIEWABLE_ACTION_BAR_PAGES) do
-	VIEWABLE_ACTION_BAR_PAGES[i] = 1
-end
+-- for i in pairs(VIEWABLE_ACTION_BAR_PAGES) do
+	-- VIEWABLE_ACTION_BAR_PAGES[i] = 1
+-- end
