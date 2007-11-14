@@ -650,12 +650,12 @@ function BongosActionButton:Get(id)
 end
 
 
---range check/flash updating
+--range check/flash and buff updating
 do
 	local f = CreateFrame('Frame')
 	f.delay = 1
 	f.nextUpdate = 1
-	
+
 	--on update script, handles throttled buff and debuff updating as well as range updating
 	f:SetScript('OnUpdate', function(self, elapsed)
 		if self.callUpdateBuffs then
@@ -800,10 +800,10 @@ do
 		end
 	end
 
-	f:SetScript('OnEvent', function(self, event, arg1)
+	f:SetScript('OnEvent', function(self, event, unit)
 		if BongosActionConfig:HighlightingBuffs() then
 			if event == 'UNIT_AURA' then
-				if arg1 == 'target' then
+				if unit == 'target' then
 					UpdateTargetBuffs()
 				end
 			elseif event == 'PLAYER_AURAS_CHANGED' then
