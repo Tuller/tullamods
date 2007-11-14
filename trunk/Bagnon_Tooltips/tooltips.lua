@@ -18,11 +18,19 @@ local function CountsToInfoString(invCount, bankCount, equipCount)
 
 	if bankCount > 0 then
 		local count = BAGNON_NUM_BANK:format(bankCount)
-		info = info and strjoin(', ', info, count) or count
+		if info then
+			info = strjoin(', ', info, count)
+		else
+			info = count
+		end
 	end
 
 	if equipCount > 0 then
-		info = info and strjoin(', ', info, BAGNON_EQUIPPED) or BAGNON_EQUIPPED
+		if info then
+			info = strjoin(', ', info, BAGNON_EQUIPPED)
+		else
+			info = BAGNON_EQUIPPED
+		end
 	end
 
 	if info then
