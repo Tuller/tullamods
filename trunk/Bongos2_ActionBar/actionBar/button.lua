@@ -345,62 +345,42 @@ end
 
 --Buff/Debuff highlighting code
 function BongosActionButton:UpdateBorder(spell)
-	if SpellHasRange(spell) and UnitExists('target') then
-		if UnitIsFriend('player', 'target') then
-			if IsHelpfulSpell(spell) and targetBuffs[spell] then
+	if spell then
+		if SpellHasRange(spell) and UnitExists('target') then
+			if UnitIsFriend('player', 'target') then
+				if IsHelpfulSpell(spell) and targetBuffs[spell] then
+					self:GetCheckedTexture():SetVertexColor(0, 1, 0)
+					return true
+				end
+			elseif IsHarmfulSpell(spell) and targetDebuffs[spell] then
+				self:GetCheckedTexture():SetVertexColor(1, 0, 1)
+				return true
+			end
+		else
+			if IsHelpfulSpell(spell) and playerBuffs[spell] then
 				self:GetCheckedTexture():SetVertexColor(0, 1, 0)
 				return true
 			end
-		elseif IsHarmfulSpell(spell) and targetDebuffs[spell] then
-			self:GetCheckedTexture():SetVertexColor(1, 0, 1)
-			return true
-		end
-	else
-		if IsHelpfulSpell(spell) and playerBuffs[spell] then
-			self:GetCheckedTexture():SetVertexColor(0, 1, 0)
-			return true
 		end
 	end
-
 	self:GetCheckedTexture():SetVertexColor(1, 1, 1)
-	return false
 end
 
-do
-	local function GetActionType(type, arg1, arg2)
-		if type == 'macro' then
-			local item, link = GetMacroItem(arg1)
-			if item then
-				return 'item', item, link
-			end
-			local spell = GetMacroSpell(arg1)
-			if spell then
-				return 'spell', spell
-			end
-		elseif type == 'spell' then
-			return 'spell', GetSpellName(arg1, arg2)
-		end
-		return type, arg1, arg2
-	end
-
-	function BongosActionButton:UpdateSpellInUse()
-		if BongosActionConfig:HighlightingBuffs() then
-			local action = self:GetPagedID()
-			if action then
-				local type, arg1, arg2 = GetActionType(GetActionInfo(action))
-				if type == 'item' then
-					local spell = GetItemSpell(arg1)
-					if spell then
-						return self:UpdateBorder(spell)
-					end
-				elseif type == 'spell' then
-					return self:UpdateBorder(arg1)
+function BongosActionButton:UpdateSpellInUse()
+	if BongosActionConfig:HighlightingBuffs() then
+		local action = self:GetPagedID()
+		if action then
+			local spellID = self.spellID
+			if spellID then
+				if self.type == 'macro' then
+					return self:UpdateBorder(GetMacroSpell(spellID))
+				else
+					return self:UpdateBorder(spellID)
 				end
 			end
 		end
-		self:GetCheckedTexture():SetVertexColor(1, 1, 1)
-		return false
 	end
+	self:GetCheckedTexture():SetVertexColor(1, 1, 1)
 end
 
 function BongosActionButton:StartFlash()
@@ -599,6 +579,16 @@ end
 function BongosActionButton:GetPagedID(refresh)
 	if refresh or not self.id then
 		self.id = SecureButton_GetModifiedAttribute(self, 'action', SecureStateChild_GetEffectiveButton(self))
+		local type, arg1, arg2 = GetActionInfo(self.id)
+
+		self.type = type
+		if type == 'spell' then
+			self.spellID = GetSpellName(arg1, arg2)
+		elseif type == 'item' then
+			self.spellID = GetItemSpell(arg1)
+		else
+			self.spellID = arg1
+		end
 	end
 	return self.id or 0
 end
