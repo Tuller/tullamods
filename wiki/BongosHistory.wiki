@@ -1,5 +1,9 @@
 #summary Version History for Bongos2
 
+1.9.4
+  * Action Bar: Fixed the error when training a new skill
+  * Action Bar: Made buff and debuff highlighting work on a few more things
+
 1.9.3
   * Action Bar: Optimized buff and debuff highlighting
   * Action Bar: Fixed a tainting issue in the unregistration code
