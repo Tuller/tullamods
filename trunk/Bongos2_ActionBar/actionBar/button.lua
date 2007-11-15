@@ -745,16 +745,6 @@ do
 		end
 	end
 
-	-- function f:UpdateEvents()
-		-- if BongosActionConfig:HighlightingBuffs() then
-			-- self:RegisterEvent('UNIT_AURA')
-			-- self:RegisterEvent('PLAYER_AURAS_CHANGED')
-			-- self:RegisterEvent('PLAYER_TARGET_CHANGED')
-		-- else
-			-- self:UnregisterAllEvents()
-		-- end
-	-- end
-
 	--buff and debuff updating stuff
 	f:SetScript('OnEvent', function(self, event, unit)
 		if BongosActionConfig:HighlightingBuffs() then
