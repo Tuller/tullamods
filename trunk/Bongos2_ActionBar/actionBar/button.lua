@@ -6,14 +6,17 @@ BongosActionButton = CreateFrame('CheckButton')
 local Button_MT = {__index = BongosActionButton}
 local buttons = {} --buttons that have been created
 local updatable = {} --buttons which have an action and are shown: thus we need to update based on range coloring
-local targetDebuffs, oldTargetDebuffs = {}, {}
+
+--buff and debuff caches
 local targetBuffs, oldTargetBuffs = {}, {}
+local targetDebuffs, oldTargetDebuffs = {}, {}
 local playerBuffs, oldPlayerBuffs = {}, {}
 
 --converts an ID into a valid action ID (between 1 and 120)
 local function toValid(id)
 	return (id-1) % BONGOS_MAX_BUTTONS + 1
 end
+
 
 --[[ Constructorish ]]--
 
@@ -116,8 +119,6 @@ function BongosActionButton:UpdateEvents()
 		self:RegisterEvent('PLAYER_LEAVE_COMBAT')
 		self:RegisterEvent('START_AUTOREPEAT_SPELL')
 		self:RegisterEvent('STOP_AUTOREPEAT_SPELL')
-
-		self:RegisterEvent('UNIT_AURA')
 	end
 end
 
@@ -132,8 +133,6 @@ function BongosActionButton:OnEvent(event, arg1)
 			self:Update()
 		elseif event == 'PLAYER_AURAS_CHANGED' or event == 'PLAYER_TARGET_CHANGED' then
 			self:UpdateUsable()
-		elseif event == 'BONGOS_UPDATE_TARGET_BUFFS' then
-			self:UpdateState()
 		elseif event == 'UNIT_INVENTORY_CHANGED' then
 			if arg1 == 'player' then
 				self:Update()
@@ -356,11 +355,10 @@ function BongosActionButton:UpdateBorder(spell)
 				self:GetCheckedTexture():SetVertexColor(1, 0, 1)
 				return true
 			end
-		else
-			if IsHelpfulSpell(spell) and playerBuffs[spell] then
-				self:GetCheckedTexture():SetVertexColor(0, 1, 0)
-				return true
-			end
+		end
+		if IsHelpfulSpell(spell) and playerBuffs[spell] then
+			self:GetCheckedTexture():SetVertexColor(0, 1, 0)
+			return true
 		end
 	end
 	self:GetCheckedTexture():SetVertexColor(1, 1, 1)
@@ -518,6 +516,7 @@ function BongosActionButton:UpdateVisibility()
 	end
 end
 
+
 --[[ Showgrid Stuff ]]
 
 function BongosActionButton:UpdateGrid()
@@ -575,7 +574,6 @@ function BongosActionButton:UpdateButtonsWithID(id)
 	end
 end
 
-
 function BongosActionButton:GetPagedID(refresh)
 	if refresh or not self.id then
 		self.id = SecureButton_GetModifiedAttribute(self, 'action', SecureStateChild_GetEffectiveButton(self))
@@ -583,7 +581,11 @@ function BongosActionButton:GetPagedID(refresh)
 
 		self.type = type
 		if type == 'spell' then
-			self.spellID = GetSpellName(arg1, arg2)
+			if arg1 and arg2 then
+				self.spellID = GetSpellName(arg1, arg2)
+			else
+				self.spellID = nil
+			end
 		elseif type == 'item' then
 			self.spellID = GetItemSpell(arg1)
 		else
@@ -643,7 +645,7 @@ do
 	end
 
 	--triggers an update whenever a target gains or loses a buff or debuff
-	local function UpdateTargetBuffs()
+	function f:UpdateTargetBuffs()
 		local changed = false
 		ClearTable(targetBuffs)
 		ClearTable(targetDebuffs)
@@ -710,12 +712,12 @@ do
 
 		--if change, mark for updating
 		if changed then
-			f.shouldUpdateBuffs = true
+			self.shouldUpdateBuffs = true
 		end
 	end
 
 	--triggers an update whenever the player gains or loses a buff
-	local function UpdatePlayerBuffs()
+	function f:UpdatePlayerBuffs()
 		local changed = true
 		ClearTable(playerBuffs)
 
@@ -739,21 +741,31 @@ do
 
 		--something changed, trigger update buffs
 		if changed then
-			f.shouldUpdateBuffs = true
+			self.shouldUpdateBuffs = true
 		end
 	end
+
+	-- function f:UpdateEvents()
+		-- if BongosActionConfig:HighlightingBuffs() then
+			-- self:RegisterEvent('UNIT_AURA')
+			-- self:RegisterEvent('PLAYER_AURAS_CHANGED')
+			-- self:RegisterEvent('PLAYER_TARGET_CHANGED')
+		-- else
+			-- self:UnregisterAllEvents()
+		-- end
+	-- end
 
 	--buff and debuff updating stuff
 	f:SetScript('OnEvent', function(self, event, unit)
 		if BongosActionConfig:HighlightingBuffs() then
 			if event == 'PLAYER_TARGET_CHANGED' then
-				UpdateTargetBuffs()
+				self:UpdateTargetBuffs()
 			elseif event == 'UNIT_AURA' then
 				if unit == 'target' then
-					UpdateTargetBuffs()
+					self:UpdateTargetBuffs()
 				end
 			elseif event == 'PLAYER_AURAS_CHANGED' then
-				UpdatePlayerBuffs()
+				self:UpdatePlayerBuffs()
 			end
 		end
 	end)
@@ -762,8 +774,6 @@ do
 	f:RegisterEvent('PLAYER_TARGET_CHANGED')
 
 	--on update script, handles throttled buff and debuff updating as well as range updating
-	f.delay = 1
-	f.nextUpdate = 1
 	f:SetScript('OnUpdate', function(self, elapsed)
 		if self.shouldUpdateBuffs then
 			self.shouldUpdateBuffs = nil
@@ -781,4 +791,6 @@ do
 			self.nextUpdate = self.nextUpdate - elapsed
 		end
 	end)
+	f.nextUpdate = 1
+	f.delay = 1
 end
