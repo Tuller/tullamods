@@ -317,14 +317,12 @@ function Bagnon:HookBagClicks()
 		end
 	end
 
-	local bCloseAllBags = CloseAllBags
-	CloseAllBags = function()
-		if BagnonUtil:ReplacingBags() or BagnonUtil:ReusingFrames() then
+	--secure'd!
+	hooksecurefunc('CloseAllBags', function() 
+		if BagnonUtil:ReplacingBags() then
 			Bagnon:HideInventory()
-		else
-			bCloseAllBags()
 		end
-	end
+	end)
 
 	local oToggleBag = ToggleBag
 	ToggleBag = function(id)
