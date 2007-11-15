@@ -4,7 +4,7 @@
 ## Notes: Movable bar framework
 ## Notes-zhCN: Bongos2 系列 核心库
 ## Author: Tuller
-## Version: 1.9.3
+## Version: 1.9.4
 ## SavedVariables: Bongos2DB, BongosVersion
 ## OptionalDeps: Dongle
 lib\Dongle.lua
