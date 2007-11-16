@@ -1,4 +1,4 @@
---[[
+﻿--[[
 	Bongos CastBar Localization file
 --]]
 
