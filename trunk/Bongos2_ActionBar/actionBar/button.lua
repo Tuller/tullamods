@@ -345,9 +345,9 @@ end
 --Buff/Debuff highlighting code
 function BongosActionButton:UpdateBorder(spell)
 	if spell then
-		if SpellHasRange(spell) and UnitExists('target') then
+		if UnitExists('target') then
 			if UnitIsFriend('player', 'target') then
-				if targetBuffs[spell] then
+				if targetBuffs[spell] or playerBuffs[spell] then
 					self:GetCheckedTexture():SetVertexColor(0, 1, 0)
 					return true
 				end
@@ -356,7 +356,7 @@ function BongosActionButton:UpdateBorder(spell)
 				return true
 			end
 		end
-		if playerBuffs[spell] then
+		if playerBuffs[spell] and not UnitIsFriend('player', 'target') then
 			self:GetCheckedTexture():SetVertexColor(0, 1, 0)
 			return true
 		end

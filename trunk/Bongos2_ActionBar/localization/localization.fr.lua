@@ -1,4 +1,4 @@
---[[
+﻿--[[
 	Bongos_Actionbar Localization
 		English (default)
 --]]
