@@ -1,4 +1,4 @@
---[[
+﻿--[[
 	Bongos Stats Localization file
 --]]
 
