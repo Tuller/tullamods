@@ -5,7 +5,7 @@
 ## Notes-zhTW: 以單一視窗顯示背包和銀行
 ## Notes-zhCN: 在单一框架内显示背包或银行中的物品
 ## SavedVariablesPerCharacter: BagnonSets
-## Version: 1.4.7
+## Version: 1.4.8
 ## OptionalDeps: Dongle, Bagnon_Forever
 lib\Gooey.xml
 lib\Dongle.lua

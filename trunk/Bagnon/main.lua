@@ -172,10 +172,7 @@ function Bagnon:CreateBank()
 	local OnHide = bank:GetScript("OnHide")
 	bank:SetScript("OnHide", function(self)
 		PlaySound("igBagnonMenuClose")
-
-		if BagnonUtil:AtBank() then
-			CloseBankFrame()
-		end
+		CloseBankFrame()
 		OnHide(self)
 	end)
 

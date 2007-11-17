@@ -1,6 +1,6 @@
 --[[
-	Bagnon Localization Information: English Language
-		This file must be present to have partial translations
+	Bagnon Localization Information: Traditional Chinese Language
+	20071117 by matini< yiting.jheng <at> gmail <dot> com
 --]]
 
 if GetLocale() ~= "zhTW" then return end
@@ -51,8 +51,3 @@ L.Scale = "縮放"
 L.Spacing = "間隔"
 L.Cols = "欄數"
 L.ReverseSort = "反向"
-
---item count tooltips
-L.NumInBags = " %d 在背包"
-L.NumInBank = " %d 在銀行"
-L.NumEquipped = " 裝備中"
