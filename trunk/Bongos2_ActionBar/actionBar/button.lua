@@ -46,7 +46,7 @@ function BongosActionButton:Create(id)
 	button.count = _G[name .. 'Count']
 
 	button:SetScript('OnAttributeChanged', self.OnAttributeChanged)
-	button:SetScript('PostClick', self.PostClick)
+	button:SetScript('PostClick', self.UpdateState)
 	button:SetScript('OnDragStart', self.OnDragStart)
 	button:SetScript('OnReceiveDrag', self.OnReceiveDrag)
 	button:SetScript('OnEnter', self.OnEnter)
@@ -149,7 +149,7 @@ function BongosActionButton:OnEvent(event, arg1)
 end
 
 function BongosActionButton:OnAttributeChanged(var, val)
-	if(var == 'state-parent' or var == 'statehidden') then
+	if var == 'state-parent' then
 		if self:IsShown() then
 			self:Update(true)
 			updatable[self] = (self.id and HasAction(self.id) or nil)
@@ -196,10 +196,6 @@ function BongosActionButton:OnUpdate(elapsed)
 			end
 		end
 	end
-end
-
-function BongosActionButton:PostClick()
-	self:UpdateState()
 end
 
 function BongosActionButton:OnDragStart()
@@ -570,27 +566,35 @@ function BongosActionButton:UpdateButtonsWithID(id)
 	for _,button in pairs(buttons) do
 		if(button:GetPagedID() == id) then
 			button:Update()
+			button:UpdateSpellID()
 		end
+	end
+end
+
+function BongosActionButton:UpdateSpellID()
+	local type, arg1, arg2 = GetActionInfo(self:GetPagedID())
+
+	self.type = type
+	if type == 'spell' then
+		if arg1 and arg2 then
+			--invalid spell slot check
+			if arg1 > 0 then
+				self.spellID = GetSpellName(arg1, arg2)
+			end
+		else
+			self.spellID = nil
+		end
+	elseif type == 'item' then
+		self.spellID = GetItemSpell(arg1)
+	else
+		self.spellID = arg1
 	end
 end
 
 function BongosActionButton:GetPagedID(refresh)
 	if refresh or not self.id then
 		self.id = SecureButton_GetModifiedAttribute(self, 'action', SecureStateChild_GetEffectiveButton(self))
-		local type, arg1, arg2 = GetActionInfo(self.id)
-
-		self.type = type
-		if type == 'spell' then
-			if arg1 and arg2 then
-				self.spellID = GetSpellName(arg1, arg2)
-			else
-				self.spellID = nil
-			end
-		elseif type == 'item' then
-			self.spellID = GetItemSpell(arg1)
-		else
-			self.spellID = arg1
-		end
+		self:UpdateSpellID()
 	end
 	return self.id or 0
 end

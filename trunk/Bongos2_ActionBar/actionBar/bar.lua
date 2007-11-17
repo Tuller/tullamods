@@ -473,7 +473,7 @@ function BActionBar:Layout()
 		local row = mod(i-1, cols)
 		local col = ceil(i / cols) - 1
 		local button = BongosActionButton:Set(startID + i-1, self)
-		button:SetPoint("TOPLEFT", self, "TOPLEFT", buttonSize * row, -buttonSize * col)
+		button:SetPoint("TOPLEFT", buttonSize * row, -buttonSize * col)
 	end
 
 	--remove any unused buttons

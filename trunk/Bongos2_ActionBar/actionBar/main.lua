@@ -54,9 +54,9 @@ function BongosActionBar:OnLeaveCombat()
 end
 
 function BongosActionBar:OnSlotChanged(event, id)
-	local hasAction = actions[id]
-	if HasAction(id) ~= hasAction then
-		actions[id] = HasAction(id) or nil
+	local hadAction = actions[id]
+	if HasAction(id) ~= hadAction then
+		actions[id] = HasAction(id)
 		self:UpdateVisibility()
 	end
 	BongosActionButton:UpdateButtonsWithID(id)
