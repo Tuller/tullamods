@@ -353,7 +353,7 @@ function BongosActionButton:UpdateBorder(spell)
 			end
 		end
 
-		if playerBuffs[spell] and not(UnitExists('target') and UnitIsFriend('player', 'target')) then
+		if playerBuffs[spell] and not UnitIsFriend('player', 'target') then
 			self:GetCheckedTexture():SetVertexColor(0, 1, 0)
 			return true
 		end
@@ -636,6 +636,7 @@ do
 	local function CloneTable(t, toClone)
 		local changed = false
 
+		--remove any values not in tClone
 		for i in pairs(t) do
 			if not toClone[i] then
 				t[i] = nil
@@ -643,6 +644,7 @@ do
 			end
 		end
 
+		--add any values in tClone that are not in t
 		for i,v in pairs(toClone) do
 			if not t[i] then
 				t[i] = v
