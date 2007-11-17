@@ -2,6 +2,12 @@
 
 = Bagnon Version History =
 
+1.4.8
+  * Removed the errant tooltips.lua from the Bagnon toc
+  * Removed a source of taint from the CloseAllBags hook
+  * Fixed a bug causing the bank frame to not properly close when closing it manually
+  * Updated the zhTW translation (thanks matini)
+
 1.4.7
   * Added more nil checks to Bagnon Tooltips
 
