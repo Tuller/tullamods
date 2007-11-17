@@ -56,14 +56,20 @@ local function UnregisterPetBar()
 	end
 end
 
-MainMenuBar:Hide()
-ExhaustionTick:UnregisterAllEvents()
-UnregisterActionBars()
-UnregisterShapeshiftBar()
-UnregisterPetBar()
+do
+	MainMenuBar:Hide()
+	ExhaustionTick:UnregisterAllEvents()
+	UnregisterActionBars()
+	UnregisterShapeshiftBar()
+	UnregisterPetBar()
+	
+	ALWAYS_SHOW_MULTIBARS = nil
+	SHOW_MULTI_ACTIONBAR_1 = nil
+	SHOW_MULTI_ACTIONBAR_2 = nil
+	SHOW_MULTI_ACTIONBAR_3 = nil
+	SHOW_MULTI_ACTIONBAR_4 = nil
 
-MultiActionBar_UpdateGridVisibility = noop
-MultiActionBar_Update = noop
--- for i in pairs(VIEWABLE_ACTION_BAR_PAGES) do
-	-- VIEWABLE_ACTION_BAR_PAGES[i] = 1
--- end
+	MultiActionBar_ShowAllGrids = noop
+	MultiActionBar_HideAllGrids = noop
+	MultiActionBar_Update()
+end
