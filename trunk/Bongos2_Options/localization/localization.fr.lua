@@ -1,4 +1,4 @@
---[[
+﻿--[[
 	Bongos Options Localization file
 --]]
 
