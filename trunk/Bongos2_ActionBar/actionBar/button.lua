@@ -8,9 +8,9 @@ local buttons = {} --buttons that have been created
 local updatable = {} --buttons which have an action and are shown: thus we need to update based on range coloring
 
 --buff and debuff caches
-local targetBuffs, oldTargetBuffs = {}, {}
-local targetDebuffs, oldTargetDebuffs = {}, {}
-local playerBuffs, oldPlayerBuffs = {}, {}
+local targetBuffs = {}
+local targetDebuffs = {}
+local playerBuffs = {}
 
 --converts an ID into a valid action ID (between 1 and 120)
 local function toValid(id)
@@ -352,7 +352,8 @@ function BongosActionButton:UpdateBorder(spell)
 				return true
 			end
 		end
-		if playerBuffs[spell] and not UnitIsFriend('player', 'target') then
+
+		if playerBuffs[spell] and not(UnitExists('target') and UnitIsFriend('player', 'target')) then
 			self:GetCheckedTexture():SetVertexColor(0, 1, 0)
 			return true
 		end
@@ -617,101 +618,121 @@ end
 --range check/flash and buff updating
 do
 	local f = CreateFrame('Frame')
+	local newVals = {} --store new info in here
 
 	--clear a table, returning true if there was stuff to clear
-	local function ClearTable(tbl)
-		if next(tbl) then
-			for i in pairs(tbl) do
-				tbl[i] = nil
+	local function ClearTable(t)
+		if next(t) then
+			for i in pairs(t) do
+				t[i] = nil
 			end
 			return true
 		end
 	end
 
-	--remove any values from old that are not in new
-	--return true if something was removed from the old set
-	local function RemoveOldVals(old, new)
+	--remove any values from t that are not in toClone
+	--adds any values from tableToClone that are not in t
+	--requires that both tables be using the same key value pairs
+	local function CloneTable(t, toClone)
 		local changed = false
-		for i in pairs(old) do
-			local found = false
-			for j in pairs(new) do
-				if i == j then
-					found = true
-					break
-				end
-			end
-			if not found then
-				old[i] = nil
+
+		for i in pairs(t) do
+			if not toClone[i] then
+				t[i] = nil
 				changed = true
 			end
 		end
+
+		for i,v in pairs(toClone) do
+			if not t[i] then
+				t[i] = v
+				changed = true
+			end
+		end
+
 		return changed
 	end
 
-	--triggers an update whenever a target gains or loses a buff or debuff
-	function f:UpdateTargetBuffs()
-		local changed = false
-		ClearTable(targetBuffs)
-		ClearTable(targetDebuffs)
+	local function UpdateFriendlyTargetBuffs()
+		--friendly target, clear target debuffs
+		if ClearTable(targetDebuffs) then
+			changed = true
+		end
 
-		--update buffs on friendly targets
+		--clear the new vals table
+		ClearTable(newVals)
+
+		--add all target buffs into newVals
+		local i = 1
+		local buff
+		repeat
+			buff = UnitBuff('target', i)
+			if buff then
+				newVals[buff] = true
+			end
+			i = i + 1
+		until not buff
+
+		--set changed to true if the target buffs table has changed
+		if CloneTable(targetBuffs, newVals) then
+			changed = true
+		end
+
+		return changed
+	end
+
+	local function UpdateEnemyTargetDebuffs()
+		--enemy target, clear target buffs
+		if ClearTable(targetBuffs) then
+			changed = true
+		end
+
+		--clear the new vals table
+		ClearTable(newVals)
+
+		--update debuffs on enemy targets
+		local i = 1
+		local buff, cooldown, _
+		repeat
+			buff, _, _, _, _, cooldown = UnitDebuff('target', i)
+			if buff and cooldown then
+				newVals[buff] = true
+			end
+			i = i + 1
+		until not buff
+
+		--set changed to true if the target debuffs table has changed
+		if CloneTable(targetDebuffs, newVals) then
+			changed = true
+		end
+
+		return changed
+	end
+
+	local function ClearTargetBuffsAndDebuffs()
+		local changed = false
+
+		if ClearTable(targetBuffs) then
+			changed = true
+		end
+
+		if ClearTable(targetDebuffs) then
+			changed = true
+		end
+
+		return changed
+	end
+
+	function f:UpdateTargetBuffs()
+		local changed
 		if UnitExists('target') then
 			if UnitIsFriend('player', 'target') then
-				--friendly target, clear target debuffs
-				if ClearTable(oldTargetDebuffs) then
-					changed = true
-				end
-
-				local i = 1
-				local buff
-				repeat
-					buff = UnitBuff('target', i)
-					if buff then
-						targetBuffs[buff] = true
-						if not oldTargetBuffs[buff] then
-							changed = true
-						end
-					end
-					i = i + 1
-				until not buff
-
-				--remove any values of the old set from the new set
-				if RemoveOldVals(oldTargetBuffs, targetBuffs) then
-					changed = true
-				end
+				changed = UpdateFriendlyTargetBuffs()
 			else
-				--enemy target, clear target buffs
-				if ClearTable(oldTargetBuffs) then
-					changed = true
-				end
-
-				--update debuffs on enemy targets
-				local i = 1
-				local buff, cooldown, _
-				repeat
-					buff, _, _, _, _, cooldown = UnitDebuff('target', i)
-					if buff and cooldown then
-						targetDebuffs[buff] = true
-						if not oldTargetDebuffs[buff] then
-							changed = true
-						end
-					end
-					i = i + 1
-				until not buff
-
-				--remove any values that aren't in the new set from the old set
-				if RemoveOldVals(oldTargetDebuffs, targetDebuffs) then
-					changed = true
-				end
+				changed = UpdateEnemyTargetDebuffs()
 			end
 		else
-			--no target, so no buffs or debuffs
-			if ClearTable(oldTargetBuffs) then
-				changed = true
-			end
-			if ClearTable(oldTargetDebuffs) then
-				changed = true
-			end
+			changed = ClearTargetBuffsAndDebuffs()
 		end
 
 		--if change, mark for updating
@@ -720,26 +741,21 @@ do
 		end
 	end
 
-	--triggers an update whenever the player gains or loses a buff
 	function f:UpdatePlayerBuffs()
 		local changed = true
-		ClearTable(playerBuffs)
+		ClearTable(newVals)
 
 		local buff
 		local i = 1
 		repeat
 			buff = UnitBuff('player', i)
 			if buff then
-				playerBuffs[buff] = true
-				if not oldPlayerBuffs[buff] then
-					changed = true
-				end
+				newVals[buff] = true
 			end
 			i = i + 1
 		until not buff
 
-		--go through all the old buffs, removing any that are no longer on the player
-		if RemoveOldVals(oldPlayerBuffs, playerBuffs) then
+		if CloneTable(playerBuffs, newVals) then
 			changed = true
 		end
 
