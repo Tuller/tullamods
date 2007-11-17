@@ -1,5 +1,12 @@
 #summary Version History for Bongos2
 
+1.9.5
+  * All: Fixed issues with the French translation
+  * Action Bar: Fixed the error when learning a new skill (for real this time)
+  * Action Bar: Fixed some bugs with the buff and debuff highlighting code
+  * Action Bar: Removed a source of taint from the unregistration code
+  * Cast Bar: Fixed an issue causing the bar color to be red, even when not interrupted
+
 1.9.4
   * Action Bar: Fixed the error when training a new skill
   * Action Bar: Made buff and debuff highlighting work on a few more things
