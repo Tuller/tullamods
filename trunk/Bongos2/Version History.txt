@@ -5,6 +5,7 @@ All: Fixed issues with the French translation
 ActionBar: Fixed the error when learning a new skill (for real this time)
 ActionBar: Fixed some bugs with the buff and debuff highlighting code
 ActionBar: Removed a source of taint from the unregistration code
+CastBar: Fixed an issue causing the bar color to be red, even when not interrupted
 
 1.9.4
 ActionBar: Fixed the error when training a new skill
