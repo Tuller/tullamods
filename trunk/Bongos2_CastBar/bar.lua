@@ -120,7 +120,6 @@ local function CastingBar_Create(parent)
 	bar.AdjustWidth = CastingBar_AdjustWidth
 
 	bar:SetScript("OnUpdate", CastingBar_OnUpdate)
-	bar:RegisterEvent("UNIT_SPELLCAST_SENT")
 
 	return bar
 end
