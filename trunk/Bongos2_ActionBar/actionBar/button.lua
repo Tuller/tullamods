@@ -656,13 +656,15 @@ do
 	end
 
 	local function UpdateFriendlyTargetBuffs()
+		local changed = false
+		
+		--clear the new vals table
+		ClearTable(newVals)
+
 		--friendly target, clear target debuffs
 		if ClearTable(targetDebuffs) then
 			changed = true
 		end
-
-		--clear the new vals table
-		ClearTable(newVals)
 
 		--add all target buffs into newVals
 		local i = 1
@@ -684,13 +686,15 @@ do
 	end
 
 	local function UpdateEnemyTargetDebuffs()
+		local changed = false
+		
+		--clear the new vals table
+		ClearTable(newVals)
+
 		--enemy target, clear target buffs
 		if ClearTable(targetBuffs) then
 			changed = true
 		end
-
-		--clear the new vals table
-		ClearTable(newVals)
 
 		--update debuffs on enemy targets
 		local i = 1
@@ -717,7 +721,6 @@ do
 		if ClearTable(targetBuffs) then
 			changed = true
 		end
-
 		if ClearTable(targetDebuffs) then
 			changed = true
 		end
@@ -726,7 +729,8 @@ do
 	end
 
 	function f:UpdateTargetBuffs()
-		local changed
+		local changed = false
+
 		if UnitExists('target') then
 			if UnitIsFriend('player', 'target') then
 				changed = UpdateFriendlyTargetBuffs()
@@ -744,7 +748,8 @@ do
 	end
 
 	function f:UpdatePlayerBuffs()
-		local changed = true
+		local changed = false
+
 		ClearTable(newVals)
 
 		local buff
