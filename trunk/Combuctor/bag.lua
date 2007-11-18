@@ -4,6 +4,7 @@
 --]]
 
 CombuctorBag = CombuctorUtil:CreateWidgetClass('Button')
+local L = LibStub('AceLocale-3.0'):GetLocale('Combuctor')
 
 local SIZE = 30
 local NORMAL_TEXTURE_SIZE = 64 * (SIZE/36)
@@ -276,7 +277,7 @@ function CombuctorBag:OnEnter()
 		GameTooltip:SetText(BACKPACK_TOOLTIP, 1, 1, 1)
 	--bank specific code
 	elseif bagID == BANK_CONTAINER then
-		GameTooltip:SetText('Bank', 1, 1, 1)
+		GameTooltip:SetText(L.Bank, 1, 1, 1)
 	--keyring specific code...again
 	elseif bagID == KEYRING_CONTAINER then
 		GameTooltip:SetText(KEYRING, 1, 1, 1)
@@ -305,7 +306,7 @@ function CombuctorBag:OnEnter()
 		if not GameTooltip:SetInventoryItem('player', CombuctorUtil:GetInvSlot(bagID)) then
 			if bagID > (GetNumBankSlots() + 4) then
 				GameTooltip:SetText(BANK_BAG_PURCHASE, 1, 1, 1)
-				GameTooltip:AddLine('Click to purchase')
+				GameTooltip:AddLine(L.ClickToPurchase)
 				SetTooltipMoney(GameTooltip, GetBankSlotCost(GetNumBankSlots()))
 			else
 				GameTooltip:SetText(EQUIP_CONTAINER, 1, 1, 1)

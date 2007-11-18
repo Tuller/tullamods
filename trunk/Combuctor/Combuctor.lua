@@ -6,7 +6,12 @@
 Combuctor = LibStub('AceAddon-3.0'):NewAddon('Combuctor', 'AceEvent-3.0', 'AceConsole-3.0')
 Combuctor:SetDefaultModuleLibraries('AceEvent-3.0')
 
-local L = COMBUCTOR_LOCALS
+local L = LibStub('AceLocale-3.0'):GetLocale('Combuctor')
+
+--set the binding name stuff here, since its mostly locale independent
+BINDING_HEADER_COMBUCTOR = "Combuctor"
+BINDING_NAME_COMBUCTOR_TOGGLE_INVENTORY = L.ToggleInventory
+BINDING_NAME_COMBUCTOR_TOGGLE_BANK = L.ToggleBank
 
 function Combuctor:OnEnable()
 	CombuctorDB = CombuctorDB or {

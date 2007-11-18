@@ -4,6 +4,7 @@
 --]]
 
 CombuctorMoneyFrame = {}
+local L = LibStub('AceLocale-3.0'):GetLocale('Combuctor')
 
 function CombuctorMoneyFrame:Create(parent)
 	local frame = CreateFrame('Frame', parent:GetName() .. 'MoneyFrame', parent, 'SmallMoneyFrameTemplate')
@@ -51,7 +52,7 @@ end
 function CombuctorMoneyFrame:OnEnter()
 	if BagnonDB then
 		GameTooltip:SetOwner(self, 'ANCHOR_TOPRIGHT')
-		GameTooltip:SetText(format('Total on %s', GetRealmName()))
+		GameTooltip:SetFormattedText(L.TotalOnRealm, GetRealmName())
 
 		local money = 0
 		for player in BagnonDB:GetPlayers() do

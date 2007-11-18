@@ -246,7 +246,7 @@ function CombuctorItem:OnEnter()
 		if bag == BANK_CONTAINER then
 			if self.hasItem then
 				self:AnchorTooltip()
-				GameTooltip:SetInventoryItem("player", BankButtonIDToInvSlotID(slot))
+				GameTooltip:SetInventoryItem('player', BankButtonIDToInvSlotID(slot))
 				GameTooltip:Show()
 			end
 		else

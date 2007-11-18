@@ -3,7 +3,7 @@
 		A combuctor frame
 --]]
 
-local L = COMBUCTOR_LOCALS
+local L = LibStub('AceLocale-3.0'):GetLocale('Combuctor')
 local ITEM_FRAME_WIDTH = 312
 local BANK_FRAME_WIDTH = 568
 local ITEM_FRAME_HEIGHT = 346
@@ -277,7 +277,7 @@ end
 
 --title stuff
 function InventoryFrame:UpdateTitleText()
-	self.title:SetText(self.titleText:format(self:GetPlayer()))
+	self.title:SetFormattedText(self.titleText, self:GetPlayer())
 end
 
 --player filtering
