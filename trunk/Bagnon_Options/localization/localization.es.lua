@@ -1,5 +1,6 @@
 ﻿--[[
 	Bagnon Main Options Localization file
+	By Ferroginus (Zul'Jin)
 --]]
 
 if GetLocale() == "esES" then
@@ -7,15 +8,15 @@ if GetLocale() == "esES" then
 
 	L.Title = "Opciones de Bagnon"
 
-	L.ShowOwners = "Show Item Owners"
+	L.ShowOwners = "Mostrar poseedores"
 	L.ShowBorders = "Resaltar calidad de objetos"
 
-	L.ReplaceBags = "Replace Bags"
-	L.ReplaceBank = "Replace Bank"
-	L.ReuseFrames = "Reuse Blizzard Frames"
+	L.ReplaceBags = "Sustituir Bolsas"
+	L.ReplaceBank = "Sustiruir Banco"
+	L.ReuseFrames = "Reusar Marcos de Blizzard"
 
 	L.Show = "Mostrar"
-	L.Bags = "Bolsos"
+	L.Bags = "Bolsas"
 	L.Bank = "Banco"
 
 	L.AtBank = "En el Banco"
