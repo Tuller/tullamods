@@ -8,4 +8,5 @@
 localization\localization.lua
 localization\localization.cn.lua
 localization\localization.fr.lua
+localization\localization.es.lua
 bar.xml
