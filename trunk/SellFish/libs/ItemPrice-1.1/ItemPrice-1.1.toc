@@ -1,4 +1,4 @@
-## Interface: 20200
+## Interface: 20300
 ## LoadOnDemand: 1
 ## Title: Lib: ItemPrice-1.1
 ## Notes: Library with vendor sell prices for items.
