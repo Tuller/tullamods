@@ -13,18 +13,18 @@ BINDING_NAME_BAGNON_TOGGLE = "Activar Inventario"
 BINDING_NAME_BANKNON_TOGGLE = "Activar Banco"
 
 --system messages
-L.NewUser = "New user detected, default settings loaded"
+L.NewUser = "Nuevo usuario detectado, cargando opciones por defecto"
 L.Updated = "Opciones de Bagnon actualizadas a v%s"
-L.UpdatedIncompatible = "Updating from an incompatible version, defaults loaded"
+L.UpdatedIncompatible = "Actualizando desde una versión incompatible, cargando opciones por defecto"
 
 --errors
-L.ErrorNoSavedBank = "Cannot open the bank, no saved information available"
+L.ErrorNoSavedBank = "No se puede abrir el banco, no hay datos disponibles"
 
 --slash commands
-L.Commands = "Commands:"
-L.ShowMenuDesc = "Shows the options menu"
-L.ShowBagsDesc = "Toggles the inventory frame"
-L.ShowBankDesc = "Toggles the bank frame"
+L.Commands = "Comandos:"
+L.ShowMenuDesc = "Muestra el Menú"
+L.ShowBagsDesc = "Activa el inventario"
+L.ShowBankDesc = "Activa el banco"
 
 --frame text
 L.TitleBank = "Banco de %s"
@@ -40,9 +40,9 @@ L.TipHideBag = "<Botón IZQ> para esconder"
 L.TipGoldOnRealm = "Total on %s"
 
 --menu text
-L.FrameSettings = "Frame Settings"
+L.FrameSettings = "Opciones del Marco"
 L.Lock = "Bloquear posición"
-L.Toplevel = "Toplevel"
+L.Toplevel = "Primer plano"
 L.BackgroundColor = "Fondo"
 L.FrameLevel = "Capa"
 L.Opacity = "Opacidad"
