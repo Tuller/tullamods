@@ -52,7 +52,7 @@ end
 function CombuctorMoneyFrame:OnEnter()
 	if BagnonDB then
 		GameTooltip:SetOwner(self, 'ANCHOR_TOPRIGHT')
-		GameTooltip:SetFormattedText(L.TotalOnRealm, GetRealmName())
+		GameTooltip:SetText(format(L.TotalOnRealm, GetRealmName()))
 
 		local money = 0
 		for player in BagnonDB:GetPlayers() do
