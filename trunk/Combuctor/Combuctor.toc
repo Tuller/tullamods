@@ -3,7 +3,7 @@
 ## Author: Tuller
 ## Notes: Pants are a dangerous foe
 ## Version: Alpha.3.0
-## OptionalDeps: LibStub, Ace3, CallbackHandler-1.0, AceAddon-3.0, AceConsole-3.0, AceEvent-3.0, Bagnon_Forever
+## OptionalDeps: LibStub, Ace3, Bagnon_Forever
 ## SavedVariables: CombuctorDB
 embeds.xml
 load.xml
