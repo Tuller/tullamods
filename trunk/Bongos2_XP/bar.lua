@@ -6,8 +6,8 @@
 BongosXP = Bongos:NewModule('Bongos-XP')
 
 local L = BONGOS_LOCALS
-local HORIZONTAL_TEXTURE = 'Interface\\Addons\\Bongos2_XP\\img\\Smooth'
-local VERTICAL_TEXTURE = 'Interface\\Addons\\Bongos2_XP\\img\\SmoothV'
+local HORIZONTAL_TEXTURE = 'Interface\\Addons\\Bongos2_XP\\img\\Armory'
+local VERTICAL_TEXTURE = 'Interface\\Addons\\Bongos2_XP\\img\\ArmoryV'
 
 local XP_FORMAT = '%s / %s'
 local REST_FORMAT = '%s / %s (+%s)'
