@@ -328,4 +328,4 @@ end
 
 SlashCmdList['KeyBoundSlashCOMMAND'] = function() KeyBound:Toggle() end
 SLASH_KeyBoundSlashCOMMAND1 = '/keybound'
-SLASH_KeyBoundSlashCOMMAND1 = '/kb'
+SLASH_KeyBoundSlashCOMMAND2 = '/kb'

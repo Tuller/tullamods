@@ -6,8 +6,9 @@
 ## Author: Tuller
 ## Dependencies: Bongos2
 localization\localization.lua
-localization\localization.cn.lua
+localization\localization.es.lua
 localization\localization.fr.lua
+localization\localization.cn.lua
 keyBound\keyBound.xml
 unreg.lua
 config.lua
