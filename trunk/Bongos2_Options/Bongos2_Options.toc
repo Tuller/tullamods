@@ -9,6 +9,7 @@
 localization\localization.lua
 localization\localization.cn.lua
 localization\localization.fr.lua
+localization\localization.es.lua
 menu.lua
 general.lua
 profiles.lua
