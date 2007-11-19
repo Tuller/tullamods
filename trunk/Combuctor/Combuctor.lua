@@ -86,6 +86,10 @@ function Combuctor:HookBagEvents()
 	OpenBackpack = AutoShowInventory
 	hooksecurefunc('CloseBackpack', AutoHideInventory)
 	--CloseBackpack = AutoHideInventory
+	
+	ToggleBag = function(bag)
+		self:Toggle(bag)
+	end
 
 	ToggleBackpack = function() 
 		self:Toggle(BACKPACK_CONTAINER) 
