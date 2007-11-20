@@ -104,7 +104,7 @@ end
 function MinimapButton:OnUpdate()
 	local mx, my = Minimap:GetCenter()
 	local px, py = GetCursorPosition()
-	local scale = UIParent:GetEffectiveScale()
+	local scale = Minimap:GetEffectiveScale()
 
 	px, py = px / scale, py / scale
 
