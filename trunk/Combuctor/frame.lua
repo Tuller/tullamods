@@ -331,7 +331,7 @@ function InventoryFrame:UpdateBagFrame()
 	end
 
 	if self.sets.showBags then
-		for _,bagID in ipairs(self:GetCurrentBagSet()) do
+		for _,bagID in ipairs(self.sets.bags) do
 			if bagID ~= KEYRING_CONTAINER then
 				local bag = CombuctorBag:Get()
 				bag:Set(self, bagID)
