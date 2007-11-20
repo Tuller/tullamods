@@ -55,31 +55,31 @@ end
 
 function MinimapButton:OnEnter()
 	local L = BONGOS_LOCALS
+	if not self.dragging then
+		GameTooltip:SetOwner(self, 'ANCHOR_TOPRIGHT')
+		GameTooltip:SetText('Bongos2', 1, 1, 1)
 
-	GameTooltip:SetOwner(self, 'ANCHOR_TOPRIGHT')
-	GameTooltip:SetText('Bongos2', 1, 1, 1)
-
-	if not(BongosOptions and BongosOptions:IsShown()) then
-		GameTooltip:AddLine(L.ShowMenuTip)
-	else
-		GameTooltip:AddLine(L.HideMenuTip)
-	end
-
-	if Bongos:IsLocked() then
-		GameTooltip:AddLine(L.UnlockBarsTip)
-	else
-		GameTooltip:AddLine(L.LockBarsTip)
-	end
-
-	if IsAddOnLoaded('Bongos2_ActionBar') then
-		if BongosActionConfig:ButtonsLocked() then
-			GameTooltip:AddLine(L.UnlockButtonsTip)
+		if not(BongosOptions and BongosOptions:IsShown()) then
+			GameTooltip:AddLine(L.ShowMenuTip)
 		else
-			GameTooltip:AddLine(L.LockButtonsTip)
+			GameTooltip:AddLine(L.HideMenuTip)
 		end
-	end
 
-	GameTooltip:Show()
+		if Bongos:IsLocked() then
+			GameTooltip:AddLine(L.UnlockBarsTip)
+		else
+			GameTooltip:AddLine(L.LockBarsTip)
+		end
+
+		if IsAddOnLoaded('Bongos2_ActionBar') then
+			if BongosActionConfig:ButtonsLocked() then
+				GameTooltip:AddLine(L.UnlockButtonsTip)
+			else
+				GameTooltip:AddLine(L.LockButtonsTip)
+			end
+		end
+		GameTooltip:Show()
+	end
 end
 
 function MinimapButton:OnLeave()
@@ -87,12 +87,15 @@ function MinimapButton:OnLeave()
 end
 
 function MinimapButton:OnDragStart()
+	self.dragging = true
 	self:LockHighlight()
 	self.icon:SetTexCoord(0, 1, 0, 1)
 	self:SetScript('OnUpdate', self.OnUpdate)
+	GameTooltip:Hide()
 end
 
 function MinimapButton:OnDragStop()
+	self.dragging = nil
 	self:SetScript('OnUpdate', nil)
 	self.icon:SetTexCoord(0.05, 0.95, 0.05, 0.95)
 	self:UnlockHighlight()

@@ -1,6 +1,7 @@
 Bongos2 Version History
 
 1.9.6
+All: Updated Spanish translation (thanks Ferroginu)
 Core: Recoded the minimap button
 
 1.9.5
