@@ -3,6 +3,7 @@ Bongos2 Version History
 1.9.6
 All: Updated Spanish translation (thanks Ferroginu)
 Core: Recoded the minimap button
+ActionBar: Fixed an updating issue with buff and debuff highlighting code
 
 1.9.5
 All: Fixed issues with the French translation
