@@ -75,28 +75,27 @@ function Combuctor:Toggle(bag, auto)
 end
 
 function Combuctor:HookBagEvents()
-	local AutoShowInventory = function() 
-		self:Show(BACKPACK_CONTAINER, true) 
+	local AutoShowInventory = function()
+		self:Show(BACKPACK_CONTAINER, true)
 	end
-	local AutoHideInventory = function() 
-		self:Hide(BACKPACK_CONTAINER, true) 
+	local AutoHideInventory = function()
+		self:Hide(BACKPACK_CONTAINER, true)
 	end
-	
+
 	--auto magic display code
 	OpenBackpack = AutoShowInventory
 	hooksecurefunc('CloseBackpack', AutoHideInventory)
-	--CloseBackpack = AutoHideInventory
-	
+
 	ToggleBag = function(bag)
 		self:Toggle(bag)
 	end
 
-	ToggleBackpack = function() 
-		self:Toggle(BACKPACK_CONTAINER) 
+	ToggleBackpack = function()
+		self:Toggle(BACKPACK_CONTAINER)
 	end
-	
+
 	ToggleKeyRing = function()
-		self:Toggle(KEYRING_CONTAINER) 
+		self:Toggle(KEYRING_CONTAINER)
 	end
 
 	OpenAllBags = function(force)
@@ -108,8 +107,8 @@ function Combuctor:HookBagEvents()
 	end
 
 	--closing the game menu triggers this function, and can be done in combat,
-	hooksecurefunc('CloseAllBags', function() 
-		self:Hide(BACKPACK_CONTAINER) 
+	hooksecurefunc('CloseAllBags', function()
+		self:Hide(BACKPACK_CONTAINER)
 	end)
 
 	BankFrame:UnregisterAllEvents()
