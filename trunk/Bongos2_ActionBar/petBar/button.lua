@@ -5,14 +5,14 @@
 --]]
 
 BongosPetButton = CreateFrame('CheckButton')
-local Button_mt = {__index = BongosPetButton}
+local Button_MT = {__index = BongosPetButton}
 local petBar = PetActionBarFrame
 
 
 --[[ Constructorish ]]--
 
 function BongosPetButton:Set(id, parent)
-	local button = setmetatable(self:Get(id), Button_mt)
+	local button = setmetatable(self:Get(id), Button_MT)
 	button:SetToplevel(nil)
 	button:SetScripts()
 	button:Style()
@@ -26,8 +26,8 @@ function BongosPetButton:Style()
 	local name = self:GetName()
 
 	local autoCast = getglobal(name .. 'AutoCast')
-	autoCast:SetPoint('TOPLEFT', self, 'TOPLEFT', -0.5, -1)
-	autoCast:SetPoint('BOTTOMRIGHT', self, 'BOTTOMRIGHT', 0.5, -1.5)
+	autoCast:SetPoint('TOPLEFT', -0.5, -1)
+	autoCast:SetPoint('BOTTOMRIGHT', 0.5, -1.5)
 
 	getglobal(name .. 'Icon'):SetTexCoord(0.06, 0.94, 0.06, 0.94)
 	getglobal(name .. 'NormalTexture2'):SetVertexColor(1, 1, 1, 0.5)
