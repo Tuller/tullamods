@@ -343,7 +343,7 @@ function BongosActionButton:UpdateBorder(spell)
 	if spell then
 		if UnitExists('target') then
 			if UnitIsFriend('player', 'target') then
-				if targetBuffs[spell] or playerBuffs[spell] then
+				if targetBuffs[spell] then
 					self:GetCheckedTexture():SetVertexColor(0, 1, 0)
 					return true
 				end
@@ -657,7 +657,7 @@ do
 
 	local function UpdateFriendlyTargetBuffs()
 		local changed = false
-		
+
 		--clear the new vals table
 		ClearTable(newVals)
 
@@ -687,7 +687,7 @@ do
 
 	local function UpdateEnemyTargetDebuffs()
 		local changed = false
-		
+
 		--clear the new vals table
 		ClearTable(newVals)
 
