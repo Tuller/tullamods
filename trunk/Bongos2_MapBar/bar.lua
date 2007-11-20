@@ -224,7 +224,7 @@ function BongosMapBar:Load()
 		showMap = true,
 	}
 
-	local bar = BBar:Create('minimap', Bar_OnCreate, nil, defaults, 'LOW')
+	local bar = BBar:Create('minimap', Bar_OnCreate, nil, defaults, 'BACKGROUND')
 	if not bar:IsUserPlaced() then
 		bar:SetPoint('TOPRIGHT')
 	end
