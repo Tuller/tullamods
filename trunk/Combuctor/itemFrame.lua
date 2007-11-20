@@ -3,7 +3,7 @@
 		The combuctor frame
 --]]
 
-CombuctorItemFrame = Combuctor:NewModule('Combuctor-ItemFrame')
+CombuctorItemFrame = Combuctor:NewModule('ItemFrame')
 CombuctorItemFrame.obj = CombuctorUtil:CreateWidgetClass('Button')
 CombuctorItemFrame.obj:Hide()
 CombuctorItemFrame.obj:SetScript('OnUpdate', function(self) CombuctorItemFrame:LayoutFrames() self:Hide() end)

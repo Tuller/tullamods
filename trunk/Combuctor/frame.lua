@@ -3,17 +3,16 @@
 		A combuctor frame
 --]]
 
-local L = LibStub('AceLocale-3.0'):GetLocale('Combuctor')
-local ITEM_FRAME_WIDTH = 312
-local BANK_FRAME_WIDTH = 568
-local ITEM_FRAME_HEIGHT = 346
-
-CombuctorFrame = Combuctor:NewModule('Combuctor-Frame')
-
+CombuctorFrame = Combuctor:NewModule('Frame')
 --some crazy code, this is used for delayed updates when bag types change because of the possibility of updating in pairs
 CombuctorFrame.obj = CombuctorUtil:CreateWidgetClass('Frame')
 CombuctorFrame.obj:Hide()
 CombuctorFrame.obj:SetScript('OnUpdate', function(self) CombuctorFrame:UpdateBagSets(); self:Hide() end)
+
+local L = LibStub('AceLocale-3.0'):GetLocale('Combuctor')
+local ITEM_FRAME_WIDTH = 312
+local BANK_FRAME_WIDTH = 568
+local ITEM_FRAME_HEIGHT = 346
 
 
 function CombuctorFrame:OnEnable()
