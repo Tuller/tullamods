@@ -23,7 +23,6 @@ function Bongos:Initialize()
 			showMinimap = true,
 			highlightBuffs = true,
 			rangeColor = {r = 1, g = 0.5, b = 0.5},
-			mapx = -24, mapy = -76,
 			bars = {}
 		}
 	}
@@ -88,12 +87,13 @@ function Bongos:UpdateSettings()
 				bagSets.rows = nil
 			end
 		end
-	end
 
-	--remove the old things for selfCast and quickMove (1.8/2.2)
-	self.profile.selfCastKey = nil
-	self.profile.quickMoveKey = nil
-	self.profile.lockButtons = nil
+		sets.selfCastKey = nil
+		sets.quickMoveKey = nil
+		sets.lockButtons = nil
+		sets.mapx = nil
+		sets.mapy = nil
+	end
 
 	--enable lock actionbar (1.8/2.2)
 	LOCK_ACTIONBAR = '1'
@@ -109,7 +109,7 @@ function Bongos:LoadModules()
 		assert(module.Load, format('Bongos Module %s: Missing Load function', name))
 		module:Load()
 	end
-	Bongos:LoadMinimap()
+	Bongos:UpdateMinimapButton()
 	BBar:ForAll('Reanchor')
 end
 
@@ -392,36 +392,30 @@ end
 
 
 --minimap functions
-function Bongos:LoadMinimap()
-	local x, y = Bongos:GetMapCoords()
-	BongosMinimapFrame:ClearAllPoints()
-	BongosMinimapFrame:SetPoint('TOPLEFT', 'Minimap', 'TOPLEFT', x, y)
-
-	if not self:ShowingMinimap() then
-		BongosMinimapFrame:Hide()
-	end
-end
-
 function Bongos:SetShowMinimap(enable)
 	self.profile.showMinimap = enable or false
-	if enable then
-		BongosMinimapFrame:Show()
-	else
-		BongosMinimapFrame:Hide()
-	end
+	self:UpdateMinimapButton()
 end
 
 function Bongos:ShowingMinimap()
 	return self.profile.showMinimap
 end
 
-function Bongos:SetMapCoords(x, y)
-	self.profile.mapx = x
-	self.profile.mapy = y
+function Bongos:UpdateMinimapButton()
+	if self:ShowingMinimap() then
+		BongosMinimapButton:UpdatePosition()
+		BongosMinimapButton:Show()
+	else
+		BongosMinimapButton:Hide()
+	end
 end
 
-function Bongos:GetMapCoords()
-	return self.profile.mapx, self.profile.mapy
+function Bongos:SetMinimapButtonPosition(angle)
+	self.profile.minimapPos = angle
+end
+
+function Bongos:GetMinimapButtonPosition(angle)
+	return self.profile.minimapPos
 end
 
 --utility function: create a widget class

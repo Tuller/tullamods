@@ -1,5 +1,8 @@
 Bongos2 Version History
 
+1.9.6
+Core: Recoded the minimap button
+
 1.9.5
 All: Fixed issues with the French translation
 ActionBar: Fixed the error when learning a new skill (for real this time)

@@ -18,4 +18,4 @@ Bongos.lua
 dragFrame.lua
 bar.lua
 menu.lua
-minimap.xml
+minimap.lua
