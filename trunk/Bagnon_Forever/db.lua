@@ -153,9 +153,10 @@ end
 
 function BagnonDB:BANKFRAME_OPENED()
 	self.atBank = true
-	self:SaveBagAll(BANK_CONTAINER)
+
+	self:UpdateBag(BANK_CONTAINER)
 	for i = 1, GetNumBankSlots() do
-		self:SaveBagAll(i + 4)
+		self:UpdateBag(i + 4)
 	end
 end
 
