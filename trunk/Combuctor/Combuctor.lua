@@ -9,7 +9,7 @@ Combuctor:SetDefaultModuleLibraries('AceEvent-3.0')
 local L = LibStub('AceLocale-3.0'):GetLocale('Combuctor')
 
 --set the binding name stuff here, since its mostly locale independent
-BINDING_HEADER_COMBUCTOR = "Combuctor"
+BINDING_HEADER_COMBUCTOR = 'Combuctor'
 BINDING_NAME_COMBUCTOR_TOGGLE_INVENTORY = L.ToggleInventory
 BINDING_NAME_COMBUCTOR_TOGGLE_BANK = L.ToggleBank
 
@@ -18,7 +18,7 @@ function Combuctor:OnEnable()
 		frames = {
 			inventory = {
 				bags = {-2, 0, 1, 2, 3, 4},
-				position = {'RIGHT', nil, 'RIGHT', 0, 0},
+				position = {'RIGHT'},
 				pushable = 1,
 				showBags = false,
 			},
@@ -133,6 +133,8 @@ function Combuctor:HookBagEvents()
 end
 
 function Combuctor:OnSlashCommand(msg)
+	local msg = msg and msg:lower()
+
 	if msg == 'bank' then
 		self:Toggle(BANK_CONTAINER)
 	elseif msg == 'bags' then
