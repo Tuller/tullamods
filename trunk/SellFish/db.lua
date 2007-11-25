@@ -23,9 +23,7 @@
 	02110-1301, USA.
 --]]
 
-assert('LibStub', 'SellFish requires LibStub')
-
-local ItemPrice, IP_REVISION = LibStub:GetLibrary('ItemPrice-1.1', true)
+local ItemPrice, IP_REVISION = LibStub and LibStub('ItemPrice-1.1', true)
 local CURRENT_VERSION = GetAddOnMetadata('SellFish', 'Version')
 local L = SELLFISH_LOCALS
 
