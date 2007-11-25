@@ -4,10 +4,6 @@
 --]]
 
 CombuctorFrame = Combuctor:NewModule('Frame')
---some crazy code, this is used for delayed updates when bag types change because of the possibility of updating in pairs
-CombuctorFrame.obj = CombuctorUtil:CreateWidgetClass('Frame')
-CombuctorFrame.obj:Hide()
-CombuctorFrame.obj:SetScript('OnUpdate', function(self) CombuctorFrame:UpdateBagSets(); self:Hide() end)
 
 local L = LibStub('AceLocale-3.0'):GetLocale('Combuctor')
 local ITEM_FRAME_WIDTH = 312
@@ -54,6 +50,26 @@ function CombuctorFrame:UpdateBagSets()
 	end
 end
 
+function CombuctorFrame:OnTitleEnter()
+	GameTooltip:SetOwner(self, 'ANCHOR_LEFT')
+	GameTooltip:SetText(self:GetText(), 1, 1, 1)
+	GameTooltip:AddLine('<Alt Left Drag> To Move')
+	GameTooltip:AddLine('<Right Click> To Reset Position')
+	GameTooltip:Show()
+end
+
+function CombuctorFrame:OnBagToggleEnter()
+	GameTooltip:SetOwner(self, 'ANCHOR_LEFT')
+
+	GameTooltip:SetText('Bags', 1, 1, 1)
+	GameTooltip:AddLine('<Left Click> To Toggle Showing Bags')
+	if self:GetParent().isBank then
+		GameTooltip:AddLine('<Right Click> To Toggle the Inventory Frame')
+	else
+		GameTooltip:AddLine('<Right Click> To Toggle the Bank Frame')
+	end
+	GameTooltip:Show()
+end
 
 --[[
 	Quality Filter Widget
@@ -62,78 +78,74 @@ end
 
 local QualityFilter = {}
 do
+	local SIZE = 20
+
 	function QualityFilter:Create(parent)
 		local f = CreateFrame('Frame', nil, parent)
-		local size = 20
+		f.UpdateHighlight = self.UpdateHighlight
 
 		local prev
 		for i = -1, 5 do
 			local button = CreateFrame('Button', nil, f, 'UIRadioButtonTemplate')
+			button:SetWidth(SIZE); button:SetHeight(SIZE)
+			button:SetScript('OnClick', self.OnButtonClick)
+			button:SetScript('OnEnter', self.OnButtonEnter)
+			button:SetScript('OnLeave', self.OnButtonLeave)
+
 			if i > -1 then
 				local bg = button:CreateTexture(nil, 'BACKGROUND')
-				bg:SetWidth(size/2)
-				bg:SetHeight(size/2)
+				bg:SetWidth(SIZE/2); bg:SetHeight(SIZE/2)
 				bg:SetPoint('CENTER')
-
-				local r,g,b = GetItemQualityColor(i)
-				bg:SetTexture(r,g,b)
+				bg:SetTexture(GetItemQualityColor(i))
 				button.bg = bg
+				button.quality = i
 			end
-
-			button:SetScript('OnClick', self.OnClick)
-			button:SetScript('OnEnter', self.OnEnter)
-			button:SetScript('OnLeave', self.OnLeave)
-			button:SetWidth(size); button:SetHeight(size)
-			button:SetID(i)
 
 			if prev then
 				button:SetPoint('LEFT', prev, 'RIGHT', 1, 0)
-				if button.bg then
-					button.bg:SetAlpha(0.5)
-				end
 			else
 				button:SetPoint('LEFT')
-				button:GetNormalTexture():SetVertexColor(1, 1, 0)
-				button:LockHighlight()
 			end
 			prev = button
 		end
 
-		f:SetWidth(size * 5)
-		f:SetHeight(size)
+		f:SetWidth(SIZE * 5); f:SetHeight(SIZE)
+		f:UpdateHighlight()
 
 		return f
 	end
 
-	function QualityFilter:OnClick()
-		local id = self:GetID()
-		local quality = (id >= 0 and id) or nil
+	function QualityFilter:UpdateHighlight()
+		local quality = self:GetParent().filter.quality
 
-		self:GetParent():GetParent().itemFrame:SetFilter('quality', quality)
-
-		for i = 1, select('#', self:GetParent():GetChildren()) do
-			local child = select(i, self:GetParent():GetChildren())
-			if child == self then
-				child:GetNormalTexture():SetVertexColor(1, 0.82, 0)
-				child:LockHighlight()
+		for i = 1, select('#', self:GetChildren()) do
+			local child = select(i, self:GetChildren())
+			if child.quality == quality then
 				if child.bg then
 					child.bg:SetAlpha(1)
 				end
+				child:GetNormalTexture():SetVertexColor(1, 0.82, 0)
+				child:LockHighlight()
 			else
-				child:GetNormalTexture():SetVertexColor(1, 1, 1)
-				child:UnlockHighlight()
 				if child.bg then
 					child.bg:SetAlpha(0.5)
 				end
+				child:GetNormalTexture():SetVertexColor(1, 1, 1)
+				child:UnlockHighlight()
 			end
 		end
 	end
 
-	function QualityFilter:OnEnter()
+	function QualityFilter:OnButtonClick()
+		self:GetParent():GetParent():SetFilter('quality', self.quality, true)
+		self:GetParent():UpdateHighlight()
+	end
+
+	function QualityFilter:OnButtonEnter()
 		GameTooltip:SetOwner(self, 'ANCHOR_RIGHT')
 
-		local quality = self:GetID()
-		if quality > -1 then
+		local quality = self.quality
+		if quality then
 			local r,g,b = GetItemQualityColor(quality)
 			GameTooltip:SetText(getglobal(format('ITEM_QUALITY%d_DESC', quality)), r, g, b)
 		else
@@ -143,7 +155,7 @@ do
 		GameTooltip:Show()
 	end
 
-	function QualityFilter:OnLeave()
+	function QualityFilter:OnButtonLeave()
 		GameTooltip:Hide()
 	end
 end
@@ -156,16 +168,10 @@ end
 
 local TypeFilter = {}
 do
-	local types
-	if GetBuildInfo() == '2.2.3' then
-		local weapon, armor, _, consumable, trade, _, _, _, _, _, misc = GetAuctionItemClasses()
-		types = {ALL, weapon, armor, L.Quest, consumable, trade, misc}
-	else
-		local weapon, armor, _, consumable, trade, _, _, _, _, misc, quest = GetAuctionItemClasses()
-		types = {ALL, weapon, armor, quest, consumable, trade, misc}
-	end
+	local weapon, armor, _, consumable, trade, _, _, _, _, misc, quest = GetAuctionItemClasses()
+	local types = {ALL, weapon, armor, quest, consumable, trade, misc}
 
-	local typeIcons = {
+	local icons = {
 		'Interface/Icons/INV_Misc_EngGizmos_17',
 		'Interface/Icons/INV_Sword_23',
 		'Interface/Icons/INV_Chest_Chain_04',
@@ -178,49 +184,52 @@ do
 	local nextID = 0
 	function TypeFilter:Create(parent)
 		local f = CreateFrame('Frame', nil, parent)
+		f.UpdateHighlight = self.UpdateHighlight
 
 		local prev
 		for i,type in ipairs(types) do
 			local button = CreateFrame('CheckButton', format('CombuctorItemFilter', nextID), f, 'SpellBookSkillLineTabTemplate')
-			button:SetNormalTexture(typeIcons[i])
+			button:SetNormalTexture(icons[i])
 			button:GetNormalTexture():SetTexCoord(0.06, 0.94, 0.06, 0.94)
-			button:SetScript('OnClick', self.OnClick)
-			button:SetScript('OnEnter', self.OnEnter)
-			button:SetScript('OnLeave', self.OnLeave)
+			button:SetScript('OnClick', self.OnButtonClick)
+			button:SetScript('OnEnter', self.OnButtonEnter)
+			button:SetScript('OnLeave', self.OnButtonLeave)
 			button:Show()
-
-			if type ~= 'All' then
-				button.type = (type ~= 'All' and type) or nil
-			end
+			button.type = (type ~= ALL and type) or nil
 
 			if prev then
 				button:SetPoint('TOPLEFT', prev, 'BOTTOMLEFT', 0, -17)
 			else
 				button:SetPoint('TOPLEFT', parent, 'TOPRIGHT', -32, -65)
-				button:SetChecked(true)
 			end
 			prev = button
 		end
 
+		f:UpdateHighlight()
 		return f
 	end
 
-	function TypeFilter:OnClick()
-		self:GetParent():GetParent().itemFrame:SetFilter('type', self.type)
+	function TypeFilter:UpdateHighlight()
+		local type = self:GetParent().filter.type
 
-		for i = 1, select('#', self:GetParent():GetChildren()) do
-			local child = select(i, self:GetParent():GetChildren())
-			child:SetChecked(child == self)
+		for i = 1, select('#', self:GetChildren()) do
+			local child = select(i, self:GetChildren())
+			child:SetChecked(child.type == type)
 		end
 	end
 
-	function TypeFilter:OnEnter()
+	function TypeFilter:OnButtonClick()
+		self:GetParent():GetParent():SetFilter('type', self.type, true)
+		self:GetParent():UpdateHighlight()
+	end
+
+	function TypeFilter:OnButtonEnter()
 		GameTooltip:SetOwner(self, 'ANCHOR_RIGHT')
 		GameTooltip:SetText(self.type or ALL)
 		GameTooltip:Show()
 	end
 
-	function TypeFilter:OnLeave()
+	function TypeFilter:OnButtonLeave()
 		GameTooltip:Hide()
 	end
 end
@@ -229,6 +238,14 @@ end
 --[[
 	Inventory Frame Widget
 --]]
+
+--some crazy code, this is used for delayed updates when bag types change because of the possibility of updating in pairs
+CombuctorFrame.obj = CombuctorUtil:CreateWidgetClass('Frame')
+CombuctorFrame.obj:Hide()
+CombuctorFrame.obj:SetScript('OnUpdate', function(self)
+	CombuctorFrame:UpdateBagSets()
+	self:Hide()
+end)
 
 local InventoryFrame = CombuctorFrame.obj
 
@@ -248,10 +265,13 @@ function InventoryFrame:Create(titleText, settings, isBank)
 	f.bagButtons = {}
 	f.bagSets = {}
 	f.tabs = {}
+	f.filter = {}
 
 	f.title = getglobal(f:GetName() .. 'Title')
 
 	f.typeFilter = TypeFilter:Create(f)
+
+	f.nameFilter = getglobal(f:GetName() .. 'Search')
 
 	f.qualityFilter = QualityFilter:Create(f)
 	f.qualityFilter:SetPoint('BOTTOMLEFT', 24, 65)
@@ -384,7 +404,9 @@ local BAG_SETS = {
 function InventoryFrame:GenerateBagSets()
 	--clear out all of the old bag sets
 	for _,bags in pairs(self.bagSets) do
-		for i in pairs(bags) do bags[i] = nil end
+		for i in pairs(bags) do
+			bags[i] = nil
+		end
 	end
 
 	--iterate through all bags, adding each to the appropiate bag set
@@ -480,6 +502,7 @@ function InventoryFrame:SetPanel(id, forceUpdate)
 	if self:GetSelectedTab() ~= id or forceUpdate then
 		PanelTemplates_SetTab(self, id)
 
+		self:ClearFilters()
 		self:UpdateBagFrame()
 		self.itemFrame:SetBags(self:GetCurrentBagSet())
 	end
@@ -597,8 +620,47 @@ function InventoryFrame:LoadPosition()
 		self:SetUserPlaced(false)
 		self:SetAttribute('UIPanelLayout-enabled', true)
 	end
+
 	if self:IsShown() then
 		HideUIPanel(self)
 		ShowUIPanel(self)
+	end
+end
+
+
+--[[ Filtering ]]--
+
+function InventoryFrame:SetFilter(key, value, update)
+	if self.filter[key] ~= value then
+		self.filter[key] = value
+
+		if key == 'quality' then
+			self.qualityFilter:UpdateHighlight()
+		end
+		if key == 'type' then
+			self.typeFilter:UpdateHighlight()
+		end
+		if update then
+			self.itemFrame:Regenerate()
+		end
+	end
+end
+
+--reset all filters
+function InventoryFrame:ClearFilters(update)
+	local f = self.filter
+	if next(f) then
+		for k in pairs(f) do
+			f[k] = nil
+		end
+
+		if update then
+			self.itemFrame:Regenerate()
+		end
+
+		self.nameFilter:ClearFocus()
+		self.nameFilter:SetText(SEARCH)
+		self.qualityFilter:UpdateHighlight()
+		self.typeFilter:UpdateHighlight()
 	end
 end

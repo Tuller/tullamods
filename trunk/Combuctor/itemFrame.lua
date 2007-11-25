@@ -109,7 +109,7 @@ function ItemFrame:Create(parent)
 	f:SetParent(parent)
 	f.items = {}
 	f.bags = {}
-	f.filter = {}
+	f.filter = parent.filter
 	f.count = 0
 
 	f:RegisterForClicks('anyUp')
@@ -128,27 +128,6 @@ end
 
 function ItemFrame:UpdateListening()
 	listeners[self] = self:IsVisible()
-end
-
-
---[[ Filtering Code ]]--
-
-function ItemFrame:SetFilter(key, value)
-	if self.filter[key] ~= value then
-		self.filter[key] = value
-		self:Regenerate()
-	end
-end
-
---reset all filters
-function ItemFrame:ResetFilters()
-	local f = self.filter
-	if next(f) then
-		for k in pairs(f) do
-			f[k] = nil
-		end
-		self:Regenerate()
-	end
 end
 
 

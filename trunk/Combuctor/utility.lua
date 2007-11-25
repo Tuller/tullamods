@@ -3,29 +3,24 @@
 		A library of functions for accessing bag data
 --]]
 
-CombuctorUtil = {}
+CombuctorUtil = CreateFrame('Frame')
+CombuctorUtil:SetScript('OnEvent', function(self, event)
+	self.atBank = (event == 'BANKFRAME_OPENED')
+end)
+CombuctorUtil:RegisterEvent('BANKFRAME_OPENED')
+CombuctorUtil:RegisterEvent('BANKFRAME_CLOSED')
 
 local currentPlayer = UnitName('player')
 local typeContainer = select(3, GetAuctionItemClasses())
 local typeQuiver = select(7, GetAuctionItemClasses())
-local subTypeBag = select(1, GetAuctionItemSubClasses(3))
+local subTypeBag = GetAuctionItemSubClasses(3)
 local subTypeSoulBag = select(2, GetAuctionItemSubClasses(3))
-local atBank = false
-
-do
-	local f = CreateFrame('Frame')
-	f:SetScript('OnEvent', function(self, event)
-		atBank = (event == 'BANKFRAME_OPENED')
-	end)
-	f:RegisterEvent('BANKFRAME_OPENED')
-	f:RegisterEvent('BANKFRAME_CLOSED')
-end
 
 
 --[[ Bank ]]--
 
 function CombuctorUtil:AtBank()
-	return atBank
+	return self.atBank
 end
 
 
