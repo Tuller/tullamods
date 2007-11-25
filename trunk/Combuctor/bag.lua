@@ -65,8 +65,7 @@ function CombuctorBag:Get()
 end
 
 function CombuctorBag:Set(parent, id)
-	self:SetID(id)
-	self:SetParent(parent)
+	self:SetID(id); self:SetParent(parent)
 
 	if id == BACKPACK_CONTAINER or id == BANK_CONTAINER then
 		SetItemButtonTexture(self, 'Interface/Buttons/Button-Backpack-Up')
@@ -165,10 +164,10 @@ function CombuctorBag:UpdateTexture()
 
 		if CombuctorUtil:IsCachedBag(bagID, player) then
 			if BagnonDB then
-				local link, count = select(2, BagnonDB:GetBagData(self:GetID(), player))
+				local link, count, texture = select(2, BagnonDB:GetBagData(self:GetID(), player))
 				if link then
 					self.hasItem = true
-					SetItemButtonTexture(self, select(10, GetItemInfo(link)))
+					SetItemButtonTexture(self, texture)
 					SetItemButtonTextureVertexColor(self, 1, 1, 1)
 				else
 					SetItemButtonTexture(self, 'Interface/PaperDoll/UI-PaperDoll-Slot-Bag')
@@ -210,18 +209,14 @@ end
 
 function CombuctorBag:SetCount(count)
 	local text = getglobal(self:GetName() .. 'Count')
-	if self:GetID() > 0 then
-		local count = count or 0
-		if count > 1 then
-			if count > 999 then
-				text:SetText(format('%.1fk', count/1000))
-			else
-				text:SetText(count)
-			end
-			text:Show()
+	local count = count or 0
+	if count > 1 then
+		if count > 999 then
+			text:SetFormattedText('%.1fk', count/1000)
 		else
-			text:Hide()
+			text:SetText(count)
 		end
+		text:Show()
 	else
 		text:Hide()
 	end
@@ -234,8 +229,9 @@ function CombuctorBag:OnClick(button)
 	local parent = self:GetParent()
 	local player = parent:GetPlayer()
 	local bagID = self:GetID()
+	local link = CombuctorUtil:GetBagLink(bagID, player)
 
-	if not CombuctorUtil:IsCachedBag(bagID, player) then
+	if not((link and HandleModifiedItemClick(link)) or CombuctorUtil:IsCachedBag(bagID, player)) then
 		if CursorHasItem() and not CombuctorUtil:IsCachedBag(bagID, player) then
 			if bagID == KEYRING_CONTAINER then
 				PutKeyInKeyRing()
@@ -314,7 +310,7 @@ function CombuctorBag:OnEnter()
 		end
 	end
 	GameTooltip:Show()
-	
+
 	self:GetParent().itemFrame:HighlightBag(bagID)
 end
 CombuctorBag.UpdateTooltip = CombuctorBag.OnEnter
