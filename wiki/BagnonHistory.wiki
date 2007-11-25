@@ -2,6 +2,11 @@
 
 = Bagnon Version History =
 
+1.4.9
+  * Fixed some errors causing Bagnon_Forever to not load properly
+  * Updated the esES translation (thanks Ferroginus)
+  * Minor tweaks
+
 1.4.8
   * Removed the errant tooltips.lua from the Bagnon toc
   * Removed a source of taint from the CloseAllBags hook
