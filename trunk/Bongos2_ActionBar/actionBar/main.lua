@@ -7,7 +7,7 @@ local DEFAULT_NUM_ACTIONBARS = 10
 local actions = {}
 
 function BongosActionBar:Load()
-	for i = 1, 120 do
+	for i = 1, BONGOS_MAX_BUTTONS do
 		actions[i] = HasAction(i)
 	end
 	for i = 1, self:GetNumber() do
@@ -123,7 +123,7 @@ function BongosActionBar:SetNumber(newSize)
 end
 
 function BongosActionBar:GetNumber()
-	return Bongos.profile.numActionBars or 10
+	return Bongos.profile.numActionBars or DEFAULT_NUM_ACTIONBARS
 end
 
 --converts BActionButton and ActionButton bindings to their proper bongos bars, inspired from Bartender3

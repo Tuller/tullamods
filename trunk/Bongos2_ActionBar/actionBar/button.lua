@@ -38,7 +38,7 @@ function BongosActionButton:Create(id)
 	button.normal:SetVertexColor(1, 1, 1, 0.5)
 
 	button.cooldown = _G[name .. 'Cooldown']
-	button.cooldown:SetFrameLevel(button.cooldown:GetFrameLevel() - 1)
+	button.cooldown:SetFrameLevel(max(button.cooldown:GetFrameLevel() - 1, 0))
 
 	button.flash = _G[name .. 'Flash']
 	button.hotkey = _G[name .. 'HotKey']
