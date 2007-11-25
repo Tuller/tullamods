@@ -205,7 +205,7 @@ function CombuctorItem:UpdateCooldown()
 	if (not self.cached) and self.hasItem then
 		local start, duration, enable = GetContainerItemCooldown(self:GetBag(), self:GetID())
 		CooldownFrame_SetTimer(self.cooldown, start, duration, enable)
-	else
+	elseif self.cooldown:IsShown() then
 		CooldownFrame_SetTimer(self.cooldown, 0, 0, 0)
 	end
 end
