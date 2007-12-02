@@ -121,10 +121,10 @@ function XPBar:UpdateExperience()
 		local rest = GetXPExhaustion()
 		if rest then
 			self:SetValue(value + rest)
-			self.text:SetText(REST_FORMAT:format(value, max, rest))
+			self.text:SetFormattedText(REST_FORMAT, value, max, rest)
 		else
 			self:SetValue(0)
-			self.text:SetText(XP_FORMAT:format(value, max))
+			self.text:SetFormattedText(XP_FORMAT, value, max)
 		end
 	end
 end
@@ -141,8 +141,7 @@ function XPBar:UpdateReputation()
 		self:SetValue(value)
 
 		local repLevel = getglobal("FACTION_STANDING_LABEL" .. reaction)
-
-		self.text:SetText(REP_FORMAT:format(name, value, max, repLevel))
+		self.text:SetFormattedText(REP_FORMAT, name, value, max, repLevel)
 	else
 		self:WatchExperience()
 	end
