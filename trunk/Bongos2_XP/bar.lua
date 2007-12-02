@@ -108,7 +108,7 @@ function XPBar:WatchReputation()
 end
 
 function XPBar:UpdateExperience()
-	if GetWatchedFactionInfo() then
+	if GetWatchedFactionInfo() and not self.sets.alwaysShowXP then
 		self:WatchReputation()
 	else
 		local value = UnitXP('player')
@@ -149,7 +149,7 @@ function XPBar:UpdateReputation()
 end
 
 function XPBar:Update()
-	if GetWatchedFactionInfo() then
+	if GetWatchedFactionInfo() and not self.sets.alwaysShowXP then
 		self:WatchReputation()
 	else
 		self:WatchExperience()
@@ -228,6 +228,17 @@ local function Bar_CreateMenu(frame)
 	alwaysShowText:SetScript('OnClick', function(self)
 		frame.sets.alwaysShowText = self:GetChecked() and 1 or nil
 		frame.xp:UpdateText()
+	end)
+	
+	--always show experience
+	local alwaysShowXP = panel:AddCheckButton(L.AlwaysShowXP)
+	alwaysShowXP:SetScript('OnShow', function(self)
+		self:SetChecked(frame.sets.alwaysShowXP)
+	end)
+
+	alwaysShowXP:SetScript('OnClick', function(self)
+		frame.sets.alwaysShowXP = self:GetChecked() and 1 or nil
+		frame.xp:Update()
 	end)
 
 	--vertical orientation slider
