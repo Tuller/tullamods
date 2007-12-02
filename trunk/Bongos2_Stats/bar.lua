@@ -3,7 +3,7 @@
 		A movable memory, latency and fps display for Bongos
 --]]
 
-BongosStats = Bongos:NewModule("Bongos-Stats")
+BongosStats = Bongos:NewModule('Bongos-Stats')
 
 local L = BONGOS_LOCALS
 local NUM_ADDONS_TO_DISPLAY = 15
@@ -12,21 +12,21 @@ local topAddOns
 
 local function Stats_AddCPULine(name, secs)
 	if secs > 3600 then
-		GameTooltip:AddDoubleLine(name, format("%.2f h", secs/3600), 1, 1, 1, 1, 0.2, 0.2)
+		GameTooltip:AddDoubleLine(name, format('%.2f h', secs/3600), 1, 1, 1, 1, 0.2, 0.2)
 	elseif secs > 60 then
-		GameTooltip:AddDoubleLine(name, format("%.2f m", secs/60), 1, 1, 1, 1, 1, 0.2)
+		GameTooltip:AddDoubleLine(name, format('%.2f m', secs/60), 1, 1, 1, 1, 1, 0.2)
 	elseif secs >= 1 then
-		GameTooltip:AddDoubleLine(name, format("%.1f s", secs), 1, 1, 1, 0.2, 1, 0.2)
+		GameTooltip:AddDoubleLine(name, format('%.1f s', secs), 1, 1, 1, 0.2, 1, 0.2)
 	elseif secs > 0 then
-		GameTooltip:AddDoubleLine(name, format("%.1f ms", secs * 1000), 1, 1, 1, 0.2, 1, 0.2)
+		GameTooltip:AddDoubleLine(name, format('%.1f ms', secs * 1000), 1, 1, 1, 0.2, 1, 0.2)
 	end
 end
 
 local function Stats_AddMemoryLine(name, size)
 	if(size > 1000) then
-		GameTooltip:AddDoubleLine(name, format("%.2f mb", size/1000), 1, 1, 1, 1, 1, 0.2)
+		GameTooltip:AddDoubleLine(name, format('%.2f mb', size/1000), 1, 1, 1, 1, 1, 0.2)
 	elseif(size > 0) then
-		GameTooltip:AddDoubleLine(name, format("%.2f kb", size), 1, 1, 1, 0.2, 1, 0.2)
+		GameTooltip:AddDoubleLine(name, format('%.2f kb', size), 1, 1, 1, 0.2, 1, 0.2)
 	end
 end
 
@@ -66,7 +66,7 @@ local function Stats_UpdateAddonsList(self, watchingCPU)
 		else
 			GameTooltip:SetText(L.MemUsage)
 		end
-		GameTooltip:AddLine("--------------------------------------------------")
+		GameTooltip:AddLine('--------------------------------------------------')
 
 		for _,addon in ipairs(topAddOns) do
 			if(watchingCPU) then
@@ -76,7 +76,7 @@ local function Stats_UpdateAddonsList(self, watchingCPU)
 			end
 		end
 
-		GameTooltip:AddLine("--------------------------------------------------")
+		GameTooltip:AddLine('--------------------------------------------------')
 		if(watchingCPU) then
 			Stats_AddCPULine(L.Total, total)
 		else
@@ -95,11 +95,11 @@ local function Stats_UpdateTooltip(self)
 	else
 		topAddOns = {}
 		for i=1, NUM_ADDONS_TO_DISPLAY do
-			topAddOns[i] = {name = "", value = 0}
+			topAddOns[i] = {name = '', value = 0}
 		end
 	end
 
-	Stats_UpdateAddonsList(self, GetCVar("scriptProfile") == "1" and not IsModifierKeyDown())
+	Stats_UpdateAddonsList(self, GetCVar('scriptProfile') == '1' and not IsModifierKeyDown())
 end
 
 --display frame
@@ -108,11 +108,11 @@ local function Stats_Update(self)
 	local sets = parent.sets
 
 	if sets.showFPS then
-		self.fps:SetText(format("%.1ffps", GetFramerate()))
+		self.fps:SetFormattedText('%.1ffps', GetFramerate())
 	end
 
 	if sets.showMemory then
-		self.mem:SetText(format("%.3fmb", gcinfo() / 1024))
+		self.mem:SetFormattedText('%.3fmb', gcinfo() / 1024)
 	end
 
 	if sets.showPing then
@@ -124,7 +124,7 @@ local function Stats_Update(self)
 		else
 			self.ping:SetTextColor(0, 1, 0)
 		end
-		self.ping:SetText(format("%dms", latency))
+		self.ping:SetFormattedText('%dms', latency)
 	end
 
 	local width = self.fps:GetStringWidth() + self.mem:GetStringWidth() + self.ping:GetStringWidth()
@@ -137,9 +137,9 @@ end
 
 local function Stats_OnEnter(self)
 	if self:GetRight() >= (GetScreenWidth() / 2) then
-		GameTooltip:SetOwner(self, "ANCHOR_BOTTOMLEFT")
+		GameTooltip:SetOwner(self, 'ANCHOR_BOTTOMLEFT')
 	else
-		GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
+		GameTooltip:SetOwner(self, 'ANCHOR_BOTTOMRIGHT')
 	end
 	Stats_UpdateTooltip(self)
 end
@@ -162,33 +162,33 @@ local function Stats_OnClick(self, button)
 end
 
 local function Stats_Create(parent)
-	local frame = CreateFrame("Button", nil, parent)
-	frame:RegisterForClicks("AnyUp")
+	local frame = CreateFrame('Button', nil, parent)
+	frame:RegisterForClicks('AnyUp')
 	frame:SetAllPoints(parent)
 
 	frame.fps = frame:CreateFontString()
-	frame.fps:SetFontObject("GameFontNormalLarge")
-	frame.fps:SetPoint("LEFT", frame)
+	frame.fps:SetFontObject('GameFontNormalLarge')
+	frame.fps:SetPoint('LEFT', frame)
 
 	frame.mem = frame:CreateFontString()
-	frame.mem:SetFontObject("GameFontHighlightLarge")
-	frame.mem:SetPoint("LEFT", frame.fps, "RIGHT", 2, 0)
+	frame.mem:SetFontObject('GameFontHighlightLarge')
+	frame.mem:SetPoint('LEFT', frame.fps, 'RIGHT', 2, 0)
 
 	frame.ping = frame:CreateFontString()
-	frame.ping:SetFontObject("GameFontHighlightLarge")
-	frame.ping:SetPoint("LEFT", frame.mem, "RIGHT", 2, 0)
+	frame.ping:SetFontObject('GameFontHighlightLarge')
+	frame.ping:SetPoint('LEFT', frame.mem, 'RIGHT', 2, 0)
 
-	frame:SetScript("OnEvent", function(self)
+	frame:SetScript('OnEvent', function(self)
 		if(GameTooltip:IsOwned(self)) then
 			Stats_UpdateTooltip(self)
 		end
 	end)
-	frame:RegisterEvent("MODIFIER_STATE_CHANGED")
+	frame:RegisterEvent('MODIFIER_STATE_CHANGED')
 
-	frame:SetScript("OnUpdate", Stats_OnUpdate)
-	frame:SetScript("OnClick", Stats_OnClick)
-	frame:SetScript("OnEnter", Stats_OnEnter)
-	frame:SetScript("OnLeave", Stats_OnLeave)
+	frame:SetScript('OnUpdate', Stats_OnUpdate)
+	frame:SetScript('OnClick', Stats_OnClick)
+	frame:SetScript('OnEnter', Stats_OnEnter)
+	frame:SetScript('OnLeave', Stats_OnLeave)
 
 	frame.toNextUpdate = 0
 
@@ -200,16 +200,16 @@ local function Bar_CreateMenu(self)
 	local menu, panel = BongosMenu:CreateMenu(self.id)
 
 	local showMemory = panel:AddCheckButton(L.ShowMemory)
-	showMemory:SetScript("OnShow", function(b) b:SetChecked(self.sets.showMemory) end)
-	showMemory:SetScript("OnClick", function() BongosStats:SetShowMemory(not self.sets.showMemory) end)
+	showMemory:SetScript('OnShow', function(b) b:SetChecked(self.sets.showMemory) end)
+	showMemory:SetScript('OnClick', function() BongosStats:SetShowMemory(not self.sets.showMemory) end)
 
 	local showFPS = panel:AddCheckButton(L.ShowFPS)
-	showFPS:SetScript("OnShow", function(b) b:SetChecked(self.sets.showFPS) end)
-	showFPS:SetScript("OnClick", function() BongosStats:SetShowFPS(not self.sets.showFPS) end)
+	showFPS:SetScript('OnShow', function(b) b:SetChecked(self.sets.showFPS) end)
+	showFPS:SetScript('OnClick', function() BongosStats:SetShowFPS(not self.sets.showFPS) end)
 
 	local showPing = panel:AddCheckButton(L.ShowPing)
-	showPing:SetScript("OnShow", function(b) b:SetChecked(self.sets.showPing) end)
-	showPing:SetScript("OnClick", function() BongosStats:SetShowPing(not self.sets.showPing) end)
+	showPing:SetScript('OnShow', function(b) b:SetChecked(self.sets.showPing) end)
+	showPing:SetScript('OnClick', function() BongosStats:SetShowPing(not self.sets.showPing) end)
 
 	return menu
 end
@@ -224,7 +224,7 @@ end
 --[[ Startup ]]--
 
 function BongosStats:Load()
-	self.bar = BBar:Create("stats", Bar_OnCreate, nil, {
+	self.bar = BBar:Create('stats', Bar_OnCreate, nil, {
 		x = 1254, y = 895, showMemory = true, showPing = true, showFPS = true,
 	})
 end
@@ -243,7 +243,7 @@ function BongosStats:SetShowFPS(enable)
 		Stats_Update(bar.frame)
 	else
 		bar.sets.showFPS = nil
-		bar.frame.fps:SetText("")
+		bar.frame.fps:SetText('')
 	end
 end
 
@@ -254,7 +254,7 @@ function BongosStats:SetShowPing(enable)
 		Stats_Update(bar.frame)
 	else
 		bar.sets.showPing = nil
-		bar.frame.ping:SetText("")
+		bar.frame.ping:SetText('')
 	end
 end
 
@@ -265,6 +265,6 @@ function BongosStats:SetShowMemory(enable)
 		Stats_Update(bar.frame)
 	else
 		bar.sets.showMemory = nil
-		bar.frame.mem:SetText("")
+		bar.frame.mem:SetText('')
 	end
 end
