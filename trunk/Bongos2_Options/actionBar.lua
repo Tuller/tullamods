@@ -208,7 +208,14 @@ function BongosOptions:AddActionBarPanel()
 	local selfCastKey = Panel_AddSelfCastDropDown(panel)
 	selfCastKey:SetPoint("TOPLEFT", quickMove, "BOTTOMLEFT", 0, 0)
 
-	local vals = {1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 24, 30, 40, 60, 120}
+
+	local vals = {}
+	for i = 1, BONGOS_MAX_BUTTONS do
+		if (BONGOS_MAX_BUTTONS % i) == 0 then
+			table.insert(vals, i)
+		end
+	end
+
 	local numBars = panel:AddSlider(L.NumActionBars, 1, #vals, 1)
 	numBars.high:SetText(vals[#vals])
 	numBars:SetScript("OnShow", function(self)
