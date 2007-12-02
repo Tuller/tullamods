@@ -3,20 +3,20 @@
 		A movable frame for rolling on items
 --]]
 
-BongosRollBar = Bongos:NewModule("Bongos-RollBar")
+BongosRollBar = Bongos:NewModule('Bongos-RollBar')
 
 --[[ Startup ]]--
 
 local function Bar_OnCreate(self)
-	local frame = getglobal("GroupLootFrame"..1)
-	frame:ClearAllPoints()
-	frame:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 4, 2)
-	self:Attach(frame)
-
-	for i=2, NUM_GROUP_LOOT_FRAMES do
-		local frame = getglobal("GroupLootFrame"..i)
+	for i = 1, NUM_GROUP_LOOT_FRAMES do	
+		local frame = getglobal('GroupLootFrame' .. i)
 		frame:ClearAllPoints()
-		frame:SetPoint("BOTTOM", "GroupLootFrame" .. (i-1), "TOP", 0, 3)
+
+		if i > 1 then
+			frame:SetPoint('BOTTOM', 'GroupLootFrame' .. (i-1), 'TOP', 0, 3)
+		else
+			frame:SetPoint('BOTTOMLEFT', self, 'BOTTOMLEFT', 4, 2)
+		end
 		self:Attach(frame)
 	end
 
@@ -25,12 +25,12 @@ local function Bar_OnCreate(self)
 end
 
 function BongosRollBar:Load()
-	local bar = BBar:Create("roll", Bar_OnCreate, nil, nil, "DIALOG")
+	local bar = BBar:Create('roll', Bar_OnCreate, nil, nil, 'DIALOG')
 	if not bar:IsUserPlaced() then
-		bar:SetPoint("LEFT", UIParent)
+		bar:SetPoint('LEFT')
 	end
 end
 
 function BongosRollBar:Unload()
-	BBar:Get("roll"):Destroy()
+	BBar:Get('roll'):Destroy()
 end
