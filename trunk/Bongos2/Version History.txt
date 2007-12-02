@@ -4,6 +4,8 @@ Bongos2 Version History
 All: Updated Spanish translation (thanks Ferroginu)
 Core: Recoded the minimap button
 ActionBar: Fixed an updating issue with buff and debuff highlighting code
+XP: Changed the texture
+XP: Added an option to always show experience
 
 1.9.5
 All: Fixed issues with the French translation
