@@ -201,6 +201,9 @@ local function Bar_OnCreate(self)
 	self.ToggleClock = Bar_ToggleClock
 
 	self:EnableMouse(false)
+
+	MinimapCluster:SetMovable(true)
+	MinimapCluster:SetUserPlaced(true) --used to fix some issues with frame placement
 	self:Attach(MinimapCluster)
 	self:SetWidth(MinimapCluster:GetWidth())
 
@@ -237,12 +240,11 @@ function BongosMapBar:Load()
 	bar:ToggleDayIndicator(bar.sets.showDay)
 	bar:ToggleMap(bar.sets.showMap)
 
-	--override GetMaxUIPanelsWidth
-	function GetMaxUIPanelsWidth()
-		return UIParent:GetRight() - UIParent:GetAttribute('RIGHT_OFFSET_BUFFER')
-	end
-
 	self.bar = bar
+end
+
+function BongosMapBar:Disable()
+	MinimapCluster:SetUserPlaced(false)
 end
 
 function BongosMapBar:Unload()
