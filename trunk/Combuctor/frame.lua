@@ -7,8 +7,8 @@ CombuctorFrame = Combuctor:NewModule('Frame')
 
 local L = LibStub('AceLocale-3.0'):GetLocale('Combuctor')
 local ITEM_FRAME_WIDTH = 312
-local BANK_FRAME_WIDTH = 568
 local ITEM_FRAME_HEIGHT = 346
+local BANK_FRAME_WIDTH = 568
 
 
 function CombuctorFrame:OnEnable()
