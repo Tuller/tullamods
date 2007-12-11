@@ -120,7 +120,7 @@ function MinimapButton:UpdatePosition()
 	local sin = math.sin(angle)
 	local minimapShape = GetMinimapShape and GetMinimapShape() or 'ROUND'
 
-	local round
+	local round = false
 	if minimapShape == 'ROUND' then
 		round = true
 	elseif minimapShape == 'SQUARE' then

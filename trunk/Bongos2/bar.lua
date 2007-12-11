@@ -44,14 +44,30 @@ local function GetRelativeCoords(frame, scale)
 	return (frame:GetLeft() or 0) * ratio, (frame:GetTop() or 0) * ratio
 end
 
+--returns the point a frame should be at based on its position relative to UIParent
+--from: wowwiki, modified to deal with scaled frames
+local function GetUIParentAnchor(frame)
+	local w, h = UIParent:GetWidth(), UIParent:GetHeight()
+	local x, y = frame:GetCenter()
+	local s = frame:GetScale()
+	w = w / s
+	h = h / s
+
+	local hhalf, vhalf = (x > w/2) and "RIGHT" or "LEFT", (y > h/2) and "TOP" or "BOTTOM"
+	local dx = hhalf == "RIGHT" and floor(frame:GetRight() + 0.5) - w or floor(frame:GetLeft() + 0.5)
+	local dy = vhalf == "TOP" and floor(frame:GetTop() + 0.5) - h or floor(frame:GetBottom() + 0.5)
+
+	return vhalf..hhalf, dx, dy
+end
+
 local function Bar_New(id, secure, strata)
 	local bar
-	if(secure) then
+	if secure then
 		bar = setmetatable(CreateFrame("Frame", nil, UIParent, "SecureStateHeaderTemplate"), Bar_MT)
 	else
 		bar = setmetatable(CreateFrame("Frame", nil, UIParent), Bar_MT)
 	end
-	if(strata) then
+	if strata then
 		bar:SetFrameStrata(strata)
 	end
 
@@ -86,8 +102,8 @@ function BBar:Create(id, OnCreate, OnDelete, defaults, strata, secure)
 	bar.OnDelete = OnDelete
 
 	bar:LoadSettings(defaults)
-	if(bar.isNew) then
-		if(OnCreate) then
+	if bar.isNew then
+		if OnCreate then
 			OnCreate(bar)
 		end
 		bar.isNew = nil
@@ -115,7 +131,7 @@ function BBar:Destroy(deleteSettings)
 	self:SetUserPlaced(false)
 	self:Hide()
 
-	if(deleteSettings) then
+	if deleteSettings then
 		Bongos:SetBarSets(self.id, nil)
 	end
 
@@ -280,37 +296,63 @@ function BBar:Stick()
 				local point = FlyPaper.Stick(self, frame, STICKY_TOLERANCE, PADDING, PADDING)
 				if point then
 					self.sets.anchor = frame.id .. point
+					--get rid of info we don't need
+					self.sets.point = nil
+					self.sets.xOff = nil
+					self.sets.yOff = nil
 					break
 				end
 			end
 		end
-	end
 
-	self:SavePosition()
+		--we didn't stick? save our position relative to ui parent
+		if not self.sets.anchor then
+			self:SavePosition()
+		end
+	end
 	self.dragFrame:UpdateColor()
 end
 
 function BBar:SavePosition()
-	self.sets.x = self:GetLeft()
-	self.sets.y = self:GetTop()
+	local sets = self.sets
 
 	local scale = self:GetScale()
-	if scale == 1 then
-		self.sets.scale = nil
-	else
-		self.sets.scale = scale
-	end
+	sets.scale = (scale ~= 1 and scale) or nil
+
+	local point, xOff, yOff = GetUIParentAnchor(self)
+	sets.point = point
+	sets.xOff = xOff
+	sets.yOff = yOff
 end
 
 --place the frame at it"s saved position
+--returns true if we've placed the frame
 function BBar:Reposition()
-	local x, y = self.sets.x, self.sets.y
 	self:Rescale()
 
+	local sets = self.sets
+
+	--handle the old anchoring code
+	local x, y = sets.x, sets.y
 	if x and y then
 		self:ClearAllPoints()
 		self:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", x, y)
 		self:SetUserPlaced(true)
+		
+		--convert to the new anchoring code
+		self.sets.x = nil
+		self.sets.y = nil
+		self:SavePosition()
+		return true
+	end
+
+	--the new hotness positioning code
+	local point, xOff, yOff = sets.point, sets.xOff, sets.yOff
+	if point then
+		self:ClearAllPoints()
+		self:SetPoint(point, xOff, yOff)
+		self:SetUserPlaced(true)
+		return true
 	end
 end
 
@@ -326,10 +368,11 @@ function BBar:Reanchor()
 	if not(frame and Bongos:IsSticky() and FlyPaper.StickToPoint(self, frame, point, PADDING, PADDING)) then
 		self.sets.anchor = nil
 
-		local x, y = GetRelativeCoords(self, self:GetScale())
-		self:ClearAllPoints()
-		self:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", x, y)
-		self:SetUserPlaced(true)
+		--no anchor, and no positon, so fall back to center of screen
+		if not self:Reposition() then
+			self:ClearAllPoints()
+			self:SetPoint('CENTER')
+		end
 	end
 	self.dragFrame:UpdateColor()
 end
