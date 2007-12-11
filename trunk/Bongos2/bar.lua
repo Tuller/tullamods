@@ -190,12 +190,15 @@ end
 function BBar:SetFrameScale(scale, scaleAnchored)
 	local x, y = GetRelativeCoords(self, scale)
 
-	self:SetScale(scale)
-	self.dragFrame:SetScale(scale)
-	self:ClearAllPoints()
-	self:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", x, y)
-	self:Reanchor()
-	self:SavePosition()
+	self.sets.scale = scale
+	self:SetScale(scale or 1)
+	self.dragFrame:SetScale(scale or 1)
+
+	if not self.sets.anchor then
+		self:ClearAllPoints()
+		self:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", x, y)
+		self:SavePosition()
+	end
 
 	if(scaleAnchored and Bongos:IsSticky()) then
 		for _,frame in self:GetAll() do
@@ -296,6 +299,7 @@ function BBar:Stick()
 				local point = FlyPaper.Stick(self, frame, STICKY_TOLERANCE, PADDING, PADDING)
 				if point then
 					self.sets.anchor = frame.id .. point
+
 					--get rid of info we don't need
 					self.sets.point = nil
 					self.sets.xOff = nil
@@ -315,10 +319,6 @@ end
 
 function BBar:SavePosition()
 	local sets = self.sets
-
-	local scale = self:GetScale()
-	sets.scale = (scale ~= 1 and scale) or nil
-
 	local point, xOff, yOff = GetUIParentAnchor(self)
 	sets.point = point
 	sets.xOff = xOff
@@ -333,6 +333,7 @@ function BBar:Reposition()
 	local sets = self.sets
 
 	--handle the old anchoring code
+	--[[ TODO: Remove this for Bongos3 ]]--
 	local x, y = sets.x, sets.y
 	if x and y then
 		self:ClearAllPoints()

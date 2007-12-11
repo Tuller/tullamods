@@ -1,5 +1,8 @@
 Bongos2 Version History
 
+1.9.7
+Core: Frame positions are now saved relative to the nearest corner of the screen.
+
 1.9.6
 All: Updated Spanish translation (thanks Ferroginu)
 Core: Recoded the minimap button
