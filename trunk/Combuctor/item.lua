@@ -181,7 +181,7 @@ function CombuctorItem:UpdateBorder(quality)
 
 	if link then
 		local quality = quality or select(3, GetItemInfo(link))
-		if quality > 1 then
+		if quality and quality > 1 then
 			local r, g, b = GetItemQualityColor(quality)
 			border:SetVertexColor(r, g, b, 0.5)
 			border:Show()
