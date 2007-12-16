@@ -20,7 +20,6 @@ core\item.lua
 core\bag.lua
 core\bagFrame.lua
 core\money.lua
-core\purchase.lua
 core\frame.lua
 core\spot.lua
 core\menu.lua
