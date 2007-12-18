@@ -44,20 +44,57 @@ local function GetRelativeCoords(frame, scale)
 	return (frame:GetLeft() or 0) * ratio, (frame:GetTop() or 0) * ratio
 end
 
---returns the point a frame should be at based on its position relative to UIParent
---from: wowwiki, modified to deal with scaled frames
-local function GetUIParentAnchor(frame)
+local function GetUIParentAnchor(f)
 	local w, h = UIParent:GetWidth(), UIParent:GetHeight()
-	local x, y = frame:GetCenter()
-	local s = frame:GetScale()
-	w = w / s
-	h = h / s
+	local x, y = f:GetCenter()
+	local s = f:GetScale()
+	w = w/s
+	h = h/s
 
-	local hhalf, vhalf = (x > w/2) and "RIGHT" or "LEFT", (y > h/2) and "TOP" or "BOTTOM"
-	local dx = hhalf == "RIGHT" and floor(frame:GetRight() + 0.5) - w or floor(frame:GetLeft() + 0.5)
-	local dy = vhalf == "TOP" and floor(frame:GetTop() + 0.5) - h or floor(frame:GetBottom() + 0.5)
+	local dx, dy
+	local hHalf = (x > w/2) and 'RIGHT' or 'LEFT'
+	if hHalf == 'RIGHT' then
+		dx = f:GetRight() - w
+	else
+		dx = f:GetLeft()
+	end
 
-	return vhalf..hhalf, dx, dy
+	local vHalf = (y > h/2) and 'TOP' or 'BOTTOM'
+	if vHalf == 'TOP' then
+		dy = f:GetTop() - h
+	else
+		dy = f:GetBottom()
+	end
+
+	return vHalf..hHalf, dx, dy
+end
+
+local function StickToScreenEdge(f, tolerance)
+	local point, x, y = GetUIParentAnchor(f)
+	local s = f:GetScale()
+	local changed = false
+
+	if abs(x) <= tolerance/s then
+		x = 0
+		f.sets.xOff = x
+		changed = true
+	end
+	
+	if abs(y) <= tolerance/s then
+		y = 0
+		f.sets.yOff = y
+		changed = true
+	end
+
+	if changed then
+		f.sets.point = point
+		f.sets.xOff = x
+		f.sets.yOff = y
+	
+		f:ClearAllPoints()
+		f:SetPoint(point, x, y)
+		return true
+	end
 end
 
 local function Bar_New(id, secure, strata)
@@ -291,35 +328,35 @@ end
 --[[ Positioning ]]--
 
 function BBar:Stick()
+	local stuck = false
+
 	if Bongos:IsSticky() then
 		self.sets.anchor = nil
 
+		--try to stick to a screen edge, then try to stick to a bar
 		for _, frame in self:GetAll() do
 			if frame ~= self then
 				local point = FlyPaper.Stick(self, frame, STICKY_TOLERANCE, PADDING, PADDING)
 				if point then
 					self.sets.anchor = frame.id .. point
-
-					--get rid of info we don't need
-					self.sets.point = nil
-					self.sets.xOff = nil
-					self.sets.yOff = nil
 					break
 				end
 			end
 		end
 
-		--we didn't stick? save our position relative to ui parent
 		if not self.sets.anchor then
-			self:SavePosition()
+			StickToScreenEdge(self, STICKY_TOLERANCE)
 		end
 	end
+	
+	self:SavePosition()
 	self.dragFrame:UpdateColor()
 end
 
 function BBar:SavePosition()
-	local sets = self.sets
 	local point, xOff, yOff = GetUIParentAnchor(self)
+	local sets = self.sets
+
 	sets.point = point
 	sets.xOff = xOff
 	sets.yOff = yOff
@@ -331,22 +368,7 @@ function BBar:Reposition()
 	self:Rescale()
 
 	local sets = self.sets
-
-	--handle the old anchoring code
-	--[[ TODO: Remove this for Bongos3 ]]--
-	local x, y = sets.x, sets.y
-	if x and y then
-		self:ClearAllPoints()
-		self:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", x, y)
-		self:SetUserPlaced(true)
-		
-		--convert to the new anchoring code
-		self.sets.x = nil
-		self.sets.y = nil
-		self:SavePosition()
-		return true
-	end
-
+	
 	--the new hotness positioning code
 	local point, xOff, yOff = sets.point, sets.xOff, sets.yOff
 	if point then
@@ -354,6 +376,20 @@ function BBar:Reposition()
 		self:SetPoint(point, xOff, yOff)
 		self:SetUserPlaced(true)
 		return true
+	else
+		--handle the old anchoring code, this should be removed with bongos3/or a year from now
+		local x, y = sets.x, sets.y
+		if x and y then
+			self:ClearAllPoints()
+			self:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", x, y)
+			self:SetUserPlaced(true)
+
+			--convert to the new anchoring code
+			self.sets.x = nil
+			self.sets.y = nil
+			self:SavePosition()
+			return true
+		end
 	end
 end
 
@@ -369,7 +405,6 @@ function BBar:Reanchor()
 	if not(frame and Bongos:IsSticky() and FlyPaper.StickToPoint(self, frame, point, PADDING, PADDING)) then
 		self.sets.anchor = nil
 
-		--no anchor, and no positon, so fall back to center of screen
 		if not self:Reposition() then
 			self:ClearAllPoints()
 			self:SetPoint('CENTER')
