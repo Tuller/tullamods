@@ -1,5 +1,8 @@
 SellFish Version History:
 
+2.0.5
+	Fixed the SetSendMailItem bug (thanks Sarf)
+
 2.0.4
 	Updated ItemPrice
 
