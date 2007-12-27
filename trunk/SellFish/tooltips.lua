@@ -185,8 +185,8 @@ local hooks = {
 		return GetInboxItemLink(id), select(3, GetInboxItem(id))
 	end,
 
-	SetSendMailItem = function()
-		return select(2, GetItemInfo(GetSendMailItem())), select(3, GetSendMailItem())
+	SetSendMailItem = function(id)
+		return select(2, GetItemInfo(GetSendMailItem(id))), select(3, GetSendMailItem(id))
 	end,
 }
 
