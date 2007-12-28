@@ -1,5 +1,8 @@
 #summary Version History for Ludwig
 
+1.5.1
+  * Made the drop downs work properly
+
 1.5
   * Updated for 2.3
   * Removed the /lw --scan command due to disconnects
