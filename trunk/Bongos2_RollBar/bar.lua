@@ -25,10 +25,13 @@ local function Bar_OnCreate(self)
 end
 
 function BongosRollBar:Load()
-	local bar = BBar:Create('roll', Bar_OnCreate, nil, nil, 'DIALOG')
-	if not bar:IsUserPlaced() then
-		bar:SetPoint('LEFT')
-	end
+	local defaults = {
+		point = 'LEFT'
+		xOff = 0,
+		yOff = 0,
+	}
+
+	BBar:Create('roll', Bar_OnCreate, nil, defaults, 'DIALOG')
 end
 
 function BongosRollBar:Unload()
