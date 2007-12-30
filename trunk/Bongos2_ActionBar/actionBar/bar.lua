@@ -288,9 +288,9 @@ local function Panel_AddLayoutSliders(panel)
 	size:SetScript("OnShow", function(self)
 		self.onShow = true
 		local frame = BBar:Get(self:GetParent().id)
-		getglobal(name .. "Size"):SetMinMaxValues(1, frame:GetMaxSize())
-		getglobal(name .. "Size"):SetValue(frame:GetSize())
-		getglobal(name .. "SizeHigh"):SetText(frame:GetMaxSize())
+		self:SetMinMaxValues(1, frame:GetMaxSize())
+		self:SetValue(frame:GetSize())
+		getglobal(self:GetName() .. "High"):SetText(frame:GetMaxSize())
 		self.onShow = nil
 	end)
 	size:SetScript("OnValueChanged", function(self, value)
