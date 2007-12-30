@@ -73,13 +73,16 @@ local function StickToScreenEdge(f, tolerance)
 	local point, x, y = GetUIParentAnchor(f)
 	local s = f:GetScale()
 	local changed = false
+	local w, h = UIParent:GetWidth(), UIParent:GetHeight()
+	w = w/s
+	h = h/s
 
 	if abs(x) <= tolerance/s then
 		x = 0
 		f.sets.xOff = x
 		changed = true
 	end
-	
+
 	if abs(y) <= tolerance/s then
 		y = 0
 		f.sets.yOff = y
@@ -90,7 +93,7 @@ local function StickToScreenEdge(f, tolerance)
 		f.sets.point = point
 		f.sets.xOff = x
 		f.sets.yOff = y
-	
+
 		f:ClearAllPoints()
 		f:SetPoint(point, x, y)
 		return true
@@ -348,7 +351,7 @@ function BBar:Stick()
 			StickToScreenEdge(self, STICKY_TOLERANCE)
 		end
 	end
-	
+
 	self:SavePosition()
 	self.dragFrame:UpdateColor()
 end
@@ -368,7 +371,7 @@ function BBar:Reposition()
 	self:Rescale()
 
 	local sets = self.sets
-	
+
 	--the new hotness positioning code
 	local point, xOff, yOff = sets.point, sets.xOff, sets.yOff
 	if point then
