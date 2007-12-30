@@ -225,12 +225,12 @@ function BongosMapBar:Load()
 		showZoom = true,
 		showDay = true,
 		showMap = true,
+		point = 'TOPRIGHT',
+		xOff = 0,
+		yOff = 0,
 	}
 
 	local bar = BBar:Create('minimap', Bar_OnCreate, nil, defaults, 'BACKGROUND')
-	if not bar:IsUserPlaced() then
-		bar:SetPoint('TOPRIGHT')
-	end
 
 	--load settings
 	--toggle title actually places the minimap on the bar, and adjusts the bar's height
