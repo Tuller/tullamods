@@ -1,4 +1,4 @@
-#summary Advanced Bongos configuration
+#summary Advanced Bongos configuration (WIP)
 #labels Featured
 
 So, you've figured out what right click menus are, you can move and scale things like a champ, and you know how to get to the options window.  But, you're still a little lost on how to do a few advanced things.  
