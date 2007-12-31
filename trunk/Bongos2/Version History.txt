@@ -1,7 +1,10 @@
 Bongos2 Version History
 
-1.9.7
+1.10.0
 Core: Frame positions are now saved relative to the nearest corner of the screen.
+Core: Dragging a bar near the edge of the screen will automatically dock the bar to that edge
+Core: Dragging a bar near the center of any edge will automatically dock and center that bar on that edge
+ActionBar: Fixed an error when showing the right click menu for action bars in any non English locale
 
 1.9.6
 All: Updated Spanish translation (thanks Ferroginu)

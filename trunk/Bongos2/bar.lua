@@ -17,15 +17,15 @@ fadeChecker.bars = {}
 fadeChecker.nextUpdate = 0.1
 fadeChecker:Hide()
 fadeChecker:SetScript("OnUpdate", function(self, elapsed)
-	if(self.nextUpdate < 0) then
+	if self.nextUpdate < 0 then
 		self.nextUpdate = 0.1
 		for bar in pairs(self.bars) do
 			if MouseIsOver(bar, 1, -1, -1, 1) then
-				if(ceil(bar:GetAlpha()*100) == ceil(bar:GetFadeAlpha()*100)) then
+				if abs(bar:GetAlpha() - bar:GetFadeAlpha()) < 0.01 then --the checking logic is a little weird because floating point values tend to not be exact
 					UIFrameFadeIn(bar, 0.1, bar:GetAlpha(), bar:GetFrameAlpha())
 				end
 			else
-				if(ceil(bar:GetAlpha()*100) == ceil(bar:GetFrameAlpha()*100)) then
+				if abs(bar:GetAlpha() - bar:GetFrameAlpha()) < 0.01 then
 					UIFrameFadeOut(bar, 0.1, bar:GetAlpha(), bar:GetFadeAlpha())
 				end
 			end
@@ -72,23 +72,49 @@ end
 local function StickToScreenEdge(f, tolerance)
 	local point, x, y = GetUIParentAnchor(f)
 	local s = f:GetScale()
+	local rTolerance = tolerance/s
+	local w = UIParent:GetWidth()/s
+	local h = UIParent:GetHeight()/s
 	local changed = false
-	local w, h = UIParent:GetWidth(), UIParent:GetHeight()
-	w = w/s
-	h = h/s
 
-	if abs(x) <= tolerance/s then
+	--sticky edges
+	if abs(x) <= rTolerance then
 		x = 0
-		f.sets.xOff = x
 		changed = true
 	end
 
-	if abs(y) <= tolerance/s then
+	if abs(y) <= rTolerance then
 		y = 0
-		f.sets.yOff = y
 		changed = true
 	end
+	
+	-- auto centering
+	local cX, cY = f:GetCenter()
+	if y == 0 then
+		if abs(cX - w/2) <= rTolerance*2 then
+			if point == 'TOPLEFT' or point == 'TOPRIGHT' then
+				point = 'TOP'
+			else
+				point = 'BOTTOM'
+			end
 
+			x = 0
+			changed = true
+		end
+	elseif x == 0 then
+		if abs(cY - h/2) <= rTolerance*2 then
+			if point == 'TOPLEFT' or point == 'BOTTOMLEFT' then
+				point = 'LEFT'
+			else
+				point = 'RIGHT'
+			end
+
+			y = 0
+			changed = true
+		end
+	end
+
+	--save this junk if we've done something
 	if changed then
 		f.sets.point = point
 		f.sets.xOff = x
@@ -384,7 +410,7 @@ function BBar:Reposition()
 		local x, y = sets.x, sets.y
 		if x and y then
 			self:ClearAllPoints()
-			self:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", x, y)
+			self:SetPoint('TOPLEFT', UIParent, 'BOTTOMLEFT', x, y)
 			self:SetUserPlaced(true)
 
 			--convert to the new anchoring code
