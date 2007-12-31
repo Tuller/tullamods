@@ -26,7 +26,7 @@ end
 
 function BongosRollBar:Load()
 	local defaults = {
-		point = 'LEFT'
+		point = 'LEFT',
 		xOff = 0,
 		yOff = 0,
 	}
