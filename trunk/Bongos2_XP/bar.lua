@@ -319,11 +319,13 @@ end
 
 --module loading
 function BongosXP:Load()
-	local bar = BBar:Create('xp', Bar_OnCreate, nil, nil, 'BACKGROUND')
-	if not bar:IsUserPlaced() then
-		bar:SetPoint('TOP', 0, -32)
-	end
+	local defaults = {
+		point = 'TOP',
+		xOff = 0,
+		yOff = -32,
+	}
 
+	local bar = BBar:Create('xp', Bar_OnCreate, nil, defaults, 'BACKGROUND')
 	bar.sets.size = min(bar.sets.size or DEFAULT_SIZE, 1)
 	bar.xp:UpdateOrientation()
 	bar.xp:Update()
