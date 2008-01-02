@@ -289,6 +289,8 @@ function InventoryFrame:Create(titleText, settings, isBank)
 	f:LoadPosition()
 
 	lastID = lastID + 1
+	
+	table.insert(UISpecialFrames, f:GetName())
 
 	return f
 end
