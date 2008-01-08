@@ -49,8 +49,8 @@ function BongosActionButton:Create(id)
 	button:SetScript('PostClick', self.UpdateState)
 	button:SetScript('OnDragStart', self.OnDragStart)
 	button:SetScript('OnReceiveDrag', self.OnReceiveDrag)
-	button:SetScript('OnEnter', self.OnEnter)
 	button:SetScript('OnLeave', self.OnLeave)
+	button:SetScript('OnEnter', self.OnEnter)
 	button:SetScript('OnEvent', self.OnEvent)
 
 	button:SetScript('OnShow', self.OnShow)
@@ -215,7 +215,16 @@ function BongosActionButton:OnReceiveDrag()
 end
 
 function BongosActionButton:OnEnter()
-	self:UpdateTooltip()
+	if GetCVar('UberTooltips') == '1' then
+		GameTooltip_SetDefaultAnchor(GameTooltip, self)
+	else
+		GameTooltip:SetOwner(self, 'ANCHOR_RIGHT')
+	end
+
+	if BongosActionConfig:ShowingTooltips() then
+		self:UpdateTooltip()
+	end
+
 	KeyBound:Set(self)
 end
 
@@ -391,20 +400,7 @@ function BongosActionButton:StopFlash()
 end
 
 function BongosActionButton:UpdateTooltip()
-	if BongosActionConfig:ShowingTooltips() then
-		if GetCVar('UberTooltips') == '1' then
-			GameTooltip_SetDefaultAnchor(GameTooltip, self)
-		else
-			GameTooltip:SetOwner(self, 'ANCHOR_RIGHT')
-		end
-
-		local action = self:GetPagedID()
-		if GameTooltip:SetAction(action) then
-			self.nextTooltipUpdate = TOOLTIP_UPDATE_TIME
-		else
-			self.nextTooltipUpdate = nil
-		end
-	end
+	GameTooltip:SetAction(self:GetPagedID())
 end
 
 
