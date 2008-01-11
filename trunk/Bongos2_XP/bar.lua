@@ -9,8 +9,8 @@ local L = BONGOS_LOCALS
 local HORIZONTAL_TEXTURE = 'Interface\\Addons\\Bongos2_XP\\img\\Armory'
 local VERTICAL_TEXTURE = 'Interface\\Addons\\Bongos2_XP\\img\\ArmoryV'
 
-local XP_FORMAT = '%s / %s'
-local REST_FORMAT = '%s / %s (+%s)'
+local XP_FORMAT = '%s / %s (%s%%)'
+local REST_FORMAT = '%s / %s (+%s) (%s%%)'
 local REP_FORMAT = '%s:  %s / %s (%s)'
 
 local DEFAULT_HEIGHT = 14
@@ -29,7 +29,9 @@ function XPBar:New(parent)
 	bar:SetAllPoints(parent)
 
 	--copy over all the XPBar functions
-	for k,v in pairs(self) do bar[k] = v end
+	for k,v in pairs(self) do 
+		bar[k] = v 
+	end
 
 	bar.id = parent.id
 	bar.sets = parent.sets
@@ -39,8 +41,10 @@ function XPBar:New(parent)
 	bar.bg = bg
 
 	local overlay = CreateFrame('StatusBar', nil, bar)
-	overlay:EnableMouse(false)
+	overlay:EnableMouse(true)
 	overlay:SetAllPoints(bar)
+	overlay.sets = parent.sets
+	overlay.bar = bar
 	bar.overlay = overlay
 
 	local text = overlay:CreateFontString(nil, 'OVERLAY')
@@ -51,7 +55,8 @@ function XPBar:New(parent)
 	bar:SetScript('OnHide', self.OnHide)
 	bar:SetScript('OnEnter', self.OnEnter)
 	bar:SetScript('OnLeave', self.OnLeave)
-
+	overlay:SetScript('OnMouseDown', self.OnMouseDown)
+	
 	bar:Update()
 	bar:UpdateText()
 	bar:UpdateTextPosition()
@@ -76,6 +81,11 @@ end
 function XPBar:OnLeave()
 	self.entered = nil
 	self:UpdateText()
+end
+
+function XPBar:OnMouseDown()
+	self.sets.alwaysShowXP = not self.sets.alwaysShowXP
+	self.bar:Update()
 end
 
 --update functions
@@ -113,6 +123,13 @@ function XPBar:UpdateExperience()
 	else
 		local value = UnitXP('player')
 		local max = UnitXPMax('player')
+		-- do percentage to 3 sig digits (nn.n%)
+		-- first get pct*10 (raw ratio * 1000)
+		local pct10 = (value / max) * 1000
+		-- now round by doing floor(n+0.5)
+		pct10 = floor(pct10 + 0.5)
+		-- now shift the decimal point back in
+		local pct = pct10 / 10
 
 		self:SetMinMaxValues(0, max)
 		self.overlay:SetMinMaxValues(0, max)
@@ -121,10 +138,10 @@ function XPBar:UpdateExperience()
 		local rest = GetXPExhaustion()
 		if rest then
 			self:SetValue(value + rest)
-			self.text:SetFormattedText(REST_FORMAT, value, max, rest)
+			self.text:SetFormattedText(REST_FORMAT, value, max, rest, pct)
 		else
 			self:SetValue(0)
-			self.text:SetFormattedText(XP_FORMAT, value, max)
+			self.text:SetFormattedText(XP_FORMAT, value, max, pct)
 		end
 	end
 end
