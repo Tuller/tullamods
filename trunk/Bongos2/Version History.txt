@@ -1,5 +1,11 @@
 Bongos2 Version History
 
+1.10.1
+ActionBar: Fixed a tooltip bug with Cowtip installed.
+XP: Added Lifernal @ Steamwheedle Cartel's changes
+XP: You can now switch between watching reputation and experience simply by clicking on the bar
+XP: The experience bar now shows a percentage
+
 1.10.0
 Core: Frame positions are now saved relative to the nearest corner of the screen.
 Core: Dragging a bar near the edge of the screen will automatically dock the bar to that edge

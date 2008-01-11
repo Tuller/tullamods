@@ -315,6 +315,13 @@ function BBar:GetFadeAlpha(alpha)
 	return fadeAlpha * self:GetFrameAlpha(), fadeAlpha
 end
 
+--poisition
+function BBar:SetFramePoint(...)
+	self:ClearAllPoints()
+	self:SetPoint(...)
+	self:SavePosition();
+end
+
 
 --[[ Attach an object to the frame ]]--
 
