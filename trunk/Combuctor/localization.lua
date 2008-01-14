@@ -7,7 +7,7 @@
 
 local L = LibStub("AceLocale-3.0"):NewLocale("Combuctor", "enUS", true)
 
---these are automatically localized (aka, don't translate them :))
+--these are automatically localized (aka, don't translate them :)
 do
 	L.All = ALL
 

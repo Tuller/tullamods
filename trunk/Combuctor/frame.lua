@@ -171,13 +171,14 @@ do
 	local nextID = 0
 	function SideFilter:Create(parent)
 		local f = CreateFrame('Frame', nil, parent)
+		f.UpdateHighlight = self.UpdateHighlight
 
 		local prev
-		for i,rule in ipairs(parent.rules) do
+		for i,category in ipairs(parent.cats) do
 			local button = CreateFrame('CheckButton', format('CombuctorItemFilter%d', nextID), f, 'SpellBookSkillLineTabTemplate')
-			button.rule = rule
+			button.category = category
 
-			button:SetNormalTexture(rule.icon)
+			button:SetNormalTexture(category.icon)
 			button:GetNormalTexture():SetTexCoord(0.06, 0.94, 0.06, 0.94)
 			button:SetScript('OnClick', self.OnButtonClick)
 			button:SetScript('OnEnter', self.OnButtonEnter)
@@ -197,24 +198,27 @@ do
 	end
 
 	function SideFilter:OnButtonClick()
-		local parent = self:GetParent()
-		local frame = parent:GetParent()
-		frame:SetRule(self.rule)
-
-		for i = 1, select('#', parent:GetChildren()) do
-			local child = select(i, parent:GetChildren())
-			child:SetChecked(child == self)
-		end
+		self:GetParent():GetParent():SetCategory(self.category)
+		self:GetParent():UpdateHighlight()
 	end
 
 	function SideFilter:OnButtonEnter()
 		GameTooltip:SetOwner(self, 'ANCHOR_RIGHT')
-		GameTooltip:SetText(self.rule.name)
+		GameTooltip:SetText(self.category.name)
 		GameTooltip:Show()
 	end
 
 	function SideFilter:OnButtonLeave()
 		GameTooltip:Hide()
+	end
+
+	function SideFilter:UpdateHighlight()
+		local category = self:GetParent().category
+
+		for i = 1, select('#', self:GetChildren()) do
+			local child = select(i, self:GetChildren())
+			child:SetChecked(child.category == category)
+		end
 	end
 end
 
@@ -228,101 +232,109 @@ CombuctorFrame.obj = CombuctorUtil:CreateWidgetClass('Frame')
 local InventoryFrame = CombuctorFrame.obj
 
 --frame constructor
-local lastID = 1
-function InventoryFrame:Create(titleText, settings, isBank)
-	local template = isBank and 'CombuctorBankTemplate' or 'CombuctorInventoryTemplate'
-	local f = self:New(CreateFrame('Frame', format('CombuctorFrame%d', lastID), UIParent, template))
-	f:SetScript('OnShow', self.OnShow)
-	f:SetScript('OnHide', self.OnHide)
-	f:SetAttribute('UIPanelLayout-pushable', settings.pushable)
+do
+	local lastID = 1
+	function InventoryFrame:Create(titleText, settings, isBank)
+		local template
+		if isBank then
+			template = 'CombuctorBankTemplate'
+		else
+			template = 'CombuctorInventoryTemplate'
+		end
 
-	f.sets = settings
-	f.isBank = isBank
-	f.titleText = titleText
+		local f = self:New(CreateFrame('Frame', format('CombuctorFrame%d', lastID), UIParent, template))
+		f:SetScript('OnShow', self.OnShow)
+		f:SetScript('OnHide', self.OnHide)
+		f:SetAttribute('UIPanelLayout-pushable', settings.pushable)
 
-	f.bagButtons = {}
-	f.tabs = {}
-	f.filter = {}
+		f.sets = settings
+		f.isBank = isBank
+		f.titleText = titleText
 
-	f.title = getglobal(f:GetName() .. 'Title')
+		f.bagButtons = {}
+		f.tabs = {}
+		f.filter = {}
 
-	--this must occur before we add the side buttons
-	f:AddFilters()
-	f.sideFilter = SideFilter:Create(f)
+		f.title = getglobal(f:GetName() .. 'Title')
 
-	f.nameFilter = getglobal(f:GetName() .. 'Search')
+		--this must occur before we add the side buttons
+		f:AddCategories()
+		f.sideFilter = SideFilter:Create(f)
 
-	f.qualityFilter = QualityFilter:Create(f)
-	f.qualityFilter:SetPoint('BOTTOMLEFT', 24, 65)
+		f.nameFilter = getglobal(f:GetName() .. 'Search')
 
-	f.itemFrame = CombuctorItemFrame:Create(f)
-	f.itemFrame:SetPoint('TOPLEFT', 24, -78)
-	f.itemFrame:SetHeight(ITEM_FRAME_HEIGHT)
+		f.qualityFilter = QualityFilter:Create(f)
+		f.qualityFilter:SetPoint('BOTTOMLEFT', 24, 65)
 
-	f.moneyFrame = CombuctorMoneyFrame:Create(f)
-	f.moneyFrame:SetPoint('BOTTOMRIGHT', -40, 67)
+		f.itemFrame = CombuctorItemFrame:Create(f)
+		f.itemFrame:SetPoint('TOPLEFT', 24, -78)
+		f.itemFrame:SetHeight(ITEM_FRAME_HEIGHT)
 
-	f:UpdateTitleText()
-	f:UpdateBagFrame()
-	f:LoadPosition()
+		f.moneyFrame = CombuctorMoneyFrame:Create(f)
+		f.moneyFrame:SetPoint('BOTTOMRIGHT', -40, 67)
 
-	lastID = lastID + 1
+		f:UpdateTitleText()
+		f:UpdateBagFrame()
+		f:LoadPosition()
 
-	table.insert(UISpecialFrames, f:GetName())
+		lastID = lastID + 1
 
-	return f
-end
+		table.insert(UISpecialFrames, f:GetName())
 
-function InventoryFrame:AddRule(name, icon, func)
-	local rule = {['name'] = name, ['icon'] = icon, ['rule'] = func}
-	self:AddSubRule(rule, L.All)
-
-	if self.rules then
-		table.insert(self.rules, rule)
-	else
-		self.rules = {rule}
-	end
-	return rule
-end
-
-function InventoryFrame:AddSubRule(rules, name, func)
-	local subRule = {['name'] = name, ['rule'] = func}
-	if rules.subRules then
-		table.insert(rules.subRules, subRule)
-	else
-		rules.subRules = {subRule}
+		return f
 	end
 end
 
-function InventoryFrame:AddFilters()
+function InventoryFrame:AddCategory(name, icon, rule)
+	local category = {['name'] = name, ['icon'] = icon, ['rule'] = rule}
+	self:AddSubCategory(category, L.All)
+
+	if self.cats then
+		table.insert(self.cats, category)
+	else
+		self.cats = {category}
+	end
+	return category
+end
+
+function InventoryFrame:AddSubCategory(category, name, rule)
+	local subCategory = {['name'] = name, ['rule'] = rule}
+	if category.subCats then
+		table.insert(category.subCats, subCategory)
+	else
+		category.subCats = {subCategory}
+	end
+end
+
+function InventoryFrame:AddCategories()
 	local class = select(2, UnitClass('player'))
 
 	--all items: this category is most like the old bagnon window, has tabs for bag types
 	--we should default to the second tab of this rule whenever we open up the window (ie, clear on close)
 	do
-		local category = self:AddRule(L.All, 'Interface/Icons/INV_Misc_EngGizmos_17')
+		local category = self:AddCategory(L.All, 'Interface/Icons/INV_Misc_EngGizmos_17')
 
-		self:AddSubRule(category, L.Normal, function(bag)
+		self:AddSubCategory(category, L.Normal, function(bag)
 			return CombuctorUtil:IsNormalBag(bag, self:GetPlayer())
 		end)
 
-		self:AddSubRule(category, L.Trade, function(bag)
+		self:AddSubCategory(category, L.Trade, function(bag)
 			return CombuctorUtil:IsProfessionBag(bag, self:GetPlayer())
 		end)
 
 		--these filters are not relevant for the bank
 		if not self.isBank then
 			if class == 'WARLOCK' then
-				self:AddSubRule(category, L.Shards, function(bag)
+				self:AddSubCategory(category, L.Shards, function(bag)
 					return CombuctorUtil:IsShardBag(bag, self:GetPlayer())
 				end)
 			elseif class == 'HUNTER' then
-				self:AddSubRule(category, L.Ammo, function(bag)
+				self:AddSubCategory(category, L.Ammo, function(bag)
 					return CombuctorUtil:IsAmmoBag(bag, self:GetPlayer())
 				end)
 			end
 
-			self:AddSubRule(category, L.Keys, function(bag)
+			self:AddSubCategory(category, L.Keys, function(bag)
 				return bag == KEYRING_CONTAINER
 			end)
 		end
@@ -334,17 +346,17 @@ function InventoryFrame:AddFilters()
 			return (type == L.Armor or type == L.Weapon)
 		end
 
-		local category = self:AddRule(L.Equipment, 'Interface/Icons/INV_Chest_Chain_04', IsEquipment)
+		local category = self:AddCategory(L.Equipment, 'Interface/Icons/INV_Chest_Chain_04', IsEquipment)
 
-		self:AddSubRule(category, L.Armor, function(bag, link, type, subType, equipLoc)
+		self:AddSubCategory(category, L.Armor, function(bag, link, type, subType, equipLoc)
 			return type == L.Armor and equipLoc ~= 'INVTYPE_TRINKET'
 		end)
 
-		self:AddSubRule(category, L.Weapon, function(bag, link, type)
+		self:AddSubCategory(category, L.Weapon, function(bag, link, type)
 			return type == L.Weapon
 		end)
 
-		self:AddSubRule(category, L.Trinket, function(bag, link, type, subType, equipLoc)
+		self:AddSubCategory(category, L.Trinket, function(bag, link, type, subType, equipLoc)
 			return type == L.Armor and equipLoc == 'INVTYPE_TRINKET'
 		end)
 	end
@@ -362,13 +374,13 @@ function InventoryFrame:AddFilters()
 			end
 		end
 
-		local category = self:AddRule(L.Usable, 'Interface/Icons/INV_Potion_93', IsUsable)
+		local category = self:AddCategory(L.Usable, 'Interface/Icons/INV_Potion_93', IsUsable)
 
-		self:AddSubRule(category, L.Consumable, function(bag, link, type)
+		self:AddSubCategory(category, L.Consumable, function(bag, link, type)
 			return type == L.Consumable
 		end)
 
-		self:AddSubRule(category, L.Devices, function(bag, link, type)
+		self:AddSubCategory(category, L.Devices, function(bag, link, type)
 			return type == L.TradeGood
 		end)
 	end
@@ -379,25 +391,37 @@ function InventoryFrame:AddFilters()
 		local function IsQuest(bag, link, type)
 			return type == L.Quest
 		end
-		self:AddRule(L.Quest, 'Interface/QuestFrame/UI-QuestLog-BookIcon', IsQuest)
+		self:AddCategory(L.Quest, 'Interface/QuestFrame/UI-QuestLog-BookIcon', IsQuest)
 	end
 
 	--trade goods + gems
+	--TODO: move item gems to consumables as a tab
 	do
-		self:AddRule(L.TradeGood, 'Interface/Icons/INV_Fabric_Silk_02', function(bag, link, type, subType)
+		local category = self:AddCategory(L.TradeGood, 'Interface/Icons/INV_Fabric_Silk_02', function(bag, link, type, subType)
 			if type == L.TradeGood then
 				return not(subType == L.Devices or subType == L.Explosives)
-			elseif type == L.Gem then
-				return true
 			end
+			return type == L.Recipe or type == L.Gem
+		end)
+
+		self:AddSubCategory(category, L.TradeGood, function(bag, link, type)
+			return type == L.TradeGood
+		end)
+
+		self:AddSubCategory(category, L.Gem, function(bag, link, type)
+			return type == L.Gem
+		end)
+
+		self:AddSubCategory(category, L.Recipe, function(bag, link, type)
+			return type == L.Recipe
 		end)
 	end
 
 	--class specific filters (not relevant to the bank)
-	if not self.IsBank then
+	if not self.isBank then
 		--hunter: ammo button
 		if class == 'HUNTER' then
-			self:AddRule(L.Projectile, 'Interface/Icons/INV_Misc_Ammo_Bullet_01', function(bag, link, type)
+			self:AddCategory(L.Projectile, 'Interface/Icons/INV_Misc_Ammo_Bullet_01', function(bag, link, type)
 				return type == L.Projectile
 			end)
 		end
@@ -406,13 +430,13 @@ function InventoryFrame:AddFilters()
 		if class == 'WARLOCK' then
 			local name,_, _, _, _,_,_,_,_,icon = GetItemInfo(6265)
 
-			self:AddRule(name, icon, function(bag, link)
+			self:AddCategory(name, icon, function(bag, link)
 				return link and (GetItemInfo(link) == name)
 			end)
 		end
 	end
 
-	self:AddRule(L.Misc, 'Interface/Icons/INV_Misc_Rune_01', function(bag, link, type)
+	self:AddCategory(L.Misc, 'Interface/Icons/INV_Misc_Rune_01', function(bag, link, type)
 		return type == L.Misc
 	end)
 end
@@ -442,7 +466,7 @@ end
 --[[ Frame Events ]]--
 
 function InventoryFrame:OnShow()
-	self:SetRule(self.rules[1])
+	self:SetCategory(self.cats[1])
 	PlaySound('igMainMenuOpen')
 end
 
@@ -553,13 +577,13 @@ function InventoryFrame:SetTab(id, rule)
 end
 
 function InventoryFrame:UpdateTabs()
-	local subRules = self.rule.subRules
-	if subRules and #subRules > 1 then
-		for i,rule in ipairs(subRules) do
+	local subCat = self.category.subCats
+	if subCat and #subCat > 1 then
+		for i,rule in ipairs(subCat) do
 			self:SetTab(i, rule)
 		end
 
-		for i = #subRules + 1, #self.tabs do
+		for i = #subCat + 1, #self.tabs do
 			self.tabs[i]:Hide()
 		end
 
@@ -576,23 +600,23 @@ end
 
 --[[ Filtering ]]--
 
-function InventoryFrame:SetRule(rule)
+function InventoryFrame:SetCategory(category)
 	local changed = false
-	self.rule = rule
+	self.category = category
 	self:UpdateTabs()
 
-	if self:SetFilter('rule', rule.rule) then
+	if self:SetFilter('rule', category.rule) then
 		changed = true
 	end
 
 	--nasty special case, the default tab for the all frame is the second, not the first
-	if rule.name == L.All then
+	if category.name == L.All then
 		PanelTemplates_SetTab(self, 2)
-		if self:SetFilter('subRule', rule.subRules[2].rule) then
+		if self:SetFilter('subRule', category.subCats[2].rule) then
 			changed = true
 		end
 	else
-		if self:SetFilter('subRule', rule.subRules[1].rule) then
+		if self:SetFilter('subRule', category.subCats[1].rule) then
 			changed = true
 		end
 	end
@@ -600,14 +624,6 @@ function InventoryFrame:SetRule(rule)
 	if changed then
 		self.itemFrame:Regenerate()
 	end
-end
-
-function InventoryFrame:SetSubRules(subRules)
-	self.subRules = subRules
-	if self.subRules then
-		self:SetFilter('subRule', self.subRules[1].rule)
-	end
-	self:UpdateTabs()
 end
 
 function InventoryFrame:SetFilter(key, value, update)
