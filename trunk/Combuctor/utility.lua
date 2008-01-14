@@ -81,6 +81,20 @@ function CombuctorUtil:IsBankBag(bag)
 	return (bag == BANK_CONTAINER or bag > 4)
 end
 
+--returns true if the given bag is a normal bag
+function CombuctorUtil:IsNormalBag(bag, player)
+	if bag == BANK_CONTAINER or bag == BACKPACK_CONTAINER then
+		return true
+	end
+
+	if bag > 0 then
+		local link = self:GetBagLink(bag, player)
+		if link then
+			return select(7, GetItemInfo(link)) == subTypeBag
+		end
+	end
+end
+
 --returns true if the given bag is an ammo bag/soul bag
 function CombuctorUtil:IsAmmoBag(bag, player)
 	--bankslots, the main bag, and the keyring cannot be ammo slots

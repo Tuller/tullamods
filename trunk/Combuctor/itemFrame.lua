@@ -108,7 +108,7 @@ function ItemFrame:Create(parent)
 	local f = self:New()
 	f:SetParent(parent)
 	f.items = {}
-	f.bags = {}
+	f.bags = parent.sets.bags
 	f.filter = parent.filter
 	f.count = 0
 
@@ -155,30 +155,28 @@ function ItemFrame:HasItem(bag, slot, link)
 			break
 		end
 	end
-	if not hasBag then return false end
+	if not hasBag then
+		return false
+	end
 
 	--do filter checks
 	local f = self.filter
 	if next(f) then
 		local link = link or CombuctorUtil:GetItemLink(bag, slot, self:GetPlayer())
-		if not link then return false end
+		local name, quality, level, ilvl, type, subType, stackCount, equipLoc
+		if link then
+			name, link, quality, level, ilvl, type, subType, stackCount, equipLoc = GetItemInfo(link)
+		end
 
-		local name, _, quality, _, level, type, subType, _, equipLoc = GetItemInfo(link)
 		if f.quality and quality ~= f.quality then
 			return false
-		elseif f.minLevel and level < f.minLevel then
+		elseif f.rule and not f.rule(bag, link, type, subType, equipLoc) then
 			return false
-		elseif f.maxLevel and level > f.maxLevel then
+		elseif f.subRule and not f.subRule(bag, link, type, subType, equipLoc) then
 			return false
-		elseif f.type and type ~= f.type then
-			return false
-		elseif f.subType and subType ~= f.subType then
-			return false
-		elseif f.equipLoc and equipLoc ~= f.equipLoc then
-			return false
+		--'smart' text search: will attempt to match type, subtype, and equip locations in addition to names
 		elseif f.name then
-			--smart text search: will attempt to match type, subtype, and equip locations in addition to names
-			local name = name:lower()
+			local name = name and name:lower()
 			if not(f.name == name or name:find(f.name)) then
 				local type = type:lower()
 				if not(f.name == type or type:find(f.name)) then

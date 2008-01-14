@@ -26,6 +26,7 @@ function Combuctor:OnEnable()
 				bags = {-1, 5, 6, 7, 8, 9, 10, 11},
 				pushable = 2,
 				showBags = true,
+				position = {'LEFT'},
 			}
 		}
 	}
@@ -45,7 +46,7 @@ function Combuctor:Show(bag, auto)
 	for _,frame in pairs(self.frames) do
 		for _,bagID in pairs(frame.sets.bags) do
 			if bagID == bag then
-				frame:ShowBag(bag, auto)
+				frame:ShowFrame(auto)
 				return
 			end
 		end
@@ -56,7 +57,7 @@ function Combuctor:Hide(bag, auto)
 	for _,frame in pairs(self.frames) do
 		for _,bagID in pairs(frame.sets.bags) do
 			if bagID == bag then
-				frame:HideBag(bag, auto)
+				frame:HideFrame(auto)
 				return
 			end
 		end
@@ -67,7 +68,7 @@ function Combuctor:Toggle(bag, auto)
 	for _,frame in pairs(self.frames) do
 		for _,bagID in pairs(frame.sets.bags) do
 			if bagID == bag then
-				frame:ToggleBag(bag, auto)
+				frame:ToggleFrame(auto)
 				return
 			end
 		end
@@ -139,12 +140,9 @@ function Combuctor:OnSlashCommand(msg)
 		self:Toggle(BANK_CONTAINER)
 	elseif msg == 'bags' then
 		self:Toggle(BACKPACK_CONTAINER)
-	elseif msg == 'keys' then
-		self:Toggle(KEYRING_CONTAINER)
 	else
 		self:Print('Commands (/cbt or /combuctor)')
 		ChatFrame1:AddMessage('- bank: Toggle bank')
 		ChatFrame1:AddMessage('- bags: Toggle inventory')
-		ChatFrame1:AddMessage('- keys: Toggle keyring')
 	end
 end
