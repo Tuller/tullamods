@@ -245,7 +245,6 @@ do
 		local f = self:New(CreateFrame('Frame', format('CombuctorFrame%d', lastID), UIParent, template))
 		f:SetScript('OnShow', self.OnShow)
 		f:SetScript('OnHide', self.OnHide)
-		f:SetAttribute('UIPanelLayout-pushable', settings.pushable)
 
 		f.sets = settings
 		f.isBank = isBank
@@ -644,32 +643,56 @@ end
 
 --[[ Positioning ]]--
 
-function InventoryFrame:SavePosition(...)
-	if self:IsUserPlaced() then
+function InventoryFrame:SavePosition(point, parent, relPoint, x, y)
+	if point then
 		if self.sets.position then
-			local numPoints = select('#', ...)
-			for i = 1, numPoints do
-				self.sets.position[i] = select(i, ...)
-			end
-			for i = numPoints + 1, #self.sets.position do
-				self.sets.position[i] = nil
-			end
+			self.sets.position[1] = point
+			self.sets.position[2] = parent
+			self.sets.position[3] = relPoint
+			self.sets.position[4] = x
+			self.sets.position[5] = y
 		else
-			self.sets.position = {...}
+			self.sets.position = {point, parent, relPoint, x, y}
 		end
+		self:SetUserPlaced(true)
 	else
 		self.sets.position = nil
+		self:SetUserPlaced(false)
 	end
+	self:UpdateManagedPosition()
 end
 
 function InventoryFrame:LoadPosition()
 	if self.sets.position then
 		self:SetPoint(unpack(self.sets.position))
 		self:SetUserPlaced(true)
-		self:SetAttribute('UIPanelLayout-enabled', nil)
 	else
-		self:SetUserPlaced(false)
-		self:SetAttribute('UIPanelLayout-enabled', true)
+		self:SetUserPlaced(nil)
+	end
+	self:UpdateManagedPosition()
+end
+
+function InventoryFrame:UpdateManagedPosition()
+	if self.sets.position then
+		if self:GetAttribute('UIPanelLayout-enabled') then
+			if self:IsShown() then
+				HideUIPanel(self)
+				self:SetAttribute('UIPanelLayout-enabled', nil)
+				ShowUIPanel(self)
+			else
+				self:SetAttribute('UIPanelLayout-enabled', nil)
+			end
+		end
+	else
+		if not self:GetAttribute('UIPanelLayout-enabled') then
+			if self:IsShown() then
+				HideUIPanel(self)
+				self:SetAttribute('UIPanelLayout-enabled', true)
+				ShowUIPanel(self)
+			else
+				self:SetAttribute('UIPanelLayout-enabled', true)
+			end
+		end
 	end
 end
 
@@ -686,15 +709,15 @@ end
 
 function InventoryFrame:ShowFrame(auto)
 	if not self:IsShown() then
-		self:Show()
+		ShowUIPanel(self)
 		self.autoShown = auto or nil
 	end
 end
 
 function InventoryFrame:HideFrame(auto)
 	if self:IsShown() then
-		if not self.autoShown or not auto then
-			self:Hide()
+		if not auto or self.autoShown then
+			HideUIPanel(self)
 			self.autoShown = nil
 		end
 	end

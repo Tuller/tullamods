@@ -4,13 +4,7 @@
 		Widget Templates
 	-->
 
-	<Button name="CombuctorFrameTabButtonTemplate" inherits="CharacterFrameTabButtonTemplate" virtual="true">
-		<Scripts>
-			<OnLoad>
-				self:RegisterForDrag("LeftButton")
-			</OnLoad>
-		</Scripts>
-	</Button>
+	<Button name="CombuctorFrameTabButtonTemplate" inherits="CharacterFrameTabButtonTemplate" virtual="true"/>
 
 	<Button name="CombuctorIconButtonTemplate" virtual="true">
 		<Size x="64" y="64"/>
@@ -209,14 +203,7 @@
 			<OnClick>
 				if IsAltKeyDown() then
 					if arg1 == 'RightButton' then
-						local parent = self:GetParent()
-						if not parent:GetAttribute('UIPanelLayout-enabled') then
-							parent:SetAttribute('UIPanelLayout-enabled', true)
-							parent:SetUserPlaced(false)
-							HideUIPanel(parent)
-							ShowUIPanel(parent)
-							parent:SavePosition()
-						end
+						self:GetParent():SavePosition(nil)
 					end
 				end
 			</OnClick>
@@ -231,15 +218,8 @@
 			<OnMouseUp>
 				if self.isMoving then
 					self.isMoving = nil
-
-					local parent = self:GetParent()
-					parent:StopMovingOrSizing()
-					if parent:GetAttribute('UIPanelLayout-enabled') then
-						parent:SetAttribute('UIPanelLayout-enabled', nil)
-						HideUIPanel(parent)
-						ShowUIPanel(parent)
-						parent:SavePosition(parent:GetPoint())
-					end
+					self:GetParent():StopMovingOrSizing()
+					self:GetParent():SavePosition(self:GetParent():GetPoint())
 				end
 			</OnMouseUp>
 			<OnEnter>
@@ -260,14 +240,6 @@
 	-->
 
 	<Frame name="CombuctorFrameTemplate" clampedToScreen="true" enableMouse="true" movable="true" frameStrata="HIGH" parent="UIParent" hidden="true" virtual="true">
-		<Attributes>
-			<Attribute name="UIPanelLayout-defined" type="boolean" value="true"/>
-			<Attribute name="UIPanelLayout-enabled" type="boolean" value="true"/>
-			<Attribute name="UIPanelLayout-whileDead" type="boolean" value="true"/>
-			<Attribute name="UIPanelLayout-area" type="string" value="left"/>
-			<Attribute name="UIPanelLayout-pushable" type="number" value="1"/>
-		</Attributes>
-
 		<HitRectInsets>
 			<AbsInset left="0" right="35" top="0" bottom="75"/>
 		</HitRectInsets>
@@ -295,6 +267,14 @@
 
 	<Frame name="CombuctorInventoryTemplate" inherits="CombuctorFrameTemplate" virtual="true">
 		<Size x="384" y="512"/>
+
+		<Attributes>
+			<Attribute name="UIPanelLayout-defined" type="boolean" value="true"/>
+			<Attribute name="UIPanelLayout-enabled" type="boolean" value="true"/>
+			<Attribute name="UIPanelLayout-whileDead" type="boolean" value="true"/>
+			<Attribute name="UIPanelLayout-area" type="string" value="left"/>
+			<Attribute name="UIPanelLayout-pushable" type="number" value="1"/>
+		</Attributes>
 
 		<Layers>
 			<Layer level="ARTWORK">
@@ -351,6 +331,14 @@
 
 	<Frame name="CombuctorBankTemplate" inherits="CombuctorFrameTemplate" virtual="true">
 		<Size x="640" y="512"/>
+
+		<Attributes>
+			<Attribute name="UIPanelLayout-defined" type="boolean" value="true"/>
+			<Attribute name="UIPanelLayout-enabled" type="boolean" value="true"/>
+			<Attribute name="UIPanelLayout-whileDead" type="boolean" value="true"/>
+			<Attribute name="UIPanelLayout-area" type="string" value="left"/>
+			<Attribute name="UIPanelLayout-pushable" type="number" value="2"/>
+		</Attributes>
 
 		<Layers>
 			<Layer level="ARTWORK">
