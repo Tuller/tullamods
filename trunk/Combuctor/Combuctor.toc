@@ -2,7 +2,7 @@
 ## Title: Combuctor
 ## Author: Tuller
 ## Notes: Pants are a dangerous foe
-## Version: Beta.0.0
+## Version: Beta.1.0
 ## OptionalDeps: Ace3, Bagnon_Forever
 ## SavedVariables: CombuctorDB
 embeds.xml
