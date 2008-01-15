@@ -199,7 +199,6 @@ do
 
 	function SideFilter:OnButtonClick()
 		self:GetParent():GetParent():SetCategory(self.category)
-		self:GetParent():UpdateHighlight()
 	end
 
 	function SideFilter:OnButtonEnter()
@@ -602,6 +601,7 @@ end
 function InventoryFrame:SetCategory(category)
 	local changed = false
 	self.category = category
+	self.sideFilter:UpdateHighlight()
 	self:UpdateTabs()
 
 	if self:SetFilter('rule', category.rule) then
