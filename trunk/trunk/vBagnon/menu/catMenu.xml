@@ -1,0 +1,105 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+	
+	<Script file="catMenu.lua"/>
+	
+	<Button name="BagnonListButton" virtual="true">
+		<ButtonText setAllPoints="true"/>
+		<NormalFont font="GameFontNormal" justifyH="LEFT"/>
+		<HighlightFont font="GameFontHighlight" justifyH="LEFT"/>
+		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
+		
+		<Scripts>
+			<OnClick>
+				BagnonCatMenuListButton_OnClick(this)
+			</OnClick>
+			<OnMouseWheel>
+				BagnonCatMenuListButton_OnMouseWheel()
+			</OnMouseWheel>
+		</Scripts>
+	</Button>
+	
+	<Frame name="BagnonCatMenuFrame" inherits="BagnonPopupFrame" parent="UIParent" virtual="true">
+		<Size x="230" y="376"/>
+
+		<Layers>
+			<Layer level="ARTWORK">		
+				<FontString name="$parentTitle" inherits="GameFontHighlightLarge" text="Frame Categories">
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset x="0" y="-8"/>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+
+		<Frames>
+			<Button name="$parentClose" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset x="-1" y="-1"/>
+					</Anchor>
+				</Anchors>
+			</Button>
+			
+			<ScrollFrame name="$parentScrollFrame" inherits="FauxScrollFrameTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+						<Offset x="-6" y="-24"/>
+					</Anchor>
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT">
+						<Offset x="-28" y="42"/>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnVerticalScroll>
+						FauxScrollFrame_OnVerticalScroll(10, BagnonCatMenu_UpdateList)
+					</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>
+
+			<Button name="$parentAdd" inherits="UIPanelButtonTemplate" text="Add">
+				<Size x="44" y="24"/>
+
+				<Anchors>
+					<Anchor point="BOTTOMLEFT">
+						<Offset x="6" y="4"/>
+					</Anchor>
+				</Anchors>
+
+				<Scripts>
+					<OnClick>
+						BagnonCatMenuAdd_OnClick(this)
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentDelete" inherits="UIPanelButtonTemplate" text="DELETE">
+				<Size x="52" y="24"/>
+
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentAdd" relativePoint="RIGHT">
+						<Offset x="6" y="0"/>
+					</Anchor>
+				</Anchors>
+
+				<Scripts>
+					<OnClick>
+						BagnonCatMenuDelete_OnClick(this)
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		
+		<Scripts>
+			<OnClick>
+				this:Hide()
+			</OnClick>
+			<OnMouseWheel>
+				BagnonCatMenu_OnMouseWheel(getglobal(this:GetName() .. "ScrollFrame"), arg1)
+			</OnMouseWheel>
+		</Scripts>
+	</Frame>
+</Ui>

@@ -1,0 +1,219 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+
+	<Script file="catAdder.lua"/>
+	
+	<CheckButton name="BagnonFilterListCheckBox" virtual="true">
+		<Size x="32" y="32"/>
+
+		<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+		<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+		<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+		<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+	</CheckButton>
+
+	<Frame name="BagnonFilterListButton" enableMouse="true" enableMouseWheel="true" virtual="true">
+		<Size x="186" y="32"/>
+		
+		<Layers>
+			<Layer level="ARTWORK">		
+				<FontString name="$parentTitle" inherits="GameFontNormalSmall" justifyV="BOTTOM" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset x="6" y="9"/>
+						</Anchor>
+						
+						<Anchor point="BOTTOMRIGHT">
+							<Offset x="-96" y="9"/>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>	
+	
+		<Frames>
+			<CheckButton name="$parentExclude" inherits="BagnonFilterListCheckBox">
+				<Anchors>
+					<Anchor point="RIGHT">
+						<Offset x="0" y="0"/>
+					</Anchor>
+				</Anchors>
+
+				<Scripts>
+					<OnClick>
+						BagnonCatAdderExclude_OnClick(this)
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			
+			<CheckButton name="$parentInclude" inherits="BagnonFilterListCheckBox">
+				<Anchors>
+					<Anchor point="RIGHT">
+						<Offset x="-48" y="0"/>
+					</Anchor>
+				</Anchors>
+				
+				<Scripts>
+					<OnClick>
+						BagnonCatAdderInclude_OnClick(this)
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+		</Frames>
+
+		<Scripts>
+			<OnMouseWheel>
+				BagnonCatAdder_OnMouseWheel(getglobal(this:GetParent():GetName() .. "ScrollFrame"), arg1)
+			</OnMouseWheel>
+		</Scripts>
+	</Frame>
+	
+	<Frame name="BagnonFilterListFrame" enableMouse="true" enableMouseWheel="true" inherits="BagnonComponent" virtual="true">
+		<Layers>
+			<Layer level="ARTWORK">		
+				<FontString name="$parentExclude" inherits="GameFontHighlight" text="Exclude">
+					<Anchors>
+						<Anchor point="TOPRIGHT">
+							<Offset x="-30" y="-6"/>
+						</Anchor>
+					</Anchors>
+				</FontString>
+
+				<FontString name="$parentExclude" inherits="GameFontHighlight" text="Include">
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="$parentExclude" relativePoint="LEFT">
+							<Offset x="-6" y="0"/>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>	
+		
+		<Frames>
+			<ScrollFrame name="$parentScrollFrame" inherits="FauxScrollFrameTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+						<Offset x="-6" y="-20"/>
+					</Anchor>
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT">
+						<Offset x="-28" y="6"/>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						BagnonCatAdderList_Update()
+					</OnShow>
+					<OnVerticalScroll>
+						FauxScrollFrame_OnVerticalScroll(9, BagnonCatAdderList_Update)
+					</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>
+		</Frames>
+
+		<Scripts>
+			<OnLoad>
+				BagnonCatAdder_AddListButtons(this)
+			</OnLoad>
+			<OnMouseWheel>
+				BagnonCatAdder_OnMouseWheel(getglobal(this:GetName() .. "ScrollFrame"), arg1)
+			</OnMouseWheel>
+		</Scripts>
+	</Frame>
+	
+	<Frame name="BagnonCatAdderFrame" inherits="BagnonPopupFrame" parent="UIParent" hidden="true" virtual="true">
+		<Size x="230" y="376"/>
+		
+		<Layers>
+			<Layer level="ARTWORK">		
+				<FontString name="$parentTitle" inherits="GameFontHighlightLarge" text="Add Category">
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset x="0" y="-8"/>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		
+		<Frames>
+			<Button name="$parentClose" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset x="-1" y="-1"/>
+					</Anchor>
+				</Anchors>
+			</Button>
+			
+			<EditBox name="$parentName" inherits="BagnonEditBox">
+				<Size x="218" y="30"/>
+				
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset x="6" y="-32"/>
+					</Anchor>
+				</Anchors>
+				
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName() .. "Text"):SetText("Name:")
+						this:SetTextInsets(48, 8, 0, 0)
+					</OnLoad>
+				</Scripts>
+			</EditBox>
+			
+			<Frame name="$parentList" inherits="BagnonFilterListFrame">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentName" relativePoint="BOTTOMLEFT">
+						<Offset x="0" y="-2"/>
+					</Anchor>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset x="-4" y="32"/>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			
+			<Button name="$parentCancel" inherits="UIPanelButtonTemplate" text="CANCEL">
+				<Size x="44" y="24"/>
+				
+				<Anchors>
+					<Anchor point="BOTTOMLEFT">
+						<Offset x="6" y="4"/>
+					</Anchor>
+				</Anchors>
+				
+				<Scripts>
+					<OnClick>
+						this:GetParent():Hide()
+					</OnClick>
+				</Scripts>
+			</Button>
+			
+			<Button name="$parentAccept" inherits="UIPanelButtonTemplate" text="ACCEPT">
+				<Size x="52" y="24"/>
+				
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentCancel" relativePoint="RIGHT">
+						<Offset x="6" y="0"/>
+					</Anchor>
+				</Anchors>
+
+				<Scripts>
+					<OnClick>
+						local parent = this:GetParent()
+						local catTitle = getglobal(parent:GetName() .. "Name"):GetText()
+						if catTitle ~= "" then
+							BagnonCatAdder_AddCategory(parent.frame, catTitle)
+						end
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		
+		<Scripts>
+			<OnHide>
+				getglobal(this:GetName() .. "Name"):SetText("")
+			</OnHide>
+		</Scripts>
+	</Frame>
+</Ui>

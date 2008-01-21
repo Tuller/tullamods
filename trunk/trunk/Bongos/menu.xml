@@ -1,0 +1,91 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+
+	<!-- General Slider -->
+	<Slider name="BongosSlider" inherits="GooeySlider" virtual="true">
+		<Size x="200" y="18"/>
+	</Slider>
+
+	<!-- Scaler -->
+	<Slider name="BongosScaleSlider" inherits="BongosSlider" minValue="50" maxValue="150" valuestep="1" virtual="true">
+		<Scripts>
+			<OnLoad>
+				getglobal(this:GetName() .. "Text"):SetText(BONGOS_SCALE);
+				getglobal(this:GetName() .. "Low"):SetText("50%");
+				getglobal(this:GetName() .. "High"):SetText("150%");
+			</OnLoad>
+			<OnShow>	
+				this:SetValue(this:GetParent().frame:GetScale() * 100)
+			</OnShow>
+			<OnValueChanged>
+				if not this:GetParent().onShow then
+					this:GetParent().frame:SetFrameScale(this:GetValue() / 100);
+				end
+				getglobal(this:GetName() .. "ValText"):SetText(this:GetValue());
+			</OnValueChanged>
+		</Scripts>
+	</Slider>
+
+	<!-- Scaler -->
+	<Slider name="BongosOpacitySlider" inherits="BongosSlider" minValue="0" maxValue="100" valuestep="1" virtual="true">
+		<Scripts>
+			<OnLoad>
+				getglobal(this:GetName() .. "Text"):SetText(BONGOS_OPACITY);
+				getglobal(this:GetName() .. "Low"):SetText("0%");
+				getglobal(this:GetName() .. "High"):SetText("100%");
+			</OnLoad>
+			<OnShow>	
+				this:SetValue(this:GetParent().frame:GetAlpha() * 100)
+			</OnShow>
+			<OnValueChanged>
+				if not this:GetParent().onShow then
+					this:GetParent().frame:SetFrameOpacity(this:GetValue() / 100);
+				end
+				getglobal(this:GetName() .. "ValText"):SetText(this:GetValue());
+			</OnValueChanged>
+		</Scripts>
+	</Slider>
+
+	<!-- Spacing -->
+	<Slider name="BongosSpaceSlider" inherits="BongosSlider" minValue="0" maxValue="36" valuestep="2" virtual="true">
+		<Scripts>
+			<OnLoad>
+				getglobal(this:GetName() .. "Text"):SetText(BONGOS_SPACING);
+				getglobal(this:GetName() .. "Low"):SetText("0");
+				getglobal(this:GetName() .. "High"):SetText("36");
+			</OnLoad>
+		</Scripts>
+	</Slider>
+
+	<!-- Right Click Menu -->
+	<Button name="BongosRightClickMenu" inherits="GooeyPopup" virtual="true">
+		<ButtonText name="$parentText">
+			<Anchors>
+				<Anchor point="TOP">
+					<Offset x="0" y="-10"/>
+				</Anchor>
+			</Anchors>
+		</ButtonText>
+		<NormalFont font="GameFontHighlightLarge"/>
+
+		<Frames>
+			<Button name="$parentClose" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset x="-2" y="-2"/>
+					</Anchor>
+				</Anchors>
+			</Button>
+		</Frames>
+		
+		<Scripts>
+			<OnLoad>
+				this:RegisterForClicks("anyUp")
+			</OnLoad>
+			<OnClick>
+				this:Hide()
+			</OnClick>
+		</Scripts>
+	</Button>
+</Ui>

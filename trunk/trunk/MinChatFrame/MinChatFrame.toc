@@ -1,0 +1,6 @@
+## Interface: 20100
+## Title: MinChatFrame
+## Notes: Modifications to the Chat Frame
+## Author: Tuller
+MinChatFrame.xml
+ChatScroll.xml

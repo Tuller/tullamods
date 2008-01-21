@@ -1,0 +1,8 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="util.lua"/>
+	<Script file="events.lua"/>
+	<Script file="itemEvents.lua"/>
+	<Script file="item.lua"/>
+
+	<Include file="Combuctor.xml"/>
+</Ui>

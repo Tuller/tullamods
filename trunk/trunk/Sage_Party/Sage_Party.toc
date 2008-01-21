@@ -1,0 +1,6 @@
+## Interface: 20300
+## Title: Sage Party
+## Notes: Party frames
+## Author: Tuller
+## Dependencies: Sage
+party.lua

@@ -1,0 +1,9 @@
+<Bindings>
+	<!-- Bar visibility toggles -->
+	<Binding name="BMENUBAR_TOGGLE" header="BBARS">
+		BBar:Get("menu"):ToggleFrame()
+	</Binding>
+	<Binding name="BBAGBAR_TOGGLE">
+		BBar:Get("bags"):ToggleFrame()
+	</Binding>
+</Bindings>
