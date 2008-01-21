@@ -1,9 +1,0 @@
-Font Information
-----------------
-Font  ...: Calibri v0.9
-Author ..: Lucas de Groot
-Website .: http://www.microsoft.com
-License .: Free
-
-Styles ..: Normal, Bold, Italic, Bold Italic
-Notes ...: Default number font is bold.

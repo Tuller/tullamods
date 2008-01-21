@@ -1,6 +1,0 @@
-## Interface: 20100
-## Title: CSpell
-## Notes: Casting bar timers
-## Author: Tuller
-## Dependencies: Bongos2
-CSpell.lua
