@@ -287,11 +287,11 @@ function CombuctorBag:OnEnter()
 				local numBankSlots = BagnonDB:GetNumBankSlots(player)
 				if numBankSlots and bagID > (numBankSlots + 4) then
 					GameTooltip:SetText(BANK_BAG_PURCHASE, 1, 1, 1)
+					if player == UnitName('player') then
+						SetTooltipMoney(GameTooltip, GetBankSlotCost(GetNumBankSlots()))
+					end
 				else
 					GameTooltip:SetText(EQUIP_CONTAINER, 1, 1, 1)
-				end
-				if player == UnitName('player') then
-					SetTooltipMoney(GameTooltip, GetBankSlotCost(GetNumBankSlots()))
 				end
 			end
 		end
