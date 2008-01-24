@@ -427,15 +427,20 @@ function InventoryFrame:AddCategories()
 		--warlock: shard button
 		if class == 'WARLOCK' then
 			local name,_, _, _, _,_,_,_,_,icon = GetItemInfo(6265)
-
-			self:AddCategory(name, icon, function(bag, link)
-				return link and (GetItemInfo(link) == name)
-			end)
+			if name then
+				self:AddCategory(name, icon, function(bag, link)
+					return link and GetItemInfo(link) == name
+				end)
+			else
+				self:AddCategory(L.SoulShard, 'Interface/Icons/INV_Misc_Gem_Amethyst_02', function(bag, link)
+					return link and (link:match('%d+') == '6265')
+				end)
+			end
 		end
 	end
 
 	self:AddCategory(L.Misc, 'Interface/Icons/INV_Misc_Rune_01', function(bag, link, type)
-		return type == L.Misc
+		return type == L.Misc and (link:match('%d+') ~= '6265')
 	end)
 end
 
