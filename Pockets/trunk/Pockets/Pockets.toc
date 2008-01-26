@@ -3,8 +3,9 @@
 ## Notes: Quick access to inventory items
 ## Author: Tuller
 ## Dependencies: Bongos2
-BagnonLib.lua
+localization.lua
+events.lua
 utility.lua
+Pockets.lua
 item.lua
-frame.lua
-bar.lua
+itemFrame.lua
