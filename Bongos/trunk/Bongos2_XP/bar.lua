@@ -340,6 +340,7 @@ function BongosXP:Load()
 		point = 'TOP',
 		xOff = 0,
 		yOff = -32,
+		alwaysShowText = true,
 	}
 
 	local bar = BBar:Create('xp', Bar_OnCreate, nil, defaults, 'BACKGROUND')
