@@ -182,7 +182,6 @@ function ItemFrame:HasItem(bag, slot, link)
 		local link = link or PocketUtil:GetItemLink(bag, slot)
 		if link then
 			local name, link, quality, level, ilvl, type, subType, stackCount, equipLoc = GetItemInfo(link)
-
 			local name =  name:lower()
 			if not(rule == name or name:find(rule)) then
 				local type = type:lower()
@@ -201,9 +200,9 @@ function ItemFrame:HasItem(bag, slot, link)
 					end
 				end
 			end
-			return true
+		else
+			return false
 		end
-		return false
 	end
 	return true
 end
