@@ -1,5 +1,5 @@
 ## Interface: 20100
-## Title: Pockets
+## Title: Davey Crocket's Rocket Pockets
 ## Notes: Quick access to inventory items
 ## Author: Tuller
 ## Dependencies: Bongos2
