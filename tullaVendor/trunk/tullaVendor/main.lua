@@ -1,7 +1,6 @@
-local f = CreateFrame("Frame")
-
-f:SetScript("OnEvent", function(self, event)
-	if event == "MERCHANT_SHOW" then
+local f = CreateFrame('Frame')
+f:SetScript('OnEvent', function(self, event)
+	if event == 'MERCHANT_SHOW' then
 		if CanMerchantRepair() then
 			local repairAllCost, canRepair = GetRepairAllCost()
 			if canRepair then
@@ -9,7 +8,6 @@ f:SetScript("OnEvent", function(self, event)
 			end
 		end
 
-		local bag, slot
 		for bag = 0, 4 do
 			for slot = 0, GetContainerNumSlots(bag) do
 				local link = GetContainerItemLink(bag, slot)
@@ -21,4 +19,7 @@ f:SetScript("OnEvent", function(self, event)
 		end
 	end
 end)
-f:RegisterEvent("MERCHANT_SHOW")
+f:RegisterEvent('MERCHANT_SHOW')
+
+--MinimapBackdrop:SetFrameLevel(0)
+--MinimapBorder:SetVertexColor(0,0,0,0.6)
