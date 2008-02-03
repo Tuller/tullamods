@@ -7,6 +7,7 @@
 --]]
 
 local L = LibStub("AceLocale-3.0"):NewLocale("Bongos3", "zhCN")
+if not L then return end
 
 --system messages
 L.NewPlayer = "建立新配置 %s"

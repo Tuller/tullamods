@@ -6,7 +6,7 @@
 local Bongos = LibStub('AceAddon-3.0'):NewAddon('Bongos3', 'AceEvent-3.0', 'AceConsole-3.0')
 Bongos.dbName = 'Bongos3DB'
 
-local CURRENT_VERSION = GetAddOnMetadata('Bongos3', 'Version') .. '.' .. ('$Rev$'):match('%d+')
+local CURRENT_VERSION = GetAddOnMetadata('Bongos', 'Version') .. '.' .. ('$Rev$'):match('%d+')
 local L = LibStub('AceLocale-3.0'):GetLocale('Bongos3')
 
 
@@ -25,7 +25,7 @@ function Bongos:OnEnable()
 	self.profile = self.db.profile
 
 	if Bongos3Version then
-		local cMinor = GetAddOnMetadata('Bongos3', 'Version')
+		local cMinor = GetAddOnMetadata('Bongos', 'Version')
 		local minor = Bongos3Version:match('(%d+).')
 
 		--settings change

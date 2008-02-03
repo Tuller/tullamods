@@ -48,7 +48,7 @@ do
 		end
 	end
 
-	BBar.Fader = f
+	Bongos.Bar.Fader = f
 end
 
 
@@ -59,7 +59,7 @@ BBar.stickyTolerance = 16
 BBar.paddingX = 2
 BBar.paddingY = 2
 
-local active = [}
+local active = {}
 local unused = {}
 
 function BBar:Create(id, defaults, strata)

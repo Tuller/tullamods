@@ -5,6 +5,7 @@
 --]]
 
 local L = LibStub("AceLocale-3.0"):NewLocale("Bongos3", "esES")
+if not L then return end
 
 --system messages
 L.NewPlayer = "Creado perfil nuevo para %s"
