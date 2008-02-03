@@ -83,74 +83,74 @@ end
 
 --[[ Profile Functions ]]--
 
--- function Bongos:SaveProfile(profile)
-	-- local currentProfile = self.db:GetCurrentProfile()
-	-- if profile and profile ~= self.db:GetCurrentProfile() then
-		-- self:UnloadModules()
-		-- self.copying = true
-		-- self.db:SetProfile(profile)
-		-- self.db:CopyProfile(currentProfile)
-		-- self.copying = nil
-	-- end
--- end
+function Bongos:SaveProfile(profile)
+	local currentProfile = self.db:GetCurrentProfile()
+	if profile and profile ~= self.db:GetCurrentProfile() then
+		self:UnloadModules()
+		self.copying = true
+		self.db:SetProfile(profile)
+		self.db:CopyProfile(currentProfile)
+		self.copying = nil
+	end
+end
 
--- function Bongos:SetProfile(name)
-	-- local profile = self:MatchProfile(name)
-	-- if profile and profile ~= self.db:GetCurrentProfile() then
-		-- self:UnloadModules()
-		-- self.db:SetProfile(profile)
-	-- end
--- end
+function Bongos:SetProfile(name)
+	local profile = self:MatchProfile(name)
+	if profile and profile ~= self.db:GetCurrentProfile() then
+		self:UnloadModules()
+		self.db:SetProfile(profile)
+	end
+end
 
--- function Bongos:DeleteProfile(name)
-	-- local profile = self:MatchProfile(name)
-	-- if profile and profile ~= self.db:GetCurrentProfile() then
-		-- self.db:DeleteProfile(profile)
-	-- else
-		-- self:Print(L.CantDeleteCurrentProfile)
-	-- end
--- end
+function Bongos:DeleteProfile(name)
+	local profile = self:MatchProfile(name)
+	if profile and profile ~= self.db:GetCurrentProfile() then
+		self.db:DeleteProfile(profile)
+	else
+		self:Print(L.CantDeleteCurrentProfile)
+	end
+end
 
--- function Bongos:CopyProfile(name)
-	-- local profile = self:MatchProfile(name)
-	-- if profile and profile ~= self.db:GetCurrentProfile() then
-		-- self:UnloadModules()
-		-- self.copying = true
-		-- self.db:ResetProfile()
-		-- self.db:CopyProfile(profile)
-		-- self.copying = nil
-	-- end
--- end
+function Bongos:CopyProfile(name)
+	local profile = self:MatchProfile(name)
+	if profile and profile ~= self.db:GetCurrentProfile() then
+		self:UnloadModules()
+		self.copying = true
+		self.db:ResetProfile()
+		self.db:CopyProfile(profile)
+		self.copying = nil
+	end
+end
 
--- function Bongos:ResetProfile()
-	-- self:UnloadModules()
-	-- self.db:ResetProfile()
--- end
+function Bongos:ResetProfile()
+	self:UnloadModules()
+	self.db:ResetProfile()
+end
 
--- function Bongos:ListProfiles()
-	-- self:Print(L.AvailableProfiles)
-	-- for _,k in ipairs(self.db:GetProfiles()) do
-		-- DEFAULT_CHAT_FRAME:AddMessage(" - " .. k)
-	-- end
--- end
+function Bongos:ListProfiles()
+	self:Print(L.AvailableProfiles)
+	for _,k in ipairs(self.db:GetProfiles()) do
+		DEFAULT_CHAT_FRAME:AddMessage(" - " .. k)
+	end
+end
 
--- function Bongos:MatchProfile(name)
-	-- local profileList = self.db:GetProfiles()
+function Bongos:MatchProfile(name)
+	local profileList = self.db:GetProfiles()
 
-	-- local name = name:lower()
-	-- local nameRealm = name .. ' - ' .. GetRealmName():lower()
-	-- local match
+	local name = name:lower()
+	local nameRealm = name .. ' - ' .. GetRealmName():lower()
+	local match
 
-	-- for i, k in ipairs(profileList) do
-		-- local key = k:lower()
-		-- if key == name then
-			-- return k
-		-- elseif key == nameRealm then
-			-- match = k
-		-- end
-	-- end
-	-- return match
--- end
+	for i, k in ipairs(profileList) do
+		local key = k:lower()
+		if key == name then
+			return k
+		elseif key == nameRealm then
+			match = k
+		end
+	end
+	return match
+end
 
 
 --[[ Messages ]]--

@@ -3,23 +3,25 @@
 		Based on the fubar and item rack minimap buttons
 --]]
 
-local MinimapButton = CreateFrame('Button', 'BongosMinimapButton', Minimap)
+local Bongos = LibStub('AceAddon-3.0'):GetAddon('Bongos3')
+local L = LibStub('AceLocale-3.0'):GetLocale('Bongos3')
+local MinimapButton = CreateFrame('Button', 'Bongos3MinimapButton', Minimap)
 
 function MinimapButton:Load()
 	self:SetWidth(31); self:SetHeight(31)
 	self:SetFrameLevel(8)
 	self:RegisterForClicks('anyUp')
 	self:RegisterForDrag('LeftButton')
-	self:SetHighlightTexture('Interface/Minimap/UI-Minimap-ZoomButton-Highlight')
+	self:SetHighlightTexture('Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight')
 
 	local overlay = self:CreateTexture(nil, 'OVERLAY')
 	overlay:SetWidth(53); overlay:SetHeight(53)
-	overlay:SetTexture('Interface/Minimap/MiniMap-TrackingBorder')
+	overlay:SetTexture('Interface\\Minimap\\MiniMap-TrackingBorder')
 	overlay:SetPoint('TOPLEFT')
 
 	local icon = self:CreateTexture(nil, 'BACKGROUND')
 	icon:SetWidth(20); icon:SetHeight(20)
-	icon:SetTexture('Interface/Icons/INV_Misc_Drum_04')
+	icon:SetTexture('Interface\\Icons\\INV_Misc_Drum_04')
 	icon:SetTexCoord(0.05, 0.95, 0.05, 0.95)
 	icon:SetPoint('TOPLEFT', 7, -5)
 	self.icon = icon
@@ -35,7 +37,7 @@ end
 
 function MinimapButton:OnClick(button)
 	if button == 'LeftButton' then
-		if IsAddOnLoaded('Bongos2_ActionBar') and IsShiftKeyDown() then
+		if IsAddOnLoaded('Bongos_ActionBar') and IsShiftKeyDown() then
 			BongosActionConfig:LockButtons(not BongosActionConfig:ButtonsLocked())
 		else
 			Bongos:SetLock(not Bongos:IsLocked())
@@ -54,12 +56,11 @@ function MinimapButton:OnMouseUp()
 end
 
 function MinimapButton:OnEnter()
-	local L = BONGOS_LOCALS
 	if not self.dragging then
 		GameTooltip:SetOwner(self, 'ANCHOR_TOPRIGHT')
 		GameTooltip:SetText('Bongos2', 1, 1, 1)
 
-		if not(BongosOptions and BongosOptions:IsShown()) then
+		if not(Bongos.Options and Bongos.Options:IsShown()) then
 			GameTooltip:AddLine(L.ShowMenuTip)
 		else
 			GameTooltip:AddLine(L.HideMenuTip)
