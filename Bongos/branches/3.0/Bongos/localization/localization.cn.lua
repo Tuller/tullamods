@@ -64,5 +64,3 @@ L.LockBarsTip = "<左键> 锁定动作条位置"
 L.UnlockBarsTip = "<左键> 解锁动作条位置"
 L.LockButtonsTip = "<Shift+左键> 锁定动作条按钮"
 L.UnlockButtonsTip = "<Shift+左键> 解锁动作条按钮"
-
-end;
