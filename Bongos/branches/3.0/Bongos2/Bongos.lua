@@ -3,26 +3,20 @@
 		Driver for bongos bars
 --]]
 
-Bongos = DongleStub('Dongle-1.0'):New('Bongos')
-Bongos.dbName = 'Bongos2DB'
-local CURRENT_VERSION = GetAddOnMetadata('Bongos2', 'Version')
-local L = BONGOS_LOCALS
+local Bongos = LibStub('AceAddon-3.0'):NewAddon('Bongos3', 'AceEvent-3.0', 'AceDB-3.0', 'AceConsole-3.0')
+Bongos.dbName = 'Bongos3DB'
+
+local CURRENT_VERSION = GetAddOnMetadata('Bongos3', 'Version')
+local L = LibStub('AceLocale-3.0'):GetLocale('Bongos3')
 
 
 --[[ Startup ]]--
 
-function Bongos:Initialize()
+function Bongos:OnInitialize()
 	local defaults = {
 		profile = {
 			sticky = true,
-			showTooltips = true,
-			showHotkeys = true,
-			showMacros = true,
-			rangeColoring = true,
-			showEmpty = false,
 			showMinimap = true,
-			highlightBuffs = true,
-			rangeColor = {r = 1, g = 0.5, b = 0.5},
 			bars = {}
 		}
 	}
@@ -30,26 +24,18 @@ function Bongos:Initialize()
 	self.profile = self.db.profile
 end
 
-function Bongos:Enable()
-	if BongosVersion then
-		local cMajor, cMinor = CURRENT_VERSION:match('(%d+)%.(%d+)')
-		local major, minor = BongosVersion:match('(%d+)%.(%d+)')
+function Bongos:OnEnable()
+	if Bongos3Version then
+		local cMinor = CURRENT_VERSION:match('(%d+).')
+		local minor = Bongos3Version:match('(%d+).')
 
-		--compatibility break
-		if major ~= cMajor then
-			self.db:ResetDB()
-			self.profile = self.db.profile
-			self:Print(L.UpdatedIncompatible)
 		--settings change
-		elseif minor ~= cMinor then
+		if minor ~= cMinor then
 			self:UpdateSettings()
 		end
-	--handle upgrading from <= 1.5 to 1.6+ because I'm a moron sometimes
-	else
-		self:UpdateSettings()
 	end
 
-	if BongosVersion ~= CURRENT_VERSION then
+	if Bongos3Version ~= CURRENT_VERSION then
 		self:UpdateVersion()
 	end
 
@@ -426,7 +412,7 @@ function Bongos:CreateWidgetClass(type)
 	function class:New(o)
 		if o then
 			local type, cType = o:GetFrameType(), self:GetFrameType()
-			assert(type == cType, format("'%s' expected, got '%s'", cType, type))
+			assert(type == cType, format('\'%s\' expected, got \'%s\'', cType, type))
 		end
 		return setmetatable(o or CreateFrame(type), mt)
 	end

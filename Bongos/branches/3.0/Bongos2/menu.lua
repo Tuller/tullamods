@@ -17,7 +17,7 @@ function BongosMenu:CreateMenu(name, tabbed)
 	frame:SetClampedToScreen(true)
 	frame:SetFrameStrata("DIALOG")
 
-	if(tabbed) then
+	if tabbed then
 		local menu = frame:AddPanelMenu()
 		menu:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, -12)
 		frame.menu = menu
@@ -25,7 +25,6 @@ function BongosMenu:CreateMenu(name, tabbed)
 	frame.content = frame:AddContentPane()
 
 	local panel = frame:AddPanel(L.Layout)
---	panel:AddVisibilityButton()
 	panel:AddAlphaSlider()
 	panel:AddFadeSlider()
 	panel:AddScaleSlider()

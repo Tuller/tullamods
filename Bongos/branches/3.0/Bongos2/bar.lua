@@ -2,79 +2,171 @@
 	BBar.lua - A movable, scalable, container frame
 --]]
 
-BBar = CreateFrame("Frame")
-local Bar_MT = {__index = BBar}
+local Bongos = LibStub('AceAddon-3.0'):GetAddon('Bongos3')
+Bongos.Bar = Bongos:CreateWidgetClass('Frame')
 
-local STICKY_TOLERANCE = 16 --how close one frame must be to another to trigger auto anchoring
-local PADDING = 2
-local active = {}
-local unused = {}
-local ceil = math.ceil
 
---fade and unfade mouseover frames
-local fadeChecker = CreateFrame("Frame")
-fadeChecker.bars = {}
-fadeChecker.nextUpdate = 0.1
-fadeChecker:Hide()
-fadeChecker:SetScript("OnUpdate", function(self, elapsed)
-	if self.nextUpdate < 0 then
-		self.nextUpdate = 0.1
-		for bar in pairs(self.bars) do
-			if MouseIsOver(bar, 1, -1, -1, 1) then
-				if abs(bar:GetAlpha() - bar:GetFadeAlpha()) < 0.01 then --the checking logic is a little weird because floating point values tend to not be exact
-					UIFrameFadeIn(bar, 0.1, bar:GetAlpha(), bar:GetFrameAlpha())
-				end
-			else
-				if abs(bar:GetAlpha() - bar:GetFrameAlpha()) < 0.01 then
-					UIFrameFadeOut(bar, 0.1, bar:GetAlpha(), bar:GetFadeAlpha())
+--[[ Auto Fade Manager ]]--
+
+do
+	local f = CreateFrame('Frame')
+	f.nextUpdate = 0.1
+	f.bars = {}
+
+	f:SetScript('OnUpdate', function(self, elapsed)
+		if self.nextUpdate < 0 then
+			self.nextUpdate = 0.1
+
+			for bar in pairs(self.bars) do
+				if MouseIsOver(bar, 1, -1, -1, 1) then
+					if abs(bar:GetAlpha() - bar:GetFadeAlpha()) < 0.01 then --the checking logic is a little weird because floating point values tend to not be exact
+						UIFrameFadeIn(bar, 0.1, bar:GetAlpha(), bar:GetFrameAlpha())
+					end
+				else
+					if abs(bar:GetAlpha() - bar:GetFrameAlpha()) < 0.01 then
+						UIFrameFadeOut(bar, 0.1, bar:GetAlpha(), bar:GetFadeAlpha())
+					end
 				end
 			end
+		else
+			self.nextUpdate = self.nextUpdate - elapsed
 		end
-	else
-		self.nextUpdate = self.nextUpdate - elapsed
+	end)
+	f:Hide()
+
+	function f:Add(bar)
+		self.bars[bar] = true
+		if not self:IsShown() then
+			self:Show()
+		end
 	end
-end)
 
+	function f:Remove(bar)
+		self.bars[bar] = nil
+		if not next(self.bars) then
+			self:Hide()
+		end
+	end
 
---[[ Local Functions ]]--
-
---returns the adjusted x and y coordinates for a frame at the given scale
-local function GetRelativeCoords(frame, scale)
-	local ratio = frame:GetScale() / scale
-	return (frame:GetLeft() or 0) * ratio, (frame:GetTop() or 0) * ratio
+	BBar.Fader = f
 end
 
-local function GetUIParentAnchor(f)
-	local w, h = UIParent:GetWidth(), UIParent:GetHeight()
-	local x, y = f:GetCenter()
-	local s = f:GetScale()
-	w = w/s
-	h = h/s
 
-	local dx, dy
-	local hHalf = (x > w/2) and 'RIGHT' or 'LEFT'
-	if hHalf == 'RIGHT' then
-		dx = f:GetRight() - w
-	else
-		dx = f:GetLeft()
+--[[ Constructor/Destructor ]]--
+
+local BBar = Bongos.Bar
+BBar.stickyTolerance = 16
+BBar.paddingX = 2
+BBar.paddingY = 2
+
+local active = [}
+local unused = {}
+
+function BBar:Create(id, defaults, strata)
+	local id = tonumber(id) or id
+	assert(id, 'id expected')
+	assert(not active[id], format('BBar \'%s\' is already in use', id))
+
+	local bar = self:Restore(id) or self:New(id)
+	bar:LoadSettings(defaults)
+
+	if bar.isNew and bar.OnCreate then
+		bar:OnCreate()
+		bar.isNew = nil
 	end
 
-	local vHalf = (y > h/2) and 'TOP' or 'BOTTOM'
-	if vHalf == 'TOP' then
-		dy = f:GetTop() - h
-	else
-		dy = f:GetBottom()
-	end
+	active[id] = bar
 
-	return vHalf..hHalf, dx, dy
+	return bar
 end
 
-local function StickToScreenEdge(f, tolerance)
-	local point, x, y = GetUIParentAnchor(f)
-	local s = f:GetScale()
-	local rTolerance = tolerance/s
-	local w = UIParent:GetWidth()/s
-	local h = UIParent:GetHeight()/s
+function BBar:CreateNew(id)
+	local bar = self:New(CreateFrame('Frame', nil, UIParent))
+	bar.id = id
+	bar.dragFrame = Bongos.Drag:Create(bar)
+	bar.isNew = true
+
+	if strata then
+		bar:SetFrameStrata(strata)
+	end
+
+	bar:SetWidth(32); bar:SetHeight(32)
+	bar:SetClampedToScreen(true)
+	bar:SetMovable(true)
+
+	return bar
+end
+
+function BBar:Restore(id)
+	local bar = self.unused[id]
+	if bar then
+		unused[id] = nil
+		return bar
+	end
+end
+
+function BBar:Destroy(deleteSettings)
+	active[self.id] = nil
+
+	if self.OnDelete then
+		self:OnDelete()
+	end
+
+	self.sets = nil
+	self.dragFrame:Hide()
+	self:ClearAllPoints()
+	self:SetUserPlaced(false)
+	self:Hide()
+
+	if deleteSettings then
+		Bongos:SetBarSets(self.id, nil)
+	end
+
+	self.Fader:Remove(self)
+
+	unused[self.id] = self
+end
+
+function BBar:LoadSettings(defaults)
+	self.sets = Bongos:GetBarSets(self.id) or Bongos:SetBarSets(self.id, defaults or {})
+	self:Reposition()
+
+	if self.sets.hidden then
+		self:HideFrame()
+	else
+		self:ShowFrame()
+	end
+
+	if Bongos:IsLocked() then
+		self:Lock()
+	else
+		self:Unlock()
+	end
+
+	self:UpdateAlpha()
+	self:UpdateFader()
+end
+
+
+--[[ Lock/Unlock ]]--
+
+function BBar:Lock()
+	self.dragFrame:Hide()
+end
+
+function BBar:Unlock()
+	self.dragFrame:Show()
+end
+
+
+--[[ Sticky Bars ]]--
+
+function BBar:StickToEdge()
+	local point, x, y = self:GetRelPosition()
+	local s = self:GetScale()
+	local w = self:GetParent():GetWidth()/s
+	local h = self:GetParent():GetHeight()/s
+	local rTolerance = self.stickyTolerance/s
 	local changed = false
 
 	--sticky edges
@@ -87,9 +179,9 @@ local function StickToScreenEdge(f, tolerance)
 		y = 0
 		changed = true
 	end
-	
+
 	-- auto centering
-	local cX, cY = f:GetCenter()
+	local cX, cY = self:GetCenter()
 	if y == 0 then
 		if abs(cX - w/2) <= rTolerance*2 then
 			if point == 'TOPLEFT' or point == 'TOPRIGHT' then
@@ -116,252 +208,14 @@ local function StickToScreenEdge(f, tolerance)
 
 	--save this junk if we've done something
 	if changed then
-		f.sets.point = point
-		f.sets.xOff = x
-		f.sets.yOff = y
+		self.sets.point = point
+		self.sets.x = x
+		self.sets.y = y
 
-		f:ClearAllPoints()
-		f:SetPoint(point, x, y)
-		return true
-	end
-end
-
-local function Bar_New(id, secure, strata)
-	local bar
-	if secure then
-		bar = setmetatable(CreateFrame("Frame", nil, UIParent, "SecureStateHeaderTemplate"), Bar_MT)
-	else
-		bar = setmetatable(CreateFrame("Frame", nil, UIParent), Bar_MT)
-	end
-	if strata then
-		bar:SetFrameStrata(strata)
-	end
-
-	bar.id = id
-	bar.dragFrame = BDragFrame_New(bar)
-
-	bar:SetClampedToScreen(true)
-	bar:SetMovable(true)
-	bar:SetSize(32)
-	bar.isNew = true
-
-	return bar
-end
-
-local function Bar_Restore(id)
-	local bar = unused[id]
-	if bar then
-		unused[id] = nil
-		return bar
-	end
-end
-
-
---[[ Usable Functions ]]--
-
-function BBar:Create(id, OnCreate, OnDelete, defaults, strata, secure)
-	local id = tonumber(id) or id
-	assert(id, "id expected")
-	assert(not active[id], format("BBar \"%s\" is already in use", id))
-
-	local bar = Bar_Restore(id) or Bar_New(id, secure, strata)
-	bar.OnDelete = OnDelete
-
-	bar:LoadSettings(defaults)
-	if bar.isNew then
-		if OnCreate then
-			OnCreate(bar)
-		end
-		bar.isNew = nil
-	end
-
-	active[id] = bar
-
-	return bar
-end
-
-function BBar:CreateHeader(id, OnCreate, OnDelete, defaults, strata)
-	return self:Create(id, OnCreate, OnDelete, defaults, strata, true)
-end
-
-function BBar:Destroy(deleteSettings)
-	active[self.id] = nil
-
-	if self.OnDelete then
-		self:OnDelete()
-	end
-
-	self.sets = nil
-	self.dragFrame:Hide()
-	self:ClearAllPoints()
-	self:SetUserPlaced(false)
-	self:Hide()
-
-	if deleteSettings then
-		Bongos:SetBarSets(self.id, nil)
-	end
-
-	fadeChecker.bars[self] = nil
-	if not next(fadeChecker.bars) then
-		fadeChecker:Hide()
-	end
-
-	unused[self.id] = self
-end
-
-
---[[ Settings Loading ]]--
-
-function BBar:LoadSettings(defaults)
-	self.sets = Bongos:GetBarSets(self.id) or Bongos:SetBarSets(self.id, defaults or {})
-	self:Reposition()
-
-	if self.sets.hidden then
-		self:HideFrame()
-	else
-		self:ShowFrame()
-	end
-
-	if Bongos:IsLocked() then
-		self:Lock()
-	else
-		self:Unlock()
-	end
-
-	self:UpdateAlpha()
-	self:UpdateFadeChecker()
-end
-
-
---[[ Lock/Unlock ]]--
-
-function BBar:Lock()
-	self.dragFrame:Hide()
-end
-
-function BBar:Unlock()
-	self.dragFrame:Show()
-end
-
-
---[[ Frame Attributes ]]--
-
---laziness function on my part
-function BBar:SetSize(x, y)
-	self:SetWidth(x)
-	self:SetHeight(y or x)
-end
-
---scale
-function BBar:SetFrameScale(scale, scaleAnchored)
-	local x, y = GetRelativeCoords(self, scale)
-
-	self.sets.scale = scale
-	self:SetScale(scale or 1)
-	self.dragFrame:SetScale(scale or 1)
-
-	if not self.sets.anchor then
 		self:ClearAllPoints()
-		self:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", x, y)
-		self:SavePosition()
-	end
-
-	if(scaleAnchored and Bongos:IsSticky()) then
-		for _,frame in self:GetAll() do
-			if frame:GetAnchor() == self then
-				frame:SetFrameScale(scale, true)
-			end
-		end
+		self:SetPoint(point, x, y)
 	end
 end
-
---opacity
-function BBar:UpdateAlpha()
-	self:SetAlpha((MouseIsOver(self) and self:GetFrameAlpha()) or self:GetFadeAlpha())
-end
-
-function BBar:SetFrameAlpha(alpha)
-	if alpha == 1 then
-		self.sets.alpha = nil
-	else
-		self.sets.alpha = alpha
-	end
-	self:UpdateAlpha()
-end
-
-function BBar:GetFrameAlpha()
-	return self.sets.alpha or 1
-end
-
-
---faded opacity (mouse not over the frame)
-function BBar:SetFadeAlpha(alpha)
-	local alpha = alpha or 1
-	if(alpha == 1) then
-		self.sets.fadeAlpha = nil
-	else
-		self.sets.fadeAlpha = alpha
-	end
-
-	self:UpdateFadeChecker()
-	self:UpdateAlpha()
-end
-
---returns fadedOpacity, fadePercentage
---fadedOpacity is what opacity the bar will be at when faded
---fadedPercentage is what modifier we use on normal opacity
-function BBar:GetFadeAlpha(alpha)
-	local fadeAlpha = self.sets.fadeAlpha or 1
-	return fadeAlpha * self:GetFrameAlpha(), fadeAlpha
-end
-
---poisition
-function BBar:SetFramePoint(...)
-	self:ClearAllPoints()
-	self:SetPoint(...)
-	self:SavePosition();
-end
-
-
---[[ Attach an object to the frame ]]--
-
-function BBar:Attach(frame)
-	frame:SetFrameStrata(self:GetFrameStrata())
-	frame:SetParent(self)
-	frame:SetFrameLevel(0)
-end
-
-
---[[ Visibility ]]--
-
-function BBar:ShowFrame()
-	self.sets.hidden = nil
-	self:Show()
-	self:UpdateFadeChecker()
-	self.dragFrame:UpdateColor()
-end
-
-function BBar:HideFrame()
-	self.sets.hidden = true
-	self:Hide()
-	self:UpdateFadeChecker()
-	self.dragFrame:UpdateColor()
-end
-
-function BBar:FrameIsShown()
-	return not self.sets.hidden
-end
-
-function BBar:ToggleFrame()
-	if self:FrameIsShown() then
-		self:HideFrame()
-	else
-		self:ShowFrame()
-	end
-end
-
-
---[[ Positioning ]]--
 
 function BBar:Stick()
 	local stuck = false
@@ -372,7 +226,7 @@ function BBar:Stick()
 		--try to stick to a screen edge, then try to stick to a bar
 		for _, frame in self:GetAll() do
 			if frame ~= self then
-				local point = FlyPaper.Stick(self, frame, STICKY_TOLERANCE, PADDING, PADDING)
+				local point = FlyPaper.Stick(self, frame, self.stickyTolerance, self.paddingX, self.paddingY)
 				if point then
 					self.sets.anchor = frame.id .. point
 					break
@@ -381,7 +235,7 @@ function BBar:Stick()
 		end
 
 		if not self.sets.anchor then
-			StickToScreenEdge(self, STICKY_TOLERANCE)
+			self:StickToEdge()
 		end
 	end
 
@@ -389,56 +243,11 @@ function BBar:Stick()
 	self.dragFrame:UpdateColor()
 end
 
-function BBar:SavePosition()
-	local point, xOff, yOff = GetUIParentAnchor(self)
-	local sets = self.sets
-
-	sets.point = point
-	sets.xOff = xOff
-	sets.yOff = yOff
-end
-
---place the frame at it"s saved position
---returns true if we've placed the frame
-function BBar:Reposition()
-	self:Rescale()
-
-	local sets = self.sets
-
-	--the new hotness positioning code
-	local point, xOff, yOff = sets.point, sets.xOff, sets.yOff
-	if point then
-		self:ClearAllPoints()
-		self:SetPoint(point, xOff, yOff)
-		self:SetUserPlaced(true)
-		return true
-	else
-		--handle the old anchoring code, this should be removed with bongos3/or a year from now
-		local x, y = sets.x, sets.y
-		if x and y then
-			self:ClearAllPoints()
-			self:SetPoint('TOPLEFT', UIParent, 'BOTTOMLEFT', x, y)
-			self:SetUserPlaced(true)
-
-			--convert to the new anchoring code
-			self.sets.x = nil
-			self.sets.y = nil
-			self:SavePosition()
-			return true
-		end
-	end
-end
-
-function BBar:Rescale()
-	self:SetScale(self.sets.scale or 1)
-	self.dragFrame:SetScale(self.sets.scale or 1)
-end
-
 --try to reanchor the frame
 function BBar:Reanchor()
 	local frame, point = self:GetAnchor()
 
-	if not(frame and Bongos:IsSticky() and FlyPaper.StickToPoint(self, frame, point, PADDING, PADDING)) then
+	if not(frame and Bongos:IsSticky() and FlyPaper.StickToPoint(self, frame, point, self.paddingX, self.paddingY)) then
 		self.sets.anchor = nil
 
 		if not self:Reposition() then
@@ -458,6 +267,191 @@ function BBar:GetAnchor()
 end
 
 
+--[[ Positioning ]]--
+
+function BBar:GetRelPosition()
+	local parent = self:GetParent()
+	local w, h = parent:GetWidth(), parent:GetHeight()
+	local x, y = self:GetCenter()
+	local s = self:GetScale()
+	w = w/s; h = h/s
+
+	local dx, dy
+	local hHalf = (x > w/2) and 'RIGHT' or 'LEFT'
+	if hHalf == 'RIGHT' then
+		dx = self:GetRight() - w
+	else
+		dx = self:GetLeft()
+	end
+
+	local vHalf = (y > h/2) and 'TOP' or 'BOTTOM'
+	if vHalf == 'TOP' then
+		dy = self:GetTop() - h
+	else
+		dy = self:GetBottom()
+	end
+
+	return vHalf..hHalf, dx, dy
+end
+
+function BBar:SavePosition()
+	local point, xOff, yOff = self:GetRelPosition()
+	local sets = self.sets
+
+	sets.point = point
+	sets.xOff = xOff
+	sets.yOff = yOff
+end
+
+--place the frame at it's saved position
+--returns true if we've placed the frame
+function BBar:Reposition()
+	self:Rescale()
+
+	local sets = self.sets
+
+	--the new hotness positioning code
+	local point, xOff, yOff = sets.point, sets.xOff, sets.yOff
+	if point then
+		self:ClearAllPoints()
+		self:SetPoint(point, xOff, yOff)
+		self:SetUserPlaced(true)
+		return true
+	else
+		--handle the old anchoring code, this should be removed with bongos3/or a year from now
+		local x, y = sets.x, sets.y
+		if x and y then
+			self:ClearAllPoints()
+			self:SetPoint('TOPLEFT', self:GetParent(), 'BOTTOMLEFT', x, y)
+			self:SetUserPlaced(true)
+
+			--convert to the new anchoring code
+			self.sets.x = nil
+			self.sets.y = nil
+			self:SavePosition()
+			return true
+		end
+	end
+end
+
+function BBar:SetFramePoint(...)
+	self:ClearAllPoints()
+	self:SetPoint(...)
+	self:SavePosition()
+end
+
+
+--[[ Scaling ]]--
+
+function BBar:GetScaledCoords(scale)
+	local ratio = self:GetScale() / scale
+	return (self:GetLeft() or 0) * ratio, (self:GetTop() or 0) * ratio
+end
+
+function BBar:SetFrameScale(scale, scaleAnchored)
+	local x, y =  self:GetScaledCoords(scale)
+
+	self.sets.scale = scale
+	self:SetScale(scale or 1)
+	self.dragFrame:SetScale(scale or 1)
+
+	if not self.sets.anchor then
+		self:ClearAllPoints()
+		self:SetPoint('TOPLEFT', UIParent, 'BOTTOMLEFT', x, y)
+		self:SavePosition()
+	end
+
+	if scaleAnchored and Bongos:IsSticky() then
+		for _,frame in self:GetAll() do
+			if frame:GetAnchor() == self then
+				frame:SetFrameScale(scale, true)
+			end
+		end
+	end
+end
+
+function BBar:Rescale()
+	self:SetScale(self.sets.scale or 1)
+	self.dragFrame:SetScale(self.sets.scale or 1)
+end
+
+
+--[[ Opacity ]]--
+
+function BBar:UpdateAlpha()
+	local alpha
+	if MouseIsOver(self, 1, -1, -1, 1) then
+		alpha = self:GetFrameAlpha()
+	else
+		alpha = self:GetFadedAlpha()
+	end
+	self:SetAlpha(alpha)
+end
+
+function BBar:SetFrameAlpha(alpha)
+	if alpha == 1 then
+		self.sets.alpha = nil
+	else
+		self.sets.alpha = alpha
+	end
+	self:UpdateAlpha()
+end
+
+function BBar:GetFrameAlpha()
+	return self.sets.alpha or 1
+end
+
+--faded opacity (mouse not over the frame)
+function BBar:SetFadeAlpha(alpha)
+	local alpha = alpha or 1
+	if alpha == 1 then
+		self.sets.fadeAlpha = nil
+	else
+		self.sets.fadeAlpha = alpha
+	end
+
+	self:UpdateAlpha()
+	self:UpdateFader()
+end
+
+--returns fadedOpacity, fadePercentage
+--fadedOpacity is what opacity the bar will be at when faded
+--fadedPercentage is what modifier we use on normal opacity
+function BBar:GetFadeAlpha(alpha)
+	local fadeAlpha = self.sets.fadeAlpha or 1
+	return fadeAlpha * self:GetFrameAlpha(), fadeAlpha
+end
+
+
+--[[ Visibility ]]--
+
+function BBar:ShowFrame()
+	self.sets.hidden = nil
+	self:Show()
+	self:UpdateFader()
+	self.dragFrame:UpdateColor()
+end
+
+function BBar:HideFrame()
+	self.sets.hidden = true
+	self:Hide()
+	self:UpdateFader()
+	self.dragFrame:UpdateColor()
+end
+
+function BBar:ToggleFrame()
+	if self:FrameIsShown() then
+		self:HideFrame()
+	else
+		self:ShowFrame()
+	end
+end
+
+function BBar:FrameIsShown()
+	return not self.sets.hidden
+end
+
+
 --[[ Menus ]]--
 
 function BBar:ShowMenu()
@@ -471,12 +465,11 @@ function BBar:ShowMenu()
 		self.menu = menu
 	end
 
-	local menu = self.menu
-	menu:SetFrameID(self.id)
-	self:PlaceMenu(menu)
+	self.menu:SetFrameID(self.id)
+	self:AnchorMenu(self.menu)
 end
 
-function BBar:PlaceMenu(menu)
+function BBar:AnchorMenu(menu)
 	local dragFrame = self.dragFrame
 	local ratio = UIParent:GetScale() / dragFrame:GetEffectiveScale()
 	local x = dragFrame:GetLeft() / ratio
@@ -484,8 +477,30 @@ function BBar:PlaceMenu(menu)
 
 	menu:Hide()
 	menu:ClearAllPoints()
-	menu:SetPoint("TOPRIGHT", UIParent, "BOTTOMLEFT", x, y)
+	menu:SetPoint('TOPRIGHT', UIParent, 'BOTTOMLEFT', x, y)
 	menu:Show()
+end
+
+
+--[[ Utility ]]--
+
+function BBar:Attach(frame)
+	frame:SetFrameStrata(self:GetFrameStrata())
+	frame:SetParent(self)
+	frame:SetFrameLevel(0)
+end
+
+--run the fade onupdate checker if only if there are mouseover frames to check
+function BBar:UpdateFader()
+	if self.sets.hidden then
+		self.Fader:Remove(self)
+	else
+		if(select(2, self:GetFadeAlpha()) == 1) then
+			self.Fader:Remove(self)
+		else
+			self.Fader:Add(self)
+		end
+	end
 end
 
 
@@ -509,14 +524,14 @@ function BBar:ForAll(method, ...)
 end
 
 --takes a barID, and performs the specified action on that bar
---this adds two special IDs, "all" for all bars and number-number for a range of IDs
+--this adds two special IDs, 'all' for all bars and number-number for a range of IDs
 function BBar:ForBar(id, method, ...)
-	assert(id and id ~= "", "Invalid barID")
+	assert(id and id ~= '', 'Invalid barID')
 
-	if id == "all" then
+	if id == 'all' then
 		self:ForAll(method, ...)
 	else
-		local startID, endID = id:match("(%d+)-(%d+)")
+		local startID, endID = id:match('(%d+)-(%d+)')
 		startID = tonumber(startID)
 		endID = tonumber(endID)
 
@@ -545,24 +560,5 @@ function BBar:ForBar(id, method, ...)
 				end
 			end
 		end
-	end
-end
-
---run the fade onupdate checker if only if there are mouseover frames to check
-function BBar:UpdateFadeChecker()
-	if(self.sets.hidden) then
-		fadeChecker.bars[self] = nil
-	else
-		if(select(2, self:GetFadeAlpha()) == 1) then
-			fadeChecker.bars[self] = nil
-		else
-			fadeChecker.bars[self] = true
-		end
-	end
-
-	if next(fadeChecker.bars) then
-		fadeChecker:Show()
-	else
-		fadeChecker:Hide()
 	end
 end
