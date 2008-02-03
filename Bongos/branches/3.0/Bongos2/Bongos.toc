@@ -2,7 +2,7 @@
 ## Title: Bongos
 ## Notes: Movable bar framework
 ## Author: Tuller
-## Version: 0.$Rev$
+## Version: 0.$WCREV$
 ## SavedVariables: Bongos3DB, BongosVersion
 ## OptionalDeps: Ace3
 lib\FlyPaper.lua
