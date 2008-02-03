@@ -5,11 +5,12 @@
 ## Version: 0
 ## SavedVariables: Bongos3DB, BongosVersion
 ## OptionalDeps: Ace3
-lib\FlyPaper.lua
+embeds.xml
 localization\localization.lua
 localization\localization.cn.lua
 localization\localization.fr.lua
 localization\localization.es.lua
+FlyPaper.lua
 Bongos.lua
 drag.lua
 bar.lua
