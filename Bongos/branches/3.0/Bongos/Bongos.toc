@@ -1,9 +1,9 @@
 ﻿## Interface: 20300
-## Title: Bongos
+## Title: Bongos3
 ## Notes: Movable bar framework
 ## Author: Tuller
 ## Version: 0
-## SavedVariables: Bongos3DB, BongosVersion
+## SavedVariables: Bongos3DB, Bongos3Version
 ## OptionalDeps: Ace3
 embeds.xml
 localization\localization.lua
