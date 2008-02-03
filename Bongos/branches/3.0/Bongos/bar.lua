@@ -19,12 +19,12 @@ do
 
 			for bar in pairs(self.bars) do
 				if MouseIsOver(bar, 1, -1, -1, 1) then
-					if abs(bar:GetAlpha() - bar:GetFadeAlpha()) < 0.01 then --the checking logic is a little weird because floating point values tend to not be exact
+					if abs(bar:GetAlpha() - bar:GetFadedAlpha()) < 0.01 then --the checking logic is a little weird because floating point values tend to not be exact
 						UIFrameFadeIn(bar, 0.1, bar:GetAlpha(), bar:GetFrameAlpha())
 					end
 				else
 					if abs(bar:GetAlpha() - bar:GetFrameAlpha()) < 0.01 then
-						UIFrameFadeOut(bar, 0.1, bar:GetAlpha(), bar:GetFadeAlpha())
+						UIFrameFadeOut(bar, 0.1, bar:GetAlpha(), bar:GetFadedAlpha())
 					end
 				end
 			end
@@ -67,20 +67,20 @@ function BBar:Create(id, defaults, strata)
 	assert(id, 'id expected')
 	assert(not active[id], format('BBar \'%s\' is already in use', id))
 
-	local bar = self:Restore(id) or self:New(id)
-	bar:LoadSettings(defaults)
-
-	if bar.isNew and bar.OnCreate then
-		bar:OnCreate()
-		bar.isNew = nil
+	local isNew
+	local bar = self:Restore(id)
+	if not bar then
+		bar = self:CreateNew(id, strata)
+		isNew = true
 	end
+	bar:LoadSettings(defaults)
 
 	active[id] = bar
 
-	return bar
+	return bar, isNew
 end
 
-function BBar:CreateNew(id)
+function BBar:CreateNew(id, strata)
 	local bar = self:New(CreateFrame('Frame', nil, UIParent))
 	bar.id = id
 	bar.dragFrame = Bongos.Drag:Create(bar)
@@ -98,7 +98,7 @@ function BBar:CreateNew(id)
 end
 
 function BBar:Restore(id)
-	local bar = self.unused[id]
+	local bar = unused[id]
 	if bar then
 		unused[id] = nil
 		return bar
@@ -128,7 +128,7 @@ function BBar:Destroy(deleteSettings)
 end
 
 function BBar:LoadSettings(defaults)
-	self.sets = Bongos:GetBarSets(self.id) or Bongos:SetBarSets(self.id, defaults or {})
+	self.sets = Bongos:GetBarSets(self.id) or Bongos:SetBarSets(self.id, defaults or {point = 'CENTER'})
 	self:Reposition()
 
 	if self.sets.hidden then
@@ -295,12 +295,12 @@ function BBar:GetRelPosition()
 end
 
 function BBar:SavePosition()
-	local point, xOff, yOff = self:GetRelPosition()
+	local point, x, y = self:GetRelPosition()
 	local sets = self.sets
 
 	sets.point = point
-	sets.xOff = xOff
-	sets.yOff = yOff
+	sets.x = x
+	sets.y = y
 end
 
 --place the frame at it's saved position
@@ -311,26 +311,12 @@ function BBar:Reposition()
 	local sets = self.sets
 
 	--the new hotness positioning code
-	local point, xOff, yOff = sets.point, sets.xOff, sets.yOff
+	local point, x, y = sets.point, sets.x, sets.y
 	if point then
 		self:ClearAllPoints()
-		self:SetPoint(point, xOff, yOff)
+		self:SetPoint(point, x, y)
 		self:SetUserPlaced(true)
 		return true
-	else
-		--handle the old anchoring code, this should be removed with bongos3/or a year from now
-		local x, y = sets.x, sets.y
-		if x and y then
-			self:ClearAllPoints()
-			self:SetPoint('TOPLEFT', self:GetParent(), 'BOTTOMLEFT', x, y)
-			self:SetUserPlaced(true)
-
-			--convert to the new anchoring code
-			self.sets.x = nil
-			self.sets.y = nil
-			self:SavePosition()
-			return true
-		end
 	end
 end
 
@@ -357,7 +343,7 @@ function BBar:SetFrameScale(scale, scaleAnchored)
 
 	if not self.sets.anchor then
 		self:ClearAllPoints()
-		self:SetPoint('TOPLEFT', UIParent, 'BOTTOMLEFT', x, y)
+		self:SetPoint('TOPLEFT', self:GetParent(), 'BOTTOMLEFT', x, y)
 		self:SavePosition()
 	end
 
@@ -417,7 +403,7 @@ end
 --returns fadedOpacity, fadePercentage
 --fadedOpacity is what opacity the bar will be at when faded
 --fadedPercentage is what modifier we use on normal opacity
-function BBar:GetFadeAlpha(alpha)
+function BBar:GetFadedAlpha(alpha)
 	local fadeAlpha = self.sets.fadeAlpha or 1
 	return fadeAlpha * self:GetFrameAlpha(), fadeAlpha
 end
@@ -495,7 +481,7 @@ function BBar:UpdateFader()
 	if self.sets.hidden then
 		self.Fader:Remove(self)
 	else
-		if(select(2, self:GetFadeAlpha()) == 1) then
+		if(select(2, self:GetFadedAlpha()) == 1) then
 			self.Fader:Remove(self)
 		else
 			self.Fader:Add(self)

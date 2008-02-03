@@ -3,7 +3,8 @@
 		Driver for bongos bars
 --]]
 
-local Bongos = LibStub('AceAddon-3.0'):NewAddon('Bongos3', 'AceEvent-3.0', 'AceConsole-3.0')
+Bongos3 = LibStub('AceAddon-3.0'):NewAddon('Bongos3', 'AceEvent-3.0', 'AceConsole-3.0')
+local Bongos = Bongos3
 Bongos.dbName = 'Bongos3DB'
 
 local CURRENT_VERSION = GetAddOnMetadata('Bongos', 'Version') .. '.' .. ('$Rev$'):match('%d+')
@@ -20,7 +21,7 @@ function Bongos:OnEnable()
 			bars = {},
 		}
 	}
-	
+
 	self.db = LibStub('AceDB-3.0'):New(self.dbName, defaults)
 	self.profile = self.db.profile
 
@@ -38,6 +39,9 @@ function Bongos:OnEnable()
 	if Bongos3Version ~= CURRENT_VERSION then
 		self:UpdateVersion()
 	end
+
+	self:LoadModules()
+	self:RegisterSlashCommands()
 end
 
 function Bongos:UpdateSettings()
@@ -48,14 +52,14 @@ function Bongos:UpdateVersion()
 	self:Print(L.Updated:format(Bongos3Version))
 end
 
--- function Bongos:LoadModules()
-	-- for name, module in self:IterateModules() do
-		-- assert(module.Load, format('Bongos Module %s: Missing Load function', name))
-		-- module:Load()
-	-- end
+function Bongos:LoadModules()
+	for name, module in self:IterateModules() do
+		assert(module.Load, format('Bongos Module %s: Missing Load function', name))
+		module:Load()
+	end
 	-- Bongos:UpdateMinimapButton()
-	-- BBar:ForAll('Reanchor')
--- end
+	self.Bar:ForAll('Reanchor')
+end
 
 -- function Bongos:UnloadModules()
 	-- for name, module in self:IterateModules() do
@@ -235,7 +239,12 @@ end
 
 --[[ Slash Commands ]]--
 
--- function Bongos:RegisterSlashCommands()
+function Bongos:RegisterSlashCommands()
+	self:RegisterChatCommand('bongos', 'OnCmd')
+	self:RegisterChatCommand('bob', 'OnCmd')
+	self:RegisterChatCommand('bgs', 'OnCmd')
+	self:RegisterChatCommand('bg3', 'OnCmd')
+
 	-- local cmdStr = '|cFF33FF99%s|r: %s'
 
 	-- local slash = self:InitializeSlashCommand('Bongos Commands', 'BONGOS', 'bongos', 'bgs', 'bob')
@@ -260,79 +269,158 @@ end
 	-- slash:RegisterSlashHandler(format(cmdStr, 'version', L.PrintVersionDesc), '^version$', 'PrintVersion')
 
 	-- self.slash = slash
--- end
+end
 
--- function Bongos:ShowMenu()
-	-- local enabled = select(4, GetAddOnInfo('Bongos2_Options'))
-	-- if enabled then
-		-- if BongosOptions then
-			-- BongosOptions:Toggle()
-		-- else
-			-- LoadAddOn('Bongos2_Options')
-		-- end
-	-- else
-		-- self.slash:PrintUsage()
-	-- end
--- end
+function Bongos:OnCmd(args)
+	local cmd = string.split(' ', args):lower()
 
--- function Bongos:ToggleLockedBars()
-	-- self:SetLock(not self.profile.locked)
--- end
+	if cmd == 'config' or cmd == 'lock' then
+		self:ToggleLockedBars()
+	elseif cmd == 'sticky' then
+		self:ToggleStickyBars()
+	elseif cmd == 'scale' then
+		self:ScaleBars(select(2, string.split(' ', args)))
+	elseif cmd == 'setalpha' then
+		self:SetOpacityForBars(select(2, string.split(' ', args)))
+	elseif cmd == 'setfade' then
+		self:SetFadeForBars(select(2, string.split(' ', args)))
+	elseif cmd == 'show' then
+		self:ShowBars(select(2, string.split(' ', args)))
+	elseif cmd == 'hide' then
+		self:HideBars(select(2, string.split(' ', args)))
+	elseif cmd == 'toggle' then
+		self:ToggleBars(select(2, string.split(' ', args)))
+	elseif cmd == 'save' then
+		self:SaveProfile(select(2, string.split(' ', args)))
+	elseif cmd == 'set' then
+		self:SetProfile(select(2, string.split(' ', args)))
+	elseif cmd == 'copy' then
+		self:CopyProfile(select(2, string.split(' ', args)))
+	elseif cmd == 'delete' then
+		self:DeleteProfile(select(2, string.split(' ', args)))
+	elseif cmd == 'reset' then
+		self:ResetProfile()
+	elseif cmd == 'list' then
+		self:ListProfiles()
+	elseif cmd == 'version' then
+		self:PrintVersion()
+	elseif cmd == 'cleanup' then
+		self:Cleanup()
+	elseif cmd == 'options' or cmd == '' then
+		self:ToggleOptionsMenu()
+	else
+		self:PrintHelp()
+	end
+end
 
--- function Bongos:ToggleStickyBars()
-	-- self:SetSticky(not self.profile.sticky)
--- end
+function Bongos:ToggleOptionsMenu()
+	local enabled = select(4, GetAddOnInfo('Bongos_Options'))
+	if enabled then
+		if self.Options then
+			self.Options:Toggle()
+		else
+			LoadAddOn('Bongos_Options')
+		end
+	else
+		self:PrintHelp()
+	end
+end
 
--- function Bongos:SetBarScale(args, scale)
-	-- local scale = tonumber(scale)
+function Bongos:ToggleLockedBars()
+	self:SetLock(not self.profile.locked)
+end
 
-	-- if scale and scale > 0 and scale <= 10 then
-		-- for _,barList in pairs({strsplit(' ', args)}) do
-			-- BBar:ForBar(barList, 'SetFrameScale', scale)
-		-- end
-	-- end
--- end
+function Bongos:ToggleStickyBars()
+	self:SetSticky(not self.profile.sticky)
+end
 
--- function Bongos:SetBarAlpha(args, alpha)
-	-- local alpha = tonumber(alpha)
+function Bongos:ScaleBars(...)
+	local numArgs = select('#', ...)
+	local scale = tonumber(select(numArgs, ...))
 
-	-- if alpha and alpha >= 0 and alpha <= 1 then
-		-- for _,barList in pairs({strsplit(' ', args)}) do
-			-- BBar:ForBar(barList, 'SetFrameAlpha', alpha)
-		-- end
-	-- end
--- end
+	if scale and scale > 0 and scale <= 10 then
+		for i = 1, numArgs - 1 do
+			self.Bar:ForBar(select(i, ...), 'SetFrameScale', scale)
+		end
+	end
+end
 
--- function Bongos:PrintVersion()
-	-- self:Print(BongosVersion)
--- end
+function Bongos:SetOpacityForBars(...)
+	local numArgs = select('#', ...)
+	local alpha = tonumber(select(numArgs, ...))
 
--- function Bongos:ShowBars(args)
-	-- for _, barList in pairs({strsplit(' ', args)}) do
-		-- BBar:ForBar(barList, 'ShowFrame')
-	-- end
--- end
+	if alpha and alpha >= 0 and alpha <= 1 then
+		for i = 1, numArgs - 1 do
+			self.Bar:ForBar(select(i, ...), 'SetFrameAlpha', alpha)
+		end
+	end
+end
 
--- function Bongos:HideBars(args)
-	-- for _, barList in pairs({strsplit(' ', args)}) do
-		-- BBar:ForBar(barList, 'HideFrame')
-	-- end
--- end
+function Bongos:SetFadeForBars(...)
+	local numArgs = select('#', ...)
+	local alpha = tonumber(select(numArgs, ...))
 
--- function Bongos:ToggleBars(args)
-	-- for _, barList in pairs({strsplit(' ', args)}) do
-		-- BBar:ForBar(barList, 'ToggleFrame')
-	-- end
--- end
+	if alpha and alpha >= 0 and alpha <= 1 then
+		for i = 1, numArgs - 1 do
+			self.Bar:ForBar(select(i, ...), 'SetFadeAlpha', alpha)
+		end
+	end
+end
 
--- function Bongos:CleanUp()
-	-- local bars = self.profile.bars
-	-- for id in pairs(self.profile.bars) do
-		-- if not BBar:Get(id) then
-			-- bars[id] = nil
-		-- end
-	-- end
--- end
+function Bongos:ShowBars(...)
+	for i = 1, select('#', ...) do
+		self.Bar:ForBar(select(i, ...), 'ShowFrame')
+	end
+end
+
+function Bongos:HideBars(...)
+	for i = 1, select('#', ...) do
+		self.Bar:ForBar(select(i, ...), 'HideFrame')
+	end
+end
+
+function Bongos:ToggleBars(...)
+	for i = 1, select('#', ...) do
+		self.Bar:ForBar(select(i, ...), 'ToggleFrame')
+	end
+end
+
+function Bongos:Cleanup()
+	local bars = self.profile.bars
+	for id in pairs(self.profile.bars) do
+		if not self.Bar:Get(id) then
+			bars[id] = nil
+		end
+	end
+end
+
+function Bongos:PrintVersion()
+	self:Print(Bongos3Version)
+end
+
+function Bongos:PrintHelp(cmd)
+	local function PrintCmd(cmd, desc)
+		DEFAULT_CHAT_FRAME:AddMessage(format(' - |cFF33FF99%s|r: %s', cmd, desc))
+	end
+
+	self:Print('Commands (/bongos, /bob, or /bgs)')
+	PrintCmd('/bongos', L.ShowOptionsDesc)
+	PrintCmd('lock', L.LockBarsDesc)
+	PrintCmd('sticky', L.StickyBarsDesc)
+	PrintCmd('scale <barList> <scale>', L.SetScaleDesc)
+	PrintCmd('setalpha <barList> <opacity>', L.SetAlphaDesc)
+	PrintCmd('setfade <barList> <opacity>', L.SetFadeDesc)
+	PrintCmd('show <barList>', L.ShowBarsDesc)
+	PrintCmd('hide <barList>', L.HideBarsDesc)
+	PrintCmd('toggle <barList>', L.ToggleBarsDesc)
+	PrintCmd('save <barList>', L.SaveDesc)
+	PrintCmd('set <barList>', L.SetDesc)
+	PrintCmd('copy <barList>', L.CopyDesc)
+	PrintCmd('delete <barList>', L.DeleteDesc)
+	PrintCmd('reset', L.ResetDesc)
+	PrintCmd('list', L.ListDesc)
+	PrintCmd('version', L.PrintVersionDesc)
+end
 
 
 --minimap functions
@@ -370,7 +458,7 @@ function Bongos:CreateWidgetClass(type)
 	function class:New(o)
 		if o then
 			local type, cType = o:GetFrameType(), self:GetFrameType()
-			assert(type == cType, format('\'%s\' expected, got \'%s\'', cType, type))
+			assert(type == cType, format("'%s' expected, got '%s'", cType, type))
 		end
 		return setmetatable(o or CreateFrame(type), mt)
 	end

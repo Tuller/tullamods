@@ -5,6 +5,7 @@
 ## Version: 0
 ## SavedVariables: Bongos3DB, Bongos3Version
 ## OptionalDeps: Ace3
+## LoadOnDemand: 1
 embeds.xml
 localization\localization.lua
 localization\localization.cn.lua

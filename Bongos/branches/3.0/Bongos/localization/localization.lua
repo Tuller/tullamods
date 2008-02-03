@@ -27,6 +27,7 @@ L.StickyBarsDesc = "Toggles auto anchoring bars"
 
 L.SetScaleDesc = "Sets the scale of <barList>"
 L.SetAlphaDesc = "Sets the opacity of <barList>"
+L.SetFadeDesc = "Sets the faded opacity of <barList>"
 
 L.ShowBarsDesc = "Shows the given <barList>"
 L.HideBarsDesc = "Hides the given <barList>"

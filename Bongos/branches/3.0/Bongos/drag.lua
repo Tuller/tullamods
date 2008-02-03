@@ -3,8 +3,6 @@
 --]]
 
 local Bongos = LibStub('AceAddon-3.0'):GetAddon('Bongos3')
-Bongos.Drag = Bongos:CreateWidgetClass('Button')
-
 local L = LibStub('AceLocale-3.0'):GetLocale('Bongos3')
 
 
@@ -15,19 +13,19 @@ local L = LibStub('AceLocale-3.0'):GetLocale('Bongos3')
 local Scaler = Bongos:CreateWidgetClass('Button')
 
 function Scaler:Create(parent)
-	local f = CreateFrame("Button", nil, parent)
+	local f = self:New(CreateFrame('Button', nil, parent))
 	f:SetFrameLevel(parent:GetFrameLevel() + 1)
-	f:SetPoint("BOTTOMRIGHT", parent)
+	f:SetPoint('BOTTOMRIGHT', parent)
 	f:SetHeight(16)
 	f:SetWidth(16)
 
-	f:SetNormalTexture("Interface\\AddOns\\Bongos2\\textures\\Rescale")
+	f:SetNormalTexture('Interface\\AddOns\\Bongos2\\textures\\Rescale')
 	f:GetNormalTexture():SetVertexColor(1, 0.82, 0)
 
-	f:SetScript("OnEnter", self.OnEnter)
-	f:SetScript("OnLeave", self.OnLeave)
-	f:SetScript("OnMouseDown", self.StartScaling)
-	f:SetScript("OnMouseUp", self.StopScaling)
+	f:SetScript('OnEnter', self.OnEnter)
+	f:SetScript('OnLeave', self.OnLeave)
+	f:SetScript('OnMouseDown', self.StartScaling)
+	f:SetScript('OnMouseUp', self.StopScaling)
 	f.parent = parent.parent
 
 	return f
@@ -53,13 +51,21 @@ end
 function Scaler:StartScaling()
 	self.isScaling = true
 	self:GetParent():LockHighlight()
-	self:SetScript("OnUpdate", self.OnUpdate)
+	self:SetScript('OnUpdate', self.OnUpdate)
 end
 
-function Scaler:StopScalingScaling()
+function Scaler:StopScaling()
 	self.isScaling = nil
 	self:GetParent():UnlockHighlight()
-	self:SetScript("OnUpdate", nil)
+	self:SetScript('OnUpdate', nil)
+end
+
+function Scaler:OnEnter()
+	self:GetNormalTexture():SetVertexColor(1, 1, 1)
+end
+
+function Scaler:OnLeave()
+	self:GetNormalTexture():SetVertexColor(1, 0.82, 0)
 end
 
 
@@ -67,6 +73,7 @@ end
 	The Drag Frame
 --]]
 
+Bongos.Drag = Bongos:CreateWidgetClass('Button')
 local Drag = Bongos.Drag
 
 function Drag:Create(parent)
@@ -78,13 +85,13 @@ function Drag:Create(parent)
 	f:SetAllPoints(parent)
 	f:SetFrameLevel(6)
 
-	local bg = f:CreateTexture(nil, "BACKGROUND")
-	bg:SetTexture("Interface/Tooltips/UI-Tooltip-Background")
+	local bg = f:CreateTexture(nil, 'BACKGROUND')
+	bg:SetTexture('Interface/Tooltips/UI-Tooltip-Background')
 	bg:SetVertexColor(0, 0, 0, 0.5)
 	bg:SetAllPoints(f)
 	f:SetNormalTexture(bg)
 
-	local highlight = f:CreateTexture(nil, "BACKGROUND")
+	local highlight = f:CreateTexture(nil, 'BACKGROUND')
 	highlight:SetTexture(0, 0, 0.6, 0.5)
 	highlight:SetAllPoints(f)
 	f:SetHighlightTexture(highlight)
@@ -94,14 +101,14 @@ function Drag:Create(parent)
 	f:SetHighlightTextColor(1, 1, 1)
 	f:SetText(parent.id)
 
-	f:RegisterForClicks("AnyUp")
+	f:RegisterForClicks('AnyUp')
 	f:EnableMouseWheel(true)
-	f:SetScript("OnMouseDown", self.OnMouseDown)
-	f:SetScript("OnMouseUp", self.OnMouseUp)
-	f:SetScript("OnMouseWheel", self.OnMouseWheel)
-	f:SetScript("OnClick", self.OnClick)
-	f:SetScript("OnEnter", self.OnEnter)
-	f:SetScript("OnLeave", self.OnLeave)
+	f:SetScript('OnMouseDown', self.OnMouseDown)
+	f:SetScript('OnMouseUp', self.OnMouseUp)
+	f:SetScript('OnMouseWheel', self.OnMouseWheel)
+	f:SetScript('OnClick', self.OnClick)
+	f:SetScript('OnEnter', self.OnEnter)
+	f:SetScript('OnLeave', self.OnLeave)
 	f:Hide()
 
 	f.scaler = Scaler:Create(f, parent)
@@ -110,13 +117,13 @@ function Drag:Create(parent)
 end
 
 function Drag:OnEnter()
-	if(not self.scaler.isScaling) then
-		GameTooltip:SetOwner(self, "ANCHOR_BOTTOMLEFT")
+	if not self.scaler.isScaling then
+		GameTooltip:SetOwner(self, 'ANCHOR_BOTTOMLEFT')
 
 		if tonumber(self:GetText()) then
-			GameTooltip:SetText(format("ActionBar %s", self:GetText()), 1, 1, 1)
+			GameTooltip:SetText(format('ActionBar %s', self:GetText()), 1, 1, 1)
 		else
-			GameTooltip:SetText(format("%s Bar", self.parent.id:gsub("^%l", string.upper)), 1, 1, 1)
+			GameTooltip:SetText(format('%s Bar', self.parent.id:gsub('^%l', string.upper)), 1, 1, 1)
 		end
 
 		if self.parent.ShowMenu then
@@ -139,7 +146,7 @@ function Drag:OnLeave()
 end
 
 function Drag:OnMouseDown(button)
-	if arg1 == "LeftButton" then
+	if arg1 == 'LeftButton' then
 		self.isMoving = true
 		self.parent:StartMoving()
 
@@ -167,13 +174,13 @@ function Drag:OnMouseWheel(arg1)
 end
 
 function Drag:OnClick(button)
-	if button == "RightButton" then
+	if button == 'RightButton' then
 		if IsShiftKeyDown() then
 			self.parent:ToggleFrame()
 		elseif self.parent.ShowMenu then
 			self.parent:ShowMenu()
 		end
-	elseif button == "MiddleButton" then
+	elseif button == 'MiddleButton' then
 		self.parent:ToggleFrame()
 	end
 	self:OnEnter()
