@@ -57,28 +57,28 @@ function Bongos:LoadModules()
 		assert(module.Load, format('Bongos Module %s: Missing Load function', name))
 		module:Load()
 	end
-	-- Bongos:UpdateMinimapButton()
+	Bongos:UpdateMinimapButton()
 	self.Bar:ForAll('Reanchor')
 end
 
--- function Bongos:UnloadModules()
-	-- for name, module in self:IterateModules() do
-		-- assert(module.Unload, format('Bongos Module %s: Missing Unload function', name))
-		-- module:Unload()
-	-- end
--- end
+function Bongos:UnloadModules()
+	for name, module in self:IterateModules() do
+		assert(module.Unload, format('Bongos Module %s: Missing Unload function', name))
+		module:Unload()
+	end
+end
 
--- function Bongos:LoadOptions(event, addon)
-	-- if addon == 'Bongos_Options' then
-		-- for name, module in self:IterateModules() do
-			-- if module.LoadOptions then
-				-- module:LoadOptions()
-			-- end
-		-- end
-		-- BongosOptions:ShowPanel(L.General)
-		-- self:UnregisterEvent(event)
-	-- end
--- end
+function Bongos:LoadOptions(event, addon)
+	if addon == 'Bongos_Options' then
+		for name, module in self:IterateModules() do
+			if module.LoadOptions then
+				module:LoadOptions()
+			end
+		end
+		self.Options:ShowPanel(L.General)
+		self:UnregisterEvent(event)
+	end
+end
 
 
 --[[ Profile Functions ]]--
@@ -244,31 +244,6 @@ function Bongos:RegisterSlashCommands()
 	self:RegisterChatCommand('bob', 'OnCmd')
 	self:RegisterChatCommand('bgs', 'OnCmd')
 	self:RegisterChatCommand('bg3', 'OnCmd')
-
-	-- local cmdStr = '|cFF33FF99%s|r: %s'
-
-	-- local slash = self:InitializeSlashCommand('Bongos Commands', 'BONGOS', 'bongos', 'bgs', 'bob')
-	-- slash:RegisterSlashHandler(format(cmdStr, '/bob', L.ShowOptionsDesc), '^$', 'ShowMenu')
-	-- slash:RegisterSlashHandler(format(cmdStr, 'config', L.LockBarsDesc), '^config$', 'ToggleLockedBars')
-	-- slash:RegisterSlashHandler(format(cmdStr, 'lock', L.LockBarsDesc), '^lock$', 'ToggleLockedBars')
-	-- slash:RegisterSlashHandler(format(cmdStr, 'sticky', L.StickyBarsDesc), '^sticky$', 'ToggleStickyBars')
-
-	-- slash:RegisterSlashHandler(format(cmdStr, 'scale <barList> <scale>', L.SetScaleDesc), '^scale (.+) ([%d%.]+)', 'SetBarScale')
-	-- slash:RegisterSlashHandler(format(cmdStr, 'setalpha <barList> <opacity>', L.SetAlphaDesc), '^setalpha (.+) ([%d%.]+)', 'SetBarAlpha')
-
-	-- slash:RegisterSlashHandler(format(cmdStr, 'show <barList>', L.ShowBarsDesc), '^show (.+)', 'ShowBars')
-	-- slash:RegisterSlashHandler(format(cmdStr, 'hide <barList>', L.HideBarsDesc), '^hide (.+)', 'HideBars')
-	-- slash:RegisterSlashHandler(format(cmdStr, 'toggle <barList>', L.ToggleBarsDesc), '^toggle (.+)', 'ToggleBars')
-
-	-- slash:RegisterSlashHandler(format(cmdStr, 'save <profle>', L.SaveDesc), 'save (%w+)', 'SaveProfile')
-	-- slash:RegisterSlashHandler(format(cmdStr, 'set <profle>', L.SetDesc), 'set (%w+)', 'SetProfile')
-	-- slash:RegisterSlashHandler(format(cmdStr, 'copy <profile>', L.CopyDesc), 'copy (%w+)', 'CopyProfile')
-	-- slash:RegisterSlashHandler(format(cmdStr, 'delete <profile>', L.DeleteDesc), '^delete (%w+)', 'DeleteProfile')
-	-- slash:RegisterSlashHandler(format(cmdStr, 'reset', L.ResetDesc), '^reset$', 'ResetProfile')
-	-- slash:RegisterSlashHandler(format(cmdStr, 'list', L.ListDesc), '^list$', 'ListProfiles')
-	-- slash:RegisterSlashHandler(format(cmdStr, 'version', L.PrintVersionDesc), '^version$', 'PrintVersion')
-
-	-- self.slash = slash
 end
 
 function Bongos:OnCmd(args)
@@ -424,31 +399,31 @@ end
 
 
 --minimap functions
--- function Bongos:SetShowMinimap(enable)
-	-- self.profile.showMinimap = enable or false
-	-- self:UpdateMinimapButton()
--- end
+function Bongos:SetShowMinimap(enable)
+	self.profile.showMinimap = enable or false
+	self:UpdateMinimapButton()
+end
 
--- function Bongos:ShowingMinimap()
-	-- return self.profile.showMinimap
--- end
+function Bongos:ShowingMinimap()
+	return self.profile.showMinimap
+end
 
--- function Bongos:UpdateMinimapButton()
-	-- if self:ShowingMinimap() then
-		-- BongosMinimapButton:UpdatePosition()
-		-- BongosMinimapButton:Show()
-	-- else
-		-- BongosMinimapButton:Hide()
-	-- end
--- end
+function Bongos:UpdateMinimapButton()
+	if self:ShowingMinimap() then
+		self.Minimap:UpdatePosition()
+		self.Minimap:Show()
+	else
+		self.Minimap:Hide()
+	end
+end
 
--- function Bongos:SetMinimapButtonPosition(angle)
-	-- self.profile.minimapPos = angle
--- end
+function Bongos:SetMinimapButtonPosition(angle)
+	self.profile.minimapPos = angle
+end
 
--- function Bongos:GetMinimapButtonPosition(angle)
-	-- return self.profile.minimapPos
--- end
+function Bongos:GetMinimapButtonPosition(angle)
+	return self.profile.minimapPos
+end
 
 --utility function: create a widget class
 function Bongos:CreateWidgetClass(type)

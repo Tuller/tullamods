@@ -5,7 +5,9 @@
 
 local Bongos = LibStub('AceAddon-3.0'):GetAddon('Bongos3')
 local L = LibStub('AceLocale-3.0'):GetLocale('Bongos3')
-local MinimapButton = CreateFrame('Button', 'Bongos3MinimapButton', Minimap)
+
+Bongos.Minimap = CreateFrame('Button', 'Bongos3MinimapButton', Minimap)
+local MinimapButton = Bongos.Minimap
 
 function MinimapButton:Load()
 	self:SetWidth(31); self:SetHeight(31)
@@ -37,13 +39,14 @@ end
 
 function MinimapButton:OnClick(button)
 	if button == 'LeftButton' then
-		if IsAddOnLoaded('Bongos_ActionBar') and IsShiftKeyDown() then
-			BongosActionConfig:LockButtons(not BongosActionConfig:ButtonsLocked())
+		local ActionBar = Bongos:GetModule('ActionBar', true)
+		if ActionBar and IsShiftKeyDown() then
+			ActionBar.Config:LockButtons(not ActionBar.Config:ButtonsLocked())
 		else
 			Bongos:SetLock(not Bongos:IsLocked())
 		end
 	elseif button == 'RightButton' then
-		Bongos:ShowMenu()
+		Bongos:ToggleOptionsMenu()
 	end
 end
 
@@ -58,7 +61,7 @@ end
 function MinimapButton:OnEnter()
 	if not self.dragging then
 		GameTooltip:SetOwner(self, 'ANCHOR_TOPRIGHT')
-		GameTooltip:SetText('Bongos2', 1, 1, 1)
+		GameTooltip:SetText('Bongos3', 1, 1, 1)
 
 		if not(Bongos.Options and Bongos.Options:IsShown()) then
 			GameTooltip:AddLine(L.ShowMenuTip)
@@ -72,8 +75,9 @@ function MinimapButton:OnEnter()
 			GameTooltip:AddLine(L.LockBarsTip)
 		end
 
-		if IsAddOnLoaded('Bongos2_ActionBar') then
-			if BongosActionConfig:ButtonsLocked() then
+		local ActionBar = Bongos:GetModule('ActionBar', true)
+		if ActionBar then
+			if ActionBar.Config:ButtonsLocked() then
 				GameTooltip:AddLine(L.UnlockButtonsTip)
 			else
 				GameTooltip:AddLine(L.LockButtonsTip)
