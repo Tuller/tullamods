@@ -67,7 +67,7 @@ function BBar:Create(id, defaults, strata)
 	assert(id, 'id expected')
 	assert(not active[id], format('BBar \'%s\' is already in use', id))
 
-	local isNew
+	local isNew = false
 	local bar = self:Restore(id)
 	if not bar then
 		bar = self:CreateNew(id, strata)
@@ -84,7 +84,6 @@ function BBar:CreateNew(id, strata)
 	local bar = self:New(CreateFrame('Frame', nil, UIParent))
 	bar.id = id
 	bar.dragFrame = Bongos.Drag:Create(bar)
-	bar.isNew = true
 
 	if strata then
 		bar:SetFrameStrata(strata)

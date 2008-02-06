@@ -3,8 +3,8 @@
 		Driver for bongos bars
 --]]
 
-Bongos3 = LibStub('AceAddon-3.0'):NewAddon('Bongos3', 'AceEvent-3.0', 'AceConsole-3.0')
-local Bongos = Bongos3
+local Bongos = LibStub('AceAddon-3.0'):NewAddon('Bongos3', 'AceEvent-3.0', 'AceConsole-3.0')
+Bongos3 = Bongos
 Bongos.dbName = 'Bongos3DB'
 
 local CURRENT_VERSION = GetAddOnMetadata('Bongos', 'Version') .. '.' .. ('$Rev$'):match('%d+')
@@ -426,16 +426,21 @@ function Bongos:GetMinimapButtonPosition(angle)
 end
 
 --utility function: create a widget class
-function Bongos:CreateWidgetClass(type)
+function Bongos:CreateWidgetClass(type, parentClass)
 	local class = CreateFrame(type)
-	local mt = {__index = class}
+	class.mt = {__index = class}
+
+	if parentClass then
+		class = setmetatable(class, {__index = parentClass})
+		class.super = parentClass
+	end
 
 	function class:New(o)
 		if o then
 			local type, cType = o:GetFrameType(), self:GetFrameType()
 			assert(type == cType, format("'%s' expected, got '%s'", cType, type))
 		end
-		return setmetatable(o or CreateFrame(type), mt)
+		return setmetatable(o or CreateFrame(type), self.mt)
 	end
 
 	return class
