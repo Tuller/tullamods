@@ -58,6 +58,30 @@ function f:OnUpdate(elapsed)
 	self.frame.text:SetFormattedText('%d x %d', self.rows, self.cols)
 end
 
+f:SetScript('OnMouseDown', function(self)
+	local x, y = GetCursorPosition()
+	local s = UIParent:GetScale()
+	x = x/s; y = y/s
+
+	if x > GetScreenWidth() / 2 then
+		self.startX = 'RIGHT'
+--		x = x + 16/s
+	else
+		self.startX = 'LEFT'
+--		x = x - 16/s
+	end
+
+	if y > GetScreenHeight() / 2 then
+		self.startY = 'TOP'
+--		y = y + 16/s
+	else
+		self.startY = 'BOTTOM'
+--		y = y - 16/s
+	end
+
+	self.x = x
+	self.y = y
+end)
 
 f:SetScript('OnDragStart', function(self)
 	if not self.frame then
@@ -71,7 +95,7 @@ f:SetScript('OnDragStart', function(self)
 		text:SetFontObject('GameFontNormal')
 		self.frame.text = text
 	end
-
+--[[
 	local x, y = GetCursorPosition()
 	local s = UIParent:GetScale()
 	x = x/s; y = y/s
@@ -94,7 +118,7 @@ f:SetScript('OnDragStart', function(self)
 
 	self.x = x
 	self.y = y
-
+--]]
 	self.frame:ClearAllPoints()
 	self.frame:SetPoint(self.startY .. self.startX, UIParent, 'BOTTOMLEFT', self.x, self.y)
 	self.frame:Show()

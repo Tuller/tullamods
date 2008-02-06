@@ -9,11 +9,10 @@ local ActionBar = Bongos:CreateWidgetClass('Frame', Bongos.Bar)
 Action.Bar = ActionBar
 
 function ActionBar:Create(id, numRows, numCols, point, x, y)
-	local bar, isNew = self.super:Create(id, {
+	local bar, isNew = self.super.Create(self, id, {
 		rows = numRows,
 		cols = numCols,
 	})
-	setmetatable(bar, self.mt)
 	
 	if isNew then
 		bar:OnCreate()

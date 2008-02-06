@@ -9,6 +9,9 @@ ActionBar.bars = {}
 function ActionBar:Load()
 	self.bars = {}
 	Bongos:Cleanup()
+	
+	self:RegisterMessage('BONGOS_LOCKED')
+	self:RegisterMessage('BONGOS_UNLOCKED')
 end
 
 function ActionBar:Unload()
