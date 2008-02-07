@@ -178,7 +178,7 @@ function Drag:OnClick(button)
 		if IsShiftKeyDown() then
 			self.parent:ToggleFrame()
 		elseif IsAltKeyDown() then
-			self.parent:Destroy()
+			self.parent:Destroy(true)
 			return
 		elseif self.parent.ShowMenu then
 			self.parent:ShowMenu()
