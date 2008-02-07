@@ -154,11 +154,15 @@ do
 	end
 
 	function ActionBar:TakeID()
-		return table.remove(availableActions, 1)
+		local id = table.remove(availableActions, 1)
+		Action.Painter:UpdateText()
+		
+		return id
 	end
 
 	function ActionBar:GiveID(id)
 		table.insert(availableActions, id)
+		Action.Painter:UpdateText()
 	end
 	
 	function ActionBar:NumFreeIDs()

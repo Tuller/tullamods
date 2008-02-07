@@ -2,14 +2,22 @@ local Bongos = LibStub('AceAddon-3.0'):GetAddon('Bongos3')
 local ActionBar = Bongos:GetModule('ActionBar')
 
 local f = CreateFrame('Frame', nil, UIParent)
+f:SetFrameStrata('BACKGROUND')
+f:SetFrameLevel(0)
+f:Hide()
+
 f.bg = f:CreateTexture()
-f.bg:SetTexture(0, 0, 0.1, 0.2)
+f.bg:SetTexture(0, 0, 0.1, 0.3)
 f.bg:SetAllPoints(f)
 
 f:SetFrameLevel(1)
 f:EnableMouse(true)
 f:RegisterForDrag('LeftButton')
 f:SetAllPoints(UIParent)
+
+f.text = f:CreateFontString()
+f.text:SetFontObject('GameFontNormalHuge')
+f.text:SetPoint('TOP', 0, -64)
 
 function f:OnUpdate(elapsed)
 	local x, y = GetCursorPosition()
@@ -56,6 +64,10 @@ function f:OnUpdate(elapsed)
 	self.rows = floor(self.frame:GetHeight() / 37 + 0.5)
 	self.cols = floor(self.frame:GetWidth() / 37 + 0.5)
 	self.frame.text:SetFormattedText('%d x %d', self.rows, self.cols)
+end
+
+function f:UpdateText()
+	self.text:SetText('Available Buttons: ' .. ActionBar.Bar:NumFreeIDs())
 end
 
 f:SetScript('OnMouseDown', function(self)
@@ -135,4 +147,8 @@ do
 
 		self:SetScript('OnUpdate', nil)
 	end)
+	
+	f:SetScript('OnShow', f.UpdateText)
 end
+
+ActionBar.Painter = f
