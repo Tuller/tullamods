@@ -8,12 +8,12 @@ local Action = Bongos:GetModule('ActionBar')
 local ActionBar = Bongos:CreateWidgetClass('Frame', Bongos.Bar)
 Action.Bar = ActionBar
 
-function ActionBar:Create(id, numRows, numCols, point, x, y)
+local id = 1
+function ActionBar:Create(numRows, numCols, point, x, y)
 	if numRows * numCols <= self:NumFreeIDs() then
 		local bar, isNew = self.super.Create(self, id, {
 			rows = numRows,
 			cols = numCols,
-			spacing = 2,
 			ids = {},
 		})
 
@@ -26,8 +26,9 @@ function ActionBar:Create(id, numRows, numCols, point, x, y)
 		bar:SavePosition()
 		bar:Layout()
 		bar:ConsumeIDs()
+		id = id + 1
 	else
-		Bongos:Print("Not enough available buttons")
+		UIErrorsFrame:AddMessage('Not Enough Available Action IDs', 1, 0.2, 0.2, 1, UIERRORS_HOLD_TIME)
 	end
 end
 
@@ -73,8 +74,12 @@ function ActionBar:GetNumStates()
 	return self.sets.states or 1
 end
 
+function ActionBar:GetSpacing()
+	return self.sets.spacing or 1
+end
+
 function ActionBar:Layout()
-	local spacing = self.sets.spacing or 0
+	local spacing = self:GetSpacing()
 	local buttonSize = 37 + spacing
 
 	self:SetWidth(buttonSize*self.sets.cols - spacing)
@@ -95,7 +100,7 @@ function ActionBar:Layout()
 		end
 	end
 
-	for i = self.sets.rows * self.sets.cols + 1, #self.buttons do
+	for i = self:GetSize() + 1, #self.buttons do
 		local button = self.buttons[i]
 		button:Release()
 		self.buttons[i] = nil
@@ -156,7 +161,7 @@ do
 	function ActionBar:TakeID()
 		local id = table.remove(availableActions, 1)
 		Action.Painter:UpdateText()
-		
+
 		return id
 	end
 
@@ -164,7 +169,7 @@ do
 		table.insert(availableActions, id)
 		Action.Painter:UpdateText()
 	end
-	
+
 	function ActionBar:NumFreeIDs()
 		return #availableActions
 	end

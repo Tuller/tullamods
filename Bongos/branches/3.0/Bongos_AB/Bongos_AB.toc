@@ -6,6 +6,6 @@
 ## SavedVariables: Bongos3ABDB
 ## Dependencies: Bongos
 ActionBar.lua
+Painter.lua
 bar.lua
 button.lua
-Boxcar.lua
