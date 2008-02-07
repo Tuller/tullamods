@@ -17,7 +17,7 @@ function ActionBar:Create(numRows, numCols, point, x, y)
 				break
 			end
 		end
-	
+
 		local bar, isNew = self.super.Create(self, id, {
 			rows = numRows,
 			cols = numCols,
@@ -33,7 +33,7 @@ function ActionBar:Create(numRows, numCols, point, x, y)
 		bar:SavePosition()
 		bar:Layout()
 		bar:ConsumeIDs()
-		
+
 		Action.profile.bars[id] = true
 	else
 		UIErrorsFrame:AddMessage('Not Enough Available Action IDs', 1, 0.2, 0.2, 1, UIERRORS_HOLD_TIME)
@@ -49,7 +49,7 @@ function ActionBar:Load(id)
 	bar:Layout()
 	bar:LoadIDs()
 end
-	
+
 
 function ActionBar:OnCreate()
 	self.buttons = {}
@@ -61,7 +61,7 @@ function ActionBar:OnDelete()
 		self.buttons[i] = nil
 	end
 	self:ReleaseAllIDs()
-	
+
 	Action.profile.bars[self.id] = nil
 end
 
@@ -143,6 +143,7 @@ function ActionBar:ConsumeIDs()
 		ids[i] = nil
 	end
 
+	self:SortAvailableIDs()
 	self:UpdateActions()
 end
 
@@ -150,6 +151,8 @@ function ActionBar:LoadIDs()
 	for _,id in pairs(self.sets.ids) do
 		self:TakeID(id)
 	end
+
+	self:SortAvailableIDs()
 	self:UpdateActions()
 end
 
@@ -158,6 +161,7 @@ function ActionBar:ReleaseAllIDs()
 	for i = #self.sets.ids, 1, -1 do
 		self:GiveID(ids[i])
 	end
+	self:SortAvailableIDs()
 end
 
 function ActionBar:UpdateActions()
@@ -210,6 +214,10 @@ do
 
 	function ActionBar:NumFreeIDs()
 		return #availableActions
+	end
+
+	function ActionBar:SortAvailableIDs()
+		table.sort(availableActions)
 	end
 end
 
