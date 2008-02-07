@@ -138,7 +138,7 @@ function ActionBar:ConsumeIDs()
 		end
 	end
 
-	for i = numIDs + 1, #ids do
+	for i = #ids, numIDs + 1, -1 do
 		self:GiveID(ids[i])
 		ids[i] = nil
 	end
@@ -154,8 +154,9 @@ function ActionBar:LoadIDs()
 end
 
 function ActionBar:ReleaseAllIDs()
-	for _,id in pairs(self.sets.ids) do
-		self:GiveID(id)
+	local ids = self.sets.ids
+	for i = #self.sets.ids, 1, -1 do
+		self:GiveID(ids[i])
 	end
 end
 
@@ -203,7 +204,7 @@ do
 	end
 
 	function ActionBar:GiveID(id)
-		table.insert(availableActions, id)
+		table.insert(availableActions, 1, id)
 		Action.Painter:UpdateText()
 	end
 
