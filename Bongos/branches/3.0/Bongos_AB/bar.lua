@@ -8,9 +8,16 @@ local Action = Bongos:GetModule('ActionBar')
 local ActionBar = Bongos:CreateWidgetClass('Frame', Bongos.Bar)
 Action.Bar = ActionBar
 
-local id = 1
 function ActionBar:Create(numRows, numCols, point, x, y)
 	if numRows * numCols <= self:NumFreeIDs() then
+		local id
+		for i = 1, #Action.profile.bars + 1 do
+			if not Action.profile.bars[i] then
+				id = i
+				break
+			end
+		end
+	
 		local bar, isNew = self.super.Create(self, id, {
 			rows = numRows,
 			cols = numCols,
@@ -26,11 +33,23 @@ function ActionBar:Create(numRows, numCols, point, x, y)
 		bar:SavePosition()
 		bar:Layout()
 		bar:ConsumeIDs()
-		id = id + 1
+		
+		Action.profile.bars[id] = true
 	else
 		UIErrorsFrame:AddMessage('Not Enough Available Action IDs', 1, 0.2, 0.2, 1, UIERRORS_HOLD_TIME)
 	end
 end
+
+function ActionBar:Load(id)
+	local bar, isNew = self.super.Create(self, id)
+	if isNew then
+		bar:OnCreate()
+	end
+
+	bar:Layout()
+	bar:LoadIDs()
+end
+	
 
 function ActionBar:OnCreate()
 	self.buttons = {}
@@ -42,6 +61,8 @@ function ActionBar:OnDelete()
 		self.buttons[i] = nil
 	end
 	self:ReleaseAllIDs()
+	
+	Action.profile.bars[self.id] = nil
 end
 
 function ActionBar:SetRows(rows)
@@ -125,6 +146,13 @@ function ActionBar:ConsumeIDs()
 	self:UpdateActions()
 end
 
+function ActionBar:LoadIDs()
+	for _,id in pairs(self.sets.ids) do
+		self:TakeID(id)
+	end
+	self:UpdateActions()
+end
+
 function ActionBar:ReleaseAllIDs()
 	for _,id in pairs(self.sets.ids) do
 		self:GiveID(id)
@@ -158,11 +186,20 @@ do
 		availableActions[i] = i
 	end
 
-	function ActionBar:TakeID()
-		local id = table.remove(availableActions, 1)
-		Action.Painter:UpdateText()
-
-		return id
+	function ActionBar:TakeID(id)
+		if id then
+			for i,availableID in pairs(availableActions) do
+				if id == availableID then
+					table.remove(availableActions, i)
+					Action.Painter:UpdateText()
+					return
+				end
+			end
+		else
+			local id = table.remove(availableActions, 1)
+			Action.Painter:UpdateText()
+			return id
+		end
 	end
 
 	function ActionBar:GiveID(id)
