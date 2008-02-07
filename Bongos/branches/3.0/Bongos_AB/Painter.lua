@@ -18,7 +18,7 @@ function Painter:Load()
 
 	--create the background
 	self.bg = self:CreateTexture()
-	self.bg:SetTexture(0, 0, 0, 0.3)
+	self.bg:SetTexture(0, 0, 0, 0.5)
 	self.bg:SetAllPoints(self)
 
 	--create the text box
