@@ -204,8 +204,10 @@ function Bongos:SetLock(enable)
 	self.profile.locked = enable or false
 	if enable then
 		self.Bar:ForAll('Lock')
+		self:SendMessage('BONGOS_LOCKED')
 	else
 		self.Bar:ForAll('Unlock')
+		self:SendMessage('BONGOS_UNLOCKED')
 	end
 end
 
