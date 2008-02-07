@@ -304,7 +304,7 @@ function Bongos:ToggleOptionsMenu()
 end
 
 function Bongos:ToggleLockedBars()
-	self:SetLock(not self.profile.locked)
+	self:SetLock(not self:IsLocked())
 end
 
 function Bongos:ToggleStickyBars()

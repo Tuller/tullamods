@@ -27,7 +27,6 @@ function Scaler:Create(parent)
 	f:SetScript('OnMouseDown', self.StartScaling)
 	f:SetScript('OnMouseUp', self.StopScaling)
 	f.parent = parent.parent
-	f:SetHitRectInsets(2, 0, 0, 0)
 
 	return f
 end

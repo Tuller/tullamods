@@ -41,7 +41,7 @@ function MinimapButton:OnClick(button)
 	if button == 'LeftButton' then
 		local ActionBar = Bongos:GetModule('ActionBar', true)
 		if ActionBar and IsShiftKeyDown() then
-			ActionBar.Config:LockButtons(not ActionBar.Config:ButtonsLocked())
+			-- ActionBar.Config:LockButtons(not ActionBar.Config:ButtonsLocked())
 		else
 			Bongos:SetLock(not Bongos:IsLocked())
 		end
@@ -75,14 +75,14 @@ function MinimapButton:OnEnter()
 			GameTooltip:AddLine(L.LockBarsTip)
 		end
 
-		local ActionBar = Bongos:GetModule('ActionBar', true)
-		if ActionBar then
-			if ActionBar.Config:ButtonsLocked() then
-				GameTooltip:AddLine(L.UnlockButtonsTip)
-			else
-				GameTooltip:AddLine(L.LockButtonsTip)
-			end
-		end
+		-- local ActionBar = Bongos:GetModule('ActionBar', true)
+		-- if ActionBar then
+			-- if ActionBar.Config:ButtonsLocked() then
+				-- GameTooltip:AddLine(L.UnlockButtonsTip)
+			-- else
+				-- GameTooltip:AddLine(L.LockButtonsTip)
+			-- end
+		-- end
 		GameTooltip:Show()
 	end
 end
