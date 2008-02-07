@@ -200,19 +200,23 @@ end
 
 --[[ Config Functions ]]--
 
-function Bongos:SetLock(enable)
-	self.profile.locked = enable or false
-	if enable then
-		self.Bar:ForAll('Lock')
-		self:SendMessage('BONGOS_LOCKED')
-	else
-		self.Bar:ForAll('Unlock')
-		self:SendMessage('BONGOS_UNLOCKED')
-	end
-end
+do
+	local locked = true
 
-function Bongos:IsLocked()
-	return self.profile.locked
+	function Bongos:SetLock(enable)
+		locked = enable or nil
+		if locked then
+			self.Bar:ForAll('Lock')
+			self:SendMessage('BONGOS_LOCKED')
+		else
+			self.Bar:ForAll('Unlock')
+			self:SendMessage('BONGOS_UNLOCKED')
+		end
+	end
+
+	function Bongos:IsLocked()
+		return locked
+	end
 end
 
 function Bongos:SetSticky(enable)

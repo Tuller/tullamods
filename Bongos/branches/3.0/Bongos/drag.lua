@@ -87,7 +87,7 @@ function Drag:Create(parent)
 
 	local bg = f:CreateTexture(nil, 'BACKGROUND')
 	bg:SetTexture('Interface/Tooltips/UI-Tooltip-Background')
-	bg:SetVertexColor(0, 0, 0, 0.5)
+	bg:SetVertexColor(1, 1, 1, 0.4)
 	bg:SetAllPoints(f)
 	f:SetNormalTexture(bg)
 
@@ -177,6 +177,9 @@ function Drag:OnClick(button)
 	if button == 'RightButton' then
 		if IsShiftKeyDown() then
 			self.parent:ToggleFrame()
+		elseif IsAltKeyDown() then
+			self.parent:Destroy()
+			return
 		elseif self.parent.ShowMenu then
 			self.parent:ShowMenu()
 		end
