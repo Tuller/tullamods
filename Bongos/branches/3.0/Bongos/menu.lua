@@ -5,6 +5,7 @@
 
 local Bongos = LibStub('AceAddon-3.0'):GetAddon('Bongos3')
 Bongos.Menu = Bongos:CreateWidgetClass('Frame')
+
 local BongosMenu = Bongos.Menu
 local L = LibStub('AceLocale-3.0'):GetLocale('Bongos3')
 
