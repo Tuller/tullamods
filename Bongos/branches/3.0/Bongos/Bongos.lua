@@ -5,7 +5,6 @@
 
 local Bongos = LibStub('AceAddon-3.0'):NewAddon('Bongos3', 'AceEvent-3.0', 'AceConsole-3.0')
 Bongos3 = Bongos
-Bongos.dbName = 'Bongos3DB'
 
 local CURRENT_VERSION = GetAddOnMetadata('Bongos', 'Version') .. '.' .. ('$Rev$'):match('%d+')
 local L = LibStub('AceLocale-3.0'):GetLocale('Bongos3')
@@ -22,7 +21,22 @@ function Bongos:OnEnable()
 		}
 	}
 
-	self.db = LibStub('AceDB-3.0'):New(self.dbName, defaults)
+	self.db = LibStub('AceDB-3.0'):New('Bongos3DB', defaults)
+	self.db:RegisterCallback('OnNewProfile', function(msg, db, ...)
+		self:OnNewProfile(...)
+	end)
+	self.db:RegisterCallback('OnProfileChanged', function(msg, db, ...)
+		self:OnProfileChanged(...)
+	end)
+	self.db:RegisterCallback('OnProfileCopied', function(msg, db, ...)
+		self:OnProfileCopied(...)
+	end)
+	self.db:RegisterCallback('OnProfileReset', function(msg, db, ...)
+		self:OnProfileReset(...)
+	end)
+	self.db:RegisterCallback('OnProfileDeleted', function(msg, db, ...)
+		self:OnProfileDeleted(...)
+	end)
 	self.profile = self.db.profile
 
 	if Bongos3Version then
@@ -45,6 +59,7 @@ function Bongos:OnEnable()
 end
 
 function Bongos:UpdateSettings()
+	--settings update code goes here (obviously)
 end
 
 function Bongos:UpdateVersion()
@@ -87,10 +102,11 @@ function Bongos:SaveProfile(profile)
 	local currentProfile = self.db:GetCurrentProfile()
 	if profile and profile ~= self.db:GetCurrentProfile() then
 		self:UnloadModules()
-		self.copying = true
+
+		self.saving = true
 		self.db:SetProfile(profile)
 		self.db:CopyProfile(currentProfile)
-		self.copying = nil
+		self.saving = nil
 	end
 end
 
@@ -98,7 +114,10 @@ function Bongos:SetProfile(name)
 	local profile = self:MatchProfile(name)
 	if profile and profile ~= self.db:GetCurrentProfile() then
 		self:UnloadModules()
+
 		self.db:SetProfile(profile)
+	else
+		self:Print(format(L.InvalidProfile, name or 'null'))
 	end
 end
 
@@ -115,8 +134,8 @@ function Bongos:CopyProfile(name)
 	local profile = self:MatchProfile(name)
 	if profile and profile ~= self.db:GetCurrentProfile() then
 		self:UnloadModules()
+
 		self.copying = true
-		self.db:ResetProfile()
 		self.db:CopyProfile(profile)
 		self.copying = nil
 	end
@@ -130,18 +149,16 @@ end
 function Bongos:ListProfiles()
 	self:Print(L.AvailableProfiles)
 	for _,k in ipairs(self.db:GetProfiles()) do
-		DEFAULT_CHAT_FRAME:AddMessage(" - " .. k)
+		DEFAULT_CHAT_FRAME:AddMessage(' - ' .. k)
 	end
 end
 
 function Bongos:MatchProfile(name)
-	local profileList = self.db:GetProfiles()
-
 	local name = name:lower()
 	local nameRealm = name .. ' - ' .. GetRealmName():lower()
 	local match
 
-	for i, k in ipairs(profileList) do
+	for i, k in ipairs(self.db:GetProfiles()) do
 		local key = k:lower()
 		if key == name then
 			return k
@@ -153,49 +170,45 @@ function Bongos:MatchProfile(name)
 end
 
 
---[[ Messages ]]--
+--[[ Profile Events ]]--
 
--- function Bongos:DONGLE_PROFILE_CREATED(event, db, parent, sv_name, profile_key)
-	-- if(sv_name == self.dbName) then
-		-- self.profile = self.db.profile
-		-- db.version = CURRENT_VERSION
-		-- self:Print(format(L.ProfileCreated , profile_key))
-	-- end
--- end
+function Bongos:OnNewProfile(profileName)
+	self:Print(format(L.ProfileCreated , profileName))
+end
 
--- function Bongos:DONGLE_PROFILE_CHANGED(event, db, parent, sv_name, profile_key)
-	-- if(sv_name == self.dbName) then
-		-- self.profile = self.db.profile
-		-- if not self.copying then
-			-- self:LoadModules()
-			-- self:Print(format(L.ProfileLoaded, profile_key))
-		-- end
-	-- end
--- end
+function Bongos:OnProfileChanged(newProfileName)
+	self.profile = self.db.profile
 
--- function Bongos:DONGLE_PROFILE_DELETED(event, db, parent, sv_name, profile_key)
-	-- if(sv_name == self.dbName) then
-		-- self:Print(format(L.ProfileDeleted, profile_key))
-	-- end
--- end
+	self:Print(format(L.ProfileLoaded, newProfileName))
+	self:SendMessage('BONGOS_PROFILE_CHANGED', newProfileName)
 
--- function Bongos:DONGLE_PROFILE_COPIED(event, db, parent, sv_name, profile_key, intoProfile_key)
-	-- if(sv_name == self.dbName) then
-		-- self.profile = self.db.profile
-		-- self:LoadModules()
-		-- self:Print(format(L.ProfileCopied, profile_key, intoProfile_key))
-	-- end
--- end
+	--changed is an intermediary step to save
+	if not self.saving then
+		self:LoadModules()
+	end
+end
 
--- function Bongos:DONGLE_PROFILE_RESET(event, db, parent, sv_name, profile_key)
-	-- if(sv_name == self.dbName) then
-		-- if not self.copying then
-			-- self.profile = self.db.profile
-			-- self:LoadModules()
-			-- self:Print(format(L.ProfileReset, profile_key))
-		-- end
-	-- end
--- end
+function Bongos:OnProfileCopied(sourceProfile)
+	self:Print(format(L.ProfileCopied, sourceProfile))
+	self:SendMessage('BONGOS_PROFILE_COPY', sourceProfile)
+
+	self:LoadModules()
+end
+
+function Bongos:OnProfileReset()
+	self:Print(format(L.ProfileReset, self.db:GetCurrentProfile()))
+	self:SendMessage('BONGOS_PROFILE_RESET', self.db:GetCurrentProfile())
+
+	--reset is an intermediary step to copying
+	if not self.copying then
+		self:LoadModules()
+	end
+end
+
+function Bongos:OnProfileDeleted(profileName)
+	self:Print(format(L.ProfileDeleted, profileName))
+	self:SendMessage('BONGOS_PROFILE_DELETE', profileName)
+end
 
 
 --[[ Config Functions ]]--
@@ -444,7 +457,7 @@ function Bongos:CreateWidgetClass(type, parentClass)
 	function class:New(o)
 		if o then
 			local type, cType = o:GetFrameType(), self:GetFrameType()
-			assert(type == cType, format("'%s' expected, got '%s'", cType, type))
+			assert(type == cType, format(''%s' expected, got '%s'', cType, type))
 		end
 		return setmetatable(o or CreateFrame(type), self.mt)
 	end

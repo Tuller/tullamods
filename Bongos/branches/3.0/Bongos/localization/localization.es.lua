@@ -16,7 +16,7 @@ L.UpdatedIncompatible = "Actualizando de una versión incompatible. Cargando val
 L.ProfileCreated = "Creado nuevo perfil \"%s\""
 L.ProfileLoaded = "Perfil activado \"%s\""
 L.ProfileDeleted = "Borrado perfil \"%s\""
-L.ProfileCopied = "Perfil copiado de \"%s\" a \"%s\""
+L.ProfileCopied = "Perfil copiado de \"%s\""
 L.ProfileReset = "Perfil reinicializado \"%s\""
 L.CantDeleteCurrentProfile = "No se puede borrar el perfil activo"
 

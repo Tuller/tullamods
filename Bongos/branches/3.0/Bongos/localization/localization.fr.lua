@@ -17,7 +17,7 @@ L.UpdatedIncompatible = "Mise à jour depuis une version incompatible. Paramètres
 L.ProfileCreated = "Nouveau profil créé \"%s\""
 L.ProfileLoaded = "Définir profil a \"%s\""
 L.ProfileDeleted = "Supprimer profil \"%s\""
-L.ProfileCopied = "Copié les paramètres depuis \"%s\" vers \"%s\""
+L.ProfileCopied = "Copié les paramètres depuis \"%s\""
 L.ProfileReset = "Remettre à zéro le profil \"%s\""
 L.CantDeleteCurrentProfile = "Le profil courant ne peut être supprimé"
 
