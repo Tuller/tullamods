@@ -457,7 +457,7 @@ function Bongos:CreateWidgetClass(type, parentClass)
 	function class:New(o)
 		if o then
 			local type, cType = o:GetFrameType(), self:GetFrameType()
-			assert(type == cType, format(''%s' expected, got '%s'', cType, type))
+			assert(type == cType, format("'%s' expected, got '%s'", cType, type))
 		end
 		return setmetatable(o or CreateFrame(type), self.mt)
 	end

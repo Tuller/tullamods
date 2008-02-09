@@ -5,6 +5,8 @@
 local Bongos = LibStub('AceAddon-3.0'):GetAddon('Bongos3')
 Bongos.Bar = Bongos:CreateWidgetClass('Frame')
 
+local L = LibStub('AceLocale-3.0'):GetLocale('Bongos3')
+
 
 --[[ Auto Fade Manager ]]--
 
@@ -450,20 +452,22 @@ function BBar:ShowMenu()
 		if self.CreateMenu then
 			menu = self:CreateMenu()
 		else
-			menu = BongosMenu:CreateMenu(self.id)
+			menu = Bongos.Menu:Create(self.id)
+			menu:AddLayoutPanel()
 		end
 		self.menu = menu
 	end
 
 	self.menu:SetFrameID(self.id)
 	self:AnchorMenu(self.menu)
+	self.menu:ShowPanel(L.Layout)
 end
 
 function BBar:AnchorMenu(menu)
-	local dragFrame = self.dragFrame
-	local ratio = UIParent:GetScale() / dragFrame:GetEffectiveScale()
-	local x = dragFrame:GetLeft() / ratio
-	local y = dragFrame:GetTop() / ratio
+	local drag = self.dragFrame
+	local ratio = UIParent:GetScale() / drag:GetEffectiveScale()
+	local x = drag:GetLeft() / ratio
+	local y = drag:GetTop() / ratio
 
 	menu:Hide()
 	menu:ClearAllPoints()
