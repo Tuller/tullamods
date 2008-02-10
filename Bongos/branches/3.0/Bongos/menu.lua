@@ -1,6 +1,5 @@
 --[[
 	BongosMenu.lua
-		GUI config functions for Sage
 --]]
 
 local Bongos = LibStub('AceAddon-3.0'):GetAddon('Bongos3')
@@ -11,8 +10,8 @@ local L = LibStub('AceLocale-3.0'):GetLocale('Bongos3')
 
 
 BongosMenu.bg = {
-	bgFile = 'Interface/DialogFrame/UI-DialogBox-Background',
-	edgeFile = 'Interface/DialogFrame/UI-DialogBox-Border',
+	bgFile = 'Interface\\DialogFrame\\UI-DialogBox-Background',
+	edgeFile = 'Interface\\DialogFrame\\UI-DialogBox-Border',
 	insets = {11, 12, 12, 11},
 	tile = true,
 	tileSize = 32,
