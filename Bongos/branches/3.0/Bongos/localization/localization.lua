@@ -36,7 +36,7 @@ L.ToggleBarsDesc = 'Toggles the given <barList>'
 
 --slash commands for profiles
 L.SetDesc = 'Switches settings to <profile>'
-L.SaveDesc = 'Saves current settings and switches to <profile'
+L.SaveDesc = 'Saves current settings and switches to <profile>'
 L.CopyDesc = 'Copies settings from <profile>'
 L.DeleteDesc = 'Deletes <profile>'
 L.ResetDesc = 'Returns to default settings'

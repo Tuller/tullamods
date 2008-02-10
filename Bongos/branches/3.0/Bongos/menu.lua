@@ -18,15 +18,14 @@ BongosMenu.bg = {
 	edgeSize = 32,
 }
 
-BongosMenu.extraWidth = 0
-BongosMenu.extraHeight = 0
+BongosMenu.extraWidth = 20
+BongosMenu.extraHeight = 40
 
 function BongosMenu:Create(name)
 	local f = self:New(CreateFrame('Frame', 'Bongos3BarMenu' .. name, UIParent))
 	f.panels = {}
 
 	f:SetBackdrop(self.bg)
-	f:SetBackdropColor(1, 1, 1, 0.8)
 	f:EnableMouse(true)
 	f:SetToplevel(true)
 	f:SetMovable(true)
@@ -64,8 +63,8 @@ end
 function BongosMenu:ShowPanel(name)
 	for index, panel in pairs(self.panels) do
 		if index == name then
-			self:SetWidth(panel:GetWidth() + self.extraWidth)
-			self:SetHeight(panel:GetHeight() + self.extraHeight)
+			self:SetWidth(max(panel.width + self.extraWidth, 186))
+			self:SetHeight(max(panel.height + self.extraHeight, 40))
 			panel:Show()
 		else
 			panel:Hide()
@@ -82,18 +81,10 @@ end
 
 function BongosMenu:AddLayoutPanel()
 	local panel = self:AddPanel(L.Layout)
-
-	self.opacity = panel:CreateOpacitySlider()
-	self.opacity:SetPoint('BOTTOMLEFT', 16, 14)
-
-	self.fade = panel:CreateFadeSlider()
-	self.fade:SetPoint('BOTTOM', self.opacity, 'TOP', 0, 20)
-
-	self.scale = panel:CreateScaleSlider()
-	self.scale:SetPoint('BOTTOM', self.fade, 'TOP', 0, 20)
-
-	panel:SetWidth(186)
-	panel:SetHeight(156)
+	
+	panel:CreateOpacitySlider()
+	panel:CreateFadeSlider()
+	panel:CreateScaleSlider()
 
 	return panel
 end
@@ -107,10 +98,13 @@ end
 local Panel = Bongos:CreateWidgetClass('Frame')
 BongosMenu.Panel = Panel
 
+Panel.width = 0
+Panel.height = 0
+
 function Panel:Create(name, parent)
 	local f = self:New(CreateFrame('Frame', parent:GetName() .. name, parent))
-	f:SetPoint('TOPLEFT', 0, -28)
-	f:SetPoint('BOTTOMRIGHT')
+	f:SetPoint('TOPLEFT', 10, -32)
+	f:SetPoint('BOTTOMRIGHT', -10, 10)
 	f:Hide()
 
 	return f
@@ -123,6 +117,15 @@ end
 function Panel:CreateCheckButton(name)
 	local button = CreateFrame('CheckButton', self:GetName() .. name, self, 'OptionsCheckButtonTemplate')
 	getglobal(button:GetName() .. 'Text'):SetText(name)
+	
+	local prev = self.checkbutton
+	if prev then
+		button:SetPoint('TOP', prev, 'BOTTOM', 0, 2)
+	else
+		button:SetPoint('TOPLEFT', 0, 2)
+	end
+	self.height = self.height + 28
+	self.checkbutton = button
 
 	return button
 end
@@ -188,7 +191,17 @@ do
 		slider:SetScript('OnShow', Slider_OnShow)
 		slider:SetScript('OnValueChanged', Slider_OnValueChanged)
 		slider:SetScript('OnMouseWheel', Slider_OnMouseWheel)
-
+		
+		local prev = self.slider
+		if prev then
+			slider:SetPoint('BOTTOM', prev, 'TOP', 0, 12)
+			self.height = self.height + 32
+		else
+			slider:SetPoint('BOTTOMLEFT', 4, 6)
+			self.height = self.height + 36
+		end
+		self.slider = slider
+		
 		return slider
 	end
 end
