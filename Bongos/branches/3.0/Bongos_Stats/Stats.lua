@@ -41,19 +41,14 @@ function Stats:OnBarCreate(bar)
 		local showMemory = panel:CreateCheckButton(L.ShowMemory)
 		showMemory:SetScript('OnShow', function(b) b:SetChecked(self.sets.showMemory) end)
 		showMemory:SetScript('OnClick', function() Stats:SetShowMemory(not self.sets.showMemory) end)
-		showMemory:SetPoint('TOPLEFT', 12, 0)
 
 		local showFPS = panel:CreateCheckButton(L.ShowFPS)
 		showFPS:SetScript('OnShow', function(b) b:SetChecked(self.sets.showFPS) end)
 		showFPS:SetScript('OnClick', function() Stats:SetShowFPS(not self.sets.showFPS) end)
-		showFPS:SetPoint('TOPLEFT', showMemory, 'BOTTOMLEFT')
 
 		local showPing = panel:CreateCheckButton(L.ShowPing)
 		showPing:SetScript('OnShow', function(b) b:SetChecked(self.sets.showPing) end)
 		showPing:SetScript('OnClick', function() Stats:SetShowPing(not self.sets.showPing) end)
-		showPing:SetPoint('TOPLEFT', showFPS, 'BOTTOMLEFT')
-
-		panel:SetHeight(panel:GetHeight() + 90)
 
 		return menu
 	end
