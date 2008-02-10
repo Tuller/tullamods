@@ -1,10 +1,10 @@
 ## Interface: 20300
-## Title: Bongos2 XP
-## Title-zhCN: |cFF0099FF[Bongos2]|r 经验条
+## Title: Bongos3 XP
+## Title-zhCN: |cFF0099FF[Bongos3]|r 经验条
 ## Notes: A movable experience and reputation bar
-## Notes-zhCN: Bongos2 系列 经验条。
+## Notes-zhCN: Bongos3 系列 经验条。
 ## Author: Tuller
-## Dependencies: Bongos2
+## Dependencies: Bongos
 localization\localization.lua
 localization\localization.cn.lua
 localization\localization.fr.lua

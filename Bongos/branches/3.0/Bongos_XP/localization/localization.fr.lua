@@ -2,11 +2,11 @@
 	Bongos XP Localization file
 --]]
 
-if GetLocale() ~= 'frFR' then return end
+local L = LibStub('AceLocale-3.0'):NewLocale('Bongos3-XP', 'frFR')
+if not L then return end
 
-local L = BONGOS_LOCALS
-L.Height = "Hauteur"
-L.Width = "Largeur"
-L.Vertical = "Vertical"
-L.AlwaysShowText = "Toujours afficher le texte"
-L.TextPosition = "Position du texte"
+L.Height = 'Hauteur'
+L.Width = 'Largeur'
+L.Vertical = 'Vertical'
+L.AlwaysShowText = 'Toujours afficher le texte'
+L.TextPosition = 'Position du texte'

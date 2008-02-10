@@ -3,11 +3,13 @@
                 Scripts for the Bongos XP bar
 --]]
 
-BongosXP = Bongos:NewModule('Bongos-XP')
+local Bongos = LibStub('AceAddon-3.0'):GetAddon('Bongos3')
+local XP = Bongos:NewModule('XP')
+local L = LibStub('AceLocale-3.0'):GetLocale('Bongos3-XP')
 
-local L = BONGOS_LOCALS
-local HORIZONTAL_TEXTURE = 'Interface\\Addons\\Bongos2_XP\\img\\Armory'
-local VERTICAL_TEXTURE = 'Interface\\Addons\\Bongos2_XP\\img\\ArmoryV'
+--constants
+local HORIZONTAL_TEXTURE = 'Interface\\Addons\\Bongos_XP\\img\\Armory'
+local VERTICAL_TEXTURE = 'Interface\\Addons\\Bongos_XP\\img\\ArmoryV'
 
 local XP_FORMAT = '%s / %s (%s%%)'
 local REST_FORMAT = '%s / %s (+%s) (%s%%)'
@@ -18,21 +20,161 @@ local DEFAULT_SIZE = 0.75
 local DEFAULT_TEXT_POSITION = 0
 
 
---[[ XPBar, a statusbar that displays reputation or experience ]]--
+--[[ Module Code ]]--
 
-local XPBar = {}
+function XP:Load()
+	local defaults = {
+		point = 'TOP',
+		x = 0,
+		y = -32,
+		alwaysShowText = true,
+	}
 
-function XPBar:New(parent)
-	local bar = CreateFrame('StatusBar', nil, parent)
+	local bar, isNew = Bongos.Bar:Create('xp', defaults, false, 'BACKGROUND')
+	if isNew then
+		self:OnBarCreate(bar)
+	end
+	bar.xp:UpdateOrientation()
+	bar.xp:Update()
+	bar.xp:UpdateText()
+
+	self.bar = bar
+end
+
+function XP:Unload()
+	self.bar:Destroy()
+end
+
+
+--[[ Menu Creation ]]--
+
+local function HeightSlider_Create(panel, bar)
+	local function OnShow(self)
+		self:SetValue(bar.sets.height or DEFAULT_HEIGHT)
+		getglobal(self:GetName() ..'Text'):SetText(bar.sets.vertical and L.Width or L.Height)
+	end
+
+	local function UpdateValue(self, value)
+		bar.sets.height = value
+		bar.xp:UpdateSize()
+	end
+
+	return panel:CreateSlider('Height', 0, 128, 1, OnShow, UpdateValue)
+end
+
+local function SizeSlider_Create(panel, bar)
+	local function OnShow(self)
+		self:SetValue((bar.sets.size or DEFAULT_SIZE)*100)
+		getglobal(self:GetName() .. 'Text'):SetText(bar.sets.vertical and L.Height or L.Width)
+	end
+
+	local function UpdateValue(self, value)
+		bar.sets.size = value/100
+		bar.xp:UpdateSize()
+	end
+
+	return panel:CreateSlider('Size', 0, 100, 1, OnShow, UpdateValue)
+end
+
+local function TextPosition_Create(panel, bar)
+	local function OnShow(self, value)
+		self:SetValue((bar.sets.textPosition or DEFAULT_TEXT_POSITION) * 100)
+		bar.xp:UpdateTextPosition()
+	end
+
+	local function UpdateValue(self, value)
+		bar.sets.textPosition = value/100
+		bar.xp:UpdateTextPosition()
+	end
+
+	return panel:CreateSlider(L.TextPosition, -50, 50, 1, OnShow, UpdateValue)
+end
+
+local function AlwaysShowText_Create(panel, bar)
+	--always show text checkbox
+	local ast = panel:CreateCheckButton(L.AlwaysShowText)
+	ast:SetScript('OnShow', function(self)
+		self:SetChecked(bar.sets.alwaysShowText)
+	end)
+
+	ast:SetScript('OnClick', function(self)
+		bar.sets.alwaysShowText = self:GetChecked() and 1 or nil
+		bar.xp:UpdateText()
+	end)
+
+	return ast
+end
+
+local function AlwaysShowXP_Create(panel, bar)
+	--always show experience
+	local asXP = panel:CreateCheckButton(L.AlwaysShowXP)
+	asXP:SetScript('OnShow', function(self)
+		self:SetChecked(bar.sets.alwaysShowXP)
+	end)
+
+	asXP:SetScript('OnClick', function(self)
+		bar.sets.alwaysShowXP = self:GetChecked() and 1 or nil
+		bar.xp:Update()
+	end)
+
+	return asXP
+end
+
+local function Vertical_Create(panel, bar)
+	local vertical = panel:CreateCheckButton(L.Vertical)
+		vertical:SetScript('OnShow', function(self)
+		self:SetChecked(bar.sets.vertical)
+	end)
+
+	vertical:SetScript('OnClick',  function(self)
+		bar.sets.vertical = self:GetChecked() and 1 or nil
+		bar.xp:UpdateOrientation()
+
+		if self:GetChecked() then
+			getglobal(panel:GetName() .. 'SizeText'):SetText(L.Height)
+			getglobal(panel:GetName() .. 'HeightText'):SetText(L.Width)
+		else
+			getglobal(panel:GetName() .. 'SizeText'):SetText(L.Width)
+			getglobal(panel:GetName() .. 'HeightText'):SetText(L.Height)
+		end
+	end)
+
+	return vertical
+end
+
+--called when the bongos bar is physically created
+function XP:OnBarCreate(bar)
+	bar.CreateMenu = function(bar)
+		local menu = Bongos.Menu:Create(bar.id)
+		local panel = menu:AddLayoutPanel()
+
+		--checkboxes
+		local ast = AlwaysShowText_Create(panel, bar)	
+		local alwaysShowXP = AlwaysShowXP_Create(panel, bar)
+		local vertical = Vertical_Create(panel, bar)
+
+		--sliders
+		local height = HeightSlider_Create(panel, bar)
+		local size = SizeSlider_Create(panel, bar)
+		local textPosition = TextPosition_Create(panel, bar)
+
+		return menu
+	end
+
+	bar.xp = self.Bar:Create(bar)
+end
+
+
+--[[ XP Bar Widget ]]--
+
+local XPBar = Bongos:CreateWidgetClass('StatusBar')
+XP.Bar = XPBar
+
+function XPBar:Create(parent)
+	local bar = self:New(CreateFrame('StatusBar', nil, parent))
 	bar:EnableMouse(true)
 	bar:SetClampedToScreen(true)
 	bar:SetAllPoints(parent)
-
-	--copy over all the XPBar functions
-	for k,v in pairs(self) do 
-		bar[k] = v 
-	end
-
 	bar.id = parent.id
 	bar.sets = parent.sets
 
@@ -53,10 +195,11 @@ function XPBar:New(parent)
 
 	bar:SetScript('OnShow', self.OnShow)
 	bar:SetScript('OnHide', self.OnHide)
-	bar:SetScript('OnEnter', self.OnEnter)
-	bar:SetScript('OnLeave', self.OnLeave)
+
+	overlay:SetScript('OnEnter', self.OnEnter)
+	overlay:SetScript('OnLeave', self.OnLeave)
 	overlay:SetScript('OnMouseDown', self.OnMouseDown)
-	
+
 	bar:Update()
 	bar:UpdateText()
 	bar:UpdateTextPosition()
@@ -74,18 +217,18 @@ function XPBar:OnHide()
 end
 
 function XPBar:OnEnter()
-	self.entered = true
-	self:UpdateText()
+	self:GetParent().entered = true
+	self:GetParent():UpdateText()
 end
 
 function XPBar:OnLeave()
-	self.entered = nil
-	self:UpdateText()
+	self:GetParent().entered = nil
+	self:GetParent():UpdateText()
 end
 
 function XPBar:OnMouseDown()
-	self.sets.alwaysShowXP = not self.sets.alwaysShowXP
-	self.bar:Update()
+	self:GetParent().sets.alwaysShowXP = not self:GetParent().sets.alwaysShowXP
+	self:GetParent():Update()
 end
 
 --update functions
@@ -225,134 +368,4 @@ function XPBar:UpdateSize()
 		self:GetParent():SetWidth(GetScreenWidth() * (size or DEFAULT_SIZE))
 		self:GetParent():SetHeight(height or DEFAULT_HEIGHT)
 	end
-end
-
-
---[[ Bongos Bar Stuff ]]--
-
---menu creation
-local function Bar_CreateMenu(frame)
-	local menu, panel = BongosMenu:CreateMenu(frame.id)
-	local size, height, textPosition
-
-	--always show text checkbox
-	local alwaysShowText = panel:AddCheckButton(L.AlwaysShowText)
-	alwaysShowText:SetScript('OnShow', function(self)
-		self:SetChecked(frame.sets.alwaysShowText)
-	end)
-
-	alwaysShowText:SetScript('OnClick', function(self)
-		frame.sets.alwaysShowText = self:GetChecked() and 1 or nil
-		frame.xp:UpdateText()
-	end)
-	
-	--always show experience
-	local alwaysShowXP = panel:AddCheckButton(L.AlwaysShowXP)
-	alwaysShowXP:SetScript('OnShow', function(self)
-		self:SetChecked(frame.sets.alwaysShowXP)
-	end)
-
-	alwaysShowXP:SetScript('OnClick', function(self)
-		frame.sets.alwaysShowXP = self:GetChecked() and 1 or nil
-		frame.xp:Update()
-	end)
-
-	--vertical orientation slider
-	local vertical = panel:AddCheckButton(L.Vertical)
-		vertical:SetScript('OnShow', function(self)
-		self:SetChecked(frame.sets.vertical)
-	end)
-
-	vertical:SetScript('OnClick',  function(self)
-		frame.sets.vertical = self:GetChecked() and 1 or nil
-		frame.xp:UpdateOrientation()
-
-		if self:GetChecked() then
-			getglobal(size:GetName() .. 'Text'):SetText(L.Height)
-			getglobal(height:GetName() .. 'Text'):SetText(L.Width)
-		else
-			getglobal(size:GetName() .. 'Text'):SetText(L.Width)
-			getglobal(height:GetName() .. 'Text'):SetText(L.Height)
-		end
-	end)
-
-	height = panel:AddSlider('Height', 0, 128, 1)
-	height:SetScript('OnShow', function(self)
-		self.onShow = true
-		self:SetValue(frame.sets.height or DEFAULT_HEIGHT)
-		getglobal(self:GetName() ..'Text'):SetText(frame.sets.vertical and L.Width or L.Height)
-		self.onShow = nil
-	end)
-
-	height:SetScript('OnValueChanged', function(self, value)
-		if not self.onShow then
-			frame.sets.height = value
-			frame.xp:UpdateSize()
-		end
-		getglobal(self:GetName() .. 'ValText'):SetText(value)
-	end)
-
-	--size slider
-	size = panel:AddSlider('Size', 0, 100, 1)
-	size:SetScript('OnShow', function(self)
-		self.onShow = true
-		self:SetValue((frame.sets.size or DEFAULT_SIZE)*100)
-		getglobal(self:GetName() .. 'Text'):SetText(frame.sets.vertical and L.Height or L.Width)
-		self.onShow = nil
-	end)
-
-	size:SetScript('OnValueChanged', function(self, value)
-		if not self.onShow then
-			frame.sets.size = value/100
-			frame.xp:UpdateSize()
-		end
-		getglobal(self:GetName() .. 'ValText'):SetText(value)
-	end)
-
-	textPosition = panel:AddSlider(L.TextPosition, -50, 50, 1)
-	textPosition:SetScript('OnShow', function(self)
-		self.onShow = true
-		self:SetValue((frame.sets.textPosition or DEFAULT_TEXT_POSITION) * 100)
-		frame.xp:UpdateTextPosition()
-		self.onShow = nil
-	end)
-
-	textPosition:SetScript('OnValueChanged', function(self, value)
-		if not self.onShow then
-			frame.sets.textPosition = value/100
-			frame.xp:UpdateTextPosition()
-		end
-		getglobal(self:GetName() .. 'ValText'):SetText(value)
-	end)
-
-	return menu
-end
-
---add stuff to the bar after it has been first created
-local function Bar_OnCreate(self)
-	self.CreateMenu = Bar_CreateMenu
-	self.xp = XPBar:New(self)
-end
-
---module loading
-function BongosXP:Load()
-	local defaults = {
-		point = 'TOP',
-		xOff = 0,
-		yOff = -32,
-		alwaysShowText = true,
-	}
-
-	local bar = BBar:Create('xp', Bar_OnCreate, nil, defaults, 'BACKGROUND')
-	bar.sets.size = min(bar.sets.size or DEFAULT_SIZE, 1)
-	bar.xp:UpdateOrientation()
-	bar.xp:Update()
-	bar.xp:UpdateText()
-
-	self.bar = bar
-end
-
---module unloading
-function BongosXP:Unload()
-	self.bar:Destroy()
 end
