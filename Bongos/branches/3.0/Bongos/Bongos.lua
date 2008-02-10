@@ -98,14 +98,14 @@ end
 
 --[[ Profile Functions ]]--
 
-function Bongos:SaveProfile(profile)
+function Bongos:SaveProfile(name)
 	local currentProfile = self.db:GetCurrentProfile()
-	if profile and profile ~= self.db:GetCurrentProfile() then
-		self:UnloadModules()
-
+	if name and name ~= currentProfile then
 		self.saving = true
-		self.db:SetProfile(profile)
+		self:UnloadModules()
+		self.db:SetProfile(name)
 		self.db:CopyProfile(currentProfile)
+--		self:LoadModules()
 		self.saving = nil
 	end
 end
@@ -114,7 +114,6 @@ function Bongos:SetProfile(name)
 	local profile = self:MatchProfile(name)
 	if profile and profile ~= self.db:GetCurrentProfile() then
 		self:UnloadModules()
-
 		self.db:SetProfile(profile)
 	else
 		self:Print(format(L.InvalidProfile, name or 'null'))
@@ -131,10 +130,10 @@ function Bongos:DeleteProfile(name)
 end
 
 function Bongos:CopyProfile(name)
+	self:Print('copying', name)
+
 	local profile = self:MatchProfile(name)
 	if profile and profile ~= self.db:GetCurrentProfile() then
-		self:UnloadModules()
-
 		self.copying = true
 		self.db:CopyProfile(profile)
 		self.copying = nil
@@ -142,14 +141,21 @@ function Bongos:CopyProfile(name)
 end
 
 function Bongos:ResetProfile()
-	self:UnloadModules()
+	if not(self.saving or self.copying) then
+		self:UnloadModules()
+	end
 	self.db:ResetProfile()
 end
 
 function Bongos:ListProfiles()
 	self:Print(L.AvailableProfiles)
+	local current = self.db:GetCurrentProfile()
 	for _,k in ipairs(self.db:GetProfiles()) do
-		DEFAULT_CHAT_FRAME:AddMessage(' - ' .. k)
+		if k == current then
+			DEFAULT_CHAT_FRAME:AddMessage(' - ' .. k, 1, 1, 0)
+		else
+			DEFAULT_CHAT_FRAME:AddMessage(' - ' .. k)
+		end
 	end
 end
 
@@ -176,14 +182,16 @@ function Bongos:OnNewProfile(profileName)
 	self:Print(format(L.ProfileCreated , profileName))
 end
 
+function Bongos:OnProfileDeleted(profileName)
+	self:Print(format(L.ProfileDeleted, profileName))
+	self:SendMessage('BONGOS_PROFILE_DELETE', profileName)
+end
+
 function Bongos:OnProfileChanged(newProfileName)
-	self.profile = self.db.profile
-
-	self:Print(format(L.ProfileLoaded, newProfileName))
-	self:SendMessage('BONGOS_PROFILE_CHANGED', newProfileName)
-
 	--changed is an intermediary step to save
 	if not self.saving then
+		self:Print(format(L.ProfileLoaded, newProfileName))
+		self:SendMessage('BONGOS_PROFILE_CHANGED', newProfileName)
 		self:LoadModules()
 	end
 end
@@ -191,25 +199,17 @@ end
 function Bongos:OnProfileCopied(sourceProfile)
 	self:Print(format(L.ProfileCopied, sourceProfile))
 	self:SendMessage('BONGOS_PROFILE_COPY', sourceProfile)
-
 	self:LoadModules()
 end
 
 function Bongos:OnProfileReset()
-	self:Print(format(L.ProfileReset, self.db:GetCurrentProfile()))
-	self:SendMessage('BONGOS_PROFILE_RESET', self.db:GetCurrentProfile())
-
 	--reset is an intermediary step to copying
-	if not self.copying then
+	if not(self.copying or self.saving) then
+		self:Print(format(L.ProfileReset, self.db:GetCurrentProfile()))
+		self:SendMessage('BONGOS_PROFILE_RESET', self.db:GetCurrentProfile())
 		self:LoadModules()
 	end
 end
-
-function Bongos:OnProfileDeleted(profileName)
-	self:Print(format(L.ProfileDeleted, profileName))
-	self:SendMessage('BONGOS_PROFILE_DELETE', profileName)
-end
-
 
 --[[ Config Functions ]]--
 
