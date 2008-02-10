@@ -32,6 +32,7 @@ end
 
 function Stats:OnBarCreate(bar)
 	bar.frame = self.Frame:Create(bar)
+	bar:SetHeight(20)
 
 	bar.CreateMenu = function(self)
 		local menu = Bongos.Menu:Create(self.id)
