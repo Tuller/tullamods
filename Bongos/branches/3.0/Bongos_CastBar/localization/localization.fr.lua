@@ -2,7 +2,7 @@
 	Bongos CastBar Localization file
 --]]
 
-if GetLocale() ~= 'frFR' then return end
+local L = LibStub('AceLocale-3.0'):NewLocale('Bongos3-CastBar', 'frFR')
+if not L then return end
 
-BONGOS_CASTBAR_SHOW_TIME = "Montrer le temps"
-BONGOS_CASTBAR = "Barre de sort"
+L.ShowTime = 'Montrer le temps'

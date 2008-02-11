@@ -4,7 +4,7 @@
 	¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡ SAVE in UTF-8 !!!!!!!!!!!!!!!!!!!!!!!!
 --]]
 
-if GetLocale() ~= 'esES' then return end
+local L = LibStub('AceLocale-3.0'):NewLocale('Bongos3-CastBar', 'esES')
+if not L then return end
 
-BONGOS_CASTBAR_SHOW_TIME = "Mostrar tiempo"
-BONGOS_CASTBAR = "Barra de Lanzamiento"
+L.ShowTime = 'Mostrar tiempo'

@@ -2,5 +2,5 @@
 	Bongos CastBar Localization file
 --]]
 
-BONGOS_CASTBAR_SHOW_TIME = "Show Time"
-BONGOS_CASTBAR = "Cast Bar"
+local L = LibStub('AceLocale-3.0'):NewLocale('Bongos3-CastBar', 'enUS', true)
+L.ShowTime = 'Show Time'

@@ -57,21 +57,11 @@
 			</Layer>
 		</Layers>
 
+
 		<Scripts>
 			<OnLoad>
 				CastingBarFrame_OnLoad("player", true)
 			</OnLoad>
-			<OnEvent>
-				if arg1 == "player" then
-					if event == "UNIT_SPELLCAST_FAILED" or event == "UNIT_SPELLCAST_INTERRUPTED" then
-						self.failed = true
-					elseif event == "UNIT_SPELLCAST_START" then
-						self.failed = nil
-					end
-					CastingBarFrame_OnEvent(event, arg1)
-					BongosCastBar:UpdateColor(arg2)
-				end
-			</OnEvent>
 		</Scripts>
 
 		<BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>

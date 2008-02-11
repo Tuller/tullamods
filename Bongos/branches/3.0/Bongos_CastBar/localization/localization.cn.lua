@@ -3,9 +3,7 @@
 		Chinese Simplified by ondh
 		http://www.ondh.cn
 --]]
-if ( GetLocale() == "zhCN" ) then
+local L = LibStub('AceLocale-3.0'):NewLocale('Bongos3-CastBar', 'zhCN')
+if not L then return end
 
-BONGOS_CASTBAR_SHOW_TIME = "显示时间"
-BONGOS_CASTBAR = "施法条"
-
-end;
+L.ShowTime = '显示时间'

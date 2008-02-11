@@ -3,45 +3,107 @@
 		A Bongos based cast bar
 --]]
 
-BongosCastBar = Bongos:NewModule('Bongos-CastBar')
-local borderScale = 197 / 150
+local Bongos = LibStub('AceAddon-3.0'):GetAddon('Bongos3')
+local CastBar = Bongos:NewModule('CastBar')
+local CastingBar = Bongos:CreateWidgetClass('StatusBar')
+local L = LibStub('AceLocale-3.0'):GetLocale('Bongos3-CastBar')
+
+function CastBar:Load()
+	local bar, isNew = Bongos.Bar:Create('cast', {showText = true, x = 618, y = 617}, false, 'HIGH')
+	if isNew then
+		self:OnBarCreate(bar)
+	end
+	bar:ToggleText(bar.sets.showText)
+
+	self.bar = bar
+end
+
+function CastBar:Unload()
+	self.bar:Destroy()
+end
+
+--[[ Bongos Bar Methods ]]--
+
+function CastBar:OnBarCreate(bar)
+	bar.ToggleText = function(self, enable)
+		self.sets.showText = enable or nil
+		if enable then
+			getglobal(self.castBar:GetName() .. 'Time'):Show()
+		else
+			getglobal(self.castBar:GetName() .. 'Time'):Hide()
+		end
+		self.castBar:AdjustWidth()
+	end
+
+	bar.CreateMenu = function(self)
+		local menu = Bongos.Menu:Create(self.id)
+		local panel = menu:AddLayoutPanel()
+
+		--checkbuttons
+		local time = panel:CreateCheckButton(L.ShowTime)
+		time:SetScript('OnClick', function(b) self:ToggleText(b:GetChecked()) end)
+		time:SetScript('OnShow', function(b) b:SetChecked(self.sets.showText) end)
+
+		return menu
+	end
+	
+	CastingBarFrame:UnregisterAllEvents()
+	CastingBarFrame:Hide()
+	
+	bar.castBar = CastingBar:Create(bar)
+	bar.castBar:SetPoint('CENTER')
+	bar:Attach(bar.castBar)
+
+	bar:SetWidth(bar.castBar:GetWidth() + 4)
+	bar:SetHeight(24)
+end
+
 
 --[[ CastingBar Stuff ]]--
 
-local function CastingBar_AdjustWidth(self)
-	local name = self:GetName()
-	local textWidth = self.text:GetStringWidth()
-	local timeWidth = (self.time:IsShown() and (self.time:GetStringWidth() + 8)*2) or 0
-	local width = textWidth + timeWidth
+local BORDER_SCALE = 197/150 --its magic!
 
-	local diff = width - self.normalWidth
-	if diff > 0 then
-		diff = width - self:GetWidth()
-	else
-		diff = self.normalWidth - self:GetWidth()
-	end
+function CastingBar:Create(parent)
+	local _G = getfenv(0)
+	local bar = self:New(CreateFrame('StatusBar', 'BongosCastBar', parent, 'BongosCastingBarTemplate'))
+	local name = bar:GetName()
 
-	if diff ~= 0 then
-		self:GetParent():SetWidth(self:GetParent():GetWidth() + diff)
+	bar.sparkTexture = _G[name .. 'Spark']
+	bar.flashTexture = _G[name .. 'Flash']
+	bar.borderTexture = _G[name .. 'Border']
+	bar.time = _G[name .. 'Time']
+	bar.text = _G[name .. 'Text']
 
-		local newWidth = self:GetWidth() + diff
-		self:SetWidth(newWidth)
-		self.borderTexture:SetWidth(newWidth * borderScale)
-		self.flashTexture:SetWidth(newWidth * borderScale)
+	bar.normalWidth = bar:GetWidth()
+	bar.AdjustWidth = CastingBar_AdjustWidth
+
+	bar:SetScript('OnUpdate', self.OnUpdate)
+	bar:SetScript('OnEvent', self.OnEvent)
+
+	return bar
+end
+
+function CastingBar:OnEvent(event, ...)
+	local unit, spell = ...
+	if unit == "player" then
+		if event == "UNIT_SPELLCAST_FAILED" or event == "UNIT_SPELLCAST_INTERRUPTED" then
+			self.failed = true
+		elseif event == "UNIT_SPELLCAST_START" then
+			self.failed = nil
+		end
+		CastingBarFrame_OnEvent(event, ...)
+		self:UpdateColor(spell)
 	end
 end
 
-local function CastingBar_OnUpdate(self, arg1)
+function CastingBar:OnUpdate(elapsed)
 	local name = self:GetName()
 	local barSpark = self.sparkTexture
 	local barFlash = self.flashTexture
 	local barTime = self.time
 
 	if self.casting then
-		local status = GetTime()
-		if status > self.maxValue then
-			status = self.maxValue
-		end
+		local status = min(GetTime(), self.maxValue)
 		if status == self.maxValue then
 			self:SetValue(self.maxValue)
 			barSpark:Hide()
@@ -52,22 +114,22 @@ local function CastingBar_OnUpdate(self, arg1)
 			self.fadeOut = 1
 			return
 		end
+
 		self:SetValue(status)
 		barFlash:Hide()
+
 		local sparkPosition = ((status - self.startTime) / (self.maxValue - self.startTime)) * self:GetWidth()
 		if sparkPosition < 0 then
 			sparkPosition = 0
 		end
+
 		barSpark:SetPoint('CENTER', self, 'LEFT', sparkPosition, 0)
 
 		--time display
 		barTime:SetFormattedText('%.1f', self.maxValue - status)
 		self:AdjustWidth()
 	elseif self.channeling then
-		local time = GetTime()
-		if time > self.endTime then
-			time = self.endTime
-		end
+		local time = min(GetTime(), self.endTime)
 		if time == self.endTime then
 			barSpark:Hide()
 			barFlash:SetAlpha(0)
@@ -77,9 +139,11 @@ local function CastingBar_OnUpdate(self, arg1)
 			self.fadeOut = 1
 			return
 		end
+
 		local barValue = self.startTime + (self.endTime - time)
 		self:SetValue(barValue)
 		barFlash:Hide()
+
 		local sparkPosition = ((barValue - self.startTime) / (self.endTime - self.startTime)) * self:GetWidth()
 		barSpark:SetPoint('CENTER', self, 'LEFT', sparkPosition, 0)
 
@@ -107,86 +171,37 @@ local function CastingBar_OnUpdate(self, arg1)
 	end
 end
 
-local function CastingBar_Create(parent)
-	local name = 'BongosCastBar'
-	local bar = CreateFrame('StatusBar', name, parent, 'BongosCastingBarTemplate')
-	bar.sparkTexture = getglobal(name .. 'Spark')
-	bar.flashTexture = getglobal(name .. 'Flash')
-	bar.borderTexture = getglobal(name .. 'Border')
-	bar.time = getglobal(name .. 'Time')
-	bar.text = getglobal(name .. 'Text')
+function CastingBar:AdjustWidth()
+	local name = self:GetName()
+	local textWidth = self.text:GetStringWidth()
+	local timeWidth = (self.time:IsShown() and (self.time:GetStringWidth() + 8) * 2) or 0
+	local width = textWidth + timeWidth
 
-	bar.normalWidth = bar:GetWidth()
-	bar.AdjustWidth = CastingBar_AdjustWidth
-
-	bar:SetScript('OnUpdate', CastingBar_OnUpdate)
-
-	return bar
-end
-
-
---[[ Bongos Bar Methods ]]--
-
-local function Bar_CreateMenu(self)
-	local menu, panel = BongosMenu:CreateMenu(BONGOS_CASTBAR)
-
-	--checkbuttons
-	local time = panel:AddCheckButton('Time')
-	time:SetScript('OnClick', function(b) self:ToggleText(b:GetChecked()) end)
-	time:SetScript('OnShow', function(b) b:SetChecked(self.sets.showText) end)
-	time:SetText(BONGOS_CASTBAR_SHOW_TIME)
-
-	return menu
-end
-
-local function Bar_ToggleText(self, enable)
-	local castingBar = self.castBar
-	self.sets.showText = enable or nil
-	if enable then
-		getglobal(castingBar:GetName() .. 'Time'):Show()
+	local diff = width - self.normalWidth
+	if diff > 0 then
+		diff = width - self:GetWidth()
 	else
-		getglobal(castingBar:GetName() .. 'Time'):Hide()
+		diff = self.normalWidth - self:GetWidth()
 	end
-	castingBar:AdjustWidth()
+
+	if diff ~= 0 then
+		self:GetParent():SetWidth(self:GetParent():GetWidth() + diff)
+
+		local newWidth = self:GetWidth() + diff
+		self:SetWidth(newWidth)
+		self.borderTexture:SetWidth(newWidth * BORDER_SCALE)
+		self.flashTexture:SetWidth(newWidth * BORDER_SCALE)
+	end
 end
 
-local function Bar_OnCreate(self)
-	CastingBarFrame:UnregisterAllEvents()
-	CastingBarFrame:Hide()
-
-	self.CreateMenu = Bar_CreateMenu
-	self.ToggleText = Bar_ToggleText
-
-	self.castBar = CastingBar_Create(self)
-	self.castBar:SetPoint('CENTER')
-	self:Attach(self.castBar)
-
-	self:SetSize(self.castBar:GetWidth() + 4, 24)
-end
-
-
---[[ Startup ]]--
-
-function BongosCastBar:Load()
-	local bar = BBar:Create('cast', Bar_OnCreate, nil, {showText = true, x = 618, y = 617}, 'HIGH')
-	bar:ToggleText(bar.sets.showText)
-
-	self.bar = bar
-end
-
-function BongosCastBar:Unload()
-	self.bar:Destroy()
-end
-
-function BongosCastBar:UpdateColor(spell)
-	local castBar = self.bar.castBar
-	if castBar.failed then
-		castBar:SetStatusBarColor(0.86, 0.08, 0.24)
+function CastingBar:UpdateColor(spell)
+	if self.failed then
+		self:SetStatusBarColor(0.86, 0.08, 0.24)
 	elseif spell and IsHelpfulSpell(spell) then
-		castBar:SetStatusBarColor(0.31, 0.78, 0.47)
+		self:SetStatusBarColor(0.31, 0.78, 0.47)
 	elseif spell and IsHarmfulSpell(spell) then
-		castBar:SetStatusBarColor(0.63, 0.36, 0.94)
+		self:SetStatusBarColor(0.63, 0.36, 0.94)
 	else
-		castBar:SetStatusBarColor(1, 0.7, 0)
+		self:SetStatusBarColor(1, 0.7, 0)
 	end
 end
