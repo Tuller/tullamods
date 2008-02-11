@@ -446,24 +446,6 @@ end
 
 --[[ Slash Commands ]]--
 
-function OmniCC:LoadSlashCommands()
-	SlashCmdList['OmniCCCOMMAND'] = function(cmd)
-		local enabled = select(4, GetAddOnInfo('OmniCC_Options'))
-		if enabled then
-			if OmniCCOptionsFrame then
-				if OmniCCOptionsFrame:IsShown() then
-					OmniCCOptionsFrame:Hide()
-				else
-					UIFrameFadeIn(OmniCCOptionsFrame, 0.2)
-				end
-			else
-				LoadAddOn('OmniCC_Options')
-			end
-		else
-			self:Print('Options menu addon not present', true)
-		end
-	end
-
-	SLASH_OmniCCCOMMAND1 = '/omnicc'
-	SLASH_OmniCCCOMMAND2 = '/occ'
-end
+hooksecurefunc('InterfaceOptionsFrame_OnShow', function()
+	LoadAddOn('OmniCC_Options')
+end)
