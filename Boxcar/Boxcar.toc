@@ -1,4 +1,0 @@
-## Interface: 20300
-## Title: Boxcar
-## Notes: Magic!
-main.lua
