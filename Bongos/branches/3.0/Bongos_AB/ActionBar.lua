@@ -11,6 +11,10 @@ function ActionBar:Load()
 	end
 	self.profile = Bongos3ABDB
 	
+	if not self.Painter.loaded then
+		self.Painter:Load()
+	end
+	
 	if next(self.profile.bars) then
 		for id in pairs(self.profile.bars) do
 			self.Bar:Load(id)
@@ -18,17 +22,6 @@ function ActionBar:Load()
 	else
 		Bongos:Cleanup()
 	end
-	
-	self:RegisterMessage('BONGOS_LOCKED')
-	self:RegisterMessage('BONGOS_UNLOCKED')
-end
-
-function ActionBar:BONGOS_LOCKED()
-	ActionBar.Painter:Hide()
-end
-
-function ActionBar:BONGOS_UNLOCKED()
-	ActionBar.Painter:Show()
 end
 
 function ActionBar:Unload()

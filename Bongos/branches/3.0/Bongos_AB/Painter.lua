@@ -6,36 +6,32 @@
 local Bongos = LibStub('AceAddon-3.0'):GetAddon('Bongos3')
 local Action = Bongos:GetModule('ActionBar')
 
-local Painter = CreateFrame('Frame', nil, UIParent)
-Painter:Hide()
+local Painter = CreateFrame('Frame')
+Action.Painter = Painter
 
 function Painter:Load()
+	self:SetParent(Bongos.lockBG)
 	self:SetFrameStrata('BACKGROUND')
 	self:SetFrameLevel(0)
 	self:SetAllPoints(self:GetParent())
 	self:RegisterForDrag('LeftButton')
 	self:EnableMouse(true)
 
-	--create the background
-	self.bg = self:CreateTexture()
-	self.bg:SetTexture(0, 0, 0, 0.5)
-	self.bg:SetAllPoints(self)
-
-	--create the text box
-	local f = CreateFrame('Frame', nil, self)
-	f:SetFrameStrata('DIALOG')
-
-	local text = Painter:CreateFontString()
-	text:SetFontObject('GameFontNormalHuge')
-	text:SetPoint('TOP', self, 'TOP', 0, -64)
-	self.text = text
-
 	self:SetScript('OnMouseDown', self.SetStartPoint)
 	self:SetScript('OnDragStart', self.ShowDragBox)
 	self:SetScript('OnDragStop', self.CreateBar)
 	self:SetScript('OnShow', self.UpdateText)
 
-	Action.Painter = self
+	--create the text box
+	local f = CreateFrame('Frame', nil, self)
+	f:SetFrameStrata('DIALOG')
+
+	local text = f:CreateFontString()
+	text:SetFontObject('GameFontNormalHuge')
+	text:SetPoint('TOP', self, 'TOP', 0, -64)
+	self.text = text
+	
+	self.loaded = true
 end
 
 --set our starting point to the cursor
@@ -130,5 +126,3 @@ end
 function Painter:UpdateText()
 	self.text:SetFormattedText('Available Action IDs: %d', Action.Bar:NumFreeIDs())
 end
-
-Painter:Load()
