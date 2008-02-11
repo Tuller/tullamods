@@ -32,7 +32,7 @@ function ActionBar:BONGOS_UNLOCKED()
 end
 
 function ActionBar:Unload()
-	for id,bar in pairs(self.bars) do
+	for id,bar in pairs(self.profile.bars) do
 		bar:Destroy()
 		self.bars[id] = nil
 	end

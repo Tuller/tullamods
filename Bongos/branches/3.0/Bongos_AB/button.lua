@@ -55,12 +55,14 @@ do
 		b:SetScript('OnHide', self.OnHide)
 
 		b:SetAttribute('type', 'action')
+		b:SetAttribute('action', 1)
 		b:SetAttribute('checkselfcast', true)
 		b:SetAttribute('useparent-unit', true)
 		b:SetAttribute('useparent-statebutton', true)
 
 		b:RegisterForDrag('LeftButton', 'RightButton')
 		b:RegisterForClicks('AnyUp')
+		b:Hide()
 
 		id = id + 1
 		return b
@@ -406,110 +408,38 @@ end
 
 
 --[[ State Updating ]]--
---[[
-local CLASS = BONGOS_CLASS
-local hasStance = (CLASS == 'DRUID' or CLASS == 'ROGUE' or CLASS == 'WARRIOR' or CLASS == 'PRIEST')
-
-function ActionButton:UpdateStateAction(stateID)
-	local id = self:GetAttribute('action')
-	local offset = self:GetParent():GetStateOffset(stateID)
-
-	if offset then
-		self:SetAttribute('*action-' .. stateID, toValid(id + offset))
-		self:SetAttribute('*action-' .. stateID .. 's', toValid(id + offset))
-	else
-		self:SetAttribute('*action-' .. stateID, nil)
-		self:SetAttribute('*action-' .. stateID .. 's', nil)
-	end
-end
-
---load up the action ID when in forms/paged from the parent action bar
-function ActionButton:UpdateStates()
-	local id = self:GetAttribute('action')
-	local parent = self:GetParent()
-
-	if hasStance then
-		local maxState = (CLASS == 'PRIEST' and 1) or GetNumShapeshiftForms()
-		for i = 1, maxState do
-			self:UpdateStateAction('s' .. i)
-		end
-		if CLASS == 'DRUID' then
-			self:UpdateStateAction('s7')
-		end
-	end
-
-	for i = 1, BONGOS_MAX_PAGES do
-		self:UpdateStateAction('p' .. i)
-	end
-
-	for i = 1, 3 do
-		self:UpdateStateAction('m' .. i)
-	end
-
-	self:UpdateStateAction('help')
-
-	self:UpdateVisibility()
-	self.needsUpdate = true
-end
 
 --update button showstates based on what state actionIDs actually have actions
 --returns true if the showstates have changed, false otherwise
 function ActionButton:UpdateVisibility()
-	local newstates
+	local newStates
+
 	if self:ShowingEmpty() then
-		newstates = '*'
+		newStates = '*'
 	else
+		local newStates
 		local id = self:GetAttribute('action')
 		if HasAction(id) then
 			newstates = 0
 		end
 
-		if hasStance then
-			local maxState = (CLASS == 'PRIEST' and 1) or GetNumShapeshiftForms()
-
-			for i = 1, maxState do
-				local action = self:GetAttribute('*action-s' .. i) or id
-				if HasAction(action) then
-					newstates = (newstates and newstates .. ',' .. i) or i
+		for i = 1, self:GetParent():GetNumStates() do
+			if HasAction(self:GetAttribute('*action-s' .. i) or id) then
+				if newStates then
+					newStates = newStates .. ',' .. i
+				else
+					newStates = i
 				end
 			end
-
-			if(CLASS == 'DRUID') then
-				local action = self:GetAttribute('*action-s' .. 7) or id
-				if HasAction(action) then
-					newstates = (newstates and newstates .. ',' .. 7) or 7
-				end
-			end
-		end
-
-		for i = 1, BONGOS_MAX_PAGES do
-			local action = self:GetAttribute('*action-p' .. i) or id
-			if HasAction(action) then
-				newstates = (newstates and newstates .. ',' .. (i+9)) or (i+9)
-			end
-		end
-
-		for i = 1, 3 do
-			local action = self:GetAttribute('*action-m' .. i) or id
-			if HasAction(action) then
-				newstates = (newstates and newstates .. ',' .. (i+15)) or (i+15)
-			end
-		end
-
-		local action = self:GetAttribute('*action-help') or id
-		if HasAction(action) then
-			newstates = (newstates and newstates .. ',' .. 15) or 15
 		end
 	end
 
-	newstates = newstates or '!*'
-	local oldstates = self:GetAttribute('showstates')
-	if not oldstates or oldstates ~= newstates then
-		self:SetAttribute('showstates', newstates)
+	local newStates = newStates or '!*'
+	if newStates ~= self:GetAttribute('showstates') then
+		self:SetAttribute('showstates', newStates)
 		return true
 	end
 end
---]]
 
 --[[ Showgrid Stuff ]]
 

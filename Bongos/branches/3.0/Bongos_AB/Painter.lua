@@ -76,14 +76,14 @@ function Painter:UpdateDragBox()
 	local s = UIParent:GetScale()
 	x = x/s; y = y/s
 
-	if (x > self.x and self.startX == 'RIGHT') then
+	if (x >= self.x and self.startX == 'RIGHT') then
 		self.startX = 'LEFT'
 	end
 	if (x < self.x and self.startX == 'LEFT') then
 		self.startX = 'RIGHT'
 	end
 
-	if (y > self.y and self.startY == 'TOP') then
+	if (y >= self.y and self.startY == 'TOP') then
 		self.startY = 'BOTTOM'
 	end
 	if (y < self.y and self.startY == 'BOTTOM') then
