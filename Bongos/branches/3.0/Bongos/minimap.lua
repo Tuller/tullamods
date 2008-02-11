@@ -45,8 +45,8 @@ function MinimapButton:OnClick(button)
 		else
 			Bongos:SetLock(not Bongos:IsLocked())
 		end
-	elseif button == 'RightButton' then
-		Bongos:ToggleOptionsMenu()
+	-- elseif button == 'RightButton' then
+		-- Bongos:ToggleOptionsMenu()
 	end
 end
 

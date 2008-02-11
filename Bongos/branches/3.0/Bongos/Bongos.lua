@@ -257,16 +257,16 @@ function Bongos:OnCmd(args)
 	elseif cmd == 'toggle' then
 		self:ToggleBars(select(2, string.split(' ', args)))
 	elseif cmd == 'save' then
-		local profileName = select(2, string.split(' ', args))
+		local profileName = string.join(' ', select(2, string.split(' ', args)))
 		self:SaveProfile(profileName)
 	elseif cmd == 'set' then
-		local profileName = select(2, string.split(' ', args))
+		local profileName = string.join(' ', select(2, string.split(' ', args)))
 		self:SetProfile(profileName)
 	elseif cmd == 'copy' then
-		local profileName = select(2, string.split(' ', args))
+		local profileName = string.join(' ', select(2, string.split(' ', args)))
 		self:CopyProfile(profileName)
 	elseif cmd == 'delete' then
-		local profileName = select(2, string.split(' ', args))
+		local profileName = string.join(' ', select(2, string.split(' ', args)))
 		self:DeleteProfile(profileName)
 	elseif cmd == 'reset' then
 		self:ResetProfile()
@@ -276,25 +276,10 @@ function Bongos:OnCmd(args)
 		self:PrintVersion()
 	elseif cmd == 'cleanup' then
 		self:Cleanup()
-	-- elseif cmd == 'options' or cmd == '' then
-		-- self:ToggleOptionsMenu()
 	else
 		self:PrintHelp()
 	end
 end
-
--- function Bongos:ToggleOptionsMenu()
-	-- local enabled = select(4, GetAddOnInfo('Bongos_Options'))
-	-- if enabled then
-		-- if self.Options then
-			-- self.Options:Toggle()
-		-- else
-			-- LoadAddOn('Bongos_Options')
-		-- end
-	-- else
-		-- self:PrintHelp()
-	-- end
--- end
 
 function Bongos:ToggleLockedBars()
 	self:SetLock(not self:IsLocked())
@@ -374,7 +359,6 @@ function Bongos:PrintHelp(cmd)
 	end
 
 	self:Print('Commands (/bongos, /bob, or /bgs)')
---	PrintCmd('/bongos', L.ShowOptionsDesc)
 	PrintCmd('lock', L.LockBarsDesc)
 	PrintCmd('sticky', L.StickyBarsDesc)
 	PrintCmd('scale <barList> <scale>', L.SetScaleDesc)
