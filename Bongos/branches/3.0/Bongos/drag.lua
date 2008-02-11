@@ -19,7 +19,7 @@ function Scaler:Create(parent)
 	f:SetHeight(16)
 	f:SetWidth(16)
 
-	f:SetNormalTexture('Interface\\AddOns\\Bongos2\\textures\\Rescale')
+	f:SetNormalTexture('Interface\\AddOns\\Bongos\\textures\\Rescale')
 	f:GetNormalTexture():SetVertexColor(1, 0.82, 0)
 
 	f:SetScript('OnEnter', self.OnEnter)

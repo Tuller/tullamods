@@ -22,6 +22,7 @@ function Bongos:OnEnable()
 	}
 
 	self.db = LibStub('AceDB-3.0'):New('Bongos3DB', defaults)
+
 	self.db:RegisterCallback('OnNewProfile', function(msg, db, ...)
 		self:OnNewProfile(...)
 	end)
@@ -37,7 +38,6 @@ function Bongos:OnEnable()
 	self.db:RegisterCallback('OnProfileDeleted', function(msg, db, ...)
 		self:OnProfileDeleted(...)
 	end)
-	self.profile = self.db.profile
 
 	if Bongos3Version then
 		local cMinor = GetAddOnMetadata('Bongos', 'Version')
@@ -64,34 +64,21 @@ end
 
 function Bongos:UpdateVersion()
 	Bongos3Version = CURRENT_VERSION
-	self:Print(L.Updated:format(Bongos3Version))
+	self:Print(format(L.Updated, Bongos3Version))
 end
 
 function Bongos:LoadModules()
 	for name, module in self:IterateModules() do
-		assert(module.Load, format('Bongos Module %s: Missing Load function', name))
 		module:Load()
 	end
-	Bongos:UpdateMinimapButton()
+
+	self:UpdateMinimapButton()
 	self.Bar:ForAll('Reanchor')
 end
 
 function Bongos:UnloadModules()
 	for name, module in self:IterateModules() do
-		assert(module.Unload, format('Bongos Module %s: Missing Unload function', name))
 		module:Unload()
-	end
-end
-
-function Bongos:LoadOptions(event, addon)
-	if addon == 'Bongos_Options' then
-		for name, module in self:IterateModules() do
-			if module.LoadOptions then
-				module:LoadOptions()
-			end
-		end
-		self.Options:ShowPanel(L.General)
-		self:UnregisterEvent(event)
 	end
 end
 
@@ -99,14 +86,12 @@ end
 --[[ Profile Functions ]]--
 
 function Bongos:SaveProfile(name)
-	local currentProfile = self.db:GetCurrentProfile()
-	if name and name ~= currentProfile then
-		self.saving = true
+	local toCopy = self.db:GetCurrentProfile()
+	if name and name ~= toCopy then
 		self:UnloadModules()
 		self.db:SetProfile(name)
-		self.db:CopyProfile(currentProfile)
---		self:LoadModules()
-		self.saving = nil
+		self.db:CopyProfile(toCopy)
+		self:LoadModules()
 	end
 end
 
@@ -115,6 +100,8 @@ function Bongos:SetProfile(name)
 	if profile and profile ~= self.db:GetCurrentProfile() then
 		self:UnloadModules()
 		self.db:SetProfile(profile)
+		--send set message
+		self:LoadModules()
 	else
 		self:Print(format(L.InvalidProfile, name or 'null'))
 	end
@@ -124,27 +111,26 @@ function Bongos:DeleteProfile(name)
 	local profile = self:MatchProfile(name)
 	if profile and profile ~= self.db:GetCurrentProfile() then
 		self.db:DeleteProfile(profile)
+		--send delete message
 	else
 		self:Print(L.CantDeleteCurrentProfile)
 	end
 end
 
 function Bongos:CopyProfile(name)
-	self:Print('copying', name)
-
-	local profile = self:MatchProfile(name)
-	if profile and profile ~= self.db:GetCurrentProfile() then
-		self.copying = true
-		self.db:CopyProfile(profile)
-		self.copying = nil
+	if name and name ~= self.db:GetCurrentProfile() then
+		self:UnloadModules()
+		self.db:CopyProfile(name)
+		--send copy message
+		self:LoadModules()
 	end
 end
 
 function Bongos:ResetProfile()
-	if not(self.saving or self.copying) then
-		self:UnloadModules()
-	end
+	self:UnloadModules()
 	self.db:ResetProfile()
+	--send reset message
+	self:LoadModules()
 end
 
 function Bongos:ListProfiles()
@@ -179,66 +165,52 @@ end
 --[[ Profile Events ]]--
 
 function Bongos:OnNewProfile(profileName)
-	self:Print(format(L.ProfileCreated , profileName))
+	self:Print('Created Profile: ' .. profileName)
 end
 
 function Bongos:OnProfileDeleted(profileName)
-	self:Print(format(L.ProfileDeleted, profileName))
-	self:SendMessage('BONGOS_PROFILE_DELETE', profileName)
+	self:Print('Deleted Profile: ' .. profileName)
 end
 
 function Bongos:OnProfileChanged(newProfileName)
-	--changed is an intermediary step to save
-	if not self.saving then
-		self:Print(format(L.ProfileLoaded, newProfileName))
-		self:SendMessage('BONGOS_PROFILE_CHANGED', newProfileName)
-		self:LoadModules()
-	end
+	self:Print('Changed Profile: ' .. newProfileName)
 end
 
 function Bongos:OnProfileCopied(sourceProfile)
-	self:Print(format(L.ProfileCopied, sourceProfile))
-	self:SendMessage('BONGOS_PROFILE_COPY', sourceProfile)
-	self:LoadModules()
+	self:Print('Copied Profile: ' .. sourceProfile)
 end
 
 function Bongos:OnProfileReset()
-	--reset is an intermediary step to copying
-	if not(self.copying or self.saving) then
-		self:Print(format(L.ProfileReset, self.db:GetCurrentProfile()))
-		self:SendMessage('BONGOS_PROFILE_RESET', self.db:GetCurrentProfile())
-		self:LoadModules()
-	end
+	self:Print('Reset Profile: ' .. self.db:GetCurrentProfile())
 end
+
 
 --[[ Config Functions ]]--
 
-do
-	local locked = true
+Bongos.locked = true
 
-	function Bongos:SetLock(enable)
-		locked = enable or nil
-		if locked then
-			self.Bar:ForAll('Lock')
-			self:SendMessage('BONGOS_LOCKED')
-		else
-			self.Bar:ForAll('Unlock')
-			self:SendMessage('BONGOS_UNLOCKED')
-		end
-	end
-
-	function Bongos:IsLocked()
-		return locked
+function Bongos:SetLock(enable)
+	self.locked = enable or nil
+	if self.locked then
+		self.Bar:ForAll('Lock')
+		self:SendMessage('BONGOS_LOCKED')
+	else
+		self.Bar:ForAll('Unlock')
+		self:SendMessage('BONGOS_UNLOCKED')
 	end
 end
 
+function Bongos:IsLocked()
+	return self.locked
+end
+
 function Bongos:SetSticky(enable)
-	self.profile.sticky = enable or false
+	self.db.profile.sticky = enable or false
 	self.Bar:ForAll('Reanchor')
 end
 
 function Bongos:IsSticky()
-	return self.profile.sticky
+	return self.db.profile.sticky
 end
 
 
@@ -246,13 +218,13 @@ end
 
 function Bongos:SetBarSets(id, sets)
 	local id = tonumber(id) or id
-	self.profile.bars[id] = sets
+	self.db.profile.bars[id] = sets
 
-	return self.profile.bars[id]
+	return self.db.profile.bars[id]
 end
 
 function Bongos:GetBarSets(id)
-	return self.profile.bars[tonumber(id) or id]
+	return self.db.profile.bars[tonumber(id) or id]
 end
 
 
@@ -285,13 +257,17 @@ function Bongos:OnCmd(args)
 	elseif cmd == 'toggle' then
 		self:ToggleBars(select(2, string.split(' ', args)))
 	elseif cmd == 'save' then
-		self:SaveProfile(select(2, string.split(' ', args)))
+		local profileName = select(2, string.split(' ', args))
+		self:SaveProfile(profileName)
 	elseif cmd == 'set' then
-		self:SetProfile(select(2, string.split(' ', args)))
+		local profileName = select(2, string.split(' ', args))
+		self:SetProfile(profileName)
 	elseif cmd == 'copy' then
-		self:CopyProfile(select(2, string.split(' ', args)))
+		local profileName = select(2, string.split(' ', args))
+		self:CopyProfile(profileName)
 	elseif cmd == 'delete' then
-		self:DeleteProfile(select(2, string.split(' ', args)))
+		local profileName = select(2, string.split(' ', args))
+		self:DeleteProfile(profileName)
 	elseif cmd == 'reset' then
 		self:ResetProfile()
 	elseif cmd == 'list' then
@@ -300,32 +276,32 @@ function Bongos:OnCmd(args)
 		self:PrintVersion()
 	elseif cmd == 'cleanup' then
 		self:Cleanup()
-	elseif cmd == 'options' or cmd == '' then
-		self:ToggleOptionsMenu()
+	-- elseif cmd == 'options' or cmd == '' then
+		-- self:ToggleOptionsMenu()
 	else
 		self:PrintHelp()
 	end
 end
 
-function Bongos:ToggleOptionsMenu()
-	local enabled = select(4, GetAddOnInfo('Bongos_Options'))
-	if enabled then
-		if self.Options then
-			self.Options:Toggle()
-		else
-			LoadAddOn('Bongos_Options')
-		end
-	else
-		self:PrintHelp()
-	end
-end
+-- function Bongos:ToggleOptionsMenu()
+	-- local enabled = select(4, GetAddOnInfo('Bongos_Options'))
+	-- if enabled then
+		-- if self.Options then
+			-- self.Options:Toggle()
+		-- else
+			-- LoadAddOn('Bongos_Options')
+		-- end
+	-- else
+		-- self:PrintHelp()
+	-- end
+-- end
 
 function Bongos:ToggleLockedBars()
 	self:SetLock(not self:IsLocked())
 end
 
 function Bongos:ToggleStickyBars()
-	self:SetSticky(not self.profile.sticky)
+	self:SetSticky(not self.db.profile.sticky)
 end
 
 function Bongos:ScaleBars(...)
@@ -380,8 +356,8 @@ function Bongos:ToggleBars(...)
 end
 
 function Bongos:Cleanup()
-	local bars = self.profile.bars
-	for id in pairs(self.profile.bars) do
+	local bars = self.db.profile.bars
+	for id in pairs(bars) do
 		if not self.Bar:Get(id) then
 			bars[id] = nil
 		end
@@ -398,7 +374,7 @@ function Bongos:PrintHelp(cmd)
 	end
 
 	self:Print('Commands (/bongos, /bob, or /bgs)')
-	PrintCmd('/bongos', L.ShowOptionsDesc)
+--	PrintCmd('/bongos', L.ShowOptionsDesc)
 	PrintCmd('lock', L.LockBarsDesc)
 	PrintCmd('sticky', L.StickyBarsDesc)
 	PrintCmd('scale <barList> <scale>', L.SetScaleDesc)
@@ -419,12 +395,12 @@ end
 
 --minimap functions
 function Bongos:SetShowMinimap(enable)
-	self.profile.showMinimap = enable or false
+	self.db.profile.showMinimap = enable or false
 	self:UpdateMinimapButton()
 end
 
 function Bongos:ShowingMinimap()
-	return self.profile.showMinimap
+	return self.db.profile.showMinimap
 end
 
 function Bongos:UpdateMinimapButton()
@@ -437,11 +413,11 @@ function Bongos:UpdateMinimapButton()
 end
 
 function Bongos:SetMinimapButtonPosition(angle)
-	self.profile.minimapPos = angle
+	self.db.profile.minimapPos = angle
 end
 
 function Bongos:GetMinimapButtonPosition(angle)
-	return self.profile.minimapPos
+	return self.db.profile.minimapPos
 end
 
 --utility function: create a widget class
