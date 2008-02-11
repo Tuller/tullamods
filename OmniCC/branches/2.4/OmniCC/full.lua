@@ -46,7 +46,6 @@ function OmniCC:Enable()
 
 	--enable the addon
 	self:HookCooldown()
-	self:LoadSlashCommands()
 end
 
 function OmniCC:LoadDefaults()
