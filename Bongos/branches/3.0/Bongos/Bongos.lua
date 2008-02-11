@@ -54,6 +54,7 @@ function Bongos:OnEnable()
 		self:UpdateVersion()
 	end
 
+	self.lockBG = self:CreateLockBG()
 	self:LoadModules()
 	self:RegisterSlashCommands()
 end
@@ -189,14 +190,29 @@ end
 
 Bongos.locked = true
 
+function Bongos:CreateLockBG()
+	local f = CreateFrame('Frame', nil, UIParent)
+	f:SetFrameStrata('BACKGROUND')
+	f:SetFrameLevel(0)
+	f:SetAllPoints(f:GetParent())
+	f:Hide()
+
+	--create the background
+	f.bg = f:CreateTexture()
+	f.bg:SetTexture(0, 0, 0, 0.5)
+	f.bg:SetAllPoints(f)
+	
+	return f
+end
+
 function Bongos:SetLock(enable)
 	self.locked = enable or nil
 	if self.locked then
 		self.Bar:ForAll('Lock')
-		self:SendMessage('BONGOS_LOCKED')
+		self.lockBG:Hide()
 	else
 		self.Bar:ForAll('Unlock')
-		self:SendMessage('BONGOS_UNLOCKED')
+		self.lockBG:Show()
 	end
 end
 
