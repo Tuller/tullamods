@@ -83,7 +83,7 @@ function Drag:Create(parent)
 	f:SetClampedToScreen(true)
 	f:SetFrameStrata(parent:GetFrameStrata())
 	f:SetAllPoints(parent)
-	f:SetFrameLevel(6)
+	f:SetFrameLevel(5)
 
 	local bg = f:CreateTexture(nil, 'BACKGROUND')
 	bg:SetTexture('Interface/Tooltips/UI-Tooltip-Background')

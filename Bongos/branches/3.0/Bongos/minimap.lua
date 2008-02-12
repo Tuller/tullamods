@@ -10,6 +10,7 @@ Bongos.Minimap = CreateFrame('Button', 'Bongos3MinimapButton', Minimap)
 local MinimapButton = Bongos.Minimap
 
 function MinimapButton:Load()
+	self:SetFrameStrata('MEDIUM')
 	self:SetWidth(31); self:SetHeight(31)
 	self:SetFrameLevel(8)
 	self:RegisterForClicks('anyUp')
