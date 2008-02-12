@@ -5,6 +5,12 @@
 ## Version: 0
 ## SavedVariables: Bongos3ABDB
 ## Dependencies: Bongos
+localization\localization.lua
+localization\localization.cn.lua
+localization\localization.fr.lua
+localization\localization.es.lua
 unreg.lua
 keyBound\keyBound.xml
+bagBar\bar.lua
+menuBar\bar.lua
 actionBar\actionBar.xml
