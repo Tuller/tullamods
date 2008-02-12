@@ -39,14 +39,11 @@ end
 
 function MinimapButton:OnClick(button)
 	if button == 'LeftButton' then
-		local ActionBar = Bongos:GetModule('ActionBar', true)
-		if ActionBar and IsShiftKeyDown() then
-			-- ActionBar.Config:LockButtons(not ActionBar.Config:ButtonsLocked())
-		else
-			Bongos:SetLock(not Bongos:IsLocked())
+		Bongos:SetLock(not Bongos:IsLocked())
+	elseif button == 'RightButton' then
+		if KeyBound then
+			KeyBound:Toggle()
 		end
-	-- elseif button == 'RightButton' then
-		-- Bongos:ToggleOptionsMenu()
 	end
 end
 
