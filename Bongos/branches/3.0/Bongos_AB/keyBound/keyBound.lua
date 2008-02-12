@@ -14,213 +14,19 @@
 			button:GetActionName() - what we're binding to, used for printing
 --]]
 
-KeyBound = DongleStub('Dongle-1.0'):New('KeyBound')
-local L = KEYBOUND_LOCALS
 
---[[ Bindframe functions ]]--
-
-local function Binder_ToBinding(button)
-	return format('CLICK %s:LeftButton', button:GetName())
-end
-
-local function Binder_FreeKey(button, key)
-	local msg
-	if button.FreeKey then
-		local action = button:FreeKey(key)
-		if button:FreeKey(key) then
-			msg = format(L.UnboundKey, GetBindingText(key, 'KEY_'), action)
-		end
-	else
-		local action = GetBindingAction(key)
-		if action and action ~= '' and action ~= Binder_ToBinding(button) then
-			msg = format(L.UnboundKey, GetBindingText(key, 'KEY_'), action)
-		end
-	end
-
-	if msg then
-		UIErrorsFrame:AddMessage(msg, 1, 0.82, 0, 1, UIERRORS_HOLD_TIME)
-	end
-end
-
-local function Binder_SetKey(button, key)
-	if InCombatLockdown() then
-		UIErrorsFrame:AddMessage(L.CannotBindInCombat, 1, 0.3, 0.3, 1, UIERRORS_HOLD_TIME)
-	else
-		Binder_FreeKey(button, key)
-
-		local msg
-		if button.SetKey then
-			button:SetKey(key)
-			msg = format(L.BoundKey, GetBindingText(key, 'KEY_'), button:GetActionName())
-		else
-			SetBindingClick(key, button:GetName(), 'LeftButton')
-			msg = format(L.BoundKey, GetBindingText(key, 'KEY_'), button:GetName())
-		end
-		SaveBindings(GetCurrentBindingSet())
-		UIErrorsFrame:AddMessage(msg, 1, 1, 1, 1, UIERRORS_HOLD_TIME)
-	end
-end
-
-local function Binder_ClearBindings(button)
-	if InCombatLockdown() then
-		UIErrorsFrame:AddMessage(L.CannotBindInCombat, 1, 0.3, 0.3, 1, UIERRORS_HOLD_TIME)
-	else
-		local msg
-		if button.ClearBindings then
-			button:ClearBindings()
-			msg = format(L.ClearedBindings, button:GetActionName())
-		else
-			local binding = Binder_ToBinding(button)
-			while GetBindingKey(binding) do
-				SetBinding(GetBindingKey(binding), nil)
-			end
-			msg = format(L.ClearedBindings, button:GetName())
-		end
-		SaveBindings(GetCurrentBindingSet())
-		UIErrorsFrame:AddMessage(msg, 1, 1, 1, 1, UIERRORS_HOLD_TIME)
-	end
-end
-
-local function Binder_GetBindings(button)
-	if button.GetBindings then
-		return button:GetBindings()
-	end
-
-	local keys
-	local binding = Binder_ToBinding(button)
-	for i = 1, select('#', GetBindingKey(binding)) do
-		local hotKey = select(i, GetBindingKey(binding))
-		if keys then
-			keys = keys .. ', ' .. GetBindingText(hotKey,'KEY_')
-		else
-			keys = GetBindingText(hotKey,'KEY_')
-		end
-	end
-
-	return keys
-end
-
-local function Binder_OnKeyDown(self, key)
-	local button = self.button
-	if not button then return end
-
-	if key == 'UNKNOWN' or key == 'SHIFT' or key == 'CTRL'	or key == 'ALT' then return end
-
-	local screenshotKey = GetBindingKey('SCREENSHOT')
-	if screenshotKey and key == screenshotKey then
-		Screenshot()
-		return
-	end
-
-	local openChatKey = GetBindingKey('OPENCHAT')
-	if openChatKey and key == openChatKey then
-		ChatFrameEditBox:Show()
-		return
-	end
-
-	if key == 'LeftButton' or key == 'RightButton' then
-		return
-	elseif key == 'MiddleButton' then
-		key = 'BUTTON3'
-	elseif key == 'Button4' then
-		key = 'BUTTON4'
-	elseif key == 'Button5' then
-		key = 'BUTTON5'
-	end
-
-	if key == 'ESCAPE' then
-		Binder_ClearBindings(button)
-		KeyBound:Set(button)
-		return
-	end
-
-	if IsShiftKeyDown() then
-		key = 'SHIFT-' .. key
-	end
-	if IsControlKeyDown() then
-		key = 'CTRL-' .. key
-	end
-	if IsAltKeyDown() then
-		key = 'ALT-' .. key
-	end
-
-	Binder_SetKey(button, key)
-	KeyBound:Set(button)
-end
-
-local function Binder_OnEnter(self)
-	local button = self.button
-	if button and not InCombatLockdown() then
-		if self:GetRight() >= (GetScreenWidth() / 2) then
-			GameTooltip:SetOwner(self, 'ANCHOR_LEFT')
-		else
-			GameTooltip:SetOwner(self, 'ANCHOR_RIGHT')
-		end
-		if(button.GetActionName) then
-			GameTooltip:SetText(button:GetActionName(), 1, 1, 1)
-		else
-			GameTooltip:SetText(button:GetName(), 1, 1, 1)
-		end
-
-		local bindings = Binder_GetBindings(button)
-		if bindings then
-			GameTooltip:AddLine(bindings, 0, 1, 0)
-			GameTooltip:AddLine(L.ClearTip)
-		else
-			GameTooltip:AddLine(L.NoKeysBoundTip, 0, 1, 0)
-		end
-		GameTooltip:Show()
-	else
-		GameTooltip:Hide()
-	end
-end
-
-local function Binder_OnLeave(self)
-	KeyBound:Set(nil)
-	GameTooltip:Hide()
-end
-
-local function Binder_OnMouseWheel(self, arg1)
-	if arg1 > 0 then
-		Binder_OnKeyDown(self, 'MOUSEWHEELUP')
-	else
-		Binder_OnKeyDown(self, 'MOUSEWHEELDOWN')
-	end
-end
-
-local function Binder_Create()
-	local binder = CreateFrame('Button')
-	binder:RegisterForClicks('anyUp')
-	binder:SetFrameStrata('DIALOG')
-	binder:EnableKeyboard(true)
-	binder:EnableMouseWheel(true)
-
-	local bg = binder:CreateTexture()
-	bg:SetTexture(0, 0, 0, 0.5)
-	bg:SetAllPoints(binder)
-
-	local text = binder:CreateFontString('OVERLAY')
-	text:SetFontObject('GameFontNormalLarge')
-	text:SetTextColor(0, 1, 0)
-	text:SetAllPoints(binder)
-	binder.text = text
-
-	binder:SetScript('OnClick', Binder_OnKeyDown)
-	binder:SetScript('OnKeyDown', Binder_OnKeyDown)
-	binder:SetScript('OnMouseWheel', Binder_OnMouseWheel)
-	binder:SetScript('OnEnter', Binder_OnEnter)
-	binder:SetScript('OnLeave', Binder_OnLeave)
-	binder:SetScript('OnHide', function() KeyBound:Set(nil) end)
-	binder:Hide()
-
-	return binder
-end
-
+KeyBound = LibStub('AceAddon-3.0'):NewAddon('KeyBound', 'AceEvent-3.0')
+local L = LibStub('AceLocale-3.0'):GetLocale('KeyBound')
+local Binder = {}
 
 --[[ KeyBound ]]--
 
 --events
-function KeyBound:Enable()
+function KeyBound:OnEnable()
+	SlashCmdList['KeyBoundSlashCOMMAND'] = function() KeyBound:Toggle() end
+	SLASH_KeyBoundSlashCOMMAND1 = '/keybound'
+	SLASH_KeyBoundSlashCOMMAND2 = '/kb'
+
 	self:RegisterEvent('PLAYER_REGEN_ENABLED')
 	self:RegisterEvent('PLAYER_REGEN_DISABLED')
 end
@@ -247,26 +53,26 @@ function KeyBound:Toggle()
 end
 
 function KeyBound:Activate()
-	if(not self:IsShown()) then
+	if not self:IsShown() then
 		if InCombatLockdown() then
 			UIErrorsFrame:AddMessage(L.CannotBindInCombat, 1, 0.3, 0.3, 1, UIERRORS_HOLD_TIME)
 		else
 			self.enabled = true
 			if not self.frame then
-				self.frame = Binder_Create()
+				self.frame = Binder:Create()
 			end
 			self:Set(nil)
-			self:TriggerMessage('KEYBOUND_ENABLED')
+			self:SendMessage('KEYBOUND_ENABLED')
 			UIErrorsFrame:AddMessage(L.Enabled, 1, 0.82, 0, 1, UIERRORS_HOLD_TIME)
 		end
 	end
 end
 
 function KeyBound:Deactivate()
-	if(self:IsShown()) then
+	if self:IsShown() then
 		self.enabled = nil
 		self:Set(nil)
-		self:TriggerMessage('KEYBOUND_DISABLED')
+		self:SendMessage('KEYBOUND_DISABLED')
 		UIErrorsFrame:AddMessage(L.Disabled, 1, 0.82, 0, 1, UIERRORS_HOLD_TIME)
 	end
 end
@@ -288,7 +94,7 @@ function KeyBound:Set(button)
 			bindFrame.text:SetFontObject('GameFontNormal')
 		end
 		bindFrame:Show()
-		Binder_OnEnter(bindFrame)
+		bindFrame:OnEnter()
 	elseif bindFrame then
 		bindFrame.button = nil
 		bindFrame:ClearAllPoints()
@@ -326,6 +132,217 @@ function KeyBound:ToShortKey(key)
 	end
 end
 
-SlashCmdList['KeyBoundSlashCOMMAND'] = function() KeyBound:Toggle() end
-SLASH_KeyBoundSlashCOMMAND1 = '/keybound'
-SLASH_KeyBoundSlashCOMMAND2 = '/kb'
+function KeyBound:UpdateBG()
+end
+
+
+--[[ Binder Widget ]]--
+
+function Binder:Create()
+	local binder = CreateFrame('Button')
+	binder:RegisterForClicks('anyUp')
+	binder:SetFrameStrata('DIALOG')
+	binder:EnableKeyboard(true)
+	binder:EnableMouseWheel(true)
+	
+	for k,v in pairs(self) do
+		binder[k] = v
+	end
+
+	local bg = binder:CreateTexture()
+	bg:SetTexture(0, 0, 0, 0.5)
+	bg:SetAllPoints(binder)
+
+	local text = binder:CreateFontString('OVERLAY')
+	text:SetFontObject('GameFontNormalLarge')
+	text:SetTextColor(0, 1, 0)
+	text:SetAllPoints(binder)
+	binder.text = text
+
+	binder:SetScript('OnClick', self.OnKeyDown)
+	binder:SetScript('OnKeyDown', self.OnKeyDown)
+	binder:SetScript('OnMouseWheel', self.OnMouseWheel)
+	binder:SetScript('OnEnter', self.OnEnter)
+	binder:SetScript('OnLeave', self.OnLeave)
+	binder:SetScript('OnHide', self.OnHide)
+	binder:Hide()
+
+	return binder
+end
+
+function Binder:OnHide()
+	KeyBound:Set(nil)
+end
+
+function Binder:OnKeyDown(key)
+	local button = self.button
+	if not button then return end
+
+	if key == 'UNKNOWN' or key == 'SHIFT' or key == 'CTRL'	or key == 'ALT' then return end
+
+	local screenshotKey = GetBindingKey('SCREENSHOT')
+	if screenshotKey and key == screenshotKey then
+		Screenshot()
+		return
+	end
+
+	local openChatKey = GetBindingKey('OPENCHAT')
+	if openChatKey and key == openChatKey then
+		ChatFrameEditBox:Show()
+		return
+	end
+
+	if key == 'LeftButton' or key == 'RightButton' then
+		return
+	elseif key == 'MiddleButton' then
+		key = 'BUTTON3'
+	elseif key == 'Button4' then
+		key = 'BUTTON4'
+	elseif key == 'Button5' then
+		key = 'BUTTON5'
+	end
+
+	if key == 'ESCAPE' then
+		self:ClearBindings(button)
+		KeyBound:Set(button)
+		return
+	end
+
+	if IsShiftKeyDown() then
+		key = 'SHIFT-' .. key
+	end
+	if IsControlKeyDown() then
+		key = 'CTRL-' .. key
+	end
+	if IsAltKeyDown() then
+		key = 'ALT-' .. key
+	end
+
+	self:SetKey(button, key)
+	KeyBound:Set(button)
+end
+
+function Binder:OnMouseWheel(arg1)
+	if arg1 > 0 then
+		self:OnKeyDown('MOUSEWHEELUP')
+	else
+		self:OnKeyDown('MOUSEWHEELDOWN')
+	end
+end
+
+function Binder:OnEnter()
+	local button = self.button
+	if button and not InCombatLockdown() then
+		if self:GetRight() >= (GetScreenWidth() / 2) then
+			GameTooltip:SetOwner(self, 'ANCHOR_LEFT')
+		else
+			GameTooltip:SetOwner(self, 'ANCHOR_RIGHT')
+		end
+
+		if button.GetActionName then
+			GameTooltip:SetText(button:GetActionName(), 1, 1, 1)
+		else
+			GameTooltip:SetText(button:GetName(), 1, 1, 1)
+		end
+
+		local bindings = self:GetBindings(button)
+		if bindings then
+			GameTooltip:AddLine(bindings, 0, 1, 0)
+			GameTooltip:AddLine(L.ClearTip)
+		else
+			GameTooltip:AddLine(L.NoKeysBoundTip, 0, 1, 0)
+		end
+		GameTooltip:Show()
+	else
+		GameTooltip:Hide()
+	end
+end
+
+function Binder:OnLeave()
+	KeyBound:Set(nil)
+	GameTooltip:Hide()
+end
+
+
+--[[ Update Functions ]]--
+
+function Binder:ToBinding(button)
+	return format('CLICK %s:LeftButton', button:GetName())
+end
+
+function Binder:FreeKey(button, key)
+	local msg
+	if button.FreeKey then
+		local action = button:FreeKey(key)
+		if button:FreeKey(key) then
+			msg = format(L.UnboundKey, GetBindingText(key, 'KEY_'), action)
+		end
+	else
+		local action = GetBindingAction(key)
+		if action and action ~= '' and action ~= self:ToBinding(button) then
+			msg = format(L.UnboundKey, GetBindingText(key, 'KEY_'), action)
+		end
+	end
+
+	if msg then
+		UIErrorsFrame:AddMessage(msg, 1, 0.82, 0, 1, UIERRORS_HOLD_TIME)
+	end
+end
+
+function Binder:SetKey(button, key)
+	if InCombatLockdown() then
+		UIErrorsFrame:AddMessage(L.CannotBindInCombat, 1, 0.3, 0.3, 1, UIERRORS_HOLD_TIME)
+	else
+		self:FreeKey(button, key)
+
+		local msg
+		if button.SetKey then
+			button:SetKey(key)
+			msg = format(L.BoundKey, GetBindingText(key, 'KEY_'), button:GetActionName())
+		else
+			SetBindingClick(key, button:GetName(), 'LeftButton')
+			msg = format(L.BoundKey, GetBindingText(key, 'KEY_'), button:GetName())
+		end
+		SaveBindings(GetCurrentBindingSet())
+		UIErrorsFrame:AddMessage(msg, 1, 1, 1, 1, UIERRORS_HOLD_TIME)
+	end
+end
+
+function Binder:ClearBindings(button)
+	if InCombatLockdown() then
+		UIErrorsFrame:AddMessage(L.CannotBindInCombat, 1, 0.3, 0.3, 1, UIERRORS_HOLD_TIME)
+	else
+		local msg
+		if button.ClearBindings then
+			button:ClearBindings()
+			msg = format(L.ClearedBindings, button:GetActionName())
+		else
+			local binding = self:ToBinding(button)
+			while GetBindingKey(binding) do
+				SetBinding(GetBindingKey(binding), nil)
+			end
+			msg = format(L.ClearedBindings, button:GetName())
+		end
+		SaveBindings(GetCurrentBindingSet())
+		UIErrorsFrame:AddMessage(msg, 1, 1, 1, 1, UIERRORS_HOLD_TIME)
+	end
+end
+
+function Binder:GetBindings(button)
+	if button.GetBindings then
+		return button:GetBindings()
+	end
+
+	local keys
+	local binding = self:ToBinding(button)
+	for i = 1, select('#', GetBindingKey(binding)) do
+		local hotKey = select(i, GetBindingKey(binding))
+		if keys then
+			keys = keys .. ', ' .. GetBindingText(hotKey,'KEY_')
+		else
+			keys = GetBindingText(hotKey,'KEY_')
+		end
+	end
+
+	return keys
+end

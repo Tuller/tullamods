@@ -5,8 +5,6 @@
 ## Version: 0
 ## SavedVariables: Bongos3ABDB
 ## Dependencies: Bongos
-ActionBar.lua
-Painter.lua
-bar.lua
-button.lua
 unreg.lua
+keyBound\keyBound.xml
+actionBar\actionBar.xml

@@ -19,9 +19,7 @@ function ActionBar:Create(numRows, numCols, point, x, y)
 		local defaults = {
 			rows = numRows, 
 			cols = numCols, 
-			ids = {}, 
-			states = 2,
-			stateHeader = {'[stealth]', '[modifier]'},
+			ids = {},
 		}
 		local bar, isNew = self.super.Create(self, id, defaults, true)
 		if isNew then
@@ -212,7 +210,7 @@ function ActionBar:UpdateStateDriver()
 
 	local header = ''
 	for i = 1, self:NumStates() do
-		local state = self:GetStateCondition(state)
+		local state = self:GetStateCondition(i)
 		if state then
 			header = header .. state .. i .. ';'
 		end

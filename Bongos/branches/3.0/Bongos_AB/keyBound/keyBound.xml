@@ -3,6 +3,6 @@
 	<Script file="localization\localization.cn.lua"/>
 	<Script file="localization\localization.fr.lua"/>
 	<Script file="keyBound.lua"/>
-	<Script file="spellBound.lua"/>
-	<Script file="macroBound.lua"/>
+	<Script file="spell.lua"/>
+	<Script file="macro.lua"/>
 </Ui>

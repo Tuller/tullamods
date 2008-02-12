@@ -3,9 +3,8 @@
 		English (default)
 --]]
 
-KEYBOUND_LOCALS = {}
+local L = LibStub('AceLocale-3.0'):NewLocale('KeyBound', 'enUS', true)
 
-local L = KEYBOUND_LOCALS
 L.Enabled = "Bindings mode enabled"
 L.Disabled = "Bindings mode disabled"
 L.ClearTip = format("Press %s to clear all bindings", GetBindingText("ESCAPE", "KEY_"))

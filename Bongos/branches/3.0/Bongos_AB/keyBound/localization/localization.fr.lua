@@ -3,9 +3,9 @@
 		French
 --]]
 
-if GetLocale() ~= 'frFR' then return end
+local L = LibStub('AceLocale-3.0'):NewLocale('KeyBound', 'frFR')
+if not L then return end
 
-local L = KEYBOUND_LOCALS
 L.Enabled = "Bindings mode enabled"
 L.Disabled = "Bindings mode disabled"
 L.ClearTip = format("Appuyer sur %s pour effacer tous les bindings", GetBindingText("ESCAPE", "KEY_"))
