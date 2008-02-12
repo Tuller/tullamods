@@ -2,9 +2,9 @@
 	Bongos Stats Localization file
 --]]
 
-if GetLocale() ~= 'frFR' then return end
+local L = LibStub('AceLocale-3.0'):NewLocale('Bongos3-Minimap', 'frFR')
+if not L then return end
 
-local L = BONGOS_LOCALS
 L.ShowMapTitle = "Afficher le titre"
 L.ShowMapZoom = "Afficher les boutons de zoom"
 L.ShowMapTime = "Afficher l'indicateur Jour/Nuit"
