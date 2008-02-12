@@ -1,10 +1,10 @@
-## Interface: 20300
-## Title: Bongos2 Options
-## Title-zhCN: |cFF0099FF[Bongos2]|r 设置
+## Interface: 20400
+## Title: Bongos3 Options
+## Title-zhCN: |cFF0099FF[Bongos3]|r 设置
 ## Notes: A load on demand option menu for Bongos
-## Notes-zhCN: Bongos2 系列 设置。
+## Notes-zhCN: Bongos3 系列 设置。
 ## Author: Tuller
-## Dependencies: Bongos2
+## Dependencies: Bongos
 ## LoadOnDemand: 1
 localization\localization.lua
 localization\localization.cn.lua
