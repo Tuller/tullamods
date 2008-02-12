@@ -269,6 +269,6 @@ do
 	end
 
 	function Panel:CreateSpacingSlider()
-		return self:CreateSlider(L.FadedOpacity, -8, 32, 1, Slider_OnShow, Slider_UpdateValue)
+		return self:CreateSlider(L.Spacing, -8, 32, 1, Slider_OnShow, Slider_UpdateValue)
 	end
 end
