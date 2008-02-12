@@ -267,11 +267,8 @@ function BagnonDB:GetBagData(bag, player)
 		local bagInfo = playerDB[ToBagIndex(bag)]
 		if bagInfo then
 			local size, link, count = strsplit(',', bagInfo)
-			local _, hyperLink, quality, texture
-			if link then
-				_,hyperLink,_,_,_,_,_,_,_, texture = GetItemInfo(link)
-			end
-			return tonumber(size), hyperLink, tonumber(count) or 1, texture
+			local hyperLink = (link and select(2, GetItemInfo(link))) or nil
+			return tonumber(size), hyperLink, tonumber(count) or 1, GetItemIcon(link)
 		end
 	end
 end
@@ -303,8 +300,8 @@ function BagnonDB:GetItemData(bag, slot, player)
 		if itemInfo then
 			local link, count = strsplit(',', itemInfo)
 			if link then
-				local _,hyperLink, quality,_,_,_,_,_,_, texture = GetItemInfo(link)
-				return hyperLink, tonumber(count) or 1, texture, tonumber(quality)
+				local hyperLink, quality = select(2, GetItemInfo(link))
+				return hyperLink, tonumber(count) or 1, GetItemIcon(link), tonumber(quality)
 			end
 		end
 	end
