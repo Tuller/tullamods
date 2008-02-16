@@ -46,25 +46,27 @@ function Painter:SetStartPoint()
 end
 
 function Painter:ShowDragBox()
-	--create the selection box, if we've not already
-	if not self.box then
-		self.box = CreateFrame('Frame', nil, self)
-		self.box.bg = self.box:CreateTexture()
-		self.box.bg:SetAllPoints(self.box)
+	if IsAltKeyDown() then
+		--create the selection box, if we've not already
+		if not self.box then
+			self.box = CreateFrame('Frame', nil, self)
+			self.box.bg = self.box:CreateTexture()
+			self.box.bg:SetAllPoints(self.box)
 
-		local text = self.box:CreateFontString()
-		text:SetPoint('CENTER')
-		text:SetFontObject('GameFontNormal')
-		self.box.text = text
+			local text = self.box:CreateFontString()
+			text:SetPoint('CENTER')
+			text:SetFontObject('GameFontNormal')
+			self.box.text = text
+		end
+		self.box.bg:SetTexture(random(), random(), random(), 0.4)
+
+		--place the box at the starting point
+		self.box:ClearAllPoints()
+		self.box:SetPoint(self.startY .. self.startX, UIParent, 'BOTTOMLEFT', self.x, self.y)
+		self.box:Show()
+
+		self:SetScript('OnUpdate', self.UpdateDragBox)
 	end
-	self.box.bg:SetTexture(random(), random(), random(), 0.4)
-
-	--place the box at the starting point
-	self.box:ClearAllPoints()
-	self.box:SetPoint(self.startY .. self.startX, UIParent, 'BOTTOMLEFT', self.x, self.y)
-	self.box:Show()
-
-	self:SetScript('OnUpdate', self.UpdateDragBox)
 end
 
 function Painter:UpdateDragBox()
@@ -118,9 +120,11 @@ end
 
 --try and create the bar
 function Painter:CreateBar()
-	Action.Bar:Create(self.rows, self.cols, self.startY .. self.startX, self.x, self.y)
-	self.box:Hide()
-	self:SetScript('OnUpdate', nil)
+	if self.box and self.box:IsShown() then
+		Action.Bar:Create(self.rows, self.cols, self.startY .. self.startX, self.x, self.y)
+		self.box:Hide()
+		self:SetScript('OnUpdate', nil)
+	end
 end
 
 function Painter:UpdateText()

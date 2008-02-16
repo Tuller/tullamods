@@ -4,25 +4,28 @@
 		Should work exactly like the normal pet action buttons, but with a modified appearance
 --]]
 
-BongosPetButton = CreateFrame('CheckButton')
-local Button_MT = {__index = BongosPetButton}
+local Bongos = LibStub('AceAddon-3.0'):GetAddon('Bongos3')
+local PetBar = Bongos:GetModule('PetBar')
+local PetButton = Bongos:CreateWidgetClass('CheckButton')
+PetBar.Button = PetButton
+
 local petBar = PetActionBarFrame
 
 
 --[[ Constructorish ]]--
 
-function BongosPetButton:Set(id, parent)
-	local button = setmetatable(self:Get(id), Button_MT)
+function PetButton:Set(id, parent)
+	local button = self:New(self:Get(id))
 	button:SetToplevel(nil)
 	button:SetScripts()
 	button:Style()
-	button:ShowHotkey(BongosActionConfig:ShowingHotkeys())
+--	button:ShowHotkey(BongosActionConfig:ShowingHotkeys())
 	parent:Attach(button)
 
 	return button
 end
 
-function BongosPetButton:Style()
+function PetButton:Style()
 	local name = self:GetName()
 
 	local autoCast = getglobal(name .. 'AutoCast')
@@ -33,7 +36,7 @@ function BongosPetButton:Style()
 	getglobal(name .. 'NormalTexture2'):SetVertexColor(1, 1, 1, 0.5)
 end
 
-function BongosPetButton:SetScripts()
+function PetButton:SetScripts()
 	self:RegisterForDrag('LeftButton', 'RightButton')
 	self:RegisterForClicks('anyUp')
 
@@ -47,7 +50,7 @@ end
 
 --[[ OnX Functions ]]--
 
-function BongosPetButton:OnDragStart()
+function PetButton:OnDragStart()
 	if petBar.showgrid > 0 or LOCK_ACTIONBAR ~= '1' or IsModifiedClick('PICKUPACTION') then
 		self:SetChecked(0)
 		PickupPetAction(self:GetID())
@@ -55,7 +58,7 @@ function BongosPetButton:OnDragStart()
 	end
 end
 
-function BongosPetButton:OnReceiveDrag()
+function PetButton:OnReceiveDrag()
 	if petBar.showgrid > 0 or LOCK_ACTIONBAR ~= '1' or IsModifiedClick('PICKUPACTION') then
 		self:SetChecked(0)
 		PickupPetAction(self:GetID())
@@ -63,17 +66,17 @@ function BongosPetButton:OnReceiveDrag()
 	end
 end
 
-function BongosPetButton:OnEnter()
-	if BongosActionConfig:ShowingTooltips() then
+function PetButton:OnEnter()
+--	if BongosActionConfig:ShowingTooltips() then
 		PetActionButton_OnEnter(self)
-	end
+--	end
 	KeyBound:Set(self)
 end
 
 
 --[[ Hotkey Functions ]]--
 
-function BongosPetButton:ShowHotkey(show)
+function PetButton:ShowHotkey(show)
 	if show then
 		getglobal(self:GetName() .. 'HotKey'):Show()
 		self:UpdateHotkey()
@@ -82,11 +85,11 @@ function BongosPetButton:ShowHotkey(show)
 	end
 end
 
-function BongosPetButton:UpdateHotkey()
+function PetButton:UpdateHotkey()
 	getglobal(self:GetName() .. 'HotKey'):SetText(self:GetHotkey() or '')
 end
 
-function BongosPetButton:GetHotkey()
+function PetButton:GetHotkey()
 	local key = GetBindingKey(format('CLICK %s:LeftButton', self:GetName()))
 	if not key then
 		key = GetBindingText(GetBindingKey('BONUSACTIONBUTTON' .. self:GetID()), 'KEY_')
@@ -97,14 +100,13 @@ end
 
 --[[ Utility Functions ]]--
 
-function BongosPetButton:Get(id)
+function PetButton:Get(id)
 	return getglobal(format('PetActionButton%d', id))
 end
 
-function BongosPetButton:ForAll(method, ...)
+function PetButton:ForAll(method, ...)
 	for i = 1, NUM_PET_ACTION_SLOTS do
 		local button = self:Get(i)
-		local action = button[method]
-		action(button, ...)
+		button[method](button, ...)
 	end
 end

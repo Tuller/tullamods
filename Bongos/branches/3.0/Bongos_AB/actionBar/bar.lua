@@ -20,6 +20,7 @@ function ActionBar:Create(numRows, numCols, point, x, y)
 			rows = numRows, 
 			cols = numCols, 
 			ids = {},
+			stateHeader = {}
 		}
 		local bar, isNew = self.super.Create(self, id, defaults, true)
 		if isNew then
@@ -139,13 +140,13 @@ function ActionBar:UpdateStates()
 end
 
 function ActionBar:NumStates()
-	return self.sets.states or 1
+	return self.sets.states or 0
 end
 
 --add/remove buttons and update their actionsIDs for each state
 --needs to be called whenever the size/number of pages of a bar changes
 function ActionBar:UpdateActions()
-	local states = self.sets.states or 1
+	local states = self:NumStates()
 	local ids = self.sets.ids
 	local numButtons = self:GetSize()
 	local index = 1
@@ -187,7 +188,7 @@ function ActionBar:Layout()
 
 	for i = 1, rows do
 		for j = 1, cols do
-			local button = self.buttons[j + cols*(rows-1)]
+			local button = self.buttons[j + cols*(i-1)]
 			button:ClearAllPoints()
 			button:SetPoint('TOPLEFT', buttonSize*(j-1), -buttonSize*(i-1))
 			button:Show()

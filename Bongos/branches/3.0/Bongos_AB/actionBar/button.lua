@@ -228,7 +228,7 @@ function ActionButton:OnEnter()
 		-- self:UpdateTooltip()
 	-- end
 
---	KeyBound:Set(self)
+	KeyBound:Set(self)
 end
 
 function ActionButton:OnLeave()
@@ -375,17 +375,17 @@ end
 
 function ActionButton:UpdateSpellInUse()
 	-- if BongosActionConfig:HighlightingBuffs() then
-		-- local action = self:GetPagedID()
-		-- if action then
-			-- local spellID = self.spellID
-			-- if spellID then
-				-- if self.type == 'macro' then
-					-- return self:UpdateBorder(GetMacroSpell(spellID))
-				-- else
-					-- return self:UpdateBorder(spellID)
-				-- end
-			-- end
-		-- end
+		local action = self:GetPagedID()
+		if action then
+			local spellID = self.spellID
+			if spellID then
+				if self.type == 'macro' then
+					return self:UpdateBorder(GetMacroSpell(spellID))
+				else
+					return self:UpdateBorder(spellID)
+				end
+			end
+		end
 	-- end
 	self:GetCheckedTexture():SetVertexColor(1, 1, 1)
 end
@@ -519,13 +519,12 @@ function ActionButton:GetPagedID(refresh)
 end
 
 function ActionButton:ShowingEmpty()
-	return self.showEmpty
+	return self.showEmpty or KeyBound:IsShown()
 --	return self.showEmpty or BongosActionConfig:ShowingEmptyButtons() or KeyBound:IsShown()
 end
 
 
 --range check/flash and buff updating
---[[
 do
 	local f = CreateFrame('Frame')
 	local newVals = {} --store new info in here
@@ -684,7 +683,7 @@ do
 
 	--buff and debuff updating stuff
 	f:SetScript('OnEvent', function(self, event, unit)
-		if BongosActionConfig:HighlightingBuffs() then
+--		if BongosActionConfig:HighlightingBuffs() then
 			if event == 'PLAYER_TARGET_CHANGED' then
 				self:UpdateTargetBuffs()
 			elseif event == 'UNIT_AURA' then
@@ -694,7 +693,7 @@ do
 			elseif event == 'PLAYER_AURAS_CHANGED' then
 				self:UpdatePlayerBuffs()
 			end
-		end
+--		end
 	end)
 	f:RegisterEvent('UNIT_AURA')
 	f:RegisterEvent('PLAYER_AURAS_CHANGED')
@@ -721,4 +720,3 @@ do
 	f.nextUpdate = 1
 	f.delay = 1
 end
---]]

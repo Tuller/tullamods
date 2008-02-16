@@ -13,4 +13,8 @@ unreg.lua
 keyBound\keyBound.xml
 bagBar\bar.lua
 menuBar\bar.lua
+classBar\bar.lua
+classBar\button.lua
+petBar\bar.lua
+petBar\button.lua
 actionBar\actionBar.xml

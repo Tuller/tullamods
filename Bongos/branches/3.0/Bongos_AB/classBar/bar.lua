@@ -1,19 +1,18 @@
 --[[
-	BongosClassBar
+	ClassBar
 		A replacement for the Blizzard shapeshift bar
 --]]
 
-local class = BONGOS_CLASS
+local class = select(2, UnitClass('player'))
 if not(class == 'DRUID' or class == 'ROGUE' or class == 'WARRIOR' or class == 'PALADIN') then
 	return
 end
 
-BongosClassBar = Bongos:NewModule('Bongos-ClassBar')
-local L = BONGOS_LOCALS
+local Bongos = LibStub('AceAddon-3.0'):GetAddon('Bongos3')
+local ClassBar = Bongos:NewModule('ClassBar', 'AceEvent-3.0')
+local L = LibStub('AceLocale-3.0'):GetLocale('Bongos3-AB')
 local DEFAULT_SPACING = 2
 
-
---[[ Bar ]]--
 
 local function Bar_SetSpacing(self, spacing)
 	self:Layout(nil, spacing)
@@ -38,32 +37,33 @@ local function Bar_Layout(self, cols, space)
 	for i = 1, numForms do
 		local row = (i - 1) % cols
 		local col = ceil(i / cols) - 1
-		BongosClassButton:Get(i):SetPoint('TOPLEFT', size * row, -size * col)
+		ClassBar.Button:Get(i):SetPoint('TOPLEFT', size * row, -size * col)
 	end
 
-	self:SetSize(size * cols - space, size * ceil(numForms/cols) - space)
+	self:SetWidth(size * cols - space)
+	self:SetHeight(size * ceil(numForms/cols) - space)
 end
 
-local function Bar_CreateMenu(frame)
-	local menu,panel = BongosMenu:CreateMenu(frame.id)
+local function Bar_CreateMenu(bar)
+	local menu = Bongos.Menu:Create(bar.id)
+	local panel = menu:AddLayoutPanel()
 
 	--sliders
-	panel:AddSpacingSlider()
+	panel:CreateSpacingSlider()
 
-	local cols = panel:AddSlider(L.Columns, 1, 1, 1)
-	cols:SetScript('OnShow', function(self)
-		self.onShow = true
+	local function Cols_OnShow(self)
 		self:SetMinMaxValues(1, GetNumShapeshiftForms())
-		self:SetValue(GetNumShapeshiftForms() - (frame.sets.cols or GetNumShapeshiftForms()) + 1)
-		getglobal(self:GetName() .. 'Low'):SetText(GetNumShapeshiftForms())
-		self.onShow = nil
-	end)
-	cols:SetScript('OnValueChanged', function(self, value)
-		if not self.onShow then
-			frame:Layout(GetNumShapeshiftForms() - value + 1)
-		end
-		getglobal(self:GetName() .. 'ValText'):SetText(GetNumShapeshiftForms() - value + 1)
-	end)
+		self:SetValue(GetNumShapeshiftForms() - (bar.sets.cols or GetNumShapeshiftForms()) + 1)
+	end
+
+	local function Cols_UpdateValue(self, value)
+		bar:Layout(GetNumShapeshiftForms() - value + 1)
+	end
+	
+	local function Cols_UpdateText(self, value)
+		self.valText:SetText(GetNumShapeshiftForms() - value + 1)
+	end
+	panel:CreateSlider(L.Columns, 1, 1, 1, Cols_OnShow, Cols_UpdateValue, Cols_UpdateText)
 
 	return menu
 end
@@ -78,21 +78,25 @@ end
 
 --[[ Events ]]--
 
-function BongosClassBar:Load()
-	self.bar = BBar:Create('class', Bar_OnCreate, nil, {x = 703, y = 651})
-	self:UpdateForms()
+function ClassBar:Load()
+	local bar, isNew = Bongos.Bar:Create('class')
+	if isNew then
+		Bar_OnCreate(bar)
+	end
+	self.bar = bar
 
+	self:UpdateForms()
 	self:RegisterEvent('UPDATE_SHAPESHIFT_FORMS', 'UpdateForms')
 end
 
-function BongosClassBar:Unload()
+function ClassBar:Unload()
 	self:UnregisterAllEvents()
 	self.bar:Destroy()
 end
 
-function BongosClassBar:UpdateForms()
+function ClassBar:UpdateForms()
 	for id = 1, GetNumShapeshiftForms() do
-		local button = BongosClassButton:Get(id) or BongosClassButton:Create(id, self.bar)
+		local button = self.Button:Get(id) or self.Button:Create(id, self.bar)
 		button:UpdateSpell()
 		button:Show()
 	end
