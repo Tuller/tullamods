@@ -1,8 +1,8 @@
-## Interface: 20100
+## Interface: 20400
 ## Title: Davey Crocket's Rocket Pockets
 ## Notes: Quick access to inventory items
 ## Author: Tuller
-## Dependencies: Bongos2
+## Dependencies: Bongos
 localization.lua
 events.lua
 utility.lua

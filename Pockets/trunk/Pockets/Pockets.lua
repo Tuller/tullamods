@@ -3,13 +3,14 @@
 		A movable memory, latency and fps display for Bongos
 --]]
 
-Pockets = Bongos:NewModule('Bongos-Pockets')
+local Bongos = LibStub('AceAddon-3.0'):GetAddon('Bongos3')
+Pockets = Bongos:NewModule('Pockets', 'AceEvent-3.0')
 local UNKNOWN_ITEM = 'Interface/Icons/INV_Misc_QuestionMark'
 
 
 --[[ DockButton Object ]]--
 
-local DockButton = PocketUtil:CreateWidgetClass('Button')
+local DockButton = Bongos:CreateWidgetClass('Button')
 
 local id = 0
 function DockButton:Create(parent)
@@ -58,7 +59,8 @@ local function Bar_Layout(self)
 		item:Hide()
 	end
 
-	self:SetSize(#self.sets.cats * (37 + 1) - 1, 37)
+	self:SetWidth(#self.sets.cats * (37 + 1) - 1)
+	self:SetHeight(37)
 end
 
 local function Bar_OnCreate(self)
@@ -69,8 +71,17 @@ end
 --[[ Startup ]]--
 
 function Pockets:Load()
-	self.bar = BBar:Create('pockets', Bar_OnCreate, nil, {xOff = 0, yOff = 0, point = 'CENTER', cats = {'food & drink', 'quest', 'bandage', 'misc', 'ammo'}})
-	self.bar:Layout()
+	local defaults = {
+		point = 'CENTER', 
+		cats = {'food & drink', 'quest', 'bandage', 'misc', 'ammo'}
+	}
+
+	local bar, isNew = Bongos.Bar:Create('pockets', defaults)
+	if isNew then
+		Bar_OnCreate(bar)
+	end
+	bar:Layout()
+	self.bar = bar
 end
 
 function Pockets:Unload()
