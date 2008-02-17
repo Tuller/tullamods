@@ -15,11 +15,13 @@ BINDING_NAME_BSTATSTOGGLE = L.ToggleBongosStats
 --[[ Startup ]]--
 
 function Stats:Load()
-	self.bar, isNew = Bongos.Bar:Create('stats', {
+	local defaults = {
 		showMemory = true,
 		showPing = true,
 		showFPS = true,
-	})
+	}
+
+	self.bar, isNew = Bongos.Bar:Create('stats', defaults)
 
 	if isNew then
 		self:OnBarCreate(self.bar)
