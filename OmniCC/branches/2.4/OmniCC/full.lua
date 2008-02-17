@@ -12,6 +12,7 @@ local DAY, HOUR, MINUTE, SHORT = 86400, 3600, 60, 5 --values for time
 local ICON_SIZE = 36 --the normal size of an icon
 local timers = {}
 local pulses = {}
+local showers = {}
 local activePulses = {}
 
 --[[
@@ -104,32 +105,11 @@ end
 	Timer Code
 --]]
 
---shower: a frame used to properly show and hide timer text without forcing the timer to be parented to the cooldown frame (needed for hiding the cooldown frame)
-local function Shower_OnShow(self)
-	local timer = timers[self:GetParent()]
-	if timer.wasShown then
-		timer:Show()
-	end
-end
-
-local function Shower_OnHide(self)
-	local timer = timers[self:GetParent()]
-	if timer:IsShown() then
-		timer.wasShown = true
-		timer:Hide()
-	end
-end
-
---timer, the frame with cooldown text
-local function Timer_OnUpdate(self, elapsed)
-	if self.nextUpdate <= 0 then
-		OmniCC:UpdateTimer(self)
-	else
-		self.nextUpdate = self.nextUpdate - elapsed
-	end
-end
-
 function OmniCC:StartTimer(cooldown, start, duration)
+	if not showers[cooldown] then
+		self:CreateShower(cooldown)
+	end
+
 	local timer = timers[cooldown] or self:CreateTimer(cooldown)
 	if timer then
 		timer.start = start
@@ -139,39 +119,74 @@ function OmniCC:StartTimer(cooldown, start, duration)
 	end
 end
 
-function OmniCC:CreateTimer(cooldown)
-	--controls the visibility of the timer
-	local shower = CreateFrame('Frame', nil, cooldown)
-	shower:SetScript('OnShow', Shower_OnShow)
-	shower:SetScript('OnHide', Shower_OnHide)
-
-	local timer = CreateFrame('Frame', nil, cooldown:GetParent())
-	timer:SetFrameLevel(cooldown:GetFrameLevel() + 5) --make sure the timer is on top of things like the cooldown model
-	timer:SetAllPoints(cooldown)
-	timer:SetToplevel(true)
-	timer:Hide()
-	timer:SetScript('OnUpdate', Timer_OnUpdate)
-
-	local text = timer:CreateFontString(nil, 'OVERLAY')
-	text:SetPoint('CENTER', timer, 'CENTER', 0, 1)
-	timer.text = text
-
-	-- parent icon, used for shine stuff
-	local parent = cooldown:GetParent()
-	if parent then
-		if parent.icon then
-			timer.icon = parent.icon
-		else
-			local name = parent:GetName()
-			if name then
-				timer.icon = getglobal(name .. 'Icon') or getglobal(name .. 'IconTexture')
-			end
+--shower: a frame used to properly show and hide timer text without forcing the timer to be parented to the cooldown frame (needed for hiding the cooldown frame)
+do
+	local function Shower_OnShow(self)
+		local timer = timers[self:GetParent()]
+		if timer.wasShown then
+			timer:Show()
 		end
 	end
 
-	timers[cooldown] = timer
+	local function Shower_OnHide(self)
+		local timer = timers[self:GetParent()]
+		if timer:IsShown() then
+			timer.wasShown = true
+			timer:Hide()
+		end
+	end
 
-	return timer
+	function OmniCC:CreateShower(cooldown)
+		--controls the visibility of the timer
+		local shower = CreateFrame('Frame', nil, cooldown)
+		shower:SetScript('OnShow', Shower_OnShow)
+		shower:SetScript('OnHide', Shower_OnHide)
+		
+		showers[cooldown] = shower
+		
+		return shower
+	end
+end
+
+do
+	--timer, the frame with cooldown text
+	local function Timer_OnUpdate(self, elapsed)
+		if self.nextUpdate <= 0 then
+			OmniCC:UpdateTimer(self)
+		else
+			self.nextUpdate = self.nextUpdate - elapsed
+		end
+	end
+
+	function OmniCC:CreateTimer(cooldown)
+		local timer = CreateFrame('Frame', nil, cooldown:GetParent())
+		timer:SetFrameLevel(cooldown:GetFrameLevel() + 5) --make sure the timer is on top of things like the cooldown model
+		timer:SetAllPoints(cooldown)
+		timer:SetToplevel(true)
+		timer:Hide()
+		timer:SetScript('OnUpdate', Timer_OnUpdate)
+
+		local text = timer:CreateFontString(nil, 'OVERLAY')
+		text:SetPoint('CENTER', timer, 'CENTER', 0, 1)
+		timer.text = text
+
+		-- parent icon, used for shine stuff
+		local parent = cooldown:GetParent()
+		if parent then
+			if parent.icon then
+				timer.icon = parent.icon
+			else
+				local name = parent:GetName()
+				if name then
+					timer.icon = getglobal(name .. 'Icon') or getglobal(name .. 'IconTexture')
+				end
+			end
+		end
+
+		timers[cooldown] = timer
+
+		return timer
+	end
 end
 
 function OmniCC:UpdateTimer(timer)
