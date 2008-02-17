@@ -4,8 +4,6 @@
 --]]
 
 local Bongos = LibStub('AceAddon-3.0'):NewAddon('Bongos3', 'AceEvent-3.0', 'AceConsole-3.0')
-Bongos3 = Bongos
-
 local CURRENT_VERSION = GetAddOnMetadata('Bongos', 'Version') .. '.' .. ('$Rev$'):match('%d+')
 local L = LibStub('AceLocale-3.0'):GetLocale('Bongos3')
 
@@ -70,11 +68,12 @@ end
 
 function Bongos:LoadModules()
 	for name, module in self:IterateModules() do
-		module:Load()
+		module:Load(self.newProfile)
 	end
 
 	self:UpdateMinimapButton()
 	self.Bar:ForAll('Reanchor')
+	self.newProfile = nil
 end
 
 function Bongos:UnloadModules()
@@ -92,6 +91,7 @@ function Bongos:SaveProfile(name)
 		self:UnloadModules()
 		self.db:SetProfile(name)
 		self.db:CopyProfile(toCopy)
+		self.isNewProfile = nil
 		self:LoadModules()
 	end
 end
@@ -102,6 +102,7 @@ function Bongos:SetProfile(name)
 		self:UnloadModules()
 		self.db:SetProfile(profile)
 		--send set message
+		self.isNewProfile = nil
 		self:LoadModules()
 	else
 		self:Print(format(L.InvalidProfile, name or 'null'))
@@ -123,6 +124,7 @@ function Bongos:CopyProfile(name)
 		self:UnloadModules()
 		self.db:CopyProfile(name)
 		--send copy message
+		self.isNewProfile = nil
 		self:LoadModules()
 	end
 end
@@ -131,6 +133,7 @@ function Bongos:ResetProfile()
 	self:UnloadModules()
 	self.db:ResetProfile()
 	--send reset message
+	self.isNewProfile = true
 	self:LoadModules()
 end
 
@@ -166,6 +169,7 @@ end
 --[[ Profile Events ]]--
 
 function Bongos:OnNewProfile(profileName)
+	self.newProfile = true
 	self:Print('Created Profile: ' .. profileName)
 end
 
@@ -241,6 +245,10 @@ end
 
 function Bongos:GetBarSets(id)
 	return self.db.profile.bars[tonumber(id) or id]
+end
+
+function Bongos:GetBars()
+	return pairs(self.db.profile.bars)
 end
 
 
