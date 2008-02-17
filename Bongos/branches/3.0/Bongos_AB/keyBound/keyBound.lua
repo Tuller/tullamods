@@ -23,7 +23,60 @@ local Binder = {}
 
 --events
 function KeyBound:OnEnable()
-	SlashCmdList['KeyBoundSlashCOMMAND'] = function() KeyBound:Toggle() end
+	do
+		local f = CreateFrame('Frame', 'KeyboundDialog', UIParent)
+		f:SetFrameStrata('DIALOG')
+		f:SetToplevel(true); f:EnableMouse(true)
+		f:SetWidth(320); f:SetHeight(96)
+		f:SetBackdrop{
+			bgFile="Interface\\DialogFrame\\UI-DialogBox-Background" ,
+			edgeFile="Interface\\DialogFrame\\UI-DialogBox-Border",
+			tile = true,
+			insets = {11, 12, 12, 11},
+			tileSize = 32,
+			edgeSize = 32,
+		}
+		f:SetPoint('TOP', 0, -24)
+		f:Hide()
+
+		local text = f:CreateFontString('ARTWORK')
+		text:SetFontObject('GameFontHighlight')
+		text:SetPoint('TOP', 0, -16)
+		text:SetWidth(290); text:SetHeight(0)
+		text:SetText(format(L.BindingsHelp, GetBindingText("ESCAPE","KEY_")))
+
+		-- per character bindings checkbox
+		local perChar = CreateFrame('CheckButton', 'KeyboundDialogCheck', f, 'OptionsCheckButtonTemplate')
+		getglobal(perChar:GetName() .. 'Text'):SetText(CHARACTER_SPECIFIC_KEYBINDINGS)
+		perChar:SetPoint('BOTTOMLEFT', 12, 8)
+		
+		perChar:SetScript("OnShow", function(self)
+			self.current = GetCurrentBindingSet()
+			self:SetChecked(GetCurrentBindingSet() == 2)
+		end)
+
+		perChar:SetScript("OnHide", function(self)
+			if InCombatLockdown() then
+				self:RegisterEvent("PLAYER_REGEN_ENABLED")
+			else
+				SaveBindings(self.current)
+			end
+		end)
+
+		perChar:SetScript("OnEvent", function(self, event)
+			SaveBindings(self.current)
+			self:UnregisterEvent(event)
+		end)
+
+		perChar:SetScript("OnClick", function(self)
+			self.current = (self:GetChecked() and 2) or 1
+			LoadBindings(self.current)
+		end)
+
+		self.dialog = f
+	end
+
+	SlashCmdList['KeyBoundSlashCOMMAND'] = function() self:Toggle() end
 	SLASH_KeyBoundSlashCOMMAND1 = '/keybound'
 	SLASH_KeyBoundSlashCOMMAND2 = '/kb'
 
@@ -34,6 +87,7 @@ end
 function KeyBound:PLAYER_REGEN_ENABLED()
 	if self.enabled then
 		UIErrorsFrame:AddMessage(L.CombatBindingsEnabled, 1, 0.3, 0.3, 1, UIERRORS_HOLD_TIME)
+		self.dialog:Hide()
 	end
 end
 
@@ -41,6 +95,7 @@ function KeyBound:PLAYER_REGEN_DISABLED()
 	if self.enabled then
 		self:Set(nil)
 		UIErrorsFrame:AddMessage(L.CombatBindingsDisabled, 1, 0.3, 0.3, 1, UIERRORS_HOLD_TIME)
+		self.dialog:Show()
 	end
 end
 
@@ -62,8 +117,8 @@ function KeyBound:Activate()
 				self.frame = Binder:Create()
 			end
 			self:Set(nil)
+			self.dialog:Show()
 			self:SendMessage('KEYBOUND_ENABLED')
-			UIErrorsFrame:AddMessage(L.Enabled, 1, 0.82, 0, 1, UIERRORS_HOLD_TIME)
 		end
 	end
 end
@@ -72,8 +127,9 @@ function KeyBound:Deactivate()
 	if self:IsShown() then
 		self.enabled = nil
 		self:Set(nil)
+		self.dialog:Hide()
+--		SaveBindings(self.dialog.bindingSet)
 		self:SendMessage('KEYBOUND_DISABLED')
-		UIErrorsFrame:AddMessage(L.Disabled, 1, 0.82, 0, 1, UIERRORS_HOLD_TIME)
 	end
 end
 
@@ -132,9 +188,6 @@ function KeyBound:ToShortKey(key)
 	end
 end
 
-function KeyBound:UpdateBG()
-end
-
 
 --[[ Binder Widget ]]--
 
@@ -144,7 +197,7 @@ function Binder:Create()
 	binder:SetFrameStrata('DIALOG')
 	binder:EnableKeyboard(true)
 	binder:EnableMouseWheel(true)
-	
+
 	for k,v in pairs(self) do
 		binder[k] = v
 	end

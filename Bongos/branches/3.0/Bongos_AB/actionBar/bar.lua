@@ -37,8 +37,6 @@ function ActionBar:Create(numRows, numCols, point, x, y)
 		bar:UpdateActions()
 		bar:UpdateStateDriver()
 		bar:Layout()
-
-		Action.profile.bars[id] = true
 	else
 		UIErrorsFrame:AddMessage('Not Enough Available Action IDs', 1, 0.2, 0.2, 1, UIERRORS_HOLD_TIME)
 	end
@@ -68,8 +66,6 @@ function ActionBar:OnDelete()
 		self.buttons[i] = nil
 	end
 	self:ReleaseAllIDs()
-
-	Action.profile.bars[self.id] = nil
 end
 
 --[[ Layout Stuff ]]--
@@ -217,7 +213,6 @@ function ActionBar:UpdateStateDriver()
 		end
 	end
 
-	Bongos:Print(header)
 	if header ~= '' then
 		RegisterStateDriver(self, 'state', header .. 0)
 	end

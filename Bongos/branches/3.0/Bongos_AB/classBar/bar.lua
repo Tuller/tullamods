@@ -79,7 +79,12 @@ end
 --[[ Events ]]--
 
 function ClassBar:Load()
-	local bar, isNew = Bongos.Bar:Create('class')
+	local defaults = {
+		x = 676,
+		y = 39,
+		point = 'BOTTOMLEFT',
+	}
+	local bar, isNew = Bongos.Bar:Create('class', defaults)
 	if isNew then
 		Bar_OnCreate(bar)
 	end

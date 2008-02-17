@@ -21,6 +21,8 @@ function Painter:Load()
 	self:SetScript('OnDragStart', self.ShowDragBox)
 	self:SetScript('OnDragStop', self.CreateBar)
 	self:SetScript('OnShow', self.UpdateText)
+	self:SetScript('OnEvent', self.OnEvent)
+	self:RegisterEvent('MODIFIER_STATE_CHANGED')
 
 	--create the text box
 	local f = CreateFrame('Frame', nil, self)
@@ -32,6 +34,10 @@ function Painter:Load()
 	self.text = text
 	
 	self.loaded = true
+end
+
+function Painter:OnEvent()
+	self:EnableMouse(IsAltKeyDown())
 end
 
 --set our starting point to the cursor
