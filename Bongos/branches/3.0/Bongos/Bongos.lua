@@ -6,6 +6,7 @@
 local Bongos = LibStub('AceAddon-3.0'):NewAddon('Bongos3', 'AceEvent-3.0', 'AceConsole-3.0')
 local CURRENT_VERSION = GetAddOnMetadata('Bongos', 'Version') .. '.' .. ('$Rev$'):match('%d+')
 local L = LibStub('AceLocale-3.0'):GetLocale('Bongos3')
+Bongos3 = Bongos
 
 
 --[[ Startup ]]--

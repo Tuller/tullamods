@@ -46,6 +46,7 @@ function MinimapButton:OnClick(button)
 			KeyBound:Toggle()
 		end
 	end
+	self:OnEnter()
 end
 
 function MinimapButton:OnMouseDown()
@@ -61,26 +62,19 @@ function MinimapButton:OnEnter()
 		GameTooltip:SetOwner(self, 'ANCHOR_TOPRIGHT')
 		GameTooltip:SetText('Bongos3', 1, 1, 1)
 
-		if not(Bongos.Options and Bongos.Options:IsShown()) then
-			GameTooltip:AddLine(L.ShowMenuTip)
-		else
-			GameTooltip:AddLine(L.HideMenuTip)
-		end
-
 		if Bongos:IsLocked() then
 			GameTooltip:AddLine(L.UnlockBarsTip)
 		else
 			GameTooltip:AddLine(L.LockBarsTip)
 		end
-
-		-- local ActionBar = Bongos:GetModule('ActionBar', true)
-		-- if ActionBar then
-			-- if ActionBar.Config:ButtonsLocked() then
-				-- GameTooltip:AddLine(L.UnlockButtonsTip)
-			-- else
-				-- GameTooltip:AddLine(L.LockButtonsTip)
-			-- end
-		-- end
+		
+		if KeyBound then
+			if KeyBound:IsShown() then
+				GameTooltip:AddLine('<Right Click> to exit keybinding mode')
+			else
+				GameTooltip:AddLine('<Right Click> to enter keybinding mode')
+			end
+		end
 		GameTooltip:Show()
 	end
 end
