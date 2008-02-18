@@ -15,7 +15,7 @@ BINDING_NAME_BSTATSTOGGLE = L.ToggleBongosStats
 --[[ Startup ]]--
 
 function Stats:Load()
-	local stats = {
+	local defaults = {
 		x = 10, 
 		y = -215,
 		point = 'TOPRIGHT',
