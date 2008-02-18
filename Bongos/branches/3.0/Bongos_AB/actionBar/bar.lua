@@ -17,10 +17,8 @@ function ActionBar:Create(numRows, numCols, point, x, y)
 		end
 
 		local defaults = {
-			rows = numRows, 
-			cols = numCols, 
-			ids = {},
-			stateHeader = {}
+			rows = numRows,
+			cols = numCols,
 		}
 		local bar, isNew = self.super.Create(self, id, defaults, true)
 		if isNew then
@@ -68,23 +66,19 @@ function ActionBar:OnDelete()
 	self:ReleaseAllIDs()
 end
 
---[[ Layout Stuff ]]--
+--[[ Dimensions ]]--
 
 function ActionBar:SetSize(rows, cols)
 	local newSize = rows * cols
-	local oldSize = self:GetSize()
-	if (newSize - oldSize) <= self:NumFreeIDs() then
-		self.sets.rows = rows
-		self.sets.cols = cols
+	local oldSize = self:GetRows() * self:GetCols()
+	self.sets.rows = rows
+	self.sets.cols = cols
 
-		if newSize ~= oldSize then
-			self:UpdateUsedIDs()
-			self:UpdateActions()
-		end
-		self:Layout()
-	else
-		UIErrorsFrame:AddMessage('Not Enough Available Action IDs', 1, 0.2, 0.2, 1, UIERRORS_HOLD_TIME)
+	if newSize ~= oldSize then
+		self:UpdateUsedIDs()
+		self:UpdateActions()
 	end
+	self:Layout()
 end
 
 function ActionBar:GetRows()
@@ -93,10 +87,6 @@ end
 
 function ActionBar:GetCols()
 	return self.sets.cols or 1
-end
-
-function ActionBar:GetSize()
-	return self:GetCols() * self:GetRows()
 end
 
 --spacing
@@ -109,63 +99,37 @@ function ActionBar:GetSpacing()
 	return self.sets.spacing or 1
 end
 
---states: allow us to map a button to multiple virtual buttons
-function ActionBar:SetStates(numStates)
-	if numStates ~= self:NumStates() then
-		self.sets.states = numStates
-		self:UpdateUsedIDs()
-		self:UpdateActions()
-	end
-end
 
-function ActionBar:UpdateStates()
-	local stateButton = ''
-	local stateButton2 = ''
-	for i = 1, self:NumStates() do
-		stateButton = stateButton .. format('%d:s%d;', i, i)
-		stateButton2 = stateButton2 .. format('%d:s%ds;', i, i)
-	end
-
-	if stateButton == '' then
-		self:SetAttribute('statebutton', nil)
-		self:SetAttribute('statebutton2', nil)
-	else
-		self:SetAttribute('statebutton', stateButton)
-		self:SetAttribute('*statebutton2', stateButton2)
-	end
-end
-
-function ActionBar:NumStates()
-	return self.sets.states or 0
-end
+--[[ Update & Layout ]]--
 
 --add/remove buttons and update their actionsIDs for each state
 --needs to be called whenever the size/number of pages of a bar changes
 function ActionBar:UpdateActions()
 	local states = self:NumStates()
 	local ids = self.sets.ids
-	local numButtons = self:GetSize()
+	local numButtons = self:GetCols() * self:GetRows()
 	local index = 1
 
-	for i = 1, numButtons do
-		local button = self.buttons[i]
-		if not button then
-			button = Action.Button:Get(self)
-			self.buttons[i] = button
-		end
+	for state = 1, self:NumStates() do
+		for index = 1, numButtons do
+			local button = self.buttons[index]
+			if not button then
+				button = Action.Button:Get(self)
+				self.buttons[index] = button
+			end
 
-		button:SetAttribute('action', ids[index])
-		index = index + 1
-
-		for j = 1, self:NumStates() do
-			button:SetAttribute(format('*action-s%d', j), ids[index])
-			button:SetAttribute(format('*action-s%ds', j), ids[index])
-			index = index + 1
+			local actionID = ids[index + numButtons*(state-1)]
+			if state == 1 then
+				button:SetAttribute('action', actionID)
+				button.needsUpdate = true
+			else
+				button:SetAttribute(format('*action-s%d', state), actionID)
+				button:SetAttribute(format('*action-s%ds', state), actionID)
+			end
 		end
-		button.needsUpdate = true
 	end
 
-	for i = self:GetSize() + 1, #self.buttons do
+	for i = numButtons + 1, #self.buttons do
 		local button = self.buttons[i]
 		button:Release()
 		self.buttons[i] = nil
@@ -192,57 +156,132 @@ function ActionBar:Layout()
 	end
 end
 
---state conditions specify when we  switch states.  uses the macro syntax for now
-function ActionBar:SetStateConditions(state, condition)
-	if self.sets.stateHeader[state] ~= condition and state <= self:NumStates() then
-		self.sets.stateHeader[state] = condition
-		self:UpdateStateDriver()
+
+--[[ States ]]--
+
+--states: allow us to map a button to multiple virtual buttons
+function ActionBar:SetNumStates(numStates)
+	if numStates ~= self:NumStates() then
+		self.sets.numStates = numStates
+		self:UpdateUsedIDs()
+		self:UpdateActions()
 	end
 end
 
+function ActionBar:UpdateStates()
+	local stateButton = ''
+	local stateButton2 = ''
+
+	for i = 2, self:NumStates() do
+		stateButton = stateButton .. format('%d:s%d;', i, i)
+		stateButton2 = stateButton2 .. format('%d:s%ds;', i, i)
+	end
+
+	if stateButton == '' then
+		self:SetAttribute('statebutton', nil)
+		self:SetAttribute('*statebutton2', nil)
+	else
+		self:SetAttribute('statebutton', stateButton)
+		self:SetAttribute('*statebutton2', stateButton2)
+	end
+end
+
+function ActionBar:NumStates()
+	return self.sets.numStates or 1
+end
+
+
+--[[ Condition - State Mapping ]]--
+
 --needs to be called whenever we change a state condition
 --or when we change the number of available states
+local stateConditions
 function ActionBar:UpdateStateDriver()
-	UnregisterStateDriver(self, 'state', 0)
+	if not stateConditions then
+		stateConditions = {}
+
+		--modifiers
+		table.insert(stateConditions, '[mod:ctrl]')
+		table.insert(stateConditions, '[mod:alt]')
+		table.insert(stateConditions, '[mod:shift]')
+
+		--pages
+		for i = 2, 6 do
+			table.insert(stateConditions, format('[bar:%d]', i))
+		end
+
+		--forms
+		table.insert(stateConditions, '[form:2/3,stealth]')
+
+		for i = 1, 7 do
+			table.insert(stateConditions, format('[form:%d]', i))
+		end
+
+		--help harm targeting
+		table.insert(stateConditions, '[help]')
+		table.insert(stateConditions, '[harm]')
+	end
+
+	UnregisterStateDriver(self, "state", 0)
 
 	local header = ''
-	for i = 1, self:NumStates() do
-		local state = self:GetStateCondition(i)
+	for _,condition in ipairs(stateConditions) do
+		local state = self:GetConditionState(condition)
 		if state then
-			header = header .. state .. i .. ';'
+			header = header .. condition .. state .. ';'
 		end
 	end
 
 	if header ~= '' then
-		RegisterStateDriver(self, 'state', header .. 0)
+		RegisterStateDriver(self, 'state', header .. '0')
 	end
 end
 
-function ActionBar:GetStateCondition(state)
-	return self.sets.stateHeader[state]
+--state conditions specify when we  switch states.  uses the macro syntax for now
+function ActionBar:SetConditionState(condition, state)
+	if not self.sets.states then
+		self.sets.states = {}
+	end
+
+	if self.sets.states[condition] ~= state then
+		self.sets.stateHeader[condition] = state
+		self:UpdateStateDriver()
+	end
+end
+
+function ActionBar:GetConditionState(condition)
+	return self.sets.states and self.sets.states[condition]
 end
 
 
 --[[ ID Grabbing ]]--
 
 function ActionBar:LoadIDs()
-	for _,id in pairs(self.sets.ids) do
-		self:TakeID(id)
+	if self.sets.ids then
+		for _,id in pairs(self.sets.ids) do
+			self:TakeID(id)
+		end
+		self:SortAvailableIDs()
+	else
+		self:UpdateUsedIDs()
 	end
-	self:SortAvailableIDs()
 end
 
 function ActionBar:UpdateUsedIDs()
-	local ids = self.sets.ids
-	local numIDs = (self:NumStates() + 1) * self:GetSize()
+	if not self.sets.ids then
+		self.sets.ids = {}
+	end
 
-	for i = 1, numIDs do
+	local ids = self.sets.ids
+	local numActions = self:GetRows() * self:GetCols() * self:NumStates()
+
+	for i = 1, (self:GetRows() * self:GetCols() * self:NumStates()) do
 		if not ids[i] then
 			ids[i] = self:TakeID()
 		end
 	end
 
-	for i = #ids, numIDs + 1, -1 do
+	for i = #ids, numActions + 1, -1 do
 		self:GiveID(ids[i])
 		ids[i] = nil
 	end
@@ -258,41 +297,111 @@ function ActionBar:ReleaseAllIDs()
 end
 
 do
-	local availableActions = {}
+	local freeActions = {}
 	for i = 1, 120 do
-		availableActions[i] = i
+		freeActions[i] = i
 	end
 
 	function ActionBar:TakeID(id)
 		if id then
-			for i,availableID in pairs(availableActions) do
+			for i,availableID in pairs(freeActions) do
 				if id == availableID then
-					table.remove(availableActions, i)
+					table.remove(freeActions, i)
 					Action.Painter:UpdateText()
 					return
 				end
 			end
 		else
-			local id = table.remove(availableActions, 1)
+			local id = table.remove(freeActions, 1)
 			Action.Painter:UpdateText()
 			return id
 		end
 	end
 
 	function ActionBar:GiveID(id)
-		table.insert(availableActions, 1, id)
+		table.insert(freeActions, 1, id)
 		Action.Painter:UpdateText()
 	end
 
 	function ActionBar:NumFreeIDs()
-		return #availableActions
+		return #freeActions
 	end
 
 	function ActionBar:SortAvailableIDs()
-		table.sort(availableActions)
+		table.sort(freeActions)
 	end
 end
 
 function ActionBar:GetButtons()
 	return pairs(self.buttons)
+end
+
+function ActionBar:CreateMenu()
+	local menu = Bongos.Menu:Create(self.id)
+	ActionBar.menu = menu
+
+	local panel = menu:AddLayoutPanel()
+	
+	panel:CreateSpacingSlider()
+	
+	local states, rows, cols
+	local function UpdateSliderSizes(bar)
+		local freeIDs = bar:NumFreeIDs()
+
+		local maxStates = bar:GetCols() * bar:GetRows()
+		states:SetMinMaxValues(1, floor(freeIDs / maxStates) + bar:NumStates())
+
+		local maxRows = bar:GetCols() * bar:NumStates()
+		rows:SetMinMaxValues(1, floor(freeIDs / maxRows) + bar:GetRows())
+
+		local maxCols = bar:GetRows() * bar:NumStates()
+		cols:SetMinMaxValues(1, floor(freeIDs / maxCols) + bar:GetCols())
+	end
+
+	states = panel:CreateSlider('States', 1, 1, 1)
+	function states:UpdateValue(value)
+		local bar = Bongos.Bar:Get(self:GetParent().id)
+		bar:SetNumStates(value)
+		UpdateSliderSizes(bar)
+	end
+	function states:OnShow()
+		local bar = Bongos.Bar:Get(self:GetParent().id)
+		local freeIDs = bar:NumFreeIDs()
+		local maxStates = bar:GetCols() * bar:GetRows()
+
+		self:SetMinMaxValues(1, floor(freeIDs / maxStates) + bar:NumStates())
+		self:SetValue(bar:NumStates())
+	end
+
+	cols = panel:CreateSlider('Cols', 1, 1, 1)
+	function cols:UpdateValue(value)
+		local bar = Bongos.Bar:Get(self:GetParent().id)
+		bar:SetSize(bar:GetRows(), value)
+		UpdateSliderSizes(bar)
+	end
+	function cols:OnShow()
+		local bar = Bongos.Bar:Get(self:GetParent().id)
+		local maxCols = bar:GetRows() * bar:NumStates()
+		local freeIDs = bar:NumFreeIDs()
+
+		self:SetMinMaxValues(1, floor(freeIDs / maxCols) + bar:GetCols())
+		self:SetValue(bar:GetCols())
+	end
+
+	rows = panel:CreateSlider('Rows', 1, 1, 1)
+	function rows:UpdateValue(value)
+		local bar = Bongos.Bar:Get(self:GetParent().id)
+		bar:SetSize(value, bar:GetCols())
+		UpdateSliderSizes(bar)
+	end
+	function rows:OnShow()
+		local bar = Bongos.Bar:Get(self:GetParent().id)		
+		local maxRows = bar:GetCols() * bar:NumStates()
+		local freeIDs = bar:NumFreeIDs()
+
+		self:SetMinMaxValues(1, floor(freeIDs / maxRows) + bar:GetRows())
+		self:SetValue(bar:GetRows())
+	end
+
+	return menu
 end

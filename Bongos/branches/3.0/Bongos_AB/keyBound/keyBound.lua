@@ -36,7 +36,7 @@ function KeyBound:OnEnable()
 			tileSize = 32,
 			edgeSize = 32,
 		}
-		f:SetPoint('TOP', 0, -24)
+		f:SetPoint('TOP', 0, -200)
 		f:Hide()
 
 		local text = f:CreateFontString('ARTWORK')
@@ -271,8 +271,10 @@ function Binder:OnKeyDown(key)
 		key = 'ALT-' .. key
 	end
 
-	self:SetKey(button, key)
-	KeyBound:Set(button)
+	if MouseIsOver(button) then
+		self:SetKey(button, key)
+		KeyBound:Set(button)
+	end
 end
 
 function Binder:OnMouseWheel(arg1)

@@ -6,19 +6,38 @@ local Bongos = LibStub('AceAddon-3.0'):GetAddon('Bongos3')
 local ActionBar = Bongos:NewModule('ActionBar', 'AceEvent-3.0')
 
 function ActionBar:Load(isNewProfile)
-	if not self.Painter.loaded then
-		self.Painter:Load()
-	end
-	
 	if isNewProfile then
+		local header = {}
+
+		local class = select(2, UnitClass('player'))
+		if class == 'DRUID' then
+			header['[mod:alt]'] = 2
+			header['[help]'] = 2
+			header['[form:1]'] = 3
+			header['[form:3]'] = 4
+			maxState = 4
+		elseif class == 'WARRIOR' then
+			header['[form:2]'] = 2
+			header['[form:3]'] = 3
+			maxState = 3
+		elseif class == 'ROGUE' then
+			header['[form:1]'] = 2
+			maxState = 2
+		else
+			maxState = 6
+		end
+
 		Bongos:SetBarSets(1, {
 			point = 'BOTTOM',
 			rows = 1,
 			cols = 12,
-			ids = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12},
-			numStates = 1,
-			stateHeader = {},
+			states = header,
+			numStates = maxState,
 		})
+	end
+
+	if not self.Painter.loaded then
+		self.Painter:Load()
 	end
 
 	for id in Bongos:GetBars() do
