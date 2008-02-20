@@ -222,11 +222,10 @@ function ActionButton:OnEnter()
 	else
 		GameTooltip:SetOwner(self, 'ANCHOR_RIGHT')
 	end
-	self:UpdateTooltip()
 
-	-- if BongosActionConfig:ShowingTooltips() then
-		-- self:UpdateTooltip()
-	-- end
+--	if BongosActionConfig:ShowingTooltips() then
+		self:UpdateTooltip()
+--	end
 
 	KeyBound:Set(self)
 end
@@ -417,13 +416,12 @@ function ActionButton:UpdateVisibility()
 	if self:ShowingEmpty() then
 		newStates = '*'
 	else
-		local newStates
 		local id = self:GetAttribute('action')
 		if HasAction(id) then
-			newstates = 0
+			newStates = 0
 		end
 
-		for i = 1, self:GetParent():GetNumStates() do
+		for i = 2, self:GetParent():NumStates() do
 			if HasAction(self:GetAttribute('*action-s' .. i) or id) then
 				if newStates then
 					newStates = newStates .. ',' .. i
@@ -519,7 +517,7 @@ function ActionButton:GetPagedID(refresh)
 end
 
 function ActionButton:ShowingEmpty()
-	return self.showEmpty or KeyBound:IsShown()
+	return self.showEmpty or KeyBound:IsShown() --or BongosActionConfig:ShowingEmptyButtons()
 --	return self.showEmpty or BongosActionConfig:ShowingEmptyButtons() or KeyBound:IsShown()
 end
 

@@ -154,6 +154,39 @@ function ActionBar:Layout()
 			button:Show()
 		end
 	end
+	
+	self:UpdateVisibility()
+end
+
+function ActionBar:UpdateVisibility()
+	local changed = false
+	for _,button in self:GetButtons() do
+		if button:UpdateVisibility() then
+			changed = true
+		end
+	end
+
+	if changed then
+		SecureStateHeader_Refresh(self)
+		if not InCombatLockdown() then
+			self:UpdateGrid()
+		end
+	end
+end
+
+function ActionBar:UpdateGrid()
+	for _,button in self:GetButtons() do
+		button:UpdateGrid()
+	end
+end
+
+function ActionBar:UpdateAction(id)
+	for _,button in self:GetButtons() do
+		if button:GetPagedID() == id then
+			button:Update()
+			button:UpdateSpellID()
+		end
+	end
 end
 
 
@@ -336,14 +369,17 @@ function ActionBar:GetButtons()
 	return pairs(self.buttons)
 end
 
+
+--[[ Menu Code ]]--
+
 function ActionBar:CreateMenu()
 	local menu = Bongos.Menu:Create(self.id)
 	ActionBar.menu = menu
 
 	local panel = menu:AddLayoutPanel()
-	
+
 	panel:CreateSpacingSlider()
-	
+
 	local states, rows, cols
 	local function UpdateSliderSizes(bar)
 		local freeIDs = bar:NumFreeIDs()
@@ -395,7 +431,7 @@ function ActionBar:CreateMenu()
 		UpdateSliderSizes(bar)
 	end
 	function rows:OnShow()
-		local bar = Bongos.Bar:Get(self:GetParent().id)		
+		local bar = Bongos.Bar:Get(self:GetParent().id)
 		local maxRows = bar:GetCols() * bar:NumStates()
 		local freeIDs = bar:NumFreeIDs()
 
