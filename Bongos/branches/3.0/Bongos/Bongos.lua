@@ -69,7 +69,7 @@ end
 
 function Bongos:LoadModules()
 	for name, module in self:IterateModules() do
-		module:Load(self.newProfile)
+		module:Load(self.isNewProfile)
 	end
 
 	self:UpdateMinimapButton()
@@ -170,7 +170,7 @@ end
 --[[ Profile Events ]]--
 
 function Bongos:OnNewProfile(profileName)
-	self.newProfile = true
+	self.isNewProfile = true
 	self:Print('Created Profile: ' .. profileName)
 end
 
