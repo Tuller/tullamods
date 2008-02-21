@@ -5,7 +5,7 @@
 
 
 local Bongos = LibStub('AceAddon-3.0'):GetAddon('Bongos3')
-local Pet = Bongos:NewModule('PetBar', 'AceEvent-3.0')
+local PetBar = Bongos:NewModule('PetBar', 'AceEvent-3.0')
 local L = LibStub('AceLocale-3.0'):GetLocale('Bongos3-AB')
 local DEFAULT_SPACING = 2
 
@@ -90,7 +90,7 @@ end
 
 --[[ Events ]]--
 
-function Pet:Load()
+function PetBar:Load()
 	local defaults = {
 		point = 'BOTTOM',
 		x = 0,
@@ -122,7 +122,7 @@ function Pet:Load()
 	self.bar = bar
 end
 
-function Pet:Unload()
+function PetBar:Unload()
 	self.bar:Destroy()
 	self:UnregisterAllMessages()
 	PetActionBarFrame:UnregisterAllEvents()
@@ -130,7 +130,7 @@ function Pet:Unload()
 	UnregisterStateDriver(PetActionBarFrame, 'visibility') 
 end
 
-function Pet:KEYBOUND_ENABLED()
+function PetBar:KEYBOUND_ENABLED()
 	for i = 1, NUM_PET_ACTION_SLOTS do
 		local button = self.Button:Get(i)
 		button:Show()
@@ -138,7 +138,7 @@ function Pet:KEYBOUND_ENABLED()
 	end
 end
 
-function Pet:KEYBOUND_DISABLED()
+function PetBar:KEYBOUND_DISABLED()
 	local petBarShown = PetHasActionBar()
 
 	for i = 1, NUM_PET_ACTION_SLOTS do
