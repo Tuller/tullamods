@@ -23,11 +23,16 @@ function ActionBar:Load(isNewProfile)
 			header['[form:2]'] = 2
 			header['[form:3]'] = 3
 			maxState = 3
-		elseif class == 'ROGUE' then
+		elseif class == 'ROGUE' or class == 'PRIEST' then
 			header['[form:1]'] = 2
 			maxState = 2
 		else
 			maxState = 6
+		end
+		
+		local keybindings = {}
+		for i = 1, 12 do
+			keybindings[i] = GetBindingKey(format('ActionButton%d', i))
 		end
 
 		Bongos:SetBarSets(1, {
@@ -36,6 +41,7 @@ function ActionBar:Load(isNewProfile)
 			cols = 12,
 			states = header,
 			numStates = maxState,
+			bindings = keybindings,
 		})
 	end
 
@@ -53,8 +59,8 @@ function ActionBar:Load(isNewProfile)
 	self:RegisterEvent('ACTIONBAR_SLOT_CHANGED', 'OnSlotChanged')
 	self:RegisterEvent('ACTIONBAR_SHOWGRID', 'UpdateGrid')
 	self:RegisterEvent('ACTIONBAR_HIDEGRID', 'UpdateGrid')
-	self:RegisterMessage('KEYBOUND_ENABLED', 'UpdateGrid')
-	self:RegisterMessage('KEYBOUND_DISABLED', 'UpdateGrid')
+	self:RegisterMessage('KEYBOUND_ENABLED', 'UpdateVisibility')
+	self:RegisterMessage('KEYBOUND_DISABLED', 'UpdateVisibility')
 end
 
 function ActionBar:Unload()

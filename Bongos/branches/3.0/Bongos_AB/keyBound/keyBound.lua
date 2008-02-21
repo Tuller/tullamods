@@ -42,8 +42,11 @@ function KeyBound:OnEnable()
 		local text = f:CreateFontString('ARTWORK')
 		text:SetFontObject('GameFontHighlight')
 		text:SetPoint('TOP', 0, -16)
-		text:SetWidth(290); text:SetHeight(0)
+		text:SetWidth(280); text:SetHeight(0)
 		text:SetText(format(L.BindingsHelp, GetBindingText("ESCAPE","KEY_")))
+		
+		local close = CreateFrame('Button', f:GetName() .. 'Close', f, 'UIPanelCloseButton')
+		close:SetPoint('TOPRIGHT', -3, -3)
 
 		-- per character bindings checkbox
 		local perChar = CreateFrame('CheckButton', 'KeyboundDialogCheck', f, 'OptionsCheckButtonTemplate')
@@ -56,6 +59,8 @@ function KeyBound:OnEnable()
 		end)
 
 		perChar:SetScript("OnHide", function(self)
+			KeyBound:Deactivate()
+				
 			if InCombatLockdown() then
 				self:RegisterEvent("PLAYER_REGEN_ENABLED")
 			else
@@ -350,12 +355,16 @@ function Binder:SetKey(button, key)
 	else
 		self:FreeKey(button, key)
 
-		local msg
 		if button.SetKey then
 			button:SetKey(key)
-			msg = format(L.BoundKey, GetBindingText(key, 'KEY_'), button:GetActionName())
 		else
 			SetBindingClick(key, button:GetName(), 'LeftButton')
+		end
+
+		local msg
+		if button.GetActionName then
+			msg = format(L.BoundKey, GetBindingText(key, 'KEY_'), button:GetActionName())
+		else
 			msg = format(L.BoundKey, GetBindingText(key, 'KEY_'), button:GetName())
 		end
 		SaveBindings(GetCurrentBindingSet())
@@ -367,15 +376,19 @@ function Binder:ClearBindings(button)
 	if InCombatLockdown() then
 		UIErrorsFrame:AddMessage(L.CannotBindInCombat, 1, 0.3, 0.3, 1, UIERRORS_HOLD_TIME)
 	else
-		local msg
 		if button.ClearBindings then
 			button:ClearBindings()
-			msg = format(L.ClearedBindings, button:GetActionName())
 		else
 			local binding = self:ToBinding(button)
 			while GetBindingKey(binding) do
 				SetBinding(GetBindingKey(binding), nil)
 			end
+		end
+
+		local msg
+		if button.GetActionName then
+			msg = format(L.ClearedBindings, button:GetActionName())
+		else
 			msg = format(L.ClearedBindings, button:GetName())
 		end
 		SaveBindings(GetCurrentBindingSet())

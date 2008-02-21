@@ -3,7 +3,6 @@
 ## Notes: ActionBars Advanced
 ## Author: Tuller
 ## Version: 0
-## SavedVariables: Bongos3ABDB
 ## Dependencies: Bongos
 localization\localization.lua
 localization\localization.cn.lua

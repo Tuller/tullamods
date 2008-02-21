@@ -74,6 +74,8 @@ function ActionButton:Get(parent)
 	parent:Attach(b)
 	parent:SetAttribute('addchild', b)
 
+	b:ShowHotkey(true)
+	b:ShowMacro(true)
 	-- b:ShowHotkey(BongosActionConfig:ShowingHotkeys())
 	-- b:ShowMacro(BongosActionConfig:ShowingMacros())
 	b:UpdateEvents()
@@ -422,7 +424,8 @@ function ActionButton:UpdateVisibility()
 		end
 
 		for i = 2, self:GetParent():NumStates() do
-			if HasAction(self:GetAttribute('*action-s' .. i) or id) then
+			local action = self:GetAttribute('*action-s' .. i) or id
+			if HasAction(action) then
 				if newStates then
 					newStates = newStates .. ',' .. i
 				else
@@ -467,10 +470,8 @@ function ActionButton:UpdateHotkey()
 end
 
 function ActionButton:GetHotkey()
-	local key = GetBindingKey(format('CLICK %s:LeftButton', self:GetName()))
-	if key then
-		return KeyBound:ToShortKey(key)
-	end
+	local bindings = self:GetParent():GetBindings(self.index)
+	return bindings and KeyBound:ToShortKey(string.split(';', bindings))
 end
 
 
@@ -519,6 +520,38 @@ end
 function ActionButton:ShowingEmpty()
 	return self.showEmpty or KeyBound:IsShown() --or BongosActionConfig:ShowingEmptyButtons()
 --	return self.showEmpty or BongosActionConfig:ShowingEmptyButtons() or KeyBound:IsShown()
+end
+
+function ActionButton:SetKey(key)
+	self:GetParent():AddBinding(self.index, key)
+end
+
+function ActionButton:FreeKey(key)
+	return self:GetParent():FreeBinding(key)
+end
+
+function ActionButton:ClearBindings()
+	self:GetParent():ClearBindings(self.index)
+end
+
+function ActionButton:GetBindings()
+	local bindings = self:GetParent():GetBindings(self.index)
+	if bindings then
+		local keys
+		for i = 1, select('#', string.split(';', bindings)) do
+			local hotKey = select(i, string.split(';', bindings))
+			if keys then
+				keys = keys .. ', ' .. GetBindingText(hotKey,'KEY_')
+			else
+				keys = GetBindingText(hotKey,'KEY_')
+			end
+		end
+		return keys
+	end
+end
+
+function ActionButton:GetActionName()
+	return format('ActionBar%s Button%d', self:GetParent().id, self.index)
 end
 
 

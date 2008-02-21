@@ -56,6 +56,7 @@ end
 function ActionBar:OnCreate()
 	self.buttons = {}
 	self:SetAttribute('statemap-state', '$input')
+	self:SetAttribute('statebindings', '*:main')
 end
 
 function ActionBar:OnDelete()
@@ -112,12 +113,7 @@ function ActionBar:UpdateActions()
 
 	for state = 1, self:NumStates() do
 		for index = 1, numButtons do
-			local button = self.buttons[index]
-			if not button then
-				button = Action.Button:Get(self)
-				self.buttons[index] = button
-			end
-
+			local button = self:GetButton(index) or self:AddButton(index)
 			local actionID = ids[index + numButtons*(state-1)]
 			if state == 1 then
 				button:SetAttribute('action', actionID)
@@ -365,8 +361,128 @@ do
 	end
 end
 
+
+--[[ Button Creation ]]--
+
+function ActionBar:AddButton(index)
+	local button = Action.Button:Get(self)
+	self.buttons[index] = button
+	
+	button.index = index
+	self:UpdateButtonBindings(index)
+	
+	return button
+end
+
+function ActionBar:GetButton(index)
+	return self.buttons and self.buttons[index]
+end
+
 function ActionBar:GetButtons()
 	return pairs(self.buttons)
+end
+
+
+--[[ Bindings ]]--
+
+local function splitNext(sep, body)
+    if (body) then
+        local pre, post = strsplit(sep, body, 2);
+        if (post) then
+            return post, pre;
+        end
+        return false, body;
+    end
+end
+local function semicolonIterator(str) return splitNext, ";", str; end
+
+function ActionBar:AddBinding(index, newBinding)
+	if newBinding then
+		local bindings = self:GetBindings(index)
+		if bindings then
+			if bindings == newBinding then
+				return
+			end
+
+			for _,binding in semicolonIterator(bindings) do
+				if binding == newBinding then
+					return
+				end
+			end
+
+			self.sets.bindings[index] = bindings .. ';' .. newBinding
+		else
+			if not self.sets.bindings then
+				self.sets.bindings = {}
+			end
+			self.sets.bindings[index] = newBinding
+		end
+		self:UpdateButtonBindings(index)
+	end
+end
+
+function ActionBar:RemoveBinding(index, binding)
+	local bindings = self:GetBindings(index)
+	local changed
+
+	if bindings == binding then
+		self.sets.bindings[index] = nil
+		changed = true
+	else
+		local newBindings
+		for _,b in semicolonIterator(bindings) do
+			if b ~= binding then
+				if newBindings then
+					newBindings = newBindings .. ';' .. b
+				else
+					newBindings = b
+				end
+			else
+				changed = true
+			end
+		end
+		self.sets.bindings[index] = newBindings
+	end
+	self:UpdateButtonBindings(index)
+	return changed
+end
+
+function ActionBar:FreeBinding(binding)
+	local changed
+
+	for _,bar in self:GetAll() do
+		local bindings = bar.sets.bindings
+		if bindings then
+			for index in pairs(bindings) do
+				if bar:RemoveBinding(index, binding) then
+					changed = true
+				end
+			end
+		end
+	end
+	return changed
+end
+
+function ActionBar:ClearBindings(index)
+	local bindings = self:GetBindings(index)
+	if bindings then
+		self.sets.bindings[index] = nil
+		self:UpdateButtonBindings(index)
+	end
+end
+
+function ActionBar:GetBindings(index)
+	return self.sets.bindings and self.sets.bindings[index]
+end
+
+function ActionBar:UpdateButtonBindings(index)
+	local button = self:GetButton(index)
+	if button then
+		button:SetAttribute('bindings-main', self:GetBindings(index))
+		button:UpdateHotkey()
+		self:SetAttribute("_bindingset", nil)
+		SecureStateHeader_Refresh(self)
+	end
 end
 
 
