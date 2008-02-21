@@ -9,7 +9,14 @@ local CastingBar = Bongos:CreateWidgetClass('StatusBar')
 local L = LibStub('AceLocale-3.0'):GetLocale('Bongos3-CastBar')
 
 function CastBar:Load()
-	local bar, isNew = Bongos.Bar:Create('cast', {showText = true, x = 618, y = 617}, false, 'HIGH')
+	local defaults = {
+		point = 'BOTTOM',
+		x = 0,
+		y = 78,
+		showText = true,
+	}
+
+	local bar, isNew = Bongos.Bar:Create('cast', defaults, false, 'HIGH')
 	if isNew then
 		self:OnBarCreate(bar)
 	end
