@@ -36,13 +36,13 @@ function KeyBound:OnEnable()
 			tileSize = 32,
 			edgeSize = 32,
 		}
-		f:SetPoint('TOP', 0, -200)
+		f:SetPoint('TOP', 0, -24)
 		f:Hide()
 
 		local text = f:CreateFontString('ARTWORK')
 		text:SetFontObject('GameFontHighlight')
 		text:SetPoint('TOP', 0, -16)
-		text:SetWidth(280); text:SetHeight(0)
+		text:SetWidth(252); text:SetHeight(0)
 		text:SetText(format(L.BindingsHelp, GetBindingText("ESCAPE","KEY_")))
 		
 		local close = CreateFrame('Button', f:GetName() .. 'Close', f, 'UIPanelCloseButton')
@@ -133,7 +133,7 @@ function KeyBound:Deactivate()
 		self.enabled = nil
 		self:Set(nil)
 		self.dialog:Hide()
---		SaveBindings(self.dialog.bindingSet)
+
 		self:SendMessage('KEYBOUND_DISABLED')
 	end
 end
