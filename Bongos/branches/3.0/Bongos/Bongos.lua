@@ -69,7 +69,9 @@ end
 
 function Bongos:LoadModules()
 	for name, module in self:IterateModules() do
-		module:Load(self.isNewProfile)
+		if module.Load then
+			module:Load(self.isNewProfile)
+		end
 	end
 
 	self:UpdateMinimapButton()
@@ -79,7 +81,9 @@ end
 
 function Bongos:UnloadModules()
 	for name, module in self:IterateModules() do
-		module:Unload()
+		if module.Unload then
+			module:Unload()
+		end
 	end
 end
 
