@@ -61,27 +61,50 @@ end
 
 --shows a given panel
 function BongosMenu:ShowPanel(name)
-	for index, panel in pairs(self.panels) do
-		if index == name then
-			self:SetWidth(max(panel.width + self.extraWidth, 186))
-			self:SetHeight(max(panel.height + self.extraHeight, 40))
+--	local w = 186
+--	local h = 40
+
+	for i, panel in pairs(self.panels) do
+		if panel.name == name then
+			if self.dropdown then
+				UIDropDownMenu_SetSelectedValue(self.dropdown, i)
+			end
 			panel:Show()
+			self:SetWidth(max(186, panel.width + self.extraWidth))
+			self:SetHeight(max(40, panel.height + self.extraHeight))
 		else
 			panel:Hide()
 		end
+--		w = max(w, panel.width + self.extraWidth)
+--		h = max(h, panel.height + self.extraHeight)
 	end
+--	self:SetWidth(w); self:SetHeight(h)
+end
+
+function BongosMenu:GetSelectedPanel()
+	for i, panel in pairs(self.panels) do
+		if panel:IsShown() then
+			return i
+		end
+	end
+	return 1
 end
 
 function BongosMenu:AddPanel(name)
 	local panel = self.Panel:Create(name, self)
-	self.panels[name] = panel
+	panel.name = name
+	table.insert(self.panels, panel)
+
+	if not self.dropdown and #self.panels > 1 then
+		self.dropdown = self:CreatePanelSelector()
+	end
 
 	return panel
 end
 
 function BongosMenu:AddLayoutPanel()
 	local panel = self:AddPanel(L.Layout)
-	
+
 	panel:CreateOpacitySlider()
 	panel:CreateFadeSlider()
 	panel:CreateScaleSlider()
@@ -89,6 +112,51 @@ function BongosMenu:AddLayoutPanel()
 	return panel
 end
 
+do
+	local info = {}
+	local function AddItem(text, value, func, checked)
+		info.text = text
+		info.func = func
+		info.value = value
+		info.checked = checked
+		info.arg1 = text
+		UIDropDownMenu_AddButton(info)
+	end
+
+	local function Dropdown_OnShow(self)
+		UIDropDownMenu_SetWidth(110, self)
+		UIDropDownMenu_Initialize(self, self.Initialize)
+		UIDropDownMenu_SetSelectedValue(self, self:GetParent():GetSelectedPanel())
+	end
+
+	function BongosMenu:CreatePanelSelector()
+		local f = CreateFrame('Frame', self:GetName() .. 'PanelSelector', self, 'UIDropDownMenuTemplate')
+		getglobal(f:GetName() .. 'Text'):SetJustifyH('LEFT')
+	
+		f:SetScript('OnShow', Dropdown_OnShow)
+
+		local function Item_OnClick(name)
+			self:ShowPanel(name)
+			UIDropDownMenu_SetSelectedValue(f, this.value)
+		end
+
+		function f.Initialize()
+			local selected = self:GetSelectedPanel()
+			for i,panel in ipairs(self.panels) do
+				AddItem(panel.name, i, Item_OnClick, i == selected)
+			end
+		end
+
+		f:SetPoint('TOPLEFT', 0, -36)
+		for _,panel in pairs(self.panels) do
+			panel:SetPoint('TOPLEFT', 10, -(32 + f:GetHeight() + 6))
+		end
+
+		self.extraHeight = (self.extraHeight or 0) + f:GetHeight() + 6
+
+		return f
+	end
+end
 
 --[[
 	Panel Components
@@ -103,7 +171,11 @@ Panel.height = 0
 
 function Panel:Create(name, parent)
 	local f = self:New(CreateFrame('Frame', parent:GetName() .. name, parent))
-	f:SetPoint('TOPLEFT', 10, -32)
+	if parent.dropdown then
+		f:SetPoint('TOPLEFT', 10, -(32 + parent.dropdown:GetHeight() + 4))
+	else
+		f:SetPoint('TOPLEFT', 10, -32)
+	end
 	f:SetPoint('BOTTOMRIGHT', -10, 10)
 	f:Hide()
 
@@ -117,7 +189,7 @@ end
 function Panel:CreateCheckButton(name)
 	local button = CreateFrame('CheckButton', self:GetName() .. name, self, 'OptionsCheckButtonTemplate')
 	getglobal(button:GetName() .. 'Text'):SetText(name)
-	
+
 	local prev = self.checkbutton
 	if prev then
 		button:SetPoint('TOP', prev, 'BOTTOM', 0, 2)
@@ -187,21 +259,21 @@ do
 		slider.OnShow = OnShow
 		slider.UpdateValue = UpdateValue
 		slider.UpdateText = UpdateText
-		
+
 		slider:SetScript('OnShow', Slider_OnShow)
 		slider:SetScript('OnValueChanged', Slider_OnValueChanged)
 		slider:SetScript('OnMouseWheel', Slider_OnMouseWheel)
-		
+
 		local prev = self.slider
 		if prev then
 			slider:SetPoint('BOTTOM', prev, 'TOP', 0, 12)
-			self.height = self.height + 32
+			self.height = self.height + 30
 		else
 			slider:SetPoint('BOTTOMLEFT', 4, 6)
 			self.height = self.height + 36
 		end
 		self.slider = slider
-		
+
 		return slider
 	end
 end

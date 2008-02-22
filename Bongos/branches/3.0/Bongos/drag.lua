@@ -121,7 +121,7 @@ function Drag:OnEnter()
 		GameTooltip:SetOwner(self, 'ANCHOR_BOTTOMLEFT')
 
 		if tonumber(self:GetText()) then
-			GameTooltip:SetText(format('ActionBar %s', self:GetText()), 1, 1, 1)
+			GameTooltip:SetText(format('ActionBar%s', self:GetText()), 1, 1, 1)
 		else
 			GameTooltip:SetText(format('%s Bar', self.parent.id:gsub('^%l', string.upper)), 1, 1, 1)
 		end
@@ -135,6 +135,11 @@ function Drag:OnEnter()
 		else
 			GameTooltip:AddLine(L.ShowBar)
 		end
+		
+		if tonumber(self:GetText()) then
+			GameTooltip:AddLine(L.DeleteBar)
+		end
+
 		GameTooltip:AddLine(format(L.SetAlpha, ceil(self.parent:GetFrameAlpha()*100)))
 
 		GameTooltip:Show()
@@ -177,9 +182,11 @@ function Drag:OnClick(button)
 	if button == 'RightButton' then
 		if IsShiftKeyDown() then
 			self.parent:ToggleFrame()
-		elseif IsAltKeyDown() then
-			self.parent:Destroy(true)
-			return
+		elseif IsControlKeyDown() then
+			if tonumber(self.parent.id) then
+				self.parent:Destroy(true)
+				return
+			end
 		elseif self.parent.ShowMenu then
 			self.parent:ShowMenu()
 		end

@@ -124,11 +124,11 @@ function BBar:Destroy(deleteSettings)
 	self:SetUserPlaced(false)
 	self:Hide()
 
+	self.Fader:Remove(self)
+
 	if deleteSettings then
 		Bongos:SetBarSets(self.id, nil)
 	end
-
-	self.Fader:Remove(self)
 
 	unused[self.id] = self
 end
