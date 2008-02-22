@@ -11,7 +11,7 @@ Bongos3 = Bongos
 
 --[[ Startup ]]--
 
-function Bongos:OnEnable()
+function Bongos:OnInitialize()
 	local defaults = {
 		profile = {
 			sticky = true,
@@ -54,8 +54,11 @@ function Bongos:OnEnable()
 	end
 
 	self.lockBG = self:CreateLockBG()
-	self:LoadModules()
 	self:RegisterSlashCommands()
+end
+
+function Bongos:OnEnable()
+	self:LoadModules()
 end
 
 function Bongos:UpdateSettings()
