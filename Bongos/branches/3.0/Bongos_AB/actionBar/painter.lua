@@ -15,7 +15,7 @@ function Painter:Load()
 	self:SetFrameLevel(0)
 	self:SetAllPoints(self:GetParent())
 	self:RegisterForDrag('LeftButton')
-	self:EnableMouse(true)
+	self:EnableMouse(IsAltKeyDown())
 
 	self:SetScript('OnMouseDown', self.SetStartPoint)
 	self:SetScript('OnDragStart', self.ShowDragBox)

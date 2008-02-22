@@ -192,8 +192,13 @@ end
 function ActionBar:SetNumStates(numStates)
 	if numStates ~= self:NumStates() then
 		self.sets.numStates = numStates
+
+		--this code is order dependent!
 		self:UpdateUsedIDs()
+		self:UpdateStates()
+		self:UpdateStateDriver()
 		self:UpdateActions()
+		self:UpdateVisibility()
 	end
 end
 
@@ -251,12 +256,13 @@ function ActionBar:UpdateStateDriver()
 		table.insert(stateConditions, '[harm]')
 	end
 
-	UnregisterStateDriver(self, "state", 0)
+	UnregisterStateDriver(self, 'state', 0)
 
 	local header = ''
+	local maxState = self:NumStates()
 	for _,condition in ipairs(stateConditions) do
 		local state = self:GetConditionState(condition)
-		if state then
+		if state and state <= maxState then
 			header = header .. condition .. state .. ';'
 		end
 	end
@@ -273,7 +279,7 @@ function ActionBar:SetConditionState(condition, state)
 	end
 
 	if self.sets.states[condition] ~= state then
-		self.sets.stateHeader[condition] = state
+		self.sets.states[condition] = state
 		self:UpdateStateDriver()
 	end
 end
@@ -394,7 +400,7 @@ local function splitNext(sep, body)
         return false, body;
     end
 end
-local function semicolonIterator(str) return splitNext, ";", str; end
+local function semicolonIterator(str) return splitNext, ';', str; end
 
 function ActionBar:AddBinding(index, newBinding)
 	if newBinding then
@@ -480,7 +486,7 @@ function ActionBar:UpdateButtonBindings(index)
 	if button then
 		button:SetAttribute('bindings-main', self:GetBindings(index))
 		button:UpdateHotkey()
-		self:SetAttribute("_bindingset", nil)
+		self:SetAttribute('_bindingset', nil)
 		SecureStateHeader_Refresh(self)
 	end
 end
@@ -488,12 +494,9 @@ end
 
 --[[ Menu Code ]]--
 
-function ActionBar:CreateMenu()
-	local menu = Bongos.Menu:Create(self.id)
-	ActionBar.menu = menu
-
+--layout panel
+local function AddLayoutPanel(menu)
 	local panel = menu:AddLayoutPanel()
-
 	panel:CreateSpacingSlider()
 
 	local states, rows, cols
@@ -525,7 +528,7 @@ function ActionBar:CreateMenu()
 		self:SetValue(bar:NumStates())
 	end
 
-	cols = panel:CreateSlider('Cols', 1, 1, 1)
+	cols = panel:CreateSlider('Columns', 1, 1, 1)
 	function cols:UpdateValue(value)
 		local bar = Bongos.Bar:Get(self:GetParent().id)
 		bar:SetSize(bar:GetRows(), value)
@@ -554,6 +557,111 @@ function ActionBar:CreateMenu()
 		self:SetMinMaxValues(1, floor(freeIDs / maxRows) + bar:GetRows())
 		self:SetValue(bar:GetRows())
 	end
+end
+
+--state slider template
+local function StateSlider_OnShow(self)
+	local f = ActionBar:Get(self:GetParent().id)
+	self:SetMinMaxValues(1, f:NumStates())
+	self:SetValue(f:GetConditionState(self.state) or 1)
+end
+
+local function StateSlider_UpdateValue(self, value)
+	local f = ActionBar:Get(self:GetParent().id)
+	if value == 1 then
+		f:SetConditionState(self.state, nil)
+	else
+		f:SetConditionState(self.state, value)
+	end
+end
+
+local function StateSlider_Create(panel, state, text)
+	local slider = panel:CreateSlider(state, 0, 1, 1)
+	slider.OnShow = StateSlider_OnShow
+	slider.UpdateValue = StateSlider_UpdateValue
+	slider.state = state
+	
+	if text then
+		getglobal(slider:GetName() .. 'Text'):SetText(text)
+	end
+	
+	panel[state] = slider
+
+	return slider
+end
+
+--stances panel
+local function AddStancesPanel(menu)
+	local class = select(2, UnitClass('player'))
+	
+	if class == 'PRIEST' or GetNumShapeshiftForms() > 0 then
+		local panel = menu:AddPanel('Stances')
+		if class == 'PRIEST' then
+			StateSlider_Create(panel, '[form:1]', 'Shadow Form')
+		else
+			if class == 'DRUID' then
+				StateSlider_Create(panel, '[form:2/3,stealth]', 'Prowl')
+			end
+			
+			panel:SetScript('OnShow', function(self)
+				local changed
+
+				for i = GetNumShapeshiftForms(), 1, -1 do
+					local state = format('[form:%d]', i)
+					local stateName = select(2, GetShapeshiftFormInfo(i))
+					local slider = self[state]
+					
+					if slider then
+						getglobal(slider:GetName() .. 'Text'):SetText(stateName)
+					else
+						local slider = StateSlider_Create(self, state, stateName)
+						slider:OnShow()
+
+						changed = true
+					end
+				end
+				
+				--we've added a slider, call showpanel, which resizes the frame
+				if changed then
+					self:GetParent():ShowPanel(self.name)
+				end
+			end)
+		end
+	end
+end
+
+--modifier panel
+local function AddModifierPanel(menu)
+	local panel = menu:AddPanel('Modifier')
+	StateSlider_Create(panel, '[mod:shift]', 'Shift')
+	StateSlider_Create(panel, '[mod:ctrl]', 'Ctrl')
+	StateSlider_Create(panel, '[mod:alt]', 'Alt')
+end
+
+--targeting
+local function AddTargetingPanel(menu)
+	local panel = menu:AddPanel('Targeting')
+	StateSlider_Create(panel, '[help]', 'Friendly Target')
+	StateSlider_Create(panel, '[harm]', 'Enemy Target')
+end
+
+--paging
+local function AddPagingPanel(menu)
+	local panel = menu:AddPanel('Paging')
+	for i = 6, 2, -1 do
+		StateSlider_Create(panel, format('[bar:%d]', i), format('Page %d', i))
+	end
+end
+
+function ActionBar:CreateMenu()
+	local menu = Bongos.Menu:Create(self.id)
+	rawset(self, 'menu', menu)
+
+	AddLayoutPanel(menu)
+	AddStancesPanel(menu)
+	AddModifierPanel(menu)
+	AddTargetingPanel(menu)
+	AddPagingPanel(menu)
 
 	return menu
 end
