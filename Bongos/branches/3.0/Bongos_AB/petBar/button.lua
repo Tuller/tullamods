@@ -7,6 +7,7 @@
 local Bongos = LibStub('AceAddon-3.0'):GetAddon('Bongos3')
 local PetBar = Bongos:GetModule('PetBar')
 local PetButton = Bongos:CreateWidgetClass('CheckButton')
+local Config = Bongos:GetModule('ActionBar-Config')
 PetBar.Button = PetButton
 
 local petBar = PetActionBarFrame
@@ -19,7 +20,7 @@ function PetButton:Set(id, parent)
 	button:SetToplevel(nil)
 	button:SetScripts()
 	button:Style()
---	button:ShowHotkey(BongosActionConfig:ShowingHotkeys())
+	button:ShowHotkey(Config:ShowingHotkeys())
 	parent:Attach(button)
 
 	return button
@@ -67,9 +68,9 @@ function PetButton:OnReceiveDrag()
 end
 
 function PetButton:OnEnter()
---	if BongosActionConfig:ShowingTooltips() then
+	if Config:ShowingTooltips() then
 		PetActionButton_OnEnter(self)
---	end
+	end
 	KeyBound:Set(self)
 end
 
@@ -91,9 +92,9 @@ end
 
 function PetButton:GetHotkey()
 	local key = GetBindingKey(format('CLICK %s:LeftButton', self:GetName()))
-	if not key then
-		key = GetBindingText(GetBindingKey('BONUSACTIONBUTTON' .. self:GetID()), 'KEY_')
-	end
+	-- if not key then
+		-- key = GetBindingText(GetBindingKey('BONUSACTIONBUTTON' .. self:GetID()), 'KEY_')
+	-- end
 	return KeyBound:ToShortKey(key)
 end
 

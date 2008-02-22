@@ -9,6 +9,7 @@ localization\localization.cn.lua
 localization\localization.fr.lua
 localization\localization.es.lua
 unreg.lua
+config.lua
 keyBound\keyBound.xml
 bagBar\bar.lua
 menuBar\bar.lua

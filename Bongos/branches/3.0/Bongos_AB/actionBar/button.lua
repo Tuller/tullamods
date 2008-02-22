@@ -4,17 +4,15 @@
 
 local Bongos = LibStub('AceAddon-3.0'):GetAddon('Bongos3')
 local Action = Bongos:GetModule('ActionBar')
+local Config = Bongos:GetModule('ActionBar-Config')
+local Updater = Action.Updater
 
 local ActionButton = Bongos:CreateWidgetClass('CheckButton')
 Action.Button = ActionButton
 
 local unused = {} --buttons we can reuse
 local updatable = {} --buttons which have an action and are shown: thus we need to update based on range coloring
-
---buff and debuff caches
-local targetBuffs = {}
-local targetDebuffs = {}
-local playerBuffs = {}
+local used = {}
 
 do
 	local id = 1
@@ -74,11 +72,11 @@ function ActionButton:Get(parent)
 	parent:Attach(b)
 	parent:SetAttribute('addchild', b)
 
-	b:ShowHotkey(true)
-	b:ShowMacro(true)
-	-- b:ShowHotkey(BongosActionConfig:ShowingHotkeys())
-	-- b:ShowMacro(BongosActionConfig:ShowingMacros())
+	b:ShowHotkey(Config:ShowingHotkeys())
+	b:ShowMacro(Config:ShowingMacros())
 	b:UpdateEvents()
+	
+	used[b] = true
 
 	return b
 end
@@ -96,6 +94,7 @@ function ActionButton:Release()
 	self:Hide()
 	self:SetParent(nil)
 	self:UnregisterAllEvents()
+	used[self] = nil
 	unused[self] = true
 end
 
@@ -189,10 +188,9 @@ function ActionButton:OnUpdate(elapsed)
 		local hotkey = self.hotkey
 		if IsActionInRange(action) == 0 then
 			hotkey:SetVertexColor(1, 0.1, 0.1)
-			-- if IsUsableAction(action) and BongosActionConfig:RangeColoring() then
-				-- local r,g,b = BongosActionConfig:GetRangeColor()
-				-- self.icon:SetVertexColor(r,g,b)
-			-- end
+			if IsUsableAction(action) and Config:ColorOOR() then
+				self.icon:SetVertexColor(Config:GetOORColor())
+			end
 		else
 			hotkey:SetVertexColor(0.6, 0.6, 0.6)
 			if IsUsableAction(action) then
@@ -225,9 +223,9 @@ function ActionButton:OnEnter()
 		GameTooltip:SetOwner(self, 'ANCHOR_RIGHT')
 	end
 
---	if BongosActionConfig:ShowingTooltips() then
+	if Config:ShowingTooltips() then
 		self:UpdateTooltip()
---	end
+	end
 
 	KeyBound:Set(self)
 end
@@ -327,15 +325,13 @@ function ActionButton:UpdateUsable()
 
 	local isUsable, notEnoughMana = IsUsableAction(action)
 	if isUsable then
-		-- if IsActionInRange(action) == 0 and BongosActionConfig:RangeColoring() then
-			-- local r,g,b = BongosActionConfig:GetRangeColor()
-			-- icon:SetVertexColor(r,g,b)
-		-- else
-			-- icon:SetVertexColor(1, 1, 1)
-		-- end
-	elseif notEnoughMana then
-		--Make the icon blue if out of mana
-		icon:SetVertexColor(0.5, 0.5, 1)
+		if IsActionInRange(action) == 0 and Config:ColorOOR() then
+			icon:SetVertexColor(Config:GetOORColor())
+		else
+			icon:SetVertexColor(1, 1, 1)
+		end
+	elseif notEnoughMana and Config:ColorOOM() then
+		icon:SetVertexColor(Config:GetOOMColor())
 	else
 		--Skill unusable
 		icon:SetVertexColor(0.3, 0.3, 0.3)
@@ -356,18 +352,19 @@ function ActionButton:UpdateBorder(spell)
 	if spell then
 		if UnitExists('target') then
 			if UnitIsFriend('player', 'target') then
-				if targetBuffs[spell] then
-					self:GetCheckedTexture():SetVertexColor(0, 1, 0)
+				if Updater:TargetHasBuff(spell) then
+					
+					self:GetCheckedTexture():SetVertexColor(Config:GetBuffColor())
 					return true
 				end
-			elseif targetDebuffs[spell] then
-				self:GetCheckedTexture():SetVertexColor(1, 0, 1)
+			elseif Updater:TargetHasDebuff(spell) then
+				self:GetCheckedTexture():SetVertexColor(Config:GetDebuffColor())
 				return true
 			end
 		end
 
-		if playerBuffs[spell] and not UnitIsFriend('player', 'target') then
-			self:GetCheckedTexture():SetVertexColor(0, 1, 0)
+		if Updater:PlayerHasBuff(spell) and not UnitIsFriend('player', 'target') then
+			self:GetCheckedTexture():SetVertexColor(Config:GetBuffColor())
 			return true
 		end
 	end
@@ -375,7 +372,7 @@ function ActionButton:UpdateBorder(spell)
 end
 
 function ActionButton:UpdateSpellInUse()
-	-- if BongosActionConfig:HighlightingBuffs() then
+	if Config:HighlightingBuffs() then
 		local action = self:GetPagedID()
 		if action then
 			local spellID = self.spellID
@@ -387,7 +384,7 @@ function ActionButton:UpdateSpellInUse()
 				end
 			end
 		end
-	-- end
+	end
 	self:GetCheckedTexture():SetVertexColor(1, 1, 1)
 end
 
@@ -518,8 +515,7 @@ function ActionButton:GetPagedID(refresh)
 end
 
 function ActionButton:ShowingEmpty()
-	return self.showEmpty or KeyBound:IsShown() --or BongosActionConfig:ShowingEmptyButtons()
---	return self.showEmpty or BongosActionConfig:ShowingEmptyButtons() or KeyBound:IsShown()
+	return self.showEmpty or KeyBound:IsShown() or Config:ShowingEmptyButtons()
 end
 
 function ActionButton:SetKey(key)
@@ -554,200 +550,16 @@ function ActionButton:GetActionName()
 	return format('ActionBar%s Button%d', self:GetParent().id, self.index)
 end
 
-
---range check/flash and buff updating
-do
-	local f = CreateFrame('Frame')
-	local newVals = {} --store new info in here
-
-	--clear a table, returning true if there was stuff to clear
-	local function ClearTable(t)
-		if next(t) then
-			for i in pairs(t) do
-				t[i] = nil
-			end
-			return true
-		end
+function ActionButton:ForAll(method, ...)
+	for button in pairs(used) do
+		button[method](button, ...)
 	end
+end
 
-	--remove any values from t that are not in toClone
-	--adds any values from tableToClone that are not in t
-	--requires that both tables be using the same key value pairs
-	local function CloneTable(t, toClone)
-		local changed = false
+function ActionButton:GetUpdatable()
+	return pairs(updatable)
+end
 
-		--remove any values not in tClone
-		for i in pairs(t) do
-			if not toClone[i] then
-				t[i] = nil
-				changed = true
-			end
-		end
-
-		--add any values in tClone that are not in t
-		for i,v in pairs(toClone) do
-			if not t[i] then
-				t[i] = v
-				changed = true
-			end
-		end
-
-		return changed
-	end
-
-	local function UpdateFriendlyTargetBuffs()
-		local changed = false
-
-		--clear the new vals table
-		ClearTable(newVals)
-
-		--friendly target, clear target debuffs
-		if ClearTable(targetDebuffs) then
-			changed = true
-		end
-
-		--add all target buffs into newVals
-		local i = 1
-		local buff
-		repeat
-			buff = UnitBuff('target', i)
-			if buff then
-				newVals[buff] = true
-			end
-			i = i + 1
-		until not buff
-
-		--set changed to true if the target buffs table has changed
-		if CloneTable(targetBuffs, newVals) then
-			changed = true
-		end
-
-		return changed
-	end
-
-	local function UpdateEnemyTargetDebuffs()
-		local changed = false
-
-		--clear the new vals table
-		ClearTable(newVals)
-
-		--enemy target, clear target buffs
-		if ClearTable(targetBuffs) then
-			changed = true
-		end
-
-		--update debuffs on enemy targets
-		local i = 1
-		local buff, cooldown, _
-		repeat
-			buff, _, _, _, _, cooldown = UnitDebuff('target', i)
-			if buff and cooldown then
-				newVals[buff] = true
-			end
-			i = i + 1
-		until not buff
-
-		--set changed to true if the target debuffs table has changed
-		if CloneTable(targetDebuffs, newVals) then
-			changed = true
-		end
-
-		return changed
-	end
-
-	local function ClearTargetBuffsAndDebuffs()
-		local changed = false
-
-		if ClearTable(targetBuffs) then
-			changed = true
-		end
-		if ClearTable(targetDebuffs) then
-			changed = true
-		end
-
-		return changed
-	end
-
-	function f:UpdateTargetBuffs()
-		local changed = false
-
-		if UnitExists('target') then
-			if UnitIsFriend('player', 'target') then
-				changed = UpdateFriendlyTargetBuffs()
-			else
-				changed = UpdateEnemyTargetDebuffs()
-			end
-		else
-			changed = ClearTargetBuffsAndDebuffs()
-		end
-
-		--if change, mark for updating
-		if changed then
-			self.shouldUpdateBuffs = true
-		end
-	end
-
-	function f:UpdatePlayerBuffs()
-		local changed = false
-
-		ClearTable(newVals)
-
-		local buff
-		local i = 1
-		repeat
-			buff = UnitBuff('player', i)
-			if buff then
-				newVals[buff] = true
-			end
-			i = i + 1
-		until not buff
-
-		if CloneTable(playerBuffs, newVals) then
-			changed = true
-		end
-
-		--something changed, trigger update buffs
-		if changed then
-			self.shouldUpdateBuffs = true
-		end
-	end
-
-	--buff and debuff updating stuff
-	f:SetScript('OnEvent', function(self, event, unit)
---		if BongosActionConfig:HighlightingBuffs() then
-			if event == 'PLAYER_TARGET_CHANGED' then
-				self:UpdateTargetBuffs()
-			elseif event == 'UNIT_AURA' then
-				if unit == 'target' then
-					self:UpdateTargetBuffs()
-				end
-			elseif event == 'PLAYER_AURAS_CHANGED' then
-				self:UpdatePlayerBuffs()
-			end
---		end
-	end)
-	f:RegisterEvent('UNIT_AURA')
-	f:RegisterEvent('PLAYER_AURAS_CHANGED')
-	f:RegisterEvent('PLAYER_TARGET_CHANGED')
-
-	--on update script, handles throttled buff and debuff updating as well as range updating
-	f:SetScript('OnUpdate', function(self, elapsed)
-		if self.shouldUpdateBuffs then
-			self.shouldUpdateBuffs = nil
-			for button in pairs(updatable) do
-				button:UpdateState()
-			end
-		end
-
-		if self.nextUpdate < 0 then
-			self.nextUpdate = self.delay
-			for button in pairs(updatable) do
-				button:OnUpdate(self.delay)
-			end
-		else
-			self.nextUpdate = self.nextUpdate - elapsed
-		end
-	end)
-	f.nextUpdate = 1
-	f.delay = 1
+function ActionButton:GetAll()
+	return pairs(used)
 end

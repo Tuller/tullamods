@@ -7,6 +7,7 @@ local ActionBar = Bongos:NewModule('ActionBar', 'AceEvent-3.0')
 local actions = {}
 
 function ActionBar:Load(isNewProfile)
+
 	for i = 1, 120 do
 		actions[i] = HasAction(i)
 	end

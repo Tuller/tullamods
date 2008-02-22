@@ -6,6 +6,7 @@ local Bongos = LibStub('AceAddon-3.0'):GetAddon('Bongos3')
 local ClassBar = Bongos:GetModule('ClassBar', true)
 if not ClassBar then return end
 
+local Config = Bongos:GetModule('ActionBar-Config')
 local ClassButton = Bongos:CreateWidgetClass('CheckButton')
 ClassBar.Button = ClassButton
 
@@ -57,7 +58,7 @@ function ClassButton:Create(id, parent)
 	button:SetScript('OnShow', self.UpdateEvents)
 	button:SetScript('OnHide', self.UpdateEvents)
 
---	button:ShowHotkey(BongosActionConfig:ShowingHotkeys())
+	button:ShowHotkey(Config:ShowingHotkeys())
 	button:UpdateSpell()
 	button:UpdateEvents()
 
@@ -93,14 +94,14 @@ function ClassButton:OnEvent(event)
 end
 
 function ClassButton:OnEnter()
---	if BongosActionConfig:ShowingTooltips() then
+	if Config:ShowingTooltips() then
 		if GetCVar('UberTooltips') == '1' then
 			GameTooltip_SetDefaultAnchor(GameTooltip, self)
 		else
 			GameTooltip:SetOwner(self, 'ANCHOR_RIGHT')
 		end
 		GameTooltip:SetShapeshift(self:GetID())
---	end
+	end
 	KeyBound:Set(self)
 end
 
@@ -160,10 +161,9 @@ end
 
 function ClassButton:GetHotkey()
 	local key = GetBindingKey(format('CLICK %s:LeftButton', self:GetName()))
-	if not key then
-		key = GetBindingText(GetBindingKey('SHAPESHIFTBUTTON' .. self:GetID()), 'KEY_')
-	end
-
+	-- if not key then
+		-- key = GetBindingText(GetBindingKey('SHAPESHIFTBUTTON' .. self:GetID()), 'KEY_')
+	-- end
 	return KeyBound:ToShortKey(key)
 end
 
