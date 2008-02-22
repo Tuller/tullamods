@@ -61,9 +61,6 @@ end
 
 --shows a given panel
 function BongosMenu:ShowPanel(name)
---	local w = 186
---	local h = 40
-
 	for i, panel in pairs(self.panels) do
 		if panel.name == name then
 			if self.dropdown then
@@ -75,10 +72,7 @@ function BongosMenu:ShowPanel(name)
 		else
 			panel:Hide()
 		end
---		w = max(w, panel.width + self.extraWidth)
---		h = max(h, panel.height + self.extraHeight)
 	end
---	self:SetWidth(w); self:SetHeight(h)
 end
 
 function BongosMenu:GetSelectedPanel()

@@ -40,9 +40,13 @@ end
 
 function MinimapButton:OnClick(button)
 	if button == 'LeftButton' then
+		if KeyBound then
+			KeyBound:Deactivate()
+		end
 		Bongos:SetLock(not Bongos:IsLocked())
 	elseif button == 'RightButton' then
 		if KeyBound then
+			Bongos:SetLock(true)
 			KeyBound:Toggle()
 		end
 	end
