@@ -33,7 +33,10 @@ function ActionBar:Load(isNewProfile)
 		
 		local keybindings = {}
 		for i = 1, 12 do
-			keybindings[i] = GetBindingKey(format('ActionButton%d', i))
+			local binding = GetBindingKey(format('CLICK BActionButton%d:LeftButton', i)) or
+							GetBindingKey(format('CLICK BongosActionButton%d:LeftButton', i)) or
+							GetBindingKey(format('ActionButton%d', i))
+			keybindings[i] = binding
 		end
 
 		Bongos:SetBarSets(1, {

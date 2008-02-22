@@ -7,7 +7,7 @@ local Bongos = LibStub('AceAddon-3.0'):GetAddon('Bongos3')
 local Action = Bongos:GetModule('ActionBar')
 local Config = Bongos:GetModule('ActionBar-Config')
 local Updater = CreateFrame('Frame')
-Action.Updater = f
+Action.Updater = Updater
 
 
 --[[ Local Functions ]]--
@@ -210,6 +210,7 @@ function Updater:ClearTargetBuffsAndDebuffs()
 
 	return changed
 end
+
 
 --[[ Access Functions ]]--
 

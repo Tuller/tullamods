@@ -1,11 +1,11 @@
 ﻿
 local Bongos = LibStub('AceAddon-3.0'):GetAddon('Bongos3')
 local Config = Bongos:NewModule('ActionBar-Config')
+local CURRENT_VERSION = GetAddOnMetadata('Bongos', 'Version')
 
 --[[ Config ]]--
 
 function Config:OnInitialize()
-	Bongos:Print("nothing says lovin'")
 	local defaults = {
 		profile = {
 			showTooltips = true,
@@ -22,16 +22,30 @@ function Config:OnInitialize()
 			rightClickUnit = 'player',
 		}
 	}
-	
 	self.db = Bongos.db:RegisterNamespace('actionBar', defaults)
+	
+	if Bongos3ABVersion then
+		local cMajor = CURRENT_VERSION:match('(%w+)')
+		local major = Bongos3ABVersion:match('(%w+)')
+
+		--settings change
+		if major ~= cMajor then
+			self:UpdateSettings()
+		end
+	end
+
+	--version update
+	if Bongos3ABVersion ~= CURRENT_VERSION then
+		self:UpdateVersion()
+	end
 end
 
-function Config:Load()
-	Bongos:Print('like shompy in the oven')
+function Config:UpdateSettings()
+	--update settingsamagig
 end
 
-function Config:Unload()
-	--do nothing
+function Config:UpdateVersion()
+	Bongos3ABVersion = CURRENT_VERSION
 end
 
 

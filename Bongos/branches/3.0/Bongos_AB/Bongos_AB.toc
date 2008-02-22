@@ -2,8 +2,9 @@
 ## Title: Bongos3 AB
 ## Notes: ActionBars Advanced
 ## Author: Tuller
-## Version: 0
+## Version: Alpha.1
 ## Dependencies: Bongos
+## SavedVariables: Bongos3ABVersion
 localization\localization.lua
 localization\localization.cn.lua
 localization\localization.fr.lua
