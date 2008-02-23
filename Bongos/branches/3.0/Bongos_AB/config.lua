@@ -19,7 +19,8 @@ function Config:OnInitialize()
 			buffColoring = true,
 			buffColor = {0, 1, 0},
 			debuffColor = {1, 0, 1},
---			rightClickUnit = 'player',
+			equippedColor = {0, 1, 0, 0.7},
+			rightClickUnit = nil,
 		}
 	}
 	self.db = Bongos.db:RegisterNamespace('actionBar', defaults)
@@ -109,7 +110,9 @@ function Config:ColorOOR()
 end
 
 function Config:SetOORColor(r, g, b)
-	self.db.profile.oorColor = {r, g, b}
+	self.db.profile.oorColor[1] = r
+	self.db.profile.oorColor[2] = g
+	self.db.profile.oorColor[3] = b
 end
 
 function Config:GetOORColor()
@@ -128,7 +131,9 @@ function Config:ColorOOM()
 end
 
 function Config:SetOOMColor(r, g, b)
-	self.db.profile.oomColor = {r, g, b}
+	self.db.profile.oomColor[1] = r
+	self.db.profile.oomColor[2] = g
+	self.db.profile.oomColor[3] = b
 end
 
 function Config:GetOOMColor()
@@ -147,21 +152,39 @@ function Config:HighlightingBuffs()
 end
 
 function Config:SetBuffColor(r, g, b)
-	self.db.profile.buffColor = {r, g, b}
+	self.db.profile.buffColor[1] = r
+	self.db.profile.buffColor[2] = g
+	self.db.profile.buffColor[3] = b
 	Bongos:GetModule('ActionBar').Button:ForAll('UpdateSpellInUse')
 end
 
-function Config:GetBuffColor(r, g, b)
+function Config:GetBuffColor()
 	return unpack(self.db.profile.buffColor)
 end
 
 function Config:SetDebuffColor(r, g, b)
-	self.db.profile.debuffColor = {r, g, b}
+	self.db.profile.debuffColor[1] = r
+	self.db.profile.debuffColor[2] = g
+	self.db.profile.debuffColor[3] = b
 	Bongos:GetModule('ActionBar').Button:ForAll('UpdateSpellInUse')
 end
 
-function Config:GetDebuffColor(r, g, b)
+function Config:GetDebuffColor()
 	return unpack(self.db.profile.debuffColor)
+end
+
+
+--equipped items
+function Config:SetEquippedColor(r, g, b, a)
+	self.db.profile.equippedColor[1] = r
+	self.db.profile.equippedColor[2] = g
+	self.db.profile.equippedColor[3] = b
+--	self.db.profile.equippedColor[4] = a
+	Bongos:GetModule('ActionBar').Button:ForAll('UpdateEquippedColor')
+end
+
+function Config:GetEquippedColor()
+	return unpack(self.db.profile.equippedColor)
 end
 
 

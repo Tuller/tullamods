@@ -25,7 +25,6 @@ do
 		b.icon:SetTexCoord(0.06, 0.94, 0.06, 0.94)
 
 		b.border = _G[name .. 'Border']
-		b.border:SetVertexColor(0, 1, 0, 0.7)
 
 		b.normal = _G[name .. 'NormalTexture']
 		b.normal:SetVertexColor(1, 1, 1, 0.5)
@@ -73,6 +72,7 @@ function ActionButton:Get(parent)
 
 	b:ShowHotkey(Config:ShowingHotkeys())
 	b:ShowMacro(Config:ShowingMacros())
+	b:UpdateEquippedColor()
 	b:UpdateEvents()
 
 	used[b] = true
@@ -407,8 +407,6 @@ function ActionButton:UpdateTooltip()
 end
 
 
---[[ State Updating ]]--
-
 --update button showstates based on what state actionIDs actually have actions
 --returns true if the showstates have changed, false otherwise
 function ActionButton:UpdateVisibility()
@@ -441,8 +439,7 @@ function ActionButton:UpdateVisibility()
 	end
 end
 
---[[ Showgrid Stuff ]]
-
+--show empty buttons
 function ActionButton:UpdateGrid()
 	if self:ShowingEmpty() or HasAction(self:GetPagedID()) then
 		self:Show()
@@ -451,9 +448,7 @@ function ActionButton:UpdateGrid()
 	end
 end
 
-
---[[ Hotkey Functions ]]--
-
+--bindings
 function ActionButton:ShowHotkey(enable)
 	local hotkey = self.hotkey
 	if enable then
@@ -473,9 +468,7 @@ function ActionButton:GetHotkey()
 	return bindings and KeyBound:ToShortKey(string.split(';', bindings))
 end
 
-
---[[ Macro Functions ]]--
-
+--macro
 function ActionButton:ShowMacro(enable)
 	local macro = self.macro
 	if enable then
@@ -483,6 +476,11 @@ function ActionButton:ShowMacro(enable)
 	else
 		macro:Hide()
 	end
+end
+
+--border coloring
+function ActionButton:UpdateEquippedColor()
+	self.border:SetVertexColor(Config:GetEquippedColor())
 end
 
 
