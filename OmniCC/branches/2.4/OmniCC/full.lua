@@ -47,6 +47,10 @@ function OmniCC:Enable()
 
 	--enable the addon
 	self:HookCooldown()
+	
+	--setup the options menu hook
+	local f = CreateFrame('Frame', nil, InterfaceOptionsFrame)
+	f:SetScript('OnShow', function(self) LoadAddOn('OmniCC_Options') self:SetScript('OnShow', nil) end)
 end
 
 function OmniCC:LoadDefaults()
@@ -113,7 +117,7 @@ function OmniCC:StartTimer(cooldown, start, duration)
 		if not showers[cooldown] then
 			self:CreateShower(cooldown)
 		end
-	
+
 		timer.start = start
 		timer.duration = duration
 		timer.nextUpdate = 0
@@ -143,9 +147,9 @@ do
 		local shower = CreateFrame('Frame', nil, cooldown)
 		shower:SetScript('OnShow', Shower_OnShow)
 		shower:SetScript('OnHide', Shower_OnHide)
-		
+
 		showers[cooldown] = shower
-		
+
 		return shower
 	end
 end
@@ -458,10 +462,3 @@ end
 function OmniCC:UsingMMSS()
 	return self.sets.useMMSS
 end
-
-
---[[ Slash Commands ]]--
-
-hooksecurefunc('InterfaceOptionsFrame_OnShow', function()
-	LoadAddOn('OmniCC_Options')
-end)
