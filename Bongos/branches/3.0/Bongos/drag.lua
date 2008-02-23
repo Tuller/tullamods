@@ -49,9 +49,11 @@ function Scaler:OnUpdate(elapsed)
 end
 
 function Scaler:StartScaling()
-	self.isScaling = true
-	self:GetParent():LockHighlight()
-	self:SetScript('OnUpdate', self.OnUpdate)
+	if not IsControlKeyDown() then
+		self.isScaling = true
+		self:GetParent():LockHighlight()
+		self:SetScript('OnUpdate', self.OnUpdate)
+	end
 end
 
 function Scaler:StopScaling()

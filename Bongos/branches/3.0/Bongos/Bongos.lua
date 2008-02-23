@@ -55,6 +55,13 @@ function Bongos:OnInitialize()
 
 	self.lockBG = self:CreateLockBG()
 	self:RegisterSlashCommands()
+	
+	--create the options menu thingy
+	self.Options = CreateFrame('Frame', 'BongosOptions', InterfaceOptionsFrame)
+	self.Options:SetScript('OnShow', function(self)
+		self:SetScript('OnShow', nil)
+		LoadAddOn('Bongos_Options')
+	end)
 end
 
 function Bongos:OnEnable()
@@ -109,7 +116,6 @@ function Bongos:SetProfile(name)
 	if profile and profile ~= self.db:GetCurrentProfile() then
 		self:UnloadModules()
 		self.db:SetProfile(profile)
-		--send set message
 		self.isNewProfile = nil
 		self:LoadModules()
 	else
@@ -121,7 +127,6 @@ function Bongos:DeleteProfile(name)
 	local profile = self:MatchProfile(name)
 	if profile and profile ~= self.db:GetCurrentProfile() then
 		self.db:DeleteProfile(profile)
-		--send delete message
 	else
 		self:Print(L.CantDeleteCurrentProfile)
 	end
@@ -131,7 +136,6 @@ function Bongos:CopyProfile(name)
 	if name and name ~= self.db:GetCurrentProfile() then
 		self:UnloadModules()
 		self.db:CopyProfile(name)
-		--send copy message
 		self.isNewProfile = nil
 		self:LoadModules()
 	end
@@ -140,7 +144,6 @@ end
 function Bongos:ResetProfile()
 	self:UnloadModules()
 	self.db:ResetProfile()
-	--send reset message
 	self.isNewProfile = true
 	self:LoadModules()
 end

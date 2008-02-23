@@ -525,7 +525,7 @@ function BBar:ForBar(id, method, ...)
 	if id == 'all' then
 		self:ForAll(method, ...)
 	else
-		local startID, endID = id:match('(%d+)-(%d+)')
+		local startID, endID = tostring(id):match('(%d+)-(%d+)')
 		startID = tonumber(startID)
 		endID = tonumber(endID)
 
