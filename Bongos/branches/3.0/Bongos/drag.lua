@@ -49,7 +49,7 @@ function Scaler:OnUpdate(elapsed)
 end
 
 function Scaler:StartScaling()
-	if not IsControlKeyDown() then
+	if not IsAltKeyDown() then
 		self.isScaling = true
 		self:GetParent():LockHighlight()
 		self:SetScript('OnUpdate', self.OnUpdate)
@@ -184,7 +184,7 @@ function Drag:OnClick(button)
 	if button == 'RightButton' then
 		if IsShiftKeyDown() then
 			self.parent:ToggleFrame()
-		elseif IsControlKeyDown() then
+		elseif IsAltKeyDown() then
 			if tonumber(self.parent.id) then
 				self.parent:Destroy(true)
 				return

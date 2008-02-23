@@ -48,7 +48,7 @@ L.PrintVersionDesc = 'Prints the current Bongos version'
 L.ShowConfig = '<Right Click> to configure'
 L.HideBar = '<Middle Click or Shift Right Click> to hide'
 L.ShowBar = '<Middle Click or Shift Right Click> to show'
-L.DeleteBar = '<Ctrl Right Click> to delete'
+L.DeleteBar = '<Alt Right Click> to delete'
 L.SetAlpha = '<Mousewheel> to set opacity (|cffffffff%d|r)'
 
 --Menu Stuff
