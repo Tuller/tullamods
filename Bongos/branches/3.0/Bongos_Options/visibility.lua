@@ -127,7 +127,7 @@ function Options:AddVisibilityPanel()
 	scroll:SetScript('OnShow', function() panel:LayoutButtons() end)
 	scroll:SetScript('OnHide', function() panel:LayoutButtons() end)
 	scroll:SetPoint('TOPLEFT', 6, -6)
-	scroll:SetPoint('BOTTOMRIGHT', -30, 6)
+	scroll:SetPoint('BOTTOMRIGHT', -28, 4)
 	panel.scrollFrame = scroll
 
 	--add list buttons
