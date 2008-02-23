@@ -87,14 +87,16 @@ end
 function OmniCC:HookCooldown()
 	local methods = getmetatable(CreateFrame('Cooldown', nil, nil, 'CooldownFrameTemplate')).__index
 	hooksecurefunc(methods, 'SetCooldown', function(self, start, duration)
-		self:SetAlpha(OmniCC.sets.showModel and 1 or 0)
+		if not self.noomnicc then
+			self:SetAlpha(OmniCC.sets.showModel and 1 or 0)
 
-		if start > 0 and duration > OmniCC.sets.minDuration then
-			OmniCC:StartTimer(self, start, duration)
-		else
-			local timer = timers[self]
-			if timer then
-				timer:Hide()
+			if start > 0 and duration > OmniCC.sets.minDuration then
+				OmniCC:StartTimer(self, start, duration)
+			else
+				local timer = timers[self]
+				if timer then
+					timer:Hide()
+				end
 			end
 		end
 	end)
@@ -106,12 +108,12 @@ end
 --]]
 
 function OmniCC:StartTimer(cooldown, start, duration)
-	if not showers[cooldown] then
-		self:CreateShower(cooldown)
-	end
-
 	local timer = timers[cooldown] or self:CreateTimer(cooldown)
 	if timer then
+		if not showers[cooldown] then
+			self:CreateShower(cooldown)
+		end
+	
 		timer.start = start
 		timer.duration = duration
 		timer.nextUpdate = 0
