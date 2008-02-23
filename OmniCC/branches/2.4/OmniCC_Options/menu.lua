@@ -9,7 +9,6 @@ local SML = LibStub('LibSharedMedia-2.0')
 local L = OMNICC_LOCALS
 
 function Options:Load()
-	--self:BuildBaseFrame()
 	self.name = 'OmniCC'
 
 	local display = self:AddDisplayPanel()
@@ -20,54 +19,9 @@ function Options:Load()
 
 	local color = Options:AddColorPanel()
 	color:SetPoint('BOTTOMLEFT', 10, 10)
-
-	-- fade in the frame
-	-- table.insert(UISpecialFrames, self:GetName())
-	-- UIFrameFadeIn(self, 0.2)
 	
 	InterfaceOptions_AddCategory(self) 
 end
-
--- function Options.okay()
--- end
-
--- function Options.cancel()
--- end
-
--- function Options.defaults()
--- end
-
--- function Options:BuildBaseFrame()
-	-- local name = self:GetName()
-
-	-- self:Hide()
-	-- self:SetWidth(400)
-	-- self:SetHeight(408)
-	-- self:SetPoint('CENTER')
-	-- self:EnableMouse(true)
-
-	-- self:SetBackdrop{
-		-- bgFile = 'Interface/DialogFrame/UI-DialogBox-Background',
-		-- edgeFile = 'Interface/DialogFrame/UI-DialogBox-Border',
-		-- insets = {11, 12, 12, 11},
-		-- tile = true,
-		-- tileSize = 32,
-		-- edgeSize = 32,
-	-- }
-
-	-- local header = self:CreateTexture(name .. 'Header', 'ARTWORK')
-	-- header:SetPoint('TOP', 0, 12)
-	-- header:SetWidth(256); header:SetHeight(64)
-	-- header:SetTexture('Interface/DialogFrame/UI-DialogBox-Header')
-
-	-- local title = self:CreateFontString(name .. 'Title', 'ARTWORK')
-	-- title:SetFontObject('GameFontNormal')
-	-- title:SetText(L.OptionsTitle)
-	-- title:SetPoint('TOP', header, 'TOP', 0, -14)
-
-	-- local close = CreateFrame('Button', name .. 'Close', self, 'UIPanelCloseButton')
-	-- close:SetPoint('TOPRIGHT', -5, -5)
--- end
 
 
 --[[ Panels ]]--
