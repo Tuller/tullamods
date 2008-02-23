@@ -19,7 +19,7 @@ function Config:OnInitialize()
 			buffColoring = true,
 			buffColor = {0, 1, 0},
 			debuffColor = {1, 0, 1},
-			rightClickUnit = 'player',
+--			rightClickUnit = 'player',
 		}
 	}
 	self.db = Bongos.db:RegisterNamespace('actionBar', defaults)
@@ -169,7 +169,7 @@ end
 function Config:SetRightClickUnit(unit)
 	self.db.profile.rightClickUnit = unit
 
-	for id,bar in Bongos:GetAll() do
+	for id,bar in Bongos.Bar:GetAll() do
 		if bar.SetRightClickUnit then
 			bar:SetRightClickUnit(unit)
 		end

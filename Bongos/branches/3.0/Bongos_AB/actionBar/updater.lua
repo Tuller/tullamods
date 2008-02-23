@@ -99,7 +99,7 @@ Updater:SetScript('OnUpdate', function(self, elapsed)
 	end
 end)
 Updater.nextUpdate = 1
-Updater.delay = 1
+Updater.delay = 0.025
 
 
 --[[ Update Functions ]]--

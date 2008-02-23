@@ -35,6 +35,8 @@ function ActionBar:Create(numRows, numCols, point, x, y)
 		bar:ClearAllPoints()
 		bar:SetPoint(point, UIParent, 'BOTTOMLEFT', x, y)
 		bar:SavePosition()
+
+		return bar
 	else
 		UIErrorsFrame:AddMessage('Not Enough Available Action IDs', 1, 0.2, 0.2, 1, UIERRORS_HOLD_TIME)
 	end
@@ -51,6 +53,8 @@ function ActionBar:Load(id)
 	bar:UpdateActions()
 	bar:UpdateStateDriver()
 	bar:Layout()
+
+	return bar
 end
 
 function ActionBar:OnCreate()
@@ -203,6 +207,7 @@ function ActionBar:SetNumStates(numStates)
 		self:UpdateStateDriver()
 		self:UpdateActions()
 		self:UpdateVisibility()
+		self:SetRightClickUnit(self:GetAttribute('unit2'))
 	end
 end
 
@@ -392,7 +397,6 @@ function ActionBar:GetButtons()
 	return pairs(self.buttons)
 end
 
-
 --[[ Bindings ]]--
 
 local function splitNext(sep, body)
@@ -492,6 +496,16 @@ function ActionBar:UpdateButtonBindings(index)
 		button:UpdateHotkey()
 		self:SetAttribute('_bindingset', nil)
 		SecureStateHeader_Refresh(self)
+	end
+end
+
+
+--[[ Right Click Selfcast ]]--
+
+function ActionBar:SetRightClickUnit(unit)
+	self:SetAttribute('unit2', unit)
+	for i = 2, self:NumStates() do
+		self:SetAttribute('*unit-s%ds', unit)
 	end
 end
 

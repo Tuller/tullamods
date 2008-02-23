@@ -53,7 +53,6 @@ do
 		b:SetScript('OnHide', self.OnHide)
 
 		b:SetAttribute('type', 'action')
-		b:SetAttribute('action', 1)
 		b:SetAttribute('checkselfcast', true)
 		b:SetAttribute('useparent-unit', true)
 		b:SetAttribute('useparent-statebutton', true)
