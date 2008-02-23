@@ -65,6 +65,10 @@ function ActionBar:OnDelete()
 		self.buttons[i] = nil
 	end
 	self:ReleaseAllIDs()
+	
+	self:SetAttribute('statebutton', nil)
+	self:SetAttribute('*statebutton2', nil)
+	UnregisterStateDriver(self, 'state', 0)
 end
 
 --[[ Dimensions ]]--

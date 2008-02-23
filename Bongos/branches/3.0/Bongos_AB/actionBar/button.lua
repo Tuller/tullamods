@@ -94,6 +94,9 @@ function ActionButton:Release()
 	self:Hide()
 	self:SetParent(nil)
 	self:UnregisterAllEvents()
+	self:SetAttribute('showstates', nil)
+	self.id = nil
+
 	used[self] = nil
 	unused[self] = true
 end
