@@ -25,16 +25,16 @@ function ActionBar:Create(numRows, numCols, point, x, y)
 			bar:OnCreate()
 		end
 
-		--place the bar, the point starts relative to UIParent bottom left, make it not that
-		bar:ClearAllPoints()
-		bar:SetPoint(point, UIParent, 'BOTTOMLEFT', x, y)
-		bar:SavePosition()
-
 		bar:UpdateUsedIDs()
 		bar:UpdateStates()
 		bar:UpdateActions()
 		bar:UpdateStateDriver()
 		bar:Layout()
+
+		--place the bar, the point starts relative to UIParent bottom left, make it not that
+		bar:ClearAllPoints()
+		bar:SetPoint(point, UIParent, 'BOTTOMLEFT', x, y)
+		bar:SavePosition()
 	else
 		UIErrorsFrame:AddMessage('Not Enough Available Action IDs', 1, 0.2, 0.2, 1, UIERRORS_HOLD_TIME)
 	end
@@ -150,7 +150,7 @@ function ActionBar:Layout()
 			button:Show()
 		end
 	end
-	
+
 	self:UpdateVisibility()
 end
 
@@ -373,10 +373,10 @@ end
 function ActionBar:AddButton(index)
 	local button = Action.Button:Get(self)
 	self.buttons[index] = button
-	
+
 	button.index = index
 	self:UpdateButtonBindings(index)
-	
+
 	return button
 end
 
@@ -580,11 +580,11 @@ local function StateSlider_Create(panel, state, text)
 	slider.OnShow = StateSlider_OnShow
 	slider.UpdateValue = StateSlider_UpdateValue
 	slider.state = state
-	
+
 	if text then
 		getglobal(slider:GetName() .. 'Text'):SetText(text)
 	end
-	
+
 	panel[state] = slider
 
 	return slider
@@ -593,7 +593,7 @@ end
 --stances panel
 local function AddStancesPanel(menu)
 	local class = select(2, UnitClass('player'))
-	
+
 	if class == 'PRIEST' or GetNumShapeshiftForms() > 0 then
 		local panel = menu:AddPanel('Stances')
 		if class == 'PRIEST' then
@@ -602,7 +602,7 @@ local function AddStancesPanel(menu)
 			if class == 'DRUID' then
 				StateSlider_Create(panel, '[form:2/3,stealth]', 'Prowl')
 			end
-			
+
 			panel:SetScript('OnShow', function(self)
 				local changed
 
@@ -610,7 +610,7 @@ local function AddStancesPanel(menu)
 					local state = format('[form:%d]', i)
 					local stateName = select(2, GetShapeshiftFormInfo(i))
 					local slider = self[state]
-					
+
 					if slider then
 						getglobal(slider:GetName() .. 'Text'):SetText(stateName)
 					else
@@ -620,7 +620,7 @@ local function AddStancesPanel(menu)
 						changed = true
 					end
 				end
-				
+
 				--we've added a slider, call showpanel, which resizes the frame
 				if changed then
 					self:GetParent():ShowPanel(self.name)
