@@ -62,7 +62,7 @@ do
 	UnregisterActionBars()
 	UnregisterShapeshiftBar()
 	UnregisterPetBar()
-	
+
 	ALWAYS_SHOW_MULTIBARS = nil
 	SHOW_MULTI_ACTIONBAR_1 = nil
 	SHOW_MULTI_ACTIONBAR_2 = nil

@@ -75,7 +75,7 @@ function ActionButton:Get(parent)
 	b:ShowHotkey(Config:ShowingHotkeys())
 	b:ShowMacro(Config:ShowingMacros())
 	b:UpdateEvents()
-	
+
 	used[b] = true
 
 	return b
@@ -356,7 +356,7 @@ function ActionButton:UpdateBorder(spell)
 		if UnitExists('target') then
 			if UnitIsFriend('player', 'target') then
 				if Updater:TargetHasBuff(spell) then
-					
+
 					self:GetCheckedTexture():SetVertexColor(Config:GetBuffColor())
 					return true
 				end

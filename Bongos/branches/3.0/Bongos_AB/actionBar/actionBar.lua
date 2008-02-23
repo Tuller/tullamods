@@ -30,7 +30,7 @@ function ActionBar:Load(isNewProfile)
 		else
 			maxState = 6
 		end
-		
+
 		local keybindings = {}
 		for i = 1, 12 do
 			local binding = GetBindingKey(format('CLICK BActionButton%d:LeftButton', i)) or
@@ -58,7 +58,7 @@ function ActionBar:Load(isNewProfile)
 			self.Bar:Load(id)
 		end
 	end
-	
+
 	self:RegisterEvent('PLAYER_REGEN_ENABLED', 'OnLeaveCombat')
 	self:RegisterEvent('ACTIONBAR_SLOT_CHANGED', 'OnSlotChanged')
 	self:RegisterEvent('ACTIONBAR_SHOWGRID', 'UpdateGrid')
@@ -73,7 +73,7 @@ function ActionBar:Unload()
 			bar:Destroy()
 		end
 	end
-	
+
 	self:UnregisterAllEvents()
 	self:UnregisterAllMessages()
 end

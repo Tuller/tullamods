@@ -59,7 +59,7 @@ local function Bar_CreateMenu(bar)
 	local function Cols_UpdateValue(self, value)
 		bar:Layout(GetNumShapeshiftForms() - value + 1)
 	end
-	
+
 	local function Cols_UpdateText(self, value)
 		self.valText:SetText(GetNumShapeshiftForms() - value + 1)
 	end

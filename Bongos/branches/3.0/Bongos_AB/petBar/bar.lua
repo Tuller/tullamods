@@ -59,15 +59,15 @@ local function Bar_CreateMenu(bar)
 	local panel = menu:AddLayoutPanel()
 
 	panel:CreateSpacingSlider()
-	
+
 	local function Cols_OnShow(self)
 		self:SetValue(NUM_PET_ACTION_SLOTS - (bar.sets.cols or NUM_PET_ACTION_SLOTS) + 1)
 	end
-	
+
 	local function Cols_UpdateValue(self, value)
 		bar:Layout(NUM_PET_ACTION_SLOTS - value + 1)
 	end
-	
+
 	local function Cols_UpdateText(self, value)
 		self.valText:SetText(NUM_PET_ACTION_SLOTS - value + 1)
 	end
@@ -96,7 +96,7 @@ function PetBar:Load()
 		x = 0,
 		y = 39,
 	}
-	
+
 	local bar, isNew = Bongos.Bar:Create('pet', defaults, true)
 	if isNew then
 		Bar_OnCreate(bar)
@@ -114,11 +114,11 @@ function PetBar:Load()
 	petBar:RegisterEvent('PET_BAR_UPDATE_COOLDOWN')
 	petBar:RegisterEvent('PET_BAR_SHOWGRID')
 	petBar:RegisterEvent('PET_BAR_HIDEGRID')
-	RegisterStateDriver(petBar, 'visibility', '[pet]show;hide') 
+	RegisterStateDriver(petBar, 'visibility', '[pet]show;hide')
 
 	self:RegisterMessage('KEYBOUND_ENABLED')
 	self:RegisterMessage('KEYBOUND_DISABLED')
-	
+
 	self.bar = bar
 end
 
@@ -127,7 +127,7 @@ function PetBar:Unload()
 	self:UnregisterAllMessages()
 	PetActionBarFrame:UnregisterAllEvents()
 
-	UnregisterStateDriver(PetActionBarFrame, 'visibility') 
+	UnregisterStateDriver(PetActionBarFrame, 'visibility')
 end
 
 function PetBar:KEYBOUND_ENABLED()

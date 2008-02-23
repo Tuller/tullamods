@@ -149,7 +149,7 @@ function Updater:UpdateTargetBuffs()
 end
 
 
-function Updater:UpdateFriendlyTargetBuffs()	
+function Updater:UpdateFriendlyTargetBuffs()
 	--friendly target, clear target debuffs
 	local changed = ClearTable(targetDebuffs)
 

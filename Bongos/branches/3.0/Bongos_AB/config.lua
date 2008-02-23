@@ -23,7 +23,7 @@ function Config:OnInitialize()
 		}
 	}
 	self.db = Bongos.db:RegisterNamespace('actionBar', defaults)
-	
+
 	if Bongos3ABVersion then
 		local cMajor = CURRENT_VERSION:match('(%w+)')
 		local major = Bongos3ABVersion:match('(%w+)')
@@ -76,7 +76,7 @@ end
 --show hotkeys
 function Config:ShowHotkeys(enable)
 	self.db.profile.showHotkeys = enable or false
-	
+
 	Bongos:GetModule('ActionBar').Button:ForAll('ShowHotkey', enable)
 	Bongos:GetModule('ClassBar').Button:ForAll('ShowHotkey', enable)
 	Bongos:GetModule('PetBar').Button:ForAll('ShowHotkey', enable)
@@ -168,7 +168,7 @@ end
 --right click selfcast
 function Config:SetRightClickUnit(unit)
 	self.db.profile.rightClickUnit = unit
-	
+
 	for id,bar in Bongos:GetAll() do
 		if bar.SetRightClickUnit then
 			bar:SetRightClickUnit(unit)
