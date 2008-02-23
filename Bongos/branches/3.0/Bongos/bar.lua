@@ -128,6 +128,7 @@ function BBar:Destroy(deleteSettings)
 
 	if deleteSettings then
 		Bongos:SetBarSets(self.id, nil)
+		self:ForAll('Reanchor')
 	end
 
 	unused[self.id] = self
