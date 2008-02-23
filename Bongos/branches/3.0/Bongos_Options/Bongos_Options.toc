@@ -8,3 +8,4 @@ menu.lua
 general.lua
 profiles.lua
 visibility.lua
+actionBar.lua

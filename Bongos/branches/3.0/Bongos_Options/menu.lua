@@ -1,6 +1,6 @@
 --[[
 	menu.lua
-		Code for the OmniCC options panel
+		Code for the Bongos options panel
 --]]
 
 local Bongos = LibStub('AceAddon-3.0'):GetAddon('Bongos3')
@@ -14,27 +14,13 @@ function Options:Load()
 	Bongos.Options = f
 
 	local AB = Bongos:GetModule('ActionBar')
-	if AB  then
+	if AB then
 		local f = self:New(CreateFrame('Frame', 'BongosABOptions', UIParent))
-		f.name = 'ActionBars'
+		f.name = ACTIONBARS_LABEL
 		f.parent = 'Bongos'
 		InterfaceOptions_AddCategory(f)
 		AB.Options = f
 	end
-	
-	--------------------------------------------------------------------------
-	--Actionbar Tab:
-
-	--General
-	--Enable Right Click Selfcast
-	--Selfcast Key
-
-	--Coloring					Display
-	-- x Color OOM [ ];  			x Show Empty Buttons
-	-- x Color OOR [ ]				x Show Tooltips
-	-- x Highlight Buffs and Debuffs	x Show Hotkeys
-	-- Buff Color [ ]  Debuff Color [ ]	x Show Bindings
-	-------------------------------------------------------------------------
 end
 
 
@@ -117,27 +103,103 @@ end
 
 --color selector
 do
-	local colorSelectors, colorCopier
+	local ColorSelect = Bongos:CreateWidgetClass('Button')
+	local selectors = {}
+
+	function ColorSelect:Create(name, parent, SaveColor, LoadColor)
+		local f = self:New(CreateFrame('Button', parent:GetName() .. name, parent))
+		f:SetWidth(16); f:SetHeight(16)
+		f:SetNormalTexture('Interface/ChatFrame/ChatFrameColorSwatch')
+		f.SaveColor = SaveColor
+		f.LoadColor = LoadColor
+		f.swatchFunc = function() f:SetColor(ColorPickerFrame:GetColorRGB()) end
+		f.cancelFunc = function() f:SetColor(f.r, f.g, f.b) end
+
+		local bg = f:CreateTexture(nil, 'BACKGROUND')
+		bg:SetWidth(14); bg:SetHeight(14)
+		bg:SetTexture(1, 1, 1)
+		bg:SetPoint('CENTER')
+		f.bg = bg
+
+		local text = f:CreateFontString(nil, 'ARTWORK')
+		text:SetFontObject('GameFontHighlightSmall')
+		text:SetPoint('LEFT', f, 'RIGHT')
+		text:SetText(name)
+		f.text = text
+
+		f:RegisterForDrag('LeftButton')
+		f:SetScript('OnDragStart', self.CopyColor)
+		f:SetScript('OnClick', self.OnClick)
+		f:SetScript('OnEnter', self.OnEnter)
+		f:SetScript('OnLeave', self.OnLeave)
+		f:SetScript('OnShow', self.OnShow)
+
+		--register the color selector, and create the copier if needed
+		table.insert(selectors, f)
+		return f
+	end
+
+	function ColorSelect:CopyColor()
+		local copier = self.copier or self:CreateCopier()
+		copier.bg:SetVertexColor(self:GetNormalTexture():GetVertexColor())
+		copier:Show()
+	end
+
+	function ColorSelect:PasteColor()
+		self:SetColor(self.copier.bg:GetVertexColor())
+		self.copier:Hide()
+	end
+
+	function ColorSelect:SetColor(...)
+		self:GetNormalTexture():SetVertexColor(...)
+		self:SaveColor(...)
+	end
+
+	function ColorSelect:OnClick()
+		if ColorPickerFrame:IsShown() then
+			ColorPickerFrame:Hide()
+		else
+			self.r, self.g, self.b = self:LoadColor()
+
+			UIDropDownMenuButton_OpenColorPicker(self)
+			ColorPickerFrame:SetFrameStrata('TOOLTIP')
+			ColorPickerFrame:Raise()
+		end
+	end
+	
+	function ColorSelect:OnShow()
+		local r, g, b = self:LoadColor()
+		self:GetNormalTexture():SetVertexColor(r, g, b)
+	end
+
+	function ColorSelect:OnEnter()
+		local color = NORMAL_FONT_COLOR
+		self.bg:SetVertexColor(color.r, color.g, color.b)
+	end
+
+	function ColorSelect:OnLeave()
+		local color = HIGHLIGHT_FONT_COLOR
+		self.bg:SetVertexColor(color.r, color.g, color.b)
+	end
 
 	--color copier: we use this to transfer color from one color selector to another
-	local function ColorCopier_Create()
-		local copier = CreateFrame('Frame')
-		copier:SetWidth(24); copier:SetHeight(24)
-		copier:Hide()
+	function ColorSelect:CreateCopier()
+		local f = CreateFrame('Frame')
+		f:SetWidth(24); f:SetHeight(24)
+		f:EnableMouse(true)
+		f:SetToplevel(true)
+		f:SetMovable(true)
+		f:RegisterForDrag('LeftButton')
+		f:SetFrameStrata('TOOLTIP')
+		f:Hide()
 
-		copier:EnableMouse(true)
-		copier:SetToplevel(true)
-		copier:SetMovable(true)
-		copier:RegisterForDrag('LeftButton')
-		copier:SetFrameStrata('TOOLTIP')
-
-		copier:SetScript('OnUpdate', function(self)
+		f:SetScript('OnUpdate', function(self)
 			local x, y = GetCursorPosition()
 			self:SetPoint('TOPLEFT', UIParent, 'BOTTOMLEFT', x - 8, y + 8)
 		end)
 
-		copier:SetScript('OnReceiveDrag', function(self)
-			for _,selector in pairs(colorSelectors) do
+		f:SetScript('OnReceiveDrag', function(self)
+			for _,selector in pairs(selectors) do
 				if MouseIsOver(selector, 8, -8, -8, 8) then
 					selector:PasteColor()
 					break
@@ -146,84 +208,18 @@ do
 			self:Hide()
 		end)
 
-		copier:SetScript('OnMouseUp', copier.Hide)
+		f:SetScript('OnMouseUp', f.Hide)
 
-		copier.bg = copier:CreateTexture()
-		copier.bg:SetTexture('Interface/ChatFrame/ChatFrameColorSwatch')
-		copier.bg:SetAllPoints(copier)
+		f.bg = f:CreateTexture()
+		f.bg:SetTexture('Interface/ChatFrame/ChatFrameColorSwatch')
+		f.bg:SetAllPoints(f)
 
-		return copier
+		ColorSelect.copier = f
+		return f
 	end
 
-	local function ColorSelect_CopyColor(self)
-		colorCopier = colorCopier or ColorCopier_Create()
-		colorCopier.bg:SetVertexColor(self:GetNormalTexture():GetVertexColor())
-		colorCopier:Show()
-	end
-
-	local function ColorSelect_PasteColor(self)
-		self:SetColor(colorCopier.bg:GetVertexColor())
-		colorCopier:Hide()
-	end
-
-	local function ColorSelect_SetColor(self, ...)
-		self:GetNormalTexture():SetVertexColor(...)
-		OmniCC:SetDurationColor(self.duration, ...)
-	end
-
-	local function ColorSelect_OnClick(self)
-		if ColorPickerFrame:IsShown() then
-			ColorPickerFrame:Hide()
-		else
-			self.r, self.g, self.b = OmniCC:GetDurationFormat(self:GetParent().duration)
-
-			UIDropDownMenuButton_OpenColorPicker(self)
-			ColorPickerFrame:SetFrameStrata('TOOLTIP')
-			ColorPickerFrame:Raise()
-		end
-	end
-
-	local function ColorSelect_OnEnter(self)
-		local color = NORMAL_FONT_COLOR
-		self.bg:SetVertexColor(color.r, color.g, color.b)
-	end
-
-	local function ColorSelect_OnLeave(self)
-		local color = HIGHLIGHT_FONT_COLOR
-		self.bg:SetVertexColor(color.r, color.g, color.b)
-	end
-
-	function Options:CreateColorSelector(name, parent, duration)
-		local frame = CreateFrame('Button', parent:GetName() .. name, parent)
-		frame:SetWidth(16); frame:SetHeight(16)
-		frame:SetNormalTexture('Interface/ChatFrame/ChatFrameColorSwatch')
-		frame.duration = duration
-
-		local bg = frame:CreateTexture(nil, 'BACKGROUND')
-		bg:SetWidth(14); bg:SetHeight(14)
-		bg:SetTexture(1, 1, 1)
-		bg:SetPoint('CENTER')
-		frame.bg = bg
-
-		frame.SetColor = ColorSelect_SetColor
-		frame.PasteColor = ColorSelect_PasteColor
-		frame.swatchFunc = function() frame:SetColor(ColorPickerFrame:GetColorRGB()) end
-		frame.cancelFunc = function() frame:SetColor(frame.r, frame.g, frame.b) end
-
-		frame:RegisterForDrag('LeftButton')
-		frame:SetScript('OnDragStart', ColorSelect_CopyColor)
-		frame:SetScript('OnClick', ColorSelect_OnClick)
-		frame:SetScript('OnEnter', ColorSelect_OnEnter)
-		frame:SetScript('OnLeave', ColorSelect_OnLeave)
-
-		--register the color selector, and create the copier if needed
-		if colorSelectors then
-			table.insert(colorSelectors, frame)
-		else
-			colorSelectors = {frame}
-		end
-
-		return frame
+	function Options:CreateColorSelector(name, parent, SaveColor, LoadColor)
+		return ColorSelect:Create(name, parent, SaveColor, LoadColor)
 	end
 end
 
