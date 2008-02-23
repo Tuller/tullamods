@@ -4,6 +4,8 @@
 
 local Bongos = LibStub('AceAddon-3.0'):GetAddon('Bongos3')
 local Action = Bongos:GetModule('ActionBar')
+local Config = Bongos:GetModule('ActionBar-Config')
+local L = LibStub('AceLocale-3.0'):GetLocale('Bongos3-AB')
 
 local ActionBar = Bongos:CreateWidgetClass('Frame', Bongos.Bar)
 Action.Bar = ActionBar
@@ -165,7 +167,7 @@ end
 function ActionBar:UpdateVisibility()
 	local changed = false
 	for _,button in self:GetButtons() do
-		if button:UpdateVisibility() then
+		if button:UpdateShowStates() then
 			changed = true
 		end
 	end
@@ -180,7 +182,7 @@ end
 
 function ActionBar:UpdateGrid()
 	for _,button in self:GetButtons() do
-		button:UpdateGrid()
+		button:UpdateShown()
 	end
 end
 
@@ -238,38 +240,12 @@ end
 
 --needs to be called whenever we change a state condition
 --or when we change the number of available states
-local stateConditions
 function ActionBar:UpdateStateDriver()
-	if not stateConditions then
-		stateConditions = {}
-
-		--modifiers
-		table.insert(stateConditions, '[mod:ctrl]')
-		table.insert(stateConditions, '[mod:alt]')
-		table.insert(stateConditions, '[mod:shift]')
-
-		--pages
-		for i = 2, 6 do
-			table.insert(stateConditions, format('[bar:%d]', i))
-		end
-
-		--forms
-		table.insert(stateConditions, '[form:2/3,stealth]')
-
-		for i = 1, 7 do
-			table.insert(stateConditions, format('[form:%d]', i))
-		end
-
-		--help harm targeting
-		table.insert(stateConditions, '[help]')
-		table.insert(stateConditions, '[harm]')
-	end
-
 	UnregisterStateDriver(self, 'state', 0)
 
 	local header = ''
 	local maxState = self:NumStates()
-	for _,condition in ipairs(stateConditions) do
+	for _,condition in ipairs(Config:GetStateConditions()) do
 		local state = self:GetConditionState(condition)
 		if state and state <= maxState then
 			header = header .. condition .. state .. ';'
@@ -531,7 +507,7 @@ local function AddLayoutPanel(menu)
 		cols:SetMinMaxValues(1, floor(freeIDs / maxCols) + bar:GetCols())
 	end
 
-	states = panel:CreateSlider('States', 1, 1, 1)
+	states = panel:CreateSlider(L.States, 1, 1, 1)
 	function states:UpdateValue(value)
 		local bar = Bongos.Bar:Get(self:GetParent().id)
 		bar:SetNumStates(value)
@@ -546,7 +522,7 @@ local function AddLayoutPanel(menu)
 		self:SetValue(bar:NumStates())
 	end
 
-	cols = panel:CreateSlider('Columns', 1, 1, 1)
+	cols = panel:CreateSlider(L.Columns, 1, 1, 1)
 	function cols:UpdateValue(value)
 		local bar = Bongos.Bar:Get(self:GetParent().id)
 		bar:SetSize(bar:GetRows(), value)
@@ -561,7 +537,7 @@ local function AddLayoutPanel(menu)
 		self:SetValue(bar:GetCols())
 	end
 
-	rows = panel:CreateSlider('Rows', 1, 1, 1)
+	rows = panel:CreateSlider(L.Rows, 1, 1, 1)
 	function rows:UpdateValue(value)
 		local bar = Bongos.Bar:Get(self:GetParent().id)
 		bar:SetSize(value, bar:GetCols())
@@ -613,12 +589,12 @@ local function AddStancesPanel(menu)
 	local class = select(2, UnitClass('player'))
 
 	if class == 'PRIEST' or GetNumShapeshiftForms() > 0 then
-		local panel = menu:AddPanel('Stances')
+		local panel = menu:AddPanel(L.Stances)
 		if class == 'PRIEST' then
-			StateSlider_Create(panel, '[form:1]', 'Shadow Form')
+			StateSlider_Create(panel, '[form:1]', L.ShadowForm)
 		else
 			if class == 'DRUID' then
-				StateSlider_Create(panel, '[form:2/3,stealth]', 'Prowl')
+				StateSlider_Create(panel, '[form:2/3,stealth]', L.Prowl)
 			end
 
 			panel:SetScript('OnShow', function(self)
@@ -650,24 +626,24 @@ end
 
 --modifier panel
 local function AddModifierPanel(menu)
-	local panel = menu:AddPanel('Modifier')
-	StateSlider_Create(panel, '[mod:shift]', 'Shift')
-	StateSlider_Create(panel, '[mod:ctrl]', 'Ctrl')
-	StateSlider_Create(panel, '[mod:alt]', 'Alt')
+	local panel = menu:AddPanel(L.Modifier)
+	StateSlider_Create(panel, '[mod:shift]', SHIFT_KEY)
+	StateSlider_Create(panel, '[mod:ctrl]', CTRL_KEY)
+	StateSlider_Create(panel, '[mod:alt]', ALT_KEY)
 end
 
 --targeting
 local function AddTargetingPanel(menu)
-	local panel = menu:AddPanel('Targeting')
-	StateSlider_Create(panel, '[help]', 'Friendly Target')
-	StateSlider_Create(panel, '[harm]', 'Enemy Target')
+	local panel = menu:AddPanel(L.Targeting)
+	StateSlider_Create(panel, '[help]', L.FriendlyTarget)
+	StateSlider_Create(panel, '[harm]', L.EnemyTarget)
 end
 
 --paging
 local function AddPagingPanel(menu)
-	local panel = menu:AddPanel('Paging')
+	local panel = menu:AddPanel(L.Paging)
 	for i = 6, 2, -1 do
-		StateSlider_Create(panel, format('[bar:%d]', i), format('Page %d', i))
+		StateSlider_Create(panel, format('[bar:%d]', i), format(L.Page, i))
 	end
 end
 

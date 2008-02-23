@@ -232,6 +232,10 @@ function ActionButton:OnEnter()
 	KeyBound:Set(self)
 end
 
+function ActionButton:UpdateTooltip()
+	GameTooltip:SetAction(self:GetPagedID())
+end
+
 function ActionButton:OnLeave()
 	GameTooltip:Hide()
 end
@@ -251,7 +255,7 @@ function ActionButton:OnHide()
 end
 
 
---[[ Update Code ]]--
+--[[ Updating ]]--
 
 --Updates the icon, count, cooldown, usability color, if the button is flashing, if the button is equipped,  and macro text.
 function ActionButton:Update(refresh)
@@ -327,15 +331,18 @@ function ActionButton:UpdateUsable()
 
 	local isUsable, notEnoughMana = IsUsableAction(action)
 	if isUsable then
+		--out of range
 		if IsActionInRange(action) == 0 and Config:ColorOOR() then
 			icon:SetVertexColor(Config:GetOORColor())
+		--in range
 		else
 			icon:SetVertexColor(1, 1, 1)
 		end
+	--no mana
 	elseif notEnoughMana and Config:ColorOOM() then
 		icon:SetVertexColor(Config:GetOOMColor())
+	--unusable
 	else
-		--Skill unusable
 		icon:SetVertexColor(0.3, 0.3, 0.3)
 	end
 end
@@ -402,14 +409,10 @@ function ActionButton:StopFlash()
 	self:UpdateState()
 end
 
-function ActionButton:UpdateTooltip()
-	GameTooltip:SetAction(self:GetPagedID())
-end
-
-
+--visibility
 --update button showstates based on what state actionIDs actually have actions
 --returns true if the showstates have changed, false otherwise
-function ActionButton:UpdateVisibility()
+function ActionButton:UpdateShowStates()
 	local newStates
 
 	if self:ShowingEmpty() then
@@ -440,7 +443,7 @@ function ActionButton:UpdateVisibility()
 end
 
 --show empty buttons
-function ActionButton:UpdateGrid()
+function ActionButton:UpdateShown()
 	if self:ShowingEmpty() or HasAction(self:GetPagedID()) then
 		self:Show()
 	else
@@ -448,7 +451,11 @@ function ActionButton:UpdateGrid()
 	end
 end
 
---bindings
+function ActionButton:ShowingEmpty()
+	return self.showEmpty or KeyBound:IsShown() or Config:ShowingEmptyButtons()
+end
+
+--binding display
 function ActionButton:ShowHotkey(enable)
 	local hotkey = self.hotkey
 	if enable then
@@ -468,56 +475,7 @@ function ActionButton:GetHotkey()
 	return bindings and KeyBound:ToShortKey(string.split(';', bindings))
 end
 
---macro
-function ActionButton:ShowMacro(enable)
-	local macro = self.macro
-	if enable then
-		macro:Show()
-	else
-		macro:Hide()
-	end
-end
-
---border coloring
-function ActionButton:UpdateEquippedColor()
-	self.border:SetVertexColor(Config:GetEquippedColor())
-end
-
-
---[[ Utility Functions ]]--
-
-function ActionButton:UpdateSpellID()
-	local type, arg1, arg2 = GetActionInfo(self:GetPagedID())
-
-	self.type = type
-	if type == 'spell' then
-		if arg1 and arg2 then
-			--invalid spell slot check
-			if arg1 > 0 then
-				self.spellID = GetSpellName(arg1, arg2)
-			end
-		else
-			self.spellID = nil
-		end
-	elseif type == 'item' then
-		self.spellID = GetItemSpell(arg1)
-	else
-		self.spellID = arg1
-	end
-end
-
-function ActionButton:GetPagedID(refresh)
-	if refresh or not self.id then
-		self.id = SecureButton_GetModifiedAttribute(self, 'action', SecureStateChild_GetEffectiveButton(self))
-		self:UpdateSpellID()
-	end
-	return self.id or 0
-end
-
-function ActionButton:ShowingEmpty()
-	return self.showEmpty or KeyBound:IsShown() or Config:ShowingEmptyButtons()
-end
-
+--binding updating
 function ActionButton:SetKey(key)
 	self:GetParent():AddBinding(self.index, key)
 end
@@ -550,16 +508,61 @@ function ActionButton:GetActionName()
 	return format('ActionBar%s Button%d', self:GetParent().id, self.index)
 end
 
+--border coloring
+function ActionButton:UpdateEquippedColor()
+	self.border:SetVertexColor(Config:GetEquippedColor())
+end
+
+--macro
+function ActionButton:ShowMacro(enable)
+	local macro = self.macro
+	if enable then
+		macro:Show()
+	else
+		macro:Hide()
+	end
+end
+
+
+--action updating
+function ActionButton:UpdateSpellID()
+	local type, arg1, arg2 = GetActionInfo(self:GetPagedID())
+
+	self.type = type
+	if type == 'spell' then
+		if arg1 and arg2 and arg1 > 0 then
+			self.spellID = GetSpellName(arg1, arg2)
+		else
+			self.spellID = nil
+		end
+	elseif type == 'item' then
+		self.spellID = GetItemSpell(arg1)
+	else
+		self.spellID = arg1
+	end
+end
+
+function ActionButton:GetPagedID(refresh)
+	if refresh or not self.id then
+		self.id = SecureButton_GetModifiedAttribute(self, 'action', SecureStateChild_GetEffectiveButton(self))
+		self:UpdateSpellID()
+	end
+	return self.id or 0
+end
+
+
+--[[ Utility Functions ]]--
+
 function ActionButton:ForAll(method, ...)
-	for button in pairs(used) do
+	for button in self:GetAll() do
 		button[method](button, ...)
 	end
 end
 
-function ActionButton:GetUpdatable()
-	return pairs(updatable)
-end
-
 function ActionButton:GetAll()
 	return pairs(used)
+end
+
+function ActionButton:GetUpdatable()
+	return pairs(updatable)
 end

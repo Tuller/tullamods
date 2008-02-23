@@ -11,15 +11,15 @@ L.Columns = 'Columns'
 L.Vertical = 'Vertical'
 L.OneBag = 'One Bag'
 L.ShowKeyring = 'Show Keyring'
-L.BagBar = 'Bag Bar'
-L.ActionBar = 'Action Bar %s'
 L.Paging = 'Paging'
 L.Stances = 'Stances'
 L.Page = 'Page %s'
-L.FriendlyStance = 'Friendly Target'
+L.FriendlyTarget = 'Friendly Target'
+L.EnemyTarget = 'Enemy Target'
 L.Modifier = 'Modifier'
 L.Prowl = 'Prowl'
 L.ShadowForm = 'Shadowform/Redemption'
+L.States = 'States'
 
 
 --Options Menu Stuff
