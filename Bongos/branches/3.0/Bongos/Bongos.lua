@@ -56,9 +56,9 @@ function Bongos:OnInitialize()
 	self.lockBG = self:CreateLockBG()
 	self:RegisterSlashCommands()
 	
-	--create the options menu thingy
-	self.Options = CreateFrame('Frame', 'BongosOptions', InterfaceOptionsFrame)
-	self.Options:SetScript('OnShow', function(self)
+	--create a loader for the options menu
+	local f = CreateFrame('Frame', nil, InterfaceOptionsFrame)
+	f:SetScript('OnShow', function(self)
 		self:SetScript('OnShow', nil)
 		LoadAddOn('Bongos_Options')
 	end)
