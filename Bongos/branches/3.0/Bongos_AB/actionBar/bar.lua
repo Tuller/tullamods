@@ -9,6 +9,7 @@ local L = LibStub('AceLocale-3.0'):GetLocale('Bongos3-AB')
 
 local ActionBar = Bongos:CreateWidgetClass('Frame', Bongos.Bar)
 Action.Bar = ActionBar
+local bars = {}
 
 function ActionBar:Create(numRows, numCols, point, x, y)
 	if numRows * numCols <= self:NumFreeIDs() then
@@ -18,12 +19,7 @@ function ActionBar:Create(numRows, numCols, point, x, y)
 			id = id + 1
 		end
 
-		local defaults = {
-			rows = numRows,
-			cols = numCols,
-		}
-
-		local bar, isNew = self.super.Create(self, id, defaults, true)
+		local bar, isNew = self.super.Create(self, id, {rows = numRows, cols = numCols}, true)
 		if isNew then
 			bar:OnCreate()
 		end
@@ -38,6 +34,7 @@ function ActionBar:Create(numRows, numCols, point, x, y)
 		bar:ClearAllPoints()
 		bar:SetPoint(point, UIParent, 'BOTTOMLEFT', x, y)
 		bar:SavePosition()
+		bars[id] = bar
 
 		return bar
 	else
@@ -56,6 +53,7 @@ function ActionBar:Load(id)
 	bar:UpdateActions()
 	bar:UpdateStateDriver()
 	bar:Layout()
+	bars[id] = bar
 
 	return bar
 end
@@ -76,6 +74,8 @@ function ActionBar:OnDelete()
 	self:SetAttribute('statebutton', nil)
 	self:SetAttribute('*statebutton2', nil)
 	UnregisterStateDriver(self, 'state', 0)
+	
+	bars[self.id] = nil
 end
 
 --[[ Dimensions ]]--
@@ -162,10 +162,10 @@ function ActionBar:Layout()
 		end
 	end
 
-	self:UpdateVisibility()
+	self:UpdateShowStates()
 end
 
-function ActionBar:UpdateVisibility()
+function ActionBar:UpdateShowStates()
 	local changed = false
 	for _,button in self:GetButtons() do
 		if button:UpdateShowStates() then
@@ -176,12 +176,12 @@ function ActionBar:UpdateVisibility()
 	if changed then
 		SecureStateHeader_Refresh(self)
 		if not InCombatLockdown() then
-			self:UpdateGrid()
+			self:UpdateShowEmpty()
 		end
 	end
 end
 
-function ActionBar:UpdateGrid()
+function ActionBar:UpdateShowEmpty()
 	for _,button in self:GetButtons() do
 		button:UpdateShown()
 	end
@@ -189,10 +189,7 @@ end
 
 function ActionBar:UpdateAction(id)
 	for _,button in self:GetButtons() do
-		if button:GetPagedID() == id then
-			button:Update()
-			button:UpdateSpellID()
-		end
+		button:UpdateAction(id)
 	end
 end
 
@@ -275,7 +272,28 @@ function ActionBar:GetConditionSet(condition)
 end
 
 
---[[ ID Grabbing ]]--
+--[[ Button Creation ]]--
+
+function ActionBar:AddButton(index)
+	local button = Action.Button:Get(self)
+	self.buttons[index] = button
+
+	button.index = index
+	self:UpdateButtonBindings(index)
+
+	return button
+end
+
+function ActionBar:GetButton(index)
+	return self.buttons[index]
+end
+
+function ActionBar:GetButtons()
+	return pairs(self.buttons)
+end
+
+
+--[[ ID Updating ]]--
 
 function ActionBar:LoadIDs()
 	if self.sets.ids then
@@ -317,6 +335,9 @@ function ActionBar:ReleaseAllIDs()
 	self:SortAvailableIDs()
 end
 
+
+--[[ Action ID Stack Stuff ]]--
+
 do
 	local freeActions = {}
 	for i = 1, 120 do
@@ -354,32 +375,12 @@ do
 end
 
 
---[[ Button Creation ]]--
-
-function ActionBar:AddButton(index)
-	local button = Action.Button:Get(self)
-	self.buttons[index] = button
-
-	button.index = index
-	self:UpdateButtonBindings(index)
-
-	return button
-end
-
-function ActionBar:GetButton(index)
-	return self.buttons and self.buttons[index]
-end
-
-function ActionBar:GetButtons()
-	return pairs(self.buttons)
-end
-
 --[[ Bindings ]]--
 
 local function splitNext(sep, body)
-    if (body) then
+    if body then
         local pre, post = strsplit(sep, body, 2);
-        if (post) then
+        if post then
             return post, pre;
         end
         return false, body;
@@ -659,4 +660,21 @@ function ActionBar:CreateMenu()
 	AddPagingPanel(menu)
 
 	return menu
+end
+
+
+--[[ Utility Functions ]]--
+
+function ActionBar:ForAll(method, ...)
+	for _,bar in pairs(bars) do
+		bar[method](bar, ...)
+	end
+end
+
+function ActionBar:ForAllShown(method, ...)
+	for _,bar in pairs(bars) do
+		if bar:IsShown() then
+			bar[method](bar, ...)
+		end
+	end
 end

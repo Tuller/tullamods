@@ -41,19 +41,15 @@ function ActionBar:Load(isNewProfile)
 
 	self:RegisterEvent('PLAYER_REGEN_ENABLED', 'OnLeaveCombat')
 	self:RegisterEvent('ACTIONBAR_SLOT_CHANGED', 'OnSlotChanged')
-	self:RegisterEvent('ACTIONBAR_SHOWGRID', 'UpdateGrid')
-	self:RegisterEvent('ACTIONBAR_HIDEGRID', 'UpdateGrid')
-	self:RegisterMessage('KEYBOUND_ENABLED', 'UpdateVisibility')
-	self:RegisterMessage('KEYBOUND_DISABLED', 'UpdateVisibility')
+	self:RegisterEvent('ACTIONBAR_SHOWGRID', 'OnShowGrid')
+	self:RegisterEvent('ACTIONBAR_HIDEGRID', 'OnShowGrid')
+
+	self:RegisterMessage('KEYBOUND_ENABLED', 'UpdateGrid')
+	self:RegisterMessage('KEYBOUND_DISABLED', 'UpdateGrid')
 end
 
 function ActionBar:Unload()
-	for id,bar in Bongos.Bar:GetAll() do
-		if tonumber(id) then
-			bar:Destroy()
-		end
-	end
-
+	self.Bar:ForAll('Destroy')
 	self:UnregisterAllEvents()
 	self:UnregisterAllMessages()
 end
@@ -110,11 +106,11 @@ end
 
 function ActionBar:OnLeaveCombat()
 	if self.needsVisUpdate then
-		self:UpdateVisibility()
+		self:UpdateShowStates()
 	end
 
 	if self.needsGridUpdate then
-		self:UpdateGridVisibility()
+		self:UpdateGrid()
 	end
 end
 
@@ -122,46 +118,35 @@ function ActionBar:OnSlotChanged(event, id)
 	local hadAction = actions[id]
 	if HasAction(id) ~= hadAction then
 		actions[id] = HasAction(id)
-		self:UpdateVisibility()
+		self:UpdateShowStates()
 	end
-
-	for id,bar in self.Bar:GetAll() do
-		if tonumber(id) and bar:IsShown() then
-			bar:UpdateAction(id)
-		end
-	end
+	self.Bar:ForAllShown('UpdateAction', id)
 end
 
-function ActionBar:UpdateGrid(event)
+function ActionBar:OnShowGrid(event)
 	self.Button.showEmpty = (event == 'ACTIONBAR_SHOWGRID')
-	self:UpdateGridVisibility()
+	self:UpdateGrid()
 end
 
---updates the showstates of every button on every bar
-function ActionBar:UpdateVisibility()
-	if InCombatLockdown() then
-		self.needsVisUpdate = true
-	else
-		self.needsVisUpdate = nil
 
-		for id,bar in self.Bar:GetAll() do
-			if tonumber(id) and bar:IsShown() then
-				bar:UpdateVisibility()
-			end
-		end
-	end
-end
+--[[ Update Functions ]]--
 
-function ActionBar:UpdateGridVisibility()
+--shows/hides buttons based on if we're in keybinding/showgrid mode
+function ActionBar:UpdateGrid()
 	if InCombatLockdown() then
 		self.needsGridUpdate = true
 	else
 		self.needsGridUpdate = nil
+		self.Bar:ForAllShown('UpdateShowEmpty')
+	end
+end
 
-		for id,bar in self.Bar:GetAll() do
-			if tonumber(id) and bar:IsShown() then
-				bar:UpdateGrid()
-			end
-		end
+--updates the showstates of every button on every bar
+function ActionBar:UpdateShowStates()
+	if InCombatLockdown() then
+		self.needsVisUpdate = true
+	else
+		self.needsVisUpdate = nil
+		self.Bar:ForAllShown('UpdateShowStates')
 	end
 end

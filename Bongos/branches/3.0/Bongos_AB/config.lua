@@ -67,7 +67,7 @@ end
 --show empty buttons
 function Config:ShowEmptyButtons(enable)
 	self.db.profile.showEmpty = enable or false
-	Bongos:GetModule('ActionBar'):UpdateVisibility()
+	Bongos:GetModule('ActionBar'):UpdateShowStates()
 end
 
 function Config:ShowingEmptyButtons()

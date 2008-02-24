@@ -44,10 +44,6 @@ do
 		b:SetScript('OnLeave', self.OnLeave)
 		b:SetScript('OnEnter', self.OnEnter)
 		b:SetScript('OnEvent', self.OnEvent)
-
-		b:SetScript('OnShow', self.OnShow)
-		b:SetScript('OnHide', self.OnHide)
-
 		b:SetScript('OnShow', self.OnShow)
 		b:SetScript('OnHide', self.OnHide)
 
@@ -539,6 +535,13 @@ function ActionButton:UpdateSpellID()
 		self.spellID = GetItemSpell(arg1)
 	else
 		self.spellID = arg1
+	end
+end
+
+function ActionButton:UpdateAction(id)
+	if self:GetPagedID() == id then
+		self:Update()
+		self:UpdateSpellID()
 	end
 end
 
