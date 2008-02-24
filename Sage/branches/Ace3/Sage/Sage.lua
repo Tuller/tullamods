@@ -96,6 +96,7 @@ function Sage:RegisterEvents()
 
 	self:RegisterEvent('UNIT_HEALTH', 'UpdateHealth')
 	self:RegisterEvent('UNIT_MAXHEALTH', 'UpdateHealth')
+	self:RegisterEvent('UNIT_HAPPINESS')
 
 	self:RegisterEvent('UNIT_MANA', 'UpdateMana')
 	self:RegisterEvent('UNIT_RAGE', 'UpdateMana')
@@ -140,6 +141,10 @@ function Sage:UpdateHealth(event, ...)
 	if self:ShowingPercents() then
 		SageInfo:OnHealthEvent(...)
 	end
+end
+
+function Sage:UNIT_HAPPINESS()
+	SageHealth:OnHappyEvent()
 end
 
 function Sage:UpdateMana(event, ...)

@@ -17,34 +17,48 @@ local L = SAGE_LOCALS
 
 --update's the bar's color based on how much health the bar's parent unit has
 local function Bar_UpdateHealthColor(self, value)
-	if not value then return end
+	if UnitIsPlayer(self.id) and UnitClass(self.id) then
+		local class = select(2, UnitClass(self.id))
+		local r = RAID_CLASS_COLORS[class].r
+		local g = RAID_CLASS_COLORS[class].g
+		local b = RAID_CLASS_COLORS[class].b
 
-	local r, g
-	local min, max = self:GetMinMaxValues()
-
-	if (value < min) or (value > max) then
-		return
-	end
-
-	if max - min > 0 then
-		value = (value - min) / (max - min)
+		self:SetStatusBarColor(r, g, b)
+	elseif self.id == 'pet' and select(2, HasPetUI()) then
+		local happiness = GetPetHappiness()
+		if happiness == 1 then
+			self:SetStatusBarColor(0.9, 0, 0)
+		elseif happiness == 2 then
+			self:SetStatusBarColor(0.9, 0.9, 0)
+		else
+			self:SetStatusBarColor(0, 0.9, 0)
+		end
 	else
-		value = 0
+		if not value then return end
+
+		local r, g
+		local min, max = self:GetMinMaxValues()
+
+		if (value < min) or (value > max) then
+			return
+		end
+
+		if max - min > 0 then
+			value = (value - min) / (max - min)
+		else
+			value = 0
+		end
+
+		if value > 0.5 then
+			r = (1.0 - value) * 2
+			g = 1.0
+		else
+			r = 1.0
+			g = value * 2
+		end
+
+		self:SetStatusBarColor(r, g, 0)
 	end
-
-	if value > 0.5 then
-		r = (1.0 - value) * 2
-		g = 1.0
-	else
-		r = 1.0
-		g = value * 2
-	end
-
-	self:SetStatusBarColor(r, g, 0)
-end
-
-function HealthBar_OnValueChanged(value)
-	Bar_UpdateHealthColor(this, value)
 end
 
 
@@ -126,7 +140,7 @@ function SageHealth:Create(parent, id)
 	bar:SetStatusBarColor(0, 1, 0)
 	bar.bg:SetVertexColor(0.6, 0, 0, 0.6)
 
-	bar:SetScript('OnValueChanged', Bar_OnValueChanged)
+	bar:SetScript('OnValueChanged', Bar_UpdateHealthColor)
 	bar:SetScript('OnShow', Bar_OnShow)
 	bar:UpdateAll()
 	bar:UpdateTexture()
@@ -210,12 +224,18 @@ function SageHealth:UpdateText()
 				text:SetText(value)
 			end
 		elseif(mode == 2) then
-			if(value == max) then
+			if value == max then
 				text:SetText('')
-			elseif(UnitIsFriend(unit, 'player')) then
-				text:SetText(value - max)
 			else
-				text:SetText(value)
+				if UnitIsFriend(unit, 'player') then
+					value = value - max
+				end
+
+				if value > -1000 then
+					text:SetText(value)
+				else
+					text:SetFormattedText('%.1fk', value/1000)
+				end
 			end
 		end
 		text:Show()
@@ -252,5 +272,12 @@ function SageHealth:OnBuffEvent(unit)
 	local bar = self:Get(unit)
 	if bar and bar:IsVisible() then
 		bar:UpdateDebuff()
+	end
+end
+
+function SageHealth:OnHappyEvent()
+	local bar = self:Get('pet')
+	if bar and bar:IsVisible() then
+		bar:UpdateHealthColor(GetUnitHealth('pet'))
 	end
 end

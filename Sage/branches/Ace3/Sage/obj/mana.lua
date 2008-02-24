@@ -64,7 +64,7 @@ function SageMana:UpdateText()
 		else
 			if(entered or mode == 3) then
 				if(Sage:ShowingMaxValues()) then
-					text:SetText(format('%d / %d', value, max))
+					text:SetFormattedText('%d / %d', value, max)
 				else
 					text:SetText(value)
 				end
@@ -74,7 +74,11 @@ function SageMana:UpdateText()
 				elseif(UnitPowerType(unit) ~= 1 and value == max) then
 					text:SetText('')
 				else
-					text:SetText(value)
+					if value < 1000 then
+						text:SetText(value)
+					else
+						text:SetFormattedText('%.1fk', value / 1000)
+					end
 				end
 			end
 		end

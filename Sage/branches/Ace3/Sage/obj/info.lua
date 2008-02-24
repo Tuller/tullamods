@@ -154,11 +154,12 @@ function SageInfo:UpdateNameColor()
 			g = UnitReactionColor[4].g
 			b = UnitReactionColor[4].b
 		-- elseif UnitIsPVP(unit) then
-			--friendly flagged players
+			-- friendly flagged players
 			-- r = UnitReactionColor[6].r
 			-- g = UnitReactionColor[6].g
 			-- b = UnitReactionColor[6].b
 		else
+			--r = 1; g = 1; b = 1
 			--update the player's name color based on their class
 			local class = select(2, UnitClass(unit))
 			if class then
