@@ -134,6 +134,15 @@ function Options:AddColorPanel()
 		Config:SetOOMColor(r, g, b)
 	end
 	oomColor:SetPoint('TOP', colorOOM, 'BOTTOM', 12, 0)
+	
+	local equipColor = self:CreateColorSelector(L.EquipColor, panel)
+	equipColor.LoadColor = function(self)
+		return Config:GetEquippedColor()
+	end
+	equipColor.SaveColor = function(self, r, g, b)
+		Config:SetEquippedColor(r, g, b)
+	end
+	equipColor:SetPoint('TOP', oomColor, 'BOTTOM', -12, 0)
 
 	--buff and debuff coloring
 	local highlightBuffs = self:CreateCheckButton(L.HighlightBuffs, panel)
@@ -143,7 +152,7 @@ function Options:AddColorPanel()
 	highlightBuffs:SetScript('OnClick', function(self)
 		Config:SetHighlightBuffs(self:GetChecked())
 	end)
-	highlightBuffs:SetPoint('TOPRIGHT', 198, -8)
+	highlightBuffs:SetPoint('TOPLEFT', 198, -8)
 
 	local buffColor = self:CreateColorSelector(L.BuffColor, panel)
 	buffColor.LoadColor = function(self)
