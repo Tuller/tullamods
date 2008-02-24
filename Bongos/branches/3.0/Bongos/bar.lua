@@ -474,6 +474,7 @@ function BBar:AnchorMenu(menu)
 	menu:ClearAllPoints()
 	menu:SetPoint('TOPRIGHT', UIParent, 'BOTTOMLEFT', x, y)
 	menu:Show()
+	menu:Raise()
 end
 
 
