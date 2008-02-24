@@ -650,7 +650,7 @@ end
 
 function ActionBar:CreateMenu()
 	local menu = Bongos.Menu:Create(self.id)
-	rawset(self, 'menu', menu)
+	ActionBar.menu = menu
 
 	AddLayoutPanel(menu)
 	AddStancesPanel(menu)
