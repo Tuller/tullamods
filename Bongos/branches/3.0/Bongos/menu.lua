@@ -190,7 +190,7 @@ function Panel:CreateCheckButton(name)
 	else
 		button:SetPoint('TOPLEFT', 0, 2)
 	end
-	self.height = self.height + 28
+	self.height = self.height + 30
 	self.checkbutton = button
 
 	return button
