@@ -14,7 +14,7 @@ function ActionBar:Load(isNewProfile)
 	if isNewProfile then
 		local defaults = {point = 'BOTTOM', rows = 1, cols = 12}
 	
-		defaults.ids, defaults.states, defaults.numSets = self:GetDefaultActions(select(2, UnitClass('player'))
+		defaults.ids, defaults.setMap, defaults.numSets = self:GetDefaultActions(select(2, UnitClass('player')))
 
 		--load keybinding from old bongos versions & the default ui
 		local bindings = {}
@@ -59,9 +59,9 @@ function ActionBar:Unload()
 end
 
 function ActionBar:GetDefaultActions(class)
+	local header
 	if class == 'DRUID' then
-		header['[form:1]'] = 3
-		header['[form:3]'] = 2
+		header = {['[form:1]'] = 3, ['[form:3]'] = 2}
 
 		--bar 1 (caster)
 		buttons = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
@@ -76,8 +76,7 @@ function ActionBar:GetDefaultActions(class)
 			table.insert(buttons, i)
 		end
 	elseif class == 'WARRIOR' then
-		header['[form:2]'] = 2
-		header['[form:3]'] = 3
+		header = {['[form:2]'] = 2, ['[form:3]'] = 3}
 
 		--bars 7-9 (battle, defensive, berserker)
 		buttons = {}
@@ -85,7 +84,7 @@ function ActionBar:GetDefaultActions(class)
 			table.insert(buttons, i)
 		end
 	elseif class == 'ROGUE' or class == 'PRIEST' then
-		header['[form:1]'] = 2
+		header = {['[form:1]'] = 2}
 
 		--bar 1 (normal)
 		buttons = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}

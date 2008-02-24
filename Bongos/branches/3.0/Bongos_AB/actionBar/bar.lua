@@ -22,6 +22,7 @@ function ActionBar:Create(numRows, numCols, point, x, y)
 			rows = numRows,
 			cols = numCols,
 		}
+
 		local bar, isNew = self.super.Create(self, id, defaults, true)
 		if isNew then
 			bar:OnCreate()
