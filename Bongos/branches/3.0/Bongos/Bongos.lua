@@ -394,7 +394,7 @@ function Bongos:PrintHelp(cmd)
 	end
 
 	self:Print('Commands (/bongos, /bob, or /bgs)')
-	PrintCmd('lock', L.LockBarsDesc)
+	PrintCmd('config', L.ConfigDesc)
 	PrintCmd('sticky', L.StickyBarsDesc)
 	PrintCmd('scale <barList> <scale>', L.SetScaleDesc)
 	PrintCmd('setalpha <barList> <opacity>', L.SetAlphaDesc)

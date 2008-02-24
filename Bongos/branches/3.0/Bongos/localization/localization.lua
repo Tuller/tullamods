@@ -23,7 +23,7 @@ L.InvalidProfile = 'Invalid Profile "%s"'
 
 --slash command help
 L.ShowOptionsDesc = 'Shows the options menu'
-L.LockBarsDesc = 'Toggles locking bar positions'
+L.ConfigDesc = 'Toggles configuration mode'
 L.StickyBarsDesc = 'Toggles auto anchoring bars'
 
 L.SetScaleDesc = 'Sets the scale of <barList>'
