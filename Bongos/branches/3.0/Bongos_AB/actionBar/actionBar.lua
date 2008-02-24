@@ -14,7 +14,7 @@ function ActionBar:Load(isNewProfile)
 	if isNewProfile then
 		local defaults = {point = 'BOTTOM', rows = 1, cols = 12}
 	
-		defaults.ids, defaults.states, defaults.numStates = self:GetDefaultActions(select(2, UnitClass('player'))
+		defaults.ids, defaults.states, defaults.numSets = self:GetDefaultActions(select(2, UnitClass('player'))
 
 		--load keybinding from old bongos versions & the default ui
 		local bindings = {}

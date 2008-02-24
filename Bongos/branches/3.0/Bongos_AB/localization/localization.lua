@@ -19,7 +19,7 @@ L.EnemyTarget = 'Enemy Target'
 L.Modifier = 'Modifier'
 L.Prowl = 'Prowl'
 L.ShadowForm = 'Shadowform/Redemption'
-L.States = 'States'
+L.Sets = 'Sets'
 
 
 --Options Menu Stuff

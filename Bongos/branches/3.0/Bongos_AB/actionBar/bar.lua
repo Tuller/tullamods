@@ -28,7 +28,7 @@ function ActionBar:Create(numRows, numCols, point, x, y)
 		end
 
 		bar:UpdateUsedIDs()
-		bar:UpdateStates()
+		bar:UpdateStateButton()
 		bar:UpdateActions()
 		bar:UpdateStateDriver()
 		bar:Layout()
@@ -51,7 +51,7 @@ function ActionBar:Load(id)
 	end
 
 	bar:LoadIDs()
-	bar:UpdateStates()
+	bar:UpdateStateButton()
 	bar:UpdateActions()
 	bar:UpdateStateDriver()
 	bar:Layout()
@@ -116,12 +116,12 @@ end
 --add/remove buttons and update their actionsIDs for each state
 --needs to be called whenever the size/number of pages of a bar changes
 function ActionBar:UpdateActions()
-	local states = self:NumStates()
+	local states = self:NumSets()
 	local ids = self.sets.ids
 	local numButtons = self:GetCols() * self:GetRows()
 	local index = 1
 
-	for state = 1, self:NumStates() do
+	for state = 1, self:NumSets() do
 		for index = 1, numButtons do
 			local button = self:GetButton(index) or self:AddButton(index)
 			local actionID = ids[index + numButtons*(state-1)]
@@ -199,13 +199,13 @@ end
 --[[ States ]]--
 
 --states: allow us to map a button to multiple virtual buttons
-function ActionBar:SetNumStates(numStates)
-	if numStates ~= self:NumStates() then
-		self.sets.numStates = numStates
+function ActionBar:SetNumSets(numSets)
+	if numSets ~= self:NumSets() then
+		self.sets.numSets = numSets
 
 		--this code is order dependent!
 		self:UpdateUsedIDs()
-		self:UpdateStates()
+		self:UpdateStateButton()
 		self:UpdateStateDriver()
 		self:UpdateActions()
 		self:UpdateVisibility()
@@ -213,11 +213,11 @@ function ActionBar:SetNumStates(numStates)
 	end
 end
 
-function ActionBar:UpdateStates()
+function ActionBar:UpdateStateButton()
 	local stateButton = ''
 	local stateButton2 = ''
 
-	for i = 2, self:NumStates() do
+	for i = 2, self:NumSets() do
 		stateButton = stateButton .. format('%d:s%d;', i, i)
 		stateButton2 = stateButton2 .. format('%d:s%ds;', i, i)
 	end
@@ -231,8 +231,8 @@ function ActionBar:UpdateStates()
 	end
 end
 
-function ActionBar:NumStates()
-	return self.sets.numStates or 1
+function ActionBar:NumSets()
+	return self.sets.numSets or 1
 end
 
 
@@ -244,9 +244,9 @@ function ActionBar:UpdateStateDriver()
 	UnregisterStateDriver(self, 'state', 0)
 
 	local header = ''
-	local maxState = self:NumStates()
+	local maxState = self:NumSets()
 	for _,condition in ipairs(Config:GetStateConditions()) do
-		local state = self:GetConditionState(condition)
+		local state = self:GetConditionSet(condition)
 		if state and state <= maxState then
 			header = header .. condition .. state .. ';'
 		end
@@ -258,19 +258,19 @@ function ActionBar:UpdateStateDriver()
 end
 
 --state conditions specify when we  switch states.  uses the macro syntax for now
-function ActionBar:SetConditionState(condition, state)
-	if not self.sets.states then
-		self.sets.states = {}
+function ActionBar:SetConditionSet(condition, state)
+	if not self.sets.setMap then
+		self.sets.setMap = {}
 	end
 
-	if self.sets.states[condition] ~= state then
-		self.sets.states[condition] = state
+	if self.sets.setMap[condition] ~= state then
+		self.sets.setMap[condition] = state
 		self:UpdateStateDriver()
 	end
 end
 
-function ActionBar:GetConditionState(condition)
-	return self.sets.states and self.sets.states[condition]
+function ActionBar:GetConditionSet(condition)
+	return self.sets.setMap and self.sets.setMap[condition]
 end
 
 
@@ -293,9 +293,9 @@ function ActionBar:UpdateUsedIDs()
 	end
 
 	local ids = self.sets.ids
-	local numActions = self:GetRows() * self:GetCols() * self:NumStates()
+	local numActions = self:GetRows() * self:GetCols() * self:NumSets()
 
-	for i = 1, (self:GetRows() * self:GetCols() * self:NumStates()) do
+	for i = 1, (self:GetRows() * self:GetCols() * self:NumSets()) do
 		if not ids[i] then
 			ids[i] = self:TakeID()
 		end
@@ -480,7 +480,7 @@ end
 
 function ActionBar:SetRightClickUnit(unit)
 	self:SetAttribute('unit2', unit)
-	for i = 2, self:NumStates() do
+	for i = 2, self:NumSets() do
 		self:SetAttribute('*unit-s%ds', unit)
 	end
 end
@@ -498,19 +498,19 @@ local function AddLayoutPanel(menu)
 		local freeIDs = bar:NumFreeIDs()
 
 		local maxStates = bar:GetCols() * bar:GetRows()
-		states:SetMinMaxValues(1, floor(freeIDs / maxStates) + bar:NumStates())
+		states:SetMinMaxValues(1, floor(freeIDs / maxStates) + bar:NumSets())
 
-		local maxRows = bar:GetCols() * bar:NumStates()
+		local maxRows = bar:GetCols() * bar:NumSets()
 		rows:SetMinMaxValues(1, floor(freeIDs / maxRows) + bar:GetRows())
 
-		local maxCols = bar:GetRows() * bar:NumStates()
+		local maxCols = bar:GetRows() * bar:NumSets()
 		cols:SetMinMaxValues(1, floor(freeIDs / maxCols) + bar:GetCols())
 	end
 
-	states = panel:CreateSlider(L.States, 1, 1, 1)
+	states = panel:CreateSlider(L.Sets, 1, 1, 1)
 	function states:UpdateValue(value)
 		local bar = Bongos.Bar:Get(self:GetParent().id)
-		bar:SetNumStates(value)
+		bar:SetNumSets(value)
 		UpdateSliderSizes(bar)
 	end
 	function states:OnShow()
@@ -518,8 +518,8 @@ local function AddLayoutPanel(menu)
 		local freeIDs = bar:NumFreeIDs()
 		local maxStates = bar:GetCols() * bar:GetRows()
 
-		self:SetMinMaxValues(1, floor(freeIDs / maxStates) + bar:NumStates())
-		self:SetValue(bar:NumStates())
+		self:SetMinMaxValues(1, floor(freeIDs / maxStates) + bar:NumSets())
+		self:SetValue(bar:NumSets())
 	end
 
 	cols = panel:CreateSlider(L.Columns, 1, 1, 1)
@@ -530,7 +530,7 @@ local function AddLayoutPanel(menu)
 	end
 	function cols:OnShow()
 		local bar = Bongos.Bar:Get(self:GetParent().id)
-		local maxCols = bar:GetRows() * bar:NumStates()
+		local maxCols = bar:GetRows() * bar:NumSets()
 		local freeIDs = bar:NumFreeIDs()
 
 		self:SetMinMaxValues(1, floor(freeIDs / maxCols) + bar:GetCols())
@@ -545,7 +545,7 @@ local function AddLayoutPanel(menu)
 	end
 	function rows:OnShow()
 		local bar = Bongos.Bar:Get(self:GetParent().id)
-		local maxRows = bar:GetCols() * bar:NumStates()
+		local maxRows = bar:GetCols() * bar:NumSets()
 		local freeIDs = bar:NumFreeIDs()
 
 		self:SetMinMaxValues(1, floor(freeIDs / maxRows) + bar:GetRows())
@@ -556,16 +556,16 @@ end
 --state slider template
 local function StateSlider_OnShow(self)
 	local f = ActionBar:Get(self:GetParent().id)
-	self:SetMinMaxValues(1, f:NumStates())
-	self:SetValue(f:GetConditionState(self.state) or 1)
+	self:SetMinMaxValues(1, f:NumSets())
+	self:SetValue(f:GetConditionSet(self.state) or 1)
 end
 
 local function StateSlider_UpdateValue(self, value)
 	local f = ActionBar:Get(self:GetParent().id)
 	if value == 1 then
-		f:SetConditionState(self.state, nil)
+		f:SetConditionSet(self.state, nil)
 	else
-		f:SetConditionState(self.state, value)
+		f:SetConditionSet(self.state, value)
 	end
 end
 

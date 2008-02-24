@@ -423,7 +423,7 @@ function ActionButton:UpdateShowStates()
 			newStates = 0
 		end
 
-		for i = 2, self:GetParent():NumStates() do
+		for i = 2, self:GetParent():NumSets() do
 			local action = self:GetAttribute('*action-s' .. i) or id
 			if HasAction(action) then
 				if newStates then
