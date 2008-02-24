@@ -1,6 +1,6 @@
 ﻿## Interface: 20400
 ## Title: Bongos3 AB
-## Notes: ActionBars Advanced
+## Notes: ActionBars for Bongos
 ## Author: Tuller
 ## Version: Alpha.1
 ## Dependencies: Bongos
