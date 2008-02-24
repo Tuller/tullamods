@@ -344,7 +344,7 @@ end
 
 function ItemFrame:Layout()
 	local borderSize = self.borderSize or 0
-	local width, height = self:LayoutItems(ceil(self.count/4), 1, borderSize/2, borderSize/2)
+	local width, height = self:LayoutItems(ceil(self.count/8), 1, borderSize/2, borderSize/2)
 
 	self:SetWidth(width+borderSize); self:SetHeight(height+borderSize)
 end

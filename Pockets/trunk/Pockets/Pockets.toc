@@ -3,7 +3,7 @@
 ## Notes: Quick access to inventory items
 ## Author: Tuller
 ## Dependencies: Bongos
-localization.lua
+## SavedVariablesPerCharacter: PocketDB
 events.lua
 utility.lua
 Pockets.lua
