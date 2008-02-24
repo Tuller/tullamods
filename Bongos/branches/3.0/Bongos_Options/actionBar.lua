@@ -142,7 +142,7 @@ function Options:AddColorPanel()
 	equipColor.SaveColor = function(self, r, g, b)
 		Config:SetEquippedColor(r, g, b)
 	end
-	equipColor:SetPoint('TOP', oomColor, 'BOTTOM', -12, 0)
+	equipColor:SetPoint('TOP', oomColor, 'BOTTOM', -14, -10)
 
 	--buff and debuff coloring
 	local highlightBuffs = self:CreateCheckButton(L.HighlightBuffs, panel)
