@@ -79,9 +79,20 @@ end
 function Config:ShowHotkeys(enable)
 	self.db.profile.showHotkeys = enable or false
 
-	Bongos:GetModule('ActionBar').Button:ForAll('ShowHotkey', enable)
-	Bongos:GetModule('ClassBar').Button:ForAll('ShowHotkey', enable)
-	Bongos:GetModule('PetBar').Button:ForAll('ShowHotkey', enable)
+	local ab = Bongos:GetModule('ActionBar', true)
+	if ab then
+		ab.Button:ForAll('ShowHotkey', enable)
+	end
+
+	local class = Bongos:GetModule('ClassBar', true)
+	if class then
+		class.Button:ForAll('ShowHotkey', enable)
+	end
+	
+	local pet = Bongos:GetModule('PetBar', true)
+	if pet then
+		pet.Button:ForAll('ShowHotkey', enable)
+	end
 end
 
 function Config:ShowingHotkeys()
@@ -202,17 +213,6 @@ end
 
 function Config:GetRightClickUnit()
 	return self.db.profile.rightClickUnit
-end
-
-
---selfcast binding
-function Config:SetSelfCastKey(key)
-	SetActionSelfCastKey(key)
-	self.db.profile.selfCastKey = key
-end
-
-function Config:GetSelfCastKey()
-	return self.db.profile.selfCastKey
 end
 
 
