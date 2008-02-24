@@ -7,46 +7,26 @@ local ActionBar = Bongos:NewModule('ActionBar', 'AceEvent-3.0')
 local actions = {}
 
 function ActionBar:Load(isNewProfile)
-
-	for i = 1, 120 do
+	for i = 1, 132 do
 		actions[i] = HasAction(i)
 	end
 
 	if isNewProfile then
-		local header = {}
+		local defaults = {point = 'BOTTOM', rows = 1, cols = 12}
+	
+		defaults.ids, defaults.states, defaults.numStates = self:GetDefaultActions(select(2, UnitClass('player'))
 
-		local class = select(2, UnitClass('player'))
-		if class == 'DRUID' then
-			header['[form:1]'] = 2
-			header['[form:3]'] = 3
-			maxState = 3
-		elseif class == 'WARRIOR' then
-			header['[form:2]'] = 2
-			header['[form:3]'] = 3
-			maxState = 3
-		elseif class == 'ROGUE' or class == 'PRIEST' then
-			header['[form:1]'] = 2
-			maxState = 2
-		else
-			maxState = 6
-		end
-
-		local keybindings = {}
+		--load keybinding from old bongos versions & the default ui
+		local bindings = {}
 		for i = 1, 12 do
 			local binding = GetBindingKey(format('CLICK BActionButton%d:LeftButton', i)) or
 							GetBindingKey(format('CLICK BongosActionButton%d:LeftButton', i)) or
 							GetBindingKey(format('ActionButton%d', i))
-			keybindings[i] = binding
+			bindings[i] = binding
 		end
+		defaults.bindings = bindings
 
-		Bongos:SetBarSets(1, {
-			point = 'BOTTOM',
-			rows = 1,
-			cols = 12,
-			states = header,
-			numStates = maxState,
-			bindings = keybindings,
-		})
+		Bongos:SetBarSets(1, defaults)
 	end
 
 	if not self.Painter.loaded then
@@ -76,6 +56,55 @@ function ActionBar:Unload()
 
 	self:UnregisterAllEvents()
 	self:UnregisterAllMessages()
+end
+
+function ActionBar:GetDefaultActions(class)
+	if class == 'DRUID' then
+		header['[form:1]'] = 3
+		header['[form:3]'] = 2
+
+		--bar 1 (caster)
+		buttons = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+
+		--bar 7 (cat)
+		for i = 73, 84 do
+			table.insert(buttons, i)
+		end
+
+		--bar 8 (bear)
+		for i = 97, 108 do
+			table.insert(buttons, i)
+		end
+	elseif class == 'WARRIOR' then
+		header['[form:2]'] = 2
+		header['[form:3]'] = 3
+
+		--bars 7-9 (battle, defensive, berserker)
+		buttons = {}
+		for i = 73, 108 do
+			table.insert(buttons, i)
+		end
+	elseif class == 'ROGUE' or class == 'PRIEST' then
+		header['[form:1]'] = 2
+
+		--bar 1 (normal)
+		buttons = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+
+		--bar 7 (stealth, shadow form)
+		for i = 73, 84 do
+			table.insert(buttons, i)
+		end
+	end
+
+	--figure out how many states we're using
+	local maxState
+	if header then
+		for _,state in pairs(header) do
+			maxState = max(maxState or 1, state)
+		end
+	end
+
+	return buttons, header, maxState
 end
 
 --[[ Events ]]--
