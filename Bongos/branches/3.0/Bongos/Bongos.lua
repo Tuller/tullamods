@@ -55,7 +55,7 @@ function Bongos:OnInitialize()
 
 	self.lockBG = self:CreateLockBG()
 	self:RegisterSlashCommands()
-	
+
 	--create a loader for the options menu
 	local f = CreateFrame('Frame', nil, InterfaceOptionsFrame)
 	f:SetScript('OnShow', function(self)
@@ -216,7 +216,7 @@ function Bongos:CreateLockBG()
 	f.bg = f:CreateTexture()
 	f.bg:SetTexture(0, 0, 0, 0.5)
 	f.bg:SetAllPoints(f)
-	
+
 	return f
 end
 
