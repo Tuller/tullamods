@@ -225,10 +225,9 @@ function BBar:StickToEdge()
 end
 
 function BBar:Stick()
-	local stuck = false
+	self.sets.anchor = nil
 
-	if Bongos:IsSticky() then
-		self.sets.anchor = nil
+	if Bongos:IsSticky() and not IsAltKeyDown() then
 
 		--try to stick to a screen edge, then try to stick to a bar
 		for _, frame in self:GetAll() do
