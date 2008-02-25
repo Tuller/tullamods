@@ -206,7 +206,7 @@ function ActionBar:SetNumSets(numSets)
 		self:UpdateStateButton()
 		self:UpdateStateDriver()
 		self:UpdateActions()
-		self:UpdateVisibility()
+		self:UpdateShowStates()
 		self:SetRightClickUnit(self:GetAttribute('unit2'))
 	end
 end
