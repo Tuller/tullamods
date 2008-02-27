@@ -95,7 +95,7 @@ function CastingBar:OnEvent(event, ...)
 	if unit == "player" then
 		if event == "UNIT_SPELLCAST_FAILED" or event == "UNIT_SPELLCAST_INTERRUPTED" then
 			self.failed = true
-		elseif event == "UNIT_SPELLCAST_START" then
+		elseif event == "UNIT_SPELLCAST_START" or event == "UNIT_SPELLCAST_CHANNEL_START" then
 			self.failed = nil
 		end
 		CastingBarFrame_OnEvent(event, ...)
