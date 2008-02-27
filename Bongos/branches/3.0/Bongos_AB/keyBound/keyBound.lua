@@ -29,8 +29,8 @@ function KeyBound:OnEnable()
 		f:SetToplevel(true); f:EnableMouse(true)
 		f:SetWidth(320); f:SetHeight(96)
 		f:SetBackdrop{
-			bgFile="Interface\\DialogFrame\\UI-DialogBox-Background" ,
-			edgeFile="Interface\\DialogFrame\\UI-DialogBox-Border",
+			bgFile='Interface\\DialogFrame\\UI-DialogBox-Background' ,
+			edgeFile='Interface\\DialogFrame\\UI-DialogBox-Border',
 			tile = true,
 			insets = {11, 12, 12, 11},
 			tileSize = 32,
@@ -43,7 +43,7 @@ function KeyBound:OnEnable()
 		text:SetFontObject('GameFontHighlight')
 		text:SetPoint('TOP', 0, -16)
 		text:SetWidth(252); text:SetHeight(0)
-		text:SetText(format(L.BindingsHelp, GetBindingText("ESCAPE","KEY_")))
+		text:SetText(format(L.BindingsHelp, GetBindingText('ESCAPE','KEY_')))
 		
 		local close = CreateFrame('Button', f:GetName() .. 'Close', f, 'UIPanelCloseButton')
 		close:SetPoint('TOPRIGHT', -3, -3)
@@ -53,27 +53,27 @@ function KeyBound:OnEnable()
 		getglobal(perChar:GetName() .. 'Text'):SetText(CHARACTER_SPECIFIC_KEYBINDINGS)
 		perChar:SetPoint('BOTTOMLEFT', 12, 8)
 		
-		perChar:SetScript("OnShow", function(self)
+		perChar:SetScript('OnShow', function(self)
 			self.current = GetCurrentBindingSet()
 			self:SetChecked(GetCurrentBindingSet() == 2)
 		end)
 
-		perChar:SetScript("OnHide", function(self)
+		perChar:SetScript('OnHide', function(self)
 			KeyBound:Deactivate()
 				
 			if InCombatLockdown() then
-				self:RegisterEvent("PLAYER_REGEN_ENABLED")
+				self:RegisterEvent('PLAYER_REGEN_ENABLED')
 			else
 				SaveBindings(self.current)
 			end
 		end)
 
-		perChar:SetScript("OnEvent", function(self, event)
+		perChar:SetScript('OnEvent', function(self, event)
 			SaveBindings(self.current)
 			self:UnregisterEvent(event)
 		end)
 
-		perChar:SetScript("OnClick", function(self)
+		perChar:SetScript('OnClick', function(self)
 			self.current = (self:GetChecked() and 2) or 1
 			LoadBindings(self.current)
 		end)
@@ -236,7 +236,11 @@ function Binder:OnKeyDown(key)
 	local button = self.button
 	if not button then return end
 
-	if key == 'UNKNOWN' or key == 'SHIFT' or key == 'CTRL'	or key == 'ALT' then return end
+	if (key == 'UNKNOWN' or key == 'LSHIFT' or key == 'RSHIFT' or
+		key == 'LCTRL' or key == 'RCTRL' or key == 'LALT' or key == 'RALT'
+		key == 'LeftButton' or key == 'RightButton') then
+		return
+	end
 
 	local screenshotKey = GetBindingKey('SCREENSHOT')
 	if screenshotKey and key == screenshotKey then
@@ -249,10 +253,12 @@ function Binder:OnKeyDown(key)
 		ChatFrameEditBox:Show()
 		return
 	end
+	
+	if ( keyPressed == 'UNKNOWN' ) then
+		return;
+	end
 
-	if key == 'LeftButton' or key == 'RightButton' then
-		return
-	elseif key == 'MiddleButton' then
+	if key == 'MiddleButton' then
 		key = 'BUTTON3'
 	elseif key == 'Button4' then
 		key = 'BUTTON4'
