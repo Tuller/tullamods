@@ -15,7 +15,7 @@ function ActionBar:Create(numRows, numCols, point, x, y)
 	if numRows * numCols <= self:NumFreeIDs() then
 		--get the next available barID
 		local id = 1
-		while Bongos.Bar:Get(id) do
+		while self.super:Get(id) do
 			id = id + 1
 		end
 
@@ -28,14 +28,15 @@ function ActionBar:Create(numRows, numCols, point, x, y)
 		bar:UpdateStateButton()
 		bar:UpdateActions()
 		bar:UpdateStateDriver()
+		bar:SetRightClickUnit(Config:GetRightClickUnit())
 		bar:Layout()
 
 		--place the bar, the point starts relative to UIParent bottom left, make it not that
 		bar:ClearAllPoints()
 		bar:SetPoint(point, UIParent, 'BOTTOMLEFT', x, y)
 		bar:SavePosition()
+		
 		bars[id] = bar
-
 		return bar
 	else
 		UIErrorsFrame:AddMessage('Not Enough Available Action IDs', 1, 0.2, 0.2, 1, UIERRORS_HOLD_TIME)
@@ -52,9 +53,10 @@ function ActionBar:Load(id)
 	bar:UpdateStateButton()
 	bar:UpdateActions()
 	bar:UpdateStateDriver()
+	bar:SetRightClickUnit(Config:GetRightClickUnit())
 	bar:Layout()
+	
 	bars[id] = bar
-
 	return bar
 end
 
@@ -72,7 +74,7 @@ function ActionBar:OnDelete()
 	self:ReleaseAllIDs()
 
 	self:SetAttribute('statebutton', nil)
-	self:SetAttribute('*statebutton2', nil)
+	self:SetAttribute('statebutton2', nil)
 	UnregisterStateDriver(self, 'state', 0)
 	
 	bars[self.id] = nil
@@ -207,7 +209,7 @@ function ActionBar:SetNumSets(numSets)
 		self:UpdateStateDriver()
 		self:UpdateActions()
 		self:UpdateShowStates()
-		self:SetRightClickUnit(self:GetAttribute('unit2'))
+		self:SetRightClickUnit(Config:GetRightClickUnit())
 	end
 end
 
@@ -222,10 +224,10 @@ function ActionBar:UpdateStateButton()
 
 	if stateButton == '' then
 		self:SetAttribute('statebutton', nil)
-		self:SetAttribute('*statebutton2', nil)
+		self:SetAttribute('statebutton2', nil)
 	else
 		self:SetAttribute('statebutton', stateButton)
-		self:SetAttribute('*statebutton2', stateButton2)
+		self:SetAttribute('statebutton2', stateButton2)
 	end
 end
 
@@ -483,7 +485,7 @@ end
 function ActionBar:SetRightClickUnit(unit)
 	self:SetAttribute('unit2', unit)
 	for i = 2, self:NumSets() do
-		self:SetAttribute('*unit-s%ds', unit)
+		self:SetAttribute(format('*unit-s%ds', i), unit)
 	end
 end
 

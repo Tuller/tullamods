@@ -203,12 +203,7 @@ end
 --right click selfcast
 function Config:SetRightClickUnit(unit)
 	self.db.profile.rightClickUnit = unit
-
-	for id,bar in Bongos.Bar:GetAll() do
-		if bar.SetRightClickUnit then
-			bar:SetRightClickUnit(unit)
-		end
-	end
+	Bongos:GetModule('ActionBar').Bar:ForAll('SetRightClickUnit', unit)
 end
 
 function Config:GetRightClickUnit()
