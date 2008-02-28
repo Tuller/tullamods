@@ -25,7 +25,6 @@ function ActionBar:Create(numRows, numCols, point, x, y)
 		end
 
 		bar:UpdateUsedIDs()
-		bar:UpdateStateButton()
 		bar:UpdateActions()
 		bar:UpdateStateDriver()
 		bar:SetRightClickUnit(Config:GetRightClickUnit())
@@ -50,7 +49,6 @@ function ActionBar:Load(id)
 	end
 
 	bar:LoadIDs()
-	bar:UpdateStateButton()
 	bar:UpdateActions()
 	bar:UpdateStateDriver()
 	bar:SetRightClickUnit(Config:GetRightClickUnit())
@@ -74,7 +72,7 @@ function ActionBar:OnDelete()
 	self:ReleaseAllIDs()
 
 	self:SetAttribute('statebutton', nil)
-	self:SetAttribute('statebutton2', nil)
+	self:SetAttribute('*statebutton2', nil)
 	UnregisterStateDriver(self, 'state', 0)
 	
 	bars[self.id] = nil
@@ -205,7 +203,6 @@ function ActionBar:SetNumSets(numSets)
 
 		--this code is order dependent!
 		self:UpdateUsedIDs()
-		self:UpdateStateButton()
 		self:UpdateStateDriver()
 		self:UpdateActions()
 		self:UpdateShowStates()
@@ -214,21 +211,27 @@ function ActionBar:SetNumSets(numSets)
 end
 
 function ActionBar:UpdateStateButton()
-	local stateButton = ''
-	local stateButton2 = ''
+	local sb1, sb2
 
 	for i = 2, self:NumSets() do
-		stateButton = stateButton .. format('%d:s%d;', i, i)
-		stateButton2 = stateButton2 .. format('%d:s%ds;', i, i)
+		local s1 = i .. ':s' .. i
+		local s2 = s1 .. 's'
+	
+		if sb1 then
+			sb1 = sb1  .. ';' .. s1
+		else
+			sb1 = s1
+		end
+	
+		if sb2 then
+			sb2 = sb2  .. ';' .. s2
+		else
+			sb2 = s2
+		end
 	end
 
-	if stateButton == '' then
-		self:SetAttribute('statebutton', nil)
-		self:SetAttribute('statebutton2', nil)
-	else
-		self:SetAttribute('statebutton', stateButton)
-		self:SetAttribute('statebutton2', stateButton2)
-	end
+	self:SetAttribute('statebutton', sb1)
+	self:SetAttribute('*statebutton2', sb2)
 end
 
 function ActionBar:NumSets()
@@ -251,6 +254,8 @@ function ActionBar:UpdateStateDriver()
 			header = header .. condition .. state .. ';'
 		end
 	end
+	
+	self:UpdateStateButton()
 
 	if header ~= '' then
 		RegisterStateDriver(self, 'state', header .. '0')
@@ -483,7 +488,7 @@ end
 --[[ Right Click Selfcast ]]--
 
 function ActionBar:SetRightClickUnit(unit)
-	self:SetAttribute('unit2', unit)
+	self:SetAttribute('*unit2', unit)
 	for i = 2, self:NumSets() do
 		self:SetAttribute(format('*unit-s%ds', i), unit)
 	end

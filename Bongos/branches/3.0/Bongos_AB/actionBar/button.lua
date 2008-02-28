@@ -51,7 +51,7 @@ do
 		b:SetAttribute('checkselfcast', true)
 		b:SetAttribute('useparent-unit', true)
 		b:SetAttribute('useparent-statebutton', true)
-
+		
 		b:RegisterForDrag('LeftButton', 'RightButton')
 		b:RegisterForClicks('AnyUp')
 		b:Hide()
@@ -63,8 +63,8 @@ end
 
 function ActionButton:Get(parent)
 	local b = self:GetUnused(parent) or self:Create(parent)
-	parent:Attach(b)
 	parent:SetAttribute('addchild', b)
+	parent:Attach(b)
 
 	b:ShowHotkey(Config:ShowingHotkeys())
 	b:ShowMacro(Config:ShowingMacros())
@@ -420,7 +420,7 @@ function ActionButton:UpdateShowStates()
 		end
 
 		for i = 2, self:GetParent():NumSets() do
-			local action = self:GetAttribute('*action-s' .. i) or id
+			local action = self:GetAttribute(format('*action-s%ds', i)) or id
 			if HasAction(action) then
 				if newStates then
 					newStates = newStates .. ',' .. i
