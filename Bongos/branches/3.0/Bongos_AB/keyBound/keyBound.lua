@@ -237,7 +237,7 @@ function Binder:OnKeyDown(key)
 	if not button then return end
 
 	if (key == 'UNKNOWN' or key == 'LSHIFT' or key == 'RSHIFT' or
-		key == 'LCTRL' or key == 'RCTRL' or key == 'LALT' or key == 'RALT'
+		key == 'LCTRL' or key == 'RCTRL' or key == 'LALT' or key == 'RALT' or
 		key == 'LeftButton' or key == 'RightButton') then
 		return
 	end
@@ -252,10 +252,6 @@ function Binder:OnKeyDown(key)
 	if openChatKey and key == openChatKey then
 		ChatFrameEditBox:Show()
 		return
-	end
-	
-	if ( keyPressed == 'UNKNOWN' ) then
-		return;
 	end
 
 	if key == 'MiddleButton' then
