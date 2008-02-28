@@ -12,7 +12,7 @@ local L = LibStub('AceLocale-3.0'):GetLocale('Bongos3')
 BongosMenu.bg = {
 	bgFile = 'Interface\\DialogFrame\\UI-DialogBox-Background',
 	edgeFile = 'Interface\\DialogFrame\\UI-DialogBox-Border',
-	insets = {11, 12, 12, 11},
+	insets = {left = 11, right = 11, top = 12, bottom = 11},
 	tile = true,
 	tileSize = 32,
 	edgeSize = 32,
