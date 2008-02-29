@@ -356,20 +356,17 @@ do
 			for i,availableID in pairs(freeActions) do
 				if id == availableID then
 					table.remove(freeActions, i)
-					Action.Painter:UpdateText()
 					return
 				end
 			end
 		else
 			local id = table.remove(freeActions, 1)
-			Action.Painter:UpdateText()
 			return id
 		end
 	end
 
 	function ActionBar:GiveID(id)
 		table.insert(freeActions, 1, id)
-		Action.Painter:UpdateText()
 	end
 
 	function ActionBar:NumFreeIDs()

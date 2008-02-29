@@ -19,18 +19,8 @@ function Painter:Load()
 	self:SetScript('OnMouseDown', self.SetStartPoint)
 	self:SetScript('OnDragStart', self.ShowDragBox)
 	self:SetScript('OnDragStop', self.CreateBar)
-	self:SetScript('OnShow', self.UpdateText)
 	self:SetScript('OnUpdate', self.OnUpdate)
 	self.nextUpdate = 0
-
-	--create the text box
-	local f = CreateFrame('Frame', nil, self)
-	f:SetFrameStrata('DIALOG')
-
-	local text = f:CreateFontString()
-	text:SetFontObject('GameFontNormalHuge')
-	text:SetPoint('TOP', self, 'TOP', 0, -64)
-	self.text = text
 
 	self.loaded = true
 end
@@ -67,7 +57,6 @@ function Painter:ShowDragBox()
 		text:SetFontObject('GameFontNormal')
 		self.box.text = text
 	end
-	self.box.bg:SetTexture(random(), random(), random(), 0.4)
 
 	--place the box at the starting point
 	self.box:ClearAllPoints()
@@ -123,6 +112,12 @@ function Painter:UpdateDragBox()
 	--update the box text and our row and colum count
 	self.rows = floor(self.box:GetHeight() / 37 + 0.5)
 	self.cols = floor(self.box:GetWidth() / 37 + 0.5)
+	
+	if self.rows * self.cols > Action.Bar:NumFreeIDs() then
+		self.box.bg:SetTexture(1, 0, 0, 0.4)
+	else
+		self.box.bg:SetTexture(0, 0.5, 0, 0.4)
+	end
 	self.box.text:SetFormattedText('%dx%d', self.rows, self.cols)
 end
 
@@ -133,8 +128,4 @@ function Painter:CreateBar()
 		self.box:Hide()
 		self:SetScript('OnUpdate', self.OnUpdate)
 	end
-end
-
-function Painter:UpdateText()
-	self.text:SetFormattedText('Available Action IDs: %d', Action.Bar:NumFreeIDs())
 end
