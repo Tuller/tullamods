@@ -161,7 +161,6 @@ function ActionBar:Layout()
 			local button = self.buttons[j + cols*(i-1)]
 			button:ClearAllPoints()
 			button:SetPoint('TOPLEFT', buttonSize*(j-1), -buttonSize*(i-1))
-			button:Show()
 		end
 	end
 
