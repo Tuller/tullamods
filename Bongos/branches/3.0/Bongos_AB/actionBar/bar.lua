@@ -666,6 +666,25 @@ function ActionBar:CreateMenu()
 	return menu
 end
 
+--[[ Showstates ]]-
+
+function ActionBar:SetShowConditions(showStates)
+	self.sets.ShowStates = showStates
+	self:UpdateShowConditions()
+end
+
+function ActionBar:UpdateShowConditions()
+	UnregisterStateDriver('visibility', self)
+	local conditions = self:GetShowConditions()
+	if conditions then
+		RegisterStateDriver('visibility', self, conditions .. 'show')
+	end
+end
+
+function ActionBar:GetShowConditions()
+	return self.sets.showStates
+end
+
 
 --[[ Utility Functions ]]--
 
