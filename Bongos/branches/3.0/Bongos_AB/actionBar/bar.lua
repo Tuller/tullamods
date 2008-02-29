@@ -666,7 +666,7 @@ function ActionBar:CreateMenu()
 	return menu
 end
 
---[[ Showstates ]]-
+--[[ Showstates ]]--
 
 function ActionBar:SetShowConditions(showStates)
 	self.sets.ShowStates = showStates
