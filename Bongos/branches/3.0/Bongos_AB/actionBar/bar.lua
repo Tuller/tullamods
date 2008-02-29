@@ -27,6 +27,7 @@ function ActionBar:Create(numRows, numCols, point, x, y)
 		bar:UpdateUsedIDs()
 		bar:UpdateActions()
 		bar:UpdateStateDriver()
+		bar:UpdateShowConditions()
 		bar:SetRightClickUnit(Config:GetRightClickUnit())
 		bar:Layout()
 
@@ -51,6 +52,7 @@ function ActionBar:Load(id)
 	bar:LoadIDs()
 	bar:UpdateActions()
 	bar:UpdateStateDriver()
+	bar:UpdateShowConditions()
 	bar:SetRightClickUnit(Config:GetRightClickUnit())
 	bar:Layout()
 	
@@ -74,6 +76,7 @@ function ActionBar:OnDelete()
 	self:SetAttribute('statebutton', nil)
 	self:SetAttribute('*statebutton2', nil)
 	UnregisterStateDriver(self, 'state', 0)
+	UnregisterStateDriver(self, 'visibility', 'show')
 	
 	bars[self.id] = nil
 end
@@ -677,7 +680,7 @@ function ActionBar:UpdateShowConditions()
 	UnregisterStateDriver(self, 'visibility')
 	local conditions = self:GetShowConditions()
 	if conditions then
-		RegisterStateDriver(self, 'visibility', conditions .. 'show')
+		RegisterStateDriver(self, 'visibility', conditions .. 'show;hide')
 	end
 end
 
