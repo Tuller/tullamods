@@ -21,6 +21,8 @@ L.Modifier = 'Modifier'
 L.Prowl = 'Prowl'
 L.ShadowForm = 'Shadowform/Redemption'
 L.Sets = 'Sets'
+L.ShowStates = 'Show States'
+L.Set = 'Set'
 
 
 --Options Menu Stuff

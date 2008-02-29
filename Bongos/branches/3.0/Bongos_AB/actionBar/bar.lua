@@ -656,6 +656,46 @@ local function AddPagingPanel(menu)
 	end
 end
 
+--showstates
+local function AddShowStatesPanel(menu)
+	local panel = menu:AddPanel(L.ShowStates)
+	panel.height = 56
+	
+	local editBox = CreateFrame('EditBox', panel:GetName() .. 'StateText', panel,  'InputBoxTemplate')
+	editBox:SetWidth(148); editBox:SetHeight(20)
+	editBox:SetPoint('TOPLEFT', 12, -10)
+	editBox:SetAutoFocus(false)
+	editBox:SetScript('OnShow', function(self)
+		local showStates = ActionBar:Get(self:GetParent().id):GetShowConditions() or ''
+		self:SetText(showStates)
+	end)
+	editBox:SetScript('OnEnterPressed', function(self)
+		local text = self:GetText()
+		if text == '' then
+			ActionBar:Get(self:GetParent().id):SetShowConditions(nil)
+		else
+			ActionBar:Get(self:GetParent().id):SetShowConditions(text)
+		end
+	end)
+	editBox:SetScript('OnEditFocusLost', function(self) self:HighlightText(0, 0) end)
+	editBox:SetScript('OnEditFocusGained', function(self) self:HighlightText() end)
+	
+	local set = CreateFrame('Button', panel:GetName() .. 'Set', panel, 'UIPanelButtonTemplate')
+	set:SetWidth(30); set:SetHeight(20)
+	set:SetText(L.Set)
+	set:SetScript('OnClick', function(self) 
+		local text = editBox:GetText()
+		if text == '' then
+			ActionBar:Get(self:GetParent().id):SetShowConditions(nil)
+		else
+			ActionBar:Get(self:GetParent().id):SetShowConditions(text)
+		end
+	end)
+	set:SetPoint('BOTTOMRIGHT', -8, 2)
+	
+	return panel
+end
+
 function ActionBar:CreateMenu()
 	local menu = Bongos.Menu:Create(self.id)
 	ActionBar.menu = menu
@@ -665,6 +705,7 @@ function ActionBar:CreateMenu()
 	AddModifierPanel(menu)
 	AddTargetingPanel(menu)
 	AddPagingPanel(menu)
+	AddShowStatesPanel(menu)
 
 	return menu
 end
@@ -677,10 +718,12 @@ function ActionBar:SetShowConditions(showStates)
 end
 
 function ActionBar:UpdateShowConditions()
-	UnregisterStateDriver(self, 'visibility')
+	UnregisterStateDriver(self, 'visibility', 'show')
+	self:Show()
+
 	local conditions = self:GetShowConditions()
 	if conditions then
-		RegisterStateDriver(self, 'visibility', conditions .. 'show;hide')
+		RegisterStateDriver(self, 'visibility', conditions .. 'show;hide', 'show')
 	end
 end
 
