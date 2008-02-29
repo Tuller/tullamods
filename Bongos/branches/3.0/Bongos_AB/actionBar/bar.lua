@@ -669,15 +669,15 @@ end
 --[[ Showstates ]]--
 
 function ActionBar:SetShowConditions(showStates)
-	self.sets.ShowStates = showStates
+	self.sets.showStates = showStates
 	self:UpdateShowConditions()
 end
 
 function ActionBar:UpdateShowConditions()
-	UnregisterStateDriver('visibility', self)
+	UnregisterStateDriver(self, 'visibility')
 	local conditions = self:GetShowConditions()
 	if conditions then
-		RegisterStateDriver('visibility', self, conditions .. 'show')
+		RegisterStateDriver(self, 'visibility', conditions .. 'show')
 	end
 end
 
