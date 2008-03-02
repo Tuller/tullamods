@@ -482,7 +482,6 @@ end
 function BBar:Attach(frame)
 	frame:SetFrameStrata(self:GetFrameStrata())
 	frame:SetParent(self)
-	frame:SetFrameLevel(0)
 end
 
 --run the fade onupdate checker if only if there are mouseover frames to check
