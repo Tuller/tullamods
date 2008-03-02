@@ -37,7 +37,7 @@ function ActionBar:Create(numRows, numCols, point, x, y)
 		bar:ClearAllPoints()
 		bar:SetPoint(point, UIParent, 'BOTTOMLEFT', x, y)
 		bar:SavePosition()
-		
+
 		bars[id] = bar
 		return bar
 	else
@@ -57,7 +57,7 @@ function ActionBar:Load(id)
 	bar:UpdateShowConditions()
 	bar:SetRightClickUnit(Config:GetRightClickUnit())
 	bar:Layout()
-	
+
 	bars[id] = bar
 	return bar
 end
@@ -79,7 +79,7 @@ function ActionBar:OnDelete()
 	self:SetAttribute('*statebutton2', nil)
 	UnregisterStateDriver(self, 'state', 0)
 	UnregisterStateDriver(self, 'visibility', 'show')
-	
+
 	bars[self.id] = nil
 end
 
@@ -140,11 +140,13 @@ function ActionBar:UpdateActions()
 			end
 		end
 	end
-	
-	if self.sets.possessBar then
+
+	if self:IsPossessBar() then
 		for i = 1, 12 do
-			local button = self:GetButton(index) or self:AddButton(index)
-			button:SetAttribute('*action-possess', 120 + i)
+			local button = self:GetButton(i)
+			if button then
+				button:SetAttribute('*action-possess', 120 + i)
+			end
 		end
 	end
 
@@ -226,36 +228,17 @@ function ActionBar:UpdateStateButton()
 	local sb1, sb2
 
 	for i = 2, self:NumSets() do
-		local s1 = i .. ':s' .. i
-		local s2 = s1 .. 's'
-	
-		if sb1 then
-			sb1 = sb1  .. ';' .. s1
-		else
-			sb1 = s1
-		end
-	
-		if sb2 then
-			sb2 = sb2  .. ';' .. s2
-		else
-			sb2 = s2
-		end
+		local state1 = i .. ':s' .. i
+		local state2 = state1 .. 's'
+
+		sb1 = (sb1 and sb1 .. ';' .. state1) or state1
+		sb2 = (sb2 and sb2 .. ';' .. state2) or state2
 	end
-	
+
 	if self:IsPossessBar() then
 		local state = self.POSSESS_STATE .. ':possess'
-		
-		if sb1 then
-			sb1 = sb1  .. ';' .. state
-		else
-			sb1 = state
-		end
-
-		if sb2 then
-			sb2 = sb2  .. ';' .. state
-		else
-			sb2 = state
-		end
+		sb1 = (sb1 and sb1 .. ';' .. state) or state
+		sb2 = (sb2 and sb2 .. ';' .. state) or state
 	end
 
 	self:SetAttribute('statebutton', sb1)
@@ -275,14 +258,11 @@ function ActionBar:UpdateStateDriver()
 	UnregisterStateDriver(self, 'state', 0)
 
 	local header = ''
-	
+
 	if self:IsPossessBar() then
-		if state and state <= maxState then
-			header = header .. format('[bonusbar:5]%d;', self.POSSESS_STATE)
-		end
+		header = header .. format('[bonusbar:5]%d;', self.POSSESS_STATE)
 	end
-		
-		
+
 	local maxState = self:NumSets()
 	for _,condition in ipairs(Config:GetStateConditions()) do
 		local state = self:GetConditionSet(condition)
@@ -290,7 +270,7 @@ function ActionBar:UpdateStateDriver()
 			header = header .. condition .. state .. ';'
 		end
 	end
-	
+
 	self:UpdateStateButton()
 
 	if header ~= '' then
@@ -545,7 +525,7 @@ end
 --layout panel
 local function AddLayoutPanel(menu)
 	local panel = menu:AddLayoutPanel()
-	
+
 	local possess = panel:CreateCheckButton(L.PossessBar)
 	possess:SetScript('OnShow', function(self)
 		local bar = Bongos.Bar:Get(self:GetParent().id)
@@ -555,8 +535,8 @@ local function AddLayoutPanel(menu)
 		local bar = Bongos.Bar:Get(self:GetParent().id)
 		bar:SetIsPossessBar(self:GetChecked())
 	end)
-	
-	
+
+
 	panel:CreateSpacingSlider()
 
 	local states, rows, cols
@@ -717,7 +697,7 @@ end
 local function AddShowStatesPanel(menu)
 	local panel = menu:AddPanel(L.ShowStates)
 	panel.height = 56
-	
+
 	local editBox = CreateFrame('EditBox', panel:GetName() .. 'StateText', panel,  'InputBoxTemplate')
 	editBox:SetWidth(148); editBox:SetHeight(20)
 	editBox:SetPoint('TOPLEFT', 12, -10)
@@ -736,11 +716,11 @@ local function AddShowStatesPanel(menu)
 	end)
 	editBox:SetScript('OnEditFocusLost', function(self) self:HighlightText(0, 0) end)
 	editBox:SetScript('OnEditFocusGained', function(self) self:HighlightText() end)
-	
+
 	local set = CreateFrame('Button', panel:GetName() .. 'Set', panel, 'UIPanelButtonTemplate')
 	set:SetWidth(30); set:SetHeight(20)
 	set:SetText(L.Set)
-	set:SetScript('OnClick', function(self) 
+	set:SetScript('OnClick', function(self)
 		local text = editBox:GetText()
 		if text == '' then
 			ActionBar:Get(self:GetParent().id):SetShowConditions(nil)
@@ -749,7 +729,7 @@ local function AddShowStatesPanel(menu)
 		end
 	end)
 	set:SetPoint('BOTTOMRIGHT', -8, 2)
-	
+
 	return panel
 end
 

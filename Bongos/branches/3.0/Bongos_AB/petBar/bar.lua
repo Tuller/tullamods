@@ -114,7 +114,7 @@ function PetBar:Load()
 	petBar:RegisterEvent('PET_BAR_UPDATE_COOLDOWN')
 	petBar:RegisterEvent('PET_BAR_SHOWGRID')
 	petBar:RegisterEvent('PET_BAR_HIDEGRID')
-	RegisterStateDriver(petBar, 'visibility', '[pet]show;hide')
+	RegisterStateDriver(petBar, 'visibility', '[target=pet,nodead,exists,nobonusbar:5]show;hide')
 
 	self:RegisterMessage('KEYBOUND_ENABLED')
 	self:RegisterMessage('KEYBOUND_DISABLED')
