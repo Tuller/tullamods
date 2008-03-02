@@ -11,6 +11,8 @@ local ActionBar = Bongos:CreateWidgetClass('Frame', Bongos.Bar)
 Action.Bar = ActionBar
 local bars = {}
 
+ActionBar.POSSESS_STATE = 999
+
 function ActionBar:Create(numRows, numCols, point, x, y)
 	if numRows * numCols <= self:NumFreeIDs() then
 		--get the next available barID
@@ -138,6 +140,13 @@ function ActionBar:UpdateActions()
 			end
 		end
 	end
+	
+	if self.sets.possessBar then
+		for i = 1, 12 do
+			local button = self:GetButton(index) or self:AddButton(index)
+			button:SetAttribute('*action-possess', 120 + i)
+		end
+	end
 
 	for i = numButtons + 1, #self.buttons do
 		local button = self.buttons[i]
@@ -212,6 +221,7 @@ function ActionBar:SetNumSets(numSets)
 	end
 end
 
+--todo: cleanup code
 function ActionBar:UpdateStateButton()
 	local sb1, sb2
 
@@ -229,6 +239,22 @@ function ActionBar:UpdateStateButton()
 			sb2 = sb2  .. ';' .. s2
 		else
 			sb2 = s2
+		end
+	end
+	
+	if self:IsPossessBar() then
+		local state = self.POSSESS_STATE .. ':possess'
+		
+		if sb1 then
+			sb1 = sb1  .. ';' .. state
+		else
+			sb1 = state
+		end
+
+		if sb2 then
+			sb2 = sb2  .. ';' .. state
+		else
+			sb2 = state
 		end
 	end
 
@@ -249,6 +275,14 @@ function ActionBar:UpdateStateDriver()
 	UnregisterStateDriver(self, 'state', 0)
 
 	local header = ''
+	
+	if self:IsPossessBar() then
+		if state and state <= maxState then
+			header = header .. format('[bonusbar:5]%d;', self.POSSESS_STATE)
+		end
+	end
+		
+		
 	local maxState = self:NumSets()
 	for _,condition in ipairs(Config:GetStateConditions()) do
 		local state = self:GetConditionSet(condition)
@@ -278,6 +312,18 @@ end
 
 function ActionBar:GetConditionSet(condition)
 	return self.sets.setMap and self.sets.setMap[condition]
+end
+
+
+function ActionBar:SetIsPossessBar(enable)
+	self.sets.possessBar = enable or nil
+	self:UpdateStateDriver()
+	self:UpdateActions()
+	self:UpdateShowStates()
+end
+
+function ActionBar:IsPossessBar()
+	return self.sets.possessBar
 end
 
 
@@ -499,6 +545,18 @@ end
 --layout panel
 local function AddLayoutPanel(menu)
 	local panel = menu:AddLayoutPanel()
+	
+	local possess = panel:CreateCheckButton(L.PossessBar)
+	possess:SetScript('OnShow', function(self)
+		local bar = Bongos.Bar:Get(self:GetParent().id)
+		self:SetChecked(bar:IsPossessBar())
+	end)
+	possess:SetScript('OnClick', function(self)
+		local bar = Bongos.Bar:Get(self:GetParent().id)
+		bar:SetIsPossessBar(self:GetChecked())
+	end)
+	
+	
 	panel:CreateSpacingSlider()
 
 	local states, rows, cols

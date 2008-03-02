@@ -418,6 +418,17 @@ function ActionButton:UpdateShowStates()
 		if HasAction(id) then
 			newStates = 0
 		end
+		
+		--so the possess bar's actions change dynamically, so we can not determine beforehand if we're going to have something to show or not
+		--so, default to showing all actions
+		--and yes, 999 is the magic state for the possess bar
+		if self:GetParent():IsPossessBar() then
+			if newStates then
+				newStates = newStates .. ',' .. 999
+			else
+				newStates = 999
+			end
+		end
 
 		for i = 2, self:GetParent():NumSets() do
 			local action = self:GetAttribute(format('*action-s%ds', i)) or id
