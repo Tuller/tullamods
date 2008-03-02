@@ -104,17 +104,30 @@ function PetBar:Load()
 	bar:Layout()
 
 	local petBar = PetActionBarFrame
-	petBar:RegisterEvent('PLAYER_CONTROL_LOST')
-	petBar:RegisterEvent('PLAYER_CONTROL_GAINED')
-	petBar:RegisterEvent('PLAYER_FARSIGHT_FOCUS_CHANGED')
-	petBar:RegisterEvent('UNIT_PET')
-	petBar:RegisterEvent('UNIT_FLAGS')
-	petBar:RegisterEvent('UNIT_AURA')
-	petBar:RegisterEvent('PET_BAR_UPDATE')
-	petBar:RegisterEvent('PET_BAR_UPDATE_COOLDOWN')
-	petBar:RegisterEvent('PET_BAR_SHOWGRID')
-	petBar:RegisterEvent('PET_BAR_HIDEGRID')
-	RegisterStateDriver(petBar, 'visibility', '[target=pet,nodead,exists,nobonusbar:5]show;hide')
+	petBar:RegisterEvent("PLAYER_CONTROL_LOST");
+	petBar:RegisterEvent("PLAYER_CONTROL_GAINED");
+	petBar:RegisterEvent("PLAYER_FARSIGHT_FOCUS_CHANGED");
+	petBar:RegisterEvent("UNIT_PET");
+	petBar:RegisterEvent("UNIT_FLAGS");
+	petBar:RegisterEvent("UNIT_AURA");
+	petBar:RegisterEvent("PET_BAR_UPDATE");
+	petBar:RegisterEvent("PET_BAR_UPDATE_COOLDOWN");
+	petBar:RegisterEvent("PET_BAR_SHOWGRID");
+	petBar:RegisterEvent("PET_BAR_HIDEGRID");
+	petBar:RegisterEvent("PET_BAR_HIDE");
+	RegisterStateDriver(bar, 'visibility',  '[target=pet,nodead,exists,nobonusbar:5]show;hide')
+	
+	-- petBar:RegisterEvent('PLAYER_CONTROL_LOST')
+	-- petBar:RegisterEvent('PLAYER_CONTROL_GAINED')
+	-- petBar:RegisterEvent('PLAYER_FARSIGHT_FOCUS_CHANGED')
+	-- petBar:RegisterEvent('UNIT_PET')
+	-- petBar:RegisterEvent('UNIT_FLAGS')
+	-- petBar:RegisterEvent('UNIT_AURA')
+	-- petBar:RegisterEvent('PET_BAR_UPDATE')
+	-- petBar:RegisterEvent('PET_BAR_UPDATE_COOLDOWN')
+	-- petBar:RegisterEvent('PET_BAR_SHOWGRID')
+	-- petBar:RegisterEvent('PET_BAR_HIDEGRID')
+	-- RegisterStateDriver(petBar, 'visibility', '[target=pet,nodead,exists,nobonusbar:5]show;hide')
 
 	self:RegisterMessage('KEYBOUND_ENABLED')
 	self:RegisterMessage('KEYBOUND_DISABLED')

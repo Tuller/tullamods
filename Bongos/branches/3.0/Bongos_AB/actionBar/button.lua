@@ -150,7 +150,6 @@ function ActionButton:OnEvent(event, arg1)
 end
 
 function ActionButton:OnAttributeChanged(var, val)
-	Bongos:Print(self:GetAttribute('state-parent'))
 	if var == 'state-parent' or var == 'statehidden' then
 		if self:IsShown() then
 			self:Update(true)
@@ -244,6 +243,7 @@ function ActionButton:OnShow()
 	end
 	updatable[self] = (self.id and HasAction(self.id) or nil)
 	self:UpdateEvents()
+	self:UpdateState()
 end
 
 function ActionButton:OnHide()
