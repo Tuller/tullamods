@@ -446,6 +446,7 @@ function Bongos:ShowOptions()
 		InterfaceOptionsFrame_OpenToFrame('Bongos')
 		return true
 	end
+	return false
 end
 
 --utility function: create a widget class
