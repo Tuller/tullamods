@@ -312,7 +312,9 @@ function Bongos:OnCmd(args)
 	elseif cmd == 'cleanup' then
 		self:Cleanup()
 	else
-		self:PrintHelp()
+		if not self:ShowOptions() then
+			self:PrintHelp()
+		end
 	end
 end
 
@@ -437,6 +439,13 @@ end
 
 function Bongos:GetMinimapButtonPosition(angle)
 	return self.db.profile.minimapPos
+end
+
+function Bongos:ShowOptions()
+	if LoadAddOn('Bongos_Options') then
+		InterfaceOptionsFrame_OpenToFrame('Bongos')
+		return true
+	end
 end
 
 --utility function: create a widget class

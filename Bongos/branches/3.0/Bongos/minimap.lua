@@ -39,7 +39,7 @@ function MinimapButton:Load()
 end
 
 function MinimapButton:OnClick(button)
-	if button == 'LeftButton' then		
+	if button == 'LeftButton' then
 		if KeyBound and IsShiftKeyDown() then
 			Bongos:SetLock(true)
 			KeyBound:Toggle()
@@ -50,8 +50,7 @@ function MinimapButton:OnClick(button)
 			Bongos:SetLock(not Bongos:IsLocked())
 		end
 	elseif button == 'RightButton' then
-		LoadAddOn('Bongos_Options')
-		InterfaceOptionsFrame_OpenToFrame('Bongos')
+		Bongos:ShowOptions()
 	end
 	self:OnEnter()
 end
@@ -70,17 +69,22 @@ function MinimapButton:OnEnter()
 		GameTooltip:SetText('Bongos3', 1, 1, 1)
 
 		if Bongos:IsLocked() then
-			GameTooltip:AddLine(L.UnlockBarsTip)
+			GameTooltip:AddLine(L.ConfigEnterTip)
 		else
-			GameTooltip:AddLine(L.LockBarsTip)
+			GameTooltip:AddLine(L.ConfigExitTip)
 		end
-		
+
 		if KeyBound then
 			if KeyBound:IsShown() then
-				GameTooltip:AddLine('<Right Click> to exit keybinding mode')
+				GameTooltip:AddLine(L.BindingEnterTip)
 			else
-				GameTooltip:AddLine('<Right Click> to enter keybinding mode')
+				GameTooltip:AddLine(L.BindingExitTip)
 			end
+		end
+
+		local enabled = select(4, GetAddOnInfo('Bongos_Options'))
+		if enabled then
+			GameTooltip:AddLine(L.ShowOptionsTip)
 		end
 		GameTooltip:Show()
 	end

@@ -60,12 +60,11 @@ L.Spacing = 'Spacing'
 L.Layout = 'Layout'
 
 --minimap button stuff
-L.ShowMenuTip = '<Right Click> to show the options menu'
-L.HideMenuTip = '<Right Click> to hide the options menu'
-L.LockBarsTip = '<Left Click> to exit configuration mode'
-L.UnlockBarsTip = '<Left Click> to enter configuration mode'
-L.LockButtonsTip = '<Shift Left Click> to lock button positions'
-L.UnlockButtonsTip = '<Shift Left Click> to unlock button positions'
+L.ConfigEnterTip = '<Left Click> to enter configuration mode'
+L.ConfigExitTip = '<Left Click> to exit configuration mode'
+L.BindingEnterTip = '<Shift Left Click> to enter binding mode'
+L.BindingExitTip = '<Shift Left Click> to exit binding mode'
+L.ShowOptionsTip = '<Right Click> to show the options menu'
 
 --Options Menu
 L.EnableStickyBars = 'Sticky Bars'
