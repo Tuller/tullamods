@@ -64,7 +64,7 @@ BBar.paddingY = 2
 local active = {}
 local unused = {}
 
-function BBar:Create(id, defaults, secure, strata)
+function BBar:Create(id, defaults, strata)
 	local id = tonumber(id) or id
 	assert(id, 'id expected')
 	assert(not active[id], format('BBar \'%s\' is already in use', id))
@@ -72,7 +72,7 @@ function BBar:Create(id, defaults, secure, strata)
 	local isNew = false
 	local bar = self:Restore(id)
 	if not bar then
-		bar = self:CreateNew(id, secure, strata)
+		bar = self:CreateNew(id, strata)
 		isNew = true
 	end
 	bar:LoadSettings(defaults)
@@ -82,13 +82,8 @@ function BBar:Create(id, defaults, secure, strata)
 	return bar, isNew
 end
 
-function BBar:CreateNew(id, secure, strata)
-	local bar
-	if secure then
-		bar = self:New(CreateFrame('Frame', nil, UIParent, 'SecureStateHeaderTemplate'))
-	else
-		bar = self:New(CreateFrame('Frame', nil, UIParent))
-	end
+function BBar:CreateNew(id, strata)
+	local bar = self:New(CreateFrame('Frame', nil, UIParent))
 	bar.id = id
 	bar.dragFrame = Bongos.Drag:Create(bar)
 
