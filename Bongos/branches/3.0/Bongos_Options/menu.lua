@@ -108,7 +108,7 @@ do
 
 	function ColorSelect:Create(name, parent, SaveColor, LoadColor)
 		local f = self:New(CreateFrame('Button', parent:GetName() .. name, parent))
-		f:SetWidth(16); f:SetHeight(16)
+		f:SetWidth(24); f:SetHeight(24)
 		f:SetNormalTexture('Interface/ChatFrame/ChatFrameColorSwatch')
 		f.SaveColor = SaveColor
 		f.LoadColor = LoadColor
@@ -116,14 +116,14 @@ do
 		f.cancelFunc = function() f:SetColor(f.r, f.g, f.b) end
 
 		local bg = f:CreateTexture(nil, 'BACKGROUND')
-		bg:SetWidth(14); bg:SetHeight(14)
+		bg:SetWidth(21); bg:SetHeight(21)
 		bg:SetTexture(1, 1, 1)
 		bg:SetPoint('CENTER')
 		f.bg = bg
 
 		local text = f:CreateFontString(nil, 'ARTWORK')
-		text:SetFontObject('GameFontHighlightSmall')
-		text:SetPoint('LEFT', f, 'RIGHT')
+		text:SetFontObject('GameFontNormalSmall')
+		text:SetPoint('LEFT', f, 'RIGHT', 2, 0)
 		text:SetText(name)
 		f.text = text
 
