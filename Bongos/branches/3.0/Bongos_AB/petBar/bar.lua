@@ -81,9 +81,10 @@ local function Bar_OnCreate(self)
 	self.Layout = Bar_Layout
 	self.SetSpacing = Bar_SetSpacing
 	self.GetSpacing = Bar_GetSpacing
+	self.bar = CreateFrame('Frame', nil, self, 'SecureStateHeaderTemplate')
 
 	for i = 1, NUM_PET_ACTION_SLOTS do
-		PetBar.Button:Set(i, self)
+		PetBar.Button:Set(i, self.bar)
 	end
 end
 
@@ -97,7 +98,7 @@ function PetBar:Load()
 		y = 39,
 	}
 
-	local bar, isNew = Bongos.Bar:Create('pet', defaults, true)
+	local bar, isNew = Bongos.Bar:Create('pet', defaults)
 	if isNew then
 		Bar_OnCreate(bar)
 	end
@@ -115,19 +116,7 @@ function PetBar:Load()
 	petBar:RegisterEvent("PET_BAR_SHOWGRID");
 	petBar:RegisterEvent("PET_BAR_HIDEGRID");
 	petBar:RegisterEvent("PET_BAR_HIDE");
-	RegisterStateDriver(bar, 'visibility',  '[target=pet,nodead,exists,nobonusbar:5]show;hide')
-	
-	-- petBar:RegisterEvent('PLAYER_CONTROL_LOST')
-	-- petBar:RegisterEvent('PLAYER_CONTROL_GAINED')
-	-- petBar:RegisterEvent('PLAYER_FARSIGHT_FOCUS_CHANGED')
-	-- petBar:RegisterEvent('UNIT_PET')
-	-- petBar:RegisterEvent('UNIT_FLAGS')
-	-- petBar:RegisterEvent('UNIT_AURA')
-	-- petBar:RegisterEvent('PET_BAR_UPDATE')
-	-- petBar:RegisterEvent('PET_BAR_UPDATE_COOLDOWN')
-	-- petBar:RegisterEvent('PET_BAR_SHOWGRID')
-	-- petBar:RegisterEvent('PET_BAR_HIDEGRID')
-	-- RegisterStateDriver(petBar, 'visibility', '[target=pet,nodead,exists,nobonusbar:5]show;hide')
+	RegisterStateDriver(bar.bar, 'visibility',  '[target=pet,nodead,exists,nobonusbar:5]show;hide')
 
 	self:RegisterMessage('KEYBOUND_ENABLED')
 	self:RegisterMessage('KEYBOUND_DISABLED')
@@ -140,7 +129,7 @@ function PetBar:Unload()
 	self:UnregisterAllMessages()
 	PetActionBarFrame:UnregisterAllEvents()
 
-	UnregisterStateDriver(PetActionBarFrame, 'visibility')
+	UnregisterStateDriver(self.bar.bar, 'visibility')
 end
 
 function PetBar:KEYBOUND_ENABLED()

@@ -64,8 +64,8 @@ end
 function ActionButton:Get(parent)
 	local b = self:GetUnused(parent) or self:Create(parent)
 	parent:SetAttribute('addchild', b)
-	parent:Attach(b)
 
+	b:SetParent(parent)
 	b:ShowHotkey(Config:ShowingHotkeys())
 	b:ShowMacro(Config:ShowingMacros())
 	b:UpdateEquippedColor()
@@ -423,7 +423,7 @@ function ActionButton:UpdateShowStates()
 		--so the possess bar's actions change dynamically, so we can not determine beforehand if we're going to have something to show or not
 		--so, default to showing all actions
 		--and yes, 999 is the magic state for the possess bar
-		if self:GetParent():IsPossessBar() then
+		if self:GetParent():GetParent():IsPossessBar() then
 			if newStates then
 				newStates = newStates .. ',' .. 999
 			else
@@ -431,7 +431,7 @@ function ActionButton:UpdateShowStates()
 			end
 		end
 
-		for i = 2, self:GetParent():NumSets() do
+		for i = 2, self:GetParent():GetParent():NumSets() do
 			local action = self:GetAttribute(format('*action-s%ds', i)) or id
 			if HasAction(action) then
 				if newStates then
@@ -479,25 +479,25 @@ function ActionButton:UpdateHotkey()
 end
 
 function ActionButton:GetHotkey()
-	local bindings = self:GetParent():GetBindings(self.index)
+	local bindings = self:GetParent():GetParent():GetBindings(self.index)
 	return bindings and KeyBound:ToShortKey(string.split(';', bindings))
 end
 
 --binding updating
 function ActionButton:SetKey(key)
-	self:GetParent():AddBinding(self.index, key)
+	self:GetParent():GetParent():AddBinding(self.index, key)
 end
 
 function ActionButton:FreeKey(key)
-	return self:GetParent():FreeBinding(key)
+	return self:GetParent():GetParent():FreeBinding(key)
 end
 
 function ActionButton:ClearBindings()
-	self:GetParent():ClearBindings(self.index)
+	self:GetParent():GetParent():ClearBindings(self.index)
 end
 
 function ActionButton:GetBindings()
-	local bindings = self:GetParent():GetBindings(self.index)
+	local bindings = self:GetParent():GetParent():GetBindings(self.index)
 	if bindings then
 		local keys
 		for i = 1, select('#', string.split(';', bindings)) do
@@ -513,7 +513,7 @@ function ActionButton:GetBindings()
 end
 
 function ActionButton:GetActionName()
-	return format('ActionBar%s Button%d', self:GetParent().id, self.index)
+	return format('ActionBar%s Button%d', self:GetParent():GetParent().id, self.index)
 end
 
 --border coloring

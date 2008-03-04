@@ -21,7 +21,7 @@ function ActionBar:Create(numRows, numCols, point, x, y)
 			id = id + 1
 		end
 
-		local bar, isNew = self.super.Create(self, id, {rows = numRows, cols = numCols}, true)
+		local bar, isNew = self.super.Create(self, id, {rows = numRows, cols = numCols})
 		if isNew then
 			bar:OnCreate()
 		end
@@ -46,7 +46,7 @@ function ActionBar:Create(numRows, numCols, point, x, y)
 end
 
 function ActionBar:Load(id)
-	local bar, isNew = self.super.Create(self, id, nil, true)
+	local bar, isNew = self.super.Create(self, id)
 	if isNew then
 		bar:OnCreate()
 	end
@@ -63,9 +63,10 @@ function ActionBar:Load(id)
 end
 
 function ActionBar:OnCreate()
+	self.bar = CreateFrame('Frame', nil, self, 'SecureStateHeaderTemplate')
+	self.bar:SetAttribute('statemap-state', '$input')
+	self.bar:SetAttribute('statebindings', '*:main')
 	self.buttons = {}
-	self:SetAttribute('statemap-state', '$input')
-	self:SetAttribute('statebindings', '*:main')
 end
 
 function ActionBar:OnDelete()
@@ -75,10 +76,10 @@ function ActionBar:OnDelete()
 	end
 	self:ReleaseAllIDs()
 
-	self:SetAttribute('statebutton', nil)
-	self:SetAttribute('*statebutton2', nil)
-	UnregisterStateDriver(self, 'state', 0)
-	UnregisterStateDriver(self, 'visibility', 'show')
+	self.bar:SetAttribute('statebutton', nil)
+	self.bar:SetAttribute('*statebutton2', nil)
+	UnregisterStateDriver(self.bar, 'state', 0)
+	UnregisterStateDriver(self.bar, 'visibility', 'show')
 
 	bars[self.id] = nil
 end
@@ -171,7 +172,7 @@ function ActionBar:Layout()
 		for j = 1, cols do
 			local button = self.buttons[j + cols*(i-1)]
 			button:ClearAllPoints()
-			button:SetPoint('TOPLEFT', buttonSize*(j-1), -buttonSize*(i-1))
+			button:SetPoint('TOPLEFT', self, 'TOPLEFT', buttonSize*(j-1), -buttonSize*(i-1))
 		end
 	end
 
@@ -187,7 +188,7 @@ function ActionBar:UpdateShowStates()
 	end
 
 	if changed then
-		SecureStateHeader_Refresh(self)
+		SecureStateHeader_Refresh(self.bar)
 		if not InCombatLockdown() then
 			self:UpdateShowEmpty()
 		end
@@ -241,8 +242,8 @@ function ActionBar:UpdateStateButton()
 		sb2 = (sb2 and sb2 .. ';' .. state) or state
 	end
 
-	self:SetAttribute('statebutton', sb1)
-	self:SetAttribute('*statebutton2', sb2)
+	self.bar:SetAttribute('statebutton', sb1)
+	self.bar:SetAttribute('*statebutton2', sb2)
 end
 
 function ActionBar:NumSets()
@@ -255,7 +256,7 @@ end
 --needs to be called whenever we change a state condition
 --or when we change the number of available states
 function ActionBar:UpdateStateDriver()
-	UnregisterStateDriver(self, 'state', 0)
+	UnregisterStateDriver(self.bar, 'state', 0)
 
 	local header = ''
 
@@ -274,7 +275,7 @@ function ActionBar:UpdateStateDriver()
 	self:UpdateStateButton()
 
 	if header ~= '' then
-		RegisterStateDriver(self, 'state', header .. '0')
+		RegisterStateDriver(self.bar, 'state', header .. '0')
 	end
 end
 
@@ -310,7 +311,7 @@ end
 --[[ Button Creation ]]--
 
 function ActionBar:AddButton(index)
-	local button = Action.Button:Get(self)
+	local button = Action.Button:Get(self.bar)
 	self.buttons[index] = button
 
 	button.index = index
@@ -504,8 +505,8 @@ function ActionBar:UpdateButtonBindings(index)
 	if button then
 		button:SetAttribute('bindings-main', self:GetBindings(index))
 		button:UpdateHotkey()
-		self:SetAttribute('_bindingset', nil)
-		SecureStateHeader_Refresh(self)
+		self.bar:SetAttribute('_bindingset', nil)
+		SecureStateHeader_Refresh(self.bar)
 	end
 end
 
@@ -513,9 +514,9 @@ end
 --[[ Right Click Selfcast ]]--
 
 function ActionBar:SetRightClickUnit(unit)
-	self:SetAttribute('*unit2', unit)
+	self.bar:SetAttribute('*unit2', unit)
 	for i = 2, self:NumSets() do
-		self:SetAttribute(format('*unit-s%ds', i), unit)
+		self.bar:SetAttribute(format('*unit-s%ds', i), unit)
 	end
 end
 
@@ -755,12 +756,12 @@ function ActionBar:SetShowConditions(showStates)
 end
 
 function ActionBar:UpdateShowConditions()
-	UnregisterStateDriver(self, 'visibility', 'show')
-	self:Show()
+	UnregisterStateDriver(self.bar, 'visibility', 'show')
+	self.bar:Show()
 
 	local conditions = self:GetShowConditions()
 	if conditions then
-		RegisterStateDriver(self, 'visibility', conditions .. 'show;hide', 'show')
+		RegisterStateDriver(self.bar, 'visibility', conditions .. 'show;hide', 'show')
 	end
 end
 

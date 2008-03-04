@@ -21,7 +21,7 @@ function PetButton:Set(id, parent)
 	button:SetScripts()
 	button:Style()
 	button:ShowHotkey(Config:ShowingHotkeys())
-	parent:Attach(button)
+	button:SetParent(parent)
 
 	return button
 end
@@ -92,9 +92,6 @@ end
 
 function PetButton:GetHotkey()
 	local key = GetBindingKey(format('CLICK %s:LeftButton', self:GetName()))
-	-- if not key then
-		-- key = GetBindingText(GetBindingKey('BONUSACTIONBUTTON' .. self:GetID()), 'KEY_')
-	-- end
 	return KeyBound:ToShortKey(key)
 end
 
