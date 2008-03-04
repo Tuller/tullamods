@@ -16,7 +16,7 @@ function CastBar:Load()
 		showText = true,
 	}
 
-	local bar, isNew = Bongos.Bar:Create('cast', defaults, false, 'HIGH')
+	local bar, isNew = Bongos.Bar:Create('cast', defaults, 'HIGH')
 	if isNew then
 		self:OnBarCreate(bar)
 	end
