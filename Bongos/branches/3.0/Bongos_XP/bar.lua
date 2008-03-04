@@ -30,7 +30,7 @@ function XP:Load()
 		alwaysShowText = true,
 	}
 
-	local bar, isNew = Bongos.Bar:Create('xp', defaults, false, 'BACKGROUND')
+	local bar, isNew = Bongos.Bar:Create('xp', defaults, 'BACKGROUND')
 	if isNew then
 		self:OnBarCreate(bar)
 	end
