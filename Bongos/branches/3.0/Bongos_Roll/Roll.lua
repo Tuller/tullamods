@@ -7,7 +7,7 @@ local Bongos = LibStub('AceAddon-3.0'):GetAddon('Bongos3')
 local Roll = Bongos:NewModule('Roll')
 
 function Roll:Load()
-	self.bar, isNew = Bongos.Bar:Create('roll', {point = 'LEFT'}, false, 'DIALOG')
+	self.bar, isNew = Bongos.Bar:Create('roll', {point = 'LEFT'}, 'DIALOG')
 	if isNew then
 		self:OnBarCreate(self.bar)
 	end
