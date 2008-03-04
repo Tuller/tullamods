@@ -225,7 +225,7 @@ function MinimapBar:Load()
 		point = 'TOPRIGHT',
 	}
 
-	local bar, isNew = Bongos.Bar:Create('minimap', defaults, false, 'BACKGROUND')
+	local bar, isNew = Bongos.Bar:Create('minimap', defaults, 'BACKGROUND')
 	if isNew then
 		Bar_OnCreate(bar)
 	end
