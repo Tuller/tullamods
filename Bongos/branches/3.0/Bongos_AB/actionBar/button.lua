@@ -336,7 +336,7 @@ function ActionButton:UpdateUsable()
 			icon:SetVertexColor(1, 1, 1)
 		end
 	--no mana
-	elseif notEnoughMana and Config:ColorOOM() then
+	elseif notEnoughMana then
 		icon:SetVertexColor(Config:GetOOMColor())
 	--unusable
 	else

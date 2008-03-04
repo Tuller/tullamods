@@ -14,7 +14,6 @@ function Config:OnInitialize()
 			showMacros = true,
 			oorColoring = true,
 			oorColor = {1, 0.5, 0.5},
-			oomColoring = true,
 			oomColor = {0.5, 0.5, 1},
 			buffColoring = true,
 			buffColor = {0, 1, 0},
@@ -133,15 +132,6 @@ end
 
 
 --set oom color
-function Config:SetOOMColoring(enable)
-	self.db.profile.oomColoring = enable or false
-	Bongos:GetModule('ActionBar').Button:ForAll('UpdateUsable')
-end
-
-function Config:ColorOOM()
-	return self.db.profile.oomColoring
-end
-
 function Config:SetOOMColor(r, g, b)
 	self.db.profile.oomColor[1] = r
 	self.db.profile.oomColor[2] = g
