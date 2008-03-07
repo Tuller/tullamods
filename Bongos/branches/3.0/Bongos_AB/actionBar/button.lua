@@ -19,15 +19,10 @@ do
 	function ActionButton:Create(parent)
 		local _G = getfenv(0)
 		local b = self:New(CreateFrame('CheckButton', format('Bongos3ActionButton%d', id), parent, 'SecureActionButtonTemplate, ActionButtonTemplate'))
-
 		local name = b:GetName()
+
 		b.icon = _G[name .. 'Icon']
-		b.icon:SetTexCoord(0.06, 0.94, 0.06, 0.94)
-
 		b.border = _G[name .. 'Border']
-
-		b.normal = _G[name .. 'NormalTexture']
-		b.normal:SetVertexColor(1, 1, 1, 0.5)
 
 		b.cooldown = _G[name .. 'Cooldown']
 		b.cooldown:SetFrameLevel(max(b.cooldown:GetFrameLevel() - 1, 0))
@@ -55,9 +50,23 @@ do
 		b:RegisterForDrag('LeftButton', 'RightButton')
 		b:RegisterForClicks('AnyUp')
 		b:Hide()
+		b:Skin()
 
 		id = id + 1
 		return b
+	end
+end
+
+function ActionButton:Skin()
+	self.icon:SetTexCoord(0.06, 0.94, 0.06, 0.94)
+	self:GetNormalTexture():SetVertexColor(1, 1, 1, 0.5)
+end
+
+function ActionButton:UpdateNormalTexture(hasAction)
+	if hasAction then
+		self:SetNormalTexture('Interface/Buttons/UI-Quickslot2')
+	else
+		self:SetNormalTexture('Interface/Buttons/UI-Quickslot')
 	end
 end
 
@@ -265,14 +274,12 @@ function ActionButton:Update(refresh)
 		icon:SetTexture(texture)
 		icon:Show()
 		self.rangeTimer = (ActionHasRange(action) and -1) or nil
-
-		self:SetNormalTexture('Interface/Buttons/UI-Quickslot2')
+		self:UpdateNormalTexture(true)
 	else
 		icon:Hide()
 		cooldown:Hide()
 		self.rangeTimer = nil
-
-		self:SetNormalTexture('Interface/Buttons/UI-Quickslot')
+		self:UpdateNormalTexture(nil)
 		self.hotkey:SetVertexColor(0.6, 0.6, 0.6)
 	end
 

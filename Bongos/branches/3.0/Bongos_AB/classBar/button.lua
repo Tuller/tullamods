@@ -25,27 +25,11 @@ function ClassButton:Create(id, parent)
 	button:SetWidth(BUTTON_SIZE); button:SetHeight(BUTTON_SIZE)
 	button:SetID(id)
 
-	--icon texture
-	local icon = button:CreateTexture(name .. 'Icon', 'BACKGROUND')
-	icon:SetTexCoord(0.06, 0.94, 0.06, 0.94)
-	icon:SetAllPoints(button)
+	button.icon = button:CreateTexture(name .. 'Icon', 'BACKGROUND')
 
-	--normal, pushed, highlight, checked textures
-	local normalTexture = button:CreateTexture(name .. 'NormalTexture')
-	normalTexture:SetWidth(NT_SIZE); normalTexture:SetHeight(NT_SIZE)
-	normalTexture:SetTexture('Interface\\Buttons\\UI-Quickslot2')
-	normalTexture:SetPoint('CENTER', 0, -1)
+	button:CreateTexture(name .. 'NormalTexture')
 
-	button:SetPushedTexture('Interface\\Buttons\\UI-Quickslot-Depress')
-	button:SetHighlightTexture('Interface\\Buttons\\ButtonHilight-Square')
-	button:SetCheckedTexture('Interface\\Buttons\\CheckButtonHilight')
-
-	--hotkey
-	local hotkey = button:CreateFontString(name .. 'HotKey', 'ARTWORK')
-	hotkey:SetFontObject('NumberFontNormalSmallGray')
-	hotkey:SetPoint('TOPRIGHT', 2, -2)
-	hotkey:SetJustifyH('RIGHT')
-	hotkey:SetWidth(BUTTON_SIZE); hotkey:SetHeight(10)
+	button.hotkey = button:CreateFontString(name .. 'HotKey', 'ARTWORK')
 
 	--cooldown model
 	button.cooldown = CreateFrame('Cooldown', nil, button, 'CooldownFrameTemplate')
@@ -58,6 +42,7 @@ function ClassButton:Create(id, parent)
 	button:SetScript('OnShow', self.UpdateEvents)
 	button:SetScript('OnHide', self.UpdateEvents)
 
+	button:Skin()
 	button:ShowHotkey(Config:ShowingHotkeys())
 	button:UpdateSpell()
 	button:UpdateEvents()
@@ -65,6 +50,24 @@ function ClassButton:Create(id, parent)
 	buttons[id] = button
 
 	return button
+end
+
+function ClassButton:Skin()
+	self.icon:SetAllPoints(self)
+	self.icon:SetTexCoord(0.06, 0.94, 0.06, 0.94)
+
+	self:SetNormalTexture('Interface\\Buttons\\UI-Quickslot2')
+	self:GetNormalTexture():SetWidth(NT_SIZE); normalTexture:SetHeight(NT_SIZE)
+	self:GetNormalTexture():SetPoint('CENTER', 0, -1)
+
+	self:SetPushedTexture('Interface\\Buttons\\UI-Quickslot-Depress')
+	self:SetHighlightTexture('Interface\\Buttons\\ButtonHilight-Square')
+	self:SetCheckedTexture('Interface\\Buttons\\CheckButtonHilight')
+
+	self.hotkey:SetFontObject('NumberFontNormalSmallGray')
+	self.hotkey:SetPoint('TOPRIGHT', 2, -2)
+	self.hotkey:SetJustifyH('RIGHT')
+	self.hotkey:SetWidth(BUTTON_SIZE); hotkey:SetHeight(10)
 end
 
 
@@ -161,9 +164,6 @@ end
 
 function ClassButton:GetHotkey()
 	local key = GetBindingKey(format('CLICK %s:LeftButton', self:GetName()))
-	-- if not key then
-		-- key = GetBindingText(GetBindingKey('SHAPESHIFTBUTTON' .. self:GetID()), 'KEY_')
-	-- end
 	return KeyBound:ToShortKey(key)
 end
 

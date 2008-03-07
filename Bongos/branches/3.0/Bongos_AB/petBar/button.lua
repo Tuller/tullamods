@@ -19,14 +19,14 @@ function PetButton:Set(id, parent)
 	local button = self:New(self:Get(id))
 	button:SetToplevel(nil)
 	button:SetScripts()
-	button:Style()
+	button:Skin()
 	button:ShowHotkey(Config:ShowingHotkeys())
 	button:SetParent(parent)
 
 	return button
 end
 
-function PetButton:Style()
+function PetButton:Skin()
 	local name = self:GetName()
 
 	local autoCast = getglobal(name .. 'AutoCast')
