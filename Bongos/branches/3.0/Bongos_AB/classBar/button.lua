@@ -26,9 +26,6 @@ function ClassButton:Create(id, parent)
 	button:SetID(id)
 
 	button.icon = button:CreateTexture(name .. 'Icon', 'BACKGROUND')
-
-	button:CreateTexture(name .. 'NormalTexture')
-
 	button.hotkey = button:CreateFontString(name .. 'HotKey', 'ARTWORK')
 
 	--cooldown model
@@ -57,8 +54,10 @@ function ClassButton:Skin()
 	self.icon:SetTexCoord(0.06, 0.94, 0.06, 0.94)
 
 	self:SetNormalTexture('Interface\\Buttons\\UI-Quickslot2')
-	self:GetNormalTexture():SetWidth(NT_SIZE); normalTexture:SetHeight(NT_SIZE)
-	self:GetNormalTexture():SetPoint('CENTER', 0, -1)
+	local nt = self:GetNormalTexture()
+	nt:ClearAllPoints()
+	nt:SetPoint('CENTER', 0, -1)
+	nt:SetWidth(NT_SIZE); nt:SetHeight(NT_SIZE)
 
 	self:SetPushedTexture('Interface\\Buttons\\UI-Quickslot-Depress')
 	self:SetHighlightTexture('Interface\\Buttons\\ButtonHilight-Square')
@@ -67,7 +66,7 @@ function ClassButton:Skin()
 	self.hotkey:SetFontObject('NumberFontNormalSmallGray')
 	self.hotkey:SetPoint('TOPRIGHT', 2, -2)
 	self.hotkey:SetJustifyH('RIGHT')
-	self.hotkey:SetWidth(BUTTON_SIZE); hotkey:SetHeight(10)
+	self.hotkey:SetWidth(BUTTON_SIZE); self.hotkey:SetHeight(10)
 end
 
 
