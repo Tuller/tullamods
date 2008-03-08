@@ -38,7 +38,7 @@ local function Bar_Layout(self)
 	end
 
 	local prev
-	for i, rule in ipairs(PocketsDB) do
+	for i, rule in ipairs(self.sets.cats) do
 		local item = self.items[i]
 		if not item then
 			item = DockButton:Create(self)
@@ -54,7 +54,7 @@ local function Bar_Layout(self)
 		prev = item
 	end
 
-	for i = #PocketsDB + 1, #self.items do
+	for i = #self.sets.cats + 1, #self.items do
 		self.items[i]:Hide()
 		item:Hide()
 	end
