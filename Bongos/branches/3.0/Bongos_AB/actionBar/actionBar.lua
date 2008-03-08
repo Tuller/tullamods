@@ -137,7 +137,7 @@ function ActionBar:UpdateGrid()
 		self.needsGridUpdate = true
 	else
 		self.needsGridUpdate = nil
-		self.Bar:ForAllShown('UpdateShowEmpty')
+		self.Bar:ForAllShown('UpdateShowStates')
 	end
 end
 
