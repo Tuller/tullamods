@@ -205,7 +205,7 @@ end
 --[[ Events ]]--
 
 --player login
-function BagEvents:Enable()
+function BagEvents:OnEnable()
 	self:RegisterEvent('BAG_UPDATE')
 	self:RegisterEvent('ITEM_LOCK_CHANGED')
 	self:RegisterEvent('BAG_UPDATE_COOLDOWN')
