@@ -1,0 +1,13 @@
+## Interface: 20400
+## Title: Bongos3 Minimap
+## Title-zhCN: |cFF0099FF[Bongos3]|r 小地图
+## Notes: A customizable, movable minimap
+## Notes-zhCN: Bongos3 系列 小地图。
+## Author: Tuller
+## Dependencies: Bongos
+## OptionalDeps: Titan
+localization\localization.lua
+localization\localization.cn.lua
+localization\localization.fr.lua
+localization\localization.es.lua
+bar.lua
