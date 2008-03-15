@@ -206,6 +206,7 @@ end
 --by default, we check for modifiers, then paging, then stances, then targeting
 function Config:SetStateConditions(conditions)
 	self.db.profile.stateConditions = conditions
+	Bongos:GetModule('ActionBar').Bar:ForAll('UpdateStateDriver')
 end
 
 function Config:GetStateConditions()
