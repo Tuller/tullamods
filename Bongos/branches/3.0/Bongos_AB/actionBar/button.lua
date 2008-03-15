@@ -190,19 +190,17 @@ function ActionButton:OnUpdate(elapsed)
 	end
 
 	-- Handle range indicator
-	if self.rangeTimer then
-		local action = self:GetPagedID()
-		local hotkey = self.hotkey
-		if IsActionInRange(action) == 0 then
-			hotkey:SetVertexColor(1, 0.1, 0.1)
-			if IsUsableAction(action) and Config:ColorOOR() then
-				self.icon:SetVertexColor(Config:GetOORColor())
-			end
-		else
-			hotkey:SetVertexColor(0.6, 0.6, 0.6)
-			if IsUsableAction(action) then
-				self.icon:SetVertexColor(1, 1, 1)
-			end
+	local action = self:GetPagedID()
+	local hotkey = self.hotkey
+	if IsActionInRange(action) == 0 then
+		hotkey:SetVertexColor(1, 0.1, 0.1)
+		if IsUsableAction(action) and Config:ColorOOR() then
+			self.icon:SetVertexColor(Config:GetOORColor())
+		end
+	else
+		hotkey:SetVertexColor(0.6, 0.6, 0.6)
+		if IsUsableAction(action) then
+			self.icon:SetVertexColor(1, 1, 1)
 		end
 	end
 end
@@ -273,12 +271,10 @@ function ActionButton:Update(refresh)
 	if texture then
 		icon:SetTexture(texture)
 		icon:Show()
-		self.rangeTimer = (ActionHasRange(action) and -1) or nil
 		self:UpdateNormalTexture(true)
 	else
 		icon:Hide()
 		cooldown:Hide()
-		self.rangeTimer = nil
 		self:UpdateNormalTexture(nil)
 		self.hotkey:SetVertexColor(0.6, 0.6, 0.6)
 	end
