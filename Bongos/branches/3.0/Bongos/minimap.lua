@@ -76,9 +76,9 @@ function MinimapButton:OnEnter()
 
 		if KeyBound then
 			if KeyBound:IsShown() then
-				GameTooltip:AddLine(L.BindingEnterTip)
-			else
 				GameTooltip:AddLine(L.BindingExitTip)
+			else
+				GameTooltip:AddLine(L.BindingEnterTip)
 			end
 		end
 
