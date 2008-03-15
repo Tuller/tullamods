@@ -15,15 +15,25 @@ do
 	f.nextUpdate = 0.1
 	f.bars = {}
 
+	--check each child for focus, as well as their children
+	--i'm using a BFS because its likely that level 2 (the buttons on a bar in the case of action bars) will be the focus if level 1 is not
 	local function IsChildFocus(...)
 		for i = 1, select('#', ...) do
-			local f = select(i, ...)
-			if GetMouseFocus() == f or IsChildFocus(f:GetChildren()) then
+			if GetMouseFocus() == select(i, ...) then
+				return true
+			end
+		end
+
+		for i = 1, select('#', ...) do
+			if IsChildFocus(select(i, ...):GetChildren()) then
 				return true
 			end
 		end
 	end
 
+	--so WorldFrame is the foucus if no other bars have focus
+	--why are we not checking for bar having focus?  because no bongos bar should ever have enable mouse set to true
+	--why not check bar.drag? because bars are not faded in config mode
 	local function IsBarFocus(bar)
 		if MouseIsOver(bar, 1, -1, -1, 1) then
 			return GetMouseFocus() == WorldFrame or IsChildFocus(bar:GetChildren())
