@@ -20,10 +20,11 @@ L.EnemyTarget = 'Enemy Target'
 L.Modifier = 'Modifier'
 L.Prowl = 'Prowl'
 L.ShadowForm = 'Shadowform/Redemption'
-L.Sets = 'Sets'
+L.Sets = 'Action Sets'
 L.PossessBar = 'Act As Possess Bar'
 L.ShowStates = 'Show States'
 L.Set = 'Set'
+L.CreateBarHelp = 'Create a new action bar via holding <Alt> and dragging on the screen.  Delete an action bar via <Alt Right Click>'
 
 
 --Options Menu Stuff

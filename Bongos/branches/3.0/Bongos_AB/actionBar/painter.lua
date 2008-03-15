@@ -5,6 +5,7 @@
 
 local Bongos = LibStub('AceAddon-3.0'):GetAddon('Bongos3')
 local Action = Bongos:GetModule('ActionBar')
+local L = LibStub('AceLocale-3.0'):GetLocale('Bongos3-AB')
 
 local Painter = CreateFrame('Frame')
 Action.Painter = Painter
@@ -20,9 +21,33 @@ function Painter:Load()
 	self:SetScript('OnDragStart', self.ShowDragBox)
 	self:SetScript('OnDragStop', self.CreateBar)
 	self:SetScript('OnUpdate', self.OnUpdate)
+	self:SetScript('OnShow', self.ShowHelp)
+	self:SetScript('OnHide', self.HideHelp)
 	self.nextUpdate = 0
 
 	self.loaded = true
+end
+
+function Painter:ShowHelp()
+	if not StaticPopupDialogs['CREATE_ACTIONBAR_BONGOS'] then
+		StaticPopupDialogs['CREATE_ACTIONBAR_BONGOS'] = {
+			text = TEXT(L.CreateBarHelp),
+			button1 = TEXT(OKAY),
+			timeout = 0,
+			hideOnEscape = 1,
+			OnAccept = function()
+				self:SetScript('OnShow', nil)
+				self:SetScript('OnHide', nil)
+			end,
+		}
+	end
+	StaticPopup_Show('CREATE_ACTIONBAR_BONGOS')
+end
+
+function Painter:HideHelp()
+	if StaticPopupDialogs['CREATE_ACTIONBAR_BONGOS'] then
+		StaticPopup_Hide('CREATE_ACTIONBAR_BONGOS')
+	end
 end
 
 function Painter:OnUpdate(elapsed)
