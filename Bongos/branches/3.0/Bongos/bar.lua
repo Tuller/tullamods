@@ -25,7 +25,8 @@ do
 		end
 
 		for i = 1, select('#', ...) do
-			if IsChildFocus(select(i, ...):GetChildren()) then
+			local f = select(i, ...)
+			if f:IsShown() and IsChildFocus(f:GetChildren()) then
 				return true
 			end
 		end
