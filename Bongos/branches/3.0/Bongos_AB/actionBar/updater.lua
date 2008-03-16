@@ -25,25 +25,23 @@ end
 --remove any values from t that are not in toClone
 --adds any values from tableToClone that are not in t
 --requires that both tables be using the same key value pairs
-local function CloneTable(t, toClone)
+local function CloneTable(from, to)
 	local changed = false
 
-	--remove any values not in tClone
-	for i in pairs(t) do
-		if not toClone[i] then
-			t[i] = nil
+	for i,v in pairs(to) do
+		if from[i] ~= v then
+			to[i] = from[i]
 			changed = true
 		end
 	end
 
-	--add any values in tClone that are not in t
-	for i,v in pairs(toClone) do
-		if not t[i] then
-			t[i] = v
+	for i,v in pairs(from) do
+		if to[i] ~= v then
+			to[i] = v
 			changed = true
 		end
 	end
-
+	
 	return changed
 end
 
@@ -70,12 +68,16 @@ Updater:SetScript('OnEvent', function(self, event, unit)
 			end
 		elseif event == 'PLAYER_AURAS_CHANGED' then
 			self:UpdatePlayerBuffs()
+		elseif event == 'PLAYER_ENTERING_WORLD' then
+			self:UpdateTargetBuffs()
+			self:UpdatePlayerBuffs()
 		end
 	end
 end)
 Updater:RegisterEvent('UNIT_AURA')
 Updater:RegisterEvent('PLAYER_AURAS_CHANGED')
 Updater:RegisterEvent('PLAYER_TARGET_CHANGED')
+Updater:RegisterEvent('PLAYER_ENTERING_WORLD')
 
 
 --on update script, handles throttled buff and debuff updating as well as range updating
@@ -119,7 +121,7 @@ function Updater:UpdatePlayerBuffs()
 		i = i + 1
 	until not buff
 
-	if CloneTable(playerBuffs, newVals) then
+	if CloneTable(newVals, playerBuffs) then
 		changed = true
 	end
 
@@ -166,7 +168,7 @@ function Updater:UpdateFriendlyTargetBuffs()
 	until not buff
 
 	--set changed to true if the target buffs table has changed
-	if CloneTable(targetBuffs, newVals) then
+	if CloneTable(newVals, targetBuffs) then
 		changed = true
 	end
 
@@ -191,7 +193,7 @@ function Updater:UpdateEnemyTargetDebuffs()
 	until not buff
 
 	--set changed to true if the target debuffs table has changed
-	if CloneTable(targetDebuffs, newVals) then
+	if CloneTable(newVals, targetDebuffs) then
 		changed = true
 	end
 
