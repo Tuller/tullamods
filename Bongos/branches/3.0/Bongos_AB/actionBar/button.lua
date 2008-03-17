@@ -46,7 +46,7 @@ do
 		b:SetAttribute('checkselfcast', true)
 		b:SetAttribute('useparent-unit', true)
 		b:SetAttribute('useparent-statebutton', true)
-		
+
 		b:RegisterForDrag('LeftButton', 'RightButton')
 		b:RegisterForClicks('AnyUp')
 		b:Hide()
@@ -422,7 +422,7 @@ function ActionButton:UpdateShowStates()
 		if HasAction(id) then
 			newStates = 0
 		end
-		
+
 		--so the possess bar's actions change dynamically, so we can not determine beforehand if we're going to have something to show or not
 		--so, default to showing all actions
 		--and yes, 999 is the magic state for the possess bar
