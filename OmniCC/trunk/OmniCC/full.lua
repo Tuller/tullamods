@@ -154,13 +154,13 @@ function OmniCC:CreateTimer(cooldown)
 	timer:SetScript('OnUpdate', Timer_OnUpdate)
 
 	local text = timer:CreateFontString(nil, 'OVERLAY')
-	text:SetPoint('CENTER', timer, 'CENTER', 0, 1)
+	text:SetPoint('CENTER', 0, 1)
 	timer.text = text
 
 	-- parent icon, used for shine stuff
 	local parent = cooldown:GetParent()
 	if parent then
-		if parent.icon then
+		if parent.icon and type(parent.icon) == 'table' then
 			timer.icon = parent.icon
 		else
 			local name = parent:GetName()
