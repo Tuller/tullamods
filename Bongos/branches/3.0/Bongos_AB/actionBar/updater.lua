@@ -28,16 +28,18 @@ end
 local function CloneTable(from, to)
 	local changed = false
 
-	for i,v in pairs(to) do
-		if from[i] ~= v then
-			to[i] = from[i]
+	for i,oldVal in pairs(to) do
+		local newVal = from[i]
+		if oldVal ~= newVal then
+			to[i] = newVal
 			changed = true
 		end
 	end
 
-	for i,v in pairs(from) do
-		if to[i] ~= v then
-			to[i] = v
+	for i,newVal in pairs(from) do
+		local oldVal = to[i]
+		if oldVal ~= newVal then
+			to[i] = newVal
 			changed = true
 		end
 	end
