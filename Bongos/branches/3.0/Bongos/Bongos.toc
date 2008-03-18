@@ -2,7 +2,7 @@
 ## Title: Bongos3
 ## Notes: Movable bar framework
 ## Author: Tuller
-## Version: Beta.2
+## Version: Beta.3
 ## SavedVariables: Bongos3DB, Bongos3Version
 ## OptionalDeps: Ace3
 ## LoadOnDemand: 1
