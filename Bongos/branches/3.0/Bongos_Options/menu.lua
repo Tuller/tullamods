@@ -13,7 +13,7 @@ function Options:Load()
 	InterfaceOptions_AddCategory(f)
 	Bongos.Options = f
 
-	local AB = Bongos:GetModule('ActionBar')
+	local AB = Bongos:GetModule('ActionBar', true)
 	if AB then
 		local f = self:New(CreateFrame('Frame', 'BongosABOptions', UIParent))
 		f.name = ACTIONBARS_LABEL or 'Action Bars' --2.3 hack, since ACTIONBARS_LABEL does not exist there

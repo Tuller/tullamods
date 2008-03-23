@@ -1,5 +1,5 @@
 ﻿local Bongos = LibStub('AceAddon-3.0'):GetAddon('Bongos3')
-local AB = Bongos:GetModule('ActionBar')
+local AB = Bongos:GetModule('ActionBar', true)
 if not AB then return end
 
 local L = LibStub('AceLocale-3.0'):GetLocale('Bongos3-AB')

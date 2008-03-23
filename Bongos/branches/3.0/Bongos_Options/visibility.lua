@@ -155,7 +155,7 @@ function Options:AddVisibilityPanel()
 	end)
 	panel.all = all
 
-	if Bongos:GetModule('ActionBar') then
+	if Bongos:GetModule('ActionBar', true) then
 		local ab = self:CreateCheckButton('action bars', panel)
 		ab:SetHitRectInsets(0, 0, 0, 0)
 	
