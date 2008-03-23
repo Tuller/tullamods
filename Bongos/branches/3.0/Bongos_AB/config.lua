@@ -227,13 +227,17 @@ function Config:GetDefaultStateConditions()
 	end
 
 	--prowl
-	table.insert(conditions, '[form:2/3,stealth]')
+	table.insert(conditions, '[bonusbar:1,stealth]')
 
 	--forms/stances
+	for i = 1, 4 do
+		table.insert(conditions, format('[bonusbar:%d]', i))
+	end
+--[[	
 	for i = 1, 7 do
 		table.insert(conditions, format('[form:%d]', i))
 	end
-
+--]]
 	--help harm targeting
 	table.insert(conditions, '[help]')
 	table.insert(conditions, '[harm]')

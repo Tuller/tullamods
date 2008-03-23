@@ -57,22 +57,17 @@ end
 function ActionBar:GetDefaultActions(class)
 	local header
 	if class == 'DRUID' then
-		header = {['[form:1]'] = 3, ['[form:3]'] = 2}
+		header = {['[bonusbar:1]'] = 2, ['[bonusbar:3]'] = 4, ['[bonusbar:4]'] = 3} --cat, bear, moonkin/tree
 
 		--bar 1 (caster)
 		buttons = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
 
-		--bar 7 (cat)
-		for i = 73, 84 do
-			table.insert(buttons, i)
-		end
-
-		--bar 8 (bear)
-		for i = 97, 108 do
+		--bar 7 (cat), bar 8 (tree/boomkin), bar 9 (bear)
+		for i = 73, 108 do
 			table.insert(buttons, i)
 		end
 	elseif class == 'WARRIOR' then
-		header = {['[form:2]'] = 2, ['[form:3]'] = 3}
+		header = {['[bonusbar:2]'] = 2, ['[bonusbar:3]'] = 3}
 
 		--bars 7-9 (battle, defensive, berserker)
 		buttons = {}
@@ -80,7 +75,7 @@ function ActionBar:GetDefaultActions(class)
 			table.insert(buttons, i)
 		end
 	elseif class == 'ROGUE' or class == 'PRIEST' then
-		header = {['[form:1]'] = 2}
+		header = {['[bonusbar:1]'] = 2}
 
 		--bar 1 (normal)
 		buttons = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}

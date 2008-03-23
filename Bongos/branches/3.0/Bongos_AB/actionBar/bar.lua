@@ -632,42 +632,35 @@ local function StateSlider_Create(panel, state, text)
 end
 
 --stances panel
+local AddForms = {}
+do
+	function AddForms:PRIEST()
+		StateSlider_Create(self, '[bonusbar:1]', GetSpellInfo(15473))
+	end
+
+	function AddForms:DRUID()
+		StateSlider_Create(self, '[bonusbar:1,stealth]', GetSpellInfo(5215))
+		StateSlider_Create(self, '[bonusbar:4]', GetSpellInfo(33891) .. '/' .. GetSpellInfo(24858))
+		StateSlider_Create(self, '[bonusbar:1]', GetSpellInfo(768))
+		StateSlider_Create(self, '[bonusbar:3]', GetSpellInfo(5487))
+	end
+
+	function AddForms:WARRIOR()
+		StateSlider_Create(self, '[bonusbar:1]', GetSpellInfo(2457))
+		StateSlider_Create(self, '[bonusbar:2]', GetSpellInfo(71))
+		StateSlider_Create(self, '[bonusbar:2]', GetSpellInfo(2458))
+	end
+
+	function AddForms:ROGUE()
+		StateSlider_Create(self, '[bonusbar:1]', GetSpellInfo(1784))
+	end
+end
+
 local function AddStancesPanel(menu)
 	local class = select(2, UnitClass('player'))
-
-	if class == 'PRIEST' or GetNumShapeshiftForms() > 0 then
+	if AddForms[class] then
 		local panel = menu:AddPanel(L.Stances)
-		if class == 'PRIEST' then
-			StateSlider_Create(panel, '[form:1]', L.ShadowForm)
-		else
-			if class == 'DRUID' then
-				StateSlider_Create(panel, '[form:2/3,stealth]', L.Prowl)
-			end
-
-			panel:SetScript('OnShow', function(self)
-				local changed
-
-				for i = GetNumShapeshiftForms(), 1, -1 do
-					local state = format('[form:%d]', i)
-					local stateName = select(2, GetShapeshiftFormInfo(i))
-					local slider = self[state]
-
-					if slider then
-						getglobal(slider:GetName() .. 'Text'):SetText(stateName)
-					else
-						local slider = StateSlider_Create(self, state, stateName)
-						slider:OnShow()
-
-						changed = true
-					end
-				end
-
-				--we've added a slider, call showpanel, which resizes the frame
-				if changed then
-					self:GetParent():ShowPanel(self.name)
-				end
-			end)
-		end
+		AddForms[class](panel) 
 	end
 end
 
