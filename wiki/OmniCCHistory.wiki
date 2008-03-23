@@ -1,11 +1,11 @@
 #summary Version History for OmniCC
 
 2.0.8
-  Updated for 2.4
-  The /omnicc menu is now part of the new blizzard interface options menu
-  Fixed a bug where I expected the parent of a cooldown to remain constant
-  Fixed a bug where I expected all frame.icons to actually be textures.
-  Developers:  I now check for .noomnicc on all cooldown frames.  If set to true, OmniCC will not show text
+  * Updated for 2.4
+  * The /omnicc menu is now part of the new blizzard interface options menu
+  * Fixed a bug where I expected the parent of a cooldown to remain constant
+  * Fixed a bug where I expected all frame.icons to actually be textures.
+  * Developers:  I now check for .noomnicc on all cooldown frames.  If set to true, OmniCC will not show text
 
 2.0.7
   * Updated for 2.3
