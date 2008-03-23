@@ -51,10 +51,11 @@ end
 	The Code
 --]]
 
+Updater.targetBuffs = {}
+Updater.targetDebuffs = {}
+Updater.playerBuffs = {}
+
 --buff and debuff caches
-local targetBuffs = {}
-local targetDebuffs = {}
-local playerBuffs = {}
 local newVals = {} --store new info in here
 
 --[[ Events ]]--
@@ -123,7 +124,7 @@ function Updater:UpdatePlayerBuffs()
 		i = i + 1
 	until not buff
 
-	if CloneTable(newVals, playerBuffs) then
+	if CloneTable(newVals, self.playerBuffs) then
 		changed = true
 	end
 
@@ -155,7 +156,7 @@ end
 
 function Updater:UpdateFriendlyTargetBuffs()
 	--friendly target, clear target debuffs
-	local changed = ClearTable(targetDebuffs)
+	local changed = ClearTable(self.targetDebuffs)
 
 	--add all target buffs into newVals
 	ClearTable(newVals)
@@ -170,7 +171,7 @@ function Updater:UpdateFriendlyTargetBuffs()
 	until not buff
 
 	--set changed to true if the target buffs table has changed
-	if CloneTable(newVals, targetBuffs) then
+	if CloneTable(newVals, self.targetBuffs) then
 		changed = true
 	end
 
@@ -179,7 +180,7 @@ end
 
 function Updater:UpdateEnemyTargetDebuffs()
 	--friendly target, clear target debuffs
-	local changed = ClearTable(targetBuffs)
+	local changed = ClearTable(self.targetBuffs)
 
 
 	--update debuffs on enemy targets
@@ -195,7 +196,7 @@ function Updater:UpdateEnemyTargetDebuffs()
 	until not buff
 
 	--set changed to true if the target debuffs table has changed
-	if CloneTable(newVals, targetDebuffs) then
+	if CloneTable(newVals, self.targetDebuffs) then
 		changed = true
 	end
 
@@ -205,10 +206,10 @@ end
 function Updater:ClearTargetBuffsAndDebuffs()
 	local changed = false
 
-	if ClearTable(targetBuffs) then
+	if ClearTable(self.targetBuffs) then
 		changed = true
 	end
-	if ClearTable(targetDebuffs) then
+	if ClearTable(self.targetDebuffs) then
 		changed = true
 	end
 
@@ -219,13 +220,13 @@ end
 --[[ Access Functions ]]--
 
 function Updater:TargetHasBuff(buff)
-	return targetBuffs[buff]
+	return self.targetBuffs[buff]
 end
 
 function Updater:TargetHasDebuff(debuff)
-	return targetDebuffs[debuff]
+	return self.targetDebuffs[debuff]
 end
 
 function Updater:PlayerHasBuff(buff)
-	return playerBuffs[buff]
+	return self.playerBuffs[buff]
 end
