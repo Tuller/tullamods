@@ -3,14 +3,12 @@
 		Credit goes to Ferroginus
 --]]
 
-if GetLocale() ~= "esES" then return end
-
-local L = BAGNON_LOCALS
+local L = LibStub('AceLocale-3.0'):NewLocale('Bagnon', 'esES')
+if not L then return end
 
 --bindings
-BINDING_HEADER_BAGNON = "Bagnon"
-BINDING_NAME_BAGNON_TOGGLE = "Activar Inventario"
-BINDING_NAME_BANKNON_TOGGLE = "Activar Banco"
+L.BagnonToggle = "Activar Inventario"
+L.BanknonToggle = "Activar Banco"
 
 --system messages
 L.NewUser = "Nuevo usuario detectado, cargando opciones por defecto"

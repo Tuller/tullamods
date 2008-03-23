@@ -3,14 +3,12 @@
 	20071117 by matini< yiting.jheng <at> gmail <dot> com
 --]]
 
-if GetLocale() ~= "zhTW" then return end
-
-local L = BAGNON_LOCALS
+local L = LibStub('AceLocale-3.0'):NewLocale('Bagnon', 'zhTW')
+if not L then return end
 
 --bindings
-BINDING_HEADER_BAGNON = "Bagnon"
-BINDING_NAME_BAGNON_TOGGLE = "切換背包整合開關"
-BINDING_NAME_BANKNON_TOGGLE = "切換銀行整合開關"
+L.BagnonToggle  = "切換背包整合開關"
+L.BanknonToggle  = "切換銀行整合開關"
 
 --system messages
 L.NewUser = "偵測到新的使用者，預設值已載入"

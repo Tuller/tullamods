@@ -7,15 +7,12 @@
 	Last Update: 4.11.2007
 --]]
 
-
-if GetLocale() ~= "zhCN" then return end
-
-local L = BAGNON_LOCALS
+local L = LibStub('AceLocale-3.0'):NewLocale('Bagnon', 'zhCN')
+if not L then return end
 
 --bindings
-BINDING_HEADER_BAGNON = "Bagnon"
-BINDING_NAME_BAGNON_TOGGLE = "开关 Bagnon"
-BINDING_NAME_BANKNON_TOGGLE = "开关 Banknon"
+L.BagnonToggle = "开关 Bagnon"
+L.BanknonToggle = "开关 Banknon"
 
 --system messages
 L.NewUser = "这是该角色第一次使用 Bagnon，已载入默认设置。"

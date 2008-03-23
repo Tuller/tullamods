@@ -3,7 +3,7 @@
 --]]
 
 BagnonBagFrame = BagnonUtil:CreateWidgetClass('Frame')
-local L = BAGNON_LOCALS
+local L = LibStub('AceLocale-3.0'):GetLocale('Bagnon')
 
 
 --[[ Toggle Frame ]]--

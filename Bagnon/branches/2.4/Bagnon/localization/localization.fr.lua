@@ -3,14 +3,12 @@
 		Credit goes to namAtsar
 --]]
 
-if GetLocale() ~= "frFR" then return end
-
-local L = BAGNON_LOCALS
+local L = LibStub('AceLocale-3.0'):NewLocale('Bagnon', 'frFR')
+if not L then return end
 
 --bindings
-BINDING_HEADER_BAGNON = "Bagnon";
-BINDING_NAME_BAGNON_TOGGLE = "Afficher Bagnon";
-BINDING_NAME_BANKNON_TOGGLE = "Afficher Banknon";
+L.BagnonToggle = "Afficher Bagnon";
+L.BanknonToggle = "Afficher Banknon";
 
 --system messages
 L.NewUser = "Charg\195\169"

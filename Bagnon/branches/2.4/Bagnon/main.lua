@@ -3,14 +3,19 @@
 		Handles settings management, and bank and inventory viewing
 --]]
 
-Bagnon = DongleStub("Dongle-1.0"):New("Bagnon")
-local L = BAGNON_LOCALS
+Bagnon = LibStub('AceAddon-3.0'):NewAddon('Bagnon', 'AceEvent-3.0', 'AceConsole-3.0')
+local L = LibStub('AceLocale-3.0'):GetLocale('Bagnon')
 local CURRENT_VERSION = GetAddOnMetadata("Bagnon", "Version")
+
+--bindings
+BINDING_HEADER_BAGNON = "Bagnon"
+BINDING_NAME_BAGNON_TOGGLE = L.BagnonToggle
+BINDING_NAME_BANKNON_TOGGLE = L.BanknonToggle
 
 
 --[[ Startup and settings management ]]--
 
-function Bagnon:Initialize()
+function Bagnon:OnInitialize()
 	local defaults = {
 		inventory = {
 			bags = {0, 1, 2, 3, 4},
@@ -66,7 +71,7 @@ function Bagnon:UpdateVersion()
 	self:Print(format(L.Updated, BagnonSets.version))
 end
 
-function Bagnon:Enable()
+function Bagnon:OnEnable()
 	BankFrame:UnregisterEvent("BANKFRAME_OPENED")
 
 	self:RegisterEvent("BANKFRAME_OPENED")
@@ -428,12 +433,40 @@ end
 --[[  Slash Commands ]]--
 
 function Bagnon:RegisterSlashCommands()
-	local slash = self:InitializeSlashCommand(L.Commands, "BAGNON", "bagnon", "bgn")
-	slash:RegisterSlashHandler(format("/bagnon: %s", L.ShowMenuDesc), "^$", "ShowMenu")
-	slash:RegisterSlashHandler(format("menu: %s", L.ShowMenuDesc), "^menu$", "ShowMenu")
-	slash:RegisterSlashHandler(format("bags: %s", L.ShowBagsDesc), "^bags$", "ToggleInventory")
-	slash:RegisterSlashHandler(format("bank: %s", L.ShowBankDesc), "^bank$", "ToggleBank")
-	self.slash = slash
+	self:RegisterChatCommand('bagnon', 'OnCmd')
+	self:RegisterChatCommand('bgn', 'OnCmd')
+end
+
+function Bagnon:OnCmd(cmd)
+	if cmd ~= '' then
+		cmd = cmd:lower()
+		if cmd == 'bank' then
+			self:ToggleBank()
+		elseif cmd == 'bags' then
+			self:ToggleInventory()
+		elseif cmd == 'version' then
+			self:PrintVersion()
+		else
+			self:PrintHelp()
+		end
+	else
+		self:ShowMenu()
+	end
+end
+
+function Bagnon:PrintVersion()
+	self:Print(self.sets.version)
+end
+
+function Bagnon:PrintHelp(cmd)
+	local function PrintCmd(cmd, desc)
+		DEFAULT_CHAT_FRAME:AddMessage(format(' - |cFF33FF99%s|r: %s', cmd, desc))
+	end
+
+	self:Print(L.Commands)
+	PrintCmd('bags', L.ShowBagsDesc)
+	PrintCmd('bank', L.ShowBankDesc)
+	PrintCmd('version', L.ShowVersionDesc)
 end
 
 function Bagnon:ShowMenu()
