@@ -83,6 +83,10 @@ local function CreateItemCacheTable()
 	return info
 end
 
+local function ToSearch(name)
+	return name:gsub('%p', '%%%1')
+end
+
 
 --[[ Usable Functions ]]--
 
@@ -108,9 +112,11 @@ end
 function Ludwig:GetItems(name, quality, type, subType, equipLoc, minLevel, maxLevel)
 	local db = self:GetAllItems()
 	local stats = itemInfo
+	local search
 
 	if name and name ~= '' then
 		name = name:lower()
+		search = ToSearch(name)
 		--this is a hack to obtain better performance, we're not filtering searches by closeness for short strings
 		if #name > 2 then
 			lastSearch = name
@@ -143,7 +149,7 @@ function Ludwig:GetItems(name, quality, type, subType, equipLoc, minLevel, maxLe
 		elseif equipLoc and stats[9][id] ~= equipLoc then
 			addItem = nil
 		elseif name then
-			if not(name == itemName or itemName:find(name)) then
+			if not(name == itemName or itemName:find(search)) then
 				addItem = nil
 			end
 		end
@@ -159,18 +165,23 @@ function Ludwig:GetItems(name, quality, type, subType, equipLoc, minLevel, maxLe
 	return filteredList
 end
 
-function Ludwig:GetItemsNamedLike(search)
-	if search == '' then return end
+function Ludwig:GetItemsNamedLike(name)
+	if name == '' then return end
+
+	local name = name:lower()
+	local search = '^' .. ToSearch(name)
+
 	for i in pairs(searchList) do
 		searchList[i] = nil
 	end
-	search = search:lower()
 
 	local db = self:GetAllItems()
 	for id, itemName in pairs(db) do
-		if itemName == search or itemName:find('^'.. search) then
+		if itemName == name or itemName:find(search) then
 			table.insert(searchList, id)
-			if itemName == search then break end
+			if itemName == name then
+				break
+			end
 		end
 	end
 

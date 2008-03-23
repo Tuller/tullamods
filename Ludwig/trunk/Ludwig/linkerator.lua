@@ -4,36 +4,30 @@
 		Thanks to N00bZXI for the autocomplete changes
 --]]
 
-local function LinkifyName(head, text, tail)
-	if not(head == "|h" or tail == "|h") then
-		if(#text > 2) then
-			local list = Ludwig:GetItemsNamedLike(text)
-			if list and list[1] then
-				return Ludwig:GetItemLink(list[1])
-			end
-		end
+local function OnFullMatch(match)
+	local list = Ludwig:GetItemsNamedLike(match)
+	if list and list[1] then
+		return (select(2, GetItemInfo(list[1])))
 	end
-	return format("%s[%s]%s", head, text, tail)
+	return match
 end
 
-local function ParseChatMessage(text)
-	return text:gsub("([|]?[h]?)%[(.-)%]([|]?[h]?)", LinkifyName)
+local function OnPartialMatch(match)
+	local list = Ludwig:GetItemsNamedLike(match)
+	if list and list[1] then
+		return '[[' .. GetItemInfo(list[1])
+	end
+	return '[[' .. match
 end
 
 local function Linkerator_OnChar(self, ...)
 	local text = self:GetText()
-	if not(text == "" or text:sub(1,1) == "/") then
-		local query = text:match("%[([^]]-)$")
-		if(query and #query > 2) then
-			local list = Ludwig:GetItemsNamedLike(query)
-			if list and list[1] then
-				local link = GetItemInfo(list[1])
-				self:SetText(text:gsub("%[([^]]-)$", "[".. link:gsub("^".. query:lower():gsub("([%$%(%)%.%[%]%*%+%-%?%^%%])", "%%%1"), query)))
-				self:HighlightText(#text, -1)
-				return
-			end
+	if text ~= '' then
+		if text:match('%[%[(.+)%]') then
+			self:SetText(text:gsub('%[%[(.+)%]', OnFullMatch))
 		else
-			self:SetText(ParseChatMessage(text))
+			self:SetText(text:gsub('%[%[(.+)', OnPartialMatch))
+			self:HighlightText(#text, -1)
 		end
 	end
 end

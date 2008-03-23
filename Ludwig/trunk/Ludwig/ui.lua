@@ -151,11 +151,12 @@ end
 --[[ Text Search ]]--
 
 function LudwigUI_OnSearchChanged(self, text)
-	if(self:HasFocus()) then
+	if self:HasFocus() then
 		if text == '' then
 			text = nil
 		end
-		if(filter.name ~= text) then
+
+		if filter.name ~= text then
 			filter.name = text
 			LudwigUI_UpdateList(true)
 		end
@@ -163,11 +164,12 @@ function LudwigUI_OnSearchChanged(self, text)
 end
 
 function LudwigUI_OnMinLevelChanged(self, text)
-	if(self:HasFocus()) then
+	if self:HasFocus() then
 		if text == '' then
 			text = nil
 		end
-		if(filter.minLevel ~= tonumber(text)) then
+
+		if filter.minLevel ~= tonumber(text) then
 			filter.minLevel = tonumber(text)
 			LudwigUI_UpdateList(true)
 		end

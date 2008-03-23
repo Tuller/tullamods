@@ -1,5 +1,10 @@
 Ludwig Version History
 
+1.6.0
+Updated for 2.4
+Linkerator has been switched to [[text] to prevent conflicts with other addons
+Searches should no longer throw errors on entering special pattern matching characters
+
 1.5.1
 Made the dropdowns work properly
 
