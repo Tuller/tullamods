@@ -635,24 +635,24 @@ end
 local AddForms = {}
 do
 	function AddForms:PRIEST()
-		StateSlider_Create(self, '[bonusbar:1]', GetSpellInfo(15473))
+		StateSlider_Create(self, '[bonusbar:1]', GetSpellInfo(15473)) --shadow form
 	end
 
 	function AddForms:DRUID()
-		StateSlider_Create(self, '[bonusbar:1,stealth]', GetSpellInfo(5215))
-		StateSlider_Create(self, '[bonusbar:4]', GetSpellInfo(33891) .. '/' .. GetSpellInfo(24858))
-		StateSlider_Create(self, '[bonusbar:1]', GetSpellInfo(768))
-		StateSlider_Create(self, '[bonusbar:3]', GetSpellInfo(5487))
+		StateSlider_Create(self, '[bonusbar:1,stealth]', GetSpellInfo(5215)) --prowl
+		StateSlider_Create(self, '[bonusbar:4]', string.match('%w+', GetSpellInfo(33891)) .. '/' .. string.match('%w+', GetSpellInfo(24858))) --tree/moonkin, i'm using some hackery to pick out the first word of each form name
+		StateSlider_Create(self, '[bonusbar:1]', GetSpellInfo(768)) --cat
+		StateSlider_Create(self, '[bonusbar:3]', GetSpellInfo(5487)) --bear
 	end
 
 	function AddForms:WARRIOR()
-		StateSlider_Create(self, '[bonusbar:1]', GetSpellInfo(2457))
-		StateSlider_Create(self, '[bonusbar:2]', GetSpellInfo(71))
-		StateSlider_Create(self, '[bonusbar:2]', GetSpellInfo(2458))
+		StateSlider_Create(self, '[bonusbar:1]', GetSpellInfo(2457)) --battle
+		StateSlider_Create(self, '[bonusbar:2]', GetSpellInfo(71)) --defensive
+		StateSlider_Create(self, '[bonusbar:3]', GetSpellInfo(2458)) --berserker
 	end
 
 	function AddForms:ROGUE()
-		StateSlider_Create(self, '[bonusbar:1]', GetSpellInfo(1784))
+		StateSlider_Create(self, '[bonusbar:1]', GetSpellInfo(1784)) --stealth
 	end
 end
 
