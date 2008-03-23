@@ -640,7 +640,7 @@ do
 
 	function AddForms:DRUID()
 		StateSlider_Create(self, '[bonusbar:1,stealth]', GetSpellInfo(5215)) --prowl
-		StateSlider_Create(self, '[bonusbar:4]', string.match('%w+', GetSpellInfo(33891)) .. '/' .. string.match('%w+', GetSpellInfo(24858))) --tree/moonkin, i'm using some hackery to pick out the first word of each form name
+		StateSlider_Create(self, '[bonusbar:4]', GetSpellInfo(33891):match('%w+') .. '/' .. GetSpellInfo(24858):match('%w+')) --tree/moonkin, i'm using some hackery to pick out the first word of each form name
 		StateSlider_Create(self, '[bonusbar:1]', GetSpellInfo(768)) --cat
 		StateSlider_Create(self, '[bonusbar:3]', GetSpellInfo(5487)) --bear
 	end
