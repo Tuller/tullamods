@@ -28,8 +28,6 @@ function Bagnon:OnInitialize()
 		},
 
 		replaceBags = 1,
-		replaceBank = 1,
-		reuseFrames = 1,
 
 		showBorders = 1,
 		showBagsAtMail = 1,
@@ -251,36 +249,36 @@ end
 --]]
 
 local function FrameOpened(id, auto)
-	if (Bagnon:InventoryHasBag(id) and BagnonUtil:ReplacingBags()) then
+	if Bagnon:InventoryHasBag(id) or (BagnonUtil:ReplacingBags() and BagnonUtil:IsInventoryBag(id)) then
 		Bagnon:ShowInventory(auto)
 		return true
 	end
 
-	if (Bagnon:BankHasBag(id) and BagnonUtil:ReplacingBank()) then
+	if Bagnon:BankHasBag(id) or (BagnonUtil:ReplacingBank() and BagnonUtil:IsBankBag(id)) then
 		Bagnon:ShowBank(auto)
 		return true
 	end
 end
 
 local function FrameClosed(id, auto)
-	if (Bagnon:InventoryHasBag(id) and BagnonUtil:ReplacingBags()) then
+	if Bagnon:InventoryHasBag(id) or (BagnonUtil:ReplacingBags() and BagnonUtil:IsInventoryBag(id)) then
 		Bagnon:HideInventory(auto)
 		return true
 	end
 
-	if (Bagnon:BankHasBag(id) and BagnonUtil:ReplacingBank()) then
+	if Bagnon:BankHasBag(id) or (BagnonUtil:ReplacingBank() and BagnonUtil:IsBankBag(id)) then
 		Bagnon:HideBank(auto)
 		return true
 	end
 end
 
 local function FrameToggled(id, auto)
-	if (Bagnon:InventoryHasBag(id) and BagnonUtil:ReplacingBags()) then
+	if Bagnon:InventoryHasBag(id) or (BagnonUtil:ReplacingBags() and BagnonUtil:IsInventoryBag(id)) then
 		Bagnon:ToggleInventory(auto)
 		return true
 	end
 
-	if (Bagnon:BankHasBag(id) and BagnonUtil:ReplacingBank()) then
+	if Bagnon:BankHasBag(id) or (BagnonUtil:ReplacingBank() and BagnonUtil:IsBankBag(id)) then
 		Bagnon:ToggleBank(auto)
 		return true
 	end
@@ -310,7 +308,7 @@ function Bagnon:HookBagClicks()
 
 	local oOpenAllBags = OpenAllBags
 	OpenAllBags = function(force)
-		if BagnonUtil:ReplacingBags() or BagnonUtil:ReusingFrames() then
+		if BagnonUtil:ReplacingBags() then
 			if force then
 				Bagnon:ShowInventory()
 			else

@@ -174,7 +174,3 @@ end
 function BagnonUtil:ReplacingBank()
 	return Bagnon.sets.showBankAtBank
 end
-
-function BagnonUtil:ReusingFrames()
-	return self:ReplacingBags()
-end
