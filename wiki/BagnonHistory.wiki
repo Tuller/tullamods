@@ -3,7 +3,9 @@
 = Bagnon Version History =
 
 1.5.0
-  * Redesigned the options menu.
+  * Updated for 2.4
+  * Redesigned the options menu
+  * Changed some hooking behaviors
 
 1.4.9
   * Fixed some errors causing Bagnon_Forever to not load properly
