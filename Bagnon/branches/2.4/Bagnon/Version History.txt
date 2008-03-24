@@ -1,5 +1,8 @@
 Bagnon Version History
 
+1.5.1
+Fixed a bug with bag hooks
+
 1.5.0
 Redesigned the options menu.
 
