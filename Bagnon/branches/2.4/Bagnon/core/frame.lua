@@ -44,7 +44,12 @@ do
 
 	function TitleFrame:OnClick(button)
 		if button == 'RightButton' then
-			BagnonMenu:Display(self:GetParent())
+			if not BagnonMenu then
+				LoadAddOn('Bagnon_Options')
+			end
+			if BagnonMenu then
+				BagnonMenu:Display(self:GetParent())
+			end
 		end
 	end
 
@@ -78,7 +83,9 @@ do
 		end
 
 		GameTooltip:SetText(self:GetText(), 1, 1, 1)
-		GameTooltip:AddLine(L.TipShowMenu)
+		if select(4, GetAddOnInfo('Bagnon_Options')) then --enable check
+			GameTooltip:AddLine(L.TipShowMenu)
+		end
 		GameTooltip:AddLine(L.TipShowSearch)
 		GameTooltip:Show()
 	end
@@ -190,7 +197,7 @@ function BagnonFrame:OnShow()
 end
 
 function BagnonFrame:OnHide()
-	if BagnonMenu.parent == self then
+	if BagnonMenu and BagnonMenu.parent == self then
 		BagnonMenu:Hide()
 	end
 

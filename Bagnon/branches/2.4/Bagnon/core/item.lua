@@ -81,7 +81,7 @@ function BagnonItem:Create()
 	item.border = border
 
 	item.cooldown = getglobal(item:GetName() .. 'Cooldown')
-	item.cooldown:SetFrameLevel(4)
+--	item.cooldown:SetFrameLevel(4)
 
 	item:UnregisterAllEvents()
 	item:SetScript('OnEvent', nil)

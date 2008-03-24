@@ -4,6 +4,7 @@
 --]]
 
 BagnonUtil = CreateFrame('Frame')
+local L = LibStub('AceLocale-3.0'):GetLocale('Bagnon')
 local currentPlayer = UnitName('player')
 local typeContainer = select(3, GetAuctionItemClasses())
 local typeQuiver = select(7, GetAuctionItemClasses())
@@ -125,12 +126,6 @@ function BagnonUtil:CreateWidgetClass(type)
 	return class
 end
 
-function BagnonUtil:AnchorAtCursor(frame)
-	local x,y = GetCursorPosition()
-	local scale = UIParent:GetScale()
-	frame:SetPoint('TOPLEFT', UIParent, 'BOTTOMLEFT', x/scale - 32, y/scale + 32)
-end
-
 
 --[[ Settings ]]--
 
@@ -138,12 +133,38 @@ function BagnonUtil:GetSets()
 	return Bagnon.sets
 end
 
+function BagnonUtil:SetShowBorders(enable)
+	self:GetSets().showBorders = enable or nil
+
+	local bags = Bagnon:GetInventory()
+	if bags and bags:IsShown() then
+		bags:Regenerate()
+	end
+
+	local bank = Bagnon:GetBank()
+	if bank and bank:IsShown() then
+		bank:Regenerate()
+	end
+end
+
 function BagnonUtil:ShowingBorders()
 	return Bagnon.sets.showBorders
 end
 
-function BagnonUtil:ReusingFrames()
-	return Bagnon.sets.reuseFrames
+function BagnonUtil:SetReplaceBags(enable)
+	if not StaticPopupDialogs['BAGNON_CONFIRM_RELOADUI'] then
+		StaticPopupDialogs['BAGNON_CONFIRM_RELOADUI'] = {
+			text = TEXT(L.ConfirmReloadUI),
+			button1 = TEXT(ACCEPT),
+			timeout = 0,
+			hideOnEscape = 1,
+		}
+	end
+	PlaySound('igMainMenuOption')
+	StaticPopup_Show('BAGNON_CONFIRM_RELOADUI')
+	
+	Bagnon.updateReplaceBags = true
+	Bagnon.replaceBags = enable or nil
 end
 
 function BagnonUtil:ReplacingBags()
@@ -151,5 +172,9 @@ function BagnonUtil:ReplacingBags()
 end
 
 function BagnonUtil:ReplacingBank()
-	return Bagnon.sets.replaceBank
+	return Bagnon.sets.showBankAtBank
+end
+
+function BagnonUtil:ReusingFrames()
+	return self:ReplacingBags()
 end

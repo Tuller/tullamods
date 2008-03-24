@@ -19,7 +19,6 @@ L.vBagnonLoaded = format("vBagnon and Bagnon are incompatible. Click %s to disab
 
 --slash commands
 L.Commands = "Commands:"
-L.ShowMenuDesc = "Shows the options menu"
 L.ShowBagsDesc = "Toggles the inventory frame"
 L.ShowBankDesc = "Toggles the bank frame"
 L.ShowVersionDesc = 'Prints the current verison'
@@ -37,24 +36,4 @@ L.TipShowBag = "<Click> to Show"
 L.TipHideBag = "<Click> to Hide"
 L.TipGoldOnRealm = "Total on %s"
 
---menu text
-L.FrameSettings = "Frame Settings"
-L.Lock = "Lock Position"
-L.Toplevel = "Always On Top"
-L.BackgroundColor = "Background"
-L.FrameLevel = "Frame Level"
-L.Opacity = "Opacity"
-L.Scale = "Scale"
-L.Spacing = "Spacing"
-L.Cols = "Columns"
-L.ReverseSort = "Reverse Order"
-
-L.Layout = 'Layout'
-L.Display = 'Display'
-
-L.AtBank = "Show When Checking The Bank"
-L.AtVendor = "Show When Selling Items"
-L.AtAH = "Show When At The AH"
-L.AtMail = "Show When Mailing Items"
-L.AtTrade = "Show When Trading"
-L.AtCraft = "Show When Crafting"
+L.ConfirmReloadUI = 'This option will be set the next time you log in'

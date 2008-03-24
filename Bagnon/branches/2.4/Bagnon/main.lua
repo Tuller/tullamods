@@ -60,6 +60,8 @@ function Bagnon:OnInitialize()
 		end
 	end
 	self.sets = BagnonSets
+	
+	self:RegisterEvent('PLAYER_LOGOUT')
 end
 
 function Bagnon:UpdateSettings()
@@ -89,6 +91,12 @@ function Bagnon:OnEnable()
 
 	self:RegisterSlashCommands()
 	self:HookBagClicks()
+end
+
+function Bagnon:PLAYER_LOGOUT()
+	if self.updateReplaceBags then
+		self.sets.replaceBags = self.replaceBags
+	end
 end
 
 
@@ -243,42 +251,36 @@ end
 --]]
 
 local function FrameOpened(id, auto)
-	if (Bagnon:InventoryHasBag(id) and BagnonUtil:ReplacingBags()) or
-	(BagnonUtil:ReusingFrames() and BagnonUtil:IsInventoryBag(id)) then
+	if (Bagnon:InventoryHasBag(id) and BagnonUtil:ReplacingBags()) then
 		Bagnon:ShowInventory(auto)
 		return true
 	end
 
-	if (Bagnon:BankHasBag(id) and BagnonUtil:ReplacingBank()) or
-	(BagnonUtil:ReusingFrames() and BagnonUtil:IsBankBag(id)) then
+	if (Bagnon:BankHasBag(id) and BagnonUtil:ReplacingBank()) then
 		Bagnon:ShowBank(auto)
 		return true
 	end
 end
 
 local function FrameClosed(id, auto)
-	if (Bagnon:InventoryHasBag(id) and BagnonUtil:ReplacingBags()) or
-	(BagnonUtil:ReusingFrames() and BagnonUtil:IsInventoryBag(id)) then
+	if (Bagnon:InventoryHasBag(id) and BagnonUtil:ReplacingBags()) then
 		Bagnon:HideInventory(auto)
 		return true
 	end
 
-	if (Bagnon:BankHasBag(id) and BagnonUtil:ReplacingBank()) or
-	(BagnonUtil:ReusingFrames() and BagnonUtil:IsBankBag(id)) then
+	if (Bagnon:BankHasBag(id) and BagnonUtil:ReplacingBank()) then
 		Bagnon:HideBank(auto)
 		return true
 	end
 end
 
 local function FrameToggled(id, auto)
-	if (Bagnon:InventoryHasBag(id) and BagnonUtil:ReplacingBags()) or
-	(BagnonUtil:ReusingFrames() and BagnonUtil:IsInventoryBag(id)) then
+	if (Bagnon:InventoryHasBag(id) and BagnonUtil:ReplacingBags()) then
 		Bagnon:ToggleInventory(auto)
 		return true
 	end
 
-	if (Bagnon:BankHasBag(id) and BagnonUtil:ReplacingBank()) or
-	(BagnonUtil:ReusingFrames() and BagnonUtil:IsBankBag(id)) then
+	if (Bagnon:BankHasBag(id) and BagnonUtil:ReplacingBank()) then
 		Bagnon:ToggleBank(auto)
 		return true
 	end
@@ -382,7 +384,7 @@ local function HideAtEvent(event)
 end
 
 function Bagnon:BANKFRAME_OPENED()
-	ShowAtEvent("Bank", not(BagnonUtil:ReplacingBank() or BagnonUtil:ReusingFrames()))
+	ShowAtEvent("Bank", not(BagnonUtil:ReplacingBank()))
 end
 
 function Bagnon:BANKFRAME_CLOSED()
