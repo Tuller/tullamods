@@ -1,8 +1,8 @@
-## Interface: 20300
+## Interface: 20400
 ## Title: Combuctor
 ## Author: Tuller
 ## Notes: Pants are a dangerous foe
-## Version: Beta.1.0
+## Version: Beta.1.1
 ## OptionalDeps: Ace3, Bagnon_Forever
 ## SavedVariables: CombuctorDB
 embeds.xml
