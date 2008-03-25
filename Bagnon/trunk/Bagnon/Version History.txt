@@ -1,5 +1,11 @@
 Bagnon Version History
 
+1.5.1
+Fixed a bug with bag hooks
+
+1.5.0
+Redesigned the options menu.
+
 1.4.9
 Fixed some errors causing Bagnon_Forever to not load properly
 Updated the esES translation (thanks Ferroginus)

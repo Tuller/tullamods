@@ -60,7 +60,7 @@ local unused = {}
 
 function BagnonItem:Create()
 	local item
-	if BagnonUtil:ReusingFrames() then
+	if BagnonUtil:ReplacingBags() then
 		local button = self:GetBlizzard(itemID)
 		if button then
 			item = self:New(button)
@@ -81,7 +81,7 @@ function BagnonItem:Create()
 	item.border = border
 
 	item.cooldown = getglobal(item:GetName() .. 'Cooldown')
-	item.cooldown:SetFrameLevel(4)
+--	item.cooldown:SetFrameLevel(4)
 
 	item:UnregisterAllEvents()
 	item:SetScript('OnEvent', nil)

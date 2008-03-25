@@ -4,6 +4,7 @@
 --]]
 
 BagnonBag = BagnonUtil:CreateWidgetClass('Button')
+local L = LibStub('AceLocale-3.0'):GetLocale('Bagnon')
 
 local SIZE = 32
 local NORMAL_TEXTURE_SIZE = 64 * (SIZE/36)
@@ -356,9 +357,9 @@ function BagnonBag:OnEnter()
 
 	if hasBag then
 		if self:GetParent():GetParent():ShowingBag(bagID) then
-			GameTooltip:AddLine(BAGNON_LOCALS.TipHideBag)
+			GameTooltip:AddLine(L.TipHideBag)
 		else
-			GameTooltip:AddLine(BAGNON_LOCALS.TipShowBag)
+			GameTooltip:AddLine(L.TipShowBag)
 		end
 		BagnonSpot:SetBagSearch(bagID)
 	end

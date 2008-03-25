@@ -3,26 +3,28 @@
 	By Ferroginus (Zul'Jin)
 --]]
 
-if GetLocale() == "esES" then
-	local L = BAGNON_OPTIONS_LOCALS
+local L = LibStub('AceLocale-3.0'):NewLocale('Bagnon-Options', 'esES')
+if not L then return end
 
-	L.Title = "Opciones de Bagnon"
+L.Title = "Opciones de Bagnon"
 
-	L.ShowOwners = "Mostrar poseedores"
-	L.ShowBorders = "Resaltar calidad de objetos"
+L.ShowBorders = "Resaltar calidad de objetos"
 
-	L.ReplaceBags = "Sustituir Bolsas"
-	L.ReplaceBank = "Sustiruir Banco"
-	L.ReuseFrames = "Reusar Marcos de Blizzard"
+L.ReplaceBags = "Sustituir Bolsas"
 
-	L.Show = "Mostrar"
-	L.Bags = "Bolsas"
-	L.Bank = "Banco"
+L.AtBank = "En el Banco"
+L.AtVendor = "En los Vendedores"
+L.AtAH = "En Casa de Subastas"
+L.AtMail = "En el Correo"
+L.AtTrade = "Comerciando"
+L.AtCraft = "Fabricando"
 
-	L.AtBank = "En el Banco"
-	L.AtVendor = "En los Vendedores"
-	L.AtAH = "En Casa de Subastas"
-	L.AtMail = "En el Correo"
-	L.AtTrade = "Comerciando"
-	L.AtCraft = "Fabricando"
-end
+--menu text
+L.Lock = "Bloquear posición"
+L.Toplevel = "Primer plano"
+L.BackgroundColor = "Fondo"
+L.FrameLevel = "Capa"
+L.Opacity = "Opacidad"
+L.Scale = "Escala"
+L.Spacing = "Espaciado"
+L.Cols = "Columnas"
