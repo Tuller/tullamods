@@ -4,56 +4,23 @@
 --]]
 
 local Options = CreateFrame('Frame', 'OmniCCOptionsFrame', UIParent)
+
 local SML = LibStub('LibSharedMedia-2.0')
 local L = OMNICC_LOCALS
 
 function Options:Load()
-	self:BuildBaseFrame()
+	self.name = 'OmniCC'
 
 	local display = self:AddDisplayPanel()
-	display:SetPoint('TOPLEFT', 20, -45)
+	display:SetPoint('TOPLEFT', 10, -24)
 
 	local font = self:AddFontPanel()
-	font:SetPoint('TOPRIGHT', -20, -45)
+	font:SetPoint('TOPRIGHT', -10, -24)
 
 	local color = Options:AddColorPanel()
-	color:SetPoint('TOPLEFT', display, 'BOTTOMLEFT', 0, -14)
-
-	--fade in the frame
-	table.insert(UISpecialFrames, self:GetName())
-	UIFrameFadeIn(self, 0.2)
-end
-
-function Options:BuildBaseFrame()
-	local name = self:GetName()
-
-	self:Hide()
-	self:SetWidth(400)
-	self:SetHeight(408)
-	self:SetPoint('CENTER')
-	self:EnableMouse(true)
-
-	self:SetBackdrop{
-		bgFile = 'Interface/DialogFrame/UI-DialogBox-Background',
-		edgeFile = 'Interface/DialogFrame/UI-DialogBox-Border',
-		insets = {left = 11, right = 11, top = 12, bottom = 11},
-		tile = true,
-		tileSize = 32,
-		edgeSize = 32,
-	}
-
-	local header = self:CreateTexture(name .. 'Header', 'ARTWORK')
-	header:SetPoint('TOP', 0, 12)
-	header:SetWidth(256); header:SetHeight(64)
-	header:SetTexture('Interface/DialogFrame/UI-DialogBox-Header')
-
-	local title = self:CreateFontString(name .. 'Title', 'ARTWORK')
-	title:SetFontObject('GameFontNormal')
-	title:SetText(L.OptionsTitle)
-	title:SetPoint('TOP', header, 'TOP', 0, -14)
-
-	local close = CreateFrame('Button', name .. 'Close', self, 'UIPanelCloseButton')
-	close:SetPoint('TOPRIGHT', -5, -5)
+	color:SetPoint('BOTTOMLEFT', 10, 10)
+	
+	InterfaceOptions_AddCategory(self) 
 end
 
 
@@ -62,7 +29,7 @@ end
 --Display
 function Options:AddDisplayPanel()
 	local panel = self:CreatePanel(L.Display)
-	panel:SetWidth(180); panel:SetHeight(198)
+	panel:SetWidth(180); panel:SetHeight(200)
 
 	--show models
 	local showModels = self:CreateCheckButton(L.ShowModels, panel)
@@ -118,7 +85,7 @@ end
 --font
 function Options:AddFontPanel()
 	local panel = self:CreatePanel(L.Font)
-	panel:SetWidth(180); panel:SetHeight(198)
+	panel:SetWidth(180); panel:SetHeight(200)
 
 	local fontFace = self:CreateFontSelector(panel)
 	fontFace:SetPoint('TOPLEFT', -5, -25)
@@ -145,7 +112,7 @@ end
 
 function Options:AddColorPanel()
 	local panel = self:CreatePanel(L.ColorsAndScaling)
-	panel:SetWidth(360); panel:SetHeight(132)
+	panel:SetWidth(367); panel:SetHeight(156)
 
 	local short = self:CreateFormatSlider(L.UnderFiveSeconds, panel, 'short')
 	short:SetPoint('TOPLEFT', 10, -28)

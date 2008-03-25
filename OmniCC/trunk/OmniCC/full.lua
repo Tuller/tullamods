@@ -12,6 +12,7 @@ local DAY, HOUR, MINUTE, SHORT = 86400, 3600, 60, 5 --values for time
 local ICON_SIZE = 36 --the normal size of an icon
 local timers = {}
 local pulses = {}
+local showers = {}
 local activePulses = {}
 
 --[[
@@ -46,7 +47,10 @@ function OmniCC:Enable()
 
 	--enable the addon
 	self:HookCooldown()
-	self:LoadSlashCommands()
+	
+	--setup the options menu hook
+	local f = CreateFrame('Frame', nil, InterfaceOptionsFrame)
+	f:SetScript('OnShow', function(self) LoadAddOn('OmniCC_Options') self:SetScript('OnShow', nil) end)
 end
 
 function OmniCC:LoadDefaults()
@@ -87,14 +91,16 @@ end
 function OmniCC:HookCooldown()
 	local methods = getmetatable(CreateFrame('Cooldown', nil, nil, 'CooldownFrameTemplate')).__index
 	hooksecurefunc(methods, 'SetCooldown', function(self, start, duration)
-		self:SetAlpha(OmniCC.sets.showModel and 1 or 0)
+		if not self.noomnicc then
+			self:SetAlpha(OmniCC.sets.showModel and 1 or 0)
 
-		if start > 0 and duration > OmniCC.sets.minDuration then
-			OmniCC:StartTimer(self, start, duration)
-		else
-			local timer = timers[self]
-			if timer then
-				timer:Hide()
+			if start > 0 and duration > OmniCC.sets.minDuration then
+				OmniCC:StartTimer(self, start, duration)
+			else
+				local timer = timers[self]
+				if timer then
+					timer:Hide()
+				end
 			end
 		end
 	end)
@@ -105,34 +111,13 @@ end
 	Timer Code
 --]]
 
---shower: a frame used to properly show and hide timer text without forcing the timer to be parented to the cooldown frame (needed for hiding the cooldown frame)
-local function Shower_OnShow(self)
-	local timer = timers[self:GetParent()]
-	if timer.wasShown then
-		timer:Show()
-	end
-end
-
-local function Shower_OnHide(self)
-	local timer = timers[self:GetParent()]
-	if timer:IsShown() then
-		timer.wasShown = true
-		timer:Hide()
-	end
-end
-
---timer, the frame with cooldown text
-local function Timer_OnUpdate(self, elapsed)
-	if self.nextUpdate <= 0 then
-		OmniCC:UpdateTimer(self)
-	else
-		self.nextUpdate = self.nextUpdate - elapsed
-	end
-end
-
 function OmniCC:StartTimer(cooldown, start, duration)
 	local timer = timers[cooldown] or self:CreateTimer(cooldown)
 	if timer then
+		if not showers[cooldown] then
+			self:CreateShower(cooldown)
+		end
+
 		timer.start = start
 		timer.duration = duration
 		timer.nextUpdate = 0
@@ -140,39 +125,74 @@ function OmniCC:StartTimer(cooldown, start, duration)
 	end
 end
 
-function OmniCC:CreateTimer(cooldown)
-	--controls the visibility of the timer
-	local shower = CreateFrame('Frame', nil, cooldown)
-	shower:SetScript('OnShow', Shower_OnShow)
-	shower:SetScript('OnHide', Shower_OnHide)
-
-	local timer = CreateFrame('Frame', nil, cooldown:GetParent())
-	timer:SetFrameLevel(cooldown:GetFrameLevel() + 5) --make sure the timer is on top of things like the cooldown model
-	timer:SetAllPoints(cooldown)
-	timer:SetToplevel(true)
-	timer:Hide()
-	timer:SetScript('OnUpdate', Timer_OnUpdate)
-
-	local text = timer:CreateFontString(nil, 'OVERLAY')
-	text:SetPoint('CENTER', 0, 1)
-	timer.text = text
-
-	-- parent icon, used for shine stuff
-	local parent = cooldown:GetParent()
-	if parent then
-		if parent.icon and type(parent.icon) == 'table' then
-			timer.icon = parent.icon
-		else
-			local name = parent:GetName()
-			if name then
-				timer.icon = getglobal(name .. 'Icon') or getglobal(name .. 'IconTexture')
-			end
+--shower: a frame used to properly show and hide timer text without forcing the timer to be parented to the cooldown frame (needed for hiding the cooldown frame)
+do
+	local function Shower_OnShow(self)
+		local timer = timers[self:GetParent()]
+		if timer.wasShown then
+			timer:Show()
 		end
 	end
 
-	timers[cooldown] = timer
+	local function Shower_OnHide(self)
+		local timer = timers[self:GetParent()]
+		if timer:IsShown() then
+			timer.wasShown = true
+			timer:Hide()
+		end
+	end
 
-	return timer
+	function OmniCC:CreateShower(cooldown)
+		--controls the visibility of the timer
+		local shower = CreateFrame('Frame', nil, cooldown)
+		shower:SetScript('OnShow', Shower_OnShow)
+		shower:SetScript('OnHide', Shower_OnHide)
+
+		showers[cooldown] = shower
+
+		return shower
+	end
+end
+
+do
+	--timer, the frame with cooldown text
+	local function Timer_OnUpdate(self, elapsed)
+		if self.nextUpdate <= 0 then
+			OmniCC:UpdateTimer(self)
+		else
+			self.nextUpdate = self.nextUpdate - elapsed
+		end
+	end
+
+	function OmniCC:CreateTimer(cooldown)
+		local timer = CreateFrame('Frame', nil, cooldown:GetParent())
+		timer:SetFrameLevel(cooldown:GetFrameLevel() + 5) --make sure the timer is on top of things like the cooldown model
+		timer:SetAllPoints(cooldown)
+		timer:SetToplevel(true)
+		timer:Hide()
+		timer:SetScript('OnUpdate', Timer_OnUpdate)
+
+		local text = timer:CreateFontString(nil, 'OVERLAY')
+		text:SetPoint('CENTER', timer, 'CENTER', 0, 1)
+		timer.text = text
+
+		-- parent icon, used for shine stuff
+		local parent = cooldown:GetParent()
+		if parent then
+			if parent.icon then
+				timer.icon = parent.icon
+			else
+				local name = parent:GetName()
+				if name then
+					timer.icon = getglobal(name .. 'Icon') or getglobal(name .. 'IconTexture')
+				end
+			end
+		end
+
+		timers[cooldown] = timer
+
+		return timer
+	end
 end
 
 function OmniCC:UpdateTimer(timer)
@@ -441,29 +461,4 @@ end
 
 function OmniCC:UsingMMSS()
 	return self.sets.useMMSS
-end
-
-
---[[ Slash Commands ]]--
-
-function OmniCC:LoadSlashCommands()
-	SlashCmdList['OmniCCCOMMAND'] = function(cmd)
-		local enabled = select(4, GetAddOnInfo('OmniCC_Options'))
-		if enabled then
-			if OmniCCOptionsFrame then
-				if OmniCCOptionsFrame:IsShown() then
-					OmniCCOptionsFrame:Hide()
-				else
-					UIFrameFadeIn(OmniCCOptionsFrame, 0.2)
-				end
-			else
-				LoadAddOn('OmniCC_Options')
-			end
-		else
-			self:Print('Options menu addon not present', true)
-		end
-	end
-
-	SLASH_OmniCCCOMMAND1 = '/omnicc'
-	SLASH_OmniCCCOMMAND2 = '/occ'
 end
