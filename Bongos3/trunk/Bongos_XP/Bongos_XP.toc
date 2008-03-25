@@ -1,0 +1,12 @@
+## Interface: 20400
+## Title: Bongos3 XP
+## Title-zhCN: |cFF0099FF[Bongos3]|r 经验条
+## Notes: A movable experience and reputation bar
+## Notes-zhCN: Bongos3 系列 经验条。
+## Author: Tuller
+## Dependencies: Bongos
+localization\localization.lua
+localization\localization.cn.lua
+localization\localization.fr.lua
+localization\localization.es.lua
+bar.lua

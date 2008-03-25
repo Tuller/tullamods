@@ -1,0 +1,12 @@
+﻿## Interface: 20400
+## Title: Bongos3 CastBar
+## Title-zhCN: |cFF0099FF[Bongos3]|r 施法条
+## Notes: A movable casting bar, with timer
+## Notes-zhCN: Bongos3 系列 施法条。
+## Author: Tuller
+## Dependencies: Bongos
+localization\localization.lua
+localization\localization.cn.lua
+localization\localization.fr.lua
+localization\localization.es.lua
+bar.xml

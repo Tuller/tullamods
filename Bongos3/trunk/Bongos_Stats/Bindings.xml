@@ -1,0 +1,7 @@
+<Bindings>
+	<Binding name="BSTATSTOGGLE" header="BSTATS">
+		if keystate == "down" then
+			Bongos3.Bar:Get('stats'):ToggleFrame()
+		end
+	</Binding>
+</Bindings>

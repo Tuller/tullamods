@@ -1,0 +1,8 @@
+﻿## Interface: 20400
+## Title: Bongos3 Roll
+## Title-zhCN: |cFF0099FF[Bongos3]|r 色子条
+## Notes: Makes the frame for rolling on items movable
+## Notes-zhCN: Bongos3 系列 色子条。
+## Author: Tuller
+## Dependencies: Bongos
+Roll.lua

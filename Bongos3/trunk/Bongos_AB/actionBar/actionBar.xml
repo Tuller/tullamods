@@ -1,0 +1,7 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="actionBar.lua"/>
+	<Script file="updater.lua"/>
+	<Script file="bar.lua"/>
+	<Script file="button.lua"/>
+	<Script file="painter.lua"/>
+</Ui>

@@ -1,0 +1,11 @@
+## Interface: 20400
+## Title: Bongos3 Options
+## Notes: A load on demand option menu for Bongos3
+## Author: Tuller
+## Dependencies: Bongos
+## LoadOnDemand: 1
+menu.lua
+general.lua
+profiles.lua
+visibility.lua
+actionBar.lua
