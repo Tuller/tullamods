@@ -1,5 +1,8 @@
 #summary Version History for OmniCC
 
+2.0.8b
+  * Corrected download
+
 2.0.8
   * Updated for 2.4
   * The /omnicc menu is now part of the new blizzard interface options menu
