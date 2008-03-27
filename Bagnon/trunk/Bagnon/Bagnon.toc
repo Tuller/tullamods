@@ -21,5 +21,4 @@ core\bagFrame.lua
 core\money.lua
 core\frame.lua
 core\spot.lua
-core\menu.lua
 main.lua
