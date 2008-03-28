@@ -57,7 +57,7 @@ end
 function ActionBar:GetDefaultActions(class)
 	local header
 	if class == 'DRUID' then
-		header = {['[bonusbar:1]'] = 2, ['[bonusbar:3]'] = 4, ['[bonusbar:4]'] = 3} --cat, bear, moonkin/tree
+		header = {['[bonusbar:1]'] = 2, ['[bonusbar:3]'] = 4, ['[bonusbar:4]'] = 3, ['[bonusbar:2]'] = 3} --cat, bear, moonkin, tree
 
 		--bar 1 (caster)
 		buttons = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
