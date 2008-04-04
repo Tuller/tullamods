@@ -47,6 +47,7 @@ do
 			if not BagnonMenu then
 				LoadAddOn('Bagnon_Options')
 			end
+
 			if BagnonMenu then
 				BagnonMenu:Display(self:GetParent())
 			end
