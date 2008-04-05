@@ -661,7 +661,7 @@ local function AddStancesPanel(menu)
 	local class = select(2, UnitClass('player'))
 	if AddForms[class] then
 		local panel = menu:AddPanel(L.Stances)
-		AddForms[class](panel) 
+		AddForms[class](panel)
 	end
 end
 

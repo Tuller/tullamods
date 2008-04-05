@@ -133,6 +133,9 @@ function PetBar:Unload()
 end
 
 function PetBar:KEYBOUND_ENABLED()
+	UnregisterStateDriver(self.bar.bar)
+	self.bar.bar:Show()
+
 	for i = 1, NUM_PET_ACTION_SLOTS do
 		local button = self.Button:Get(i)
 		button:Show()
@@ -142,6 +145,7 @@ end
 
 function PetBar:KEYBOUND_DISABLED()
 	local petBarShown = PetHasActionBar()
+	RegisterStateDriver(self.bar.bar, 'visibility',  '[target=pet,nodead,exists,nobonusbar:5]show;hide')
 
 	for i = 1, NUM_PET_ACTION_SLOTS do
 		local button = self.Button:Get(i)
