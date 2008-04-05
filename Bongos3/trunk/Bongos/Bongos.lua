@@ -273,7 +273,7 @@ function Bongos:RegisterSlashCommands()
 end
 
 function Bongos:OnCmd(args)
-	local cmd = string.split(' ', args):lower()
+	local cmd = string.split(' ', args):lower() or args:lower()
 
 	if cmd == 'config' or cmd == 'lock' then
 		self:ToggleLockedBars()
@@ -311,6 +311,8 @@ function Bongos:OnCmd(args)
 		self:PrintVersion()
 	elseif cmd == 'cleanup' then
 		self:Cleanup()
+	elseif cmd == 'help' or cmd == '?' then
+		self:PrintHelp()
 	else
 		if not self:ShowOptions() then
 			self:PrintHelp()
