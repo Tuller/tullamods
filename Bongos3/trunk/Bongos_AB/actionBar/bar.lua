@@ -152,6 +152,7 @@ function ActionBar:UpdateActions()
 
 	for i = numButtons + 1, #self.buttons do
 		local button = self.buttons[i]
+		button:UnloadBindings(self:GetBindings(i))
 		button:Release()
 		self.buttons[i] = nil
 	end
@@ -312,6 +313,7 @@ end
 function ActionBar:AddButton(index)
 	local button = Action.Button:Get(self.bar)
 	self.buttons[index] = button
+	button:LoadBindings(self:GetBindings(index))
 
 	button.index = index
 
@@ -412,6 +414,66 @@ function ActionBar:SetRightClickUnit(unit)
 	self.bar:SetAttribute('*unit2', unit)
 	for i = 2, self:NumSets() do
 		self.bar:SetAttribute(format('*unit-s%ds', i), unit)
+	end
+end
+
+--[[ Binding Code ]]--
+
+function ActionBar:AddBinding(index, key)
+	if not self.sets.bindings then
+		self.sets.bindings = {}
+	end
+
+	if self.sets.bindings[index] then
+		if type(self.sets.bindings[index]) == 'table' then
+			for _,binding in pairs(self.sets.bindings[index]) do
+				if binding == key then
+					return
+				end
+			end
+			table.insert(self.sets.bindings[index], key)
+		elseif self.sets.bindings[index] ~= key then
+			self.sets.bindings[index] = {self.sets.bindings, key}
+		end
+	else
+		self.sets.bindings[index] = key
+	end
+end
+
+function ActionBar:RemoveBinding(index, key)
+	if self.sets.bindings then
+		if type(self.sets.bindings[index]) == 'table' then
+			local found
+			for i,binding in pairs(self.sets.bindings[index]) do
+				if binding == key then
+					found = i
+					break
+				end
+			end
+			if found then
+				table.remove(self.sets.bindings[index], i)
+
+				if not next(self.sets.bindings[index]) then
+					self.sets.bindings[index] = nil
+				end
+			end
+		elseif self.sets.bindings[index] == key then
+			self.sets.bindings[index] = nil
+		end
+
+		if not next(self.sets.bindings) then
+			self.sets.bindings = nil
+		end
+	end
+end
+
+function ActionBar:GetBindings(index)
+	if self.sets.bindings then
+		if type(self.sets.bindings[index] == 'table') then
+			return unpack(self.sets.bindings[index])
+		else
+			return self.sets.bindings[index]
+		end
 	end
 end
 

@@ -488,6 +488,59 @@ function ActionButton:GetHotkey()
 	end
 end
 
+--[[ Binding Setttings ]]--
+
+function ActionButton:LoadBindings(...)
+	for i = 1, select('#', ...) do
+		SetOverrideBindingClick(self:GetParent(), false, select(i, ...), self:GetName(), 'LeftButton')
+	end
+end
+
+function ActionButton:UnloadBindings(...)
+	for i = 1, select('#', ...) do
+		SetOverrideBindingClick(self:GetParent(), false, select(i, ...), nil)
+	end
+end
+
+-- binds the given key to the given button
+function ActionButton:SetKey(key)
+	self:GetParent():GetParent():AddBinding(self.index, key)
+	SetOverrideBindingClick(self:GetParent(), false, key, self:GetName(), 'LeftButton')
+end
+
+function ActionButton:RemoveKey(key)
+	self:GetParent():GetParent():RemoveBinding(self.index, key)
+	SetOverrideBindingClick(self:GetParent(), false, key, nil)
+end
+
+-- unbinds the given key from all other buttons
+function ActionButton:FreeKey(key)
+	self:ForAll('RemoveKey', key)
+end
+
+-- removes all keys bound to the given button
+function ActionButton:ClearBindings(key)
+	local bar = self:GetParent():GetParent()
+	local binding
+	repeat
+		binding = bar:GetBindings(self.index) 
+		if binding then
+			bar:RemoveBinding(self.index, key)
+			SetOverrideBindingClick(self:GetParent(), false, key, nil)
+		end
+	until not binding
+end
+
+-- returns a string listing all bindings of the given button
+function ActionButton:GetBindings()
+	return string.join(',', self:GetParent():GetParent():GetBindings())
+end
+
+-- what we're binding to, used for printing
+function ActionButton:GetActionName()
+	return format('Action Bar %d Button %d', self:GetParent():GetParent().id, self.index)
+end	
+
 --border coloring
 function ActionButton:UpdateEquippedColor()
 	self.border:SetVertexColor(Config:GetEquippedColor())
