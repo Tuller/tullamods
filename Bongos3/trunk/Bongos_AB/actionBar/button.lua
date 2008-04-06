@@ -482,11 +482,14 @@ function ActionButton:UpdateHotkey()
 end
 
 function ActionButton:GetHotkey()
-	local bindings = self:GetParent():GetParent():GetBindings(self.index)
-	return bindings and KeyBound:ToShortKey(string.split(';', bindings))
+	local key = GetBindingKey(format('CLICK %s:LeftButton', self:GetName()))
+	if key then
+		return KeyBound:ToShortKey(key)
+	end
 end
 
 --binding updating
+--[[
 function ActionButton:SetKey(key)
 	self:GetParent():GetParent():AddBinding(self.index, key)
 end
@@ -514,10 +517,12 @@ function ActionButton:GetBindings()
 		return keys
 	end
 end
+--]]
 
 function ActionButton:GetActionName()
 	return format('ActionBar%s Button%d', self:GetParent():GetParent().id, self.index)
 end
+--]]
 
 --border coloring
 function ActionButton:UpdateEquippedColor()

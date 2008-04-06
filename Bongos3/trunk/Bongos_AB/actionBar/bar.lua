@@ -65,7 +65,7 @@ end
 function ActionBar:OnCreate()
 	self.bar = CreateFrame('Frame', nil, self, 'SecureStateHeaderTemplate')
 	self.bar:SetAttribute('statemap-state', '$input')
-	self.bar:SetAttribute('statebindings', '*:main')
+--	self.bar:SetAttribute('statebindings', '*:main')
 	self.buttons = {}
 end
 
@@ -315,7 +315,7 @@ function ActionBar:AddButton(index)
 	self.buttons[index] = button
 
 	button.index = index
-	self:UpdateButtonBindings(index)
+--	self:UpdateButtonBindings(index)
 
 	return button
 end
@@ -409,6 +409,8 @@ end
 
 
 --[[ Bindings ]]--
+
+--[[
 
 local function splitNext(sep, body)
     if body then
@@ -510,6 +512,7 @@ function ActionBar:UpdateButtonBindings(index)
 	end
 end
 
+--]]
 
 --[[ Right Click Selfcast ]]--
 

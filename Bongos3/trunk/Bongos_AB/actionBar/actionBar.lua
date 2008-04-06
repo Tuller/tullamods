@@ -17,6 +17,7 @@ function ActionBar:Load(isNewProfile)
 		defaults.ids, defaults.setMap, defaults.numSets = self:GetDefaultActions(select(2, UnitClass('player')))
 
 		--load keybinding from old bongos versions & the default ui
+--[[
 		local bindings = {}
 		for i = 1, 12 do
 			local binding = GetBindingKey(format('CLICK BActionButton%d:LeftButton', i)) or
@@ -25,6 +26,7 @@ function ActionBar:Load(isNewProfile)
 			bindings[i] = binding
 		end
 		defaults.bindings = bindings
+--]]
 
 		Bongos:SetBarSets(1, defaults)
 	end
