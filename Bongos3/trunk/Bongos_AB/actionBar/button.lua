@@ -488,42 +488,6 @@ function ActionButton:GetHotkey()
 	end
 end
 
---binding updating
---[[
-function ActionButton:SetKey(key)
-	self:GetParent():GetParent():AddBinding(self.index, key)
-end
-
-function ActionButton:FreeKey(key)
-	return self:GetParent():GetParent():FreeBinding(key)
-end
-
-function ActionButton:ClearBindings()
-	self:GetParent():GetParent():ClearBindings(self.index)
-end
-
-function ActionButton:GetBindings()
-	local bindings = self:GetParent():GetParent():GetBindings(self.index)
-	if bindings then
-		local keys
-		for i = 1, select('#', string.split(';', bindings)) do
-			local hotKey = select(i, string.split(';', bindings))
-			if keys then
-				keys = keys .. ', ' .. GetBindingText(hotKey,'KEY_')
-			else
-				keys = GetBindingText(hotKey,'KEY_')
-			end
-		end
-		return keys
-	end
-end
---]]
-
-function ActionButton:GetActionName()
-	return format('ActionBar%s Button%d', self:GetParent():GetParent().id, self.index)
-end
---]]
-
 --border coloring
 function ActionButton:UpdateEquippedColor()
 	self.border:SetVertexColor(Config:GetEquippedColor())
