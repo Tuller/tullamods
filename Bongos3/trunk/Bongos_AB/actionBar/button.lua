@@ -109,7 +109,6 @@ end
 function ActionButton:UpdateEvents()
 	self:UnregisterAllEvents()
 
-	self:RegisterEvent('UPDATE_BINDINGS')
 	if self:IsVisible() then
 		self:RegisterEvent('PLAYER_ENTERING_WORLD')
 		self:RegisterEvent('PLAYER_AURAS_CHANGED')
@@ -136,9 +135,7 @@ end
 --[[ OnX Functions ]]--
 
 function ActionButton:OnEvent(event, arg1)
-	if event == 'UPDATE_BINDINGS' then
-		self:UpdateHotkey()
-	elseif self:IsVisible() and HasAction(self:GetPagedID()) then
+	if self:IsVisible() and HasAction(self:GetPagedID()) then
 		if event == 'PLAYER_ENTERING_WORLD' then
 			self:Update()
 		elseif event == 'PLAYER_AURAS_CHANGED' or event == 'PLAYER_TARGET_CHANGED' then
@@ -482,7 +479,7 @@ function ActionButton:UpdateHotkey()
 end
 
 function ActionButton:GetHotkey()
-	local key = GetBindingKey(self:GetParent():GetParent():GetBindings(self.index))
+	local key = self:GetParent():GetParent():GetBindings(self.index)
 	if key then
 		return KeyBound:ToShortKey(key)
 	end
@@ -497,23 +494,27 @@ function ActionButton:LoadBindings(...)
 			SetOverrideBindingClick(self:GetParent(), false, key, self:GetName(), 'LeftButton')
 		end
 	end
+	self:UpdateHotkey()
 end
 
 function ActionButton:UnloadBindings(...)
 	for i = 1, select('#', ...) do
 		SetOverrideBinding(self:GetParent(), false, select(i, ...), nil)
 	end
+	self:UpdateHotkey()
 end
 
 -- binds the given key to the given button
 function ActionButton:SetKey(key)
 	self:GetParent():GetParent():AddBinding(self.index, key)
 	SetOverrideBindingClick(self:GetParent(), false, key, self:GetName(), 'LeftButton')
+	self:UpdateHotkey()
 end
 
 function ActionButton:RemoveKey(key)
 	self:GetParent():GetParent():RemoveBinding(self.index, key)
 	SetOverrideBinding(self:GetParent(), false, key, nil)
+	self:UpdateHotkey()
 end
 
 -- unbinds the given key from all other buttons
@@ -532,6 +533,7 @@ function ActionButton:ClearBindings(key)
 			SetOverrideBinding(self:GetParent(), false, binding, nil)
 		end
 	until not binding
+	self:UpdateHotkey()
 end
 
 -- returns a string listing all bindings of the given button

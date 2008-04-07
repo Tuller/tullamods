@@ -426,7 +426,6 @@ function ActionBar:AddBinding(index, key)
 
 	local prevBinding = self.sets.bindings[index]
 	if prevBinding then
-		Bongos:Print(type(self.sets.bindings[index]))
 		if type(self.sets.bindings[index]) == 'table' then
 			for _,binding in pairs(self.sets.bindings[index]) do
 				if binding == key then
