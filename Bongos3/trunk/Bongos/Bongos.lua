@@ -69,10 +69,20 @@ function Bongos:OnEnable()
 end
 
 function Bongos:UpdateSettings()
-	--settings update code goes here (obviously)
+	for _,profile in pairs(Bongos3DB.profiles) do
+		for _,sets in pairs(profile.bars) do
+			sets.bindings = nil
+		end
+	end
 end
 
 function Bongos:UpdateVersion()
+	for _,profile in pairs(Bongos3DB.profiles) do
+		for _,sets in pairs(profile.bars) do
+			sets.bindings = nil
+		end
+	end
+
 	Bongos3Version = CURRENT_VERSION
 	self:Print(format(L.Updated, Bongos3Version))
 end
