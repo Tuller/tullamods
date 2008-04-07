@@ -312,10 +312,10 @@ end
 
 function ActionBar:AddButton(index)
 	local button = Action.Button:Get(self.bar)
-	self.buttons[index] = button
 	button:LoadBindings(self:GetBindings(index))
-
 	button.index = index
+
+	self.buttons[index] = button
 
 	return button
 end
@@ -424,7 +424,9 @@ function ActionBar:AddBinding(index, key)
 		self.sets.bindings = {}
 	end
 
-	if self.sets.bindings[index] then
+	local prevBinding = self.sets.bindings[index]
+	if prevBinding then
+		Bongos:Print(type(self.sets.bindings[index]))
 		if type(self.sets.bindings[index]) == 'table' then
 			for _,binding in pairs(self.sets.bindings[index]) do
 				if binding == key then
@@ -432,8 +434,8 @@ function ActionBar:AddBinding(index, key)
 				end
 			end
 			table.insert(self.sets.bindings[index], key)
-		elseif self.sets.bindings[index] ~= key then
-			self.sets.bindings[index] = {self.sets.bindings, key}
+		elseif prevBinding ~= key then
+			self.sets.bindings[index] = {prevBinding, key}
 		end
 	else
 		self.sets.bindings[index] = key
@@ -450,8 +452,9 @@ function ActionBar:RemoveBinding(index, key)
 					break
 				end
 			end
+
 			if found then
-				table.remove(self.sets.bindings[index], i)
+				table.remove(self.sets.bindings[index], found)
 
 				if not next(self.sets.bindings[index]) then
 					self.sets.bindings[index] = nil
@@ -469,11 +472,10 @@ end
 
 function ActionBar:GetBindings(index)
 	if self.sets.bindings then
-		if type(self.sets.bindings[index] == 'table') then
+		if type(self.sets.bindings[index]) == 'table' then
 			return unpack(self.sets.bindings[index])
-		else
-			return self.sets.bindings[index]
 		end
+		return self.sets.bindings[index]
 	end
 end
 

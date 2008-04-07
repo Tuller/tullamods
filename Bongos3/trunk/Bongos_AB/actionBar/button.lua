@@ -482,7 +482,7 @@ function ActionButton:UpdateHotkey()
 end
 
 function ActionButton:GetHotkey()
-	local key = GetBindingKey(format('CLICK %s:LeftButton', self:GetName()))
+	local key = GetBindingKey(self:GetParent():GetParent():GetBindings(self.index))
 	if key then
 		return KeyBound:ToShortKey(key)
 	end
@@ -492,13 +492,16 @@ end
 
 function ActionButton:LoadBindings(...)
 	for i = 1, select('#', ...) do
-		SetOverrideBindingClick(self:GetParent(), false, select(i, ...), self:GetName(), 'LeftButton')
+		local key = select(i, ...)
+		if key then
+			SetOverrideBindingClick(self:GetParent(), false, key, self:GetName(), 'LeftButton')
+		end
 	end
 end
 
 function ActionButton:UnloadBindings(...)
 	for i = 1, select('#', ...) do
-		SetOverrideBindingClick(self:GetParent(), false, select(i, ...), nil)
+		SetOverrideBinding(self:GetParent(), false, select(i, ...), nil)
 	end
 end
 
@@ -510,7 +513,7 @@ end
 
 function ActionButton:RemoveKey(key)
 	self:GetParent():GetParent():RemoveBinding(self.index, key)
-	SetOverrideBindingClick(self:GetParent(), false, key, nil)
+	SetOverrideBinding(self:GetParent(), false, key, nil)
 end
 
 -- unbinds the given key from all other buttons
@@ -525,20 +528,20 @@ function ActionButton:ClearBindings(key)
 	repeat
 		binding = bar:GetBindings(self.index) 
 		if binding then
-			bar:RemoveBinding(self.index, key)
-			SetOverrideBindingClick(self:GetParent(), false, key, nil)
+			bar:RemoveBinding(self.index, binding)
+			SetOverrideBinding(self:GetParent(), false, binding, nil)
 		end
 	until not binding
 end
 
 -- returns a string listing all bindings of the given button
 function ActionButton:GetBindings()
-	return string.join(',', self:GetParent():GetParent():GetBindings())
+	return string.join(',', self:GetParent():GetParent():GetBindings(self.index))
 end
 
 -- what we're binding to, used for printing
 function ActionButton:GetActionName()
-	return format('Action Bar %d Button %d', self:GetParent():GetParent().id, self.index)
+	return format('ActionBar %d Button %d', self:GetParent():GetParent().id, self.index)
 end	
 
 --border coloring
