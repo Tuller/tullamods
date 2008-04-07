@@ -21,13 +21,17 @@ local function OnPartialMatch(match)
 end
 
 local function Linkerator_OnChar(self, ...)
-	local text = self:GetText()
+        local obj = self;
+        if(WIM_EditBoxInFocus) then
+            obj = WIM_EditBoxInFocus;
+        end
+	local text = obj:GetText()
 	if text ~= '' then
 		if text:match('%[%[(.+)%]') then
-			self:SetText(text:gsub('%[%[(.+)%]', OnFullMatch))
+			obj:SetText(text:gsub('%[%[(.+)%]', OnFullMatch))
 		else
-			self:SetText(text:gsub('%[%[(.+)', OnPartialMatch))
-			self:HighlightText(#text, -1)
+			obj:SetText(text:gsub('%[%[(.+)', OnPartialMatch))
+			obj:HighlightText(#text, -1)
 		end
 	end
 end
