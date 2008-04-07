@@ -12,11 +12,7 @@
 		Pet
 --]]
 
--- local noop = function() return end
-
 --[[ Unregistering Functions ]]--
-
-local function noop() end
 
 --Unregister action buttons
 local function UnregisterActionButton(button)
@@ -57,18 +53,26 @@ local function UnregisterPetBar()
 end
 
 do
+	local noop = function() return end
+
 	MainMenuBar:Hide()
 	ExhaustionTick:UnregisterAllEvents()
 	UnregisterActionBars()
 	UnregisterShapeshiftBar()
 	UnregisterPetBar()
+	
+	UIPARENT_MANAGED_FRAME_POSITIONS["MultiBarRight"] = nil
+	UIPARENT_MANAGED_FRAME_POSITIONS["MultiBarLeft"] = nil
+	UIPARENT_MANAGED_FRAME_POSITIONS["MultiBarBottomLeft"] = nil
+	UIPARENT_MANAGED_FRAME_POSITIONS["MultiBarBottomRight"] = nil
+	UIPARENT_MANAGED_FRAME_POSITIONS["MainMenuBar"] = nil
 
 	ALWAYS_SHOW_MULTIBARS = nil
 	SHOW_MULTI_ACTIONBAR_1 = nil
 	SHOW_MULTI_ACTIONBAR_2 = nil
 	SHOW_MULTI_ACTIONBAR_3 = nil
 	SHOW_MULTI_ACTIONBAR_4 = nil
-
+	
 	MultiActionBar_ShowAllGrids = noop
 	MultiActionBar_HideAllGrids = noop
 	MultiActionBar_Update()
