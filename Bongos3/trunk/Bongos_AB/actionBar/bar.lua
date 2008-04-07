@@ -312,8 +312,8 @@ end
 
 function ActionBar:AddButton(index)
 	local button = Action.Button:Get(self.bar)
-	button:LoadBindings(self:GetBindings(index))
 	button.index = index
+	button:LoadBindings(self:GetBindings(index))
 
 	self.buttons[index] = button
 
