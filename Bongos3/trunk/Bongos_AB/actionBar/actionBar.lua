@@ -25,7 +25,7 @@ function ActionBar:Load(isNewProfile)
 			bindings[i] = binding
 		end
 		defaults.bindings = bindings
-		
+
 		Bongos:SetBarSets(1, defaults)
 	end
 
