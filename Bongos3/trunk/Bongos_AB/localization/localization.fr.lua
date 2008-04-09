@@ -1,4 +1,4 @@
-﻿--[[
+--[[
 	Bongos_Actionbar Localization
 		French
 --]]
@@ -11,8 +11,6 @@ L.Size = 'Tailles'
 L.Vertical = 'Vertical'
 L.OneBag = 'Un Sac'
 L.Paging = 'Paging'
-L.Stances = 'Stances'
-L.Page = 'Page %s'
 L.FriendlyTarget = 'Cible amie'
 L.Modifier = 'Modifier'
 L.Prowl = 'Prowl'

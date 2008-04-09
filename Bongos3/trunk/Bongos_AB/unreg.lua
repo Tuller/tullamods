@@ -52,8 +52,8 @@ local function UnregisterPetBar()
 	end
 end
 
+local noop = function() return end
 do
-	local noop = function() return end
 
 	MainMenuBar:Hide()
 	ExhaustionTick:UnregisterAllEvents()
@@ -61,11 +61,11 @@ do
 	UnregisterShapeshiftBar()
 	UnregisterPetBar()
 	
-	UIPARENT_MANAGED_FRAME_POSITIONS["MultiBarRight"] = nil
-	UIPARENT_MANAGED_FRAME_POSITIONS["MultiBarLeft"] = nil
-	UIPARENT_MANAGED_FRAME_POSITIONS["MultiBarBottomLeft"] = nil
-	UIPARENT_MANAGED_FRAME_POSITIONS["MultiBarBottomRight"] = nil
-	UIPARENT_MANAGED_FRAME_POSITIONS["MainMenuBar"] = nil
+	-- UIPARENT_MANAGED_FRAME_POSITIONS["MultiBarRight"] = nil
+	-- UIPARENT_MANAGED_FRAME_POSITIONS["MultiBarLeft"] = nil
+	-- UIPARENT_MANAGED_FRAME_POSITIONS["MultiBarBottomLeft"] = nil
+	-- UIPARENT_MANAGED_FRAME_POSITIONS["MultiBarBottomRight"] = nil
+	-- UIPARENT_MANAGED_FRAME_POSITIONS["MainMenuBar"] = nil
 
 	ALWAYS_SHOW_MULTIBARS = nil
 	SHOW_MULTI_ACTIONBAR_1 = nil

@@ -20,7 +20,6 @@ function Config:OnInitialize()
 			debuffColor = {1, 0, 1},
 			equippedColor = {0, 1, 0, 0.7},
 			rightClickUnit = nil,
-			stateConditions = self:GetDefaultStateConditions(),
 		}
 	}
 	self.db = Bongos.db:RegisterNamespace('actionBar', defaults)
@@ -204,43 +203,12 @@ end
 --state conditions control what states we actually include in bongos for checking
 --more importantly, it determines the order they are checked
 --by default, we check for modifiers, then paging, then stances, then targeting
-function Config:SetStateConditions(conditions)
-	self.db.profile.stateConditions = conditions
-	Bongos:GetModule('ActionBar').Bar:ForAll('UpdateStateDriver')
-end
-
 function Config:GetStateConditions()
-	return self.db.profile.stateConditions
+	self.stateHeader = self.stateHeader or self:LoadStateHeader()
+	return self.stateHeader
 end
 
-function Config:GetDefaultStateConditions()
-	local conditions = {}
-
-	--modifiers
-	table.insert(conditions, '[mod:ctrl]')
-	table.insert(conditions, '[mod:alt]')
-	table.insert(conditions, '[mod:shift]')
-
-	--paging
-	for i = 2, 6 do
-		table.insert(conditions, format('[bar:%d]', i))
-	end
-
-	--prowl
-	table.insert(conditions, '[bonusbar:1,stealth]')
-
-	--forms/stances
-	for i = 1, 4 do
-		table.insert(conditions, format('[bonusbar:%d]', i))
-	end
---[[	
-	for i = 1, 7 do
-		table.insert(conditions, format('[form:%d]', i))
-	end
---]]
-	--help harm targeting
-	table.insert(conditions, '[help]')
-	table.insert(conditions, '[harm]')
-
-	return conditions
+function Config:GetStanceMenuLayout()
+	self.stanceLayout = self.stanceLayout or self:LoadStanceLayout()
+	return self.stanceLayout
 end

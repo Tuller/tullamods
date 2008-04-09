@@ -228,7 +228,7 @@ end
 function ActionBar:UpdateStateButton()
 	local sb1, sb2
 
-	for i = 2, self:NumSets() do
+	for i = 1, self:NumSets() do
 		local state1 = i .. ':s' .. i
 		local state2 = state1 .. 's'
 
@@ -412,7 +412,7 @@ end
 
 function ActionBar:SetRightClickUnit(unit)
 	self.bar:SetAttribute('*unit2', unit)
-	for i = 2, self:NumSets() do
+	for i = 1, self:NumSets() do
 		self.bar:SetAttribute(format('*unit-s%ds', i), unit)
 	end
 end
@@ -501,7 +501,7 @@ local function AddLayoutPanel(menu)
 	local states, rows, cols
 	local function UpdateSliderSizes(bar)
 		local freeIDs = bar:NumFreeIDs()
-
+		
 		local maxStates = bar:GetCols() * bar:GetRows()
 		states:SetMinMaxValues(1, floor(freeIDs / maxStates) + bar:NumSets())
 
@@ -512,7 +512,7 @@ local function AddLayoutPanel(menu)
 		cols:SetMinMaxValues(1, floor(freeIDs / maxCols) + bar:GetCols())
 	end
 
-	states = panel:CreateSlider(L.Sets, 1, 1, 1)
+	states = panel:CreateSlider(L.Pages, 1, 1, 1)
 	function states:UpdateValue(value)
 		local bar = Bongos.Bar:Get(self:GetParent().id)
 		bar:SetNumSets(value)
@@ -561,16 +561,24 @@ end
 --state slider template
 local function StateSlider_OnShow(self)
 	local f = ActionBar:Get(self:GetParent().id)
-	self:SetMinMaxValues(1, f:NumSets())
-	self:SetValue(f:GetConditionSet(self.state) or 1)
+	self:SetMinMaxValues(0, f:NumSets())
+	self:SetValue(f:GetConditionSet(self.state) or 0)
 end
 
 local function StateSlider_UpdateValue(self, value)
 	local f = ActionBar:Get(self:GetParent().id)
-	if value == 1 then
+	if value == 0 then
 		f:SetConditionSet(self.state, nil)
 	else
 		f:SetConditionSet(self.state, value)
+	end
+end
+
+local function StateSlider_UpdateText(self, value)
+	if value == 0 then
+		self.valText:SetText('Disabled')
+	else
+		self.valText:SetText(L.Page:format(value))
 	end
 end
 
@@ -578,73 +586,45 @@ local function StateSlider_Create(panel, state, text)
 	local slider = panel:CreateSlider(state, 0, 1, 1)
 	slider.OnShow = StateSlider_OnShow
 	slider.UpdateValue = StateSlider_UpdateValue
+	slider.UpdateText = StateSlider_UpdateText
 	slider.state = state
 
-	if text then
-		getglobal(slider:GetName() .. 'Text'):SetText(text)
-	end
+	local title = getglobal(slider:GetName() .. 'Text')
+	title:ClearAllPoints()
+	title:SetPoint('BOTTOMLEFT', slider, 'TOPLEFT')
+	title:SetJustifyH('LEFT')	
+	title:SetText(text or state)
+
+	local value = slider.valText;
+	value:ClearAllPoints()
+	value:SetPoint('BOTTOMRIGHT', slider, 'TOPRIGHT')
+	value:SetJustifyH('RIGHT')
 
 	panel[state] = slider
 
 	return slider
 end
 
+local function AddStancePanels(menu)
+	local stancePanels = Config:GetStanceMenuLayout()
+	if stancePanels then
+		for _,panelInfo in ipairs(stancePanels) do
+			local panel = menu:AddPanel(panelInfo[1])
+			for i = #panelInfo[2], 1, -1 do
+				local name, condition = unpack(panelInfo[2][i])
+				local slider = StateSlider_Create(panel, condition, name)
+				slider:SetWidth(slider:GetWidth() + 16)
+
+				if i == #panelInfo[2] then
+					slider:ClearAllPoints()
+					slider:SetPoint('BOTTOM', 0, 4)
+				end
+			end
+		end
+	end
+end
+
 --stances panel
-local AddForms = {}
-do
-	function AddForms:PRIEST()
-		StateSlider_Create(self, '[bonusbar:1]', GetSpellInfo(15473)) --shadow form
-	end
-
-	function AddForms:DRUID()
-		StateSlider_Create(self, '[bonusbar:4]', GetSpellInfo(24858)) --moonkin
-		StateSlider_Create(self, '[bonusbar:2]', GetSpellInfo(33891)) --tree
-		StateSlider_Create(self, '[bonusbar:1,stealth]', GetSpellInfo(5215)) --prowl
-		StateSlider_Create(self, '[bonusbar:1]', GetSpellInfo(768)) --cat
-		StateSlider_Create(self, '[bonusbar:3]', GetSpellInfo(5487)) --bear
-	end
-
-	function AddForms:WARRIOR()
-		StateSlider_Create(self, '[bonusbar:1]', GetSpellInfo(2457)) --battle
-		StateSlider_Create(self, '[bonusbar:2]', GetSpellInfo(71)) --defensive
-		StateSlider_Create(self, '[bonusbar:3]', GetSpellInfo(2458)) --berserker
-	end
-
-	function AddForms:ROGUE()
-		StateSlider_Create(self, '[bonusbar:1]', GetSpellInfo(1784)) --stealth
-	end
-end
-
-local function AddStancesPanel(menu)
-	local class = select(2, UnitClass('player'))
-	if AddForms[class] then
-		local panel = menu:AddPanel(L.Stances)
-		AddForms[class](panel)
-	end
-end
-
---modifier panel
-local function AddModifierPanel(menu)
-	local panel = menu:AddPanel(L.Modifier)
-	StateSlider_Create(panel, '[mod:shift]', SHIFT_KEY)
-	StateSlider_Create(panel, '[mod:ctrl]', CTRL_KEY)
-	StateSlider_Create(panel, '[mod:alt]', ALT_KEY)
-end
-
---targeting
-local function AddTargetingPanel(menu)
-	local panel = menu:AddPanel(L.Targeting)
-	StateSlider_Create(panel, '[help]', L.FriendlyTarget)
-	StateSlider_Create(panel, '[harm]', L.EnemyTarget)
-end
-
---paging
-local function AddPagingPanel(menu)
-	local panel = menu:AddPanel(L.Paging)
-	for i = 6, 2, -1 do
-		StateSlider_Create(panel, format('[bar:%d]', i), format(L.Page, i))
-	end
-end
 
 --showstates
 local function AddShowStatesPanel(menu)
@@ -691,10 +671,7 @@ function ActionBar:CreateMenu()
 	ActionBar.menu = menu
 
 	AddLayoutPanel(menu)
-	AddStancesPanel(menu)
-	AddModifierPanel(menu)
-	AddTargetingPanel(menu)
-	AddPagingPanel(menu)
+	AddStancePanels(menu)
 	AddShowStatesPanel(menu)
 
 	return menu
