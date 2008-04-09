@@ -41,13 +41,13 @@ end
 		layout = {
 			{"panelName", conditionTable}
 		}
-	
+
 	with condition table having the format of
 		conditionTable = {
 			{"condition1", "macroOption1"},
 			{"condition2", "macroOption2"},
 		}
-		
+
 		such as
 		conditionTable = {
 			{"Alt and Control Down", "[mod:alt,mod:ctrl]"},
@@ -59,7 +59,7 @@ end
 
 function Config:LoadStanceLayout()
 	local layout = {}
-	
+
 	--[[
 		class specific panels, adds sliders for druid forms, priest shadowform, warrior stances, and rogue stealth
 
@@ -89,7 +89,7 @@ function Config:LoadStanceLayout()
 	elseif enClass == 'ROGUE' then
 		table.insert(layout, {class, {{GetSpellInfo(1784), '[bonusbar:1]'}}}) --stealth
 	end
-	
+
 	--paging panel
 	--adds sliders for shift + number paging
 	--i'm using some shortcuts here, but its the same stuff as for the other stuff
@@ -98,7 +98,7 @@ function Config:LoadStanceLayout()
 		table.insert(pageConditions, {getglobal('BINDING_NAME_ACTIONPAGE' .. i), format('[bar:%d]', i)})
 	end
 	table.insert(layout, {L.Paging, pageConditions})
-	
+
 	--modifier panel
 	--for things like holding down alt, control, or shift
 	local modifierConditions = {
@@ -107,8 +107,8 @@ function Config:LoadStanceLayout()
 		{SHIFT_KEY, '[mod:shift]'},
 	}
 	table.insert(layout, {L.Modifier, modifierConditions})
-	
-	
+
+
 	--targeting panel
 	--for things like when targeting a friendly or enemy unit
 	local targetConditions = {
