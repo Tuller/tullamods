@@ -21,8 +21,10 @@ function Options:AddGeneralPanel()
 	end)
 	lockButtons:SetScript('OnClick', function(self)
 		if self:GetChecked() then
+			SetCVar('lockActionBars', 1)
 			LOCK_ACTIONBAR = '1'
 		else
+			SetCVar('lockActionBars', 0)
 			LOCK_ACTIONBAR = '0'
 		end
 	end)
