@@ -576,7 +576,7 @@ end
 
 local function StateSlider_UpdateText(self, value)
 	if value == 0 then
-		self.valText:SetText('Disabled')
+		self.valText:SetText(L.Disabled)
 	else
 		self.valText:SetText(L.Page:format(value))
 	end

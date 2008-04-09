@@ -22,6 +22,7 @@ L.Set = 'Set'
 L.PossessBar = 'Act As Possess Bar'
 L.ShowStates = 'Show States'
 L.CreateBarHelp = 'Create a new action bar via holding <Alt> and dragging on the screen.  Delete an action bar via <Alt Right Click>'
+L.Disabled = ADDON_DISABLED
 
 
 --Options Menu Stuff
