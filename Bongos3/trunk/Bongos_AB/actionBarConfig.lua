@@ -78,7 +78,7 @@ function Config:LoadStanceLayout()
 		}
 		table.insert(layout, {class, classConditions})
 	elseif enClass == 'PRIEST' then
-		table.insert(layout, {class, {GetSpellInfo(15473), '[bonusbar:1]'}}) --shadowform
+		table.insert(layout, {class, {{GetSpellInfo(15473), '[bonusbar:1]'}}}) --shadowform
 	elseif enClass == 'WARRIOR' then
 		local classConditions = {
 			{GetSpellInfo(2457), '[bonusbar:1]'},	--battle
@@ -86,8 +86,8 @@ function Config:LoadStanceLayout()
 			{GetSpellInfo(2458), '[bonusbar:3]'}	--berserker
 		}
 		table.insert(layout, {class, classConditions})
-	elseif class == 'ROUGE' then
-		table.insert(layout, {class, {GetSpellInfo(1784), '[bonusbar:1]'}}) --stealth
+	elseif enClass == 'ROGUE' then
+		table.insert(layout, {class, {{GetSpellInfo(1784), '[bonusbar:1]'}}}) --stealth
 	end
 	
 	--paging panel
