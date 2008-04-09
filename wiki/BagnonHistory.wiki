@@ -2,6 +2,9 @@
 
 = Bagnon Version History =
 
+1.5.2
+  * Fixed a few toc issues causing the Menu:Display bug, as well as preventing Bagnon_Forever from loading properly
+
 1.5.1
   * Fixed a bag hook bug
 
