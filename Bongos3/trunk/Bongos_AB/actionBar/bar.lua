@@ -41,7 +41,7 @@ function ActionBar:Create(numRows, numCols, point, x, y)
 		bars[id] = bar
 		return bar
 	else
-		UIErrorsFrame:AddMessage('Not Enough Available Action IDs', 1, 0.2, 0.2, 1, UIERRORS_HOLD_TIME)
+		UIErrorsFrame:AddMessage(L.NotEnoughActionButtons, 1, 0.2, 0.2, 1, UIERRORS_HOLD_TIME)
 	end
 end
 
@@ -385,17 +385,20 @@ do
 			for i,availableID in pairs(freeActions) do
 				if id == availableID then
 					table.remove(freeActions, i)
+					Action.Painter:UpdateDialogTitle()
 					return
 				end
 			end
 		else
 			local id = table.remove(freeActions, 1)
+			Action.Painter:UpdateDialogTitle()
 			return id
 		end
 	end
 
 	function ActionBar:GiveID(id)
 		table.insert(freeActions, 1, id)
+		Action.Painter:UpdateDialogTitle()
 	end
 
 	function ActionBar:NumFreeIDs()

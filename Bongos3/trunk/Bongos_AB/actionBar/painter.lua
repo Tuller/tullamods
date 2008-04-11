@@ -28,25 +28,50 @@ function Painter:Load()
 	self.loaded = true
 end
 
+function Painter:CreateHelp()
+	local f = CreateFrame('Frame', 'BongosABHelpDialog', UIParent)
+	f:SetFrameStrata('DIALOG')
+	f:SetToplevel(true); f:EnableMouse(true)
+	f:SetWidth(320); f:SetHeight(96)
+	f:SetBackdrop{
+		bgFile='Interface\\DialogFrame\\UI-DialogBox-Background' ,
+		edgeFile='Interface\\DialogFrame\\UI-DialogBox-Border',
+		tile = true,
+		insets = {left = 11, right = 12, top = 12, bottom = 11},
+		tileSize = 32,
+		edgeSize = 32,
+	}
+	f:SetPoint('TOP', 0, -24)
+	f:Hide()
+	
+	f.title = f:CreateFontString('ARTWORK')
+	f.title:SetPoint('TOP', 0, -16)
+	f.title:SetFontObject('GameFontNormalLarge')
+	
+	f.text = f:CreateFontString('ARTWORK')
+	f.text:SetFontObject('GameFontHighlight')
+	f.text:SetPoint('TOP', 0, -40)
+	f.text:SetWidth(300); f.text:SetHeight(0)
+	f.text:SetText(L.CreateBarHelp)
+	
+	f:SetHeight(24 + 8 + 24 + f.text:GetStringHeight())
+	
+	local close = CreateFrame('Button', f:GetName() .. 'Close', f, 'UIPanelCloseButton')
+	close:SetPoint('TOPRIGHT', -3, -3)
+
+	self.dialog = f
+	return f
+end
+
 function Painter:ShowHelp()
-	if not StaticPopupDialogs['CREATE_ACTIONBAR_BONGOS'] then
-		StaticPopupDialogs['CREATE_ACTIONBAR_BONGOS'] = {
-			text = TEXT(L.CreateBarHelp),
-			button1 = TEXT(OKAY),
-			timeout = 0,
-			hideOnEscape = 1,
-			OnAccept = function()
-				self:SetScript('OnShow', nil)
-				self:SetScript('OnHide', nil)
-			end,
-		}
-	end
-	StaticPopup_Show('CREATE_ACTIONBAR_BONGOS')
+	local dialog = self.dialog or self:CreateHelp()
+	dialog:Show()
+	self:UpdateDialogTitle()
 end
 
 function Painter:HideHelp()
-	if StaticPopupDialogs['CREATE_ACTIONBAR_BONGOS'] then
-		StaticPopup_Hide('CREATE_ACTIONBAR_BONGOS')
+	if self.dialog then
+		self.dialog:Hide()
 	end
 end
 
@@ -152,5 +177,11 @@ function Painter:CreateBar()
 		Action.Bar:Create(self.rows, self.cols, self.startY .. self.startX, self.x, self.y)
 		self.box:Hide()
 		self:SetScript('OnUpdate', self.OnUpdate)
+	end
+end
+
+function Painter:UpdateDialogTitle()
+	if self.dialog then
+		self.dialog.title:SetFormattedText(L.NumActionButtons, Action.Bar:NumFreeIDs())
 	end
 end

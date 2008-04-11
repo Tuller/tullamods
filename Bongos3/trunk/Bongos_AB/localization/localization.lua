@@ -21,7 +21,15 @@ L.Page = 'Page %d'
 L.Set = 'Set'
 L.PossessBar = 'Act As Possess Bar'
 L.ShowStates = 'Show States'
-L.CreateBarHelp = 'Create a new action bar via holding <Alt> and dragging on the screen.  Delete an action bar via <Alt Right Click>'
+
+L.CreateBarHelp = [[Create a new action bar via holding <Alt-Drag> on an empty part of the screen.
+
+Delete an action bar via <Alt-RightClick>
+
+Free up Action Buttons by either reducing the size of or deleting bars]]
+
+L.NumActionButtons = 'Available Action Buttons: %d'
+L.NotEnoughActionButtons = 'Not Enough Action Buttons. Reduce the size of or delete some bars.'
 L.Disabled = ADDON_DISABLED
 
 
