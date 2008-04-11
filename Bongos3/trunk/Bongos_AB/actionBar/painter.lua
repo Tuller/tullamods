@@ -56,6 +56,10 @@ function Painter:CreateHelp()
 	
 	f:SetHeight(24 + 8 + 24 + f.text:GetStringHeight())
 	
+	local tr = f:CreateTitleRegion()
+	tr:SetAllPoints(f)
+	f:SetClampedToScreen(true)
+	
 	local close = CreateFrame('Button', f:GetName() .. 'Close', f, 'UIPanelCloseButton')
 	close:SetPoint('TOPRIGHT', -3, -3)
 

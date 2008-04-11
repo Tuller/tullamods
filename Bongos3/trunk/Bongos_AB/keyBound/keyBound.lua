@@ -38,6 +38,10 @@ function KeyBound:OnEnable()
 		}
 		f:SetPoint('TOP', 0, -24)
 		f:Hide()
+		
+		local tr = f:CreateTitleRegion()
+		tr:SetAllPoints(f)
+		f:SetClampedToScreen(true)
 
 		local text = f:CreateFontString('ARTWORK')
 		text:SetFontObject('GameFontHighlight')
