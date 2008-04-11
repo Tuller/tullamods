@@ -53,8 +53,8 @@ end
 function CombuctorFrame:OnTitleEnter()
 	GameTooltip:SetOwner(self, 'ANCHOR_LEFT')
 	GameTooltip:SetText(self:GetText(), 1, 1, 1)
-	GameTooltip:AddLine('<Alt Left Drag> To Move')
-	GameTooltip:AddLine('<Right Click> To Reset Position')
+	GameTooltip:AddLine('<Alt-LeftDrag> To Move')
+	GameTooltip:AddLine('<RightClick> To Reset Position')
 	GameTooltip:Show()
 end
 
@@ -62,11 +62,11 @@ function CombuctorFrame:OnBagToggleEnter()
 	GameTooltip:SetOwner(self, 'ANCHOR_LEFT')
 
 	GameTooltip:SetText('Bags', 1, 1, 1)
-	GameTooltip:AddLine('<Left Click> To Toggle Showing Bags')
+	GameTooltip:AddLine('<LeftClick> To Toggle Showing Bags')
 	if self:GetParent().isBank then
-		GameTooltip:AddLine('<Right Click> To Toggle the Inventory Frame')
+		GameTooltip:AddLine('<RightClick> To Toggle the Inventory Frame')
 	else
-		GameTooltip:AddLine('<Right Click> To Toggle the Bank Frame')
+		GameTooltip:AddLine('<RightClick> To Toggle the Bank Frame')
 	end
 	GameTooltip:Show()
 end
