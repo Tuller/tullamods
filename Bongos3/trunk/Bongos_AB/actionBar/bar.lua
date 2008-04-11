@@ -504,7 +504,7 @@ local function AddLayoutPanel(menu)
 	local states, rows, cols
 	local function UpdateSliderSizes(bar)
 		local freeIDs = bar:NumFreeIDs()
-		
+
 		local maxStates = bar:GetCols() * bar:GetRows()
 		states:SetMinMaxValues(1, floor(freeIDs / maxStates) + bar:NumSets())
 
@@ -595,7 +595,7 @@ local function StateSlider_Create(panel, state, text)
 	local title = getglobal(slider:GetName() .. 'Text')
 	title:ClearAllPoints()
 	title:SetPoint('BOTTOMLEFT', slider, 'TOPLEFT')
-	title:SetJustifyH('LEFT')	
+	title:SetJustifyH('LEFT')
 	title:SetText(text or state)
 
 	local value = slider.valText;
@@ -603,9 +603,47 @@ local function StateSlider_Create(panel, state, text)
 	value:SetPoint('BOTTOMRIGHT', slider, 'TOPRIGHT')
 	value:SetJustifyH('RIGHT')
 
-	panel[state] = slider
+	panel.states = panel.states or {}
+	panel.states[state] = slider
 
 	return slider
+end
+
+local function PageSlider_OnShow(self)
+	local bar = Bongos.Bar:Get(self:GetParent().id)
+	self:SetMinMaxValues(1, floor(bar:NumFreeIDs() / (bar:GetCols() * bar:GetRows())) + bar:NumSets())
+	self:SetValue(bar:NumSets())
+end
+
+local function PageSlider_UpdateValue(self, value)
+	Bongos.Bar:Get(self:GetParent().id):SetNumSets(value)
+
+	local stateSliders = self:GetParent().states
+	if stateSliders then
+		for _,slider in pairs(stateSliders) do
+			slider:SetMinMaxValues(0, value)
+		end
+	end
+end
+
+local function PageSlider_Create(panel)
+	local s = panel:CreateSlider(L.Pages, 1, 1, 1)
+	
+	local title = getglobal(s:GetName() .. 'Text')
+	title:ClearAllPoints()
+	title:SetPoint('BOTTOMLEFT', s, 'TOPLEFT')
+	title:SetJustifyH('LEFT')
+
+	local value = s.valText;
+	value:ClearAllPoints()
+	value:SetPoint('BOTTOMRIGHT', s, 'TOPRIGHT')
+	value:SetJustifyH('RIGHT')
+
+	s:SetWidth(s:GetWidth() + 16)
+
+	s.OnShow = PageSlider_OnShow
+	s.UpdateValue = PageSlider_UpdateValue
+	return s
 end
 
 local function AddStancePanels(menu)
@@ -613,6 +651,7 @@ local function AddStancePanels(menu)
 	if stancePanels then
 		for _,panelInfo in ipairs(stancePanels) do
 			local panel = menu:AddPanel(panelInfo[1])
+
 			for i = #panelInfo[2], 1, -1 do
 				local name, condition = unpack(panelInfo[2][i])
 				local slider = StateSlider_Create(panel, condition, name)
@@ -623,6 +662,8 @@ local function AddStancePanels(menu)
 					slider:SetPoint('BOTTOM', 0, 4)
 				end
 			end
+
+			PageSlider_Create(panel)
 		end
 	end
 end
