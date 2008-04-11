@@ -69,17 +69,14 @@ function Bongos:OnEnable()
 end
 
 function Bongos:UpdateSettings()
-	for _,profile in pairs(Bongos3DB.profiles) do
-		for _,sets in pairs(profile.bars) do
-			sets.bindings = nil
-		end
-	end
 end
 
 function Bongos:UpdateVersion()
-	for _,profile in pairs(Bongos3DB.profiles) do
-		for _,sets in pairs(profile.bars) do
-			sets.bindings = nil
+	if tonumber(Bongos3Version:match('Beta%.(%d+)')) or 999 < 8 then 
+		for _,profile in pairs(Bongos3DB.profiles) do
+			for _,sets in pairs(profile.bars) do
+				sets.bindings = nil
+			end
 		end
 	end
 
