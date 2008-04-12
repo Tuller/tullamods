@@ -4,3 +4,11 @@ Beta.11
   * Added an option to make the pet bar act as the possess bar
   * Made the binding and config mode dialogs movable
   * Fixed a bug for new users
+
+Beta 10:
+    * Added a Page slider to each stance menu, tried to make the bar creation help more informative/noticeable.
+
+Beta 9:
+    * Replaced the term Action Set with paging, and altered all of the stance sliders to say Page X instead of simply X
+    * Differentiated Page 1 from the default state of do nothing, called Disabled.
+    * Changed the format used for creating the right click menu for action bars to be table driven. Take a look at Bongos_AB/actionBarConfig.lua if you wanna edit it.
