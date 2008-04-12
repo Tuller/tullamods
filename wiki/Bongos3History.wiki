@@ -1,0 +1,5 @@
+#summary Version history for Bongos3
+
+Beta.11
+  * Added an option to make the pet bar act as the possess bar
+  * Made the binding and config mode dialogs movable
