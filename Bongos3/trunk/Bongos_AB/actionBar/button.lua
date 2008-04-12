@@ -95,6 +95,7 @@ function ActionButton:GetUnused(parent)
 end
 
 function ActionButton:Release()
+	self:UnloadBindings(self:GetParent():GetParent():GetBindings(self.id))
 	self:Hide()
 	self:SetParent(nil)
 	self:UnregisterAllEvents()
@@ -499,7 +500,10 @@ end
 
 function ActionButton:UnloadBindings(...)
 	for i = 1, select('#', ...) do
-		SetOverrideBinding(self:GetParent(), false, select(i, ...), nil)
+		local key = select(i, ...)
+		if key then
+			SetOverrideBinding(self:GetParent(), false, key, nil)
+		end
 	end
 	self:UpdateHotkey()
 end
