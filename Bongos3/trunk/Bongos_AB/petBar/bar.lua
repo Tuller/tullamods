@@ -10,27 +10,50 @@ local L = LibStub('AceLocale-3.0'):GetLocale('Bongos3-AB')
 local DEFAULT_SPACING = 2
 
 
---[[ Bar Functions ]]--
+--[[ Bongos Bar Functions ]]--
 
-local function Bar_SetSpacing(self, spacing)
-	self:Layout(nil, spacing)
+local Bar = {}
+
+function Bar:CreateMenu()
+	local bar = self
+	local menu = Bongos.Menu:Create(self.id)
+	local panel = menu:AddLayoutPanel()
+
+	local possess = panel:CreateCheckButton(L.PossessBar)
+	possess:SetScript('OnShow', function(self)
+		self:SetChecked(bar:IsPossessBar())
+	end)
+	possess:SetScript('OnClick', function(self)
+		bar:SetPossessBar(self:GetChecked())
+	end)
+
+	panel:CreateSpacingSlider()
+
+	local cols = panel:CreateSlider(L.Columns, 1, NUM_PET_ACTION_SLOTS, 1)
+	cols.OnShow = function(self)
+		self:SetValue(NUM_PET_ACTION_SLOTS - (bar.sets.cols or NUM_PET_ACTION_SLOTS) + 1)
+	end
+	cols.UpdateValue = function(self, value)
+		bar:Layout(NUM_PET_ACTION_SLOTS - value + 1)
+	end
+	cols.UpdateText = function(self, value)
+		self.valText:SetText(NUM_PET_ACTION_SLOTS - value + 1)
+	end
+
+	return menu
 end
 
-local function Bar_GetSpacing(self)
-	return self.sets.spacing or DEFAULT_SPACING
-end
-
-local function Bar_Layout(self, cols, spacing)
+function Bar:Layout(cols, spacing)
 	if InCombatLockdown() then return end
 
-	cols = (cols or self.sets.cols or NUM_PET_ACTION_SLOTS)
+	local cols = (cols or self.sets.cols or NUM_PET_ACTION_SLOTS)
 	if cols == NUM_PET_ACTION_SLOTS then
 		self.sets.cols = nil
 	else
 		self.sets.cols = cols
 	end
 
-	spacing = (spacing or self.sets.spacing or DEFAULT_SPACING)
+	local spacing = (spacing or self.sets.spacing or DEFAULT_SPACING)
 	if spacing == DEFAULT_SPACING then
 		self.sets.spacing = nil
 	else
@@ -54,37 +77,32 @@ local function Bar_Layout(self, cols, spacing)
 	end
 end
 
-local function Bar_CreateMenu(bar)
-	local menu = Bongos.Menu:Create(bar.id)
-	local panel = menu:AddLayoutPanel()
-
-	panel:CreateSpacingSlider()
-
-	local function Cols_OnShow(self)
-		self:SetValue(NUM_PET_ACTION_SLOTS - (bar.sets.cols or NUM_PET_ACTION_SLOTS) + 1)
-	end
-
-	local function Cols_UpdateValue(self, value)
-		bar:Layout(NUM_PET_ACTION_SLOTS - value + 1)
-	end
-
-	local function Cols_UpdateText(self, value)
-		self.valText:SetText(NUM_PET_ACTION_SLOTS - value + 1)
-	end
-	panel:CreateSlider(L.Columns, 1, NUM_PET_ACTION_SLOTS, 1, Cols_OnShow, Cols_UpdateValue, Cols_UpdateText)
-
-	return menu
+function Bar:SetSpacing(spacing)
+	self:Layout(nil, spacing)
 end
 
-local function Bar_OnCreate(self)
-	self.CreateMenu = Bar_CreateMenu
-	self.Layout = Bar_Layout
-	self.SetSpacing = Bar_SetSpacing
-	self.GetSpacing = Bar_GetSpacing
-	self.bar = CreateFrame('Frame', nil, self, 'SecureStateHeaderTemplate')
+function Bar:GetSpacing()
+	return self.sets.spacing or DEFAULT_SPACING
+end
 
-	for i = 1, NUM_PET_ACTION_SLOTS do
-		PetBar.Button:Set(i, self.bar)
+function Bar:SetPossessBar(enable)
+	self.sets.possessBar = enable or nil
+	self:UpdateStateDriver(not KeyBound:IsShown())
+end
+
+function Bar:IsPossessBar()
+	return self.sets.possessBar
+end
+
+function Bar:UpdateStateDriver(enable)
+	UnregisterStateDriver(self.header, 'visibility')
+
+	if enable then
+		if self:IsPossessBar() then
+			RegisterStateDriver(self.header, 'visibility',  '[target=pet,nodead,exists]show;[bonusbar:5]show;hide')
+		else
+			RegisterStateDriver(self.header, 'visibility',  '[target=pet,nodead,exists,nobonusbar:5]show;hide')
+		end
 	end
 end
 
@@ -100,7 +118,7 @@ function PetBar:Load()
 
 	local bar, isNew = Bongos.Bar:Create('pet', defaults)
 	if isNew then
-		Bar_OnCreate(bar)
+		self:OnCreate(bar)
 	end
 	bar:Layout()
 
@@ -116,25 +134,40 @@ function PetBar:Load()
 	petBar:RegisterEvent("PET_BAR_SHOWGRID");
 	petBar:RegisterEvent("PET_BAR_HIDEGRID");
 	petBar:RegisterEvent("PET_BAR_HIDE");
-	RegisterStateDriver(bar.bar, 'visibility',  '[target=pet,nodead,exists,nobonusbar:5]show;hide')
 
 	self:RegisterMessage('KEYBOUND_ENABLED')
 	self:RegisterMessage('KEYBOUND_DISABLED')
 
 	self.bar = bar
+	self.bar:UpdateStateDriver(true)
 end
 
 function PetBar:Unload()
+	self.bar:UpdateStateDriver(false)
 	self.bar:Destroy()
 	self:UnregisterAllMessages()
-	PetActionBarFrame:UnregisterAllEvents()
 
-	UnregisterStateDriver(self.bar.bar, 'visibility')
+	PetActionBarFrame:UnregisterAllEvents()
+end
+
+--called when we first create our bongos bar
+function PetBar:OnCreate(bar)
+	--copy over all the functions from the Bar table
+	for k,v in pairs(Bar) do
+		bar[k] = v
+	end
+
+	--create the state header, which controls when the pet buttons are shown
+	bar.header = CreateFrame('Frame', nil, bar, 'SecureStateHeaderTemplate')
+
+	for i = 1, NUM_PET_ACTION_SLOTS do
+		PetBar.Button:Set(i, bar.header)
+	end
 end
 
 function PetBar:KEYBOUND_ENABLED()
-	UnregisterStateDriver(self.bar.bar)
-	self.bar.bar:Show()
+	self.bar:UpdateStateDriver(false)
+	self.bar.header:Show()
 
 	for i = 1, NUM_PET_ACTION_SLOTS do
 		local button = self.Button:Get(i)
@@ -144,9 +177,9 @@ function PetBar:KEYBOUND_ENABLED()
 end
 
 function PetBar:KEYBOUND_DISABLED()
-	local petBarShown = PetHasActionBar()
-	RegisterStateDriver(self.bar.bar, 'visibility',  '[target=pet,nodead,exists,nobonusbar:5]show;hide')
+	self.bar:UpdateStateDriver(true)
 
+	local petBarShown = PetHasActionBar()
 	for i = 1, NUM_PET_ACTION_SLOTS do
 		local button = self.Button:Get(i)
 		if petBarShown and GetPetActionInfo(i) then
