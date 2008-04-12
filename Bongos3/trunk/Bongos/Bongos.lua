@@ -73,7 +73,7 @@ end
 
 function Bongos:UpdateVersion()
 	if Bongos3Version then
-		if tonumber(Bongos3Version:match('Beta%.(%d+)')) or 999 < 8 then 
+		if (tonumber(Bongos3Version:match('Beta%.(%d+)')) or 999) < 8 then 
 			for _,profile in pairs(Bongos3DB.profiles) do
 				for _,sets in pairs(profile.bars) do
 					sets.bindings = nil
