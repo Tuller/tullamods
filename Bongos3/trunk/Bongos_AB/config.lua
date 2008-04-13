@@ -70,6 +70,18 @@ function Config:ShowingTooltips()
 	return self.db.profile.showTooltips
 end
 
+function Config:ShowTooltipsInCombat(enable)
+	self.db.profile.showTooltipsInCombat = enable or false
+end
+
+function Config:ShowingTooltipsInCombat()
+	return self.db.profile.showTooltipsInCombat
+end
+
+function Config:ShouldShowTooltips()
+	return self:ShowingTooltips() and (self:ShowingTooltipsInCombat() or not InCombatLockdown())
+end
+
 
 --show empty buttons
 function Config:ShowEmptyButtons(enable)
