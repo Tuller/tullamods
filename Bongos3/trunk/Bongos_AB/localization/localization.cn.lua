@@ -16,3 +16,7 @@ L.FriendlyTarget = '友好目标'
 L.Modifier = '调整键'
 L.Prowl = '潜行'
 L.ShadowForm = '暗影形态'
+
+L.BarVisibility = "Bongos 动作条可见性"
+L.ToggleMenu = "显示系统栏"
+L.ToggleBags = "显示背包栏"

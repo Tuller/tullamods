@@ -2,6 +2,15 @@
 local Bongos = LibStub('AceAddon-3.0'):GetAddon('Bongos3')
 local Config = Bongos:NewModule('ActionBar-Config')
 local CURRENT_VERSION = GetAddOnMetadata('Bongos', 'Version')
+local L = LibStub('AceLocale-3.0'):GetLocale('Bongos3-AB')
+
+
+--[[ Binding Menu Text ]]--
+
+BINDING_HEADER_BBARS = L.BarVisibility
+BINDING_NAME_BMENUBAR_TOGGLE = L.ToggleMenu
+BINDING_NAME_BBAGBAR_TOGGLE = L.ToggleBags
+
 
 --[[ Config ]]--
 

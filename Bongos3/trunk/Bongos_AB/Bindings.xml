@@ -1,0 +1,9 @@
+<Bindings>
+	<!-- Bar visibility toggles -->
+	<Binding name="BMENUBAR_TOGGLE" header="BBARS">
+		Bongos3.Bar:ForBar('menu', 'ToggleFrame')
+	</Binding>
+	<Binding name="BBAGBAR_TOGGLE">
+		Bongos3.Bar:ForBar('bags', 'ToggleFrame')
+	</Binding>
+</Bindings>

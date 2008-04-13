@@ -33,6 +33,12 @@ L.NotEnoughActionButtons = 'Not Enough Action Buttons. Reduce the size of or del
 L.Disabled = ADDON_DISABLED
 
 
+--keybindings
+L.BarVisibility = "Bongos Bar Visibility"
+L.ToggleMenu = "Toggle the MenuBar"
+L.ToggleBags = "Toggle the BagBar"
+
+
 --Options Menu Stuff
 L.Display = 'Display'
 L.EnableRightClickSelfCast = 'Right Click Selfcast'
