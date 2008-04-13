@@ -19,7 +19,7 @@ L.Modifier = 'Modifier'
 L.Pages = 'Pages'
 L.Page = 'Page %d'
 L.Set = 'Set'
-L.PossessBar = 'Act As Possess Bar'
+L.PossessBar = 'Act as Possess Bar'
 L.ShowStates = 'Show States'
 
 L.CreateBarHelp = [[Create a new action bar via holding <Alt-Drag> on an empty part of the screen.
@@ -29,7 +29,7 @@ Delete an action bar via <Alt-RightClick>
 Free up Action Buttons by either reducing the size of or deleting bars]]
 
 L.NumActionButtons = 'Available Action Buttons: %d'
-L.NotEnoughActionButtons = 'Not Enough Action Buttons. Reduce the size of or delete some bars.'
+L.NotEnoughActionButtons = 'Not enough action buttons. Reduce the size of, or delete some bars.'
 L.Disabled = ADDON_DISABLED
 
 
@@ -51,9 +51,9 @@ L.ShowBindings = 'Show Binding Text'
 L.ShowMacros = 'Show Macro Text'
 
 L.Colors = 'Colors'
-L.ColorOOR = 'Color When Out Of Range'
-L.OORColor = 'Out Of Range Color'
-L.OOMColor = 'Out Of Mana Color'
+L.ColorOOR = 'Color When out of Range'
+L.OORColor = 'Out of Range Color'
+L.OOMColor = 'Out of Mana Color'
 L.HighlightBuffs = 'Highlight Buffs'
 L.BuffColor = 'Buff Color'
 L.DebuffColor = 'Debuff Color'
