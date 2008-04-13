@@ -628,7 +628,7 @@ end
 
 local function PageSlider_Create(panel)
 	local s = panel:CreateSlider(L.Pages, 1, 1, 1)
-	
+
 	local title = getglobal(s:GetName() .. 'Text')
 	title:ClearAllPoints()
 	title:SetPoint('BOTTOMLEFT', s, 'TOPLEFT')
