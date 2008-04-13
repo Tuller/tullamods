@@ -1,5 +1,12 @@
 #summary Version history for Bongos3
 
+Beta.12
+  * Fixed a bug causing disabling sticky bars causing bars to move out of place
+  * Fixed bug causing bindings to clear on a new version update
+  * Fixed a bug causing bindings to not disable properly when removing a button or loading a profile
+  * Added an option to show tooltips only in combat
+  * Slightly tweaked the interface options menu
+
 Beta.11
   * Added an option to make the pet bar act as the possess bar
   * Made the binding and config mode dialogs movable
