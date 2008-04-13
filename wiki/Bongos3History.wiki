@@ -2,7 +2,7 @@
 
 Beta.12
   * Fixed a bug causing disabling sticky bars causing bars to move out of place
-  * Fixed bug causing bindings to clear on a new version update
+  * Fixed a bug causing bindings to clear on a new version update
   * Fixed a bug causing bindings to not disable properly when removing a button or loading a profile
   * Fixed a bug causing the stats display to not show correct information after a profile load
   * Added an option to show tooltips only in combat
