@@ -25,14 +25,18 @@ function Stats:Load()
 		showFPS = true,
 	}
 
-	self.bar, isNew = Bongos.Bar:Create('stats', defaults)
+	local bar, isNew = Bongos.Bar:Create('stats', defaults)
+	self.bar = bar
 
 	if isNew then
-		self:OnBarCreate(self.bar)
+		self:OnBarCreate(bar)
 	end
 end
 
 function Stats:Unload()
+	self.bar.frame.ping = ''
+	self.bar.frame.fps = ''
+	self.bar.frame.mem = ''
 	self.bar:Destroy()
 end
 
