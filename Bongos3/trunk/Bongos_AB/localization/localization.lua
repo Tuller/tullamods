@@ -24,7 +24,7 @@ L.ShowStates = 'Show States'
 
 L.CreateBarHelp = [[Create a new action bar via holding <Alt-Drag> on an empty part of the screen.
 
-Delete an action bar via <Alt-RightClick>
+Delete an action bar via <Alt-Right Click>
 
 Free up Action Buttons by either reducing the size of or deleting bars]]
 
@@ -51,7 +51,7 @@ L.ShowBindings = 'Show Binding Text'
 L.ShowMacros = 'Show Macro Text'
 
 L.Colors = 'Colors'
-L.ColorOOR = 'Color When out of Range'
+L.ColorOOR = 'Color when Out of Range'
 L.OORColor = 'Out of Range Color'
 L.OOMColor = 'Out of Mana Color'
 L.HighlightBuffs = 'Highlight Buffs'
