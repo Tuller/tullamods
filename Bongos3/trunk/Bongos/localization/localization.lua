@@ -10,7 +10,6 @@ local L = LibStub('AceLocale-3.0'):NewLocale('Bongos3', 'enUS', true)
 --system messages
 L.NewPlayer = 'Created new profile for %s'
 L.Updated = 'Updated to v%s'
-L.UpdatedIncompatible = 'Updating from an incompatible version. Default settings loaded'
 
 --profiles
 L.ProfileCreated = 'Created new profile "%s"'
@@ -54,7 +53,7 @@ L.SetAlpha = '<Mousewheel> to set opacity (|cffffffff%d|r)'
 --Menu Stuff
 L.Scale = 'Scale'
 L.Opacity = 'Opacity'
-L.FadedOpacity = 'AutoFade Opacity'
+L.FadedOpacity = 'Faded Opacity'
 L.Visibility = 'Visibility'
 L.Spacing = 'Spacing'
 L.Layout = 'Layout'
