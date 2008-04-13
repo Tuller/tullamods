@@ -246,7 +246,9 @@ end
 
 function Bongos:SetSticky(enable)
 	self.db.profile.sticky = enable or false
-	self.Bar:ForAll('Reanchor')
+	if not enable then
+		self.Bar:ForAll('Stick')
+	end
 end
 
 function Bongos:IsSticky()
