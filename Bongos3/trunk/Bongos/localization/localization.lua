@@ -19,7 +19,7 @@ L.ProfileDeleted = 'Deleted profile "%s"'
 L.ProfileCopied = 'Copied settings from "%s"'
 L.ProfileReset = 'Reset profile "%s"'
 L.CantDeleteCurrentProfile = 'Cannot delete the current profile'
-L.InvalidProfile = 'Invalid Profile "%s"'
+L.InvalidProfile = 'Invalid profile "%s"'
 
 --slash command help
 L.ShowOptionsDesc = 'Shows the options menu'
@@ -45,10 +45,10 @@ L.AvailableProfiles = 'Available Profiles'
 L.PrintVersionDesc = 'Prints the current Bongos version'
 
 --dragFrame tooltips
-L.ShowConfig = '<RightClick> to configure'
-L.HideBar = '<MiddleClick or Shift-RightClick> to hide'
-L.ShowBar = '<MiddleClick or Shift-RightClick> to show'
-L.DeleteBar = '<Alt-RightClick> to delete'
+L.ShowConfig = '<Right Click> to configure'
+L.HideBar = '<Middle Click or Shift-Right Click> to hide'
+L.ShowBar = '<Middle Click or Shift-Right Click> to show'
+L.DeleteBar = '<Alt-Right Click> to delete'
 L.SetAlpha = '<Mousewheel> to set opacity (|cffffffff%d|r)'
 
 --Menu Stuff
@@ -60,11 +60,11 @@ L.Spacing = 'Spacing'
 L.Layout = 'Layout'
 
 --minimap button stuff
-L.ConfigEnterTip = '<LeftClick> to enter configuration mode'
-L.ConfigExitTip = '<LeftClick> to exit configuration mode'
-L.BindingEnterTip = '<Shift-LeftClick> to enter binding mode'
-L.BindingExitTip = '<Shift-LeftClick> to exit binding mode'
-L.ShowOptionsTip = '<RightClick> to show the options menu'
+L.ConfigEnterTip = '<Left Click> to enter configuration mode'
+L.ConfigExitTip = '<Left Click> to exit configuration mode'
+L.BindingEnterTip = '<Shift-Left Click> to enter binding mode'
+L.BindingExitTip = '<Shift-Left Click> to exit binding mode'
+L.ShowOptionsTip = '<Right Click> to show the options menu'
 
 --Options Menu
 L.EnableStickyBars = 'Sticky Bars'
