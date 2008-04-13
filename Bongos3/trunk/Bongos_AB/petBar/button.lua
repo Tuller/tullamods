@@ -68,7 +68,7 @@ function PetButton:OnReceiveDrag()
 end
 
 function PetButton:OnEnter()
-	if Config:ShowingTooltips() then
+	if Config:ShouldShowTooltips() then
 		PetActionButton_OnEnter(self)
 	end
 	KeyBound:Set(self)

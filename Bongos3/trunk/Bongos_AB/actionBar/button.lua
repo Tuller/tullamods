@@ -226,7 +226,7 @@ function ActionButton:OnEnter()
 		GameTooltip:SetOwner(self, 'ANCHOR_RIGHT')
 	end
 
-	if Config:ShowingTooltips() then
+	if Config:ShouldShowTooltips() then
 		self:UpdateTooltip()
 	end
 

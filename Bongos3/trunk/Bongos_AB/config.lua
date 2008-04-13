@@ -18,6 +18,7 @@ function Config:OnInitialize()
 	local defaults = {
 		profile = {
 			showTooltips = true,
+			showTooltipsInCombat = true,
 			showEmpty = false,
 			showHotkeys = true,
 			showMacros = true,
