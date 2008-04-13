@@ -34,9 +34,9 @@ function Stats:Load()
 end
 
 function Stats:Unload()
-	self.bar.frame.ping = ''
-	self.bar.frame.fps = ''
-	self.bar.frame.mem = ''
+	self.bar.frame.ping:SetText('')
+	self.bar.frame.fps:SetText('')
+	self.bar.frame.mem:SetText('')
 	self.bar:Destroy()
 end
 
