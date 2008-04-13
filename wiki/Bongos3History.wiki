@@ -1,5 +1,8 @@
 #summary Version history for Bongos3
 
+Gamma.1
+  * Fixed some grammar issues
+
 Beta.12
   * Fixed a bug causing disabling sticky bars causing bars to move out of place
   * Fixed a bug causing bindings to clear on a new version update
