@@ -66,14 +66,38 @@ function Options:AddDisplayPanel()
 	end)
 	showEmpty:SetPoint('TOPLEFT', 10, -8)
 
-	local showTooltips = self:CreateCheckButton(L.ShowTooltips, panel)
-	showTooltips:SetScript('OnShow', function(self)
-		self:SetChecked(Config:ShowingTooltips())
-	end)
-	showTooltips:SetScript('OnClick', function(self)
-		Config:ShowTooltips(self:GetChecked())
-	end)
-	showTooltips:SetPoint('TOP', showEmpty, 'BOTTOM')
+	local showTooltips, inCombat
+	do
+		showTooltips = self:CreateCheckButton(L.ShowTooltips, panel)
+		showTooltips:SetScript('OnShow', function(self)
+			self:SetChecked(Config:ShowingTooltips())
+		end)
+		showTooltips:SetScript('OnClick', function(self)
+			Config:ShowTooltips(self:GetChecked())
+
+			if self:GetChecked() then
+				inCombat:Enable()
+			else
+				inCombat:Disable()
+			end
+		end)
+		showTooltips:SetPoint('TOP', showEmpty, 'BOTTOM')
+
+		inCombat = self:CreateCheckButton(L.ShowTipsInCombat, panel)
+		inCombat:SetScript('OnShow', function(self)
+			self:SetChecked(Config:ShowingTooltipsInCombat())
+
+			if showTooltips:GetChecked() then
+				self:Enable()
+			else
+				self:Disable()
+			end
+		end)
+		inCombat:SetScript('OnClick', function(self)
+			Config:ShowTooltipsInCombat(self:GetChecked())
+		end)
+		inCombat:SetPoint('TOP', showTooltips, 'BOTTOM', 16, 0)
+	end
 
 	local showBindings = self:CreateCheckButton(L.ShowBindings, panel)
 	showBindings:SetScript('OnShow', function(self)
@@ -82,7 +106,7 @@ function Options:AddDisplayPanel()
 	showBindings:SetScript('OnClick', function(self)
 		Config:ShowHotkeys(self:GetChecked())
 	end)
-	showBindings:SetPoint('TOP', showTooltips, 'BOTTOM')
+	showBindings:SetPoint('TOP', inCombat, 'BOTTOM', -16, 0)
 
 	local showMacros = self:CreateCheckButton(L.ShowMacros, panel)
 	showMacros:SetScript('OnShow', function(self)
@@ -98,7 +122,7 @@ function Options:AddColorPanel()
 	local panel = self:CreatePanel(L.Colors)
 	panel:SetWidth(367); panel:SetHeight(156)
 	panel:SetPoint('BOTTOMLEFT', 10, 10)
-	
+
 	local colorOOR = self:CreateCheckButton(L.ColorOOR, panel)
 	colorOOR:SetScript('OnShow', function(self)
 		self:SetChecked(Config:ColorOOR())
@@ -107,7 +131,7 @@ function Options:AddColorPanel()
 		Config:SetOORColoring(self:GetChecked())
 	end)
 	colorOOR:SetPoint('TOPLEFT', 10, -8)
-	
+
 	local oorColor = self:CreateColorSelector(L.OORColor, panel)
 	oorColor.LoadColor = function(self)
 		return Config:GetOORColor()
@@ -126,7 +150,7 @@ function Options:AddColorPanel()
 		Config:SetOOMColor(r, g, b)
 	end
 	oomColor:SetPoint('TOP', oorColor, 'BOTTOM', -12, -14)
-	
+
 	local equipColor = self:CreateColorSelector(L.EquipColor, panel)
 	equipColor.LoadColor = function(self)
 		return Config:GetEquippedColor()

@@ -34,6 +34,7 @@ function Options:CreatePanel(name)
 	panel:SetBackdropBorderColor(0.4, 0.4, 0.4)
 	panel:SetBackdropColor(0.15, 0.15, 0.15, 0.5)
 	getglobal(panel:GetName() .. 'Title'):SetText(name)
+	getglobal(panel:GetName() .. 'Title'):SetFontObject('GameFontNormal')
 
 	return panel
 end
@@ -75,7 +76,7 @@ end
 
 --check button
 function Options:CreateCheckButton(name, parent)
-	local button = CreateFrame('CheckButton', parent:GetName() .. name, parent, 'OptionsCheckButtonTemplate')
+	local button = CreateFrame('CheckButton', parent:GetName() .. name, parent, 'InterfaceOptionsCheckButtonTemplate')
 	getglobal(button:GetName() .. 'Text'):SetText(name)
 
 	return button
@@ -122,7 +123,7 @@ do
 		f.bg = bg
 
 		local text = f:CreateFontString(nil, 'ARTWORK')
-		text:SetFontObject('GameFontNormalSmall')
+		text:SetFontObject('GameFontHighlightSmall')
 		text:SetPoint('LEFT', f, 'RIGHT', 2, 0)
 		text:SetText(name)
 		f.text = text
