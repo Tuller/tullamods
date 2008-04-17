@@ -69,11 +69,9 @@ function Bongos:OnEnable()
 end
 
 function Bongos:UpdateSettings()
-end
-
-function Bongos:UpdateVersion()
+	--keybinding reset for Beta.7 and under versions
 	if Bongos3Version then
-		if (tonumber(Bongos3Version:match('Beta%.(%d+)')) or 999) < 8 then 
+		if tonumber(Bongos3Version:match('Beta%.(%d+)') or 999) < 8 then
 			for _,profile in pairs(Bongos3DB.profiles) do
 				for _,sets in pairs(profile.bars) do
 					sets.bindings = nil
@@ -81,7 +79,9 @@ function Bongos:UpdateVersion()
 			end
 		end
 	end
+end
 
+function Bongos:UpdateVersion()
 	Bongos3Version = CURRENT_VERSION
 	self:Print(format(L.Updated, Bongos3Version))
 end
