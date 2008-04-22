@@ -234,9 +234,11 @@ function Bongos:SetLock(enable)
 	if self.locked then
 		self.Bar:ForAll('Lock')
 		self.lockBG:Hide()
+		self:SendMessage('BONGOS_LOCK_ENABLE')
 	else
 		self.Bar:ForAll('Unlock')
 		self.lockBG:Show()
+		self:SendMessage('BONGOS_LOCK_DISABLE')
 	end
 end
 
