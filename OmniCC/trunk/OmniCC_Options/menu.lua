@@ -5,7 +5,7 @@
 
 local Options = CreateFrame('Frame', 'OmniCCOptionsFrame', UIParent)
 
-local SML = LibStub('LibSharedMedia-2.0')
+local SML = LibStub('LibSharedMedia-3.0')
 local L = OMNICC_LOCALS
 
 function Options:Load()
