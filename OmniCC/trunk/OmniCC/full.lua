@@ -237,14 +237,14 @@ end
 
 function OmniCC:GetFormattedTime(s)
 	if s >= DAY then
-		return format('%dd', floor(s/DAY + 0.5)), 1
+		return format('%dd', floor(s/DAY + 0.5)), s - floor(s)
 	elseif s >= HOUR then
-		return format('%dh', floor(s/HOUR + 0.5)), 1
+		return format('%dh', floor(s/HOUR + 0.5)), s - floor(s)
 	elseif s >= MINUTE then
 		if s <= MINUTE*3 and self:UsingMMSS() then
 			return format('%d:%02d', floor(s/60), s % MINUTE), s - floor(s)
 		end
-		return format('%dm', floor(s/MINUTE + 0.5)), 1
+		return format('%dm', floor(s/MINUTE + 0.5)), s - floor(s)
 	end
 	return floor(s + 0.5), s - floor(s)
 end
