@@ -4,7 +4,7 @@
 ## Author: Tuller
 ## Version: 2.0.8
 ## SavedVariables: OmniCCDB
-## OptionalDeps: LibStub, LibSharedMedia-2.0
+## OptionalDeps: LibSharedMedia-3.0
 embeds.xml
 localization.lua
 full.lua
