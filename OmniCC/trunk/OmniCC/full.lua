@@ -51,6 +51,15 @@ function OmniCC:Enable()
 	--setup the options menu hook
 	local f = CreateFrame('Frame', nil, InterfaceOptionsFrame)
 	f:SetScript('OnShow', function(self) LoadAddOn('OmniCC_Options') self:SetScript('OnShow', nil) end)
+
+	--load slash commands
+	SlashCmdList["OmniCCCOMMAND"] = function()
+		if LoadAddOn('OmniCC_Options') then
+			InterfaceOptionsFrame_OpenToFrame('OmniCC')
+		end
+	end
+	SLASH_OmniCCCOMMAND1 = "/omnicc"
+	SLASH_OmniCCCOMMAND2 = "/occ"
 end
 
 function OmniCC:LoadDefaults()
@@ -338,18 +347,6 @@ function OmniCC:UpdateAllPulses(elapsed)
 	end
 end
 
---[[
-	Utility Functions
---]]
-
-function OmniCC:Print(msg, showAddon)
-	if showAddon then
-		ChatFrame1:AddMessage(format('|cFF33FF99OmniCC|r: %s', tostring(msg)))
-	else
-		ChatFrame1:AddMessage(tostring(msg))
-	end
-end
-
 
 --[[
 	Configuration Functions
@@ -461,4 +458,16 @@ end
 
 function OmniCC:UsingMMSS()
 	return self.sets.useMMSS
+end
+
+--[[
+	Utility Functions
+--]]
+
+function OmniCC:Print(msg, showAddon)
+	if showAddon then
+		ChatFrame1:AddMessage(format('|cFF33FF99OmniCC|r: %s', tostring(msg)))
+	else
+		ChatFrame1:AddMessage(tostring(msg))
+	end
 end

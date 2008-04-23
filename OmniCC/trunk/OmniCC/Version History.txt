@@ -1,5 +1,10 @@
 OmniCC Version History
 
+2.0.9
+Updated to LSM 3
+Unthrottled the updates for cooldowns with durations > 1 minute.  This is to prevent an issue with prep.
+Reimplemented the slash commands
+
 2.0.8
 Updated for 2.4
 The /omnicc menu is now part of the new blizzard interface options menu
