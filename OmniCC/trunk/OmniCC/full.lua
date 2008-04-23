@@ -4,7 +4,7 @@
 		Cooldown text should work on absolutely everything.  Pulses will work on anything that I can determine the icon of
 --]]
 
-local SML = LibStub and LibStub('LibSharedMedia-2.0') --shared media library
+local SML = LibStub('LibSharedMedia-3.0') --shared media library
 local CURRENT_VERSION = GetAddOnMetadata('OmniCC', 'Version') --the addon's current version
 local L = OMNICC_LOCALS --localized strings
 
@@ -173,7 +173,7 @@ do
 		timer:SetScript('OnUpdate', Timer_OnUpdate)
 
 		local text = timer:CreateFontString(nil, 'OVERLAY')
-		text:SetPoint('CENTER', timer, 'CENTER', 0, 1)
+		text:SetPoint('CENTER', 0, 1)
 		timer.text = text
 
 		-- parent icon, used for shine stuff
@@ -237,14 +237,14 @@ end
 
 function OmniCC:GetFormattedTime(s)
 	if s >= DAY then
-		return format('%dd', floor(s/DAY + 0.5)), s % DAY
+		return format('%dd', floor(s/DAY + 0.5)), 1
 	elseif s >= HOUR then
-		return format('%dh', floor(s/HOUR + 0.5)), s % HOUR
+		return format('%dh', floor(s/HOUR + 0.5)), 1
 	elseif s >= MINUTE then
 		if s <= MINUTE*3 and self:UsingMMSS() then
 			return format('%d:%02d', floor(s/60), s % MINUTE), s - floor(s)
 		end
-		return format('%dm', floor(s/MINUTE + 0.5)), s % MINUTE
+		return format('%dm', floor(s/MINUTE + 0.5)), 1
 	end
 	return floor(s + 0.5), s - floor(s)
 end
