@@ -64,7 +64,7 @@ end
 
 function OmniCC:LoadDefaults()
 	OmniCCDB = {
-		font = 'Friz Quadrata TT', --what font to use
+		font = SML:GetDefault("font"), --what font to use
 		fontOutline = 'OUTLINE', --what outline to use on fonts
 		fontSize = 18, --the base font size to use at a scale of 1
 
@@ -88,6 +88,7 @@ function OmniCC:LoadDefaults()
 end
 
 function OmniCC:UpdateSettings()
+	OmniCCDB.font = SML:GetDefault("font")
 end
 
 function OmniCC:UpdateVersion()
@@ -100,7 +101,7 @@ end
 function OmniCC:HookCooldown()
 	local methods = getmetatable(CreateFrame('Cooldown', nil, nil, 'CooldownFrameTemplate')).__index
 	hooksecurefunc(methods, 'SetCooldown', function(self, start, duration)
-		if not self.noomnicc then
+		if not self.noCooldownCount then
 			self:SetAlpha(OmniCC.sets.showModel and 1 or 0)
 
 			if start > 0 and duration > OmniCC.sets.minDuration then

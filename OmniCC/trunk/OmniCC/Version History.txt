@@ -1,5 +1,9 @@
 OmniCC Version History
 
+2.1.0
+Updated a setting to make LSM3 work properly.
+Switched to using noCooldownCount to signify that cooldown count should not display on an object, instead of noomnicc
+
 2.0.9
 Updated to LSM 3
 Unthrottled the updates for cooldowns with durations > 1 minute.  This is to prevent an issue with prep.
