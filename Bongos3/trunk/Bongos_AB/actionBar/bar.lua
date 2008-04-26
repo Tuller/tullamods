@@ -68,7 +68,7 @@ function ActionBar:OnCreate()
 	self.buttons = {}
 end
 
-function ActionBar:OnDelete()
+function ActionBar:OnDelete(deleteSettings)
 	for i,button in self:GetButtons() do
 		button:Release()
 		self.buttons[i] = nil
@@ -79,6 +79,10 @@ function ActionBar:OnDelete()
 	self.bar:SetAttribute('*statebutton2', nil)
 	UnregisterStateDriver(self.bar, 'state', 0)
 	UnregisterStateDriver(self.bar, 'visibility', 'show')
+
+	if deleteSettings and self:IsPossessBar() then
+		Config:SetPossessBar('pet')
+	end
 
 	bars[self.id] = nil
 end
@@ -296,15 +300,14 @@ function ActionBar:GetConditionSet(condition)
 end
 
 
-function ActionBar:SetIsPossessBar(enable)
-	self.sets.possessBar = enable or nil
+function ActionBar:UpdatePossessBar()
 	self:UpdateStateDriver()
 	self:UpdateActions()
 	self:UpdateShowStates()
 end
 
 function ActionBar:IsPossessBar()
-	return self.sets.possessBar
+	return Config:IsPossessBar(self.id)
 end
 
 
@@ -494,10 +497,8 @@ local function AddLayoutPanel(menu)
 		self:SetChecked(bar:IsPossessBar())
 	end)
 	possess:SetScript('OnClick', function(self)
-		local bar = Bongos.Bar:Get(self:GetParent().id)
-		bar:SetIsPossessBar(self:GetChecked())
+		Config:SetPossessBar((self:GetChecked() and self:GetParent().id) or 'pet')
 	end)
-
 
 	panel:CreateSpacingSlider()
 
@@ -720,6 +721,7 @@ function ActionBar:CreateMenu()
 
 	return menu
 end
+
 
 --[[ Showstates ]]--
 

@@ -2,7 +2,7 @@
 ## Title: Bongos3 ActionBars
 ## Notes: ActionBars for Bongos
 ## Author: Tuller
-## Version: Beta.12
+## Version: 1.0
 ## Dependencies: Bongos
 ## SavedVariables: Bongos3ABVersion
 localization\localization.lua

@@ -30,6 +30,7 @@ function Config:OnInitialize()
 			debuffColor = {1, 0, 1},
 			equippedColor = {0, 1, 0, 0.7},
 			rightClickUnit = nil,
+			possessBar = '1',
 		}
 	}
 	self.db = Bongos.db:RegisterNamespace('actionBar', defaults)
@@ -46,12 +47,29 @@ function Config:OnInitialize()
 
 	--version update
 	if Bongos3ABVersion ~= CURRENT_VERSION then
-		self:UpdateVersion()
+		local major, minor = Bongos3ABVersion and Bongos3ABVersion:match('(%w+)%.(%d+)')
+		self:UpdateVersion(major, minor)
 	end
 end
 
-function Config:UpdateSettings()
-	--update settingsamagig
+function Config:UpdateSettings(major, minor)
+	--possess bar default change.  This should really be in the action bar stuff
+	if major == 'Beta' or major == 'Gamma' then
+		for name,profile in pairs(Bongos3DB.profiles) do
+			local possessBar = 1
+
+			for id,sets in pairs(profile.bars) do
+				if sets.possessBar then
+					possessBar = id
+					sets.possessBar = nil
+				end
+			end
+			
+			if possessBar then
+				Bongos3DB.namespaces.actionBar.profiles[name].possessBar = possessBar
+			end
+		end
+	end	
 end
 
 function Config:UpdateVersion()
@@ -108,7 +126,7 @@ function Config:ShowHotkeys(enable)
 	if class then
 		class.Button:ForAll('ShowHotkey', enable)
 	end
-	
+
 	local pet = Bongos:GetModule('PetBar', true)
 	if pet then
 		pet.Button:ForAll('ShowHotkey', enable)
@@ -233,4 +251,30 @@ end
 function Config:GetStanceMenuLayout()
 	self.stanceLayout = self.stanceLayout or self:LoadStanceLayout()
 	return self.stanceLayout
+end
+
+--the possess bar is the bar that shows up when the player gains control of another creature
+--and at the same time loses control of themselves
+--at least one bar must be set to be the possess bar, so I've chosen the pet bar
+--since the pet bar should always exist, and action bars may not
+function Config:SetPossessBar(barID)
+	local prevBar = Bongos.Bar:Get(Config:GetPossessBar())
+	local bar = (barID and Bongos.Bar:Get(barID)) or Bongos.Bar:Get('pet')
+	
+	self.db.profile.possessBar = barID or 'pet'
+	if prevBar then
+		prevBar:UpdatePossessBar()
+	end
+
+	if bar then
+		bar:UpdatePossessBar()
+	end
+end
+
+function Config:GetPossessBar()
+	return self.db.profile.possessBar
+end
+
+function Config:IsPossessBar(barID)
+	return (self:GetPossessBar() == barID)
 end

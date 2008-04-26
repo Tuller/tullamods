@@ -6,6 +6,7 @@
 
 local Bongos = LibStub('AceAddon-3.0'):GetAddon('Bongos3')
 local PetBar = Bongos:NewModule('PetBar', 'AceEvent-3.0')
+local Config = Bongos:GetModule('ActionBar-Config')
 local L = LibStub('AceLocale-3.0'):GetLocale('Bongos3-AB')
 local DEFAULT_SPACING = 2
 
@@ -18,14 +19,6 @@ function Bar:CreateMenu()
 	local bar = self
 	local menu = Bongos.Menu:Create(self.id)
 	local panel = menu:AddLayoutPanel()
-
-	local possess = panel:CreateCheckButton(L.PossessBar)
-	possess:SetScript('OnShow', function(self)
-		self:SetChecked(bar:IsPossessBar())
-	end)
-	possess:SetScript('OnClick', function(self)
-		bar:SetPossessBar(self:GetChecked())
-	end)
 
 	panel:CreateSpacingSlider()
 
@@ -85,13 +78,12 @@ function Bar:GetSpacing()
 	return self.sets.spacing or DEFAULT_SPACING
 end
 
-function Bar:SetPossessBar(enable)
-	self.sets.possessBar = enable or nil
+function Bar:UpdatePossessBar()
 	self:UpdateStateDriver(not KeyBound:IsShown())
 end
 
 function Bar:IsPossessBar()
-	return self.sets.possessBar
+	return Config:IsPossessBar(self.id)
 end
 
 function Bar:UpdateStateDriver(enable)
