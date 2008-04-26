@@ -136,7 +136,7 @@ function BBar:Destroy(deleteSettings)
 	active[self.id] = nil
 
 	if self.OnDelete then
-		self:OnDelete()
+		self:OnDelete(deleteSettings)
 	end
 
 	self.sets = nil

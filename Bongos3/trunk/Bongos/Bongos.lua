@@ -50,7 +50,8 @@ function Bongos:OnInitialize()
 
 	--version update
 	if Bongos3Version ~= CURRENT_VERSION then
-		self:UpdateVersion()
+		local major, minor = Bongos3Version and Bongos3Version:match('(%w+)%.(%d+)')
+		self:UpdateVersion(major, minor)
 	end
 
 	self.lockBG = self:CreateLockBG()
@@ -68,14 +69,12 @@ function Bongos:OnEnable()
 	self:LoadModules()
 end
 
-function Bongos:UpdateSettings()
+function Bongos:UpdateSettings(major, minor)
 	--keybinding reset for Beta.7 and under versions
-	if Bongos3Version then
-		if tonumber(Bongos3Version:match('Beta%.(%d+)') or 999) < 8 then
-			for _,profile in pairs(Bongos3DB.profiles) do
-				for _,sets in pairs(profile.bars) do
-					sets.bindings = nil
-				end
+	if major == 'Beta' and tonumber(minor) < 8 then
+		for _,profile in pairs(Bongos3DB.profiles) do
+			for _,sets in pairs(profile.bars) do
+				sets.bindings = nil
 			end
 		end
 	end
