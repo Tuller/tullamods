@@ -15,6 +15,71 @@ local L = SAGE_LOCALS
 
 --[[ Local Functions ]]--
 
+--[[
+   Calculate RGB from HSV, reverse of RGB2HSV()
+   Hue is in degrees
+   Lightness is between 0 and 1
+   Saturation is between 0 and 1
+]]--
+
+local function RGBtoHSV(r, g, b)
+	local h, s, v, min, max, delta
+
+	min = math.min( r, g, b )
+	max = math.max( r, g, b )
+	delta = max - min
+	s = delta / max
+	v = max
+
+	if r == max then
+		h = (g-b)/delta -- between yellow & magenta
+	elseif g == max then
+		h = 2 + (b-r)/delta; -- between cyan & yellow
+	else
+		h = 4 + (r-g )/delta; -- between magenta & cyan
+	end
+	
+	h = h * 60;
+	if h < 0 then
+		h = h + 360
+	end
+	
+	return h, s, v
+end
+
+
+local function HSVToRGB(h, s, v)
+	if s == 0 then 
+		return v, v, v 
+	else
+		local h = h/60;			-- sector 0 to 5
+		local i = math.floor(h);
+		local f = h - i;			-- factorial part of h
+		local ap = v * (1 - s);
+		local aq = v * (1 - s * f);
+		local at = v * (1 - s * (1 - f));
+
+		if i == 0 then
+			return v, at, ap
+		elseif i == 1 then
+			return aq, v, ap
+		elseif i == 2 then
+			return ap, v, at
+		elseif i == 3 then
+			return ap, aq, v
+		elseif i == 4 then
+			return at, ap, v
+		elseif i == 5 then
+			return v, ap, aq
+		end
+	end
+end
+
+local function GetComplement(r, g, b)
+	local h, s, v = RGBtoHSV(r, g, b)
+	return HSVToRGB((h - 180) % 360,  s, v)
+end
+
 --update's the bar's color based on how much health the bar's parent unit has
 local function Bar_UpdateHealthColor(self, value)
 	if UnitIsPlayer(self.id) and UnitClass(self.id) then
@@ -34,31 +99,11 @@ local function Bar_UpdateHealthColor(self, value)
 			self:SetStatusBarColor(0, 0.9, 0)
 		end
 	else
-		if not value then return end
-
-		local r, g
-		local min, max = self:GetMinMaxValues()
-
-		if (value < min) or (value > max) then
-			return
-		end
-
-		if max - min > 0 then
-			value = (value - min) / (max - min)
-		else
-			value = 0
-		end
-
-		if value > 0.5 then
-			r = (1.0 - value) * 2
-			g = 1.0
-		else
-			r = 1.0
-			g = value * 2
-		end
-
-		self:SetStatusBarColor(r, g, 0)
+		self:SetStatusBarColor(0, 0.8, 0)
 	end
+	
+	local r, g, b = GetComplement(self:GetStatusBarColor())
+	self.bg:SetVertexColor(r, g, b, 0.6)
 end
 
 
