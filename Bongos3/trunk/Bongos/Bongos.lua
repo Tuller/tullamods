@@ -20,6 +20,7 @@ function Bongos:OnInitialize()
 		}
 	}
 
+	--register database events
 	self.db = LibStub('AceDB-3.0'):New('Bongos3DB', defaults)
 
 	self.db:RegisterCallback('OnNewProfile', function(msg, db, ...)
@@ -38,11 +39,10 @@ function Bongos:OnInitialize()
 		self:OnProfileDeleted(...)
 	end)
 
-	
 	--version update
 	if Bongos3Version then
-		local major, minor = Bongos3Version:match('(%w+)%.(%d+)')
-		local cMajor, cMinor = CURRENT_VERSION:match('(%w+)%.(%d+)')
+		local major, minor = Bongos3Version:match('(%w+)%.(%w+)')
+		local cMajor, cMinor = CURRENT_VERSION:match('(%w+)%.(%w+)')
 
 		--settings change
 		if major ~= cMajor then
