@@ -49,8 +49,8 @@ function Config:OnInitialize()
 end
 
 function Config:UpdateSettings(major, minor)
-	--possess bar default change.  This should really be in the action bar stuff
 	if major == 'Beta' or major == 'Gamma' then
+		--possess bar default change.  This should really be in the action bar stuff
 		for name,profile in pairs(Bongos3DB.profiles) do
 			local possessBar = 1
 
