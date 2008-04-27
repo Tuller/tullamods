@@ -1,14 +1,16 @@
 --[[
 	Sage.lua
-		Driver for Sage bars
+		Driver for Sage frames
 --]]
 
-local Sage = LibStub('AceAddon-3.0'):NewAddon('Sage', 'AceEvent-3.0', 'AceConsole-3.0')
+Sage = LibStub('AceAddon-3.0'):NewAddon('Sage', 'AceEvent-3.0', 'AceConsole-3.0')
 local L = LibStub('AceLocale-3.0'):GetLocale('Sage')
+local SML = LibStub('LibSharedMedia-3.0') --shared media library
 
-local CURRENT_VERSION = GetAddOnMetadata('Bongos', 'Version')
+local CURRENT_VERSION = GetAddOnMetadata('Sage', 'Version')
 local TEXTURE_PATH = 'Interface\\AddOns\\Sage\\textures\\%s'
-local BLIZZ_TEXTURE = 'Interface/TargetingFrame/UI-StatusBar'
+local BLIZZ_TEXTURE = 'Interface/TargetingFrame/UI-StatusFrame'
+
 
 --[[ Startup ]]--
 
@@ -16,15 +18,15 @@ function Sage:OnInitialize()
 	local defaults = {
 		class = {
 			sticky = true,
-			showCastBars = true,
+			showCastFrames = true,
 			showPercents = false,
-			outlineBarFonts = false,
+			outlineFrameFonts = false,
 			outlineOutsideFonts = false,
 			debuffColoring = true,
 			showMaxValues = true,
 			showPvP = true,
 			fontSize = 14,
-			barTexture = 'Armory2',
+			barTexture = SML:GetDefault(SML.MediaType.STATUSBAR),
 			rangeCheck = true,
 			frames = {}
 		}
@@ -67,7 +69,6 @@ function Sage:OnInitialize()
 		end
 	end
 
-
 	self:RegisterSlashCommands()
 
 	--create a loader for the options menu
@@ -83,6 +84,7 @@ function Sage:OnEnable()
 end
 
 function Sage:UpdateSettings(major, minor)
+	--update settingsamagig
 end
 
 function Sage:UpdateVersion()
@@ -97,7 +99,7 @@ function Sage:LoadModules()
 		end
 	end
 
-	self.Bar:ForAll('Reanchor')
+	self.Frame:ForAll('Reanchor')
 	self.newProfile = nil
 end
 
@@ -217,22 +219,176 @@ function Sage:UpdateVersion()
 	self:Print(format(L.Updated, SageVersion))
 end
 
+
+--[[ Slash Commands ]]--
+
+function Sage:RegisterSlashCommands()
+	self:RegisterChatCommand('sage', 'OnCmd')
+	self:RegisterChatCommand('sg', 'OnCmd')
+end
+
+function Sage:OnCmd(args)
+	local cmd = string.split(' ', args):lower() or args:lower()
+
+	if cmd == 'lock' then
+		self:ToggleLockedFrames()
+	elseif cmd == 'sticky' then
+		self:ToggleStickyFrames()
+	elseif cmd == 'scale' then
+		self:ScaleFrames(select(2, string.split(' ', args)))
+	elseif cmd == 'setalpha' then
+		self:SetOpacityForFrames(select(2, string.split(' ', args)))
+	elseif cmd == 'save' then
+		local profileName = string.join(' ', select(2, string.split(' ', args)))
+		self:SaveProfile(profileName)
+	elseif cmd == 'set' then
+		local profileName = string.join(' ', select(2, string.split(' ', args)))
+		self:SetProfile(profileName)
+	elseif cmd == 'copy' then
+		local profileName = string.join(' ', select(2, string.split(' ', args)))
+		self:CopyProfile(profileName)
+	elseif cmd == 'delete' then
+		local profileName = string.join(' ', select(2, string.split(' ', args)))
+		self:DeleteProfile(profileName)
+	elseif cmd == 'reset' then
+		self:ResetProfile()
+	elseif cmd == 'list' then
+		self:ListProfiles()
+	elseif cmd == 'version' then
+		self:PrintVersion()
+	elseif cmd == 'cleanup' then
+		self:Cleanup()
+	elseif cmd == 'help' or cmd == '?' then
+		self:PrintHelp()
+	else
+		if not self:ShowOptions() then
+			self:PrintHelp()
+		end
+	end
+end
+
+function Sage:ToggleLockedFrames()
+	self:SetLock(not self:IsLocked())
+end
+
+function Sage:ToggleStickyFrames()
+	self:SetSticky(not self.db.profile.sticky)
+end
+
+function Sage:ScaleFrames(...)
+	local numArgs = select('#', ...)
+	local scale = tonumber(select(numArgs, ...))
+
+	if scale and scale > 0 and scale <= 10 then
+		for i = 1, numArgs - 1 do
+			self.Frame:ForFrame(select(i, ...), 'SetFrameScale', scale)
+		end
+	end
+end
+
+function Sage:SetOpacityForFrames(...)
+	local numArgs = select('#', ...)
+	local alpha = tonumber(select(numArgs, ...))
+
+	if alpha and alpha >= 0 and alpha <= 1 then
+		for i = 1, numArgs - 1 do
+			self.Frame:ForFrame(select(i, ...), 'SetFrameAlpha', alpha)
+		end
+	end
+end
+
+function Sage:Cleanup()
+	local frames = self.db.profile.frames
+	for id in pairs(frames) do
+		if not self.Frame:Get(id) then
+			frames[id] = nil
+		end
+	end
+end
+
+function Sage::PrintVersion()
+	self:Print(SageVersion)
+end
+
+function Sage:PrintHelp(cmd)
+	local function PrintCmd(cmd, desc)
+		DEFAULT_CHAT_FRAME:AddMessage(format(' - |cFF33FF99%s|r: %s', cmd, desc))
+	end
+
+	self:Print('Commands (/sage or /sg)')
+	PrintCmd('lock', L.LockDesc)
+	PrintCmd('sticky', L.StickyFramesDesc)
+	PrintCmd('scale <frameList> <scale>', L.SetScaleDesc)
+	PrintCmd('setalpha <frameList> <opacity>', L.SetAlphaDesc)
+	PrintCmd('save <profile>', L.SaveDesc)
+	PrintCmd('set <profile>', L.SetDesc)
+	PrintCmd('copy <profile>', L.CopyDesc)
+	PrintCmd('delete <profile>', L.DeleteDesc)
+	PrintCmd('reset', L.ResetDesc)
+	PrintCmd('list', L.ListDesc)
+	PrintCmd('version', L.PrintVersionDesc)
+end
+
+function Sage:ShowOptions()
+	if LoadAddOn('Sage_Options') then
+		InterfaceOptionsFrame_OpenToFrame('Sage')
+		return true
+	end
+	return nil
+end
+
+
+--[[ Settings Access ]]--
+
+function Sage:SetFrameSets(id, sets)
+	local id = tonumber(id) or id
+	self.db.profile.frames[id] = sets
+
+	return self.db.profile.frames[id]
+end
+
+function Sage:GetFrameSets(id)
+	return self.db.profile.frames[tonumber(id) or id]
+end
+
+function Sage:GetFrames()
+	return pairs(self.db.profile.frames)
+end
+
+
+--[[ Utility Functions ]]--
+
+--utility function: create a widget class
+function Sage:CreateWidgetClass(type, parentClass)
+	local class = CreateFrame(type)
+	class.mt = {__index = class}
+
+	if parentClass then
+		class = setmetatable(class, {__index = parentClass})
+		class.super = parentClass
+	end
+
+	function class:New(o)
+		if o then
+			local type, cType = o:GetFrameType(), self:GetFrameType()
+			assert(type == cType, format("'%s' expected, got '%s'", cType, type))
+		end
+		return setmetatable(o or CreateFrame(type), self.mt)
+	end
+
+	return class
+end
+
+
+
+--[[ Event Actions ]]--
+
 function Sage:RegisterEvents()
 	self:RegisterEvent('ADDON_LOADED', 'LoadOptions')
 
 	self:RegisterEvent('UNIT_HEALTH', 'UpdateHealth')
 	self:RegisterEvent('UNIT_MAXHEALTH', 'UpdateHealth')
 	self:RegisterEvent('UNIT_HAPPINESS')
-
-	self:RegisterEvent('UNIT_MANA', 'UpdateMana')
-	self:RegisterEvent('UNIT_RAGE', 'UpdateMana')
-	self:RegisterEvent('UNIT_FOCUS', 'UpdateMana')
-	self:RegisterEvent('UNIT_ENERGY', 'UpdateMana')
-	self:RegisterEvent('UNIT_MAXMANA', 'UpdateMana')
-	self:RegisterEvent('UNIT_MAXRAGE', 'UpdateMana')
-	self:RegisterEvent('UNIT_MAXFOCUS', 'UpdateMana')
-	self:RegisterEvent('UNIT_MAXENERGY', 'UpdateMana')
-	self:RegisterEvent('UNIT_DISPLAYPOWER', 'UpdateMana')
 
 	self:RegisterEvent('UNIT_AURA', 'UpdateBuff')
 
@@ -245,21 +401,7 @@ function Sage:RegisterEvents()
 	self:RegisterEvent('PARTY_LOOT_METHOD_CHANGED', 'UpdateInfo')
 	self:RegisterEvent('PARTY_MEMBERS_CHANGED', 'UpdateInfo')
 
-	self:SetShowCastBars(self:ShowingCastBars())
-end
-
-
---[[ Event Actions ]]--
-
-function Sage:LoadOptions(event, addon)
-	if(addon == 'Sage_Options') then
-		for name, module in self:IterateModules() do
-			if(module.LoadOptions) then
-				module:LoadOptions()
-			end
-		end
-		SageOptions:ShowPanel('General')
-	end
+	self:SetShowCastFrames(self:ShowingCastFrames())
 end
 
 function Sage:UpdateHealth(event, ...)
@@ -273,10 +415,6 @@ function Sage:UNIT_HAPPINESS()
 	SageHealth:OnHappyEvent()
 end
 
-function Sage:UpdateMana(event, ...)
-	SageMana:OnEvent(...)
-end
-
 function Sage:UpdateBuff(event, ...)
 	SageBuff:OnEvent(...)
 	SageHealth:OnBuffEvent(...)
@@ -288,67 +426,6 @@ end
 
 function Sage:UpdateCast(event, ...)
 	SageCast[event](SageCast, ...)
-end
-
-
---[[ Slash Commands ]]--
-
-function Sage:RegisterSlashCommands()
-	local cmdStr = '|cFF33FF99%s|r: %s'
-
-	local slash = self:InitializeSlashCommand('Sage Commands', 'SAGE', 'sage', 'sg')
-	slash:RegisterSlashHandler(format(cmdStr, '/sage', 'Toggles the option menu'), '^$', 'ShowMenu')
-	slash:RegisterSlashHandler(format(cmdStr, 'lock', L.LockFramesDesc), '^lock$', 'ToggleLock')
-	slash:RegisterSlashHandler(format(cmdStr, 'sticky', L.StickyFramesDesc), '^sticky$', 'ToggleSticky')
-
-	slash:RegisterSlashHandler(format(cmdStr, 'scale <frameList> <scale>', L.SetScaleDesc), '^scale (.+) ([%d%.]+)', 'SetFrameScale')
-	slash:RegisterSlashHandler(format(cmdStr, 'setalpha <frameList> <opacity>', L.SetAlphaDesc), '^setalpha (.+) ([%d%.]+)', 'SetFrameAlpha')
-	slash:RegisterSlashHandler(format(cmdStr, 'texture <texture>', 'Sets the statusbar texture'), '^texture (.+)', 'SetBarTexture')
-
-	slash:RegisterSlashHandler(format(cmdStr, 'save <profle>', L.SaveDesc), 'save (%w+)', 'SaveProfile')
-	slash:RegisterSlashHandler(format(cmdStr, 'set <profle>', L.SetDesc), 'set (%w+)', 'SetProfile')
-	slash:RegisterSlashHandler(format(cmdStr, 'copy <profile>', L.CopyDesc), 'copy (%w+)', 'CopyProfile')
-	slash:RegisterSlashHandler(format(cmdStr, 'delete <profile>', L.DeleteDesc), '^delete (%w+)', 'DeleteProfile')
-	slash:RegisterSlashHandler(format(cmdStr, 'reset', L.ResetDesc), '^reset$', 'ResetProfile')
-	slash:RegisterSlashHandler(format(cmdStr, 'list', L.ListDesc), '^list$', 'ListProfiles')
-	slash:RegisterSlashHandler(format(cmdStr, 'version', L.PrintVersionDesc), '^version$', 'PrintVersion')
-
-	self.slash = slash
-end
-
-function Sage:PrintVersion()
-	self:Print(SageVersion)
-end
-
-function Sage:ShowMenu()
-	local enabled = select(4, GetAddOnInfo('Sage_Options'))
-	if enabled then
-		if SageOptions then
-			SageOptions:Toggle()
-		else
-			LoadAddOn('Sage_Options')
-		end
-	else
-		self.slash:PrintUsage()
-	end
-end
-
-function Sage:SetFrameScale(args, scale)
-	local scale = tonumber(scale)
-	if scale and scale > 0 and scale <= 10 then
-		for _,frameList in pairs({strsplit(' ', args)}) do
-			SageFrame:ForFrame(frameList, 'SetFrameScale', scale)
-		end
-	end
-end
-
-function Sage:SetFrameAlpha(args, alpha)
-	local alpha = tonumber(alpha)
-	if alpha and alpha >= 0 and alpha <= 1 then
-		for _,frameList in pairs({strsplit(' ', args)}) do
-			SageFrame:ForFrame(frameList, 'SetFrameAlpha', alpha)
-		end
-	end
 end
 
 
@@ -379,7 +456,7 @@ function Sage:ToggleLock()
 	self:SetLock(not self:IsLocked())
 end
 
---auto docking bars
+--auto docking frames
 function Sage:SetSticky(enable)
 	self.profile.sticky = enable or false
 	SageFrame:ForAll('Reanchor')
@@ -394,29 +471,19 @@ function Sage:ToggleSticky()
 end
 
 --bar textures
-function Sage:SetBarTexture(texture)
+function Sage:SetFrameTexture(texture)
 	self.profile.barTexture = texture
-	SageBar:UpdateAllTextures()
+--	self.StatusBar:UpdateTextures()
 end
 
-function Sage:GetBarTexture(texID)
-	local texID = texID or (self.profile.barTexture or 'blizzard')
-
-	if(AceLibrary) then
-		local SML = AceLibrary:HasInstance('SharedMedia-1.0') and AceLibrary('SharedMedia-1.0')
-		if(SML) then
-			local texture = SML:Fetch('statusbar', texID, true)
-			if(texture) then
-				return texture
-			end
-		end
-	end
-	return (texID:lower() == 'blizzard' and BLIZZ_TEXTURE) or format(TEXTURE_PATH, texID)
+function Sage:GetFrameTexture()
+	return SML:Fetch(SML.MediaType.STATUSBAR, self.db.profile.barTexture)
 end
 
 --font size
 function Sage:SetFontSize(size)
 	self.profile.fontSize = size
+	self.font:Update()
 	SageFont:Update()
 end
 
@@ -425,13 +492,13 @@ function Sage:GetFontSize()
 end
 
 --outline statusbar fonts
-function Sage:SetOutlineBarFonts(enable)
-	self.profile.outlineBarFonts = enable or false
-	SageFont:UpdateBarFonts()
+function Sage:SetOutlineFrameFonts(enable)
+	self.profile.outlineFrameFonts = enable or false
+	SageFont:UpdateFrameFonts()
 end
 
-function Sage:OutlineBarFonts()
-	return self.profile.outlineBarFonts
+function Sage:OutlineFrameFonts()
+	return self.profile.outlineFrameFonts
 end
 
 --outline outside fonts
@@ -444,7 +511,7 @@ function Sage:OutlineOutsideFonts()
 	return self.profile.outlineOutsideFonts
 end
 
---color healthbars when debuffed
+--color healthframes when debuffed
 function Sage:SetDebuffColoring(enable)
 	self.profile.debuffColoring = enable or false
 	SageHealth:ForAll('UpdateDebuff')
@@ -464,9 +531,9 @@ function Sage:ShowingPercents()
 	return self.profile.showPercents
 end
 
---cast bars
-function Sage:SetShowCastBars(enable)
-	self.profile.showCastBars = enable or false
+--cast frames
+function Sage:SetShowCastFrames(enable)
+	self.profile.showCastFrames = enable or false
 
 	if enable then
 		self:RegisterEvent('UNIT_SPELLCAST_START', 'UpdateCast')
@@ -490,13 +557,13 @@ function Sage:SetShowCastBars(enable)
 	SageCast:ForAll('Update')
 end
 
-function Sage:ShowingCastBars()
-	return self.profile.showCastBars
+function Sage:ShowingCastFrames()
+	return self.profile.showCastFrames
 end
 
 function Sage:SetShowMaxValues(enable)
 	self.profile.showMaxValues = enable or false
-	SageBar:UpdateAll()
+	SageFrame:UpdateAll()
 end
 
 function Sage:ShowingMaxValues()
