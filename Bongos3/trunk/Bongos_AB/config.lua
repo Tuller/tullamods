@@ -30,7 +30,7 @@ function Config:OnInitialize()
 			debuffColor = {1, 0, 1},
 			equippedColor = {0, 1, 0, 0.7},
 			rightClickUnit = nil,
-			possessBar = '1',
+			possessBar = 1,
 		}
 	}
 	self.db = Bongos.db:RegisterNamespace('actionBar', defaults)
