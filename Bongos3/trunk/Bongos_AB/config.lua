@@ -36,19 +36,15 @@ function Config:OnInitialize()
 	self.db = Bongos.db:RegisterNamespace('actionBar', defaults)
 
 	if Bongos3ABVersion then
-		local cMajor = CURRENT_VERSION:match('(%w+)')
-		local major = Bongos3ABVersion:match('(%w+)')
+		local major, minor = Bongos3ABVersion:match('(%w+)%.(%d+)')
+		local cMajor, cMinor = CURRENT_VERSION:match('(%w+)%.(%d+)')
 
 		--settings change
 		if major ~= cMajor then
-			self:UpdateSettings()
+			self:UpdateSettings(major, minor)
+		elseif minor ~= cMinor then
+			self:UpdateVersion()
 		end
-	end
-
-	--version update
-	if Bongos3ABVersion ~= CURRENT_VERSION then
-		local major, minor = Bongos3ABVersion and Bongos3ABVersion:match('(%w+)%.(%d+)')
-		self:UpdateVersion(major, minor)
 	end
 end
 
@@ -70,6 +66,7 @@ function Config:UpdateSettings(major, minor)
 			end
 		end
 	end	
+	self:UpdateVersion()
 end
 
 function Config:UpdateVersion()
