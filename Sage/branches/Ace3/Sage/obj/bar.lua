@@ -9,19 +9,13 @@ Sage.StatusBar = StatusBar
 
 --[[ Constructor ]]--
 
-function StatusBar:Create(parent, id, font, size, outline)
+function StatusBar:Create(parent, id)
 	local bar = self:New(CreateFrame('StatusBar', nil, parent))
 	bar.id = id or parent.id
 	
 	bar.bg = bar:CreateTexture(nil, 'BACKGROUND')
 	bar.bg:SetAllPoints(bar)
-	
-	if font then
-		bar.text = bar:CreateFontString(nil, 'OVERLAY')
-		bar.text:SetPoint('CENTER')
-		bar.text:SetFont(font, size, outline)
-	end
-	
+
 	self:Register(bar)
 	
 	return bar
@@ -32,13 +26,12 @@ end
 
 function StatusBar:SetTexture(texture)
 	self.texture = texture
-	self:ForAll('UpdateTexture', texture)
+	self:UpdateTexture()
 end
 
-function StatusBar:UpdateTexture(texture)
-	local texture = texture or self.texture
-	self:SetStatusBarTexture(texture)
-	self.bg:SetTexture(texture)
+function StatusBar:UpdateTexture()
+	self:SetStatusBarTexture(self.texture)
+	self.bg:SetTexture(self.texture)
 end
 
 function StatusBar:GetTexture()
@@ -50,12 +43,17 @@ end
 
 function StatusBar:SetFont(...)
 	self.font, self.fontSize, self.outline = ...
-	self:ForAll('UpdateFont', ...)
+	self:UpdateFont()
 end
 
 function StatusBar:UpdateFont()
-	if self.text then
-		self.text:SetFont(self:GetFont())
+	local font, size, outline = self:GetFont()
+	if font then
+		if not self.text then
+			bar.text = bar:CreateFontString(nil, 'OVERLAY')
+			bar.text:SetPoint('CENTER')
+		end
+		bar.text:SetFont(font, size, outline)	
 	end
 end
 
@@ -66,18 +64,20 @@ end
 
 --[[ Callbacks ]]--
 
-function StatusBar:SetTextMode(mode)
-	self.textMode = mode
-end
+function StatusBar:SetEntered(entered)
+	self.entered = entered
 
-function StatusBar:UpdateText(...)
-	if self.OnTextUpdate then
-		self:OnTextUpdate(...)
+	if self.text then
+		self:UpdateText()
 	end
 end
 
-function StatusBar:GetTextMode()
-	return self.textMode
+function StatusBar:SetTextMode(mode)
+	self.textMode = mode
+
+	if self.text then
+		self:UpdateText()
+	end
 end
 
 
@@ -155,6 +155,13 @@ local function HSVToRGB(h, s, v)
 			return v, ap, aq
 		end
 	end
+end
+
+function StatusBar:SetColor(...)
+	set:SetStatusBarColor(...)
+
+	local r, g, b = self:GetComplement(...)
+	self.bg:SetVertexColor(r * 0.6, g * 0.6, b * 0.6, 0.8)
 end
 
 function StatusBar:GetComplement(r, g, b)

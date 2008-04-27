@@ -8,31 +8,31 @@ local ManaBar = Sage:CreateObjectClass('StatusBar', Sage.StatusBar)
 Sage.ManaBar = ManaBar
 local Config = Sage.Config
 
+
 --[[ Constructor ]]--
 
 function ManaBar:Create(...)
 	local bar = self:New(self.super:Create(...))
 	bar:SetScript('OnShow', bar.Update)
-	
+
 	if self.bars then
 		self.bars[bar.id] = bar
 	else
 		self.bars = {[bar.id] = bar}
 	end
-	
+
 	return bar
 end
 
 
 --[[ Events ]]--
 
-function ManaBar:OnEvent(event, unit)
+ManaBar:SetScript('OnEvent', function(self, event, unit)
 	local bar = self:Get(unit)
 	if bar and bar:IsVisible() then
 		bar:Update()
 	end
-end
-
+end)
 ManaBar:RegisterEvent('UNIT_MANA')
 ManaBar:RegisterEvent('UNIT_RAGE')
 ManaBar:RegisterEvent('UNIT_FOCUS')
@@ -50,15 +50,12 @@ function ManaBar:Update()
 	local unit = self.id
 	local max = UnitManaMax(unit)
 	self:SetMinMaxValues(0, max)
-	
+
 	if UnitIsConnected(unit) then
 		--update mana bar color
 		local power = UnitPowerType(unit)
 		local info = ManaBarColor[power]
-		self:SetStatusBarColor(info.r, info.g, info.b)
-
-		local r, g, b = self:GetComplement(self:GetStatusBarColor())
-		self.bg:SetVertexColor(r, g, b, 0.6)
+		self:SetColor(info.r, info.g, info.b)
 
 		if power == 1 then --rage
 			self:SetValue(max - UnitMana(unit))
@@ -67,14 +64,14 @@ function ManaBar:Update()
 		end
 	else
 		self:SetValue(maxMana)
-		self:SetStatusBarColor(0.5, 0.5, 0.5)
+		self:SetColor(0.5, 0.5, 0.5)
 	end
 
-	self:OnTextUpdate()
+	self:UpdateText()
 end
 
 --the update text function is indeed rather complex
-function ManaBar:OnTextUpdate()
+function ManaBar:UpdateText()
 	local unit, mode, text, entered = self.id, self.mode, self.text, self.entered
 	local value = self:GetValue()
 	local min, max = self:GetMinMaxValues()
@@ -84,7 +81,7 @@ function ManaBar:OnTextUpdate()
 	elseif UnitIsGhost(unit) or UnitIsDead(unit) or not UnitIsConnected(unit) then --disconnected
 		text:Hide()
 	elseif entered or mode == 'always' then
-		if Config:ShowMaximum(unit) then
+		if Config:ShowMaxValues(unit) then
 			text:SetFormattedText('%d / %d', value, max)
 		else
 			text:SetText(value)
@@ -105,6 +102,7 @@ function ManaBar:OnTextUpdate()
 		end
 	end
 end
+
 
 --[[ Utility Functions ]]--
 

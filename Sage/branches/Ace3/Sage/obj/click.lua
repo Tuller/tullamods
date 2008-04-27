@@ -3,43 +3,42 @@
 		The clickable portion of a SageFrame
 --]]
 
-SageClick = CreateFrame('Button')
-local Frame_mt = {__index = SageClick}
+local ClickFrame = Sage:CreateObjectClass('Button')
+Sage.ClickFrame = ClickFrame
 
-local function Frame_OnEnter(self) self:OnEnter() end
-local function Frame_OnLeave(self) self:OnLeave() end
-
-function SageClick:Create(parent, id)
-	local frame = CreateFrame('Button', format('SageClick%s', id or parent.id), parent, 'SecureUnitButtonTemplate')
-	setmetatable(frame, Frame_mt)
+function ClickFrame:Create(parent, id)
+	local frame = self:New(CreateFrame('Button', 'SageClick' .. (id or parent.id), parent, 'SecureUnitButtonTemplate'))
 	frame.unit = id or parent.id
 
+	--menu display
 	SecureUnitButton_OnLoad(frame, id or parent.id, function() frame:ShowMenu() end)
+	
 	--support for click casting mods that use the clique standard
 	ClickCastFrames = ClickCastFrames or {}
     ClickCastFrames[frame] = true
-
 	frame:RegisterForClicks('anyUp')
-	frame:SetScript('OnEnter', Frame_OnEnter)
-	frame:SetScript('OnLeave', Frame_OnLeave)
+
+	--on mouseover events
+	frame:SetScript('OnEnter', frame.OnEnter)
+	frame:SetScript('OnLeave', frame.OnLeave)
 
 	return frame
 end
 
 --show tooltip, show text if its not always shown
-function SageClick:OnEnter()
+function ClickFrame:OnEnter()
 	UnitFrame_OnEnter(self)
-	SageBar:UpdateText(self.unit, true)
+	Sage.StatusBar:ForUnit(self.unit, 'UpdateText', true)
 end
 
 --hide tooltip, and text if its not always shown
-function SageClick:OnLeave()
+function ClickFrame:OnLeave()
 	UnitFrame_OnLeave(self)
-	SageBar:UpdateText(self.unit, false)
+	Sage.StatusBar:ForUnit(self.unit, 'UpdateText', nil)
 end
 
 --credit goes to agUF for this function
-function SageClick:ShowMenu()
+function ClickFrame:ShowMenu()
 	local unit = self:GetAttribute('unit')
 	local menu
 	

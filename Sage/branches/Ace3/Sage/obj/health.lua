@@ -33,27 +33,24 @@ function HealthBar:UpdateColor()
 	local unit = self.id
 	if self.debuff then
 		local color = DebuffTypeColor[self.debuff or 'none']
-		self:SetStatusBarColor(color.r, color.g, color.b)
+		self:SetColor(color.r, color.g, color.b)
 	elseif unit == 'pet' and select(2, HasPetUI()) then
 		local happiness = GetPetHappiness()
 		if happiness == 1 then
-			self:SetStatusBarColor(0.9, 0, 0)
+			self:SetColor(1, 0, 0)
 		elseif happiness == 2 then
-			self:SetStatusBarColor(0.9, 0.9, 0)
+			self:SetColor(1, 1, 0)
 		else
-			self:SetStatusBarColor(0, 0.9, 0)
+			self:SetColor(0, 1, 0)
 		end
 	elseif UnitIsFeignDeath(unit) then
-		self:SetStatusBarColor(0, 0.9, 0.78)
+		self:SetColor(0, 0.9, 0.78)
 	elseif UnitIsPlayer(unit) and Config:ColorHealthByClass() then
 		local color = RAID_CLASS_COLORS[select(2, UnitClass(unit))]
-		self:SetStatusBarColor(color.r, color.g, color.b)
+		self:SetColor(color.r, color.g, color.b)
 	else
-		self:SetStatusBarColor(0, 0.8, 0)
+		self:SetColor(0, 0.8, 0)
 	end
-	
-	local r, g, b = self:GetComplement(self:GetStatusBarColor())
-	self.bg:SetVertexColor(r, g, b, 0.6)
 end
 
 
@@ -169,7 +166,7 @@ function SageHealth:UpdateDebuff()
 end
 
 --mode 1 = show only on mouseover, 2 = compact, 3 = full
-function SageHealth:OnTextUpdate()
+function SageHealth:UpdateText()
 	local unit, mode, text, entered = self.id, self.mode, self.text, self.entered
 	local value = self:GetValue()
 	local min, max = self:GetMinMaxValues()
@@ -186,8 +183,8 @@ function SageHealth:OnTextUpdate()
 		elseif not UnitIsConnected(unit) then
 			text:SetText(L.Offline)
 		elseif entered or mode == 'always' then
-			if Config:ShowMaximum(unit) then
-				text:SetText(format('%d / %d', value, max))
+			if Config:ShowMaxValues(unit) then
+				text:SetFormattedText('%d / %d', value, max)
 			else
 				text:SetText(value)
 			end

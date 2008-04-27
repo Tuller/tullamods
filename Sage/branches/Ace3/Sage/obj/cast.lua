@@ -3,51 +3,113 @@
 		Unit casting bars
 --]]
 
-SageCast = CreateFrame('StatusBar')
-local Bar_MT = {__index = SageCast}
+local CastBar = Sage:CreateObjectClass('Frame')
+Sage.CastBar = CastBar
+local Config = Sage.Config
 
 --[[ Constructor ]]--
 
-local function Frame_Update(self) self.bar:Update() end
-local function Bar_OnUpdate(self) self:OnUpdate() end
+local function OnUpdate(self) self:GetParent():OnUpdate() end
 
-function SageCast:Create(parent, id, noText)
-	local frame = CreateFrame('Frame', nil, parent)
-	frame.id = id or parent.id
-	frame.Update = Frame_Update
-	frame:SetScript('OnShow', Frame_Update)
+function CastBar:Create(parent, unit, ...)
+	local frame = self:New(CreateFrame('Frame', nil, parent))
+	frame:SetScript('OnShow', frame.Update)
+	frame.id = unit or parent.unit
+	
+	frame.bar = Sage.StatusBar:Create(frame, unit, ...)
+	frame.bar:SetScript('OnUpdate', OnUpdate)
 
-	local bar
-	if(noText) then
-		bar = setmetatable(SageBar:Create(frame, id), Bar_MT)
-	else
-		bar = setmetatable(SageBar:Create(frame, id, SageFont:GetSmallBarFont(), true), Bar_MT)
-	end
-	bar:Hide()
-	bar:SetScript('OnUpdate', Bar_OnUpdate)
-	bar:UpdateTexture()
-	frame.bar = bar
+	local bar = self:New(self.super:Create(...))
+	bar:SetScript('OnShow', bar.Update)
+
+	bar.updater = CreateFrame('Frame', nil, bar)
+	bar.updater:SetScript('OnUpdate', OnUpdate)
+	bar.updater:Hide()
 
 	local icon = bar:CreateTexture(nil, 'OVERLAY')
 	icon:SetTexCoord(0.06, 0.94, 0.06, 0.94)
-	icon:SetWidth(12); icon:SetHeight(12)
+	icon:SetWidth(12)
+	icon:SetHeight(12)
+	icon:SetPoint('TOPLEFT', bar)
 	bar.icon = icon
 
 	icon:SetPoint('TOPLEFT', frame)
 	bar:SetPoint('TOPLEFT', icon, 'TOPRIGHT')
 	bar:SetPoint('BOTTOMRIGHT', frame)
 
-	if(not self.bars) then self.bars = {} end
+	if not self.bars then self.bars = {} end
 	self.bars[bar.id] = bar
 
-	return frame
+	return bar
 end
 
+
+--[[ Events ]]--
+
+function CastBar:OnEvent(event, ...)
+	local func = self[event]
+	if func then
+		func(self, ...)
+	end
+end
+CastBar:RegisterEvent('PLAYER_ENTERING_WORLD')
+CastBar:RegisterEvent('UNIT_SPELLCAST_START')
+CastBar:RegisterEvent('UNIT_SPELLCAST_DELAYED')
+CastBar:RegisterEvent('UNIT_SPELLCAST_CHANNEL_START')
+CastBar:RegisterEvent('UNIT_SPELLCAST_CHANNEL_UPDATE')
+CastBar:RegisterEvent('UNIT_SPELLCAST_STOP')
+CastBar:RegisterEvent('UNIT_SPELLCAST_FAILED')
+CastBar:RegisterEvent('UNIT_SPELLCAST_INTERRUPTED')
+CastBar:RegisterEvent('UNIT_SPELLCAST_CHANNEL_STOP')
+
+
+function CastBar:PLAYER_ENTERING_WORLD()
+	self:ForAll('Update')
+end
+
+function CastBar:UNIT_SPELLCAST_START(unit)
+	self:ForUnit(unit, 'OnSpellStart')
+end
+
+function CastBar:UNIT_SPELLCAST_DELAYED(unit)
+	self:ForUnit(unit, 'OnSpellDelayed')
+end
+
+function CastBar:UNIT_SPELLCAST_CHANNEL_START(unit)
+	self:ForUnit(unit, 'OnChannelStart')
+end
+
+function CastBar:UNIT_SPELLCAST_CHANNEL_UPDATE(unit)
+	self:ForUnit(unit, 'OnChannelUpdate')
+end
+
+--finish events
+function CastBar:UNIT_SPELLCAST_STOP(unit)
+	self:ForUnit(unit, 'OnSpellStop')
+end
+
+function CastBar:UNIT_SPELLCAST_FAILED(unit)
+	self:ForUnit(unit, 'Finish')
+end
+
+function CastBar:UNIT_SPELLCAST_INTERRUPTED(unit)
+	self:ForUnit(unit, 'Finish')
+end
+
+function CastBar:UNIT_SPELLCAST_CHANNEL_STOP(unit)
+	self:ForUnit(unit, 'Finish')
+end
+
+
+--[[ Event Functions ]]--
+
 function SageCast:Update()
-	if Sage:ShowingCastBars() then
-		if UnitCastingInfo(self.id) then
+	local unit = self.id
+
+	if Config:ShowingCastBars(unit) then
+		if UnitCastingInfo(unit) then
 			self:OnSpellStart()
-		elseif UnitChannelInfo(self.id) then
+		elseif UnitChannelInfo(unit) then
 			self:OnChannelStart()
 		else
 			self:Finish()
@@ -57,24 +119,16 @@ function SageCast:Update()
 	end
 end
 
-SageCast.UpdateTexture = SageBar.UpdateTexture
-
-
---[[ Event Functions ]]--
-
 function SageCast:OnSpellStart()
 	local name, nameSubtext, text, texture, startTime, endTime, isTradeSkill = UnitCastingInfo(self.id)
 	if not(name) or isTradeSkill then self:Hide() return end
 
 	if IsHelpfulSpell(name) then
-		self:SetStatusBarColor(0, 1, 1)
-		self.bg:SetVertexColor(0, 0.6, 0.6, 0.4)
+		self:SetColor(0, 1, 1)
 	elseif IsHarmfulSpell(name) then
-		self:SetStatusBarColor(1, 0, 1)
-		self.bg:SetVertexColor(0.6, 0, 0.6, 0.4)
+		self:SetColor(1, 0, 1)
 	else
-		self:SetStatusBarColor(1, 1, 0)
-		self.bg:SetVertexColor(0.6, 0.6, 0, 0.4)
+		self:SetColor(1, 1, 0)
 	end
 
 	self.startTime = startTime / 1000
@@ -100,7 +154,7 @@ function SageCast:OnSpellDelayed()
 		self:SetMinMaxValues(self.startTime, self.maxValue)
 
 		if not self.casting then
-			self:SetStatusBarColor(1, 0.7, 0)
+			self:SetColor(1, 0.7, 0)
 			self.casting = true
 			self.channeling = nil
 		end
@@ -112,14 +166,11 @@ function SageCast:OnChannelStart()
 	if not(name) or isTradeSkill then self:Hide() return end
 
 	if IsHelpfulSpell(name) then
-		self:SetStatusBarColor(0, 1, 1)
-		self.bg:SetVertexColor(0, 0.6, 0.6, 0.4)
+		self:SetColor(0, 1, 1)
 	elseif IsHarmfulSpell(name) then
-		self:SetStatusBarColor(1, 0, 1)
-		self.bg:SetVertexColor(0.6, 0, 0.6, 0.4)
+		self:SetColor(1, 0, 1)
 	else
-		self:SetStatusBarColor(1, 1, 0)
-		self.bg:SetVertexColor(0.6, 0.6, 0, 0.4)
+		self:SetColor(1, 1, 0)
 	end
 
 	self.startTime = startTime / 1000
@@ -160,8 +211,8 @@ function SageCast:OnUpdate()
 			self:Finish()
 		else
 			self:SetValue(value)
-			if(self.text) then
-				self.text:SetText(format('%.1fs', self.maxValue - value))
+			if self.text then
+				self.text:SetFormattedText('%.1fs', self.maxValue - value)
 			end
 		end
 	elseif self.channeling then
@@ -171,15 +222,15 @@ function SageCast:OnUpdate()
 			self:Finish()
 		else
 			self:SetValue(self.startTime + (self.endTime - value))
-			if(self.text) then
-				self.text:SetText(format('%.1fs', self.endTime - value))
+			if self.text then
+				self.text:SetFormattedText('%.1fs', self.endTime - value)
 			end
 		end
 	end
 end
 
 function SageCast:OnSpellStop()
-	if(not self.channeling) then
+	if not self.channeling then
 		self:Finish()
 	end
 end
@@ -188,70 +239,20 @@ function SageCast:Finish()
 	self.casting = nil
 	self.channeling = nil
 
-	self:SetStatusBarColor(0, 1, 0)
+	self:SetColor(0, 1, 0)
 	self:Hide()
 end
 
 
 --[[ Utility Functions ]]--
 
---sets whether to color health when debuffed or not
-function SageCast:ForAll(method, ...)
-	local bars = self.bars
-	if(bars) then
-		for _,bar in pairs(bars) do
-			bar[method](bar, ...)
-		end
-	end
-end
-
-function SageCast:ForUnit(unit, method, ...)
+function CastBar:ForUnit(unit, method, ...)
 	local bar = self:Get(unit)
-	if(bar) then
+	if bar then
 		bar[method](bar, ...)
 	end
 end
 
-function SageCast:Get(id)
-	return self.bars and self.bars[id]
-end
-
-
---[[ Events ]]--
-
-function SageCast:PLAYER_ENTERING_WORLD()
-	self:ForAll('Update')
-end
-
-function SageCast:UNIT_SPELLCAST_START(unit)
-	self:ForUnit(unit, 'OnSpellStart')
-end
-
-function SageCast:UNIT_SPELLCAST_DELAYED(unit)
-	self:ForUnit(unit, 'OnSpellDelayed')
-end
-
-function SageCast:UNIT_SPELLCAST_CHANNEL_START(unit)
-	self:ForUnit(unit, 'OnChannelStart')
-end
-
-function SageCast:UNIT_SPELLCAST_CHANNEL_UPDATE(unit)
-	self:ForUnit(unit, 'OnChannelUpdate')
-end
-
---finish events
-function SageCast:UNIT_SPELLCAST_STOP(unit)
-	self:ForUnit(unit, 'OnSpellStop')
-end
-
-function SageCast:UNIT_SPELLCAST_FAILED(unit)
-	self:ForUnit(unit, 'Finish')
-end
-
-function SageCast:UNIT_SPELLCAST_INTERRUPTED(unit)
-	self:ForUnit(unit, 'Finish')
-end
-
-function SageCast:UNIT_SPELLCAST_CHANNEL_STOP(unit)
-	self:ForUnit(unit, 'Finish')
+function CastBar:Get(unit)
+	return self.bars and self.bars[unit]
 end
