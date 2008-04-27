@@ -38,20 +38,18 @@ function Bongos:OnInitialize()
 		self:OnProfileDeleted(...)
 	end)
 
+	
+	--version update
 	if Bongos3Version then
-		local cMajor = CURRENT_VERSION:match('(%w+)')
-		local major = Bongos3Version:match('(%w+)')
+		local major, minor = Bongos3Version:match('(%w+)%.(%d+)')
+		local cMajor, cMinor = CURRENT_VERSION:match('(%w+)%.(%d+)')
 
 		--settings change
 		if major ~= cMajor then
-			self:UpdateSettings()
+			self:UpdateSettings(major, minor)
+		elseif minor ~= cMinor then
+			self:UpdateVersion()
 		end
-	end
-
-	--version update
-	if Bongos3Version ~= CURRENT_VERSION then
-		local major, minor = Bongos3Version and Bongos3Version:match('(%w+)%.(%d+)')
-		self:UpdateVersion(major, minor)
 	end
 
 	self.lockBG = self:CreateLockBG()
@@ -78,6 +76,7 @@ function Bongos:UpdateSettings(major, minor)
 			end
 		end
 	end
+	self:UpdateVersion()
 end
 
 function Bongos:UpdateVersion()
