@@ -3,21 +3,18 @@
 		Driver for Sage bars
 --]]
 
-Sage = DongleStub('Dongle-1.0'):New('Sage')
-Sage.dbName = 'Sage2DB'
+local Sage = LibStub('AceAddon-3.0'):NewAddon('Sage', 'AceEvent-3.0', 'AceConsole-3.0')
+local L = LibStub('AceLocale-3.0'):GetLocale('Sage')
 
-local CURRENT_VERSION = GetAddOnMetadata('Sage', 'Version')
+local CURRENT_VERSION = GetAddOnMetadata('Bongos', 'Version')
 local TEXTURE_PATH = 'Interface\\AddOns\\Sage\\textures\\%s'
 local BLIZZ_TEXTURE = 'Interface/TargetingFrame/UI-StatusBar'
-local L = SAGE_LOCALS
-
 
 --[[ Startup ]]--
 
-function Sage:Enable()
+function Sage:OnInitialize()
 	local defaults = {
-		profile = {
-			locked = true,
+		class = {
 			sticky = true,
 			showCastBars = true,
 			showPercents = false,
@@ -28,45 +25,64 @@ function Sage:Enable()
 			showPvP = true,
 			fontSize = 14,
 			barTexture = 'Armory2',
-			rangeSpell = L.RangeCheckSpells[select(2, UnitClass('player'))],
 			rangeCheck = true,
 			frames = {}
 		}
 	}
 
-	self.db = self:InitializeDB(self.dbName, defaults, 'Default')
-	self.profile = self.db.profile
+	self.db = LibStub('AceDB-3.0'):New('SageDB', defaults, (UnitClass('player')))
 
-	if(not SageVersion) then
-		self:UpdateSettings()
-	else
-		local cMajor, cMinor = CURRENT_VERSION:match('(%w+)%.(%w+)')
-		local major, minor = SageVersion:match('(%w+)%.(%w+)')
+	self.db:RegisterCallback('OnNewProfile', function(msg, db, ...)
+		self:OnNewProfile(...)
+	end)
+	self.db:RegisterCallback('OnProfileChanged', function(msg, db, ...)
+		self:OnProfileChanged(...)
+	end)
+	self.db:RegisterCallback('OnProfileCopied', function(msg, db, ...)
+		self:OnProfileCopied(...)
+	end)
+	self.db:RegisterCallback('OnProfileReset', function(msg, db, ...)
+		self:OnProfileReset(...)
+	end)
+	self.db:RegisterCallback('OnProfileDeleted', function(msg, db, ...)
+		self:OnProfileDeleted(...)
+	end)
 
+	if SageVersion then
+		local major, minor, build = SageVersion:match('(%w+)%.(%w+)%.(%d+)')
+		local cMajor, cMinor, cBuld = CURRENT_VERSION:match('(%w+)%.(%w+)%.(%d+)')
+		
 		if major ~= cMajor then
-			self.db:ResetDB('Default')
-			self.profile = self.db.profile
-			self:Print(L.UpdatedIncompatible)
+			self.db:Reset()
 		elseif minor ~= cMinor then
-			self:UpdateSettings()
+			self:UpdateSettings(major, minor)
+			self:UpdateVersion()
+		elseif build ~= cBuild then
+			self:UpdateVersion()
+		end
+
+		--settings change
+		if major ~= cMajor then
+			self:UpdateSettings(major, minor)
 		end
 	end
-	if SageVersion ~= CURRENT_VERSION then
-		self:UpdateVersion()
-	end
 
-	self:RegisterEvents()
+
 	self:RegisterSlashCommands()
-	self:LoadModules()
 
-	self:RegisterMessage('DONGLE_PROFILE_CREATED')
-	self:RegisterMessage('DONGLE_PROFILE_CHANGED')
-	self:RegisterMessage('DONGLE_PROFILE_DELETED')
-	self:RegisterMessage('DONGLE_PROFILE_COPIED')
-	self:RegisterMessage('DONGLE_PROFILE_RESET')
+	--create a loader for the options menu
+	local f = CreateFrame('Frame', nil, InterfaceOptionsFrame)
+	f:SetScript('OnShow', function(self)
+		self:SetScript('OnShow', nil)
+		LoadAddOn('Sage_Options')
+	end)
 end
 
-function Sage:UpdateSettings()
+function Sage:OnEnable()
+	self:LoadModules()
+end
+
+function Sage:UpdateSettings(major, minor)
 end
 
 function Sage:UpdateVersion()
@@ -75,20 +91,130 @@ function Sage:UpdateVersion()
 end
 
 function Sage:LoadModules()
-	SageFont:Update()
 	for name, module in self:IterateModules() do
-		assert(module.Load, format('Sage Module %s: Missing Load function', name))
-		module:Load()
+		if module.Load then
+			module:Load(self.isNewProfile)
+		end
 	end
-	SageFrame:ForAll('Reanchor')
-	self:SetShowPercents(self:ShowingPercents())
+
+	self.Bar:ForAll('Reanchor')
+	self.newProfile = nil
 end
 
 function Sage:UnloadModules()
 	for name, module in self:IterateModules() do
-		assert(module.Unload, format('Sage Module %s: Missing Unload function', name))
-		module:Unload()
+		if module.Unload then
+			module:Unload()
+		end
 	end
+end
+
+
+--[[ Profile Functions ]]--
+
+function Sage:SaveProfile(name)
+	local toCopy = self.db:GetCurrentProfile()
+	if name and name ~= toCopy then
+		self:UnloadModules()
+		self.db:SetProfile(name)
+		self.db:CopyProfile(toCopy)
+		self.isNewProfile = nil
+		self:LoadModules()
+	end
+end
+
+function Sage:SetProfile(name)
+	local profile = self:MatchProfile(name)
+	if profile and profile ~= self.db:GetCurrentProfile() then
+		self:UnloadModules()
+		self.db:SetProfile(profile)
+		self.isNewProfile = nil
+		self:LoadModules()
+	else
+		self:Print(format(L.InvalidProfile, name or 'null'))
+	end
+end
+
+function Sage:DeleteProfile(name)
+	local profile = self:MatchProfile(name)
+	if profile and profile ~= self.db:GetCurrentProfile() then
+		self.db:DeleteProfile(profile)
+	else
+		self:Print(L.CantDeleteCurrentProfile)
+	end
+end
+
+function Sage:CopyProfile(name)
+	if name and name ~= self.db:GetCurrentProfile() then
+		self:UnloadModules()
+		self.db:CopyProfile(name)
+		self.isNewProfile = nil
+		self:LoadModules()
+	end
+end
+
+function Sage:ResetProfile()
+	self:UnloadModules()
+	self.db:ResetProfile()
+	self.isNewProfile = true
+	self:LoadModules()
+end
+
+function Sage:ListProfiles()
+	self:Print(L.AvailableProfiles)
+	local current = self.db:GetCurrentProfile()
+	for _,k in ipairs(self.db:GetProfiles()) do
+		if k == current then
+			DEFAULT_CHAT_FRAME:AddMessage(' - ' .. k, 1, 1, 0)
+		else
+			DEFAULT_CHAT_FRAME:AddMessage(' - ' .. k)
+		end
+	end
+end
+
+function Sage:MatchProfile(name)
+	local name = name:lower()
+	local nameRealm = name .. ' - ' .. GetRealmName():lower()
+	local match
+
+	for i, k in ipairs(self.db:GetProfiles()) do
+		local key = k:lower()
+		if key == name then
+			return k
+		elseif key == nameRealm then
+			match = k
+		end
+	end
+	return match
+end
+
+
+--[[ Profile Events ]]--
+
+function Sage:OnNewProfile(profileName)
+	self.isNewProfile = true
+	self:Print('Created Profile: ' .. profileName)
+end
+
+function Sage:OnProfileDeleted(profileName)
+	self:Print('Deleted Profile: ' .. profileName)
+end
+
+function Sage:OnProfileChanged(newProfileName)
+	self:Print('Changed Profile: ' .. newProfileName)
+end
+
+function Sage:OnProfileCopied(sourceProfile)
+	self:Print('Copied Profile: ' .. sourceProfile)
+end
+
+function Sage:OnProfileReset()
+	self:Print('Reset Profile: ' .. self.db:GetCurrentProfile())
+end
+
+function Sage:UpdateVersion()
+	SageVersion = CURRENT_VERSION
+	self:Print(format(L.Updated, SageVersion))
 end
 
 function Sage:RegisterEvents()
@@ -162,123 +288,6 @@ end
 
 function Sage:UpdateCast(event, ...)
 	SageCast[event](SageCast, ...)
-end
-
-
---[[ Profile Functions ]]--
-
-function Sage:SaveProfile(profile)
-	local currentProfile = self.db:GetCurrentProfile()
-	if profile and profile ~= self.db:GetCurrentProfile() then
-		self:UnloadModules()
-		self.copying = true
-		self.db:SetProfile(profile)
-		self.db:CopyProfile(currentProfile)
-		self.copying = nil
-	end
-end
-
-function Sage:SetProfile(name)
-	local profile = self:MatchProfile(name)
-	if profile and profile ~= self.db:GetCurrentProfile() then
-		self:UnloadModules()
-		self.db:SetProfile(profile)
-	end
-end
-
-function Sage:DeleteProfile(name)
-	local profile = self:MatchProfile(name)
-	if profile and profile ~= self.db:GetCurrentProfile() then
-		self.db:DeleteProfile(profile)
-	else
-		self:Print(L.CantDeleteCurrentProfile)
-	end
-end
-
-function Sage:CopyProfile(name)
-	local profile = self:MatchProfile(name)
-	if profile and profile ~= self.db:GetCurrentProfile() then
-		self:UnloadModules()
-		self.copying = true
-		self.db:ResetProfile()
-		self.db:CopyProfile(profile)
-		self.copying = nil
-	end
-end
-
-function Sage:ResetProfile()
-	self:UnloadModules()
-	self.db:ResetProfile()
-end
-
-function Sage:ListProfiles()
-	self:Print(L.AvailableProfiles)
-	for _,k in ipairs(self.db:GetProfiles()) do
-		DEFAULT_CHAT_FRAME:AddMessage(' - ' .. k)
-	end
-end
-
-function Sage:MatchProfile(name)
-	local profileList = self.db:GetProfiles()
-
-	local name = name:lower()
-	local nameRealm = format('%s - %s', name, GetRealmName():lower())
-	local match
-
-	for i, k in ipairs(profileList) do
-		local key = k:lower()
-		if key == name then
-			return k
-		elseif key == nameRealm then
-			match = k
-		end
-	end
-	return match
-end
-
-
---[[ Messages ]]--
-
-function Sage:DONGLE_PROFILE_CREATED(event, db, parent, sv_name, profile_key)
-	if(sv_name == self.dbName) then
-		self.profile = self.db.profile
-		db.version = CURRENT_VERSION
-		self:Print(format(L.ProfileCreated , profile_key))
-	end
-end
-
-function Sage:DONGLE_PROFILE_CHANGED(event, db, parent, sv_name, profile_key)
-	if(sv_name == self.dbName) then
-		self.profile = self.db.profile
-		if not self.copying then
-			self:LoadModules()
-			self:Print(format(L.ProfileLoaded, profile_key))
-		end
-	end
-end
-
-function Sage:DONGLE_PROFILE_DELETED(event, db, parent, sv_name, profile_key)
-	if(sv_name == self.dbName) then
-		self:Print(format(L.ProfileDeleted, profile_key))
-	end
-end
-
-function Sage:DONGLE_PROFILE_COPIED(event, db, parent, sv_name, profile_key, intoProfile_key)
-	if(sv_name == self.dbName) then
-		self.profile = self.db.profile
-		self:LoadModules()
-		self:Print(format(L.ProfileCopied, profile_key, intoProfile_key))
-	end
-end
-
-function Sage:DONGLE_PROFILE_RESET(event, db, parent, sv_name, profile_key)
-	if(sv_name == self.dbName) then
-		if not self.copying then
-			self.profile = self.db.profile
-			self:LoadModules()
-			self:Print(format(L.ProfileReset, profile_key))
-		end
-	end
 end
 
 
@@ -458,7 +467,8 @@ end
 --cast bars
 function Sage:SetShowCastBars(enable)
 	self.profile.showCastBars = enable or false
-	if(enable) then
+
+	if enable then
 		self:RegisterEvent('UNIT_SPELLCAST_START', 'UpdateCast')
 		self:RegisterEvent('UNIT_SPELLCAST_DELAYED', 'UpdateCast')
 		self:RegisterEvent('UNIT_SPELLCAST_CHANNEL_START', 'UpdateCast')
