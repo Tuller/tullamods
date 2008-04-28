@@ -1,4 +1,8 @@
-SellFish Version History:
+SellFish Version History:\
+
+2.0.7
+	Updated ItemPrice
+	Fixed a bug with querying cached items
 
 2.0.6
 	Updated for 2.4
