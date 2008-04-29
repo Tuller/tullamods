@@ -5,7 +5,7 @@
 
 
 local function hookItem(tip)
-	local setItem = tip:GetScript('OnTooltipSetItem')
+	local set = tip:GetScript('OnTooltipSetItem')
 	local _G = getfenv(0)
 
 	tip:SetScript('OnTooltipSetItem', function(self, ...)
