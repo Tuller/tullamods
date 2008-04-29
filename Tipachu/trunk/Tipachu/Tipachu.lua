@@ -1,5 +1,5 @@
 --[[
-	Tuba
+	Tipachu
 		Adds item icons to tooltips
 --]]
 
