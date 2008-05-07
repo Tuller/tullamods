@@ -16,7 +16,7 @@ local BLIZZ_TEXTURE = 'Interface/TargetingFrame/UI-StatusFrame'
 
 function Sage:OnInitialize()
 	local defaults = {
-		class = {
+		profile = {
 			sticky = true,
 			showCastFrames = true,
 			showPercents = false,
@@ -32,7 +32,7 @@ function Sage:OnInitialize()
 		}
 	}
 
-	self.db = LibStub('AceDB-3.0'):New('SageDB', defaults, (UnitClass('player')))
+	self.db = LibStub('AceDB-3.0'):New('SageDB', defaults, UnitClass('player'))
 
 	self.db:RegisterCallback('OnNewProfile', function(msg, db, ...)
 		self:OnNewProfile(...)
@@ -473,43 +473,13 @@ end
 --bar textures
 function Sage:SetFrameTexture(texture)
 	self.profile.barTexture = texture
---	self.StatusBar:UpdateTextures()
+	self.StatusBar:ForAll('SetTexture', self:GetFrameTexture())
 end
 
 function Sage:GetFrameTexture()
 	return SML:Fetch(SML.MediaType.STATUSBAR, self.db.profile.barTexture)
 end
 
---font size
-function Sage:SetFontSize(size)
-	self.profile.fontSize = size
-	self.font:Update()
-	SageFont:Update()
-end
-
-function Sage:GetFontSize()
-	return self.profile.fontSize or DEFAULT_FONT_SIZE
-end
-
---outline statusbar fonts
-function Sage:SetOutlineFrameFonts(enable)
-	self.profile.outlineFrameFonts = enable or false
-	SageFont:UpdateFrameFonts()
-end
-
-function Sage:OutlineFrameFonts()
-	return self.profile.outlineFrameFonts
-end
-
---outline outside fonts
-function Sage:SetOutlineOutsideFonts(enable)
-	self.profile.outlineOutsideFonts = enable or false
-	SageFont:UpdateOutsideFonts()
-end
-
-function Sage:OutlineOutsideFonts()
-	return self.profile.outlineOutsideFonts
-end
 
 --color healthframes when debuffed
 function Sage:SetDebuffColoring(enable)
@@ -534,7 +504,7 @@ end
 --cast frames
 function Sage:SetShowCastFrames(enable)
 	self.profile.showCastFrames = enable or false
-
+--[[
 	if enable then
 		self:RegisterEvent('UNIT_SPELLCAST_START', 'UpdateCast')
 		self:RegisterEvent('UNIT_SPELLCAST_DELAYED', 'UpdateCast')
@@ -554,7 +524,8 @@ function Sage:SetShowCastFrames(enable)
 		self:UnregisterEvent('UNIT_SPELLCAST_INTERRUPTED')
 		self:UnregisterEvent('UNIT_SPELLCAST_CHANNEL_STOP')
 	end
-	SageCast:ForAll('Update')
+--]]
+	self.CastBar:SetEnabled(enable)
 end
 
 function Sage:ShowingCastFrames()

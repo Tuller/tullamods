@@ -15,16 +15,12 @@ local Config = Sage.Config
 
 --[[ Constructor ]]--
 
-function HealthBar:Create(...)
-	local bar = self:New(self.super:Create(...))
+function HealthBar:Create(parent, unit,)
+	local bar = self:New(self.super:Create(parent, unit))
 	bar:SetScript('OnShow', bar.UpdateAll)
 	bar:SetScript('OnValueChanged', bar.UpdateColor)
 	
-	if self.bars then
-		self.bars[bar.id] = bar
-	else
-		self.bars = {[bar.id] = bar}
-	end
+	self:Register(bar)
 	
 	return bar
 end
@@ -210,6 +206,14 @@ end
 
 --[[ Utility Functions ]]--
 
-function SageHealth:Get(id)
-	return self.bars and self.bars[id]
+function SageHealth:Register(bar)
+	if self.bars then
+		self.bars[bar.unit] = bar
+	else
+		self.bars = {[bar.unit] = bar}
+	end
+end
+
+function SageHealth:Get(unit)
+	return self.bars and self.bars[unit]
 end

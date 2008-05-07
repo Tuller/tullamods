@@ -9,15 +9,15 @@ Sage.StatusBar = StatusBar
 
 --[[ Constructor ]]--
 
-function StatusBar:Create(parent, id)
+function StatusBar:Create(parent, unit)
 	local bar = self:New(CreateFrame('StatusBar', nil, parent))
-	bar.id = id or parent.id
-	
+	bar.unit = unit or parent.unit
+
 	bar.bg = bar:CreateTexture(nil, 'BACKGROUND')
 	bar.bg:SetAllPoints(bar)
 
 	self:Register(bar)
-	
+
 	return bar
 end
 
@@ -30,8 +30,9 @@ function StatusBar:SetTexture(texture)
 end
 
 function StatusBar:UpdateTexture()
-	self:SetStatusBarTexture(self.texture)
-	self.bg:SetTexture(self.texture)
+	local texture = self:GetTexture()
+	self:SetStatusBarTexture(texture)
+	self.bg:SetTexture(texture)
 end
 
 function StatusBar:GetTexture()
@@ -41,8 +42,13 @@ end
 
 --[[ Font ]]--
 
-function StatusBar:SetFont(...)
-	self.font, self.fontSize, self.outline = ...
+function StatusBar:SetFont(font, size, outline)
+	self.font, self.fontSize, self.outline = font, size, outline
+	self:UpdateFont()
+end
+
+function StatusBar:SetOutline(enable)
+	self.forceOutline = enable or nil
 	self:UpdateFont()
 end
 
@@ -50,32 +56,30 @@ function StatusBar:UpdateFont()
 	local font, size, outline = self:GetFont()
 	if font then
 		if not self.text then
-			bar.text = bar:CreateFontString(nil, 'OVERLAY')
-			bar.text:SetPoint('CENTER')
+			self.text = self:CreateFontString(nil, 'OVERLAY')
+			self.text:SetPoint('CENTER')
 		end
-		bar.text:SetFont(font, size, outline)	
+		self.text:SetFont(font, size, outline and 'OUTLINE')
 	end
 end
 
 function StatusBar:GetFont()
-	return self.font, self.fontSize, self.outline
+	return self.font, self.fontSize, (self.forceOutline or self.outline)
 end
 
 
---[[ Callbacks ]]--
+--[[ Text ]]--
 
 function StatusBar:SetEntered(entered)
 	self.entered = entered
-
-	if self.text then
+	if self.UpdateText then
 		self:UpdateText()
 	end
 end
 
 function StatusBar:SetTextMode(mode)
 	self.textMode = mode
-
-	if self.text then
+	if self.UpdateText then
 		self:UpdateText()
 	end
 end
@@ -108,7 +112,7 @@ end
 local function RGBtoHSV(r, g, b)
 	local h, s, v, min, max, delta
 
-	min = math.min(r, g, b 
+	min = math.min(r, g, b
 	max = math.max(r, g, b)
 	delta = max - min
 	s = delta / max
@@ -121,18 +125,18 @@ local function RGBtoHSV(r, g, b)
 	else
 		h = 4 + (r-g)/delta; -- between magenta & cyan
 	end
-	
+
 	h = h * 60;
 	if h < 0 then
 		h = h + 360
 	end
-	
+
 	return h, s, v
 end
 
 local function HSVToRGB(h, s, v)
-	if s == 0 then 
-		return v, v, v 
+	if s == 0 then
+		return v, v, v
 	else
 		local h = h/60;			-- sector 0 to 5
 		local i = math.floor(h);
