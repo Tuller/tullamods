@@ -54,11 +54,13 @@ function Bar:Layout(cols, spacing)
 	end
 	spacing = spacing + 2
 
+	local w = PetBar.Button:Get(1):GetWidth() + spacing
+	local h = PetBar.Button:Get(1):GetHeight() + spacing
 	local buttonSize = 30 + spacing
 	local offset = spacing / 2
 
-	self:SetWidth(buttonSize * cols - spacing)
-	self:SetHeight(buttonSize * ceil(NUM_PET_ACTION_SLOTS/cols) - spacing)
+	self:SetWidth(w * cols - spacing)
+	self:SetHeight(h * ceil(NUM_PET_ACTION_SLOTS/cols) - spacing)
 
 	for i = 1, NUM_PET_ACTION_SLOTS do
 		local row = mod(i - 1, cols)
@@ -66,7 +68,7 @@ function Bar:Layout(cols, spacing)
 
 		local button = PetBar.Button:Get(i)
 		button:ClearAllPoints()
-		button:SetPoint('TOPLEFT', self, 'TOPLEFT', buttonSize * row, -buttonSize * col)
+		button:SetPoint('TOPLEFT', self, 'TOPLEFT', w * row, -h * col)
 	end
 end
 

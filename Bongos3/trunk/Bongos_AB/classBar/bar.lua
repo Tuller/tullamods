@@ -31,17 +31,18 @@ local function Bar_Layout(self, cols, space)
 	space = (space or self.sets.space or DEFAULT_SPACING)
 	self.sets.space = (space ~= DEFAULT_SPACING and space) or nil
 
-	local size = 30 + space
+	local w = ClassBar.Button:Get(1):GetWidth() + space
+	local h = ClassBar.Button:Get(1):GetHeight() + space
 	local offset = space / 2
 
 	for i = 1, numForms do
 		local row = (i - 1) % cols
 		local col = ceil(i / cols) - 1
-		ClassBar.Button:Get(i):SetPoint('TOPLEFT', size * row, -size * col)
+		ClassBar.Button:Get(i):SetPoint('TOPLEFT', w * row, -h * col)
 	end
 
-	self:SetWidth(size * cols - space)
-	self:SetHeight(size * ceil(numForms/cols) - space)
+	self:SetWidth(w * cols - space)
+	self:SetHeight(h * ceil(numForms/cols) - space)
 end
 
 local function Bar_CreateMenu(bar)

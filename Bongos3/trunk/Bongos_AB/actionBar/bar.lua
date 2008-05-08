@@ -166,17 +166,18 @@ end
 --layout must be performed only AFTER we actually have buttons
 function ActionBar:Layout()
 	local spacing = self:GetSpacing()
-	local buttonSize = 37 + spacing
+	local w = self.buttons[1]:GetWidth() + spacing
+	local h = self.buttons[1]:GetHeight() + spacing
 	local rows, cols = self:GetRows(), self:GetCols()
 
-	self:SetWidth(buttonSize*cols - spacing)
-	self:SetHeight(buttonSize*rows - spacing)
+	self:SetWidth(w*cols - spacing)
+	self:SetHeight(h*rows - spacing)
 
 	for i = 1, rows do
 		for j = 1, cols do
 			local button = self.buttons[j + cols*(i-1)]
 			button:ClearAllPoints()
-			button:SetPoint('TOPLEFT', self, 'TOPLEFT', buttonSize*(j-1), -buttonSize*(i-1))
+			button:SetPoint('TOPLEFT', self, 'TOPLEFT', w*(j-1), -h*(i-1))
 		end
 	end
 
