@@ -96,24 +96,32 @@ function OmniCC:UpdateVersion()
 	self:Print(L.Updated:format(OmniCCDB.version), true)
 end
 
---hook the cooldown function (effectively enable the addon)
---we inherit CooldownFrameTemplate here to prevent a crash issue
-function OmniCC:HookCooldown()
-	local methods = getmetatable(CreateFrame('Cooldown', nil, nil, 'CooldownFrameTemplate')).__index
-	hooksecurefunc(methods, 'SetCooldown', function(self, start, duration)
-		if not self.noCooldownCount then
-			self:SetAlpha(OmniCC.sets.showModel and 1 or 0)
+do
+	--hook the cooldown function (effectively enable the addon)
+	--we inherit CooldownFrameTemplate here to prevent a crash issue
+	local function HideTimer(self)
+		local timer = timers[self]
+		if timer then
+			timer:Hide()
+		end
+	end
 
-			if start > 0 and duration > OmniCC.sets.minDuration then
-				OmniCC:StartTimer(self, start, duration)
+	function OmniCC:HookCooldown()
+		local methods = getmetatable(CreateFrame('Cooldown', nil, nil, 'CooldownFrameTemplate')).__index
+		hooksecurefunc(methods, 'SetCooldown', function(self, start, duration)
+			if self.noCooldownCount then
+				HideTimer(self)
 			else
-				local timer = timers[self]
-				if timer then
-					timer:Hide()
+				self:SetAlpha(OmniCC.sets.showModel and 1 or 0)
+
+				if start > 0 and duration > OmniCC.sets.minDuration then
+					OmniCC:StartTimer(self, start, duration)
+				else
+					HideTimer(self)
 				end
 			end
-		end
-	end)
+		end)
+	end
 end
 
 
@@ -247,14 +255,14 @@ end
 
 function OmniCC:GetFormattedTime(s)
 	if s >= DAY then
-		return format('%dd', floor(s/DAY + 0.5)), s - floor(s)
+		return format('%dd', floor(s/DAY + 0.5)), s % DAY
 	elseif s >= HOUR then
-		return format('%dh', floor(s/HOUR + 0.5)), s - floor(s)
+		return format('%dh', floor(s/HOUR + 0.5)), s % HOUR
 	elseif s >= MINUTE then
 		if s <= MINUTE*3 and self:UsingMMSS() then
 			return format('%d:%02d', floor(s/60), s % MINUTE), s - floor(s)
 		end
-		return format('%dm', floor(s/MINUTE + 0.5)), s - floor(s)
+		return format('%dm', floor(s/MINUTE + 0.5)), s % MINUTE
 	end
 	return floor(s + 0.5), s - floor(s)
 end
