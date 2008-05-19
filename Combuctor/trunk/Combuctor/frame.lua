@@ -242,6 +242,10 @@ do
 		end
 
 		local f = self:New(CreateFrame('Frame', format('CombuctorFrame%d', lastID), UIParent, template))
+		if isBank then
+			f:AddTextures()
+		end
+
 		f:SetScript('OnShow', self.OnShow)
 		f:SetScript('OnHide', self.OnHide)
 
@@ -281,6 +285,61 @@ do
 
 		return f
 	end
+end
+
+function InventoryFrame:AddTextures()
+	local tl = self:CreateTexture(nil, 'ARTWORK')
+	tl:SetTexture('Interface/MerchantFrame/UI-Merchant-TopLeft')
+	tl:SetWidth(256); tl:SetHeight(256)
+	tl:SetPoint('TOPLEFT')
+	
+	local tm = self:CreateTexture(nil, 'ARTWORK')
+	tm:SetTexture('Interface/MerchantFrame/UI-Merchant-TopLeft')
+	tm:SetWidth(256); tm:SetHeight(256)
+	tm:SetPoint('TOPLEFT', 256, 0)
+	tm:SetTexCoordModifiesRect(true)
+	tm:SetTexCoord(0.5, 1, 0, 1)
+	
+	local tm = self:CreateTexture(nil, 'ARTWORK')
+	tm:SetTexture('Interface/MerchantFrame/UI-Merchant-TopLeft')
+	tm:SetWidth(256); tm:SetHeight(256)
+	tm:SetPoint('TOPLEFT', 512 - 128, 0)
+	tm:SetTexCoordModifiesRect(true)
+	tm:SetTexCoord(0.5, 1, 0, 1)
+	
+	local tr = self:CreateTexture(nil, 'ARTWORK')
+	tr:SetTexture('Interface/MerchantFrame/UI-Merchant-TopRight')
+	tr:SetWidth(128); tl:SetHeight(256)
+	tr:SetPoint('TOPRIGHT')
+	
+	
+	local bl = self:CreateTexture(nil, 'ARTWORK')
+	bl:SetTexture('Interface/MerchantFrame/UI-Merchant-BotLeft')
+	bl:SetWidth(256); bl:SetHeight(256)
+	bl:SetPoint('BOTTOMLEFT')
+	bl:SetTexCoordModifiesRect(true)
+	bl:SetTexCoord(0, 0.25, 0, 1)
+	
+	for i = 1, 5 do
+		local bm = self:CreateTexture(nil, 'ARTWORK')
+		bm:SetTexture('Interface/MerchantFrame/UI-Merchant-BotLeft')
+		bm:SetWidth(256); bm:SetHeight(256)
+		bm:SetPoint('BOTTOMLEFT', i * 64, 0)
+		bm:SetTexCoordModifiesRect(true)
+		bm:SetTexCoord(0.25, 0.5, 0, 1)
+	end
+	
+	local bm = self:CreateTexture(nil, 'ARTWORK')
+	bm:SetTexture('Interface/MerchantFrame/UI-Merchant-BotLeft')
+	bm:SetWidth(256); bm:SetHeight(256)
+	bm:SetPoint('BOTTOMLEFT', 6 * 64, 0)
+	bm:SetTexCoordModifiesRect(true)
+	bm:SetTexCoord(0.5, 1, 0, 1)
+	
+	local br = self:CreateTexture(nil, 'ARTWORK')
+	br:SetTexture('Interface/MerchantFrame/UI-Merchant-BotRight')
+	br:SetWidth(128); tl:SetHeight(256)
+	br:SetPoint('BOTTOMRIGHT')
 end
 
 function InventoryFrame:AddCategory(name, icon, rule)

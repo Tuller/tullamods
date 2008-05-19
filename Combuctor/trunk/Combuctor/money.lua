@@ -15,6 +15,7 @@ function CombuctorMoneyFrame:Create(parent)
 	local click = CreateFrame('Button', nil, frame)
 	click:SetFrameLevel(frame:GetFrameLevel() + 3)
 	click:SetAllPoints(frame)
+	frame.click = click
 
 	click:SetScript('OnClick', self.OnClick)
 	click:SetScript('OnEnter', self.OnEnter)

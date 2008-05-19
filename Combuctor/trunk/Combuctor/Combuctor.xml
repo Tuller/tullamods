@@ -278,7 +278,7 @@
 
 		<Layers>
 			<Layer level="ARTWORK">
-				<Texture file="Interface\MerchantFrame\UI-Merchant-TopLeft">
+				<Texture file="Interface\MerchantFrame\UI-Merchant-TopLeft" >
 					<Size x="256" y="256"/>
 					<Anchors>
 						<Anchor point="TOPLEFT"/>
@@ -340,16 +340,17 @@
 			<Attribute name="UIPanelLayout-pushable" type="number" value="2"/>
 		</Attributes>
 
+		<!--
 		<Layers>
 			<Layer level="ARTWORK">
-				<Texture file="Interface\MerchantFrame\UI-Merchant-TopLeft">
+				<Texture name="TL" file="Interface\MerchantFrame\UI-Merchant-TopLeft"  texCoordModifiesRect="true">
 					<Size x="256" y="256"/>
 					<Anchors>
 						<Anchor point="TOPLEFT"/>
 					</Anchors>
 				</Texture>
 
-				<Texture file="Interface\MerchantFrame\UI-Merchant-TopLeft">
+				<Texture name="TM1" file="Interface\MerchantFrame\UI-Merchant-TopLeft" texCoordModifiesRect="true">>
 					<Size x="128" y="256"/>
 					<Anchors>
 						<Anchor point="TOPLEFT">
@@ -359,7 +360,7 @@
 					<TexCoords left="0.38" right="0.88" top="0" bottom="1"/>
 				</Texture>
 
-				<Texture file="Interface\MerchantFrame\UI-Merchant-TopLeft">
+				<Texture name="TM2" file="Interface\MerchantFrame\UI-Merchant-TopLeft" texCoordModifiesRect="true">>
 					<Size x="128" y="256"/>
 					<Anchors>
 						<Anchor point="TOPLEFT">
@@ -369,15 +370,15 @@
 					<TexCoords left="0.45" right="0.95" top="0" bottom="1"/>
 				</Texture>
 
-				<Texture file="Interface\MerchantFrame\UI-Merchant-TopRight">
+				<Texture name = "TR" file="Interface\MerchantFrame\UI-Merchant-TopRight" texCoordModifiesRect="true">>
 					<Size x="128" y="256"/>
 					<Anchors>
 						<Anchor point="TOPRIGHT"/>
 					</Anchors>
 				</Texture>
 
-				<!-- Bottom -->
-				<Texture file="Interface\MerchantFrame\UI-Merchant-BotLeft">
+				Bottom 
+				<Texture file="Interface\MerchantFrame\UI-Merchant-BotLeft" texCoordModifiesRect="true">>
 					<Size x="174" y="256"/>
 					<Anchors>
 						<Anchor point="BOTTOMLEFT"/>
@@ -385,7 +386,7 @@
 					<TexCoords left="0" right="0.68" top="0" bottom="1"/>
 				</Texture>
 
-				<Texture file="Interface\MerchantFrame\UI-Merchant-BotLeft">
+				<Texture file="Interface\MerchantFrame\UI-Merchant-BotLeft" texCoordModifiesRect="true">>
 					<Size x="82" y="256"/>
 					<Anchors>
 						<Anchor point="BOTTOMLEFT">
@@ -395,7 +396,7 @@
 					<TexCoords left="0.31" right="0.63" top="0" bottom="1"/>
 				</Texture>
 
-				<Texture file="Interface\MerchantFrame\UI-Merchant-BotLeft">
+				<Texture file="Interface\MerchantFrame\UI-Merchant-BotLeft" texCoordModifiesRect="true">>
 					<Size x="128" y="256"/>
 					<Anchors>
 						<Anchor point="BOTTOMLEFT">
@@ -405,7 +406,7 @@
 					<TexCoords left="0.15" right="0.65" top="0" bottom="1"/>
 				</Texture>
 
-				<Texture file="Interface\MerchantFrame\UI-Merchant-BotLeft">
+				<Texture file="Interface\MerchantFrame\UI-Merchant-BotLeft" texCoordModifiesRect="true">>
 					<Size x="128" y="256"/>
 					<Anchors>
 						<Anchor point="BOTTOMLEFT">
@@ -415,7 +416,7 @@
 					<TexCoords left="0.5" right="1" top="0" bottom="1"/>
 				</Texture>
 
-				<Texture file="Interface\MerchantFrame\UI-Merchant-BotRight">
+				<Texture file="Interface\MerchantFrame\UI-Merchant-BotRight" texCoordModifiesRect="true">>
 					<Size x="128" y="256"/>
 					<Anchors>
 						<Anchor point="BOTTOMRIGHT"/>
@@ -423,6 +424,7 @@
 				</Texture>
 			</Layer>
 		</Layers>
+		-->
 
 		<Frames>
 			<Button name="$parentTitle" inherits="CombuctorDragFrameTemplate">
