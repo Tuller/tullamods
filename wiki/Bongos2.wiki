@@ -1,5 +1,4 @@
 #summary Bongos2 for Dummies
-#labels Featured
 
 
 = So what the heck is Bongos? =
