@@ -67,8 +67,8 @@ local function Frame_OnCreate(self)
 	self.health:SetPoint("BOTTOMRIGHT", self.info, "BOTTOMRIGHT", 0, -20)
 
 	self.mana = SageMana:Create(self)
-	self.mana:SetPoint("TOPLEFT", self.health, "BOTTOMLEFT")
-	self.mana:SetPoint("BOTTOMRIGHT", self.health, "BOTTOMRIGHT", 0, -12)
+	self.mana:SetPoint("TOPLEFT", self.health, "BOTTOMLEFT", 0, -1)
+	self.mana:SetPoint("BOTTOMRIGHT", self.health, "BOTTOMRIGHT", 0, -13)
 
 	if self.sets.showCombatText then
 		SageCombat:Register(self)
@@ -76,6 +76,11 @@ local function Frame_OnCreate(self)
 
 	self.click:SetPoint("TOPLEFT", self.info)
 	self.click:SetPoint("BOTTOMRIGHT", self.mana)
+	
+	local bg = self:CreateTexture(nil, 'BACKGROUND')
+	bg:SetPoint('TOPLEFT', self.health, 'TOPLEFT', -1, 1)
+	bg:SetPoint('BOTTOMRIGHT', self.mana, 'BOTTOMRIGHT', 1, -1)
+	bg:SetTexture(0, 0, 0)
 end
 
 
