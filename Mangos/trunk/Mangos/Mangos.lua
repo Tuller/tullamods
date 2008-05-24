@@ -168,7 +168,7 @@ function ABFrame:UpdateStateDriver()
 			header = header .. condition .. state .. ';'
 		end
 	end
-	
+
 	if self.possessBar then
 		header = header .. '[bonusbar:5]999;'
 	end
@@ -189,14 +189,14 @@ end
 
 function ABFrame:UpdateStateButton()
 	local sb1, sb2 = '', ''
-	
+
 	if self.states then
 		for state in ipairs(self.states) do
 			sb1 = sb1 .. (state .. ':S' .. state .. ';')
 			sb2 = sb2 .. (state .. ':S' .. state .. 's;')
 		end
 	end
-	
+
 	if self.possessBar then
 		sb1 = sb1 .. '999:possess;'
 	end
@@ -233,7 +233,7 @@ do
 				self.buttons[i]:SetAttribute('*action-possess', 120 + i)
 			end
 		end
-		
+
 		for _,b in pairs(self.buttons) do
 			self.header:SetAttribute('addchild', b)
 		end
@@ -278,7 +278,7 @@ function Mangos:Load()
 	if LBF then
 		LBF:Group('Mangos'):Skin(unpack(self.abStyle))
 	end
-	
+
 	local b = self:Get(1)
 	b.states = {
 		'[bar:2]',
