@@ -31,9 +31,14 @@ local function Bar_Layout(self, cols, space)
 	space = (space or self.sets.space or DEFAULT_SPACING)
 	self.sets.space = (space ~= DEFAULT_SPACING and space) or nil
 
-	local w = ClassBar.Button:Get(1):GetWidth() + space
-	local h = ClassBar.Button:Get(1):GetHeight() + space
-	local offset = space / 2
+	local w, h
+	if numForms > 1 then
+		w = ClassBar.Button:Get(1):GetWidth() + space
+		h = ClassBar.Button:Get(1):GetHeight() + space
+	else
+		w = 24
+		h = 24
+	end
 
 	for i = 1, numForms do
 		local row = (i - 1) % cols
