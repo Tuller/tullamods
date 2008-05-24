@@ -11,6 +11,11 @@ local MIN_SCALE = 0.5 --the minimum scale we want to show cooldown counts at, an
 local MIN_DURATION = 3 --the minimum duration to show cooldown text for
 local DAY, HOUR, MINUTE = 86400, 3600, 60
 
+--omg speed
+local format = string.format
+local floor = math.floor
+local min = math.min
+
 local function GetFormattedTime(s)
 	if s >= DAY then
 		return format('%dd', floor(s/DAY + 0.5)), s % DAY
