@@ -28,7 +28,7 @@ end
 local AB = CreateObject('CheckButton')
 
 function AB:Get(id)
-	return self:Restore(id) or self:New(id)
+	return self:New(id)
 end
 
 local function Create(id)
@@ -42,7 +42,7 @@ local function Create(id)
 		return _G['MultiBarLeftButton' .. (id-36)]
 	elseif id <= 60 then
 		return _G['MultiBarRightButton' .. (id-48)]
-	elseif id <= 120
+	elseif id <= 120 then
 		return CreateFrame('CheckButton', 'MangoActionButton' .. (id-60), nil, 'ActionBarButtonTemplate')
 	end
 end
@@ -93,22 +93,25 @@ end
 
 local ABFrame = CreateObject('Frame')
 
-function ABFrame:New(id, numButtons)
+function ABFrame:New(id, length)
 	local f = self:Bind(CreateFrame('Frame', 'MangoBar' .. id, UIParent, 'SecureStateHeaderTemplate'))
 	f:SetAttribute('statemap-state', '$input')
 	f:SetClampedToScreen(true)
 	f:SetMovable(true)
 	f:Register()
 
+	f.id = id
+	f.maxLength = length
 	f.buttons = {}
-	for i = 1, numButtons do
-		local b = AB:Get()
-		f.buttons[i] 
-	for _,b in pairs(buttons) do
-		b:SetParent(f)
-		f:SetAttribute('addchild', b)
+	for i = 1, length do
+		local b = AB:Get((id-1)*length + i)
+		if b then
+			b:SetParent(f)
+			f.buttons[i] = b
+		else
+			break
+		end
 	end
-	f.buttons = buttons
 
 	Sticky:RegisterFrame(f)
 	Sticky:SetFrameEnabled(f, true)
@@ -127,7 +130,7 @@ function ABFrame:Layout(columns, spacing, padW, padH)
 	local w = self.buttons[1]:GetWidth() + spacing
 	local h = self.buttons[1]:GetHeight() + spacing
 
-	for i,button in ipairs(self.buttons) do
+	for i,button in pairs(self.buttons) do
 		local col = (i - 1) % columns
 		local row = ceil(i / columns) - 1
 		button:SetPoint('TOPLEFT', w * col + padW, -(h * row + padH))
@@ -186,16 +189,20 @@ end
 
 do
 	local function Validate(id)
-		return (id - 1) % 132 + 1
+		return (id - 1) % 120 + 1
 	end
 
 	function ABFrame:UpdateActions()
 		if self.states then
-			for i,state in pairs(self.states) do
+			local base = (self.id-1) * #self.buttons
+			for state,offset in pairs(self.offsets) do
 				for j,b in pairs(self.buttons) do
-					local id = Validate(j + 12*(self.offsets[i]-1))
-					b:SetAttribute('*action-S' .. i, id)
+					b:SetAttribute('*action-S' .. state, Validate(j + (base*offset)))
 				end
+			end
+
+			for _,b in pairs(self.buttons) do
+				self:SetAttribute('addchild', b)
 			end
 		end
 	end
@@ -208,15 +215,23 @@ Mangos = {}
 Mangos.locked = true
 Mangos.abStyle = {'Entropy: Copper', 0.5, true}
 Mangos.abCount = 10
-Mangos.settings = {}
+Mangos.paging = {
+	{states = {'[modifier]'}, offsets = {1}}
+}
 
 function Mangos:Load()
+	local len = math.ceil(120 / self.abCount)
 	for i = 1, self.abCount do
-		local f = ABFrame:New(i, ceil(120 / self.abCount))
+		local f = ABFrame:New(i, len, self.paging[i])
 		f:SetPoint('BOTTOM', 0, i*36 + 120)
 		f:Layout()
-		self:Register(f, i)
+		self:Register(i, f)
 	end
+	
+	local b = self:Get(1)
+	b.states = self.paging[1].states
+	b.offsets = self.paging[1].offsets
+	b:UpdateStateDriver()
 
 	if LBF then
 		LBF:Group('Mangos'):Skin(unpack(self.abStyle))
@@ -260,6 +275,10 @@ end
 function Mangos:Register(id, bar)
 	if not self.bars then self.bars = {} end
 	self.bars[id] = bar
+end
+
+function Mangos:Get(id)
+	return self.bars and self.bars[id]
 end
 
 Mangos:Load()
