@@ -40,13 +40,13 @@ do
 		if id <= 12 then
 			return _G['ActionButton' .. id]
 		elseif id <= 24 then
-			return _G['MultiBarBottomRightButton' .. (id-12)]
+			return _G['MultiBarBottomLeftButton' .. (id-12)]
 		elseif id <= 36 then
-			return _G['MultiBarBottomLeftButton' .. (id-24)]
+			return _G['MultiBarBottomRightButton' .. (id-24)]
 		elseif id <= 48 then
-			return _G['MultiBarLeftButton' .. (id-36)]
+			return _G['MultiBarRightButton' .. (id-36)]
 		elseif id <= 60 then
-			return _G['MultiBarRightButton' .. (id-48)]
+			return _G['MultiBarLeftButton' .. (id-48)]
 		elseif id <= 120 then
 			return CreateFrame('CheckButton', 'MangoActionButton' .. (id-60), nil, 'ActionBarButtonTemplate')
 		end
