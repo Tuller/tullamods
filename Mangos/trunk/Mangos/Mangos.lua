@@ -259,8 +259,57 @@ end
 
 Mangos = CreateFrame('Frame')
 Mangos.locked = true
-Mangos.abStyle = {'Entropy: Copper', 0.5, true}
-Mangos.abCount = 10
+
+Mangos.settings = {
+	profile = {
+		ab = {
+			count = 10,
+			style = {'Entropy: Copper', 0.5, true},
+			bars = {
+				1 = {
+					point = {},
+					columns = 12, spacing = 2, pX = 0, pY = 0,
+					size = 12,
+					scale = 1,
+					opacity = 1,
+					fadedOpacity 1,
+					possess = true,
+					showstates = nil,
+					states = {
+						DRUID = {
+							'[bar:1]' = 1,
+							'[bar:2]' = 2,
+							'[bar:3]' = 3,
+						}
+					}
+					bindings = {}
+				}
+			}
+		},
+
+		classBar = {
+			style = {'Entropy: Copper', 0.5, true},
+			point = {},
+			columns = 20, spacing = 2, pX = 0, pY = 0,
+			scale = 1,
+			opacity = 1,
+			fadedOpacity 0,
+			showstates = '[moo]',
+			bindings = {},
+		},
+
+		petBar = {
+			style = {'Entropy: Copper', 0.5, true},
+			point = {},
+			columns = 10, spacing = 2, pX = 0, pY = 0,
+			scale = 1,
+			opacity = 1,
+			fadedOpacity 0,
+			showstates = '[target=pet,exists,nodead,nomounted,nobonusbar:5]',
+			bindings = {},
+		},
+	}
+}
 
 function Mangos:Load()
 	local barLength = ceil(120 / self.abCount)
@@ -285,7 +334,7 @@ function Mangos:Load()
 		'[bar:3]',
 		'[bar:4]',
 		'[bar:5]',
-		'[bar:6]'
+		'[bar:6]',
 	}
 	b.offsets = {1, 2, 3, 4, 5, 6}
 	b:SetPossessBar(true)
