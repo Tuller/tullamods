@@ -3,7 +3,10 @@
 		Because sometimes I feel bad about doing to much
 --]]
 
+--libs and omgspeed
 local _G = getfenv(0)
+local ceil = math.ceil
+local format = string.format
 local KeyBound = LibStub('LibKeyBound-1.0')
 local Sticky = LibStub('LibStickyFrames-2.0')
 local LBF = LibStub('LibButtonFacade', true)
@@ -31,43 +34,45 @@ function AB:Get(id)
 	return self:New(id)
 end
 
-local function Create(id)
-	if id <= 12 then
-		return _G['ActionButton' .. id]
-	elseif id <= 24 then
-		return _G['MultiBarBottomRightButton' .. (id-12)]
-	elseif id <= 36 then
-		return _G['MultiBarBottomLeftButton' .. (id-24)]
-	elseif id <= 48 then
-		return _G['MultiBarLeftButton' .. (id-36)]
-	elseif id <= 60 then
-		return _G['MultiBarRightButton' .. (id-48)]
-	elseif id <= 120 then
-		return CreateFrame('CheckButton', 'MangoActionButton' .. (id-60), nil, 'ActionBarButtonTemplate')
-	end
-end
-
-function AB:New(id)
-	local b = Create(id)
-	if b then
-		self:Bind(b)
-
-		b:SetAttribute('action', id)
-		b:SetID(0)
-		b:ClearAllPoints()
-		b:SetAttribute('useparent-statebutton', true)
-		b:SetAttribute('useparent-actionbar', nil)
-		b:SetScript('OnEnter', self.OnEnter)
-		b:SetAttribute('showgrid', 2)
-		b:Show()
-
-		_G[b:GetName() .. 'Name']:Hide() --hide macro text
-
-		if LBF then
-			LBF:Group('Mangos'):AddButton(b)
+do
+	local function Create(id)
+		if id <= 12 then
+			return _G['ActionButton' .. id]
+		elseif id <= 24 then
+			return _G['MultiBarBottomRightButton' .. (id-12)]
+		elseif id <= 36 then
+			return _G['MultiBarBottomLeftButton' .. (id-24)]
+		elseif id <= 48 then
+			return _G['MultiBarLeftButton' .. (id-36)]
+		elseif id <= 60 then
+			return _G['MultiBarRightButton' .. (id-48)]
+		elseif id <= 120 then
+			return CreateFrame('CheckButton', 'MangoActionButton' .. (id-60), nil, 'ActionBarButtonTemplate')
 		end
 	end
-	return b
+
+	function AB:New(id)
+		local b = Create(id)
+		if b then
+			self:Bind(b)
+
+			b:SetAttribute('action', id)
+			b:SetID(0)
+			b:ClearAllPoints()
+			b:SetAttribute('useparent-statebutton', true)
+			b:SetAttribute('useparent-actionbar', nil)
+			b:SetScript('OnEnter', self.OnEnter)
+			b:SetAttribute('showgrid', 1)
+			ActionButton_ShowGrid(b)
+
+			_G[b:GetName() .. 'Name']:Hide() --hide macro text
+
+			if LBF then
+				LBF:Group('Mangos'):AddButton(b)
+			end
+		end
+		return b
+	end
 end
 
 --keybound support
@@ -81,6 +86,7 @@ function AB:GetHotkey()
 	return KeyBound:ToShortKey(key)
 end
 
+--utility
 function AB:RCall(f, ...)
 	local pThis = this
 	this = self
@@ -94,31 +100,41 @@ end
 local ABFrame = CreateObject('Frame')
 
 function ABFrame:New(id, length)
-	local f = self:Bind(CreateFrame('Frame', 'MangoBar' .. id, UIParent, 'SecureStateHeaderTemplate'))
-	f:SetAttribute('statemap-state', '$input')
-	f:SetClampedToScreen(true)
-	f:SetMovable(true)
-	f:Register()
+	if (id-1)*length + 1 <= 120 then
+		--create frame
+		local f = self:Bind(CreateFrame('Frame', 'MangoBar' .. id, UIParent))
+		f:SetClampedToScreen(true)
+		f:SetMovable(true)
+		f.maxLength = length
+		f.id = id
 
-	f.id = id
-	f.maxLength = length
-	f.buttons = {}
-	for i = 1, length do
-		local b = AB:Get((id-1)*length + i)
-		if b then
-			b:SetParent(f)
-			f.buttons[i] = b
-		else
-			break
+		--create the header
+		f.header = CreateFrame('Frame', nil, f, 'SecureStateHeaderTemplate')
+		f.header:SetAttribute('statemap-state', '$input')
+		f.header:SetAllPoints(f)
+
+		--add buttons
+		f.buttons = {}
+		for i = 1, length do
+			local b = AB:Get((id-1)*length + i)
+			if b then
+				f.buttons[i] = b
+				b:SetParent(f.header)
+			else
+				break
+			end
 		end
+
+		--register with LSF
+		Sticky:RegisterFrame(f)
+		Sticky:SetFrameEnabled(f, true)
+		Sticky:SetFrameText(f, 'bar: ' .. id)
+
+		--register as an ab
+		f:Register()
+
+		return f
 	end
-
-	Sticky:RegisterFrame(f)
-	Sticky:SetFrameEnabled(f, true)
-	Sticky:SetFrameText(f, id)
-	Sticky:SetFrameGroup(f, 'Mangos')
-
-	return f
 end
 
 function ABFrame:Layout(columns, spacing, padW, padH)
@@ -140,6 +156,69 @@ function ABFrame:Layout(columns, spacing, padW, padH)
 	self:SetHeight(h * ceil(#self.buttons/columns) - spacing + padH*2)
 end
 
+--stateheader code
+function ABFrame:UpdateStateDriver()
+	UnregisterStateDriver(self.header, 'state', 0)
+
+	local header = ''
+	if self.states then
+		for state,condition in ipairs(self.states) do
+			header = header .. condition .. state .. ';'
+		end
+	end
+
+	self:UpdateStateButton()
+	self:UpdateActions()
+
+	if header ~= '' then
+		RegisterStateDriver(self.header, 'state', header .. 0)
+	end
+end
+
+function ABFrame:RegisterShowStates(states)
+	UnregisterStateDriver(self.header, 'visibility', 'show')
+	self.header:Show()
+	RegisterStateDriver(self.header, 'visibility', states .. 'show;hide')
+end
+
+function ABFrame:UpdateStateButton()
+	if self.states then
+		local sb1, sb2 = '', ''
+		for state in ipairs(self.states) do
+			sb1 = sb1 .. (state .. ':S' .. state .. ';')
+			sb2 = sb2 .. (state .. ':S' .. state .. 's;')
+		end
+
+		self.header:SetAttribute('statebutton', sb1)
+		self.header:SetAttribute('*statebutton2', sb2)
+	end
+end
+
+do
+	local function Validate(id)
+		return (id - 1) % 120 + 1
+	end
+
+	function ABFrame:UpdateActions()
+		if self.states then
+			for state in pairs(self.states) do
+				local offset = #self.buttons * self.offsets[state]
+
+				for _,b in pairs(self.buttons) do
+					local id = Validate(b:GetAttribute('action') + offset)
+					b:SetAttribute('*action-S' .. state, id)
+					b:SetAttribute('*action-S' .. state .. 's', id)
+				end
+			end
+
+			for _,b in pairs(self.buttons) do
+				self.header:SetAttribute('addchild', b)
+			end
+		end
+	end
+end
+
+--utility
 function ABFrame:Register()
 	if not ABFrame.frames then ABFrame.frames = {} end
 	ABFrame.frames[self] = true
@@ -154,89 +233,36 @@ function ABFrame:ForAll(method, ...)
 end
 
 
---[[ States ]]--
-
---needs to be called whenever we change a state condition
---or when we change the number of available states
-function ABFrame:UpdateStateDriver()
-	UnregisterStateDriver(self, 'state', 0)
-
-	local header = ''
-	if self.states then
-		for i,condition in ipairs(self.states) do
-			header = header .. condition .. i .. ';'
-		end
-	end
-
-	self:UpdateStateButton()
-	self:UpdateActions()
-
-	if header ~= '' then
-		RegisterStateDriver(self, 'state', header .. 0)
-	end
-end
-
---todo: cleanup code
-function ABFrame:UpdateStateButton()
-	if self.states then
-		local sb1 = ''
-		for i in ipairs(self.states) do
-			sb1 = sb1 .. (i .. ':S' .. i .. ';')
-		end
-		self:SetAttribute('statebutton', sb1 .. 0 .. ':nil')
-	end
-end
-
-do
-	local function Validate(id)
-		return (id - 1) % 120 + 1
-	end
-
-	function ABFrame:UpdateActions()
-		if self.states then
-			local base = (self.id-1) * #self.buttons
-			for state,offset in pairs(self.offsets) do
-				for j,b in pairs(self.buttons) do
-					b:SetAttribute('*action-S' .. state, Validate(j + (base*offset)))
-				end
-			end
-
-			for _,b in pairs(self.buttons) do
-				self:SetAttribute('addchild', b)
-			end
-		end
-	end
-end
-
-
 --[[ Core ]]--
 
-Mangos = {}
+Mangos = CreateFrame('Frame')
 Mangos.locked = true
 Mangos.abStyle = {'Entropy: Copper', 0.5, true}
 Mangos.abCount = 10
-Mangos.paging = {
-	{states = {'[modifier]'}, offsets = {1}}
-}
 
 function Mangos:Load()
-	local len = math.ceil(120 / self.abCount)
+	local barLength = ceil(120 / self.abCount)
 	for i = 1, self.abCount do
-		local f = ABFrame:New(i, len, self.paging[i])
-		f:SetPoint('BOTTOM', 0, i*36 + 120)
-		f:Layout()
-		self:Register(i, f)
+		local f = ABFrame:New(i, barLength)
+		if f then
+			f:SetPoint('BOTTOM', 0, (i-1)*37)
+			f:Layout(nil, 2)
+			self:Register(i, f)
+		else
+			break
+		end
 	end
-	
+
 	local b = self:Get(1)
-	b.states = self.paging[1].states
-	b.offsets = self.paging[1].offsets
+	b.states = {'[mod:alt]', '[bonusbar:1,stealth]', '[bonusbar:1]', '[bonusbar:2]', '[bonusbar:3]', '[help]'}
+	b.offsets = {1, 7, 6, 2, 8, 1}
 	b:UpdateStateDriver()
+	b:RegisterShowStates('[mod]')
 
 	if LBF then
 		LBF:Group('Mangos'):Skin(unpack(self.abStyle))
 	end
-	
+
 	self:RegisterSlashCommands()
 end
 
@@ -251,12 +277,12 @@ function Mangos:Unlock()
 end
 
 function Mangos:RegisterSlashCommands()
-	SlashCmdList['MangosCOMMAND'] = function() 
-		if self.locked then 
-			self:Unlock() 
-		else 
-			self:Lock() 
-		end 
+	SlashCmdList['MangosCOMMAND'] = function()
+		if self.locked then
+			self:Unlock()
+		else
+			self:Lock()
+		end
 	end
 	SLASH_MangosCOMMAND1 = '/mangos'
 	SLASH_MangosCOMMAND2 = '/mg'
@@ -268,6 +294,7 @@ function Mangos:HideBlizzard()
 	UIPARENT_MANAGED_FRAME_POSITIONS['MultiBarBottomLeft'] = nil
 	UIPARENT_MANAGED_FRAME_POSITIONS['MultiBarBottomRight'] = nil
 	UIPARENT_MANAGED_FRAME_POSITIONS['MainMenuBar'] = nil
+	MultiActionBar_UpdateGrid = Multibar_EmptyFunc
 	MainMenuBar:UnregisterAllEvents()
 	MainMenuBar:Hide()
 end
@@ -281,5 +308,7 @@ function Mangos:Get(id)
 	return self.bars and self.bars[id]
 end
 
-Mangos:Load()
+--startup
+Mangos:SetScript('OnEvent', Mangos.Load)
+Mangos:RegisterEvent('PLAYER_LOGIN')
 Mangos:HideBlizzard()
