@@ -46,7 +46,7 @@ do
 			self.nextUpdate = 0.1
 
 			for bar in pairs(self.bars) do
-				if (not Bongos3:IsLocked()) or IsBarFocus(bar) then
+				if IsBarFocus(bar) then
 					if abs(bar:GetAlpha() - bar:GetFadedAlpha()) < 0.01 then --the checking logic is a little weird because floating point values tend to not be exact
 						UIFrameFadeIn(bar, 0.1, bar:GetAlpha(), bar:GetFrameAlpha())
 					end
