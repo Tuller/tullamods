@@ -10,6 +10,7 @@ local format = string.format
 local KeyBound = LibStub('LibKeyBound-1.0')
 local Sticky = LibStub('LibStickyFrames-2.0')
 local LBF = LibStub('LibButtonFacade', true)
+local RANGE_INDICATOR = ''
 
 
 --[[ Class Creator ]]--
@@ -66,6 +67,7 @@ do
 			ActionButton_ShowGrid(b)
 
 			_G[b:GetName() .. 'Name']:Hide() --hide macro text
+			_G[b:GetName() .. 'HotKey']:SetAlpha(0)
 
 			if LBF then
 				LBF:Group('Mangos'):AddButton(b)
@@ -166,6 +168,10 @@ function ABFrame:UpdateStateDriver()
 			header = header .. condition .. state .. ';'
 		end
 	end
+	
+	if self.possessBar then
+		header = header .. '[bonusbar:5]999;'
+	end
 
 	self:UpdateStateButton()
 	self:UpdateActions()
@@ -182,16 +188,26 @@ function ABFrame:RegisterShowStates(states)
 end
 
 function ABFrame:UpdateStateButton()
+	local sb1, sb2 = '', ''
+	
 	if self.states then
-		local sb1, sb2 = '', ''
 		for state in ipairs(self.states) do
 			sb1 = sb1 .. (state .. ':S' .. state .. ';')
 			sb2 = sb2 .. (state .. ':S' .. state .. 's;')
 		end
-
-		self.header:SetAttribute('statebutton', sb1)
-		self.header:SetAttribute('*statebutton2', sb2)
 	end
+	
+	if self.possessBar then
+		sb1 = sb1 .. '999:possess;'
+	end
+
+	self.header:SetAttribute('statebutton', sb1)
+	self.header:SetAttribute('*statebutton2', sb2)
+end
+
+function ABFrame:SetPossessBar(enable)
+	self.possessBar = enable or nil
+	self:UpdateStateDriver()
 end
 
 do
@@ -210,10 +226,16 @@ do
 					b:SetAttribute('*action-S' .. state .. 's', id)
 				end
 			end
+		end
 
-			for _,b in pairs(self.buttons) do
-				self.header:SetAttribute('addchild', b)
+		if self.possessBar then
+			for i = 1, min(#self.buttons, 12) do
+				self.buttons[i]:SetAttribute('*action-possess', 120 + i)
 			end
+		end
+		
+		for _,b in pairs(self.buttons) do
+			self.header:SetAttribute('addchild', b)
 		end
 	end
 end
@@ -253,15 +275,20 @@ function Mangos:Load()
 		end
 	end
 
-	local b = self:Get(1)
-	b.states = {'[mod:alt]', '[bonusbar:1,stealth]', '[bonusbar:1]', '[bonusbar:2]', '[bonusbar:3]', '[help]'}
-	b.offsets = {1, 7, 6, 2, 8, 1}
-	b:UpdateStateDriver()
-	b:RegisterShowStates('[mod]')
-
 	if LBF then
 		LBF:Group('Mangos'):Skin(unpack(self.abStyle))
 	end
+	
+	local b = self:Get(1)
+	b.states = {
+		'[bar:2]',
+		'[bar:3]',
+		'[bar:4]',
+		'[bar:5]',
+		'[bar:6]'
+	}
+	b.offsets = {1, 2, 3, 4, 5, 6}
+	b:SetPossessBar(true)
 
 	self:RegisterSlashCommands()
 end
