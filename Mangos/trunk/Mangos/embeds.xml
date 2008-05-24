@@ -1,0 +1,6 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="libs\LibStub\LibStub.lua"/>
+	<Include file="libs\CallbackHandler-1.0\CallbackHandler-1.0.xml"/>
+	<Include file="libs\LibKeyBound-1.0\lib.xml"/>
+	<Include file="libs\LibStickyFrames-2.0\lib.xml"/>
+</Ui>

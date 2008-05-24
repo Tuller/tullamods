@@ -81,28 +81,6 @@ function AB:GetHotkey()
 	return KeyBound:ToShortKey(key)
 end
 
---[[
-function AB:Free()
-	self:UnregisterAllEvents()
-	self:SetParent(nil)
-	self:Hide()
-
-	if not AB.Unused then AB.Unused = {} end
-	AB.Unused[self.baseID] = self
-end
-
-function AB:Restore(id)
-	if self.Unused then
-		local b = AB.Unused[id]
-		if b then
-			b:Load()
-			AB.Unused[id] = nil
-		end
-		return b
-	end
-end
---]]
-
 function AB:RCall(f, ...)
 	local pThis = this
 	this = self
@@ -140,13 +118,6 @@ function ABFrame:New(id, numButtons)
 	return f
 end
 
-function ABFrame:Free()
-	for i,button in self.buttons do
-		button:Free()
-		self.buttons[i] =  nil
-	end
-end
-
 function ABFrame:Layout(columns, spacing, padW, padH)
 	local columns = columns or #self.buttons
 	local rows = ceil(#self.buttons / columns)
@@ -166,17 +137,17 @@ function ABFrame:Layout(columns, spacing, padW, padH)
 	self:SetHeight(h * ceil(#self.buttons/columns) - spacing + padH*2)
 end
 
+function ABFrame:Register()
+	if not ABFrame.frames then ABFrame.frames = {} end
+	ABFrame.frames[self] = true
+end
+
 function ABFrame:ForAll(method, ...)
 	if self.frames then
 		for f in pairs(self.frames) do
 			f[method](f, ...)
 		end
 	end
-end
-
-function ABFrame:Register()
-	if not ABFrame.frames then ABFrame.frames = {} end
-	ABFrame.frames[self] = true
 end
 
 
