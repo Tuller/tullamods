@@ -1,5 +1,19 @@
 #summary Version history for Bongos3
 
+1.2
+* Switched to using LibKeyBound instead of KeyBound
+* Added jailborc's XP bar modifications
+* Fixed errors with the class bar under the case of a class with no classbar skills.
+
+1.1
+* Fixed a bug causing my upgrade code not to run. If you're upgrading from 1.0 to 1.1, please make sure you've set a bar as the possess bar
+* Fixed typo
+
+1.0
+* The possess bar will now default to the pet bar if no action bar has been set to act as it
+* You can now only have one possess bar at a time
+* Bongos now fires two Ace3 messages: BONGOS_LOCK_ENABLE and BONGOS_LOCK_DISABLE
+
 Gamma.1
   * Fixed some grammar issues
 
