@@ -49,23 +49,13 @@ function Config:OnInitialize()
 end
 
 function Config:UpdateSettings(major, minor)
-	if major == 'Beta' or major == 'Gamma' then
-		--possess bar default change.  This should really be in the action bar stuff
-		for name,profile in pairs(Bongos3DB.profiles) do
-			local possessBar = 1
-
-			for id,sets in pairs(profile.bars) do
-				if sets.possessBar then
-					possessBar = id
-					sets.possessBar = nil
-				end
-			end
-			
-			if possessBar then
-				Bongos3DB.namespaces.actionBar.profiles[name].possessBar = possessBar
-			end
+	--possess bar default change.  This should really be in the action bar stuff
+	for name,profile in pairs(Bongos3DB.profiles) do
+		for id,sets in pairs(profile.bars) do
+			sets.possessBar = nil
 		end
-	end	
+		Bongos3DB.namespaces.actionBar.profiles[name].possessBar = 1
+	end
 	self:UpdateVersion()
 end
 
