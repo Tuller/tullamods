@@ -5,8 +5,8 @@
 
 
 local function hookItem(tip)
-	local set = tip:GetScript('OnTooltipSetItem')
 	local _G = getfenv(0)
+	local set = tip:GetScript('OnTooltipSetItem')
 
 	tip:SetScript('OnTooltipSetItem', function(self, ...)
 		local link = select(2, self:GetItem())
@@ -16,7 +16,7 @@ local function hookItem(tip)
 				text:SetFormattedText('|T%s:%d|t%s', GetItemIcon(link), TipachuSize or 24, text:GetText())
 			end
 		end
-		
+
 		if set then
 			return set(self, ...)
 		end
