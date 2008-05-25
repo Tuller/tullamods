@@ -37,7 +37,6 @@ L.Trade = 'Trade'
 L.Ammo = 'Ammo'
 L.Shards = 'Shards'
 L.Usable = 'Usable'
-L.SoulShard = 'Soul Shard' --this is a fallback translation,for cases where a person has never seen a soul shard
 
 --tooltips
 L.Bank = 'Bank'

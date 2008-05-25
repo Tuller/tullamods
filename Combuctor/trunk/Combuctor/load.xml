@@ -1,11 +1,11 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
 	<Script file="localization.lua"/>
+	<Script file="localization.zhCN.lua"/>
 	<Script file="Combuctor.lua"/>
 	<Script file="events.lua"/>
 	<Script file="utility.lua"/>
 	<Script file="item.lua"/>
 	<Script file="itemFrame.lua"/>
-<!--	<Script file="listFrame.lua"/>	-->
 	<Script file="bag.lua"/>
 	<Script file="money.lua"/>
 	<Script file="frame.lua"/>
