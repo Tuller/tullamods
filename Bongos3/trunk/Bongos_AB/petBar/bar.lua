@@ -5,7 +5,7 @@
 
 
 local Bongos = LibStub('AceAddon-3.0'):GetAddon('Bongos3')
-local PetBar = Bongos:NewModule('PetBar', 'AceEvent-3.0')
+local PetBar = Bongos:NewModule('PetBar')
 local Config = Bongos:GetModule('ActionBar-Config')
 local L = LibStub('AceLocale-3.0'):GetLocale('Bongos3-AB')
 local DEFAULT_SPACING = 2
@@ -117,20 +117,21 @@ function PetBar:Load()
 	bar:Layout()
 
 	local petBar = PetActionBarFrame
-	petBar:RegisterEvent("PLAYER_CONTROL_LOST");
-	petBar:RegisterEvent("PLAYER_CONTROL_GAINED");
-	petBar:RegisterEvent("PLAYER_FARSIGHT_FOCUS_CHANGED");
-	petBar:RegisterEvent("UNIT_PET");
-	petBar:RegisterEvent("UNIT_FLAGS");
-	petBar:RegisterEvent("UNIT_AURA");
-	petBar:RegisterEvent("PET_BAR_UPDATE");
-	petBar:RegisterEvent("PET_BAR_UPDATE_COOLDOWN");
-	petBar:RegisterEvent("PET_BAR_SHOWGRID");
-	petBar:RegisterEvent("PET_BAR_HIDEGRID");
-	petBar:RegisterEvent("PET_BAR_HIDE");
+	petBar:RegisterEvent("PLAYER_CONTROL_LOST")
+	petBar:RegisterEvent("PLAYER_CONTROL_GAINED")
+	petBar:RegisterEvent("PLAYER_FARSIGHT_FOCUS_CHANGED")
+	petBar:RegisterEvent("UNIT_PET")
+	petBar:RegisterEvent("UNIT_FLAGS")
+	petBar:RegisterEvent("UNIT_AURA")
+	petBar:RegisterEvent("PET_BAR_UPDATE")
+	petBar:RegisterEvent("PET_BAR_UPDATE_COOLDOWN")
+	petBar:RegisterEvent("PET_BAR_SHOWGRID")
+	petBar:RegisterEvent("PET_BAR_HIDEGRID")
+	petBar:RegisterEvent("PET_BAR_HIDE")
 
-	self:RegisterMessage('KEYBOUND_ENABLED')
-	self:RegisterMessage('KEYBOUND_DISABLED')
+	local kb = LibStub('LibKeyBound-1.0')
+	kb.RegisterCallback(self, 'LIBKEYBOUND_ENABLED', 'KEYBOUND_ENABLED')
+	kb.RegisterCallback(self, 'LIBKEYBOUND_DISABLED', 'KEYBOUND_DISABLED')
 
 	self.bar = bar
 	self.bar:UpdateStateDriver(true)

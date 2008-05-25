@@ -3,6 +3,7 @@
 --]]
 
 local Bongos = LibStub('AceAddon-3.0'):GetAddon('Bongos3')
+local KeyBound = LibStub('LibKeyBound-1.0')
 local Action = Bongos:GetModule('ActionBar')
 local Config = Bongos:GetModule('ActionBar-Config')
 local Updater = Action.Updater

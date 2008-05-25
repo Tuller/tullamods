@@ -8,6 +8,7 @@ local Bongos = LibStub('AceAddon-3.0'):GetAddon('Bongos3')
 local PetBar = Bongos:GetModule('PetBar')
 local PetButton = Bongos:CreateWidgetClass('CheckButton')
 local Config = Bongos:GetModule('ActionBar-Config')
+local KeyBound = LibStub('LibKeyBound-1.0')
 PetBar.Button = PetButton
 
 local petBar = PetActionBarFrame

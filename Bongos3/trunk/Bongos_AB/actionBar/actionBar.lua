@@ -7,6 +7,8 @@ local ActionBar = Bongos:NewModule('ActionBar', 'AceEvent-3.0')
 local actions = {}
 
 function ActionBar:Load(isNewProfile)
+	Bongos3:Print('load')
+
 	for i = 1, 132 do
 		actions[i] = HasAction(i)
 	end
@@ -44,8 +46,9 @@ function ActionBar:Load(isNewProfile)
 	self:RegisterEvent('ACTIONBAR_SHOWGRID', 'OnShowGrid')
 	self:RegisterEvent('ACTIONBAR_HIDEGRID', 'OnShowGrid')
 
-	self:RegisterMessage('KEYBOUND_ENABLED', 'UpdateGrid')
-	self:RegisterMessage('KEYBOUND_DISABLED', 'UpdateGrid')
+	local kb = LibStub('LibKeyBound-1.0')
+	kb.RegisterCallback(self, 'LIBKEYBOUND_ENABLED', 'UpdateGrid')
+	kb.RegisterCallback(self, 'LIBKEYBOUND_DISABLED', 'UpdateGrid')
 end
 
 function ActionBar:Unload()
@@ -132,7 +135,7 @@ function ActionBar:UpdateGrid()
 		self.needsGridUpdate = true
 	else
 		self.needsGridUpdate = nil
-		self.Bar:ForAllShown('UpdateShowStates')
+		self.Bar:ForAllShown('UpdateShowEmpty')
 	end
 end
 

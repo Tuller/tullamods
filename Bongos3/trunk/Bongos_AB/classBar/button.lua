@@ -6,6 +6,7 @@ local Bongos = LibStub('AceAddon-3.0'):GetAddon('Bongos3')
 local ClassBar = Bongos:GetModule('ClassBar', true)
 if not ClassBar then return end
 
+local KeyBound = LibStub('LibKeyBound-1.0')
 local Config = Bongos:GetModule('ActionBar-Config')
 local ClassButton = Bongos:CreateWidgetClass('CheckButton')
 ClassBar.Button = ClassButton
