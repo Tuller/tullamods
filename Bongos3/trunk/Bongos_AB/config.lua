@@ -1,7 +1,7 @@
 ﻿
 local Bongos = LibStub('AceAddon-3.0'):GetAddon('Bongos3')
 local Config = Bongos:NewModule('ActionBar-Config')
-local CURRENT_VERSION = GetAddOnMetadata('Bongos', 'Version')
+local CURRENT_VERSION = GetAddOnMetadata('Bongos_AB', 'Version')
 local L = LibStub('AceLocale-3.0'):GetLocale('Bongos3-AB')
 
 
@@ -49,13 +49,13 @@ function Config:OnInitialize()
 end
 
 function Config:UpdateSettings(major, minor)
-	--possess bar default change.  This should really be in the action bar stuff
 	for name,profile in pairs(Bongos3DB.profiles) do
 		for id,sets in pairs(profile.bars) do
 			sets.possessBar = nil
 		end
 		Bongos3DB.namespaces.actionBar.profiles[name].possessBar = 1
 	end
+
 	self:UpdateVersion()
 end
 
