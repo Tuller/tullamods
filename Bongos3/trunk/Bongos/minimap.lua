@@ -40,6 +40,7 @@ end
 
 function MinimapButton:OnClick(button)
 	if button == 'LeftButton' then
+		local KeyBound = LibStub('LibKeyBound-1.0', true)
 		if KeyBound and IsShiftKeyDown() then
 			Bongos:SetLock(true)
 			KeyBound:Toggle()
