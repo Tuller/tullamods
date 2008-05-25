@@ -1,5 +1,9 @@
 OmniCC Version History
 
+2.1.1
+Rethrottled the updates
+Tweaked the no cooldown count flag to hide active timers.
+
 2.1.0
 Updated a setting to make LSM3 work properly.
 Switched to using noCooldownCount to signify that cooldown count should not display on an object, instead of noomnicc
