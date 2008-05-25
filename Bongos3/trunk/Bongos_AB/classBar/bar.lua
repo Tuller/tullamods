@@ -31,23 +31,21 @@ local function Bar_Layout(self, cols, space)
 	space = (space or self.sets.space or DEFAULT_SPACING)
 	self.sets.space = (space ~= DEFAULT_SPACING and space) or nil
 
-	local w, h
-	if numForms > 1 then
-		w = ClassBar.Button:Get(1):GetWidth() + space
-		h = ClassBar.Button:Get(1):GetHeight() + space
+	if numForms > 0 then
+		local w = ClassBar.Button:Get(1):GetWidth() + space
+		local h = ClassBar.Button:Get(1):GetHeight() + space
+		
+		for i = 1, numForms do
+			local row = (i - 1) % cols
+			local col = ceil(i / cols) - 1
+			ClassBar.Button:Get(i):SetPoint('TOPLEFT', w * row, -h * col)
+		end
+		
+		self:SetWidth(w * cols - space)
+		self:SetHeight(h * ceil(numForms/cols) - space)
 	else
-		w = 24
-		h = 24
+		self:SetWidth(30); self:SetHeight(30)
 	end
-
-	for i = 1, numForms do
-		local row = (i - 1) % cols
-		local col = ceil(i / cols) - 1
-		ClassBar.Button:Get(i):SetPoint('TOPLEFT', w * row, -h * col)
-	end
-
-	self:SetWidth(w * cols - space)
-	self:SetHeight(h * ceil(numForms/cols) - space)
 end
 
 local function Bar_CreateMenu(bar)
@@ -58,16 +56,19 @@ local function Bar_CreateMenu(bar)
 	panel:CreateSpacingSlider()
 
 	local function Cols_OnShow(self)
-		self:SetMinMaxValues(1, GetNumShapeshiftForms())
-		self:SetValue(GetNumShapeshiftForms() - (bar.sets.cols or GetNumShapeshiftForms()) + 1)
+		local nForms = max(GetNumShapeshiftForms(), 1)
+		self:SetMinMaxValues(1, nForms)
+		self:SetValue(nForms - (bar.sets.cols or nForms) + 1)
 	end
 
 	local function Cols_UpdateValue(self, value)
-		bar:Layout(GetNumShapeshiftForms() - value + 1)
+		local nForms = max(GetNumShapeshiftForms(), 1)
+		bar:Layout(nForms - value + 1)
 	end
 
 	local function Cols_UpdateText(self, value)
-		self.valText:SetText(GetNumShapeshiftForms() - value + 1)
+		local nForms = max(GetNumShapeshiftForms(), 1)
+		self.valText:SetText(nForms - value + 1)
 	end
 	panel:CreateSlider(L.Columns, 1, 1, 1, Cols_OnShow, Cols_UpdateValue, Cols_UpdateText)
 
