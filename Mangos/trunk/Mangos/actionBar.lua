@@ -58,7 +58,7 @@ function ActionButton:Create(id)
 		b:SetAttribute('useparent-statebutton', true)
 		b:SetAttribute('useparent-actionbar', nil)
 		b:SetScript('OnEnter', self.OnEnter)
-		b:SetAttribute('showgrid', 1)
+		b:SetAttribute('showgrid', 0)
 
 		_G[b:GetName() .. 'Name']:Hide() --hide macro text
 
@@ -176,6 +176,7 @@ ActionBar.conditions = {
 	'[bar:5]',
 	'[bar:6]',
 	'[bonusbar:1,stealth]',
+	'[bonusbar:1]',
 	'[bonusbar:2]',
 	'[bonusbar:3]',
 	'[bonusbar:4]',
@@ -210,7 +211,7 @@ function ActionBar:GetDefaults(id)
 	defaults.x = 0
 	defaults.y = 37*id
 	defaults.pages = {}
-	defaults.hidden = id > 5
+--	defaults.hidden = id > 5
 	defaults.numButtons = 12
 
 	return defaults
