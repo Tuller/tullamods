@@ -1,390 +1,443 @@
-﻿--[[
-	Mangos
-		Because sometimes I feel bad about doing to much
+--[[
+	Mangos.lua
+		Driver for Mangos Frames
 --]]
 
---libs and omgspeed
-local _G = getfenv(0)
-local ceil = math.ceil
-local format = string.format
-local KeyBound = LibStub('LibKeyBound-1.0')
-local Sticky = LibStub('LibStickyFrames-2.0')
-local LBF = LibStub('LibButtonFacade', true)
-local RANGE_INDICATOR = ''
+Mangos = LibStub('AceAddon-3.0'):NewAddon('Mangos', 'AceEvent-3.0', 'AceConsole-3.0')
+local L = LibStub('AceLocale-3.0'):GetLocale('Mangos')
+local CURRENT_VERSION = GetAddOnMetadata('Mangos', 'Version')
 
+--[[ Startup ]]--
 
---[[ Class Creator ]]--
+function Mangos:OnInitialize()
+	--register database events
+	self.db = LibStub('AceDB-3.0'):New('MangosDB', self:GetDefaults(), 'Default')
+	self.db.RegisterCallback(self, 'OnNewProfile')
+	self.db.RegisterCallback(self, 'OnProfileChanged')
+	self.db.RegisterCallback(self, 'OnProfileCopied')
+	self.db.RegisterCallback(self, 'OnProfileReset')
+	self.db.RegisterCallback(self, 'OnProfileDeleted')
 
-local function CreateObject(type)
-	local w = setmetatable({}, {__index = CreateFrame(type)})
-	w.mt = {__index = w}
+	--version update
+	if MangosVersion then
+		local major, minor = MangosVersion:match('(%w+)%.(%w+)')
+		local cMajor, cMinor = CURRENT_VERSION:match('(%w+)%.(%w+)')
 
-	w.Bind = function(self, o)
-		return setmetatable(o, self.mt)
-	end
-
-	return w
-end
-
-
---[[ Action Button ]]--
-
-local AB = CreateObject('CheckButton')
-
-function AB:Get(id)
-	return self:New(id)
-end
-
-do
-	local function Create(id)
-		if id <= 12 then
-			return _G['ActionButton' .. id]
-		elseif id <= 24 then
-			return _G['MultiBarBottomLeftButton' .. (id-12)]
-		elseif id <= 36 then
-			return _G['MultiBarBottomRightButton' .. (id-24)]
-		elseif id <= 48 then
-			return _G['MultiBarRightButton' .. (id-36)]
-		elseif id <= 60 then
-			return _G['MultiBarLeftButton' .. (id-48)]
-		elseif id <= 120 then
-			return CreateFrame('CheckButton', 'MangoActionButton' .. (id-60), nil, 'ActionBarButtonTemplate')
+		--settings change
+		if major ~= cMajor then
+			self:UpdateSettings(major, minor)
+		elseif minor ~= cMinor then
+			self:UpdateVersion()
 		end
 	end
-
-	function AB:New(id)
-		local b = Create(id)
-		if b then
-			self:Bind(b)
-
-			b:SetAttribute('action', id)
-			b:SetID(0)
-			b:ClearAllPoints()
-			b:SetAttribute('useparent-statebutton', true)
-			b:SetAttribute('useparent-actionbar', nil)
-			b:SetScript('OnEnter', self.OnEnter)
-			b:SetAttribute('showgrid', 1)
-			ActionButton_ShowGrid(b)
-
-			_G[b:GetName() .. 'Name']:Hide() --hide macro text
-			_G[b:GetName() .. 'HotKey']:SetAlpha(0)
-
-			if LBF then
-				LBF:Group('Mangos'):AddButton(b)
-			end
-		end
-		return b
-	end
-end
-
---keybound support
-function AB:OnEnter()
-	ActionButton_SetTooltip(self)
-	KeyBound:Set(self)
-end
-
-function AB:GetHotkey()
-	local key = GetBindingKey(format('CLICK %s:LeftButton', self:GetName()))
-	return KeyBound:ToShortKey(key)
-end
-
---utility
-function AB:RCall(f, ...)
-	local pThis = this
-	this = self
-	f(...)
-	this = pThis
-end
-
-
---[[ Action Bar ]]--
-
-local ABFrame = CreateObject('Frame')
-
-function ABFrame:New(id, length)
-	if (id-1)*length + 1 <= 120 then
-		--create frame
-		local f = self:Bind(CreateFrame('Frame', 'MangoBar' .. id, UIParent))
-		f:SetClampedToScreen(true)
-		f:SetMovable(true)
-		f.maxLength = length
-		f.id = id
-
-		--create the header
-		f.header = CreateFrame('Frame', nil, f, 'SecureStateHeaderTemplate')
-		f.header:SetAttribute('statemap-state', '$input')
-		f.header:SetAllPoints(f)
-
-		--add buttons
-		f.buttons = {}
-		for i = 1, length do
-			local b = AB:Get((id-1)*length + i)
-			if b then
-				f.buttons[i] = b
-				b:SetParent(f.header)
-			else
-				break
-			end
-		end
-
-		--register with LSF
-		Sticky:RegisterFrame(f)
-		Sticky:SetFrameEnabled(f, true)
-		Sticky:SetFrameText(f, 'bar: ' .. id)
-
-		--register as an ab
-		f:Register()
-
-		return f
-	end
-end
-
-function ABFrame:Layout(columns, spacing, padW, padH)
-	local columns = columns or #self.buttons
-	local rows = ceil(#self.buttons / columns)
-	local padW = padW or 0
-	local padH = padH or padW or 0
-	local spacing = spacing or 0
-	local w = self.buttons[1]:GetWidth() + spacing
-	local h = self.buttons[1]:GetHeight() + spacing
-
-	for i,button in pairs(self.buttons) do
-		local col = (i - 1) % columns
-		local row = ceil(i / columns) - 1
-		button:SetPoint('TOPLEFT', w * col + padW, -(h * row + padH))
-	end
-
-	self:SetWidth(w * columns - spacing + padW*2)
-	self:SetHeight(h * ceil(#self.buttons/columns) - spacing + padH*2)
-end
-
---stateheader code
-function ABFrame:UpdateStateDriver()
-	UnregisterStateDriver(self.header, 'state', 0)
-
-	local header = ''
-	if self.states then
-		for state,condition in ipairs(self.states) do
-			header = header .. condition .. state .. ';'
-		end
-	end
-
-	if self.possessBar then
-		header = header .. '[bonusbar:5]999;'
-	end
-
-	self:UpdateStateButton()
-	self:UpdateActions()
-
-	if header ~= '' then
-		RegisterStateDriver(self.header, 'state', header .. 0)
-	end
-end
-
-function ABFrame:RegisterShowStates(states)
-	UnregisterStateDriver(self.header, 'visibility', 'show')
-	self.header:Show()
-	RegisterStateDriver(self.header, 'visibility', states .. 'show;hide')
-end
-
-function ABFrame:UpdateStateButton()
-	local sb1, sb2 = '', ''
-
-	if self.states then
-		for state in ipairs(self.states) do
-			sb1 = sb1 .. (state .. ':S' .. state .. ';')
-			sb2 = sb2 .. (state .. ':S' .. state .. 's;')
-		end
-	end
-
-	if self.possessBar then
-		sb1 = sb1 .. '999:possess;'
-	end
-
-	self.header:SetAttribute('statebutton', sb1)
-	self.header:SetAttribute('*statebutton2', sb2)
-end
-
-function ABFrame:SetPossessBar(enable)
-	self.possessBar = enable or nil
-	self:UpdateStateDriver()
-end
-
-do
-	local function Validate(id)
-		return (id - 1) % 120 + 1
-	end
-
-	function ABFrame:UpdateActions()
-		if self.states then
-			for state in pairs(self.states) do
-				local offset = #self.buttons * self.offsets[state]
-
-				for _,b in pairs(self.buttons) do
-					local id = Validate(b:GetAttribute('action') + offset)
-					b:SetAttribute('*action-S' .. state, id)
-					b:SetAttribute('*action-S' .. state .. 's', id)
-				end
-			end
-		end
-
-		if self.possessBar then
-			for i = 1, min(#self.buttons, 12) do
-				self.buttons[i]:SetAttribute('*action-possess', 120 + i)
-			end
-		end
-
-		for _,b in pairs(self.buttons) do
-			self.header:SetAttribute('addchild', b)
-		end
-	end
-end
-
---utility
-function ABFrame:Register()
-	if not ABFrame.frames then ABFrame.frames = {} end
-	ABFrame.frames[self] = true
-end
-
-function ABFrame:ForAll(method, ...)
-	if self.frames then
-		for f in pairs(self.frames) do
-			f[method](f, ...)
-		end
-	end
-end
-
-
---[[ Core ]]--
-
-Mangos = CreateFrame('Frame')
-Mangos.locked = true
-
-Mangos.settings = {
-	profile = {
-		ab = {
-			count = 10,
-			style = {'Entropy: Copper', 0.5, true},
-			bars = {
-				1 = {
-					point = {},
-					columns = 12, spacing = 2, pX = 0, pY = 0,
-					size = 12,
-					scale = 1,
-					opacity = 1,
-					fadedOpacity 1,
-					possess = true,
-					showstates = nil,
-					states = {
-						DRUID = {
-							'[bar:1]' = 1,
-							'[bar:2]' = 2,
-							'[bar:3]' = 3,
-						}
-					}
-					bindings = {}
-				}
-			}
-		},
-
-		classBar = {
-			style = {'Entropy: Copper', 0.5, true},
-			point = {},
-			columns = 20, spacing = 2, pX = 0, pY = 0,
-			scale = 1,
-			opacity = 1,
-			fadedOpacity 0,
-			showstates = '[moo]',
-			bindings = {},
-		},
-
-		petBar = {
-			style = {'Entropy: Copper', 0.5, true},
-			point = {},
-			columns = 10, spacing = 2, pX = 0, pY = 0,
-			scale = 1,
-			opacity = 1,
-			fadedOpacity 0,
-			showstates = '[target=pet,exists,nodead,nomounted,nobonusbar:5]',
-			bindings = {},
-		},
-	}
-}
-
-function Mangos:Load()
-	local barLength = ceil(120 / self.abCount)
-	for i = 1, self.abCount do
-		local f = ABFrame:New(i, barLength)
-		if f then
-			f:SetPoint('BOTTOM', 0, (i-1)*37)
-			f:Layout(nil, 2)
-			self:Register(i, f)
-		else
-			break
-		end
-	end
-
-	if LBF then
-		LBF:Group('Mangos'):Skin(unpack(self.abStyle))
-	end
-
-	local b = self:Get(1)
-	b.states = {
-		'[bar:2]',
-		'[bar:3]',
-		'[bar:4]',
-		'[bar:5]',
-		'[bar:6]',
-	}
-	b.offsets = {1, 2, 3, 4, 5, 6}
-	b:SetPossessBar(true)
 
 	self:RegisterSlashCommands()
-end
-
-function Mangos:Lock()
-	self.locked = true
-	Sticky:SetGroup(nil)
-end
-
-function Mangos:Unlock()
-	self.locked = nil
-	Sticky:SetGroup(true)
-end
-
-function Mangos:RegisterSlashCommands()
-	SlashCmdList['MangosCOMMAND'] = function()
-		if self.locked then
-			self:Unlock()
-		else
-			self:Lock()
-		end
-	end
-	SLASH_MangosCOMMAND1 = '/mangos'
-	SLASH_MangosCOMMAND2 = '/mg'
+--[[
+	--create a loader for the options menu
+	local f = CreateFrame('Frame', nil, InterfaceOptionsFrame)
+	f:SetScript('OnShow', function(self)
+		self:SetScript('OnShow', nil)
+		LoadAddOn('Mangos_Options')
+	end)
+--]]
+	self:HideBlizzard()
 end
 
 function Mangos:HideBlizzard()
+	RANGE_INDICATOR = ''
+
 	UIPARENT_MANAGED_FRAME_POSITIONS['MultiBarRight'] = nil
 	UIPARENT_MANAGED_FRAME_POSITIONS['MultiBarLeft'] = nil
 	UIPARENT_MANAGED_FRAME_POSITIONS['MultiBarBottomLeft'] = nil
 	UIPARENT_MANAGED_FRAME_POSITIONS['MultiBarBottomRight'] = nil
 	UIPARENT_MANAGED_FRAME_POSITIONS['MainMenuBar'] = nil
+
 	MultiActionBar_UpdateGrid = Multibar_EmptyFunc
 	MainMenuBar:UnregisterAllEvents()
 	MainMenuBar:Hide()
 end
 
-function Mangos:Register(id, bar)
-	if not self.bars then self.bars = {} end
-	self.bars[id] = bar
+function Mangos:OnEnable()
+	self:Load()
 end
 
-function Mangos:Get(id)
-	return self.bars and self.bars[id]
+function Mangos:Load()
+	for i = 1, self:NumBars() do
+		self.ActionBar:New(i)
+	end
+	self.PetBar:New()
+
+	local LBF = LibStub('LibButtonFacade', true)
+	if LBF then
+		LBF:Group('Mangos', 'Action Bars'):Skin(unpack(self.db.profile.ab.style))
+		LBF:Group('Mangos', 'Pet Bar'):Skin(unpack(self.db.profile.petStyle))
+	end
 end
 
---startup
-Mangos:SetScript('OnEvent', Mangos.Load)
-Mangos:RegisterEvent('PLAYER_LOGIN')
-Mangos:HideBlizzard()
+function Mangos:Unload()
+	self.Frame:ForAll('Free')
+end
+
+function Mangos:GetDefaults()
+	return {
+		profile = {
+			possessBar = 1,
+
+			ab = {
+				count = 10,
+				style = {'Entropy: Copper', 0.5, true},
+			},
+			
+			petStyle  = {'Entropy: Silver', 0.5, nil},
+
+			frames = {}
+		}
+	}
+end
+
+function Mangos:UpdateSettings(major, minor)
+	self:UpdateVersion()
+end
+
+function Mangos:UpdateVersion()
+	MangosVersion = CURRENT_VERSION
+	self:Print(format(L.Updated, MangosVersion))
+end
+
+
+--[[ Profile Functions ]]--
+
+function Mangos:SaveProfile(name)
+	local toCopy = self.db:GetCurrentProfile()
+	if name and name ~= toCopy then
+		self:Unload()
+		self.db:SetProfile(name)
+		self.db:CopyProfile(toCopy)
+		self.isNewProfile = nil
+		self:Load()
+	end
+end
+
+function Mangos:SetProfile(name)
+	local profile = self:MatchProfile(name)
+	if profile and profile ~= self.db:GetCurrentProfile() then
+		self:Unload()
+		self.db:SetProfile(profile)
+		self.isNewProfile = nil
+		self:Load()
+	else
+		self:Print(format(L.InvalidProfile, name or 'null'))
+	end
+end
+
+function Mangos:DeleteProfile(name)
+	local profile = self:MatchProfile(name)
+	if profile and profile ~= self.db:GetCurrentProfile() then
+		self.db:DeleteProfile(profile)
+	else
+		self:Print(L.CantDeleteCurrentProfile)
+	end
+end
+
+function Mangos:CopyProfile(name)
+	if name and name ~= self.db:GetCurrentProfile() then
+		self:Unload()
+		self.db:CopyProfile(name)
+		self.isNewProfile = nil
+		self:Load()
+	end
+end
+
+function Mangos:ResetProfile()
+	self:Unload()
+	self.db:ResetProfile()
+	self.isNewProfile = true
+	self:Load()
+end
+
+function Mangos:ListProfiles()
+	self:Print(L.AvailableProfiles)
+	local current = self.db:GetCurrentProfile()
+	for _,k in ipairs(self.db:GetProfiles()) do
+		if k == current then
+			DEFAULT_CHAT_FRAME:AddMessage(' - ' .. k, 1, 1, 0)
+		else
+			DEFAULT_CHAT_FRAME:AddMessage(' - ' .. k)
+		end
+	end
+end
+
+function Mangos:MatchProfile(name)
+	local name = name:lower()
+	local nameRealm = name .. ' - ' .. GetRealmName():lower()
+	local match
+
+	for i, k in ipairs(self.db:GetProfiles()) do
+		local key = k:lower()
+		if key == name then
+			return k
+		elseif key == nameRealm then
+			match = k
+		end
+	end
+	return match
+end
+
+
+--[[ Profile Events ]]--
+
+function Mangos:OnNewProfile(msg, db, name)
+	self.isNewProfile = true
+	self:Print('Created Profile: ' .. name)
+end
+
+function Mangos:OnProfileDeleted(msg, db, name)
+	self:Print('Deleted Profile: ' .. name)
+end
+
+function Mangos:OnProfileChanged(msg, db, name)
+	self:Print('Changed Profile: ' .. name)
+end
+
+function Mangos:OnProfileCopied(msg, db, name)
+	self:Print('Copied Profile: ' .. name)
+end
+
+function Mangos:OnProfileReset(msg, db)
+	self:Print('Reset Profile: ' .. db:GetCurrentProfile())
+end
+
+
+--[[ Settings Access ]]--
+
+function Mangos:SetFrameSets(id, sets)
+	local id = tonumber(id) or id
+	self.db.profile.frames[id] = sets
+
+	return self.db.profile.frames[id]
+end
+
+function Mangos:GetFrameSets(id)
+	return self.db.profile.frames[tonumber(id) or id]
+end
+
+
+--[[ Slash Commands ]]--
+
+function Mangos:RegisterSlashCommands()
+	self:RegisterChatCommand('mangos', 'OnCmd')
+	self:RegisterChatCommand('mg', 'OnCmd')
+end
+
+function Mangos:OnCmd(args)
+	local cmd = string.split(' ', args):lower() or args:lower()
+	
+	--frame functions
+	if cmd == 'config' or cmd == 'lock' then
+		self:ToggleLockedFrames()
+	elseif cmd == 'scale' then
+		self:ScaleFrames(select(2, string.split(' ', args)))
+	elseif cmd == 'setalpha' then
+		self:SetOpacityForFrames(select(2, string.split(' ', args)))
+	elseif cmd == 'setfade' then
+		self:SetFadeForFrames(select(2, string.split(' ', args)))
+	elseif cmd == 'show' then
+		self:ShowFrames(select(2, string.split(' ', args)))
+	elseif cmd == 'hide' then
+		self:HideFrames(select(2, string.split(' ', args)))
+	elseif cmd == 'toggle' then
+		self:ToggleFrames(select(2, string.split(' ', args)))
+	--profile functions
+	elseif cmd == 'save' then
+		local profileName = string.join(' ', select(2, string.split(' ', args)))
+		self:SaveProfile(profileName)
+	elseif cmd == 'set' then
+		local profileName = string.join(' ', select(2, string.split(' ', args)))
+		self:SetProfile(profileName)
+	elseif cmd == 'copy' then
+		local profileName = string.join(' ', select(2, string.split(' ', args)))
+		self:CopyProfile(profileName)
+	elseif cmd == 'delete' then
+		local profileName = string.join(' ', select(2, string.split(' ', args)))
+		self:DeleteProfile(profileName)
+	elseif cmd == 'reset' then
+		self:ResetProfile()
+	elseif cmd == 'list' then
+		self:ListProfiles()
+	elseif cmd == 'version' then
+		self:PrintVersion()
+	elseif cmd == 'help' or cmd == '?' then
+		self:PrintHelp()
+	--options stuff
+	else
+		if not self:ShowOptions() then
+			self:PrintHelp()
+		end
+	end
+end
+
+--config mode
+Mangos.locked = true
+
+function Mangos:SetLock(enable)
+	self.locked = enable or nil
+	if self.locked then
+		self.Frame:ForAll('Lock')
+	else
+		self.Frame:ForAll('Unlock')
+	end
+end
+
+function Mangos:Locked()
+	return self.locked
+end
+
+function Mangos:ToggleLockedFrames()
+	self:SetLock(not self:Locked())
+end
+
+--scale
+function Mangos:ScaleFrames(...)
+	local numArgs = select('#', ...)
+	local scale = tonumber(select(numArgs, ...))
+
+	if scale and scale > 0 and scale <= 10 then
+		for i = 1, numArgs - 1 do
+			self.Frame:ForBar(select(i, ...), 'SetFrameScale', scale)
+		end
+	end
+end
+
+--opacity
+function Mangos:SetOpacityForFrames(...)
+	local numArgs = select('#', ...)
+	local alpha = tonumber(select(numArgs, ...))
+
+	if alpha and alpha >= 0 and alpha <= 1 then
+		for i = 1, numArgs - 1 do
+			self.Frame:ForBar(select(i, ...), 'SetFrameAlpha', alpha)
+		end
+	end
+end
+
+function Mangos:SetFadeForFrames(...)
+	local numArgs = select('#', ...)
+	local alpha = tonumber(select(numArgs, ...))
+
+	if alpha and alpha >= 0 and alpha <= 1 then
+		for i = 1, numArgs - 1 do
+			self.Frame:ForBar(select(i, ...), 'SetFadeAlpha', alpha)
+		end
+	end
+end
+
+--visibility
+function Mangos:ShowFrames(...)
+	for i = 1, select('#', ...) do
+		self.Frame:ForBar(select(i, ...), 'ShowFrame')
+	end
+end
+
+function Mangos:HideFrames(...)
+	for i = 1, select('#', ...) do
+		self.Frame:ForBar(select(i, ...), 'HideFrame')
+	end
+end
+
+function Mangos:ToggleFrames(...)
+	for i = 1, select('#', ...) do
+		self.Frame:ForBar(select(i, ...), 'ToggleFrame')
+	end
+end
+
+--version info
+function Mangos:PrintVersion()
+	self:Print(MangosVersion)
+end
+
+function Mangos:PrintHelp(cmd)
+	local function PrintCmd(cmd, desc)
+		DEFAULT_CHAT_FRAME:AddMessage(format(' - |cFF33FF99%s|r: %s', cmd, desc))
+	end
+
+	self:Print('Commands (/Mangos, /bob, or /bgs)')
+	PrintCmd('config', L.ConfigDesc)
+	PrintCmd('scale <barList> <scale>', L.SetScaleDesc)
+	PrintCmd('setalpha <barList> <opacity>', L.SetAlphaDesc)
+	PrintCmd('setfade <barList> <opacity>', L.SetFadeDesc)
+	PrintCmd('show <barList>', L.ShowFramesDesc)
+	PrintCmd('hide <barList>', L.HideFramesDesc)
+	PrintCmd('toggle <barList>', L.ToggleFramesDesc)
+	PrintCmd('save <profile>', L.SaveDesc)
+	PrintCmd('set <profile>', L.SetDesc)
+	PrintCmd('copy <profile>', L.CopyDesc)
+	PrintCmd('delete <profile>', L.DeleteDesc)
+	PrintCmd('reset', L.ResetDesc)
+	PrintCmd('list', L.ListDesc)
+	PrintCmd('version', L.PrintVersionDesc)
+end
+
+function Mangos:ShowOptions()
+	if LoadAddOn('Mangos_Options') then
+		InterfaceOptionsFrame_OpenToFrame('Mangos')
+		return true
+	end
+	return false
+end
+
+function Mangos:NumBars()
+	return self.db.profile.ab.count
+end
+
+function Mangos:GetPossessBar()
+	return Mangos.Frame:Get(self.db.profile.possessBar)
+end
+
+--[[
+--minimap
+function Mangos:SetShowMinimap(enable)
+	self.db.profile.showMinimap = enable or false
+	self:UpdateMinimapButton()
+end
+
+function Mangos:ShowingMinimap()
+	return self.db.profile.showMinimap
+end
+
+function Mangos:UpdateMinimapButton()
+	if self:ShowingMinimap() then
+		self.Minimap:UpdatePosition()
+		self.Minimap:Show()
+	else
+		self.Minimap:Hide()
+	end
+end
+
+function Mangos:SetMinimapButtonPosition(angle)
+	self.db.profile.minimapPos = angle
+end
+
+function Mangos:GetMinimapButtonPosition(angle)
+	return self.db.profile.minimapPos
+end
+--]]
+
+
+--[[ Utility Functions ]]--
+
+--utility function: create a widget class
+function Mangos:CreateClass(type, parentClass)
+	local class = CreateFrame(type)
+	class.mt = {__index = class}
+
+	if parentClass then
+		class = setmetatable(class, {__index = parentClass})
+		class.super = parentClass
+	end
+
+	function class:Bind(o)
+		return setmetatable(o, self.mt)
+	end
+
+	return class
+end

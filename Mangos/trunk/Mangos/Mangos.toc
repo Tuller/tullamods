@@ -4,4 +4,10 @@
 ## Author: Tuller
 ## Version: 0
 embeds.xml
+FlyPaper.lua
+localization\localization.lua
 Mangos.lua
+drag.lua
+frame.lua
+actionBar.lua
+petBar.lua
