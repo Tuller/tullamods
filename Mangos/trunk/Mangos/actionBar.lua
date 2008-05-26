@@ -150,8 +150,8 @@ ActionBar.mainbarOffsets = {
 			pages['[bonusbar:1,stealth]'] = 5
 			pages['[bonusbar:1]'] = 6
 			pages['[bonusbar:2]'] = 7
-			pages['[bonusbar:3]'] = 9
-			pages['[bonusbar:4]'] = 8
+			pages['[bonusbar:3]'] = 8
+			pages['[bonusbar:4]'] = 9
 		elseif k == 'WARRIOR' then
 			pages['[bonusbar:1]'] = 6
 			pages['[bonusbar:2]'] = 7
@@ -189,9 +189,9 @@ ActionBar.class = select(2, UnitClass('player'))
 function ActionBar:New(id)
 	local f = self.super.New(self, id, self:GetDefaults(id))
 	if f.id == 1 then
-		f.sets.pages = setmetatable(f.sets.pages or {}, self.mainbarOffsets)
+		f.sets.pages = setmetatable(f.sets.pages, self.mainbarOffsets)
 	else
-		f.sets.pages = setmetatable(f.sets.pages or {}, self.defaultOffsets)
+		f.sets.pages = setmetatable(f.sets.pages, self.defaultOffsets)
 	end
 
 	f.pages = f.sets.pages[f.class]
@@ -211,7 +211,6 @@ function ActionBar:GetDefaults(id)
 	defaults.x = 0
 	defaults.y = 37*(id-1)
 	defaults.pages = {}
---	defaults.hidden = id > 5
 	defaults.numButtons = 12
 
 	return defaults

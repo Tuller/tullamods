@@ -385,7 +385,7 @@ end
 
 --[[ Sticky Bars ]]--
 
-Frame.stickyTolerance = 16
+Frame.stickyTolerance = 24
 
 function Frame:StickToEdge()
 	local point, x, y = self:GetRelPosition()

@@ -33,8 +33,8 @@ function Drag:New(owner)
 
 	f:RegisterForClicks('AnyUp')
 	f:RegisterForDrag('LeftButton')
-	f:SetScript('OnDragStart', self.StartMoving)
-	f:SetScript('OnDragStop', self.StopMoving)
+	f:SetScript('OnMouseDown', self.StartMoving)
+	f:SetScript('OnMouseUp', self.StopMoving)
 	f:SetScript('OnMouseWheel', self.OnMouseWheel)
 	f:SetScript('OnClick', self.OnClick)
 	f:SetScript('OnEnter', self.OnEnter)
@@ -71,8 +71,8 @@ function Drag:OnLeave()
 	GameTooltip:Hide()
 end
 
-function Drag:StartMoving()
-	if arg1 == 'LeftButton' then
+function Drag:StartMoving(button)
+	if button == 'LeftButton' then
 		self.owner:StartMoving()
 
 		if GameTooltip:IsOwned(self) then
