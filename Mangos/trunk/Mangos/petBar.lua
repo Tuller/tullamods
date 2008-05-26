@@ -20,7 +20,9 @@ function PetButton:New(id)
 end
 
 function PetButton:Create(id)
-	local b = _G['PetActionButton' .. id]
+	local b = self:Bind(_G['PetActionButton' .. id])
+	b:SetScript('OnEnter', self.OnEnter)
+
 	if LBF then
 		LBF:Group('Mangos', 'Pet Bar'):AddButton(b)
 	end
@@ -33,14 +35,15 @@ function PetButton:Restore(id)
 		b = unused[id]
 		if b then
 			unused[id] = nil
+			b:Show()
 			return b
 		end
 	end
 end
 
-function PetButton:Free(id)
+function PetButton:Free()
 	local unused = PetButton.unused or {}
-	unused[id] = self
+	unused[self:GetID()] = self
 	PetButton.unused = unused
 
 	self:SetParent(nil)

@@ -209,7 +209,7 @@ function ActionBar:GetDefaults(id)
 	local defaults = {}
 	defaults.point = 'BOTTOM'
 	defaults.x = 0
-	defaults.y = 37*id
+	defaults.y = 37*(id-1)
 	defaults.pages = {}
 --	defaults.hidden = id > 5
 	defaults.numButtons = 12
