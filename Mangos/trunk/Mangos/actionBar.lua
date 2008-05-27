@@ -38,12 +38,6 @@ local function Create(id)
 		return _G['MultiBarRightButton' .. (id-36)]
 	elseif id <= 60 then
 		return _G['MultiBarLeftButton' .. (id-48)]
---[[
-	elseif id <= 72 then
-		local b = _G['BonusActionButton' .. (id-60)]
-		b.isBonus = nil
-		return b
---]]
 	elseif id <= 120 then
 		return CreateFrame('CheckButton', 'MangoActionButton' .. (id-60), nil, 'ActionBarButtonTemplate')
 	end
@@ -184,17 +178,14 @@ ActionBar.conditions = {
 	'[bonusbar:4]',
 	'[help]',
 	'[harm]',
+	'[none]'
 }
 
 ActionBar.class = select(2, UnitClass('player'))
 
 function ActionBar:New(id)
 	local f = self.super.New(self, id, self:GetDefaults(id))
-	if f.id == 1 then
-		f.sets.pages = setmetatable(f.sets.pages, self.mainbarOffsets)
-	else
-		f.sets.pages = setmetatable(f.sets.pages, self.defaultOffsets)
-	end
+	f.sets.pages = setmetatable(f.sets.pages, f.id == 1 and self.mainbarOffsets or self.defaultOffsets)
 
 	f.pages = f.sets.pages[f.class]
 	f.baseID = ceil(120 / Mangos:NumBars()) * (id-1)
