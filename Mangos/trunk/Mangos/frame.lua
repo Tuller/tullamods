@@ -553,11 +553,7 @@ end
 
 function Frame:CreateMenu()
 	self.menu = Mangos.Menu:New(self.id)
-
-	local p = self.menu:AddLayoutPanel()
-	p:NewPaddingSlider()
-	p:NewSpacingSlider()
---	p:NewColumnsSlider()
+	self.menu:AddLayoutPanel()
 end
 
 function Frame:ShowMenu()

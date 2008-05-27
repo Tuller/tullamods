@@ -343,3 +343,136 @@ end
 function ActionBar:IsPossessBar()
 	return self == Mangos:GetPossessBar()
 end
+
+do
+	--state slider template
+	local function ConditionSlider_OnShow(self)
+		self:SetMinMaxValues(-1, Mangos:NumBars() - 1)
+		self:SetValue(self:GetParent().owner:GetPage(self.condition) or -1)
+	end
+
+	local function ConditionSlider_UpdateValue(self, value)
+		self:GetParent().owner:SetPage(self.condition, (value > -1 and value) or nil)
+	end
+
+	local function ConditionSlider_UpdateText(self, value)
+		if value > -1 then
+			local page = (self:GetParent().owner.id + value - 1) % Mangos:NumBars() + 1
+			self.valText:SetFormattedText('Bar: %d', page)
+		else
+			self.valText:SetText(DISABLE)
+		end
+	end
+
+	local function ConditionSlider_New(panel, condition, text)
+		local s = panel:NewSlider(condition, 0, 1, 1)
+		s.OnShow = ConditionSlider_OnShow
+		s.UpdateValue = ConditionSlider_UpdateValue
+		s.UpdateText = ConditionSlider_UpdateText
+		s.condition = condition
+		s:SetWidth(s:GetWidth() + 28)
+
+		local title = getglobal(s:GetName() .. 'Text')
+		title:ClearAllPoints()
+		title:SetPoint('BOTTOMLEFT', s, 'TOPLEFT')
+		title:SetJustifyH('LEFT')
+		title:SetText(text or condition)
+
+		local value = s.valText
+		value:ClearAllPoints()
+		value:SetPoint('BOTTOMRIGHT', s, 'TOPRIGHT')
+		value:SetJustifyH('RIGHT')
+
+		return s
+	end
+
+	local function AddLayout(self)
+		local p = self:AddLayoutPanel()
+	end
+
+	local function AddClass(self)
+		local lClass, class = UnitClass('player')
+		if class == 'WARRIOR' or class == 'DRUID' or class == 'PRIEST' or class == 'ROGUE' then
+			local p = self:NewPanel(lClass)
+			if class == 'WARRIOR' then
+				ConditionSlider_New(p, '[bonusbar:3]', GetSpellInfo(2458))
+				ConditionSlider_New(p, '[bonusbar:2]', GetSpellInfo(71))
+				ConditionSlider_New(p, '[bonusbar:1]', GetSpellInfo(2457))
+			elseif class == 'DRUID' then
+				ConditionSlider_New(p, '[bonusbar:4]', GetSpellInfo(24858))
+				ConditionSlider_New(p, '[bonusbar:3]', GetSpellInfo(5487))
+				ConditionSlider_New(p, '[bonusbar:2]', GetSpellInfo(33891))
+				ConditionSlider_New(p, '[bonusbar:1,stealth]', GetSpellInfo(5215))
+				ConditionSlider_New(p, '[bonusbar:1]', GetSpellInfo(768))
+			elseif class == 'PRIEST' then
+				ConditionSlider_New(p, '[bonusbar:1]', GetSpellInfo(15473))
+			elseif class == 'ROGUE' then
+				ConditionSlider_New(p, '[bonusbar:1]', GetSpellInfo(1784))
+			end
+		end
+	end
+
+	local function AddPaging(self)
+		local p = self:NewPanel(ACTION_PAGE)
+		for i = 6, 2, -1 do
+			ConditionSlider_New(p, format('[bar:%d]', i), getglobal('BINDING_NAME_ACTIONPAGE' .. i))
+		end
+	end
+
+	local function AddModifier(self)
+		local p = self:NewPanel('Modifiers')
+		ConditionSlider_New(p, '[mod:SELFCAST]', AUTO_SELF_CAST_KEY_TEXT)
+		ConditionSlider_New(p, '[mod:shift]', SHIFT_KEY)
+		ConditionSlider_New(p, '[mod:alt]', ALT_KEY)
+		ConditionSlider_New(p, '[mod:ctrl]', CTRL_KEY)
+	end
+
+	local function AddTargeting(self)
+		local p = self:NewPanel('Targeting')
+		ConditionSlider_New(p, '[none]', NONE)
+		ConditionSlider_New(p, '[harm]', 'Harm')
+		ConditionSlider_New(p, '[help]', 'Help')
+	end
+
+	local function AddShowState(self)
+		local p = self:NewPanel('Show States')
+		p.height = 56
+
+		local editBox = CreateFrame('EditBox', p:GetName() .. 'StateText', p,  'InputBoxTemplate')
+		editBox:SetWidth(148); editBox:SetHeight(20)
+		editBox:SetPoint('TOPLEFT', 12, -10)
+		editBox:SetAutoFocus(false)
+		editBox:SetScript('OnShow', function(self)
+			self:SetText(self:GetParent().owner:GetShowStates() or '')
+		end)
+		editBox:SetScript('OnEnterPressed', function(self)
+			local text = self:GetText()
+			self:GetParent().owner:SetShowStates(text ~= '' and text or nil)
+		end)
+		editBox:SetScript('OnEditFocusLost', function(self) self:HighlightText(0, 0) end)
+		editBox:SetScript('OnEditFocusGained', function(self) self:HighlightText() end)
+
+		local set = CreateFrame('Button', p:GetName() .. 'Set', p, 'UIPanelButtonTemplate')
+		set:SetWidth(30); set:SetHeight(20)
+		set:SetText('Set')
+		set:SetScript('OnClick', function(self)
+			local text = editBox:GetText()
+			self:GetParent().owner:SetShowStates(text ~= '' and text or nil)
+		end)
+		set:SetPoint('BOTTOMRIGHT', -8, 2)
+
+		return p
+	end
+
+	function ActionBar:CreateMenu()
+		local menu = Mangos.Menu:New(self.id)
+		AddLayout(menu)
+		AddClass(menu)
+		AddPaging(menu)
+		AddModifier(menu)
+		AddTargeting(menu)
+		AddShowState(menu)
+
+		ActionBar.menu = menu
+	end
+end

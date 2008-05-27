@@ -57,6 +57,8 @@ L.FadedOpacity = 'Faded Opacity'
 L.Visibility = 'Visibility'
 L.Spacing = 'Spacing'
 L.Layout = 'Layout'
+L.Columns = 'Columns'
+L.Size = 'Size'
 
 --minimap button stuff
 L.ConfigEnterTip = '<Left Click> to enter configuration mode'

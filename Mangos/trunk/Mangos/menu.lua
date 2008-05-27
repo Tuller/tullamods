@@ -88,7 +88,7 @@ function Menu:GetSelectedPanel()
 	return 1
 end
 
-function Menu:AddPanel(name)
+function Menu:NewPanel(name)
 	local panel = self.Panel:New(name, self)
 	panel.name = name
 	table.insert(self.panels, panel)
@@ -101,11 +101,14 @@ function Menu:AddPanel(name)
 end
 
 function Menu:AddLayoutPanel()
-	local panel = self:AddPanel(L.Layout)
+	local panel = self:NewPanel(L.Layout)
 
 	panel:NewOpacitySlider()
 	panel:NewFadeSlider()
 	panel:NewScaleSlider()
+	panel:NewPaddingSlider()
+	panel:NewSpacingSlider()
+	panel:NewColumnsSlider()
 
 	return panel
 end
@@ -348,5 +351,21 @@ do
 
 	function Panel:NewSpacingSlider()
 		return self:NewSlider(L.Spacing, -8, 32, 1, Slider_OnShow, Slider_UpdateValue)
+	end
+end
+
+--columns
+do
+	local function Slider_OnShow(self)
+		self:SetMinMaxValues(1, self:GetParent().owner:NumButtons())
+		self:SetValue(self:GetParent().owner:NumColumns())
+	end
+
+	local function Slider_UpdateValue(self, value)
+		self:GetParent().owner:SetColumns(value)
+	end
+
+	function Panel:NewColumnsSlider()
+		return self:NewSlider(L.Columns, 1, 1, 1, Slider_OnShow, Slider_UpdateValue)
 	end
 end
