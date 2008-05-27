@@ -426,6 +426,15 @@ function Mangos:NumBars()
 	return self.db.profile.ab.count
 end
 
+function Mangos:SetPossessBar(id)
+	self.db.profile.possessBar = id
+
+	for i = 1, self:NumBars() do
+		Mangos.Frame:Get(i):UpdateStateDriver()
+	end
+	Mangos.Frame:Get('pet'):UpdatePossess()
+end
+
 function Mangos:GetPossessBar()
 	return Mangos.Frame:Get(self.db.profile.possessBar)
 end

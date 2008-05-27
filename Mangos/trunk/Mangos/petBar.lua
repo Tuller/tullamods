@@ -55,7 +55,7 @@ function PetButton:OnEnter()
 	self:RCall(PetActionButton_OnEnter)
 	KeyBound:Set(self)
 end
-	
+
 function PetButton:GetHotkey()
 	return KeyBound:ToShortKey(GetBindingKey(format('CLICK %s:LeftButton', self:GetName())))
 end
@@ -72,21 +72,29 @@ end
 --[[ Pet Bar ]]--
 
 local PetBar = Mangos:CreateClass('Frame', Mangos.Frame)
-Mangos.PetBar  = PetBar 
+Mangos.PetBar  = PetBar
 
 
 function PetBar:New()
 	local f = self.super.New(self, 'pet', self:GetDefaults())
 	f:LoadButtons()
 	f:Layout()
+	f:UpdatePossess()
 
 	return f
+end
+
+function PetBar:UpdatePossess()
+	if Mangos:GetPossessBar() == self then
+		self:SetShowStates('[target=pet,nodead,exists]')
+	else
+		self:SetShowStates('[target=pet,nodead,exists,nobonusbar:5]')
+	end
 end
 
 function PetBar:GetDefaults()
 	return {
 		point = 'CENTER',
-		showstates = '[target=pet,nodead,exists,nobonusbar:5]show;hide',
 		numButtons = 10,
 		spacing = 6
 	}
