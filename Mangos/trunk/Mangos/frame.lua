@@ -18,7 +18,7 @@ do
 			self.nextUpdate = 0.1
 
 			for f in pairs(self.fs) do
-				if self:IsBarFocus(f) then
+				if self:IsFocus(f) then
 					if abs(f:GetAlpha() - f:GetFadedAlpha()) < 0.01 then --the checking logic is a little weird because floating point values tend to not be exact
 						self:FadeIn(f, 0.1, f:GetAlpha(), f:GetFrameAlpha())
 					end
@@ -58,7 +58,7 @@ do
 
 	function Fader:IsFocus(f)
 		if MouseIsOver(f, 1, -1, -1, 1) then
-			return GetMouseFocus() == WorldFrame or IsChildFocus(f:GetChildren())
+			return GetMouseFocus() == WorldFrame or self:IsChildFocus(f:GetChildren())
 		end
 	end
 
@@ -71,7 +71,7 @@ do
 
 		for i = 1, select('#', ...) do
 			local f = select(i, ...)
-			if f:IsShown() and IsChildFocus(f:GetChildren()) then
+			if f:IsShown() and self:IsChildFocus(f:GetChildren()) then
 				return true
 			end
 		end

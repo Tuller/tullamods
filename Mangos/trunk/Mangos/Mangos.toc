@@ -2,7 +2,8 @@
 ## Title: Mangos
 ## Notes: Pure Actionbars
 ## Author: Tuller
-## Version: 0
+## Version: 1.0.0
+## SavedVariables: MangosDB, MangosVersion
 embeds.xml
 FlyPaper.lua
 localization\localization.lua

@@ -20,26 +20,21 @@ function Mangos:OnInitialize()
 
 	--version update
 	if MangosVersion then
-		local major, minor = MangosVersion:match('(%w+)%.(%w+)')
-		local cMajor, cMinor = CURRENT_VERSION:match('(%w+)%.(%w+)')
-
-		--settings change
-		if major ~= cMajor then
-			self:UpdateSettings(major, minor)
-		elseif minor ~= cMinor then
+		if MangosVersion ~= CURRENT_VERSION then
+			self:UpdateSettings(MangosVersion:match('(%w+)%.(%w+)%.(%w+)'))
 			self:UpdateVersion()
 		end
 	end
 
 	self:RegisterSlashCommands()
---[[
+
 	--create a loader for the options menu
 	local f = CreateFrame('Frame', nil, InterfaceOptionsFrame)
 	f:SetScript('OnShow', function(self)
 		self:SetScript('OnShow', nil)
 		LoadAddOn('Mangos_Options')
 	end)
---]]
+
 	self:HideBlizzard()
 end
 
@@ -66,6 +61,8 @@ function Mangos:Load()
 		self.ActionBar:New(i)
 	end
 	self.PetBar:New()
+	
+	self.Frame:ForAll('Reanchor')
 
 	local LBF = LibStub('LibButtonFacade', true)
 	if LBF then
@@ -95,8 +92,8 @@ function Mangos:GetDefaults()
 	}
 end
 
-function Mangos:UpdateSettings(major, minor)
-	self:UpdateVersion()
+function Mangos:UpdateSettings(major, minor, bugfix)
+	--do stuff
 end
 
 function Mangos:UpdateVersion()
@@ -239,8 +236,14 @@ function Mangos:OnCmd(args)
 		self:ScaleFrames(select(2, string.split(' ', args)))
 	elseif cmd == 'setalpha' then
 		self:SetOpacityForFrames(select(2, string.split(' ', args)))
-	elseif cmd == 'setfade' then
+	elseif cmd == 'fade' then
 		self:SetFadeForFrames(select(2, string.split(' ', args)))
+	elseif cmd == 'setcols' then
+		self:SetColumnsForFrames(select(2, string.split(' ', args)))
+	elseif cmd == 'pad' then
+		self:SetPaddingForFrames(select(2, string.split(' ', args)))
+	elseif cmd == 'space' then
+		self:SetSpacingForFrame(select(2, string.split(' ', args)))
 	elseif cmd == 'show' then
 		self:ShowFrames(select(2, string.split(' ', args)))
 	elseif cmd == 'hide' then
@@ -327,6 +330,40 @@ function Mangos:SetFadeForFrames(...)
 	if alpha and alpha >= 0 and alpha <= 1 then
 		for i = 1, numArgs - 1 do
 			self.Frame:ForBar(select(i, ...), 'SetFadeAlpha', alpha)
+		end
+	end
+end
+
+--columns
+function Mangos:SetColumnsForFrames(...)
+	local numArgs = select('#', ...)
+	local cols = tonumber(select(numArgs, ...))
+
+	if cols then
+		for i = 1, numArgs - 1 do
+			self.Frame:ForBar(select(i, ...), 'SetColumns', cols)
+		end
+	end
+end
+
+function Mangos:SetSpacingForFrame(...)
+	local numArgs = select('#', ...)
+	local spacing = tonumber(select(numArgs, ...))
+
+	if spacing then
+		for i = 1, numArgs - 1 do
+			self.Frame:ForBar(select(i, ...), 'SetSpacing', spacing)
+		end
+	end
+end
+
+function Mangos:SetPaddingForFrames(...)
+	local numArgs = select('#', ...)
+	local pW, pH = select(numArgs - 1, ...)
+
+	if tonumber(pW) and tonumber(pH) then
+		for i = 1, numArgs - 2 do
+			self.Frame:ForBar(select(i, ...), 'SetPadding', tonumber(pW), tonumber(pH))
 		end
 	end
 end
