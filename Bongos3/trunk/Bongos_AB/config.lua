@@ -45,6 +45,8 @@ function Config:OnInitialize()
 		elseif minor ~= cMinor then
 			self:UpdateVersion()
 		end
+	else
+		Bongos3ABVersion = CURRENT_VERSION
 	end
 end
 
