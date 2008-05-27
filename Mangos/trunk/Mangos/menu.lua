@@ -35,7 +35,7 @@ function Menu:New(name)
 
 	--title text
 	f.text = f:CreateFontString(nil, 'OVERLAY')
-	f.text:SetPoint('TOP', 0, -15)
+	f.text:SetPoint('TOPLEFT', 20, -15)
 	f.text:SetFontObject('GameFontHighlight')
 
 	--close button
@@ -50,7 +50,7 @@ function Menu:SetOwner(owner)
 	for _,f in pairs(self.panels) do
 		f.owner = owner
 	end
-	self.text:SetFormattedText('Bar: %s', tostring(owner.id):gsub('^%l', string.upper))
+	self.text:SetFormattedText('Bar %s Settings', tostring(owner.id):gsub('^%l', string.upper))
 	self:Anchor(owner)
 end
 
