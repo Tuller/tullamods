@@ -8,10 +8,10 @@ local _G = getfenv(0)
 local ceil = math.ceil
 local min = math.min
 local format = string.format
-
+local MAX_BUTTONS = 120
 local KeyBound = LibStub('LibKeyBound-1.0')
 local LBF = LibStub('LibButtonFacade', true)
-
+local L = LibStub('AceLocale-3.0'):GetLocale('Mangos')
 
 --[[ Action Button ]]--
 
@@ -38,7 +38,7 @@ local function Create(id)
 		return _G['MultiBarRightButton' .. (id-36)]
 	elseif id <= 60 then
 		return _G['MultiBarLeftButton' .. (id-48)]
-	elseif id <= 120 then
+	elseif id <= MAX_BUTTONS then
 		return CreateFrame('CheckButton', 'MangoActionButton' .. (id-60), nil, 'ActionBarButtonTemplate')
 	end
 end
@@ -59,7 +59,7 @@ function ActionButton:Create(id)
 		_G[b:GetName() .. 'Name']:Hide() --hide macro text
 
 		if LBF then
-			LBF:Group('Mangos', 'Action Bars'):AddButton(b)
+			LBF:Group('Mangos', ACTIONBAR_LABEL):AddButton(b)
 		end
 	end
 	return b
@@ -188,7 +188,7 @@ function ActionBar:New(id)
 	f.sets.pages = setmetatable(f.sets.pages, f.id == 1 and self.mainbarOffsets or self.defaultOffsets)
 
 	f.pages = f.sets.pages[f.class]
-	f.baseID = ceil(120 / Mangos:NumBars()) * (id-1)
+	f.baseID = ceil(MAX_BUTTONS / Mangos:NumBars()) * (id-1)
 	f.header:SetAttribute('statemap-state', '$input')
 
 	f:LoadButtons()
@@ -275,12 +275,12 @@ function ActionBar:UpdateStateDriver()
 end
 
 local function ToValidID(id)
-	return (id - 1) % 120 + 1
+	return (id - 1) % MAX_BUTTONS + 1
 end
 
 function ActionBar:UpdateAction(i)
 	local b = self.buttons[i]
-	local maxSize = ceil(Mangos:NumBars() / 120)
+	local maxSize = ceil(Mangos:NumBars() / MAX_BUTTONS)
 
 	for state,condition in ipairs(self.conditions) do
 		local page = self:GetPage(condition)
@@ -291,7 +291,7 @@ function ActionBar:UpdateAction(i)
 	end
 
 	if self:IsPossessBar() and i <= 12 then
-		b:SetAttribute('*action-possess', 120 + i)
+		b:SetAttribute('*action-possess', MAX_BUTTONS + i)
 	else
 		b:SetAttribute('*action-possess', nil)
 	end
@@ -300,7 +300,7 @@ function ActionBar:UpdateAction(i)
 end
 
 function ActionBar:UpdateActions()
-	local maxSize = ceil(120 / Mangos:NumBars())
+	local maxSize = ceil(MAX_BUTTONS / Mangos:NumBars())
 
 	for state,condition in ipairs(self.conditions) do
 		local page = self:GetPage(condition)
@@ -315,7 +315,7 @@ function ActionBar:UpdateActions()
 
 	if self:IsPossessBar() then
 		for i = 1, min(#self.buttons, 10) do
-			self.buttons[i]:SetAttribute('*action-possess', 120 + i)
+			self.buttons[i]:SetAttribute('*action-possess', MAX_BUTTONS + i)
 		end
 		for i = 11, #self.buttons do
 			self.buttons[i]:SetAttribute('*action-possess', nil)
@@ -349,7 +349,7 @@ do
 	local function ConditionSlider_UpdateText(self, value)
 		if value > -1 then
 			local page = (self:GetParent().owner.id + value) % Mangos:NumBars()
-			self.valText:SetFormattedText('Bar: %d', page)
+			self.valText:SetFormattedText(L.Bar, page)
 		else
 			self.valText:SetText(DISABLE)
 		end
@@ -363,7 +363,7 @@ do
 		s.condition = condition
 		s:SetWidth(s:GetWidth() + 28)
 
-		local title = getglobal(s:GetName() .. 'Text')
+		local title = _G[s:GetName() .. 'Text']
 		title:ClearAllPoints()
 		title:SetPoint('BOTTOMLEFT', s, 'TOPLEFT')
 		title:SetJustifyH('LEFT')
@@ -404,14 +404,14 @@ do
 	end
 
 	local function AddPaging(self)
-		local p = self:NewPanel('Quick Paging')
+		local p = self:NewPanel(L.QuickPaging)
 		for i = 6, 2, -1 do
 			ConditionSlider_New(p, format('[bar:%d]', i), getglobal('BINDING_NAME_ACTIONPAGE' .. i))
 		end
 	end
 
 	local function AddModifier(self)
-		local p = self:NewPanel('Modifiers')
+		local p = self:NewPanel(L.Modifiers)
 		ConditionSlider_New(p, '[mod:SELFCAST]', AUTO_SELF_CAST_KEY_TEXT)
 		ConditionSlider_New(p, '[mod:shift]', SHIFT_KEY)
 		ConditionSlider_New(p, '[mod:alt]', ALT_KEY)
@@ -419,14 +419,14 @@ do
 	end
 
 	local function AddTargeting(self)
-		local p = self:NewPanel('Targeting')
+		local p = self:NewPanel(L.Targeting)
 		ConditionSlider_New(p, '[none]', NONE)
-		ConditionSlider_New(p, '[harm]', 'Harm')
-		ConditionSlider_New(p, '[help]', 'Help')
+		ConditionSlider_New(p, '[harm]', L.Harm)
+		ConditionSlider_New(p, '[help]', L.Help)
 	end
 
 	local function AddShowState(self)
-		local p = self:NewPanel('Show States')
+		local p = self:NewPanel(L.ShowStates)
 		p.height = 56
 
 		local editBox = CreateFrame('EditBox', p:GetName() .. 'StateText', p,  'InputBoxTemplate')
@@ -445,7 +445,7 @@ do
 
 		local set = CreateFrame('Button', p:GetName() .. 'Set', p, 'UIPanelButtonTemplate')
 		set:SetWidth(30); set:SetHeight(20)
-		set:SetText('Set')
+		set:SetText(L.Set)
 		set:SetScript('OnClick', function(self)
 			local text = editBox:GetText()
 			self:GetParent().owner:SetShowStates(text ~= '' and text or nil)

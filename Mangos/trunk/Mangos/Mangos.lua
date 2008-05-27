@@ -69,7 +69,7 @@ function Mangos:Load()
 
 	local LBF = LibStub('LibButtonFacade', true)
 	if LBF then
-		LBF:Group('Mangos', 'Action Bars'):Skin(unpack(self.db.profile.ab.style))
+		LBF:Group('Mangos', ACTIONBAR_LABEL):Skin(unpack(self.db.profile.ab.style))
 		LBF:Group('Mangos', 'Pet Bar'):Skin(unpack(self.db.profile.petStyle))
 	end
 end

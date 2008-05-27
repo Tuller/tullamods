@@ -23,7 +23,6 @@ L.InvalidProfile = 'Invalid profile "%s"'
 --slash command help
 L.ShowOptionsDesc = 'Shows the options menu'
 L.ConfigDesc = 'Toggles configuration mode'
-L.StickyFramesDesc = 'Toggles auto anchoring bars'
 
 L.SetScaleDesc = 'Sets the scale of <frameList>'
 L.SetAlphaDesc = 'Sets the opacity of <frameList>'
@@ -41,7 +40,7 @@ L.DeleteDesc = 'Deletes <profile>'
 L.ResetDesc = 'Returns to default settings'
 L.ListDesc = 'Lists all profiles'
 L.AvailableProfiles = 'Available Profiles'
-L.PrintVersionDesc = 'Prints the current Bongos version'
+L.PrintVersionDesc = 'Prints the current version'
 
 --dragFrame tooltips
 L.ShowConfig = '<Right Click> to configure'
@@ -59,7 +58,15 @@ L.Spacing = 'Spacing'
 L.Layout = 'Layout'
 L.Columns = 'Columns'
 L.Size = 'Size'
+L.Modifiers = 'Modifiers'
+L.QuickPaging = 'Quick Paging'
+L.Help = 'Help'
+L.Harm = 'Harm'
+L.Targeting = 'Targeting'
+L.ShowStates = 'Show States'
+L.Set = 'Set'
 
+--[[
 --minimap button stuff
 L.ConfigEnterTip = '<Left Click> to enter configuration mode'
 L.ConfigExitTip = '<Left Click> to exit configuration mode'
@@ -78,3 +85,4 @@ L.Set = 'Set'
 L.Save = 'Save'
 L.Delete = 'Delete'
 L.EnterName = 'Enter Profile Name'
+--]]
