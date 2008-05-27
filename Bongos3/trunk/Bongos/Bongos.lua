@@ -50,6 +50,8 @@ function Bongos:OnInitialize()
 		elseif minor ~= cMinor then
 			self:UpdateVersion()
 		end
+	else
+		Bongos3Version = CURRENT_VERSION
 	end
 
 	self.lockBG = self:CreateLockBG()
