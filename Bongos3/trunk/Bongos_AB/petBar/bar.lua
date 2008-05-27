@@ -140,7 +140,6 @@ end
 function PetBar:Unload()
 	self.bar:UpdateStateDriver(false)
 	self.bar:Destroy()
-	self:UnregisterAllMessages()
 
 	PetActionBarFrame:UnregisterAllEvents()
 end
