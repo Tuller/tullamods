@@ -551,15 +551,24 @@ end
 
 --[[ Menus ]]--
 
+function Frame:CreateMenu()
+	self.menu = Mangos.Menu:New(self.id)
+
+	local p = self.menu:AddLayoutPanel()
+	p:NewPaddingSlider()
+	p:NewSpacingSlider()
+--	p:NewColumnsSlider()
+end
+
 function Frame:ShowMenu()
-	if not(self.menu) and self.CreateMenu then
+	if not self.menu then
 		self:CreateMenu()
 	end
 
 	local menu = self.menu
 	if menu then
 		menu:Hide()
-		menu:SetFrame(self)
+		menu:SetOwner(self)
 		menu:ShowPanel('Layout')
 		menu:Show()
 	end

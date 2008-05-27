@@ -8,6 +8,7 @@ embeds.xml
 FlyPaper.lua
 localization\localization.lua
 Mangos.lua
+menu.lua
 drag.lua
 frame.lua
 actionBar.lua
