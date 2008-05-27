@@ -1,16 +1,16 @@
 #summary Version history for Bongos3
 
 1.2e
-* Fixed a petbar error
+  * Fixed a petbar error
 
 1.2d
-* Updated keybound
+  * Updated keybound
 
 1.2c
-* Corrected zip file structure
+  * Corrected zip file structure
 
 1.2b
-* Removed an erroneous debug print
+  * Removed an erroneous debug print
 
 1.2
   * Switched to using LibKeyBound instead of KeyBound
