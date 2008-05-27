@@ -313,9 +313,9 @@ function ActionBar:UpdateActions()
 
 	for state,condition in ipairs(self.conditions) do
 		local page = self:GetPage(condition)
-		for _,b in pairs(self.buttons) do
+		for i,b in pairs(self.buttons) do
 			local page = self:GetPage(condition)
-			local id = page and ToValidID(b:GetAttribute('action') + (self.id + page - 1)*maxSize) or nil
+			local id = page and ToValidID(i + (self.id + page - 1)*maxSize) or nil
 
 			b:SetAttribute('*action-S' .. state, id)
 			b:SetAttribute('*action-S' .. state .. 's', id)
@@ -357,7 +357,7 @@ do
 
 	local function ConditionSlider_UpdateText(self, value)
 		if value > -1 then
-			local page = (self:GetParent().owner.id + value - 1) % Mangos:NumBars() + 1
+			local page = (self:GetParent().owner.id + value) % Mangos:NumBars()
 			self.valText:SetFormattedText('Bar: %d', page)
 		else
 			self.valText:SetText(DISABLE)
@@ -413,7 +413,7 @@ do
 	end
 
 	local function AddPaging(self)
-		local p = self:NewPanel(ACTION_PAGE)
+		local p = self:NewPanel('Quick Paging')
 		for i = 6, 2, -1 do
 			ConditionSlider_New(p, format('[bar:%d]', i), getglobal('BINDING_NAME_ACTIONPAGE' .. i))
 		end
