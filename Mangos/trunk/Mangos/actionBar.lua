@@ -38,12 +38,14 @@ local function Create(id)
 		return _G['MultiBarRightButton' .. (id-36)]
 	elseif id <= 60 then
 		return _G['MultiBarLeftButton' .. (id-48)]
+--[[
 	elseif id <= 72 then
 		local b = _G['BonusActionButton' .. (id-60)]
 		b.isBonus = nil
 		return b
+--]]
 	elseif id <= 120 then
-		return CreateFrame('CheckButton', 'MangoActionButton' .. (id-72), nil, 'ActionBarButtonTemplate')
+		return CreateFrame('CheckButton', 'MangoActionButton' .. (id-60), nil, 'ActionBarButtonTemplate')
 	end
 end
 

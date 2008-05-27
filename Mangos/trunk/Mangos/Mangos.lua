@@ -24,6 +24,9 @@ function Mangos:OnInitialize()
 			self:UpdateSettings(MangosVersion:match('(%w+)%.(%w+)%.(%w+)'))
 			self:UpdateVersion()
 		end
+	--new user
+	else
+		MangosVersion = CURRENT_VERSION
 	end
 
 	self:RegisterSlashCommands()
