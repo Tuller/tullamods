@@ -1,5 +1,5 @@
 ﻿## Interface: 20400
-## Title: Mangos
+## Title: Mr. GoodBars
 ## Notes: Pure Actionbars
 ## Author: Tuller
 ## Version: 1.0.0
