@@ -40,13 +40,13 @@ end
 
 function MinimapButton:OnClick(button)
 	if button == 'LeftButton' then
-		local KeyBound = LibStub('LibKeyBound-1.0', true)
-		if KeyBound and IsShiftKeyDown() then
+		local KB = LibStub('LibKeyBound-1.0', true)
+		if KB  and IsShiftKeyDown() then
 			Bongos:SetLock(true)
-			KeyBound:Toggle()
+			KB :Toggle()
 		else
-			if KeyBound then
-				KeyBound:Deactivate()
+			if KB  then
+				KB :Deactivate()
 			end
 			Bongos:SetLock(not Bongos:IsLocked())
 		end
@@ -75,8 +75,9 @@ function MinimapButton:OnEnter()
 			GameTooltip:AddLine(L.ConfigExitTip)
 		end
 
-		if KeyBound then
-			if KeyBound:IsShown() then
+		local KB = LibStub('LibKeyBound-1.0', true)
+		if KB then
+			if KB:IsShown() then
 				GameTooltip:AddLine(L.BindingExitTip)
 			else
 				GameTooltip:AddLine(L.BindingEnterTip)

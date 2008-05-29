@@ -70,14 +70,6 @@ function Bongos:OnEnable()
 end
 
 function Bongos:UpdateSettings(major, minor)
-	--keybinding reset for Beta.7 and under versions
-	if major == 'Beta' and tonumber(minor) < 8 then
-		for _,profile in pairs(Bongos3DB.profiles) do
-			for _,sets in pairs(profile.bars) do
-				sets.bindings = nil
-			end
-		end
-	end
 	self:UpdateVersion()
 end
 
