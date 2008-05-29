@@ -65,6 +65,7 @@ L.Harm = 'Harm'
 L.Targeting = 'Targeting'
 L.ShowStates = 'Show States'
 L.Set = 'Set'
+L.Bar = 'Bar %d'
 
 --[[
 --minimap button stuff

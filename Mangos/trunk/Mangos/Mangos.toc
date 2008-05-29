@@ -1,5 +1,5 @@
 ﻿## Interface: 20400
-## Title: Mr. GoodBars
+## Title: Mangos
 ## Notes: Pure Actionbars
 ## Author: Tuller
 ## Version: 1.0.0
@@ -13,3 +13,4 @@ drag.lua
 frame.lua
 actionBar.lua
 petBar.lua
+classBar.lua

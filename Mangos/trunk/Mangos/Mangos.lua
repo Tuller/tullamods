@@ -58,10 +58,15 @@ end
 function Mangos:OnEnable()
 	local LBF = LibStub('LibButtonFacade', true)
 	if LBF then
-		LBF:RegisterSkinCallback('Mangos', self.OnSkin, self) 
+		LBF:RegisterSkinCallback('Mangos', self.OnSkin, self)
 	end
 
 	self:Load()
+end
+
+local function HasClassBar()
+	local _,class = UnitClass('player')
+	return class == 'PALADIN' or class == 'DRUID' or class == 'WARRIOR' or class == 'ROGUE'
 end
 
 function Mangos:Load()
@@ -70,27 +75,34 @@ function Mangos:Load()
 	end
 	self.PetBar:New()
 	
+	if HasClassBar() then
+		self.ClassBar:New()
+	end
+
 	self.Frame:ForAll('Reanchor')
 
 	local LBF = LibStub('LibButtonFacade', true)
 	if LBF then
 		LBF:Group('Mangos', ACTIONBAR_LABEL):Skin(unpack(self.db.profile.ab.style))
 		LBF:Group('Mangos', 'Pet Bar'):Skin(unpack(self.db.profile.petStyle))
+		LBF:Group('Mangos', 'Class Bar'):Skin(unpack(self.db.profile.classStyle))
 	end
 end
 
 function Mangos:OnSkin(skin, glossAlpha, gloss, group, button, colors)
+	local styleDB
 	if group == ACTIONBAR_LABEL then
-		self.db.profile.ab.style[1] = skin
-		self.db.profile.ab.style[2] = glossAlpha
-		self.db.profile.ab.style[3] = gloss
-		self.db.profile.ab.style[4] = colors
+		styleDB = self.db.profile.ab.style
 	elseif group == 'Pet Bar' then
-		self.db.profile.petStyle[1] = skin
-		self.db.profile.petStyle[2] = glossAlpha
-		self.db.profile.petStyle[3] = gloss
-		self.db.profile.petStyle[4] = colors
+		styleDB = self.db.profile.petStyle
+	elseif group == 'Class Bar' then
+		styleDB = self.db.profile.classStyle
 	end
+
+	styleDB[1] = skin
+	styleDB[2] = glossAlpha
+	styleDB[3] = gloss
+	styleDB[4] = colors
 end
 
 function Mangos:Unload()
@@ -106,8 +118,10 @@ function Mangos:GetDefaults()
 				count = 10,
 				style = {'Entropy: Copper', 0.5, true},
 			},
-			
+
 			petStyle  = {'Entropy: Silver', 0.5, nil},
+
+			classStyle = {'Entropy: Silver', 0.5, nil},
 
 			frames = {}
 		}
@@ -250,7 +264,7 @@ end
 
 function Mangos:OnCmd(args)
 	local cmd = string.split(' ', args):lower() or args:lower()
-	
+
 	--frame functions
 	if cmd == 'config' or cmd == 'lock' then
 		self:ToggleLockedFrames()
