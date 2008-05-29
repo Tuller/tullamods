@@ -36,6 +36,7 @@ L.Keys = 'Keys'
 L.Trade = 'Trade'
 L.Ammo = 'Ammo'
 L.Shards = 'Shards'
+L.SoulShard = 'Soul Shard'
 L.Usable = 'Usable'
 
 --tooltips
