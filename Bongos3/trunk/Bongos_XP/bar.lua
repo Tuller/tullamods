@@ -80,19 +80,13 @@ function XPBar:Create(parent)
 	overlay:SetAllPoints(bar)
 	bar.overlay = overlay
 
-	--click frame, allows easy switching between xp and reputation
-	local click = CreateFrame('Button', nil, overlay)
-	click:SetAllPoints(bar)
-	click:SetScript('OnEnter', function() bar:OnEnter() end)
-	click:SetScript('OnLeave', function() bar:OnLeave() end)
-	click:SetScript('OnClick', function() bar:OnClick() end)
-
-	local text = click:CreateFontString(nil, 'OVERLAY')
+	local text = overlay:CreateFontString(nil, 'OVERLAY')
 	text:SetFontObject('GameFontHighlight')
 	bar.text = text
 
 	bar:SetScript('OnShow', self.OnShow)
 	bar:SetScript('OnHide', self.OnHide)
+	bar:SetScript('OnMouseUp', self.OnClick) --we don't need a button frame to include this feature
 
 	Ace:EmbedLibrary(bar, "AceEvent-3.0")
 	return bar
@@ -237,10 +231,12 @@ end
 function XPBar:ToggleText(enable)
 	self.sets.alwaysShowText = enable
 	if enable then
-		self:EnableMouse(false)
+		self:SetScript('OnEnter', nil)
+		self:SetScript('OnLeave', nil)
 		self:OnEnter()
 	else
-		self:EnableMouse(true)
+		self:SetScript('OnEnter', self.OnEnter)
+		self:SetScript('OnLeave', self.OnLeave)
 		self:OnLeave()
 	end
 end
@@ -290,9 +286,10 @@ function XP:CreateVerticalButton(panel)
 		local checked = button:GetChecked()
 		self.sets.vertical = checked and 1 or nil
 		self.xp:UpdateOrientation()
-
-		getglobal(panel:GetName() .. 'Width'):Show()
-		getglobal(panel:GetName() .. 'Height'):Show()
+		
+		local width, height = getglobal(panel:GetName() .. 'Width'), getglobal(panel:GetName() .. 'Height')
+		width:Hide() width:Show() --still needs a better solution
+		height:Hide() height:Show()
 	end)
 
 	return button
@@ -305,8 +302,8 @@ function XP:CreateAlwaysXPButton(panel)
 	end)
 
 	button:SetScript('OnClick', function()
-		self.sets.alwaysShowXP = button:GetChecked() and 1 or nil
-		self.xp:UpdateWatch()
+		self.xp:OnClick() --still needs a better solution
+		button:Hide() button:Show()
 	end)
 
 	return button
