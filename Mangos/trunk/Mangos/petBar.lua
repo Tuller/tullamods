@@ -120,3 +120,26 @@ function PetBar:RemoveButton(i)
 	self.buttons[i] = nil
 	b:Free()
 end
+
+
+--[[ keybound  support ]]--
+
+function PetBar:KEYBOUND_ENABLED()
+	self:SetShowStates(nil)
+	for _,button in pairs(self.buttons) do
+		button:Show()
+	end
+end
+
+function PetBar:KEYBOUND_DISABLED()
+	self:UpdatePossess()
+	
+	local petBarShown = PetHasActionBar()
+	for _,button in pairs(self.buttons) do
+		if petBarShown and GetPetActionInfo(button:GetID()) then
+			button:Show()
+		else
+			button:Hide()
+		end
+	end
+end

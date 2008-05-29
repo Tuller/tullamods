@@ -56,6 +56,11 @@ function Mangos:HideBlizzard()
 end
 
 function Mangos:OnEnable()
+	local LBF = LibStub('LibButtonFacade', true)
+	if LBF then
+		LBF:RegisterSkinCallback('Mangos', self.OnSkin, self) 
+	end
+
 	self:Load()
 end
 
@@ -71,6 +76,20 @@ function Mangos:Load()
 	if LBF then
 		LBF:Group('Mangos', ACTIONBAR_LABEL):Skin(unpack(self.db.profile.ab.style))
 		LBF:Group('Mangos', 'Pet Bar'):Skin(unpack(self.db.profile.petStyle))
+	end
+end
+
+function Mangos:OnSkin(skin, glossAlpha, gloss, group, button, colors)
+	if group == ACTIONBAR_LABEL then
+		self.db.profile.ab.style[1] = skin
+		self.db.profile.ab.style[2] = glossAlpha
+		self.db.profile.ab.style[3] = gloss
+		self.db.profile.ab.style[4] = colors
+	elseif group == 'Pet Bar' then
+		self.db.profile.petStyle[1] = skin
+		self.db.profile.petStyle[2] = glossAlpha
+		self.db.profile.petStyle[3] = gloss
+		self.db.profile.petStyle[4] = colors
 	end
 end
 
