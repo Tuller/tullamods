@@ -53,6 +53,10 @@ function Mangos:HideBlizzard()
 	MultiActionBar_UpdateGrid = Multibar_EmptyFunc
 	MainMenuBar:UnregisterAllEvents()
 	MainMenuBar:Hide()
+	
+	BonusActionBarFrame:UnregisterAllEvents()
+	ShapeshiftBarFrame:UnregisterAllEvents()
+	BonusActionBarFrame:Hide()
 end
 
 function Mangos:OnEnable()
