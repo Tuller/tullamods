@@ -106,6 +106,7 @@ function Mangos:Load()
 
 	self.Frame:ForAll('Reanchor')
 
+	--button facade support
 	local LBF = LibStub('LibButtonFacade', true)
 	if LBF then
 		LBF:Group('Mangos', ACTIONBAR_LABEL):Skin(unpack(self.db.profile.ab.style))

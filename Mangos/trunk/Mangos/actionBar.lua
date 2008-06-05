@@ -203,6 +203,7 @@ function ActionBar:New(id)
 	f:LoadButtons()
 	f:UpdateStateDriver()
 	f:Layout()
+	f:ShowGrid()
 
 	return f
 end
