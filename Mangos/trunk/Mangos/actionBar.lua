@@ -73,6 +73,7 @@ function ActionButton:Restore(id)
 	if b then
 		self.unused[id] = nil
 		b:LoadEvents()
+		b:Show()
 		self.active[id] = b
 		return b
 	end
