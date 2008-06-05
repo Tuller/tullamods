@@ -25,6 +25,7 @@ function ActionButton:New(id)
 	local b = self:Restore(id) or self:Create(id)
 	b:SetAttribute('showgrid', 0)
 	b:UpdateGrid()
+
 	self.active[id] = b
 
 	return b
@@ -191,6 +192,7 @@ ActionBar.conditions = {
 }
 
 ActionBar.class = select(2, UnitClass('player'))
+local active = {}
 
 function ActionBar:New(id)
 	local f = self.super.New(self, id, self:GetDefaults(id))
@@ -203,7 +205,9 @@ function ActionBar:New(id)
 	f:LoadButtons()
 	f:UpdateStateDriver()
 	f:Layout()
-	f:ShowGrid()
+	f:UpdateGrid()
+	
+	active[id] = f
 
 	return f
 end
@@ -217,6 +221,11 @@ function ActionBar:GetDefaults(id)
 	defaults.numButtons = 12
 
 	return defaults
+end
+
+function ActionBar:Free()
+	active[self.id] = nil
+	self.super.Free(self)
 end
 
 
@@ -357,10 +366,21 @@ end
 
 function ActionBar:HideGrid()
 	for _,b in pairs(self.buttons) do
-		b:SetAttribute('showgrid', b:GetAttribute('showgrid') - 1)
+		b:SetAttribute('showgrid', max(b:GetAttribute('showgrid') - 1, 0))
 		b:UpdateGrid()
 	end
 end
+
+function ActionBar:UpdateGrid()
+	if Mangos:ShowGrid() then
+		self:ShowGrid()
+	else
+		self:HideGrid()
+	end
+end
+
+
+--[[ Keybound Support ]]--
 
 function ActionBar:KEYBOUND_ENABLED()
 	self:ShowGrid()
@@ -369,6 +389,17 @@ end
 function ActionBar:KEYBOUND_DISABLED()
 	self:HideGrid()
 end
+
+
+--[[ Utility ]]--
+
+function ActionBar:ForAll(method, ...)
+	for _,f in pairs(active) do
+		f[method](f, ...)
+	end
+end
+
+--[[ menu code ]]--
 
 do
 	--state slider template

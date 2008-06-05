@@ -83,9 +83,9 @@ end
 
 local Frame = Mangos:CreateClass('Frame')
 Mangos.Frame = Frame
-Frame.active = {}
-Frame.unused = {}
 
+local active = {}
+local unused = {}
 
 --constructor
 function Frame:New(id, defaults)
@@ -94,7 +94,7 @@ function Frame:New(id, defaults)
 	f:LoadSettings(defaults)
 	f.buttons = {}
 
-	self.active[id] = f
+	active[id] = f
 	return f
 end
 
@@ -113,16 +113,16 @@ function Frame:Create(id)
 end
 
 function Frame:Restore(id)
-	local f = self.unused[id]
+	local f = unused[id]
 	if f then
-		self.unused[id] = nil
+		unused[id] = nil
 		return f
 	end
 end
 
 --destructor
 function Frame:Free()
-	self.active[self.id] = nil
+	active[self.id] = nil
 
 	UnregisterStateDriver(self.header, 'state', 0)
 	UnregisterStateDriver(self.header, 'visibility', 'show')
@@ -138,7 +138,7 @@ function Frame:Free()
 	self.drag:Hide()
 	self:Hide()
 
-	self.unused[self.id] = self
+	unused[self.id] = self
 end
 
 function Frame:LoadSettings(defaults)
@@ -590,11 +590,11 @@ end
 --[[ Metafunctions ]]--
 
 function Frame:Get(id)
-	return self.active[tonumber(id) or id]
+	return active[tonumber(id) or id]
 end
 
 function Frame:GetAll()
-	return pairs(self.active)
+	return pairs(active)
 end
 
 function Frame:ForAll(method, ...)

@@ -28,6 +28,12 @@ L.SetScaleDesc = 'Sets the scale of <frameList>'
 L.SetAlphaDesc = 'Sets the opacity of <frameList>'
 L.SetFadeDesc = 'Sets the faded opacity of <frameList>'
 
+L.SetColsDesc = 'Sets the number of columns for <frameList>'
+L.SetPadDesc = 'Sets the padding level for <frameList>'
+L.SetSpaceDesc = 'Sets the spacing level for <frameList>'
+
+L.ShowGridDesc = 'Toggles showing empty buttons on actionbars'
+
 L.ShowFramesDesc = 'Shows the given <frameList>'
 L.HideFramesDesc = 'Hides the given <frameList>'
 L.ToggleFramesDesc = 'Toggles the given <frameList>'
@@ -66,24 +72,3 @@ L.Targeting = 'Targeting'
 L.ShowStates = 'Show States'
 L.Set = 'Set'
 L.Bar = 'Bar %d'
-
---[[
---minimap button stuff
-L.ConfigEnterTip = '<Left Click> to enter configuration mode'
-L.ConfigExitTip = '<Left Click> to exit configuration mode'
-L.BindingEnterTip = '<Shift-Left Click> to enter binding mode'
-L.BindingExitTip = '<Shift-Left Click> to exit binding mode'
-L.ShowOptionsTip = '<Right Click> to show the options menu'
-
---Options Menu
-L.EnableStickyFrames = 'Sticky Frames'
-L.ShowMinimapButton = 'Show Minimap Button'
-L.General = 'General'
-L.Profiles = 'Profiles'
-L.Visibility = 'Visibility'
-L.Copy = 'Copy'
-L.Set = 'Set'
-L.Save = 'Save'
-L.Delete = 'Delete'
-L.EnterName = 'Enter Profile Name'
---]]

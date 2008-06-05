@@ -107,11 +107,11 @@ function Mangos:Load()
 	self.Frame:ForAll('Reanchor')
 
 	--button facade support
-	local LBF = LibStub('LibButtonFacade', true)
-	if LBF then
-		LBF:Group('Mangos', ACTIONBAR_LABEL):Skin(unpack(self.db.profile.ab.style))
-		LBF:Group('Mangos', 'Pet Bar'):Skin(unpack(self.db.profile.petStyle))
-		LBF:Group('Mangos', 'Class Bar'):Skin(unpack(self.db.profile.classStyle))
+	local bf = LibStub('LibButtonFacade', true)
+	if bf then
+		bf:Group('Mangos', ACTIONBAR_LABEL):Skin(unpack(self.db.profile.ab.style))
+		bf:Group('Mangos', 'Pet Bar'):Skin(unpack(self.db.profile.petStyle))
+		bf:Group('Mangos', 'Class Bar'):Skin(unpack(self.db.profile.classStyle))
 	end
 end
 
@@ -144,6 +144,7 @@ function Mangos:GetDefaults()
 
 			ab = {
 				count = 10,
+				showgrid = true,
 				style = {'Entropy: Copper', 0.5, true},
 			},
 
@@ -314,6 +315,9 @@ function Mangos:OnCmd(args)
 		self:HideFrames(select(2, string.split(' ', args)))
 	elseif cmd == 'toggle' then
 		self:ToggleFrames(select(2, string.split(' ', args)))
+	--actionbar functions
+	elseif cmd == 'showgrid' then
+		self:ToggleGrid()
 	--profile functions
 	elseif cmd == 'save' then
 		local profileName = string.join(' ', select(2, string.split(' ', args)))
@@ -451,6 +455,20 @@ function Mangos:ToggleFrames(...)
 	end
 end
 
+--empty button display
+function Mangos:ToggleGrid()
+	self:SetShowGrid(not self:ShowGrid())
+end
+
+function Mangos:SetShowGrid(enable)
+	self.db.profile.showgrid = enable
+	self.ActionBar:ForAll('UpdateGrid')
+end
+
+function Mangos:ShowGrid()
+	return self.db.profile.showgrid
+end
+
 --version info
 function Mangos:PrintVersion()
 	self:Print(MangosVersion)
@@ -463,12 +481,16 @@ function Mangos:PrintHelp(cmd)
 
 	self:Print('Commands (/Mangos, /bob, or /bgs)')
 	PrintCmd('config', L.ConfigDesc)
-	PrintCmd('scale <barList> <scale>', L.SetScaleDesc)
-	PrintCmd('setalpha <barList> <opacity>', L.SetAlphaDesc)
-	PrintCmd('setfade <barList> <opacity>', L.SetFadeDesc)
-	PrintCmd('show <barList>', L.ShowFramesDesc)
-	PrintCmd('hide <barList>', L.HideFramesDesc)
-	PrintCmd('toggle <barList>', L.ToggleFramesDesc)
+	PrintCmd('scale <frameList> <scale>', L.SetScaleDesc)
+	PrintCmd('setalpha <frameList> <opacity>', L.SetAlphaDesc)
+	PrintCmd('fade <frameList> <opacity>', L.SetFadeDesc)
+	PrintCmd('setcols <frameList> <columns>', L.SetColsDesc)
+	PrintCmd('pad <frameList> <padding>', L.SetPadDesc)
+	PrintCmd('space <frameList> <spacing>', L.SetSpacingDesc)
+	PrintCmd('show <frameList>', L.ShowFramesDesc)
+	PrintCmd('hide <frameList>', L.HideFramesDesc)
+	PrintCmd('toggle <frameList>', L.ToggleFramesDesc)
+	PrintCmd('showgrid', L.ShowGridDesc)
 	PrintCmd('save <profile>', L.SaveDesc)
 	PrintCmd('set <profile>', L.SetDesc)
 	PrintCmd('copy <profile>', L.CopyDesc)
@@ -493,14 +515,12 @@ end
 function Mangos:SetPossessBar(id)
 	self.db.profile.possessBar = id
 
-	for i = 1, self:NumBars() do
-		Mangos.Frame:Get(i):UpdateStateDriver()
-	end
-	Mangos.Frame:Get('pet'):UpdatePossess()
+	self.ActionBar:ForAll('UpdateStateDriver')
+	self.Frame:Get('pet'):UpdatePossess()
 end
 
 function Mangos:GetPossessBar()
-	return Mangos.Frame:Get(self.db.profile.possessBar)
+	return self.Frame:Get(self.db.profile.possessBar)
 end
 
 --[[
