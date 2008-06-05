@@ -37,8 +37,29 @@ function Mangos:OnInitialize()
 		self:SetScript('OnShow', nil)
 		LoadAddOn('Mangos_Options')
 	end)
+	
+	--keybound support
+	local kb = LibStub('LibKeyBound-1.0')
+	kb.RegisterCallback(self, 'LIBKEYBOUND_ENABLED')
+	kb.RegisterCallback(self, 'LIBKEYBOUND_DISABLED')
 
 	self:HideBlizzard()
+end
+
+function Mangos:LIBKEYBOUND_ENABLED()
+	for _,frame in self.Frame:GetAll() do
+		if frame.KEYBOUND_ENABLED then
+			frame:KEYBOUND_ENABLED()
+		end
+	end
+end
+
+function Mangos:LIBKEYBOUND_DISABLED()
+	for _,frame in self.Frame:GetAll() do
+		if frame.KEYBOUND_DISABLED then
+			frame:KEYBOUND_DISABLED()
+		end
+	end
 end
 
 function Mangos:HideBlizzard()
@@ -103,10 +124,12 @@ function Mangos:OnSkin(skin, glossAlpha, gloss, group, button, colors)
 		styleDB = self.db.profile.classStyle
 	end
 
-	styleDB[1] = skin
-	styleDB[2] = glossAlpha
-	styleDB[3] = gloss
-	styleDB[4] = colors
+	if styleDB then
+		styleDB[1] = skin
+		styleDB[2] = glossAlpha
+		styleDB[3] = gloss
+		styleDB[4] = colors
+	end
 end
 
 function Mangos:Unload()

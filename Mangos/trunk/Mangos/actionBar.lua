@@ -13,6 +13,7 @@ local KeyBound = LibStub('LibKeyBound-1.0')
 local LBF = LibStub('LibButtonFacade', true)
 local L = LibStub('AceLocale-3.0'):GetLocale('Mangos')
 
+
 --[[ Action Button ]]--
 
 local ActionButton = Mangos:CreateClass('CheckButton')
@@ -22,6 +23,8 @@ ActionButton.active = {}
 --constructor
 function ActionButton:New(id)
 	local b = self:Restore(id) or self:Create(id)
+	b:SetAttribute('showgrid', 0)
+	b:UpdateGrid()
 	self.active[id] = b
 
 	return b
@@ -54,7 +57,6 @@ function ActionButton:Create(id)
 		b:SetAttribute('useparent-statebutton', true)
 		b:SetAttribute('useparent-actionbar', nil)
 		b:SetScript('OnEnter', self.OnEnter)
-		b:SetAttribute('showgrid', 0)
 
 		_G[b:GetName() .. 'Name']:Hide() --hide macro text
 
@@ -69,7 +71,6 @@ function ActionButton:Restore(id)
 	local b = self.unused[id]
 	if b then
 		self.unused[id] = nil
-		b:Show()
 		b:LoadEvents()
 		self.active[id] = b
 		return b
@@ -106,6 +107,14 @@ end
 
 function ActionButton:GetHotkey()
 	return KeyBound:ToShortKey(GetBindingKey(format('CLICK %s:LeftButton', self:GetName())))
+end
+
+function ActionButton:UpdateGrid()
+	if self:GetAttribute('showgrid') > 0 then
+		self:RCall(ActionButton_ShowGrid)
+	else
+		self:RCall(ActionButton_HideGrid)
+	end
 end
 
 --you can hopefully guess what the 'R' stands for
@@ -333,6 +342,31 @@ end
 
 function ActionBar:IsPossessBar()
 	return self == Mangos:GetPossessBar()
+end
+
+
+--[[ Grid ]]--
+
+function ActionBar:ShowGrid()
+	for _,b in pairs(self.buttons) do
+		b:SetAttribute('showgrid', b:GetAttribute('showgrid') + 1)
+		b:UpdateGrid()
+	end
+end
+
+function ActionBar:HideGrid()
+	for _,b in pairs(self.buttons) do
+		b:SetAttribute('showgrid', b:GetAttribute('showgrid') - 1)
+		b:UpdateGrid()
+	end
+end
+
+function ActionBar:KEYBOUND_ENABLED()
+	self:ShowGrid()
+end
+
+function ActionBar:KEYBOUND_DISABLED()
+	self:HideGrid()
 end
 
 do
