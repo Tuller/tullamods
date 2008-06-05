@@ -30,7 +30,7 @@ L.SetFadeDesc = 'Sets the faded opacity of <frameList>'
 
 L.SetColsDesc = 'Sets the number of columns for <frameList>'
 L.SetPadDesc = 'Sets the padding level for <frameList>'
-L.SetSpaceDesc = 'Sets the spacing level for <frameList>'
+L.SetSpacingDesc = 'Sets the spacing level for <frameList>'
 
 L.ShowGridDesc = 'Toggles showing empty buttons on actionbars'
 

@@ -479,7 +479,7 @@ function Mangos:PrintHelp(cmd)
 		DEFAULT_CHAT_FRAME:AddMessage(format(' - |cFF33FF99%s|r: %s', cmd, desc))
 	end
 
-	self:Print('Commands (/Mangos, /bob, or /bgs)')
+	self:Print('Commands (/mg, /mangos)')
 	PrintCmd('config', L.ConfigDesc)
 	PrintCmd('scale <frameList> <scale>', L.SetScaleDesc)
 	PrintCmd('setalpha <frameList> <opacity>', L.SetAlphaDesc)
