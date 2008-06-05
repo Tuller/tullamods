@@ -1,6 +1,6 @@
 ﻿## Interface: 20400
 ## Title: Mangos
-## Notes: Pure Actionbars
+## Notes: A main actionbar replacement
 ## Author: Tuller
 ## Version: 1.0.0
 ## SavedVariables: MangosDB, MangosVersion
