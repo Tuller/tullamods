@@ -3,12 +3,6 @@
 		Because sometimes I feel bad about doing to much
 --]]
 
---libs and omgspeed
-local _G = getfenv(0)
-local format = string.format
-
-
---load up the bag set...
 local menuButtons = {
 	CharacterMicroButton,
 	SpellbookMicroButton,
@@ -45,11 +39,10 @@ do
 end
 
 
---[[ Bag Bar ]]--
+--[[ Menu Bar ]]--
 
 local MenuBar = Mangos:CreateClass('Frame', Mangos.Frame)
 Mangos.MenuBar  = MenuBar
-
 
 function MenuBar:New()
 	local f = self.super.New(self, 'menu', self:GetDefaults())

@@ -4,10 +4,7 @@
 --]]
 
 --libs and omgspeed
-local _G = getfenv(0)
-local format = string.format
 --local LBF = LibStub('LibButtonFacade', true)
-
 
 --load up the bag set...
 local bags = {}
@@ -52,7 +49,7 @@ do
 			GameTooltip:Hide()
 		end)
 
-		_G[b:GetName() .. 'IconTexture']:SetTexture('Interface\\Icons\\INV_Misc_Bag_16')
+		getglobal(b:GetName() .. 'IconTexture'):SetTexture('Interface\\Icons\\INV_Misc_Bag_16')
 
 		return b
 	end
