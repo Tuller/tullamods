@@ -99,6 +99,8 @@ function Mangos:Load()
 		self.ActionBar:New(i)
 	end
 	self.PetBar:New()
+	self.BagBar:New()
+	self.MenuBar:New()
 	
 	if HasClassBar() then
 		self.ClassBar:New()
@@ -112,6 +114,7 @@ function Mangos:Load()
 		bf:Group('Mangos', ACTIONBAR_LABEL):Skin(unpack(self.db.profile.ab.style))
 		bf:Group('Mangos', 'Pet Bar'):Skin(unpack(self.db.profile.petStyle))
 		bf:Group('Mangos', 'Class Bar'):Skin(unpack(self.db.profile.classStyle))
+--		bf:Group('Mangos', 'Bag Bar'):Skin(unpack(self.db.profile.bagStyle))
 	end
 end
 
@@ -123,6 +126,10 @@ function Mangos:OnSkin(skin, glossAlpha, gloss, group, button, colors)
 		styleDB = self.db.profile.petStyle
 	elseif group == 'Class Bar' then
 		styleDB = self.db.profile.classStyle
+--[[
+	elseif group == 'Bag Bar' then
+		styleDB = self.db.profile.bagStyle
+--]]
 	end
 
 	if styleDB then
@@ -151,6 +158,8 @@ function Mangos:GetDefaults()
 			petStyle  = {'Entropy: Silver', 0.5, nil},
 
 			classStyle = {'Entropy: Silver', 0.5, nil},
+			
+--			bagStyle = {'Entropy: Bronze', 0.5, nil},
 
 			frames = {}
 		}

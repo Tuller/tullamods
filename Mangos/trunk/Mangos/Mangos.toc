@@ -2,7 +2,7 @@
 ## Title: Mangos
 ## Notes: A main actionbar replacement
 ## Author: Tuller
-## Version: 1.0.0
+## Version: 1.1.0
 ## SavedVariables: MangosDB, MangosVersion
 ## OptionalDeps: Ace3, LibKeyBound-1.0
 embeds.xml
@@ -15,3 +15,5 @@ frame.lua
 actionBar.lua
 petBar.lua
 classBar.lua
+bagBar.lua
+menuBar.lua
