@@ -11,7 +11,7 @@ local KeyBound = LibStub('LibKeyBound-1.0')
 local LBF = LibStub('LibButtonFacade', true)
 
 
---[[ Action Button ]]--
+--[[ Pet Button ]]--
 
 local PetButton = Mangos:CreateClass('CheckButton')
 
@@ -74,7 +74,6 @@ end
 local PetBar = Mangos:CreateClass('Frame', Mangos.Frame)
 Mangos.PetBar  = PetBar
 
-
 function PetBar:New()
 	local f = self.super.New(self, 'pet', self:GetDefaults())
 	f:LoadButtons()
@@ -98,15 +97,6 @@ function PetBar:GetDefaults()
 		numButtons = 10,
 		spacing = 6
 	}
-end
-
-
---[[ button stuff]]--
-
-function PetBar:LoadButtons()
-	for i = 1, self:NumButtons() do
-		self:AddButton(i)
-	end
 end
 
 function PetBar:AddButton(i)
@@ -133,7 +123,7 @@ end
 
 function PetBar:KEYBOUND_DISABLED()
 	self:UpdatePossess()
-	
+
 	local petBarShown = PetHasActionBar()
 	for _,button in pairs(self.buttons) do
 		if petBarShown and GetPetActionInfo(button:GetID()) then

@@ -62,12 +62,6 @@ function MenuBar:GetDefaults()
 	}
 end
 
-function MenuBar:LoadButtons()
-	for i = 1, self:NumButtons() do
-		self:AddButton(i)
-	end
-end
-
 function MenuBar:AddButton(i)
 	local b = menuButtons[i]
 	b:SetParent(self.header)

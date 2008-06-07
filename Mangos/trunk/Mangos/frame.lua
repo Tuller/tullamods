@@ -164,6 +164,13 @@ end
 
 --[[ Layout ]]--
 
+--this function is used in a lot of places, but never called in Frame
+function Frame:LoadButtons()
+	for i = 1, self:NumButtons() do
+		self:AddButton(i)
+	end
+end
+
 function Frame:SetNumButtons(size)
 	self.sets.numButtons = numButtons
 

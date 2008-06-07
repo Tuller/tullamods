@@ -85,12 +85,6 @@ function BagBar:GetDefaults()
 	}
 end
 
-function BagBar:LoadButtons()
-	for i = 1, self:NumButtons() do
-		self:AddButton(i)
-	end
-end
-
 function BagBar:AddButton(i)
 	local b = bags[i]
 	b:SetParent(self.header)

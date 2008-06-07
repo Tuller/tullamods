@@ -101,6 +101,7 @@ function Mangos:Load()
 	self.PetBar:New()
 	self.BagBar:New()
 	self.MenuBar:New()
+	self.RollBar:New()
 	
 	if HasClassBar() then
 		self.ClassBar:New()
