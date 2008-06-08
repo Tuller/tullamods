@@ -215,7 +215,7 @@ function ActionBar:New(id)
 	f:Layout()
 	f:UpdateGrid()
 	f:UpdateRightClickUnit()
-	
+
 	active[id] = f
 
 	return f
