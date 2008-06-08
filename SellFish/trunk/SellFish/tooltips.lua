@@ -119,9 +119,7 @@ end
 
 local hooks = {
 	SetHyperlink = function(link, count)
-		if GetItemInfo(link) then
-			return link, count
-		end
+		return select(2, GetItemInfo(link)), count
 	end,
 
 	SetBagItem = function(bag, slot)
