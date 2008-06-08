@@ -198,7 +198,7 @@ function StatsFrame:UpdateAddonsList(watchingCPU)
 	local total = 0
 	for i=1, GetNumAddOns() do
 		local value = (watchingCPU and GetAddOnCPUUsage(i)/1000) or GetAddOnMemoryUsage(i)
-		local name = GetAddOnInfo(i)
+		local name = (GetAddOnInfo(i))
 		total = total + value
 
 		for j,addon in ipairs(topAddOns) do
