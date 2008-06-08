@@ -75,7 +75,7 @@ local PetBar = Mangos:CreateClass('Frame', Mangos.Frame)
 Mangos.PetBar  = PetBar
 
 function PetBar:New()
-	local f = self.super.New(self, 'pet', self:GetDefaults())
+	local f = self.super.New(self, 'pet')
 	f:LoadButtons()
 	f:Layout()
 	f:UpdatePossess()
@@ -94,6 +94,8 @@ end
 function PetBar:GetDefaults()
 	return {
 		point = 'CENTER',
+		x = 0,
+		y = -32,
 		numButtons = 10,
 		spacing = 6
 	}

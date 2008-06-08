@@ -197,7 +197,7 @@ Mangos.ClassBar  = ClassBar
 
 
 function ClassBar:New()
-	local f = self.super.New(self, 'class', self:GetDefaults())
+	local f = self.super.New(self, 'class')
 	f:SetScript('OnEvent', f.UpdateForms)
 	f:RegisterEvent('UPDATE_SHAPESHIFT_FORMS')
 	f:UpdateForms()

@@ -70,7 +70,7 @@ Mangos.BagBar  = BagBar
 
 
 function BagBar:New()
-	local f = self.super.New(self, 'bags', self:GetDefaults())
+	local f = self.super.New(self, 'bags')
 	f:LoadButtons()
 	f:Layout()
 
@@ -81,7 +81,7 @@ function BagBar:GetDefaults()
 	return {
 		point = 'BOTTOMRIGHT',
 		numButtons = #bags,
-		spacing = 2
+		spacing = 4
 	}
 end
 

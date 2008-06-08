@@ -196,7 +196,7 @@ ActionBar.class = select(2, UnitClass('player'))
 local active = {}
 
 function ActionBar:New(id)
-	local f = self.super.New(self, id, self:GetDefaults(id))
+	local f = self.super.New(self, id)
 	f.sets.pages = setmetatable(f.sets.pages, f.id == 1 and self.mainbarOffsets or self.defaultOffsets)
 
 	f.pages = f.sets.pages[f.class]
@@ -213,11 +213,11 @@ function ActionBar:New(id)
 	return f
 end
 
-function ActionBar:GetDefaults(id)
+function ActionBar:GetDefaults()
 	local defaults = {}
 	defaults.point = 'BOTTOM'
 	defaults.x = 0
-	defaults.y = 37*(id-1)
+	defaults.y = 37*(self.id-1)
 	defaults.pages = {}
 	defaults.numButtons = 12
 

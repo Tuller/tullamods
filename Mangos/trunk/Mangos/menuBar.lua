@@ -45,7 +45,7 @@ local MenuBar = Mangos:CreateClass('Frame', Mangos.Frame)
 Mangos.MenuBar  = MenuBar
 
 function MenuBar:New()
-	local f = self.super.New(self, 'menu', self:GetDefaults())
+	local f = self.super.New(self, 'menu')
 	f:LoadButtons()
 	f:Layout()
 
@@ -55,10 +55,9 @@ end
 function MenuBar:GetDefaults()
 	return {
 		point = 'BOTTOMRIGHT',
-		x = -200,
+		x = -244,
 		y = 0,
 		numButtons = #menuButtons,
-		spacing = -6
 	}
 end
 

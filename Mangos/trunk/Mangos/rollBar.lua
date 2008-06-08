@@ -7,7 +7,7 @@ local RollBar = Mangos:CreateClass('Frame', Mangos.Frame)
 Mangos.RollBar  = RollBar
 
 function RollBar:New()
-	local f = self.super.New(self, 'roll', self:GetDefaults())
+	local f = self.super.New(self, 'roll')
 	f:LoadButtons()
 	f:Layout()
 
@@ -18,6 +18,7 @@ function RollBar:GetDefaults()
 	return {
 		point = 'LEFT',
 		numButtons = NUM_GROUP_LOOT_FRAMES,
+		columns = 1,
 		spacing = 2
 	}
 end

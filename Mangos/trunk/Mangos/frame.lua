@@ -88,10 +88,10 @@ local active = {}
 local unused = {}
 
 --constructor
-function Frame:New(id, defaults)
+function Frame:New(id)
 	local id = tonumber(id) or id
 	local f = self:Restore(id) or self:Create(id)
-	f:LoadSettings(defaults)
+	f:LoadSettings()
 	f.buttons = {}
 
 	active[id] = f
@@ -142,7 +142,7 @@ function Frame:Free()
 end
 
 function Frame:LoadSettings(defaults)
-	self.sets = Mangos:GetFrameSets(self.id) or Mangos:SetFrameSets(self.id, defaults)
+	self.sets = Mangos:GetFrameSets(self.id) or Mangos:SetFrameSets(self.id, self:GetDefaults()) --get defaults must be provided by anything implementing the Frame type
 	self:Reposition()
 
 	if self.sets.hidden then
