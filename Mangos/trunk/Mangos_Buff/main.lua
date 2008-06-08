@@ -247,22 +247,17 @@ local function ActionButton_UpdateBorder(self, spell)
 	self:GetCheckedTexture():SetVertexColor(1, 1, 1)
 end
 
-local function ActionButton_UpdateSpellInUse(self)
-	local action = self.action
-	if action then
-		local spellID = self.spellID
-		if spellID then
-			if self.type == 'macro' then
-				return ActionButton_UpdateBorder(self, GetMacroSpell(spellID))
-			else
-				return ActionButton_UpdateBorder(self, spellID)
-			end
+local function ActionButton_IsSpellInUse(self)
+	local spellID = self.spellID
+	if spellID then
+		if self.type == 'macro' then
+			return ActionButton_UpdateBorder(self, GetMacroSpell(spellID))
 		end
+		return ActionButton_UpdateBorder(self, spellID)
 	end
-	self:GetCheckedTexture():SetVertexColor(1, 1, 1)
 end
 
-hooksecurefunc('ActionButton_CalculateAction', function(self)
+local function ActionButton_UpdateSpell(self)
 	if self.action then
 		local type, arg1, arg2 = GetActionInfo(self.action)
 
@@ -278,12 +273,16 @@ hooksecurefunc('ActionButton_CalculateAction', function(self)
 		else
 			self.spellID = arg1
 		end
+
+		ActionButton_UpdateState(self)
 	end
-end)
+end
 
 hooksecurefunc('ActionButton_UpdateState', function(self)
 	local self = self or this
-	if self.action then
-		self:SetChecked(ActionButton_UpdateSpellInUse(self) or self:GetChecked())
-	end
+	self:SetChecked(ActionButton_IsSpellInUse(self) or self:GetChecked())
+end)
+
+hooksecurefunc('ActionButton_UpdateAction', function(self)
+	ActionButton_UpdateSpell(self or this)
 end)
