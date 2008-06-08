@@ -47,7 +47,7 @@ do
 			self:Hide()
 		end
 	end
-	
+
 	-- Generic fade function, taken from UIFrameFade
 	--the following code exists only so that I can prevent some basic tainting issues caused by the UIFrameFade function attempting to show frames
 	local function Fade(frame, fadeInfo)
@@ -422,7 +422,7 @@ end
 
 --[[ Sticky Bars ]]--
 
-Frame.stickyTolerance = 24
+Frame.stickyTolerance = 16
 
 function Frame:StickToEdge()
 	local point, x, y = self:GetRelPosition()
