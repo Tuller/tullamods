@@ -99,6 +99,7 @@ function ActionButton:Free()
 	self.unused[id] = self
 end
 
+--these are all events that are registered OnLoad for action buttons
 function ActionButton:LoadEvents()
 	self:RegisterEvent('PLAYER_ENTERING_WORLD')
 	self:RegisterEvent('ACTIONBAR_SHOWGRID')
@@ -126,7 +127,8 @@ function ActionButton:UpdateGrid()
 	end
 end
 
---you can hopefully guess what the 'R' stands for
+--I use this to call any blizzard function which still uses 'this'
+--to be removed once Wrath is out
 function ActionButton:RCall(f, ...)
 	local pThis = this
 	this = self
@@ -143,6 +145,8 @@ Mangos.ActionBar = ActionBar
 
 --[[ Constructor Code ]]--
 
+--metatable magic.  Basically this says, "create a new table for this index"
+--I do this so that I only create page tables for classes the user is actually playing
 ActionBar.defaultOffsets = {
 	__index = function(t, i)
 		t[i] = {};
@@ -150,8 +154,10 @@ ActionBar.defaultOffsets = {
 	end
 }
 
+--metatable magic.  Basically this says, "create a new table for this index, with these defaults"
+--I do this so that I only create page tables for classes the user is actually playing
 ActionBar.mainbarOffsets = {
-	__index = function(t, k)
+	__index = function(t, i)
 		local pages = {
 			['[bar:2]'] = 1,
 			['[bar:3]'] = 2,
@@ -160,25 +166,26 @@ ActionBar.mainbarOffsets = {
 			['[bar:6]'] = 5,
 		}
 
-		if k == 'DRUID' then
+		if i == 'DRUID' then
 			pages['[bonusbar:1,stealth]'] = 5
 			pages['[bonusbar:1]'] = 6
 			pages['[bonusbar:2]'] = 7
 			pages['[bonusbar:3]'] = 8
 			pages['[bonusbar:4]'] = 9
-		elseif k == 'WARRIOR' then
+		elseif i == 'WARRIOR' then
 			pages['[bonusbar:1]'] = 6
 			pages['[bonusbar:2]'] = 7
 			pages['[bonusbar:3]'] = 8
-		elseif k == 'PRIEST' or k == 'ROGUE' then
+		elseif i == 'PRIEST' or i == 'ROGUE' then
 			pages['[bonusbar:1]'] = 6
 		end
 
-		t[k] = pages
+		t[i] = pages
 		return pages
 	end
 }
 
+--this is the set of conditions used for paging, in order of evaluation
 ActionBar.conditions = {
 	'[mod:SELFCAST]',
 	'[mod:ctrl]',
@@ -221,6 +228,7 @@ function ActionBar:New(id)
 	return f
 end
 
+--TODO: change the position code to be based more on the number of action bars
 function ActionBar:GetDefaults()
 	local defaults = {}
 	defaults.point = 'BOTTOM'
@@ -237,6 +245,7 @@ function ActionBar:Free()
 	self.super.Free(self)
 end
 
+--returns the maximum possible size for a given bar
 function ActionBar:MaxLength()
 	return floor(MAX_BUTTONS / Mangos:NumBars())
 end
@@ -315,6 +324,7 @@ local function ToValidID(id)
 	return (id - 1) % MAX_BUTTONS + 1
 end
 
+--updates the actionID of a given button for all states
 function ActionBar:UpdateAction(i)
 	local b = self.buttons[i]
 	local maxSize = self:MaxLength()
@@ -336,6 +346,7 @@ function ActionBar:UpdateAction(i)
 	self.header:SetAttribute('addchild', b)
 end
 
+--updates the actionID of all buttons for all states
 function ActionBar:UpdateActions()
 	local maxSize = self:MaxLength()
 
@@ -368,13 +379,13 @@ function ActionBar:UpdateActions()
 	end
 end
 
+--returns true if the possess bar, false otherwise
 function ActionBar:IsPossessBar()
 	return self == Mangos:GetPossessBar()
 end
 
 
---[[ Grid ]]--
-
+--Empty button display
 function ActionBar:ShowGrid()
 	for _,b in pairs(self.buttons) do
 		b:SetAttribute('showgrid', b:GetAttribute('showgrid') + 1)
@@ -398,8 +409,7 @@ function ActionBar:UpdateGrid()
 end
 
 
---[[ Keybound Support ]]--
-
+--keybound support
 function ActionBar:KEYBOUND_ENABLED()
 	self:ShowGrid()
 end
@@ -409,8 +419,7 @@ function ActionBar:KEYBOUND_DISABLED()
 end
 
 
---[[ Right Click Selfcast ]]--
-
+--right click targeting support
 function ActionBar:UpdateRightClickUnit()
 	local unit = Mangos:GetRightClickUnit()
 
@@ -421,17 +430,16 @@ function ActionBar:UpdateRightClickUnit()
 	end
 end
 
-
---[[ Utility ]]--
-
+--utility functions
 function ActionBar:ForAll(method, ...)
 	for _,f in pairs(active) do
 		f[method](f, ...)
 	end
 end
 
---[[ menu code ]]--
 
+--right click menu code for action bars
+--TODO: Probably enable the showstate stuff for other bars, since every bar basically has showstate functionality for 'free'
 do
 	--state slider template
 	local function ConditionSlider_OnShow(self)
@@ -478,6 +486,7 @@ do
 		local p = self:AddLayoutPanel()
 	end
 
+	--GetSpellInfo(spellID) is awesome for localization
 	local function AddClass(self)
 		local lClass, class = UnitClass('player')
 		if class == 'WARRIOR' or class == 'DRUID' or class == 'PRIEST' or class == 'ROGUE' then
@@ -503,7 +512,7 @@ do
 	local function AddPaging(self)
 		local p = self:NewPanel(L.QuickPaging)
 		for i = 6, 2, -1 do
-			ConditionSlider_New(p, format('[bar:%d]', i), getglobal('BINDING_NAME_ACTIONPAGE' .. i))
+			ConditionSlider_New(p, format('[bar:%d]', i), _G['BINDING_NAME_ACTIONPAGE' .. i])
 		end
 	end
 
