@@ -64,6 +64,7 @@ function ActionButton:Create(id)
 		b:ClearAllPoints()
 		b:SetAttribute('useparent-statebutton', true)
 		b:SetAttribute('useparent-actionbar', nil)
+		b:EnableMouseWheel(true)
 		b:SetScript('OnEnter', self.OnEnter)
 
 		_G[b:GetName() .. 'Name']:Hide() --hide macro text
@@ -136,6 +137,21 @@ function ActionButton:RCall(f, ...)
 	this = pThis
 end
 
+--hotkey code override
+--done to allow hiding of keys, and also for keybinding name shortening
+ActionButton_UpdateHotkeys = function(abType)
+	abType = abType or 'ACTIONBUTTON'
+
+	local key = KeyBound:ToShortKey(GetBindingKey(abType..this:GetID()) or GetBindingKey(format('CLICK %s:LeftButton', this:GetName())))
+	local hotkey = _G[this:GetName()..'HotKey']
+	if key then
+		hotkey:SetText(key)
+		hotkey:Show()
+	else
+		hotkey:Hide()
+	end
+end
+
 
 --[[ Action Bar ]]--
 
@@ -145,16 +161,16 @@ Mangos.ActionBar = ActionBar
 
 --[[ Constructor Code ]]--
 
---metatable magic.  Basically this says, "create a new table for this index"
+--metatable magic.  Basically this says, 'create a new table for this index'
 --I do this so that I only create page tables for classes the user is actually playing
 ActionBar.defaultOffsets = {
 	__index = function(t, i)
-		t[i] = {};
+		t[i] = {}
 		return t[i]
 	end
 }
 
---metatable magic.  Basically this says, "create a new table for this index, with these defaults"
+--metatable magic.  Basically this says, 'create a new table for this index, with these defaults'
 --I do this so that I only create page tables for classes the user is actually playing
 ActionBar.mainbarOffsets = {
 	__index = function(t, i)
@@ -299,15 +315,15 @@ function ActionBar:UpdateStateDriver()
 	local header, sb1, sb2 = '', '', ''
 	for state,condition in ipairs(self.conditions) do
 		if self:GetPage(condition) then
-			header = header .. condition .. state .. ';'
-			sb1 = sb1 .. (state .. ':S' .. state .. ';')
-			sb2 = sb2 .. (state .. ':S' .. state .. 's;')
+			header = header .. condition .. state .. ''
+			sb1 = sb1 .. (state .. ':S' .. state .. '')
+			sb2 = sb2 .. (state .. ':S' .. state .. 's')
 		end
 	end
 
 	if self:IsPossessBar() then
-		header = header .. '[bonusbar:5]999;'
-		sb1 = sb1 .. '999:possess;'
+		header = header .. '[bonusbar:5]999'
+		sb1 = sb1 .. '999:possess'
 	end
 
 	self.header:SetAttribute('statebutton', sb1)
@@ -536,7 +552,7 @@ do
 		p.height = 56
 
 		local editBox = CreateFrame('EditBox', p:GetName() .. 'StateText', p,  'InputBoxTemplate')
-		editBox:SetWidth(148); editBox:SetHeight(20)
+		editBox:SetWidth(148) editBox:SetHeight(20)
 		editBox:SetPoint('TOPLEFT', 12, -10)
 		editBox:SetAutoFocus(false)
 		editBox:SetScript('OnShow', function(self)
@@ -550,7 +566,7 @@ do
 		editBox:SetScript('OnEditFocusGained', function(self) self:HighlightText() end)
 
 		local set = CreateFrame('Button', p:GetName() .. 'Set', p, 'UIPanelButtonTemplate')
-		set:SetWidth(30); set:SetHeight(20)
+		set:SetWidth(30) set:SetHeight(20)
 		set:SetText(L.Set)
 		set:SetScript('OnClick', function(self)
 			local text = editBox:GetText()

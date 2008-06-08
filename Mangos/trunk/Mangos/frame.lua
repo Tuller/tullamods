@@ -47,15 +47,40 @@ do
 			self:Hide()
 		end
 	end
+	
+	-- Generic fade function, taken from UIFrameFade
+	--the following code exists only so that I can prevent some basic tainting issues caused by the UIFrameFade function attempting to show frames
+	local function Fade(frame, fadeInfo)
+		frame:SetAlpha(fadeInfo.startAlpha)
+		frame.fadeInfo = fadeInfo
 
-	function Fader:FadeIn(...)
-		UIFrameFadeIn(...)
+		for _,f in pairs(FADEFRAMES) do
+			if f == frame then
+				return
+			end
+		end
+		tinsert(FADEFRAMES, frame)
 	end
 
-	function Fader:FadeOut(...)
-		UIFrameFadeOut(...)
+	function Fader:FadeIn(frame, timeToFade, startAlpha, endAlpha)
+		local fadeInfo = {}
+		fadeInfo.mode = "IN"
+		fadeInfo.timeToFade = timeToFade
+		fadeInfo.startAlpha = startAlpha
+		fadeInfo.endAlpha = endAlpha
+		Fade(frame, fadeInfo)
 	end
 
+	function Fader:FadeOut(frame, timeToFade, startAlpha, endAlpha)
+		local fadeInfo = {}
+		fadeInfo.mode = "OUT"
+		fadeInfo.timeToFade = timeToFade
+		fadeInfo.startAlpha = startAlpha
+		fadeInfo.endAlpha = endAlpha
+		Fade(frame, fadeInfo)
+	end
+
+	--this code determins if the mouse is over either the frame itself, or any child frames
 	function Fader:IsFocus(f)
 		if MouseIsOver(f, 1, -1, -1, 1) then
 			return GetMouseFocus() == WorldFrame or self:IsChildFocus(f:GetChildren())
@@ -243,7 +268,7 @@ function Frame:Layout()
 		self:SetWidth(w*cols - spacing + pW*2)
 		self:SetHeight(h*ceil(#self.buttons/cols) - spacing + pH*2)
 	else
-		self:SetWidth(30); self:SetHeight(30)
+		self:SetWidth(30) self:SetHeight(30)
 	end
 end
 
@@ -379,7 +404,7 @@ function Frame:UpdateShowStates()
 
 	local showstates = self:GetShowStates()
 	if showstates then
-		RegisterStateDriver(self.header, 'visibility', showstates .. 'show;hide')
+		RegisterStateDriver(self.header, 'visibility', showstates .. 'showhide')
 	end
 end
 
@@ -510,7 +535,7 @@ function Frame:GetRelPosition()
 	local w, h = parent:GetWidth(), parent:GetHeight()
 	local x, y = self:GetCenter()
 	local s = self:GetScale()
-	w = w/s; h = h/s
+	w = w/s h = h/s
 
 	local dx, dy
 	local hHalf = (x > w/2) and 'RIGHT' or 'LEFT'
