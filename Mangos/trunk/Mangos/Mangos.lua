@@ -30,6 +30,7 @@ function Mangos:OnInitialize()
 		MangosVersion = CURRENT_VERSION
 	end
 
+	--slash command support
 	self:RegisterSlashCommands()
 
 	--create a loader for the options menu
@@ -38,112 +39,27 @@ function Mangos:OnInitialize()
 		self:SetScript('OnShow', nil)
 		LoadAddOn('Mangos_Options')
 	end)
-	
+
 	--keybound support
 	local kb = LibStub('LibKeyBound-1.0')
 	kb.RegisterCallback(self, 'LIBKEYBOUND_ENABLED')
 	kb.RegisterCallback(self, 'LIBKEYBOUND_DISABLED')
-
-	self:HideBlizzard()
-end
-
-function Mangos:LIBKEYBOUND_ENABLED()
-	for _,frame in self.Frame:GetAll() do
-		if frame.KEYBOUND_ENABLED then
-			frame:KEYBOUND_ENABLED()
-		end
-	end
-end
-
-function Mangos:LIBKEYBOUND_DISABLED()
-	for _,frame in self.Frame:GetAll() do
-		if frame.KEYBOUND_DISABLED then
-			frame:KEYBOUND_DISABLED()
-		end
-	end
-end
-
-function Mangos:HideBlizzard()
-	RANGE_INDICATOR = ''
-
-	UIPARENT_MANAGED_FRAME_POSITIONS['MultiBarRight'] = nil
-	UIPARENT_MANAGED_FRAME_POSITIONS['MultiBarLeft'] = nil
-	UIPARENT_MANAGED_FRAME_POSITIONS['MultiBarBottomLeft'] = nil
-	UIPARENT_MANAGED_FRAME_POSITIONS['MultiBarBottomRight'] = nil
-	UIPARENT_MANAGED_FRAME_POSITIONS['MainMenuBar'] = nil
-
-	MultiActionBar_UpdateGrid = Multibar_EmptyFunc
-	MainMenuBar:UnregisterAllEvents()
-	MainMenuBar:Hide()
 	
-	BonusActionBarFrame:UnregisterAllEvents()
-	ShapeshiftBarFrame:UnregisterAllEvents()
-	BonusActionBarFrame:Hide()
-end
-
-function Mangos:OnEnable()
+	--button facade support
 	local LBF = LibStub('LibButtonFacade', true)
 	if LBF then
 		LBF:RegisterSkinCallback('Mangos', self.OnSkin, self)
 	end
+
+	--hide blizzard junk
+	self:HideBlizzard()
+end
+
+function Mangos:OnEnable()
 	self:Load()
 end
 
-local function HasClassBar()
-	local _,class = UnitClass('player')
-	return class == 'PALADIN' or class == 'DRUID' or class == 'WARRIOR' or class == 'ROGUE'
-end
-
-function Mangos:Load()
-	for i = 1, self:NumBars() do
-		self.ActionBar:New(i)
-	end
-	self.PetBar:New()
-	self.BagBar:New()
-	self.MenuBar:New()
-	self.RollBar:New()
-	
-	if HasClassBar() then
-		self.ClassBar:New()
-	end
-
-	self.Frame:ForAll('Reanchor')
-
-	--button facade support
-	local bf = LibStub('LibButtonFacade', true)
-	if bf then
-		bf:Group('Mangos', ACTIONBAR_LABEL):Skin(unpack(self.db.profile.ab.style))
-		bf:Group('Mangos', 'Pet Bar'):Skin(unpack(self.db.profile.petStyle))
-		bf:Group('Mangos', 'Class Bar'):Skin(unpack(self.db.profile.classStyle))
---		bf:Group('Mangos', 'Bag Bar'):Skin(unpack(self.db.profile.bagStyle))
-	end
-end
-
-function Mangos:OnSkin(skin, glossAlpha, gloss, group, button, colors)
-	local styleDB
-	if group == ACTIONBAR_LABEL then
-		styleDB = self.db.profile.ab.style
-	elseif group == 'Pet Bar' then
-		styleDB = self.db.profile.petStyle
-	elseif group == 'Class Bar' then
-		styleDB = self.db.profile.classStyle
---[[
-	elseif group == 'Bag Bar' then
-		styleDB = self.db.profile.bagStyle
---]]
-	end
-
-	if styleDB then
-		styleDB[1] = skin
-		styleDB[2] = glossAlpha
-		styleDB[3] = gloss
-		styleDB[4] = colors
-	end
-end
-
-function Mangos:Unload()
-	self.Frame:ForAll('Free')
-end
+--[[ Version Updating ]]--
 
 function Mangos:GetDefaults()
 	return {
@@ -174,6 +90,110 @@ end
 function Mangos:UpdateVersion()
 	MangosVersion = CURRENT_VERSION
 	self:Print(format(L.Updated, MangosVersion))
+end
+
+
+--Load is called  when the addon is first enabled,
+do
+	local function HasClassBar()
+		local _,class = UnitClass('player')
+		return class == 'PALADIN' or class == 'DRUID' or class == 'WARRIOR' or class == 'ROGUE'
+	end
+
+	function Mangos:Load()
+		for i = 1, self:NumBars() do
+			self.ActionBar:New(i)
+		end
+		self.PetBar:New()
+		self.BagBar:New()
+		self.MenuBar:New()
+		self.RollBar:New()
+		
+		if HasClassBar() then
+			self.ClassBar:New()
+		end
+
+		self.Frame:ForAll('Reanchor')
+
+		--button facade support
+		local bf = LibStub('LibButtonFacade', true)
+		if bf then
+			bf:Group('Mangos', ACTIONBAR_LABEL):Skin(unpack(self.db.profile.ab.style))
+			bf:Group('Mangos', 'Pet Bar'):Skin(unpack(self.db.profile.petStyle))
+			bf:Group('Mangos', 'Class Bar'):Skin(unpack(self.db.profile.classStyle))
+	--		bf:Group('Mangos', 'Bag Bar'):Skin(unpack(self.db.profile.bagStyle))
+		end
+	end
+end
+
+--unload is called when we're switching profiles
+function Mangos:Unload()
+	self.Frame:ForAll('Free')
+end
+
+
+--[[ Blizzard Stuff Hiding ]]--
+
+function Mangos:HideBlizzard()
+	RANGE_INDICATOR = ''
+
+	UIPARENT_MANAGED_FRAME_POSITIONS['MultiBarRight'] = nil
+	UIPARENT_MANAGED_FRAME_POSITIONS['MultiBarLeft'] = nil
+	UIPARENT_MANAGED_FRAME_POSITIONS['MultiBarBottomLeft'] = nil
+	UIPARENT_MANAGED_FRAME_POSITIONS['MultiBarBottomRight'] = nil
+	UIPARENT_MANAGED_FRAME_POSITIONS['MainMenuBar'] = nil
+
+	MultiActionBar_UpdateGrid = Multibar_EmptyFunc
+	MainMenuBar:UnregisterAllEvents()
+	MainMenuBar:Hide()
+	
+	BonusActionBarFrame:UnregisterAllEvents()
+	ShapeshiftBarFrame:UnregisterAllEvents()
+	BonusActionBarFrame:Hide()
+end
+
+
+--[[ Button Facade Events ]]--
+
+function Mangos:OnSkin(skin, glossAlpha, gloss, group, button, colors)
+	local styleDB
+	if group == ACTIONBAR_LABEL then
+		styleDB = self.db.profile.ab.style
+	elseif group == 'Pet Bar' then
+		styleDB = self.db.profile.petStyle
+	elseif group == 'Class Bar' then
+		styleDB = self.db.profile.classStyle
+--[[
+	elseif group == 'Bag Bar' then
+		styleDB = self.db.profile.bagStyle
+--]]
+	end
+
+	if styleDB then
+		styleDB[1] = skin
+		styleDB[2] = glossAlpha
+		styleDB[3] = gloss
+		styleDB[4] = colors
+	end
+end
+
+
+--[[ Keybound Events ]]--
+
+function Mangos:LIBKEYBOUND_ENABLED()
+	for _,frame in self.Frame:GetAll() do
+		if frame.KEYBOUND_ENABLED then
+			frame:KEYBOUND_ENABLED()
+		end
+	end
+end
+
+function Mangos:LIBKEYBOUND_DISABLED()
+	for _,frame in self.Frame:GetAll() do
+		if frame.KEYBOUND_DISABLED then
+			frame:KEYBOUND_DISABLED()
+		end
+	end
 end
 
 
@@ -229,6 +249,7 @@ end
 
 function Mangos:ListProfiles()
 	self:Print(L.AvailableProfiles)
+
 	local current = self.db:GetCurrentProfile()
 	for _,k in ipairs(self.db:GetProfiles()) do
 		if k == current then
@@ -260,27 +281,27 @@ end
 
 function Mangos:OnNewProfile(msg, db, name)
 	self.isNewProfile = true
-	self:Print('Created Profile: ' .. name)
+	self:Print(format(L.ProfileCreated, name))
 end
 
 function Mangos:OnProfileDeleted(msg, db, name)
-	self:Print('Deleted Profile: ' .. name)
+	self:Print(format(L.ProfileDeleted, name))
 end
 
 function Mangos:OnProfileChanged(msg, db, name)
-	self:Print('Changed Profile: ' .. name)
+	self:Print(format(L.ProfileLoaded, name))
 end
 
 function Mangos:OnProfileCopied(msg, db, name)
-	self:Print('Copied Profile: ' .. name)
+	self:Print(format(L.ProfileCopied, name))
 end
 
 function Mangos:OnProfileReset(msg, db)
-	self:Print('Reset Profile: ' .. db:GetCurrentProfile())
+	self:Print(format(L.ProfileReset, db:GetCurrentProfile()))
 end
 
 
---[[ Settings Access ]]--
+--[[ Settings...Setting ]]--
 
 function Mangos:SetFrameSets(id, sets)
 	local id = tonumber(id) or id
@@ -291,6 +312,17 @@ end
 
 function Mangos:GetFrameSets(id)
 	return self.db.profile.frames[tonumber(id) or id]
+end
+
+
+--[[ Options Menu Display ]]--
+
+function Mangos:ShowOptions()
+	if LoadAddOn('Mangos_Options') then
+		InterfaceOptionsFrame_OpenToFrame('Mangos')
+		return true
+	end
+	return false
 end
 
 
@@ -357,7 +389,41 @@ function Mangos:OnCmd(args)
 	end
 end
 
---config mode
+function Mangos:PrintHelp(cmd)
+	local function PrintCmd(cmd, desc)
+		DEFAULT_CHAT_FRAME:AddMessage(format(' - |cFF33FF99%s|r: %s', cmd, desc))
+	end
+
+	self:Print('Commands (/mg, /mangos)')
+	PrintCmd('config', L.ConfigDesc)
+	PrintCmd('scale <frameList> <scale>', L.SetScaleDesc)
+	PrintCmd('setalpha <frameList> <opacity>', L.SetAlphaDesc)
+	PrintCmd('fade <frameList> <opacity>', L.SetFadeDesc)
+	PrintCmd('setcols <frameList> <columns>', L.SetColsDesc)
+	PrintCmd('pad <frameList> <padding>', L.SetPadDesc)
+	PrintCmd('space <frameList> <spacing>', L.SetSpacingDesc)
+	PrintCmd('show <frameList>', L.ShowFramesDesc)
+	PrintCmd('hide <frameList>', L.HideFramesDesc)
+	PrintCmd('toggle <frameList>', L.ToggleFramesDesc)
+	PrintCmd('showgrid', L.ShowGridDesc)
+	PrintCmd('save <profile>', L.SaveDesc)
+	PrintCmd('set <profile>', L.SetDesc)
+	PrintCmd('copy <profile>', L.CopyDesc)
+	PrintCmd('delete <profile>', L.DeleteDesc)
+	PrintCmd('reset', L.ResetDesc)
+	PrintCmd('list', L.ListDesc)
+	PrintCmd('version', L.PrintVersionDesc)
+end
+
+--version info
+function Mangos:PrintVersion()
+	self:Print(MangosVersion)
+end
+
+
+--[[ Configuration Functions ]]--
+
+--moving
 Mangos.locked = true
 
 function Mangos:SetLock(enable)
@@ -401,6 +467,7 @@ function Mangos:SetOpacityForFrames(...)
 	end
 end
 
+--faded opacity
 function Mangos:SetFadeForFrames(...)
 	local numArgs = select('#', ...)
 	local alpha = tonumber(select(numArgs, ...))
@@ -424,6 +491,7 @@ function Mangos:SetColumnsForFrames(...)
 	end
 end
 
+--spacing
 function Mangos:SetSpacingForFrame(...)
 	local numArgs = select('#', ...)
 	local spacing = tonumber(select(numArgs, ...))
@@ -435,6 +503,7 @@ function Mangos:SetSpacingForFrame(...)
 	end
 end
 
+--padding
 function Mangos:SetPaddingForFrames(...)
 	local numArgs = select('#', ...)
 	local pW, pH = select(numArgs - 1, ...)
@@ -479,49 +548,17 @@ function Mangos:ShowGrid()
 	return self.db.profile.showgrid
 end
 
---version info
-function Mangos:PrintVersion()
-	self:Print(MangosVersion)
+--right click selfcast
+function Mangos:SetRightClickUnit(unit)
+	self.db.profile.ab.rightClickUnit = unit
+	self.ActionBar:ForAll('UpdateRightClickUnit')
 end
 
-function Mangos:PrintHelp(cmd)
-	local function PrintCmd(cmd, desc)
-		DEFAULT_CHAT_FRAME:AddMessage(format(' - |cFF33FF99%s|r: %s', cmd, desc))
-	end
-
-	self:Print('Commands (/mg, /mangos)')
-	PrintCmd('config', L.ConfigDesc)
-	PrintCmd('scale <frameList> <scale>', L.SetScaleDesc)
-	PrintCmd('setalpha <frameList> <opacity>', L.SetAlphaDesc)
-	PrintCmd('fade <frameList> <opacity>', L.SetFadeDesc)
-	PrintCmd('setcols <frameList> <columns>', L.SetColsDesc)
-	PrintCmd('pad <frameList> <padding>', L.SetPadDesc)
-	PrintCmd('space <frameList> <spacing>', L.SetSpacingDesc)
-	PrintCmd('show <frameList>', L.ShowFramesDesc)
-	PrintCmd('hide <frameList>', L.HideFramesDesc)
-	PrintCmd('toggle <frameList>', L.ToggleFramesDesc)
-	PrintCmd('showgrid', L.ShowGridDesc)
-	PrintCmd('save <profile>', L.SaveDesc)
-	PrintCmd('set <profile>', L.SetDesc)
-	PrintCmd('copy <profile>', L.CopyDesc)
-	PrintCmd('delete <profile>', L.DeleteDesc)
-	PrintCmd('reset', L.ResetDesc)
-	PrintCmd('list', L.ListDesc)
-	PrintCmd('version', L.PrintVersionDesc)
+function Mangos:GetRightClickUnit()
+	return self.db.profile.ab.rightClickUnit
 end
 
-function Mangos:ShowOptions()
-	if LoadAddOn('Mangos_Options') then
-		InterfaceOptionsFrame_OpenToFrame('Mangos')
-		return true
-	end
-	return false
-end
-
-function Mangos:NumBars()
-	return self.db.profile.ab.count
-end
-
+--possess bar settings
 function Mangos:SetPossessBar(id)
 	self.db.profile.possessBar = id
 
@@ -533,34 +570,23 @@ function Mangos:GetPossessBar()
 	return self.Frame:Get(self.db.profile.possessBar)
 end
 
---[[
---minimap
-function Mangos:SetShowMinimap(enable)
-	self.db.profile.showMinimap = enable or false
-	self:UpdateMinimapButton()
-end
+--action bar numbers
+function Mangos:SetNumBars(count)
+	count = max(min(count, 120), 1) --sometimes, I do entertaininig things
 
-function Mangos:ShowingMinimap()
-	return self.db.profile.showMinimap
-end
+	if count ~= self:NumBars() then
+		self.ActionBar:ForAll('Delete')
+		self.db.profile.ab.count = count
 
-function Mangos:UpdateMinimapButton()
-	if self:ShowingMinimap() then
-		self.Minimap:UpdatePosition()
-		self.Minimap:Show()
-	else
-		self.Minimap:Hide()
+		for i = 1, self:NumBars() do
+			self.ActionBar:New(i)
+		end
 	end
 end
 
-function Mangos:SetMinimapButtonPosition(angle)
-	self.db.profile.minimapPos = angle
+function Mangos:NumBars()
+	return self.db.profile.ab.count
 end
-
-function Mangos:GetMinimapButtonPosition(angle)
-	return self.db.profile.minimapPos
-end
---]]
 
 
 --[[ Utility Functions ]]--

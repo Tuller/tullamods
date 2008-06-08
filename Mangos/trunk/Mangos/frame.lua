@@ -141,6 +141,11 @@ function Frame:Free()
 	unused[self.id] = self
 end
 
+function Frame:Delete()
+	self:Free()
+	Mangos:SetFrameSets(self.id, nil)
+end
+
 function Frame:LoadSettings(defaults)
 	self.sets = Mangos:GetFrameSets(self.id) or Mangos:SetFrameSets(self.id, self:GetDefaults()) --get defaults must be provided by anything implementing the Frame type
 	self:Reposition()

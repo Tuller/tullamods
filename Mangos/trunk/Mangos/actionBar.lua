@@ -23,12 +23,14 @@ ActionButton.active = {}
 --constructor
 function ActionButton:New(id)
 	local b = self:Restore(id) or self:Create(id)
-	b:SetAttribute('showgrid', 0)
-	b:UpdateGrid()
+	if b then
+		b:SetAttribute('showgrid', 0)
+		b:UpdateGrid()
 
-	self.active[id] = b
+		self.active[id] = b
 
-	return b
+		return b
+	end
 end
 
 local function Create(id)
@@ -42,8 +44,13 @@ local function Create(id)
 		return _G['MultiBarRightButton' .. (id-36)]
 	elseif id <= 60 then
 		return _G['MultiBarLeftButton' .. (id-48)]
+	elseif id <= 72 then
+		local b = _G['BonusActionButton' .. (id - 60)]
+		b:UnregisterEvent('UPDATE_BONUS_ACTIONBAR')
+		b.isBonus = nil
+		return b
 	elseif id <= MAX_BUTTONS then
-		return CreateFrame('CheckButton', 'MangoActionButton' .. (id-60), nil, 'ActionBarButtonTemplate')
+		return CreateFrame('CheckButton', 'MangoActionButton' .. (id-72), nil, 'ActionBarButtonTemplate')
 	end
 end
 
@@ -207,6 +214,7 @@ function ActionBar:New(id)
 	f:UpdateStateDriver()
 	f:Layout()
 	f:UpdateGrid()
+	f:UpdateRightClickUnit()
 	
 	active[id] = f
 
@@ -219,7 +227,7 @@ function ActionBar:GetDefaults()
 	defaults.x = 0
 	defaults.y = 37*(self.id-1)
 	defaults.pages = {}
-	defaults.numButtons = 12
+	defaults.numButtons = self:MaxLength()
 
 	return defaults
 end
@@ -229,24 +237,33 @@ function ActionBar:Free()
 	self.super.Free(self)
 end
 
+function ActionBar:MaxLength()
+	return floor(MAX_BUTTONS / Mangos:NumBars())
+end
+
 
 --[[ button stuff]]--
 
 function ActionBar:LoadButtons()
 	for i = 1, self:NumButtons() do
 		local b = ActionButton:New(self.baseID + i)
-		b:SetParent(self.header)
-		self.buttons[i] = b
+		if b then
+			b:SetParent(self.header)
+			self.buttons[i] = b
+		else
+			break
+		end
 	end
 	self:UpdateActions()
 end
 
 function ActionBar:AddButton(i)
 	local b = ActionButton:New(self.baseID + i)
-	self.buttons[i] = b
-
-	b:SetParent(self.header)
-	self:UpdateAction(i)
+	if b then
+		self.buttons[i] = b
+		b:SetParent(self.header)
+		self:UpdateAction(i)
+	end
 end
 
 function ActionBar:RemoveButton(i)
@@ -300,7 +317,7 @@ end
 
 function ActionBar:UpdateAction(i)
 	local b = self.buttons[i]
-	local maxSize = ceil(Mangos:NumBars() / MAX_BUTTONS)
+	local maxSize = self:MaxLength()
 
 	for state,condition in ipairs(self.conditions) do
 		local page = self:GetPage(condition)
@@ -320,7 +337,7 @@ function ActionBar:UpdateAction(i)
 end
 
 function ActionBar:UpdateActions()
-	local maxSize = ceil(MAX_BUTTONS / Mangos:NumBars())
+	local maxSize = self:MaxLength()
 
 	for state,condition in ipairs(self.conditions) do
 		local page = self:GetPage(condition)
@@ -392,6 +409,19 @@ function ActionBar:KEYBOUND_DISABLED()
 end
 
 
+--[[ Right Click Selfcast ]]--
+
+function ActionBar:UpdateRightClickUnit()
+	local unit = Mangos:GetRightClickUnit()
+
+	self.header:SetAttribute('*unit2', unit)
+
+	for state in ipairs(self.conditions) do
+		self.header:SetAttribute(format('*unit-s%ds', state), unit)
+	end
+end
+
+
 --[[ Utility ]]--
 
 function ActionBar:ForAll(method, ...)
@@ -415,7 +445,7 @@ do
 
 	local function ConditionSlider_UpdateText(self, value)
 		if value > -1 then
-			local page = (self:GetParent().owner.id + value) % Mangos:NumBars()
+			local page = (self:GetParent().owner.id + value - 1) % Mangos:NumBars() + 1
 			self.valText:SetFormattedText(L.Bar, page)
 		else
 			self.valText:SetText(DISABLE)
