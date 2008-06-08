@@ -7,6 +7,7 @@ Mangos = LibStub('AceAddon-3.0'):NewAddon('Mangos', 'AceEvent-3.0', 'AceConsole-
 local L = LibStub('AceLocale-3.0'):GetLocale('Mangos')
 local CURRENT_VERSION = GetAddOnMetadata('Mangos', 'Version')
 
+
 --[[ Startup ]]--
 
 function Mangos:OnInitialize()
@@ -85,7 +86,6 @@ function Mangos:OnEnable()
 	if LBF then
 		LBF:RegisterSkinCallback('Mangos', self.OnSkin, self)
 	end
-
 	self:Load()
 end
 
