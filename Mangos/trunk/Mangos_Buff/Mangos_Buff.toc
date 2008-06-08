@@ -1,0 +1,6 @@
+﻿## Interface: 20400
+## Title: Mangos Buff Highlighting
+## Notes: Adds buff highlighting to Mangos
+## Author: Tuller
+## Dependencies: Mangos
+main.lua
