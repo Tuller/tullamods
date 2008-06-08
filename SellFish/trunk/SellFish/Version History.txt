@@ -1,5 +1,9 @@
 SellFish Version History:\
 
+2.0.8
+	Updated ItemPrice
+	Fixed a bug with querying cached item (hopefully really this time)
+
 2.0.7
 	Updated ItemPrice
 	Fixed a bug with querying cached items
