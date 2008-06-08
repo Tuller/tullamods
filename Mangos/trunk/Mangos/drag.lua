@@ -26,7 +26,7 @@ function Drag:New(owner)
 	t:SetTexture(0, 0, 0.6, 0.5)
 	t:SetAllPoints(f)
 	f:SetHighlightTexture(t)
-	
+
 	f:SetTextFontObject('GameFontNormalLarge')
 	f:SetHighlightTextColor(1, 1, 1)
 	f:SetText(owner.id)
@@ -58,7 +58,7 @@ function Drag:OnEnter()
 	else
 		GameTooltip:AddLine(L.ShowBar)
 	end
-	
+
 	if tonumber(self:GetText()) then
 		GameTooltip:AddLine(L.DeleteBar)
 	end
