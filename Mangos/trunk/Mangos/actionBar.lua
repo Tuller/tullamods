@@ -233,7 +233,7 @@ function ActionBar:New(id)
 	f.sets.pages = setmetatable(f.sets.pages, f.id == 1 and self.mainbarOffsets or self.defaultOffsets)
 
 	f.pages = f.sets.pages[f.class]
-	f.baseID = ceil(MAX_BUTTONS / Mangos:NumBars()) * (id-1)
+	f.baseID = f:MaxLength() * (id-1)
 	f.header:SetAttribute('statemap-state', '$input')
 
 	f:LoadButtons()
@@ -318,15 +318,15 @@ function ActionBar:UpdateStateDriver()
 	local header, sb1, sb2 = '', '', ''
 	for state,condition in ipairs(self.conditions) do
 		if self:GetPage(condition) then
-			header = header .. condition .. state .. ''
-			sb1 = sb1 .. (state .. ':S' .. state .. '')
-			sb2 = sb2 .. (state .. ':S' .. state .. 's')
+			header = header .. condition .. state .. ';'
+			sb1 = sb1 .. (state .. ':S' .. state .. ';')
+			sb2 = sb2 .. (state .. ':S' .. state .. 's;')
 		end
 	end
 
 	if self:IsPossessBar() then
-		header = header .. '[bonusbar:5]999'
-		sb1 = sb1 .. '999:possess'
+		header = header .. '[bonusbar:5]999;'
+		sb1 = sb1 .. '999:possess;'
 	end
 
 	self.header:SetAttribute('statebutton', sb1)
