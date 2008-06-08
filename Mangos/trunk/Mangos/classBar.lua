@@ -63,9 +63,9 @@ function ClassButton:Create(id)
 	b:SetScript('OnShow', b.UpdateEvents)
 	b:SetScript('OnHide', b.UpdateEvents)
 
-	b:ShowHotkey()
 	b:UpdateSpell()
 	b:UpdateEvents()
+	b:UpdateHotkey()
 
 	if LBF then
 		LBF:Group('Mangos', 'Class Bar'):AddButton(b)
@@ -172,17 +172,15 @@ end
 
 --[[ Hotkey Functions ]]--
 
-function ClassButton:ShowHotkey(show)
-	if show then
-		self.hotkey:Show()
-		self:UpdateHotkey()
-	else
-		self.hotkey:Hide()
-	end
-end
-
 function ClassButton:UpdateHotkey()
-	self.hotkey:SetText(self:GetHotkey() or '')
+	local key = KeyBound:ToShortKey(GetBindingKey(format('CLICK %s:LeftButton', self:GetName()))) or ''
+	self.hotkey:SetText(key)
+	
+	if key == '' then
+		self.hotkey:Hide()
+	else
+		self.hotkey:Show()
+	end
 end
 
 function ClassButton:GetHotkey()

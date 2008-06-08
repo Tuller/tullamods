@@ -56,6 +56,18 @@ function PetButton:OnEnter()
 	KeyBound:Set(self)
 end
 
+function PetButton:UpdateHotkey()
+	local hotkey = _G[self:GetName() .. 'HotKey']
+	local text = KeyBound:ToShortKey(GetBindingKey('BONUSACTIONBUTTON'..self:GetID()) or GetBindingKey(format('CLICK %s:LeftButton', self:GetName()))) 
+	hotkey:SetText(text)
+
+	if text == '' then
+		hotkey:Hide()
+	else
+		hotkey:Show()
+	end
+end
+
 function PetButton:GetHotkey()
 	return KeyBound:ToShortKey(GetBindingKey(format('CLICK %s:LeftButton', self:GetName())))
 end
@@ -67,6 +79,8 @@ function PetButton:RCall(f, ...)
 	f(...)
 	this = pThis
 end
+
+PetActionButton_SetHotkeys = function() PetButton.UpdateHotkey(this) end
 
 
 --[[ Pet Bar ]]--

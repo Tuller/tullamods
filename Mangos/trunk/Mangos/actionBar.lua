@@ -116,6 +116,20 @@ function ActionButton:OnEnter()
 	KeyBound:Set(self)
 end
 
+function ActionButton:UpdateHotkey(abType)
+	abType = abType or 'ACTIONBUTTON'
+
+	local hotkey = _G[self:GetName()..'HotKey']
+	local key = KeyBound:ToShortKey(GetBindingKey(abType..self:GetID()) or GetBindingKey(format('CLICK %s:LeftButton', self:GetName()))) or ''
+	hotkey:SetText(key)
+
+	if key == '' then
+		hotkey:Hide()
+	else
+		hotkey:Show()
+	end
+end
+
 function ActionButton:GetHotkey()
 	return KeyBound:ToShortKey(GetBindingKey(format('CLICK %s:LeftButton', self:GetName())))
 end
@@ -139,18 +153,7 @@ end
 
 --hotkey code override
 --done to allow hiding of keys, and also for keybinding name shortening
-ActionButton_UpdateHotkeys = function(abType)
-	abType = abType or 'ACTIONBUTTON'
-
-	local key = KeyBound:ToShortKey(GetBindingKey(abType..this:GetID()) or GetBindingKey(format('CLICK %s:LeftButton', this:GetName())))
-	local hotkey = _G[this:GetName()..'HotKey']
-	if key then
-		hotkey:SetText(key)
-		hotkey:Show()
-	else
-		hotkey:Hide()
-	end
-end
+ActionButton_UpdateHotkeys = function(abType) ActionButton.UpdateHotkey(this, abType) end
 
 
 --[[ Action Bar ]]--
