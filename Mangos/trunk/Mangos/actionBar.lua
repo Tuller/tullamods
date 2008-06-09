@@ -26,6 +26,7 @@ function ActionButton:New(id)
 	if b then
 		b:SetAttribute('showgrid', 0)
 		b:UpdateGrid()
+		b:UpdateHotkey(b.buttonType)
 
 		self.active[id] = b
 
@@ -37,18 +38,18 @@ local function Create(id)
 	if id <= 12 then
 		return _G['ActionButton' .. id]
 	elseif id <= 24 then
-		return _G['MultiBarBottomLeftButton' .. (id-12)]
-	elseif id <= 36 then
-		return _G['MultiBarBottomRightButton' .. (id-24)]
-	elseif id <= 48 then
-		return _G['MultiBarRightButton' .. (id-36)]
-	elseif id <= 60 then
-		return _G['MultiBarLeftButton' .. (id-48)]
-	elseif id <= 72 then
-		local b = _G['BonusActionButton' .. (id - 60)]
+		local b = _G['BonusActionButton' .. (id - 12)]
 		b:UnregisterEvent('UPDATE_BONUS_ACTIONBAR')
 		b.isBonus = nil
 		return b
+	elseif id <= 36 then
+		return _G['MultiBarRightButton' .. (id-24)]
+	elseif id <= 48 then
+		return _G['MultiBarLeftButton' .. (id-36)]
+	elseif id <= 60 then
+		return _G['MultiBarBottomRightButton' .. (id-48)]
+	elseif id <= 72 then
+		return _G['MultiBarBottomLeftButton' .. (id-60)]
 	elseif id <= MAX_BUTTONS then
 		return CreateFrame('CheckButton', 'MangoActionButton' .. (id-72), nil, 'ActionBarButtonTemplate')
 	end
