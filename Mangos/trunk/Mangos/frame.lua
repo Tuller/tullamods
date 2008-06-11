@@ -201,7 +201,7 @@ function Frame:LoadButtons()
 	end
 end
 
-function Frame:SetNumButtons(size)
+function Frame:SetNumButtons(numButtons)
 	self.sets.numButtons = numButtons
 
 	for i = #self.buttons + 1, self:NumButtons() do
@@ -220,7 +220,7 @@ function Frame:NumButtons()
 end
 
 function Frame:SetColumns(columns)
-	self.sets.columns = columns
+	self.sets.columns = columns ~= self:NumButtons() and columns or nil
 	self:Layout()
 end
 

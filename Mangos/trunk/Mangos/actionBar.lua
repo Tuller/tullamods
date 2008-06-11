@@ -504,6 +504,17 @@ do
 
 	local function AddLayout(self)
 		local p = self:AddLayoutPanel()
+
+		local size = p:NewSlider(L.Size, 1, 1, 1)
+		size.OnShow = function(self)
+			self:SetMinMaxValues(1, self:GetParent().owner:MaxLength())
+			self:SetValue(self:GetParent().owner:NumButtons())
+		end
+
+		size.UpdateValue = function(self, value)
+			self:GetParent().owner:SetNumButtons(value)
+			_G[self:GetParent():GetName() .. L.Columns]:OnShow()
+		end
 	end
 
 	--GetSpellInfo(spellID) is awesome for localization
