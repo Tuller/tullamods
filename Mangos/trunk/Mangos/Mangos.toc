@@ -2,7 +2,7 @@
 ## Title: Mangos
 ## Notes: A main actionbar replacement
 ## Author: Tuller
-## Version: 1.5.0
+## Version: 1.5.1
 ## SavedVariables: MangosDB, MangosVersion
 ## OptionalDeps: Ace3, LibKeyBound-1.0
 embeds.xml
