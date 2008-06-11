@@ -13,7 +13,7 @@ function MRB:Load()
 	self.frame = RollBar:New()
 end
 
-function MRB:Free()
+function MRB:Unload()
 	self.frame:Free()
 end
 
