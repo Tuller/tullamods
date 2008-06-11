@@ -59,10 +59,6 @@ function Drag:OnEnter()
 		GameTooltip:AddLine(L.ShowBar)
 	end
 
-	if tonumber(self:GetText()) then
-		GameTooltip:AddLine(L.DeleteBar)
-	end
-
 	GameTooltip:AddLine(format(L.SetAlpha, ceil(self.owner:GetFrameAlpha()*100)))
 	GameTooltip:Show()
 end
