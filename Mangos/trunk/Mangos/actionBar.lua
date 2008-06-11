@@ -582,7 +582,7 @@ do
 	end
 
 	function ActionBar:CreateMenu()
-		local menu = Mangos.Menu:New(self.id)
+		local menu = Mangos:NewMenu(self.id)
 		AddLayout(menu)
 		AddClass(menu)
 		AddPaging(menu)

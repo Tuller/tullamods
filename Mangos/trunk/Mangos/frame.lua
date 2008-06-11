@@ -589,7 +589,7 @@ end
 --[[ Menus ]]--
 
 function Frame:CreateMenu()
-	self.menu = Mangos.Menu:New(self.id)
+	self.menu = Mangos:NewMenu(self.id)
 	self.menu:AddLayoutPanel()
 end
 

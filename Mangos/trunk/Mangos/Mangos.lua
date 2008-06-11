@@ -37,7 +37,7 @@ function Mangos:OnInitialize()
 	local f = CreateFrame('Frame', nil, InterfaceOptionsFrame)
 	f:SetScript('OnShow', function(self)
 		self:SetScript('OnShow', nil)
-		LoadAddOn('Mangos_Options')
+		LoadAddOn('Mangos_Config')
 	end)
 
 	--keybound support
@@ -329,11 +329,18 @@ end
 --[[ Options Menu Display ]]--
 
 function Mangos:ShowOptions()
-	if LoadAddOn('Mangos_Options') then
+	if LoadAddOn('Mangos_Config') then
 		InterfaceOptionsFrame_OpenToFrame('Mangos')
 		return true
 	end
 	return false
+end
+
+function Mangos:NewMenu(id)
+	if not self.Menu then
+		LoadAddOn('Mangos_Config')
+	end
+	return self.Menu:New(id)
 end
 
 
