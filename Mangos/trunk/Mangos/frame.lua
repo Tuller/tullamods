@@ -635,7 +635,7 @@ function Frame:GetAll()
 end
 
 function Frame:ForAll(method, ...)
-	for _, f in self:GetAll() do
+	for _,f in self:GetAll() do
 		local action = f[method]
 		if action then
 			action(f, ...)
@@ -645,7 +645,7 @@ end
 
 --takes a fID, and performs the specified action on that f
 --this adds two special IDs, 'all' for all fs and number-number for a range of IDs
-function Frame:ForBar(id, method, ...)
+function Frame:ForFrame(id, method, ...)
 	if id == 'all' then
 		self:ForAll(method, ...)
 	else
@@ -670,7 +670,7 @@ function Frame:ForBar(id, method, ...)
 				end
 			end
 		else
-			local f = self:Get(tonumber(id) or id)
+			local f = self:Get(id)
 			if f then
 				local action = f[method]
 				if action then

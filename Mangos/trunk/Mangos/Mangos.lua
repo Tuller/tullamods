@@ -44,7 +44,7 @@ function Mangos:OnInitialize()
 	local kb = LibStub('LibKeyBound-1.0')
 	kb.RegisterCallback(self, 'LIBKEYBOUND_ENABLED')
 	kb.RegisterCallback(self, 'LIBKEYBOUND_DISABLED')
-	
+
 	--button facade support
 	local LBF = LibStub('LibButtonFacade', true)
 	if LBF then
@@ -75,7 +75,7 @@ function Mangos:GetDefaults()
 			petStyle  = {'Entropy: Silver', 0.5, nil},
 
 			classStyle = {'Entropy: Silver', 0.5, nil},
-			
+
 --			bagStyle = {'Entropy: Bronze', 0.5, nil},
 
 			frames = {}
@@ -93,42 +93,53 @@ function Mangos:UpdateVersion()
 end
 
 
---Load is called  when the addon is first enabled,
-do
-	local function HasClassBar()
-		local _,class = UnitClass('player')
-		return class == 'PALADIN' or class == 'DRUID' or class == 'WARRIOR' or class == 'ROGUE'
+--Load is called  when the addon is first enabled, and also whenever a profile is loaded
+local function HasClassBar()
+	local _,class = UnitClass('player')
+	return class == 'PALADIN' or class == 'DRUID' or class == 'WARRIOR' or class == 'ROGUE'
+end
+
+function Mangos:Load()
+	for i = 1, self:NumBars() do
+		self.ActionBar:New(i)
+	end
+	if HasClassBar() then
+		self.ClassBar:New()
+	end
+	self.PetBar:New()
+	self.BagBar:New()
+	self.MenuBar:New()
+
+	--button facade support
+	local bf = LibStub('LibButtonFacade', true)
+	if bf then
+		bf:Group('Mangos', ACTIONBAR_LABEL):Skin(unpack(self.db.profile.ab.style))
+		bf:Group('Mangos', 'Pet Bar'):Skin(unpack(self.db.profile.petStyle))
+		bf:Group('Mangos', 'Class Bar'):Skin(unpack(self.db.profile.classStyle))
+--		bf:Group('Mangos', 'Bag Bar'):Skin(unpack(self.db.profile.bagStyle))
 	end
 
-	function Mangos:Load()
-		for i = 1, self:NumBars() do
-			self.ActionBar:New(i)
-		end
-		self.PetBar:New()
-		self.BagBar:New()
-		self.MenuBar:New()
-		self.RollBar:New()
-		
-		if HasClassBar() then
-			self.ClassBar:New()
-		end
-
-		self.Frame:ForAll('Reanchor')
-
-		--button facade support
-		local bf = LibStub('LibButtonFacade', true)
-		if bf then
-			bf:Group('Mangos', ACTIONBAR_LABEL):Skin(unpack(self.db.profile.ab.style))
-			bf:Group('Mangos', 'Pet Bar'):Skin(unpack(self.db.profile.petStyle))
-			bf:Group('Mangos', 'Class Bar'):Skin(unpack(self.db.profile.classStyle))
-	--		bf:Group('Mangos', 'Bag Bar'):Skin(unpack(self.db.profile.bagStyle))
-		end
+	--load in extra functionality
+	for _,module in self:IterateModules() do
+		module:Load()
 	end
+
+	--anchor everything
+	self.Frame:ForAll('Reanchor')
 end
 
 --unload is called when we're switching profiles
 function Mangos:Unload()
-	self.Frame:ForAll('Free')
+	self.ActionBar:ForAll('Free')
+	self.Frame:ForFrame('pet', 'Free')
+	self.Frame:ForFrame('class', 'Free')
+	self.Frame:ForFrame('menu', 'Free')
+	self.Frame:ForFrame('bags', 'Free')
+
+	--unload any module stuff
+	for _,module in self:IterateModules() do
+		module:Unload()
+	end
 end
 
 
@@ -146,7 +157,7 @@ function Mangos:HideBlizzard()
 	MultiActionBar_UpdateGrid = Multibar_EmptyFunc
 	MainMenuBar:UnregisterAllEvents()
 	MainMenuBar:Hide()
-	
+
 	BonusActionBarFrame:UnregisterAllEvents()
 	ShapeshiftBarFrame:UnregisterAllEvents()
 	BonusActionBarFrame:Hide()
@@ -450,7 +461,7 @@ function Mangos:ScaleFrames(...)
 
 	if scale and scale > 0 and scale <= 10 then
 		for i = 1, numArgs - 1 do
-			self.Frame:ForBar(select(i, ...), 'SetFrameScale', scale)
+			self.Frame:ForFrame(select(i, ...), 'SetFrameScale', scale)
 		end
 	end
 end
@@ -462,7 +473,7 @@ function Mangos:SetOpacityForFrames(...)
 
 	if alpha and alpha >= 0 and alpha <= 1 then
 		for i = 1, numArgs - 1 do
-			self.Frame:ForBar(select(i, ...), 'SetFrameAlpha', alpha)
+			self.Frame:ForFrame(select(i, ...), 'SetFrameAlpha', alpha)
 		end
 	end
 end
@@ -474,7 +485,7 @@ function Mangos:SetFadeForFrames(...)
 
 	if alpha and alpha >= 0 and alpha <= 1 then
 		for i = 1, numArgs - 1 do
-			self.Frame:ForBar(select(i, ...), 'SetFadeAlpha', alpha)
+			self.Frame:ForFrame(select(i, ...), 'SetFadeAlpha', alpha)
 		end
 	end
 end
@@ -486,7 +497,7 @@ function Mangos:SetColumnsForFrames(...)
 
 	if cols then
 		for i = 1, numArgs - 1 do
-			self.Frame:ForBar(select(i, ...), 'SetColumns', cols)
+			self.Frame:ForFrame(select(i, ...), 'SetColumns', cols)
 		end
 	end
 end
@@ -498,7 +509,7 @@ function Mangos:SetSpacingForFrame(...)
 
 	if spacing then
 		for i = 1, numArgs - 1 do
-			self.Frame:ForBar(select(i, ...), 'SetSpacing', spacing)
+			self.Frame:ForFrame(select(i, ...), 'SetSpacing', spacing)
 		end
 	end
 end
@@ -510,7 +521,7 @@ function Mangos:SetPaddingForFrames(...)
 
 	if tonumber(pW) and tonumber(pH) then
 		for i = 1, numArgs - 2 do
-			self.Frame:ForBar(select(i, ...), 'SetPadding', tonumber(pW), tonumber(pH))
+			self.Frame:ForFrame(select(i, ...), 'SetPadding', tonumber(pW), tonumber(pH))
 		end
 	end
 end
@@ -518,19 +529,19 @@ end
 --visibility
 function Mangos:ShowFrames(...)
 	for i = 1, select('#', ...) do
-		self.Frame:ForBar(select(i, ...), 'ShowFrame')
+		self.Frame:ForFrame(select(i, ...), 'ShowFrame')
 	end
 end
 
 function Mangos:HideFrames(...)
 	for i = 1, select('#', ...) do
-		self.Frame:ForBar(select(i, ...), 'HideFrame')
+		self.Frame:ForFrame(select(i, ...), 'HideFrame')
 	end
 end
 
 function Mangos:ToggleFrames(...)
 	for i = 1, select('#', ...) do
-		self.Frame:ForBar(select(i, ...), 'ToggleFrame')
+		self.Frame:ForFrame(select(i, ...), 'ToggleFrame')
 	end
 end
 
