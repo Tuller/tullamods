@@ -1,0 +1,7 @@
+﻿## Interface: 20400
+## Title: Mangos Config
+## Notes: GUI based configuration for Mangos
+## Author: Tuller
+## Dependencies: Mangos
+## LoadOnDemand: 1
+menu.lua
