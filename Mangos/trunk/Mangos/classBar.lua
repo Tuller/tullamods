@@ -177,9 +177,9 @@ function ClassButton:UpdateHotkey()
 	self.hotkey:SetText(key)
 
 	if key ~= ''  and Mangos:ShowBindingText() then
-		hotkey:Show()
+		self.hotkey:Show()
 	else
-		hotkey:Hide()
+		self.hotkey:Hide()
 	end
 end
 
