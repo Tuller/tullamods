@@ -211,9 +211,9 @@ do
 		function dd.Initialize()
 			local selected = Mangos:GetRightClickUnit()  or 'NONE'
 
-			AddItem('Player', 'player', Item_OnClick, 'player' == selected)
-			AddItem('Focus', 'focus', Item_OnClick, 'focus' == selected)
-			AddItem('Mouseover', 'mouseover', Item_OnClick, 'mouseover' == selected)
+			AddItem(L.RCUPlayer, 'player', Item_OnClick, 'player' == selected)
+			AddItem(L.RCUFocus, 'focus', Item_OnClick, 'focus' == selected)
+			AddItem(L.RCUToT, 'targettarget', Item_OnClick, 'targettarget' == selected)
 			AddItem(NONE_KEY, 'NONE', Item_OnClick, 'NONE' == selected)
 		end
 		return dd
