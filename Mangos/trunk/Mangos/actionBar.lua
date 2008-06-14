@@ -11,7 +11,6 @@ local format = string.format
 local MAX_BUTTONS = 120
 local KeyBound = LibStub('LibKeyBound-1.0')
 local LBF = LibStub('LibButtonFacade', true)
-local L = LibStub('AceLocale-3.0'):GetLocale('Mangos')
 
 
 --[[ Action Button ]]--
@@ -27,6 +26,7 @@ function ActionButton:New(id)
 		b:SetAttribute('showgrid', 0)
 		b:UpdateGrid()
 		b:UpdateHotkey(b.buttonType)
+		b:UpdateMacro()
 
 		self.active[id] = b
 
@@ -124,10 +124,10 @@ function ActionButton:UpdateHotkey(abType)
 	local key = KeyBound:ToShortKey(GetBindingKey(abType..self:GetID()) or GetBindingKey(format('CLICK %s:LeftButton', self:GetName()))) or ''
 	hotkey:SetText(key)
 
-	if key == '' then
-		hotkey:Hide()
-	else
+	if key ~= ''  and Mangos:ShowBindingText() then
 		hotkey:Show()
+	else
+		hotkey:Hide()
 	end
 end
 
@@ -140,6 +140,14 @@ function ActionButton:UpdateGrid()
 		self:RCall(ActionButton_ShowGrid)
 	else
 		self:RCall(ActionButton_HideGrid)
+	end
+end
+
+function ActionButton:UpdateMacro()
+	if Mangos:ShowMacroText() then
+		_G[self:GetName() .. 'Name']:Show()
+	else
+		_G[self:GetName() .. 'Name']:Hide()
 	end
 end
 
@@ -428,6 +436,8 @@ function ActionBar:UpdateGrid()
 	end
 end
 
+function ActionBar:UpdateMacroText()
+end
 
 --keybound support
 function ActionBar:KEYBOUND_ENABLED()
@@ -461,6 +471,8 @@ end
 --right click menu code for action bars
 --TODO: Probably enable the showstate stuff for other bars, since every bar basically has showstate functionality for 'free'
 do
+	local L
+
 	--state slider template
 	local function ConditionSlider_OnShow(self)
 		self:SetMinMaxValues(-1, Mangos:NumBars() - 1)
@@ -594,6 +606,8 @@ do
 
 	function ActionBar:CreateMenu()
 		local menu = Mangos:NewMenu(self.id)
+		
+		L = LibStub('AceLocale-3.0'):GetLocale('Mangos-Config')
 		AddLayout(menu)
 		AddClass(menu)
 		AddPaging(menu)

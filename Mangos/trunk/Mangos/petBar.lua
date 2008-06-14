@@ -16,7 +16,10 @@ local LBF = LibStub('LibButtonFacade', true)
 local PetButton = Mangos:CreateClass('CheckButton')
 
 function PetButton:New(id)
-	return PetButton:Restore(id) or PetButton:Create(id)
+	local b = PetButton:Restore(id) or PetButton:Create(id)
+	b:UpdateHotkey()
+	
+	return b
 end
 
 function PetButton:Create(id)
@@ -58,13 +61,13 @@ end
 
 function PetButton:UpdateHotkey()
 	local hotkey = _G[self:GetName() .. 'HotKey']
-	local text = KeyBound:ToShortKey(GetBindingKey('BONUSACTIONBUTTON'..self:GetID()) or GetBindingKey(format('CLICK %s:LeftButton', self:GetName()))) 
-	hotkey:SetText(text)
+	local key = KeyBound:ToShortKey(GetBindingKey('BONUSACTIONBUTTON'..self:GetID()) or GetBindingKey(format('CLICK %s:LeftButton', self:GetName()))) 
+	hotkey:SetText(key)
 
-	if text == '' then
-		hotkey:Hide()
-	else
+	if key ~= ''  and Mangos:ShowBindingText() then
 		hotkey:Show()
+	else
+		hotkey:Hide()
 	end
 end
 

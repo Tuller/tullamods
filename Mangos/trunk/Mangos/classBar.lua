@@ -175,11 +175,11 @@ end
 function ClassButton:UpdateHotkey()
 	local key = KeyBound:ToShortKey(GetBindingKey(format('CLICK %s:LeftButton', self:GetName()))) or ''
 	self.hotkey:SetText(key)
-	
-	if key == '' then
-		self.hotkey:Hide()
+
+	if key ~= ''  and Mangos:ShowBindingText() then
+		hotkey:Show()
 	else
-		self.hotkey:Show()
+		hotkey:Hide()
 	end
 end
 

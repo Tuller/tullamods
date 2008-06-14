@@ -65,6 +65,8 @@ function Mangos:GetDefaults()
 	return {
 		profile = {
 			possessBar = 1,
+			showBindingText = true,
+			showMacroText = true,
 
 			ab = {
 				count = 10,
@@ -375,9 +377,6 @@ function Mangos:OnCmd(args)
 		self:HideFrames(select(2, string.split(' ', args)))
 	elseif cmd == 'toggle' then
 		self:ToggleFrames(select(2, string.split(' ', args)))
-	--actionbar functions
-	elseif cmd == 'showgrid' then
-		self:ToggleGrid()
 	--profile functions
 	elseif cmd == 'save' then
 		local profileName = string.join(' ', select(2, string.split(' ', args)))
@@ -423,7 +422,6 @@ function Mangos:PrintHelp(cmd)
 	PrintCmd('show <frameList>', L.ShowFramesDesc)
 	PrintCmd('hide <frameList>', L.HideFramesDesc)
 	PrintCmd('toggle <frameList>', L.ToggleFramesDesc)
-	PrintCmd('showgrid', L.ShowGridDesc)
 	PrintCmd('save <profile>', L.SaveDesc)
 	PrintCmd('set <profile>', L.SetDesc)
 	PrintCmd('copy <profile>', L.CopyDesc)
@@ -574,6 +572,44 @@ end
 
 function Mangos:GetRightClickUnit()
 	return self.db.profile.ab.rightClickUnit
+end
+
+--binding text
+function Mangos:SetShowBindingText(enable)
+	self.db.profile.showBindingText = enable
+	
+	for _,f in self.Frame:GetAll() do
+		if f.buttons then
+			for _,b in pairs(f.buttons) do
+				if b.UpdateHotkey then
+					b:UpdateHotkey()
+				end
+			end
+		end
+	end
+end
+
+function Mangos:ShowBindingText()
+	return self.db.profile.showBindingText
+end
+
+--macro text
+function Mangos:SetShowMacroText(enable)
+	self.db.profile.showMacroText = enable
+
+	for _,f in self.Frame:GetAll() do
+		if f.buttons then
+			for _,b in pairs(f.buttons) do
+				if b.UpdateMacro then
+					b:UpdateMacro()
+				end
+			end
+		end
+	end
+end
+
+function Mangos:ShowMacroText()
+	return self.db.profile.showMacroText
 end
 
 --possess bar settings
