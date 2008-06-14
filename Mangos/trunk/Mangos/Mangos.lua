@@ -65,7 +65,7 @@ function Mangos:GetDefaults()
 	return {
 		profile = {
 			possessBar = 1,
-			
+
 			showMacroText = true,
 			showBindingText = true,
 
@@ -615,10 +615,12 @@ end
 
 --possess bar settings
 function Mangos:SetPossessBar(id)
+	local prevBar = self:GetPossessBar()
 	self.db.profile.possessBar = id
+	local newBar = self:GetPossessBar()
 
-	self.ActionBar:ForAll('UpdateStateDriver')
-	self.Frame:Get('pet'):UpdatePossess()
+	prevBar:UpdateStateDriver()
+	newBar:UpdateStateDriver()
 end
 
 function Mangos:GetPossessBar()

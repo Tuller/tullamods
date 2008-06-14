@@ -404,7 +404,7 @@ function Frame:UpdateShowStates()
 
 	local showstates = self:GetShowStates()
 	if showstates then
-		RegisterStateDriver(self.header, 'visibility', showstates .. 'showhide')
+		RegisterStateDriver(self.header, 'visibility', showstates .. 'show;hide')
 	end
 end
 

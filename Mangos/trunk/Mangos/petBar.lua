@@ -95,13 +95,13 @@ function PetBar:New()
 	local f = self.super.New(self, 'pet')
 	f:LoadButtons()
 	f:Layout()
-	f:UpdatePossess()
+	f:UpdateStateDriver()
 
 	return f
 end
 
-function PetBar:UpdatePossess()
-	if Mangos:GetPossessBar() == self then
+function PetBar:UpdateStateDriver()
+	if self == Mangos:GetPossessBar() then
 		self:SetShowStates('[target=pet,nodead,exists]')
 	else
 		self:SetShowStates('[target=pet,nodead,exists,nobonusbar:5]')
@@ -141,7 +141,7 @@ function PetBar:KEYBOUND_ENABLED()
 end
 
 function PetBar:KEYBOUND_DISABLED()
-	self:UpdatePossess()
+	self:UpdateStateDriver()
 
 	local petBarShown = PetHasActionBar()
 	for _,button in pairs(self.buttons) do
