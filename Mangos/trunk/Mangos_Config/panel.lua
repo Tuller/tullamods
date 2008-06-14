@@ -96,4 +96,4 @@ function Panel:NewButton(name, width, height)
 end
 
 --load up the options menu
-Mangos.Options = Panel:New('MangosOptions', 'Mangos', LibStub('AceLocale-3.0'):GetLocale('Mangos-Config').MangosDesc)
+Mangos.Options = Panel:New('MangosOptions', select(2, GetAddOnInfo('Mangos')))
