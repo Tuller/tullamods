@@ -65,8 +65,9 @@ function Mangos:GetDefaults()
 	return {
 		profile = {
 			possessBar = 1,
-			showBindingText = true,
+			
 			showMacroText = true,
+			showBindingText = true,
 
 			ab = {
 				count = 10,
@@ -443,7 +444,7 @@ end
 Mangos.locked = true
 
 function Mangos:SetLock(enable)
-	self.locked = enable or nil
+	self.locked = enable or false
 	if self.locked then
 		self.Frame:ForAll('Lock')
 	else
@@ -556,7 +557,7 @@ function Mangos:ToggleGrid()
 end
 
 function Mangos:SetShowGrid(enable)
-	self.db.profile.showgrid = enable
+	self.db.profile.showgrid = enable or false
 	self.ActionBar:ForAll('UpdateGrid')
 end
 
@@ -576,8 +577,8 @@ end
 
 --binding text
 function Mangos:SetShowBindingText(enable)
-	self.db.profile.showBindingText = enable
-	
+	self.db.profile.showBindingText = enable or false
+
 	for _,f in self.Frame:GetAll() do
 		if f.buttons then
 			for _,b in pairs(f.buttons) do
@@ -595,7 +596,7 @@ end
 
 --macro text
 function Mangos:SetShowMacroText(enable)
-	self.db.profile.showMacroText = enable
+	self.db.profile.showMacroText = enable or false
 
 	for _,f in self.Frame:GetAll() do
 		if f.buttons then
