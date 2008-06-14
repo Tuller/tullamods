@@ -38,7 +38,7 @@ local function CloneTable(from, to)
 			changed = true
 		end
 	end
-	
+
 	return changed
 end
 
