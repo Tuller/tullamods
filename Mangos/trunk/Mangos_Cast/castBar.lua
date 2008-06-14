@@ -56,7 +56,7 @@ end
 
 function CastBar:CreateMenu()
 	local menu = Mangos.Menu:New(self.id)
-	local panel = menu:NewPanel(LibStub('AceLocale-3.0'):GetLocale('Mangos').Layout)
+	local panel = menu:NewPanel(LibStub('AceLocale-3.0'):GetLocale('Mangos-Config').Layout)
 
 	local time = panel:NewCheckButton(MANGOS_SHOW_TIME)
 	time:SetScript('OnClick', function(b) self:ToggleText(b:GetChecked()) end)
