@@ -5,7 +5,10 @@
 local Menu = Mangos:CreateClass('Frame')
 Mangos.Menu = Menu
 
-local L = LibStub('AceLocale-3.0'):GetLocale('Mangos')
+local L = LibStub('AceLocale-3.0'):GetLocale('Mangos-Config')
+local _G = getfenv()
+local max = math.max
+local min = math.min
 
 
 Menu.bg = {
@@ -34,9 +37,8 @@ function Menu:New(name)
 	f:SetScript('OnMouseUp', self.StopMovingOrSizing)
 
 	--title text
-	f.text = f:CreateFontString(nil, 'OVERLAY')
+	f.text = f:CreateFontString(nil, 'OVERLAY', 'GameFontHighlight')
 	f.text:SetPoint('TOP', 0, -15)
-	f.text:SetFontObject('GameFontHighlight')
 
 	--close button
 	f.close = CreateFrame('Button', nil, f, 'UIPanelCloseButton')
@@ -52,9 +54,9 @@ function Menu:SetOwner(owner)
 	end
 
 	if tonumber(owner.id) then
-		self.text:SetFormattedText('ActionBar %s Settings', owner.id)
+		self.text:SetFormattedText(L.ActionBarSettings, owner.id)
 	else
-		self.text:SetFormattedText('%s Bar Settings', tostring(owner.id):gsub('^%l', string.upper))
+		self.text:SetFormattedText(L.BarSettings, tostring(owner.id):gsub('^%l', string.upper))
 	end
 
 	self:Anchor(owner)
@@ -138,7 +140,7 @@ do
 
 	function Menu:NewPanelSelector()
 		local f = CreateFrame('Frame', self:GetName() .. 'PanelSelector', self, 'UIDropDownMenuTemplate')
-		getglobal(f:GetName() .. 'Text'):SetJustifyH('LEFT')
+		_G[f:GetName() .. 'Text']:SetJustifyH('LEFT')
 	
 		f:SetScript('OnShow', Dropdown_OnShow)
 
@@ -195,7 +197,7 @@ end
 --checkbutton
 function Panel:NewCheckButton(name)
 	local button = CreateFrame('CheckButton', self:GetName() .. name, self, 'OptionsCheckButtonTemplate')
-	getglobal(button:GetName() .. 'Text'):SetText(name)
+	_G[button:GetName() .. 'Text']:SetText(name)
 
 	local prev = self.checkbutton
 	if prev then
@@ -254,9 +256,9 @@ do
 		slider:SetValueStep(step)
 		slider:EnableMouseWheel(true)
 
-		getglobal(name .. 'Text'):SetText(text)
-		getglobal(name .. 'Low'):SetText('')
-		getglobal(name .. 'High'):SetText('')
+		_G[name .. 'Text']:SetText(text)
+		_G[name .. 'Low']:SetText('')
+		_G[name .. 'High']:SetText('')
 
 		local text = slider:CreateFontString(nil, 'BACKGROUND')
 		text:SetFontObject('GameFontHighlightSmall')
@@ -341,7 +343,7 @@ do
 	end
 
 	function Panel:NewPaddingSlider()
-		return self:NewSlider('Padding', -16, 32, 1, Slider_OnShow, Slider_UpdateValue)
+		return self:NewSlider(L.Padding, -16, 32, 1, Slider_OnShow, Slider_UpdateValue)
 	end
 end
 
