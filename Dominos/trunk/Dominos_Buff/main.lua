@@ -3,8 +3,6 @@
 		Handles ranged updating + buff highlighting updating
 --]]
 
-local Dominos = Dominos
-
 --[[ Local Functions ]]--
 
 --clear a table, returning true if there was stuff to clear
@@ -284,6 +282,8 @@ hooksecurefunc('ActionButton_Update', function(self)
 end)
 
 
+--[[ Loading ]]--
+
 --register buttons
 for id = 1, 12 do
 	table.insert(Updater.buttons, _G['ActionButton' .. id])
@@ -294,6 +294,7 @@ for id = 1, 12 do
 	table.insert(Updater.buttons, _G['MultiBarBottomLeftButton' .. id])
 end
 
+--register any stock action buttons created after this addon is loaded
 hooksecurefunc('ActionButton_OnLoad', function()
 	table.insert(Updater.buttons, this)
 end)
