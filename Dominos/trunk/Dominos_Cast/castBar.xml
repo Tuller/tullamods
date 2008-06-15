@@ -1,9 +1,9 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
 
-	<!--  Djembe CastBar - Puts the casting bar in a movable bar -->
+	<!--  Dominos CastBar - Puts the casting bar in a movable bar -->
 	<Script file="castBar.lua"/>
 
-	<StatusBar name="DjembeCastingBarTemplate" drawLayer="BORDER" hidden="true" virtual="true">
+	<StatusBar name="DominosCastingBarTemplate" drawLayer="BORDER" hidden="true" virtual="true">
 		<Size x="210" y="14"/>
 
 		<Layers>

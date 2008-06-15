@@ -1,5 +1,5 @@
 ﻿--[[
-	Mangos
+	Dominos
 		Because sometimes I feel bad about doing to much
 --]]
 
@@ -13,7 +13,7 @@ local LBF = LibStub('LibButtonFacade', true)
 
 --[[ Pet Button ]]--
 
-local PetButton = Mangos:CreateClass('CheckButton')
+local PetButton = Dominos:CreateClass('CheckButton')
 
 function PetButton:New(id)
 	local b = PetButton:Restore(id) or PetButton:Create(id)
@@ -27,7 +27,7 @@ function PetButton:Create(id)
 	b:SetScript('OnEnter', self.OnEnter)
 
 	if LBF then
-		LBF:Group('Mangos', 'Pet Bar'):AddButton(b)
+		LBF:Group('Dominos', 'Pet Bar'):AddButton(b)
 	end
 	return b
 end
@@ -64,7 +64,7 @@ function PetButton:UpdateHotkey()
 	local key = KeyBound:ToShortKey(GetBindingKey('BONUSACTIONBUTTON'..self:GetID()) or GetBindingKey(format('CLICK %s:LeftButton', self:GetName()))) 
 	hotkey:SetText(key)
 
-	if key ~= ''  and Mangos:ShowBindingText() then
+	if key ~= ''  and Dominos:ShowBindingText() then
 		hotkey:Show()
 	else
 		hotkey:Hide()
@@ -88,8 +88,8 @@ PetActionButton_SetHotkeys = function() PetButton.UpdateHotkey(this) end
 
 --[[ Pet Bar ]]--
 
-local PetBar = Mangos:CreateClass('Frame', Mangos.Frame)
-Mangos.PetBar  = PetBar
+local PetBar = Dominos:CreateClass('Frame', Dominos.Frame)
+Dominos.PetBar  = PetBar
 
 function PetBar:New()
 	local f = self.super.New(self, 'pet')
@@ -101,7 +101,7 @@ function PetBar:New()
 end
 
 function PetBar:UpdateStateDriver()
-	if self == Mangos:GetPossessBar() then
+	if self == Dominos:GetPossessBar() then
 		self:SetShowStates('[target=pet,nodead,exists]')
 	else
 		self:SetShowStates('[target=pet,nodead,exists,nobonusbar:5]')

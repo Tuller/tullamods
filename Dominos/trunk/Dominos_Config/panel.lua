@@ -1,10 +1,10 @@
 --[[
 	menu.lua
-		Code for the Mangos options panel
+		Code for the Dominos options panel
 --]]
 
 --panel object
-local Panel = Mangos:CreateClass('Frame')
+local Panel = Dominos:CreateClass('Frame')
 local _G = getfenv(0)
 local min = math.min
 local max = math.max
@@ -96,4 +96,4 @@ function Panel:NewButton(name, width, height)
 end
 
 --load up the options menu
-Mangos.Options = Panel:New('MangosOptions', select(2, GetAddOnInfo('Mangos')))
+Dominos.Options = Panel:New('DominosOptions', select(2, GetAddOnInfo('Dominos')))

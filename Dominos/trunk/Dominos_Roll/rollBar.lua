@@ -1,26 +1,26 @@
 ﻿--[[
-	Mangos
+	Dominos
 		Because sometimes I feel bad about doing to much
 --]]
 
 
 --[[ Module Stuff ]]--
 
-local MRB = Mangos:NewModule('roll')
+local DRB = Dominos:NewModule('roll')
 local RollBar
 
-function MRB:Load()
+function DRB:Load()
 	self.frame = RollBar:New()
 end
 
-function MRB:Unload()
+function DRB:Unload()
 	self.frame:Free()
 end
 
 
 --[[ Roll Bar Object ]]--
 
-RollBar = Mangos:CreateClass('Frame', Mangos.Frame)
+RollBar = Dominos:CreateClass('Frame', Dominos.Frame)
 
 function RollBar:New()
 	local f = self.super.New(self, 'roll')

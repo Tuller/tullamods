@@ -1,7 +1,7 @@
 ﻿## Interface: 20400
-## Title: Mangos Cast
+## Title: Dominos Cast
 ## Notes: A movable casting bar, with timer
 ## Author: Tuller
-## Dependencies: Mangos
+## Dependencies: Dominos
 localization.lua
 castBar.xml

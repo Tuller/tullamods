@@ -1,9 +1,9 @@
 --[[
-	Mangos Frame
+	Dominos Frame
 		An action button frame thingy
 --]]
 
-local Mangos = Mangos
+local Dominos = Dominos
 
 
 --[[ Fade Manager ]]--
@@ -106,8 +106,8 @@ end
 
 --[[ Mango Frame ]]--
 
-local Frame = Mangos:CreateClass('Frame')
-Mangos.Frame = Frame
+local Frame = Dominos:CreateClass('Frame')
+Dominos.Frame = Frame
 
 local active = {}
 local unused = {}
@@ -132,7 +132,7 @@ function Frame:Create(id)
 	f.header = CreateFrame('Frame', nil, f, 'SecureStateHeaderTemplate')
 	f.header:SetAllPoints(f)
 
-	f.drag = Mangos.DragFrame:New(f)
+	f.drag = Dominos.DragFrame:New(f)
 
 	return f
 end
@@ -168,11 +168,11 @@ end
 
 function Frame:Delete()
 	self:Free()
-	Mangos:SetFrameSets(self.id, nil)
+	Dominos:SetFrameSets(self.id, nil)
 end
 
 function Frame:LoadSettings(defaults)
-	self.sets = Mangos:GetFrameSets(self.id) or Mangos:SetFrameSets(self.id, self:GetDefaults()) --get defaults must be provided by anything implementing the Frame type
+	self.sets = Dominos:GetFrameSets(self.id) or Dominos:SetFrameSets(self.id, self:GetDefaults()) --get defaults must be provided by anything implementing the Frame type
 	self:Reposition()
 
 	if self.sets.hidden then
@@ -181,7 +181,7 @@ function Frame:LoadSettings(defaults)
 		self:ShowFrame()
 	end
 
-	if Mangos:Locked() then
+	if Dominos:Locked() then
 		self:Lock()
 	else
 		self:Unlock()
@@ -589,7 +589,7 @@ end
 --[[ Menus ]]--
 
 function Frame:CreateMenu()
-	self.menu = Mangos:NewMenu(self.id)
+	self.menu = Dominos:NewMenu(self.id)
 	self.menu:AddLayoutPanel()
 end
 

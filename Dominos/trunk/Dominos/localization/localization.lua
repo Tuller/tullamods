@@ -1,11 +1,11 @@
 ﻿--[[
 	Localization.lua
-		Translations for Bongos
+		Translations for Dominos
 
 	English: Default language
 --]]
 
-local L = LibStub('AceLocale-3.0'):NewLocale('Mangos', 'enUS', true)
+local L = LibStub('AceLocale-3.0'):NewLocale('Dominos', 'enUS', true)
 
 --system messages
 L.NewPlayer = 'Created new profile for %s'

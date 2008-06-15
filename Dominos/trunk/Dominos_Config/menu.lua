@@ -2,10 +2,10 @@
 	Menu.lua
 --]]
 
-local Menu = Mangos:CreateClass('Frame')
-Mangos.Menu = Menu
+local Menu = Dominos:CreateClass('Frame')
+Dominos.Menu = Menu
 
-local L = LibStub('AceLocale-3.0'):GetLocale('Mangos-Config')
+local L = LibStub('AceLocale-3.0'):GetLocale('Dominos-Config')
 local _G = getfenv()
 local max = math.max
 local min = math.min
@@ -24,7 +24,7 @@ Menu.extraWidth = 20
 Menu.extraHeight = 40
 
 function Menu:New(name)
-	local f = self:Bind(CreateFrame('Frame', 'MangosFrameMenu' .. name, UIParent))
+	local f = self:Bind(CreateFrame('Frame', 'DominosFrameMenu' .. name, UIParent))
 	f.panels = {}
 
 	f:SetBackdrop(self.bg)
@@ -172,7 +172,7 @@ end
 --]]
 
 --a panel is a subframe of a menu, basically
-local Panel = Mangos:CreateClass('Frame')
+local Panel = Dominos:CreateClass('Frame')
 Menu.Panel = Panel
 
 Panel.width = 0

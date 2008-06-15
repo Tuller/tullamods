@@ -1,11 +1,11 @@
 ﻿--[[
 	Localization.lua
-		Translations for Bongos
+		Translations for Dominos
 
 	English: Default language
 --]]
 
-local L = LibStub('AceLocale-3.0'):NewLocale('Mangos-Config', 'enUS', true)
+local L = LibStub('AceLocale-3.0'):NewLocale('Dominos-Config', 'enUS', true)
 
 L.Scale = 'Scale'
 L.Opacity = 'Opacity'
@@ -34,7 +34,7 @@ L.RCUToT = 'Target of Target'
 L.EnterName = 'Enter Name'
 L.PossessBar = 'Possess Bar'
 L.Profiles = 'Profiles'
-L.ProfilesPanelDesc = 'Allows you to manage saved Mangos layouts'
+L.ProfilesPanelDesc = 'Allows you to manage saved Dominos layouts'
 L.SelfcastKey = 'Selfcast Key'
 L.QuickMoveKey = 'Quick Move Key'
 L.ShowMacroText = 'Show Macro Text'

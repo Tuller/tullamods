@@ -1,5 +1,5 @@
 ﻿--[[
-	Mangos
+	Dominos
 		Because sometimes I feel bad about doing to much
 --]]
 
@@ -12,14 +12,14 @@ do
 	local function Add(b)
 --[[
 		if LBF then
-			LBF:Group('Mangos', 'Bag Bar'):AddButton(b)
+			LBF:Group('Dominos', 'Bag Bar'):AddButton(b)
 		end
 --]]
 		table.insert(bags, b)
 	end
 
 	local function CreateKeyRing()
-		local b = CreateFrame('CheckButton', 'MangosKeyringButton', UIParent, 'ItemButtonTemplate')
+		local b = CreateFrame('CheckButton', 'DominosKeyringButton', UIParent, 'ItemButtonTemplate')
 		b:RegisterForClicks('anyUp')
 		b:Hide()
 
@@ -65,8 +65,8 @@ end
 
 --[[ Bag Bar ]]--
 
-local BagBar = Mangos:CreateClass('Frame', Mangos.Frame)
-Mangos.BagBar  = BagBar
+local BagBar = Dominos:CreateClass('Frame', Dominos.Frame)
+Dominos.BagBar  = BagBar
 
 
 function BagBar:New()

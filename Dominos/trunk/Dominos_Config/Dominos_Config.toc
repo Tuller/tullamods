@@ -1,8 +1,8 @@
 ﻿## Interface: 20400
-## Title: Mangos Config
-## Notes: GUI based configuration for Mangos
+## Title: Dominos Config
+## Notes: GUI based configuration for Dominos
 ## Author: Tuller
-## Dependencies: Mangos
+## Dependencies: Dominos
 ## LoadOnDemand: 1
 localization\localization.lua
 menu.lua

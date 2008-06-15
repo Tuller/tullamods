@@ -1,18 +1,18 @@
 --[[
-	Mangos.lua
-		Driver for Mangos Frames
+	Dominos.lua
+		Driver for Dominos Frames
 --]]
 
-Mangos = LibStub('AceAddon-3.0'):NewAddon('Mangos', 'AceEvent-3.0', 'AceConsole-3.0')
-local L = LibStub('AceLocale-3.0'):GetLocale('Mangos')
-local CURRENT_VERSION = GetAddOnMetadata('Mangos', 'Version')
+Dominos = LibStub('AceAddon-3.0'):NewAddon('Dominos', 'AceEvent-3.0', 'AceConsole-3.0')
+local L = LibStub('AceLocale-3.0'):GetLocale('Dominos')
+local CURRENT_VERSION = GetAddOnMetadata('Dominos', 'Version')
 
 
 --[[ Startup ]]--
 
-function Mangos:OnInitialize()
+function Dominos:OnInitialize()
 	--register database events
-	self.db = LibStub('AceDB-3.0'):New('MangosDB', self:GetDefaults(), 'Default')
+	self.db = LibStub('AceDB-3.0'):New('DominosDB', self:GetDefaults(), 'Default')
 	self.db.RegisterCallback(self, 'OnNewProfile')
 	self.db.RegisterCallback(self, 'OnProfileChanged')
 	self.db.RegisterCallback(self, 'OnProfileCopied')
@@ -20,14 +20,14 @@ function Mangos:OnInitialize()
 	self.db.RegisterCallback(self, 'OnProfileDeleted')
 
 	--version update
-	if MangosVersion then
-		if MangosVersion ~= CURRENT_VERSION then
-			self:UpdateSettings(MangosVersion:match('(%w+)%.(%w+)%.(%w+)'))
+	if DominosVersion then
+		if DominosVersion ~= CURRENT_VERSION then
+			self:UpdateSettings(DominosVersion:match('(%w+)%.(%w+)%.(%w+)'))
 			self:UpdateVersion()
 		end
 	--new user
 	else
-		MangosVersion = CURRENT_VERSION
+		DominosVersion = CURRENT_VERSION
 	end
 
 	--slash command support
@@ -37,7 +37,7 @@ function Mangos:OnInitialize()
 	local f = CreateFrame('Frame', nil, InterfaceOptionsFrame)
 	f:SetScript('OnShow', function(self)
 		self:SetScript('OnShow', nil)
-		LoadAddOn('Mangos_Config')
+		LoadAddOn('Dominos_Config')
 	end)
 
 	--keybound support
@@ -48,20 +48,20 @@ function Mangos:OnInitialize()
 	--button facade support
 	local LBF = LibStub('LibButtonFacade', true)
 	if LBF then
-		LBF:RegisterSkinCallback('Mangos', self.OnSkin, self)
+		LBF:RegisterSkinCallback('Dominos', self.OnSkin, self)
 	end
 
 	--hide blizzard junk
 	self:HideBlizzard()
 end
 
-function Mangos:OnEnable()
+function Dominos:OnEnable()
 	self:Load()
 end
 
 --[[ Version Updating ]]--
 
-function Mangos:GetDefaults()
+function Dominos:GetDefaults()
 	return {
 		profile = {
 			possessBar = 1,
@@ -86,13 +86,13 @@ function Mangos:GetDefaults()
 	}
 end
 
-function Mangos:UpdateSettings(major, minor, bugfix)
+function Dominos:UpdateSettings(major, minor, bugfix)
 	--do stuff
 end
 
-function Mangos:UpdateVersion()
-	MangosVersion = CURRENT_VERSION
-	self:Print(format(L.Updated, MangosVersion))
+function Dominos:UpdateVersion()
+	DominosVersion = CURRENT_VERSION
+	self:Print(format(L.Updated, DominosVersion))
 end
 
 
@@ -102,7 +102,7 @@ local function HasClassBar()
 	return class == 'PALADIN' or class == 'DRUID' or class == 'WARRIOR' or class == 'ROGUE'
 end
 
-function Mangos:Load()
+function Dominos:Load()
 	for i = 1, self:NumBars() do
 		self.ActionBar:New(i)
 	end
@@ -116,10 +116,10 @@ function Mangos:Load()
 	--button facade support
 	local bf = LibStub('LibButtonFacade', true)
 	if bf then
-		bf:Group('Mangos', ACTIONBAR_LABEL):Skin(unpack(self.db.profile.ab.style))
-		bf:Group('Mangos', 'Pet Bar'):Skin(unpack(self.db.profile.petStyle))
-		bf:Group('Mangos', 'Class Bar'):Skin(unpack(self.db.profile.classStyle))
---		bf:Group('Mangos', 'Bag Bar'):Skin(unpack(self.db.profile.bagStyle))
+		bf:Group('Dominos', ACTIONBAR_LABEL):Skin(unpack(self.db.profile.ab.style))
+		bf:Group('Dominos', 'Pet Bar'):Skin(unpack(self.db.profile.petStyle))
+		bf:Group('Dominos', 'Class Bar'):Skin(unpack(self.db.profile.classStyle))
+--		bf:Group('Dominos', 'Bag Bar'):Skin(unpack(self.db.profile.bagStyle))
 	end
 
 	--load in extra functionality
@@ -132,7 +132,7 @@ function Mangos:Load()
 end
 
 --unload is called when we're switching profiles
-function Mangos:Unload()
+function Dominos:Unload()
 	self.ActionBar:ForAll('Free')
 	self.Frame:ForFrame('pet', 'Free')
 	self.Frame:ForFrame('class', 'Free')
@@ -148,7 +148,7 @@ end
 
 --[[ Blizzard Stuff Hiding ]]--
 
-function Mangos:HideBlizzard()
+function Dominos:HideBlizzard()
 	RANGE_INDICATOR = ''
 
 	UIPARENT_MANAGED_FRAME_POSITIONS['MultiBarRight'] = nil
@@ -169,7 +169,7 @@ end
 
 --[[ Button Facade Events ]]--
 
-function Mangos:OnSkin(skin, glossAlpha, gloss, group, button, colors)
+function Dominos:OnSkin(skin, glossAlpha, gloss, group, button, colors)
 	local styleDB
 	if group == ACTIONBAR_LABEL then
 		styleDB = self.db.profile.ab.style
@@ -194,7 +194,7 @@ end
 
 --[[ Keybound Events ]]--
 
-function Mangos:LIBKEYBOUND_ENABLED()
+function Dominos:LIBKEYBOUND_ENABLED()
 	for _,frame in self.Frame:GetAll() do
 		if frame.KEYBOUND_ENABLED then
 			frame:KEYBOUND_ENABLED()
@@ -202,7 +202,7 @@ function Mangos:LIBKEYBOUND_ENABLED()
 	end
 end
 
-function Mangos:LIBKEYBOUND_DISABLED()
+function Dominos:LIBKEYBOUND_DISABLED()
 	for _,frame in self.Frame:GetAll() do
 		if frame.KEYBOUND_DISABLED then
 			frame:KEYBOUND_DISABLED()
@@ -213,7 +213,7 @@ end
 
 --[[ Profile Functions ]]--
 
-function Mangos:SaveProfile(name)
+function Dominos:SaveProfile(name)
 	local toCopy = self.db:GetCurrentProfile()
 	if name and name ~= toCopy then
 		self:Unload()
@@ -224,7 +224,7 @@ function Mangos:SaveProfile(name)
 	end
 end
 
-function Mangos:SetProfile(name)
+function Dominos:SetProfile(name)
 	local profile = self:MatchProfile(name)
 	if profile and profile ~= self.db:GetCurrentProfile() then
 		self:Unload()
@@ -236,7 +236,7 @@ function Mangos:SetProfile(name)
 	end
 end
 
-function Mangos:DeleteProfile(name)
+function Dominos:DeleteProfile(name)
 	local profile = self:MatchProfile(name)
 	if profile and profile ~= self.db:GetCurrentProfile() then
 		self.db:DeleteProfile(profile)
@@ -245,7 +245,7 @@ function Mangos:DeleteProfile(name)
 	end
 end
 
-function Mangos:CopyProfile(name)
+function Dominos:CopyProfile(name)
 	if name and name ~= self.db:GetCurrentProfile() then
 		self:Unload()
 		self.db:CopyProfile(name)
@@ -254,14 +254,14 @@ function Mangos:CopyProfile(name)
 	end
 end
 
-function Mangos:ResetProfile()
+function Dominos:ResetProfile()
 	self:Unload()
 	self.db:ResetProfile()
 	self.isNewProfile = true
 	self:Load()
 end
 
-function Mangos:ListProfiles()
+function Dominos:ListProfiles()
 	self:Print(L.AvailableProfiles)
 
 	local current = self.db:GetCurrentProfile()
@@ -274,7 +274,7 @@ function Mangos:ListProfiles()
 	end
 end
 
-function Mangos:MatchProfile(name)
+function Dominos:MatchProfile(name)
 	local name = name:lower()
 	local nameRealm = name .. ' - ' .. GetRealmName():lower()
 	local match
@@ -293,55 +293,55 @@ end
 
 --[[ Profile Events ]]--
 
-function Mangos:OnNewProfile(msg, db, name)
+function Dominos:OnNewProfile(msg, db, name)
 	self.isNewProfile = true
 	self:Print(format(L.ProfileCreated, name))
 end
 
-function Mangos:OnProfileDeleted(msg, db, name)
+function Dominos:OnProfileDeleted(msg, db, name)
 	self:Print(format(L.ProfileDeleted, name))
 end
 
-function Mangos:OnProfileChanged(msg, db, name)
+function Dominos:OnProfileChanged(msg, db, name)
 	self:Print(format(L.ProfileLoaded, name))
 end
 
-function Mangos:OnProfileCopied(msg, db, name)
+function Dominos:OnProfileCopied(msg, db, name)
 	self:Print(format(L.ProfileCopied, name))
 end
 
-function Mangos:OnProfileReset(msg, db)
+function Dominos:OnProfileReset(msg, db)
 	self:Print(format(L.ProfileReset, db:GetCurrentProfile()))
 end
 
 
 --[[ Settings...Setting ]]--
 
-function Mangos:SetFrameSets(id, sets)
+function Dominos:SetFrameSets(id, sets)
 	local id = tonumber(id) or id
 	self.db.profile.frames[id] = sets
 
 	return self.db.profile.frames[id]
 end
 
-function Mangos:GetFrameSets(id)
+function Dominos:GetFrameSets(id)
 	return self.db.profile.frames[tonumber(id) or id]
 end
 
 
 --[[ Options Menu Display ]]--
 
-function Mangos:ShowOptions()
-	if LoadAddOn('Mangos_Config') then
-		InterfaceOptionsFrame_OpenToFrame('Mangos')
+function Dominos:ShowOptions()
+	if LoadAddOn('Dominos_Config') then
+		InterfaceOptionsFrame_OpenToFrame('Dominos')
 		return true
 	end
 	return false
 end
 
-function Mangos:NewMenu(id)
+function Dominos:NewMenu(id)
 	if not self.Menu then
-		LoadAddOn('Mangos_Config')
+		LoadAddOn('Dominos_Config')
 	end
 	return self.Menu:New(id)
 end
@@ -349,12 +349,12 @@ end
 
 --[[ Slash Commands ]]--
 
-function Mangos:RegisterSlashCommands()
-	self:RegisterChatCommand('mangos', 'OnCmd')
-	self:RegisterChatCommand('mg', 'OnCmd')
+function Dominos:RegisterSlashCommands()
+	self:RegisterChatCommand('dominos', 'OnCmd')
+	self:RegisterChatCommand('dom', 'OnCmd')
 end
 
-function Mangos:OnCmd(args)
+function Dominos:OnCmd(args)
 	local cmd = string.split(' ', args):lower() or args:lower()
 
 	--frame functions
@@ -407,12 +407,12 @@ function Mangos:OnCmd(args)
 	end
 end
 
-function Mangos:PrintHelp(cmd)
+function Dominos:PrintHelp(cmd)
 	local function PrintCmd(cmd, desc)
 		DEFAULT_CHAT_FRAME:AddMessage(format(' - |cFF33FF99%s|r: %s', cmd, desc))
 	end
 
-	self:Print('Commands (/mg, /mangos)')
+	self:Print('Commands (/dom, /dominos)')
 	PrintCmd('config', L.ConfigDesc)
 	PrintCmd('scale <frameList> <scale>', L.SetScaleDesc)
 	PrintCmd('setalpha <frameList> <opacity>', L.SetAlphaDesc)
@@ -433,17 +433,17 @@ function Mangos:PrintHelp(cmd)
 end
 
 --version info
-function Mangos:PrintVersion()
-	self:Print(MangosVersion)
+function Dominos:PrintVersion()
+	self:Print(DominosVersion)
 end
 
 
 --[[ Configuration Functions ]]--
 
 --moving
-Mangos.locked = true
+Dominos.locked = true
 
-function Mangos:SetLock(enable)
+function Dominos:SetLock(enable)
 	self.locked = enable or false
 	if self.locked then
 		self.Frame:ForAll('Lock')
@@ -452,16 +452,16 @@ function Mangos:SetLock(enable)
 	end
 end
 
-function Mangos:Locked()
+function Dominos:Locked()
 	return self.locked
 end
 
-function Mangos:ToggleLockedFrames()
+function Dominos:ToggleLockedFrames()
 	self:SetLock(not self:Locked())
 end
 
 --scale
-function Mangos:ScaleFrames(...)
+function Dominos:ScaleFrames(...)
 	local numArgs = select('#', ...)
 	local scale = tonumber(select(numArgs, ...))
 
@@ -473,7 +473,7 @@ function Mangos:ScaleFrames(...)
 end
 
 --opacity
-function Mangos:SetOpacityForFrames(...)
+function Dominos:SetOpacityForFrames(...)
 	local numArgs = select('#', ...)
 	local alpha = tonumber(select(numArgs, ...))
 
@@ -485,7 +485,7 @@ function Mangos:SetOpacityForFrames(...)
 end
 
 --faded opacity
-function Mangos:SetFadeForFrames(...)
+function Dominos:SetFadeForFrames(...)
 	local numArgs = select('#', ...)
 	local alpha = tonumber(select(numArgs, ...))
 
@@ -497,7 +497,7 @@ function Mangos:SetFadeForFrames(...)
 end
 
 --columns
-function Mangos:SetColumnsForFrames(...)
+function Dominos:SetColumnsForFrames(...)
 	local numArgs = select('#', ...)
 	local cols = tonumber(select(numArgs, ...))
 
@@ -509,7 +509,7 @@ function Mangos:SetColumnsForFrames(...)
 end
 
 --spacing
-function Mangos:SetSpacingForFrame(...)
+function Dominos:SetSpacingForFrame(...)
 	local numArgs = select('#', ...)
 	local spacing = tonumber(select(numArgs, ...))
 
@@ -521,7 +521,7 @@ function Mangos:SetSpacingForFrame(...)
 end
 
 --padding
-function Mangos:SetPaddingForFrames(...)
+function Dominos:SetPaddingForFrames(...)
 	local numArgs = select('#', ...)
 	local pW, pH = select(numArgs - 1, ...)
 
@@ -533,50 +533,50 @@ function Mangos:SetPaddingForFrames(...)
 end
 
 --visibility
-function Mangos:ShowFrames(...)
+function Dominos:ShowFrames(...)
 	for i = 1, select('#', ...) do
 		self.Frame:ForFrame(select(i, ...), 'ShowFrame')
 	end
 end
 
-function Mangos:HideFrames(...)
+function Dominos:HideFrames(...)
 	for i = 1, select('#', ...) do
 		self.Frame:ForFrame(select(i, ...), 'HideFrame')
 	end
 end
 
-function Mangos:ToggleFrames(...)
+function Dominos:ToggleFrames(...)
 	for i = 1, select('#', ...) do
 		self.Frame:ForFrame(select(i, ...), 'ToggleFrame')
 	end
 end
 
 --empty button display
-function Mangos:ToggleGrid()
+function Dominos:ToggleGrid()
 	self:SetShowGrid(not self:ShowGrid())
 end
 
-function Mangos:SetShowGrid(enable)
+function Dominos:SetShowGrid(enable)
 	self.db.profile.showgrid = enable or false
 	self.ActionBar:ForAll('UpdateGrid')
 end
 
-function Mangos:ShowGrid()
+function Dominos:ShowGrid()
 	return self.db.profile.showgrid
 end
 
 --right click selfcast
-function Mangos:SetRightClickUnit(unit)
+function Dominos:SetRightClickUnit(unit)
 	self.db.profile.ab.rightClickUnit = unit
 	self.ActionBar:ForAll('UpdateRightClickUnit')
 end
 
-function Mangos:GetRightClickUnit()
+function Dominos:GetRightClickUnit()
 	return self.db.profile.ab.rightClickUnit
 end
 
 --binding text
-function Mangos:SetShowBindingText(enable)
+function Dominos:SetShowBindingText(enable)
 	self.db.profile.showBindingText = enable or false
 
 	for _,f in self.Frame:GetAll() do
@@ -590,12 +590,12 @@ function Mangos:SetShowBindingText(enable)
 	end
 end
 
-function Mangos:ShowBindingText()
+function Dominos:ShowBindingText()
 	return self.db.profile.showBindingText
 end
 
 --macro text
-function Mangos:SetShowMacroText(enable)
+function Dominos:SetShowMacroText(enable)
 	self.db.profile.showMacroText = enable or false
 
 	for _,f in self.Frame:GetAll() do
@@ -609,12 +609,12 @@ function Mangos:SetShowMacroText(enable)
 	end
 end
 
-function Mangos:ShowMacroText()
+function Dominos:ShowMacroText()
 	return self.db.profile.showMacroText
 end
 
 --possess bar settings
-function Mangos:SetPossessBar(id)
+function Dominos:SetPossessBar(id)
 	local prevBar = self:GetPossessBar()
 	self.db.profile.possessBar = id
 	local newBar = self:GetPossessBar()
@@ -623,12 +623,12 @@ function Mangos:SetPossessBar(id)
 	newBar:UpdateStateDriver()
 end
 
-function Mangos:GetPossessBar()
+function Dominos:GetPossessBar()
 	return self.Frame:Get(self.db.profile.possessBar)
 end
 
 --action bar numbers
-function Mangos:SetNumBars(count)
+function Dominos:SetNumBars(count)
 	count = max(min(count, 120), 1) --sometimes, I do entertaininig things
 
 	if count ~= self:NumBars() then
@@ -641,7 +641,7 @@ function Mangos:SetNumBars(count)
 	end
 end
 
-function Mangos:NumBars()
+function Dominos:NumBars()
 	return self.db.profile.ab.count
 end
 
@@ -649,7 +649,7 @@ end
 --[[ Utility Functions ]]--
 
 --utility function: create a widget class
-function Mangos:CreateClass(type, parentClass)
+function Dominos:CreateClass(type, parentClass)
 	local class = CreateFrame(type)
 	class.mt = {__index = class}
 

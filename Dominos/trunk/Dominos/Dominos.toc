@@ -1,14 +1,14 @@
 ﻿## Interface: 20400
-## Title: Mangos
+## Title: Dominos
 ## Notes: A main actionbar replacement
 ## Author: Tuller
-## Version: 1.7.3
-## SavedVariables: MangosDB, MangosVersion
+## Version: 1.0.0
+## SavedVariables: DominosDB, DominosVersion
 ## OptionalDeps: Ace3, LibKeyBound-1.0
 embeds.xml
 FlyPaper.lua
 localization\localization.lua
-Mangos.lua
+Dominos.lua
 drag.lua
 frame.lua
 actionBar.lua

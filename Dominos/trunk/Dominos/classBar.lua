@@ -1,5 +1,5 @@
 ﻿--[[
-	Mangos
+	Dominos
 		Because sometimes I feel bad about doing to much
 --]]
 
@@ -15,7 +15,7 @@ local LBF = LibStub('LibButtonFacade', true)
 
 --[[ Class Button ]]--
 
-local ClassButton = Mangos:CreateClass('CheckButton')
+local ClassButton = Dominos:CreateClass('CheckButton')
 
 
 --[[ Constructor ]]--
@@ -25,7 +25,7 @@ function ClassButton:New(id)
 end
 
 function ClassButton:Create(id)
-	local name = format('BongosClassButton%d', id)
+	local name = format('DominosClassButton%d', id)
 
 	local b = self:Bind(CreateFrame('CheckButton', name, nil, 'SecureActionButtonTemplate'))
 	b:SetWidth(BUTTON_SIZE)
@@ -68,7 +68,7 @@ function ClassButton:Create(id)
 	b:UpdateHotkey()
 
 	if LBF then
-		LBF:Group('Mangos', 'Class Bar'):AddButton(b)
+		LBF:Group('Dominos', 'Class Bar'):AddButton(b)
 	end
 
 	return b
@@ -176,7 +176,7 @@ function ClassButton:UpdateHotkey()
 	local key = KeyBound:ToShortKey(GetBindingKey(format('CLICK %s:LeftButton', self:GetName()))) or ''
 	self.hotkey:SetText(key)
 
-	if key ~= ''  and Mangos:ShowBindingText() then
+	if key ~= ''  and Dominos:ShowBindingText() then
 		self.hotkey:Show()
 	else
 		self.hotkey:Hide()
@@ -190,8 +190,8 @@ end
 
 --[[ Class Bar ]]--
 
-local ClassBar = Mangos:CreateClass('Frame', Mangos.Frame)
-Mangos.ClassBar  = ClassBar
+local ClassBar = Dominos:CreateClass('Frame', Dominos.Frame)
+Dominos.ClassBar  = ClassBar
 
 
 function ClassBar:New()

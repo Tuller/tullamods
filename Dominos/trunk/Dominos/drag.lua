@@ -2,10 +2,10 @@
 	The Drag Frame
 --]]
 
-local Drag = Mangos:CreateClass('Button')
-Mangos.DragFrame = Drag
+local Drag = Dominos:CreateClass('Button')
+Dominos.DragFrame = Drag
 
-local L = LibStub('AceLocale-3.0'):GetLocale('Mangos')
+local L = LibStub('AceLocale-3.0'):GetLocale('Dominos')
 
 function Drag:New(owner)
 	local f = self:Bind(CreateFrame('Button', nil, UIParent))

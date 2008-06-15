@@ -1,19 +1,19 @@
 ﻿--[[
 	general.lua
-		The general panel of the mangos options menu
+		The general panel of the Dominos options menu
 --]]
 
-local L = LibStub('AceLocale-3.0'):GetLocale('Mangos-Config')
-local Mangos = Mangos
-local Options = Mangos.Options
+local L = LibStub('AceLocale-3.0'):GetLocale('Dominos-Config')
+local Dominos = Dominos
+local Options = Dominos.Options
 
 --[[ Buttons ]]--
 
 --toggle config mode
 local lock = Options:NewButton('Config Mode', 136, 22)
-lock.UpdateText = function(self) self:SetText(Mangos:Locked() and L.EnterConfigMode or L.ExitConfigMode) end
+lock.UpdateText = function(self) self:SetText(Dominos:Locked() and L.EnterConfigMode or L.ExitConfigMode) end
 lock:SetScript('OnShow', lock.UpdateText)
-lock:SetScript('OnClick', function(self) Mangos:ToggleLockedFrames() self:UpdateText() end)
+lock:SetScript('OnClick', function(self) Dominos:ToggleLockedFrames() self:UpdateText() end)
 lock:SetPoint('TOPLEFT', 12, -72)
 
 --toggle keybinding mode
@@ -46,30 +46,30 @@ lockButtons:SetPoint('TOPLEFT', lock, 'BOTTOMLEFT', 0, -24)
 --show empty buttons
 local showEmpty = Options:NewCheckButton(L.ShowEmptyButtons)
 showEmpty:SetScript('OnShow', function(self)
-	self:SetChecked(Mangos:ShowGrid())
+	self:SetChecked(Dominos:ShowGrid())
 end)
 showEmpty:SetScript('OnClick', function(self)
-	Mangos:SetShowGrid(self:GetChecked())
+	Dominos:SetShowGrid(self:GetChecked())
 end)
 showEmpty:SetPoint('TOP', lockButtons, 'BOTTOM', 0, -10)
 
 --show keybinding text
 local showBindings = Options:NewCheckButton(L.ShowBindingText)
 showBindings:SetScript('OnShow', function(self)
-	self:SetChecked(Mangos:ShowBindingText())
+	self:SetChecked(Dominos:ShowBindingText())
 end)
 showBindings:SetScript('OnClick', function(self)
-	Mangos:SetShowBindingText(self:GetChecked())
+	Dominos:SetShowBindingText(self:GetChecked())
 end)
 showBindings:SetPoint('TOP', showEmpty, 'BOTTOM', 0, -10)
 
 --show macro text
 local showMacros = Options:NewCheckButton(L.ShowMacroText)
 showMacros:SetScript('OnShow', function(self)
-	self:SetChecked(Mangos:ShowMacroText())
+	self:SetChecked(Dominos:ShowMacroText())
 end)
 showMacros:SetScript('OnClick', function(self)
-	Mangos:SetShowMacroText(self:GetChecked())
+	Dominos:SetShowMacroText(self:GetChecked())
 end)
 showMacros:SetPoint('TOP', showBindings, 'BOTTOM', 0, -10)
 
@@ -87,7 +87,7 @@ end)
 scale:SetScript('OnValueChanged', function(self, value)
 	self.valText:SetText(value)
 	if not self.onShow then
-		Mangos.Frame:ForAll('SetFrameScale', value/100)
+		Dominos.Frame:ForAll('SetFrameScale', value/100)
 	end
 end)
 scale:SetPoint('TOPLEFT', showMacros, 'BOTTOMLEFT', 0, -18)
@@ -102,7 +102,7 @@ end)
 opacity:SetScript('OnValueChanged', function(self, value)
 	self.valText:SetText(value)
 	if not self.onShow then
-		Mangos.Frame:ForAll('SetFrameAlpha', value/100)
+		Dominos.Frame:ForAll('SetFrameAlpha', value/100)
 	end
 end)
 opacity:SetPoint('TOPLEFT', scale, 'BOTTOMLEFT', 0, -20)
@@ -117,7 +117,7 @@ end)
 faded:SetScript('OnValueChanged', function(self, value)
 	self.valText:SetText(value)
 	if not self.onShow then
-		Mangos.Frame:ForAll('SetFadeAlpha', value/100)
+		Dominos.Frame:ForAll('SetFadeAlpha', value/100)
 	end
 end)
 faded:SetPoint('TOPLEFT', opacity, 'BOTTOMLEFT', 0, -20)
@@ -132,7 +132,7 @@ end)
 padding:SetScript('OnValueChanged', function(self, value)
 	self.valText:SetText(value)
 	if not self.onShow then
-		Mangos.Frame:ForAll('SetPadding', value)
+		Dominos.Frame:ForAll('SetPadding', value)
 	end
 end)
 padding:SetPoint('TOPLEFT', faded, 'BOTTOMLEFT', 0, -20)
@@ -147,7 +147,7 @@ end)
 spacing:SetScript('OnValueChanged', function(self, value)
 	self.valText:SetText(value)
 	if not self.onShow then
-		Mangos.Frame:ForAll('SetSpacing', value)
+		Dominos.Frame:ForAll('SetSpacing', value)
 	end
 end)
 spacing:SetPoint('TOPLEFT', padding, 'BOTTOMLEFT', 0, -20)
@@ -200,16 +200,16 @@ do
 		dd:SetScript('OnShow', function(self)
 			UIDropDownMenu_SetWidth(110, self)
 			UIDropDownMenu_Initialize(self, self.Initialize)
-			UIDropDownMenu_SetSelectedValue(self, Mangos:GetRightClickUnit() or 'NONE')
+			UIDropDownMenu_SetSelectedValue(self, Dominos:GetRightClickUnit() or 'NONE')
 		end)
 
 		local function Item_OnClick()
-			Mangos:SetRightClickUnit(this.value ~= 'NONE' and this.value or nil)
+			Dominos:SetRightClickUnit(this.value ~= 'NONE' and this.value or nil)
 			UIDropDownMenu_SetSelectedValue(dd, this.value)
 		end
 
 		function dd.Initialize()
-			local selected = Mangos:GetRightClickUnit()  or 'NONE'
+			local selected = Dominos:GetRightClickUnit()  or 'NONE'
 
 			AddItem(L.RCUPlayer, 'player', Item_OnClick, 'player' == selected)
 			AddItem(L.RCUFocus, 'focus', Item_OnClick, 'focus' == selected)
@@ -225,18 +225,18 @@ do
 		dd:SetScript('OnShow', function(self)
 			UIDropDownMenu_SetWidth(110, self)
 			UIDropDownMenu_Initialize(self, self.Initialize)
-			UIDropDownMenu_SetSelectedValue(self, Mangos:GetPossessBar().id)
+			UIDropDownMenu_SetSelectedValue(self, Dominos:GetPossessBar().id)
 		end)
 
 		local function Item_OnClick()
-			Mangos:SetPossessBar(this.value)
+			Dominos:SetPossessBar(this.value)
 			UIDropDownMenu_SetSelectedValue(dd, this.value)
 		end
 
 		function dd.Initialize()
-			local selected = Mangos:GetPossessBar().id
+			local selected = Dominos:GetPossessBar().id
 
-			for i = 1, Mangos:NumBars() do
+			for i = 1, Dominos:NumBars() do
 				AddItem('Action Bar ' .. i, i, Item_OnClick, i == selected)
 			end
 			AddItem('Pet Bar', 'pet', Item_OnClick, 'pet' == selected)

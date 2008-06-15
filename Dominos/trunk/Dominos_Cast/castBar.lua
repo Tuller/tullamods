@@ -1,22 +1,22 @@
 --[[
-	A Mangos based cast bar
+	A Dominos based cast bar
 --]]
 
-local MCB = Mangos:NewModule('CastingBar')
+local DCB = Dominos:NewModule('CastingBar')
 local CastBar, CastingBar
 
-function MCB:Load()
+function DCB:Load()
 	self.frame = CastBar:New()
 end
 
-function MCB:Unload()
+function DCB:Unload()
 	self.frame:Free()
 end
 
 
---[[ Mangos Frame Object ]]--
+--[[ Dominos Frame Object ]]--
 
-CastBar = Mangos:CreateClass('Frame', Mangos.Frame)
+CastBar = Dominos:CreateClass('Frame', Dominos.Frame)
 
 function CastBar:New()
 	local f = self.super.New(self, 'cast')
@@ -55,10 +55,10 @@ function CastBar:UpdateText()
 end
 
 function CastBar:CreateMenu()
-	local menu = Mangos.Menu:New(self.id)
-	local panel = menu:NewPanel(LibStub('AceLocale-3.0'):GetLocale('Mangos-Config').Layout)
+	local menu = Dominos.Menu:New(self.id)
+	local panel = menu:NewPanel(LibStub('AceLocale-3.0'):GetLocale('Dominos-Config').Layout)
 
-	local time = panel:NewCheckButton(MANGOS_SHOW_TIME)
+	local time = panel:NewCheckButton(Dominos_SHOW_TIME)
 	time:SetScript('OnClick', function(b) self:ToggleText(b:GetChecked()) end)
 	time:SetScript('OnShow', function(b) b:SetChecked(self.sets.showText) end)
 
@@ -78,7 +78,7 @@ end
 
 --[[ CastingBar Object ]]--
 
-CastingBar = Mangos:CreateClass('StatusBar')
+CastingBar = Dominos:CreateClass('StatusBar')
 
 --omg speed
 local BORDER_SCALE = 197/150 --its magic!
@@ -89,7 +89,7 @@ local CASTING_BAR_FLASH_STEP = CASTING_BAR_FLASH_STEP
 local CASTING_BAR_ALPHA_STEP = CASTING_BAR_ALPHA_STEP
 
 function CastingBar:New(parent)
-	local f = self:Bind(CreateFrame('StatusBar', 'DjembeCastingBar', parent, 'DjembeCastingBarTemplate'))
+	local f = self:Bind(CreateFrame('StatusBar', 'DominosCastingBar', parent, 'DominosCastingBarTemplate'))
 	f:SetPoint('CENTER')
 
 	local name = f:GetName()

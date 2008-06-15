@@ -3,7 +3,7 @@
 		Handles ranged updating + buff highlighting updating
 --]]
 
-local Mangos = Mangos
+local Dominos = Dominos
 
 --[[ Local Functions ]]--
 
@@ -83,8 +83,8 @@ Updater:SetScript('OnUpdate', function(self, elapsed)
 	if self.shouldUpdateBuffs then
 		self.shouldUpdateBuffs = nil
 
-		for i = 1, Mangos:NumBars() do
-			local f = Mangos.Frame:Get(i)
+		for i = 1, Dominos:NumBars() do
+			local f = Dominos.Frame:Get(i)
 			if f:IsVisible() then
 				for _,b in pairs(f.buttons) do
 					if HasAction(b.action) then

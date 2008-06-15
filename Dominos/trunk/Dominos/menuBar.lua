@@ -1,5 +1,5 @@
 ﻿--[[
-	Mangos
+	Dominos
 		Because sometimes I feel bad about doing to much
 --]]
 
@@ -19,7 +19,7 @@ do
 	TalentMicroButton.UpdateShown = function(self)
 		if UnitLevel('player') < 10 then
 			self:Hide()
-		elseif Mangos.Frame:Get('menu') then
+		elseif Dominos.Frame:Get('menu') then
 			self:Show()
 		end
 	end
@@ -41,8 +41,8 @@ end
 
 --[[ Menu Bar ]]--
 
-local MenuBar = Mangos:CreateClass('Frame', Mangos.Frame)
-Mangos.MenuBar  = MenuBar
+local MenuBar = Dominos:CreateClass('Frame', Dominos.Frame)
+Dominos.MenuBar  = MenuBar
 
 function MenuBar:New()
 	local f = self.super.New(self, 'menu')

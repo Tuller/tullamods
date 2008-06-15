@@ -2,7 +2,7 @@
 	A profile selector panel
 --]]
 
-local L = LibStub('AceLocale-3.0'):GetLocale('Mangos-Config')
+local L = LibStub('AceLocale-3.0'):GetLocale('Dominos-Config')
 local _G = getfenv(0)
 
 --profile options
@@ -53,7 +53,7 @@ end
 --[[ Panel Functions ]]--
 
 local function Panel_UpdateList(self)
-	local list = Mangos.db:GetProfiles()
+	local list = Dominos.db:GetProfiles()
 	local size = #list
 	table.sort(list)
 
@@ -75,7 +75,7 @@ local function Panel_UpdateList(self)
 end
 
 local function Panel_Highlight(self, profile)
-	local profile = profile or Mangos.db:GetCurrentProfile()
+	local profile = profile or Dominos.db:GetCurrentProfile()
 
 	for _,button in pairs(self.buttons) do
 		if(button:GetText() == profile) then
@@ -100,7 +100,7 @@ local function Panel_CreatePopupDialog(panel)
 		OnAccept = function()
 			local text = _G[this:GetParent():GetName()..'EditBox']:GetText()
 			if text ~= '' then
-				Mangos:SaveProfile(text)
+				Dominos:SaveProfile(text)
 				panel:UpdateList()
 				panel:Highlight(text)
 			end
@@ -108,7 +108,7 @@ local function Panel_CreatePopupDialog(panel)
 		EditBoxOnEnterPressed = function()
 			local text = _G[this:GetParent():GetName()..'EditBox']:GetText()
 			if text ~= '' then
-				Mangos:SaveProfile(text)
+				Dominos:SaveProfile(text)
 				panel:UpdateList()
 				panel:Highlight(text)
 			end
@@ -129,7 +129,7 @@ local function Panel_CreatePopupDialog(panel)
 end
 
 do
-	local panel = Mangos.Options:New('MangosProfiles', L.Profiles, L.ProfilesPanelDesc)
+	local panel = Dominos.Options:New('DominosProfiles', L.Profiles, L.ProfilesPanelDesc)
 	panel.UpdateList = Panel_UpdateList
 	panel.Highlight = Panel_Highlight
 
@@ -152,7 +152,7 @@ do
 	set:SetScript('OnClick', function()
 		local selected = panel.selected
 		if selected then
-			Mangos:SetProfile(selected:GetText())
+			Dominos:SetProfile(selected:GetText())
 			panel:UpdateList()
 			panel:Highlight(selected:GetText())
 		end
@@ -160,14 +160,14 @@ do
 	set:SetPoint('BOTTOMLEFT', 10, 10)
 
 	local save = panel:NewButton(L.Save, 64, 22)
-	save:SetScript('OnClick', function() StaticPopup_Show('MANGOS_OPTIONS_SAVE_PROFILE') end)
+	save:SetScript('OnClick', function() StaticPopup_Show('Dominos_OPTIONS_SAVE_PROFILE') end)
 	save:SetPoint('LEFT', set, 'RIGHT', 4, 0)
 
 	local copy = panel:NewButton(L.Copy, 64, 22)
 	copy:SetScript('OnClick', function()
 		local selected = panel.selected
 		if selected then
-			Mangos:CopyProfile(selected:GetText())
+			Dominos:CopyProfile(selected:GetText())
 		end
 	end)
 	copy:SetPoint('LEFT', save, 'RIGHT', 4, 0)
@@ -176,7 +176,7 @@ do
 	delete:SetScript('OnClick', function()
 		local selected = panel.selected
 		if selected then
-			Mangos:DeleteProfile(selected:GetText())
+			Dominos:DeleteProfile(selected:GetText())
 			panel:UpdateList()
 			panel:Highlight()
 		end
@@ -196,5 +196,5 @@ do
 		panel.buttons[i] = button
 	end
 
-	StaticPopupDialogs['MANGOS_OPTIONS_SAVE_PROFILE'] = Panel_CreatePopupDialog(panel)
+	StaticPopupDialogs['Dominos_OPTIONS_SAVE_PROFILE'] = Panel_CreatePopupDialog(panel)
 end

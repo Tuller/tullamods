@@ -1,5 +1,5 @@
 ﻿--[[
-	Mangos
+	Dominos
 		Because sometimes I feel bad about doing to much
 --]]
 
@@ -15,7 +15,7 @@ local LBF = LibStub('LibButtonFacade', true)
 
 --[[ Action Button ]]--
 
-local ActionButton = Mangos:CreateClass('CheckButton')
+local ActionButton = Dominos:CreateClass('CheckButton')
 ActionButton.unused = {}
 ActionButton.active = {}
 
@@ -71,7 +71,7 @@ function ActionButton:Create(id)
 		_G[b:GetName() .. 'Name']:Hide() --hide macro text
 
 		if LBF then
-			LBF:Group('Mangos', ACTIONBAR_LABEL):AddButton(b)
+			LBF:Group('Dominos', ACTIONBAR_LABEL):AddButton(b)
 		end
 	end
 	return b
@@ -124,7 +124,7 @@ function ActionButton:UpdateHotkey(abType)
 	local key = KeyBound:ToShortKey(GetBindingKey(abType..self:GetID()) or GetBindingKey(format('CLICK %s:LeftButton', self:GetName()))) or ''
 	hotkey:SetText(key)
 
-	if key ~= ''  and Mangos:ShowBindingText() then
+	if key ~= ''  and Dominos:ShowBindingText() then
 		hotkey:Show()
 	else
 		hotkey:Hide()
@@ -144,7 +144,7 @@ function ActionButton:UpdateGrid()
 end
 
 function ActionButton:UpdateMacro()
-	if Mangos:ShowMacroText() then
+	if Dominos:ShowMacroText() then
 		_G[self:GetName() .. 'Name']:Show()
 	else
 		_G[self:GetName() .. 'Name']:Hide()
@@ -167,8 +167,8 @@ ActionButton_UpdateHotkeys = function(abType) ActionButton.UpdateHotkey(this, ab
 
 --[[ Action Bar ]]--
 
-local ActionBar = Mangos:CreateClass('Frame', Mangos.Frame)
-Mangos.ActionBar = ActionBar
+local ActionBar = Dominos:CreateClass('Frame', Dominos.Frame)
+Dominos.ActionBar = ActionBar
 
 
 --[[ Constructor Code ]]--
@@ -275,7 +275,7 @@ end
 
 --returns the maximum possible size for a given bar
 function ActionBar:MaxLength()
-	return floor(MAX_BUTTONS / Mangos:NumBars())
+	return floor(MAX_BUTTONS / Dominos:NumBars())
 end
 
 
@@ -409,7 +409,7 @@ end
 
 --returns true if the possess bar, false otherwise
 function ActionBar:IsPossessBar()
-	return self == Mangos:GetPossessBar()
+	return self == Dominos:GetPossessBar()
 end
 
 
@@ -429,7 +429,7 @@ function ActionBar:HideGrid()
 end
 
 function ActionBar:UpdateGrid()
-	if Mangos:ShowGrid() then
+	if Dominos:ShowGrid() then
 		self:ShowGrid()
 	else
 		self:HideGrid()
@@ -451,7 +451,7 @@ end
 
 --right click targeting support
 function ActionBar:UpdateRightClickUnit()
-	local unit = Mangos:GetRightClickUnit()
+	local unit = Dominos:GetRightClickUnit()
 
 	self.header:SetAttribute('*unit2', unit)
 
@@ -475,7 +475,7 @@ do
 
 	--state slider template
 	local function ConditionSlider_OnShow(self)
-		self:SetMinMaxValues(-1, Mangos:NumBars() - 1)
+		self:SetMinMaxValues(-1, Dominos:NumBars() - 1)
 		self:SetValue(self:GetParent().owner:GetPage(self.condition) or -1)
 	end
 
@@ -485,7 +485,7 @@ do
 
 	local function ConditionSlider_UpdateText(self, value)
 		if value > -1 then
-			local page = (self:GetParent().owner.id + value - 1) % Mangos:NumBars() + 1
+			local page = (self:GetParent().owner.id + value - 1) % Dominos:NumBars() + 1
 			self.valText:SetFormattedText(L.Bar, page)
 		else
 			self.valText:SetText(DISABLE)
@@ -605,9 +605,9 @@ do
 	end
 
 	function ActionBar:CreateMenu()
-		local menu = Mangos:NewMenu(self.id)
+		local menu = Dominos:NewMenu(self.id)
 		
-		L = LibStub('AceLocale-3.0'):GetLocale('Mangos-Config')
+		L = LibStub('AceLocale-3.0'):GetLocale('Dominos-Config')
 		AddLayout(menu)
 		AddClass(menu)
 		AddPaging(menu)
