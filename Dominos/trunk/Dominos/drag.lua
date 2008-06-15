@@ -69,6 +69,7 @@ end
 
 function Drag:StartMoving(button)
 	if button == 'LeftButton' then
+		self.isMoving = true
 		self.owner:StartMoving()
 
 		if GameTooltip:IsOwned(self) then
@@ -78,9 +79,12 @@ function Drag:StartMoving(button)
 end
 
 function Drag:StopMoving()
-	self.owner:StopMovingOrSizing()
-	self.owner:Stick()
-	self:OnEnter()
+	if self.isMoving then
+		self.isMoving = nil
+		self.owner:StopMovingOrSizing()
+		self.owner:Stick()
+		self:OnEnter()
+	end
 end
 
 function Drag:OnMouseWheel(arg1)
