@@ -51,6 +51,7 @@ local Updater = CreateFrame('Frame')
 Updater.targetBuffs = {}
 Updater.targetDebuffs = {}
 Updater.playerBuffs = {}
+Updater.buttons = {}
 
 --buff and debuff caches
 local newVals = {} --store new info in here
@@ -83,14 +84,9 @@ Updater:SetScript('OnUpdate', function(self, elapsed)
 	if self.shouldUpdateBuffs then
 		self.shouldUpdateBuffs = nil
 
-		for i = 1, Dominos:NumBars() do
-			local f = Dominos.Frame:Get(i)
-			if f:IsVisible() then
-				for _,b in pairs(f.buttons) do
-					if HasAction(b.action) then
-						ActionButton_UpdateState(b)
-					end
-				end
+		for _,b in pairs(self.buttons) do
+			if b:IsVisible() and HasAction(b.action) then
+				ActionButton_UpdateState(b)
 			end
 		end
 	end
@@ -283,6 +279,21 @@ hooksecurefunc('ActionButton_UpdateState', function(self)
 	self:SetChecked(ActionButton_IsSpellInUse(self) or self:GetChecked())
 end)
 
-hooksecurefunc('ActionButton_UpdateAction', function(self)
+hooksecurefunc('ActionButton_Update', function(self)
 	ActionButton_UpdateSpell(self or this)
+end)
+
+
+--register buttons
+for id = 1, 12 do
+	table.insert(Updater.buttons, _G['ActionButton' .. id])
+	table.insert(Updater.buttons, _G['BonusActionButton' .. id])
+	table.insert(Updater.buttons, _G['MultiBarRightButton' .. id])
+	table.insert(Updater.buttons, _G['MultiBarLeftButton' .. id])
+	table.insert(Updater.buttons, _G['MultiBarBottomRightButton' .. id])
+	table.insert(Updater.buttons, _G['MultiBarBottomLeftButton' .. id])
+end
+
+hooksecurefunc('ActionButton_OnLoad', function()
+	table.insert(Updater.buttons, this)
 end)

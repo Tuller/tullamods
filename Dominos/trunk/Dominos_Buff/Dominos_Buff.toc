@@ -2,5 +2,4 @@
 ## Title: Dominos Buff
 ## Notes: Adds borders around action buttons when a buff or debuff is cast on your target or yourself
 ## Author: Tuller
-## Dependencies: Dominos
 main.lua
