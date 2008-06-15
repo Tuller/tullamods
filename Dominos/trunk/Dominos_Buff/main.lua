@@ -54,6 +54,7 @@ Updater.buttons = {}
 --buff and debuff caches
 local newVals = {} --store new info in here
 
+
 --[[ Events ]]--
 
 --buff and debuff updating stuff
