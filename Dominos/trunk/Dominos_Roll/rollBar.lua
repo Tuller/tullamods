@@ -50,3 +50,5 @@ function RollBar:RemoveButton(i)
 	b:SetParent(nil)
 	self.buttons[i] = nil
 end
+
+UIPARENT_MANAGED_FRAME_POSITIONS['GroupLootFrame1'] = nil
