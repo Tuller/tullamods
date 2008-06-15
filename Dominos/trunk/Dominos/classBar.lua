@@ -69,6 +69,9 @@ function ClassButton:Create(id)
 
 	if LBF then
 		LBF:Group('Dominos', 'Class Bar'):AddButton(b)
+	else
+		b.icon:SetTexCoord(0.06, 0.94, 0.06, 0.94)
+		b:GetNormalTexture():SetVertexColor(1, 1, 1, 0.5)
 	end
 
 	return b

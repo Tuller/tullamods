@@ -68,10 +68,12 @@ function ActionButton:Create(id)
 		b:EnableMouseWheel(true)
 		b:SetScript('OnEnter', self.OnEnter)
 
-		_G[b:GetName() .. 'Name']:Hide() --hide macro text
-
+		--skin buttons
 		if LBF then
 			LBF:Group('Dominos', ACTIONBAR_LABEL):AddButton(b)
+		else
+			_G[b:GetName() .. 'Icon']:SetTexCoord(0.06, 0.94, 0.06, 0.94)
+			b:GetNormalTexture():SetVertexColor(1, 1, 1, 0.5)
 		end
 	end
 	return b
@@ -261,8 +263,11 @@ function ActionBar:GetDefaults()
 	local defaults = {}
 	defaults.point = 'BOTTOM'
 	defaults.x = 0
-	defaults.y = 37*(self.id-1)
+	defaults.y = 40*(self.id-1)
 	defaults.pages = {}
+	defaults.spacing = 4
+	defaults.padW = 2
+	defaults.padH = 2
 	defaults.numButtons = self:MaxLength()
 
 	return defaults
