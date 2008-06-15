@@ -17,11 +17,8 @@ lock:SetScript('OnClick', function(self) Dominos:ToggleLockedFrames() self:Updat
 lock:SetPoint('TOPLEFT', 12, -72)
 
 --toggle keybinding mode
-local kb = LibStub('LibKeyBound-1.0')
-local bind = Options:NewButton('Binding Mode', 136, 22)
-bind.UpdateText = function(self) self:SetText(kb:IsShown() and L.ExitBindingMode or L.EnterBindingMode) end
-bind:SetScript('OnShow', bind.UpdateText)
-bind:SetScript('OnClick', function(self) kb:Toggle() self:UpdateText() end)
+local bind = Options:NewButton(L.EnterBindingMode, 136, 22)
+bind:SetScript('OnClick', function(self) LibStub('LibKeyBound-1.0'):Activate() HideUIPanel(InterfaceOptionsFrame) end)
 bind:SetPoint('LEFT', lock, 'RIGHT', 4, 0)
 
 
