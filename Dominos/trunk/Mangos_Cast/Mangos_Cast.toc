@@ -1,0 +1,7 @@
+﻿## Interface: 20400
+## Title: Mangos Cast
+## Notes: A movable casting bar, with timer
+## Author: Tuller
+## Dependencies: Mangos
+localization.lua
+castBar.xml
