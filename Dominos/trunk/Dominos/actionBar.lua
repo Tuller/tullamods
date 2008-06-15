@@ -84,6 +84,7 @@ function ActionButton:Restore(id)
 	if b then
 		self.unused[id] = nil
 		b:LoadEvents()
+		b:RCall(ActionButton_Update)
 		b:Show()
 		self.active[id] = b
 		return b
@@ -99,7 +100,7 @@ function ActionButton:Free()
 	self:UnregisterAllEvents()
 	self:SetParent(nil)
 	self:Hide()
-
+	self.eventsRegistered = nil
 	self.unused[id] = self
 end
 
