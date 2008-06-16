@@ -51,7 +51,7 @@ local function Create(id)
 	elseif id <= 72 then
 		return _G['MultiBarBottomLeftButton' .. (id-60)]
 	elseif id <= MAX_BUTTONS then
-		return CreateFrame('CheckButton', 'MangoActionButton' .. (id-72), nil, 'ActionBarButtonTemplate')
+		return CreateFrame('CheckButton', 'DominosActionButton' .. (id-72), nil, 'ActionBarButtonTemplate')
 	end
 end
 
@@ -70,7 +70,7 @@ function ActionButton:Create(id)
 
 		--skin buttons
 		if LBF then
-			LBF:Group('Dominos', ACTIONBAR_LABEL):AddButton(b)
+			LBF:Group('Dominos', 'Action Bar'):AddButton(b)
 		else
 			_G[b:GetName() .. 'Icon']:SetTexCoord(0.06, 0.94, 0.06, 0.94)
 			b:GetNormalTexture():SetVertexColor(1, 1, 1, 0.5)

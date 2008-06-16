@@ -68,6 +68,7 @@ function Dominos:GetDefaults()
 
 			showMacroText = true,
 			showBindingText = true,
+			showTooltips = true,
 
 			ab = {
 				count = 10,
@@ -116,7 +117,7 @@ function Dominos:Load()
 	--button facade support
 	local bf = LibStub('LibButtonFacade', true)
 	if bf then
-		bf:Group('Dominos', ACTIONBAR_LABEL):Skin(unpack(self.db.profile.ab.style))
+		bf:Group('Dominos', 'Action Bar'):Skin(unpack(self.db.profile.ab.style))
 		bf:Group('Dominos', 'Pet Bar'):Skin(unpack(self.db.profile.petStyle))
 		bf:Group('Dominos', 'Class Bar'):Skin(unpack(self.db.profile.classStyle))
 --		bf:Group('Dominos', 'Bag Bar'):Skin(unpack(self.db.profile.bagStyle))
@@ -378,6 +379,9 @@ function Dominos:OnCmd(args)
 		self:HideFrames(select(2, string.split(' ', args)))
 	elseif cmd == 'toggle' then
 		self:ToggleFrames(select(2, string.split(' ', args)))
+	--actionbar functions
+	elseif cmd = 'numbars' then
+		self:SetNumBars(tonumber(select(2, string.split(' ', args))))
 	--profile functions
 	elseif cmd == 'save' then
 		local profileName = string.join(' ', select(2, string.split(' ', args)))
