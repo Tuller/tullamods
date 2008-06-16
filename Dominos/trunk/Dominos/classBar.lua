@@ -125,12 +125,14 @@ function ClassButton:OnEvent(event)
 end
 
 function ClassButton:OnEnter()
-	if GetCVar('UberTooltips') == '1' then
-		GameTooltip_SetDefaultAnchor(GameTooltip, self)
-	else
-		GameTooltip:SetOwner(self, 'ANCHOR_RIGHT')
+	if Dominos:ShowTooltips() then
+		if GetCVar('UberTooltips') == '1' then
+			GameTooltip_SetDefaultAnchor(GameTooltip, self)
+		else
+			GameTooltip:SetOwner(self, 'ANCHOR_RIGHT')
+		end
+		GameTooltip:SetShapeshift(self:GetID())
 	end
-	GameTooltip:SetShapeshift(self:GetID())
 	KeyBound:Set(self)
 end
 

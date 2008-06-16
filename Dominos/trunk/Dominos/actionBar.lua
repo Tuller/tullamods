@@ -116,7 +116,9 @@ end
 
 --keybound support
 function ActionButton:OnEnter()
-	ActionButton_SetTooltip(self)
+	if Dominos:ShowTooltips() then
+		ActionButton_SetTooltip(self)
+	end
 	KeyBound:Set(self)
 end
 

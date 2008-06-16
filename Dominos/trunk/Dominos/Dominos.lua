@@ -380,7 +380,7 @@ function Dominos:OnCmd(args)
 	elseif cmd == 'toggle' then
 		self:ToggleFrames(select(2, string.split(' ', args)))
 	--actionbar functions
-	elseif cmd = 'numbars' then
+	elseif cmd == 'numbars' then
 		self:SetNumBars(tonumber(select(2, string.split(' ', args))))
 	--profile functions
 	elseif cmd == 'save' then
@@ -647,6 +647,15 @@ end
 
 function Dominos:NumBars()
 	return self.db.profile.ab.count
+end
+
+--tooltips
+function Dominos:ShowTooltips()
+	return self.db.profile.showTooltips
+end
+
+function Dominos:SetShowTooltips(enable)
+	self.db.profile.showTooltips = enable or false
 end
 
 

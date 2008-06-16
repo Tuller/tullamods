@@ -58,7 +58,9 @@ end
 
 --keybound support
 function PetButton:OnEnter()
-	self:RCall(PetActionButton_OnEnter)
+	if Dominos:ShowTooltips() then
+		self:RCall(PetActionButton_OnEnter)
+	end
 	KeyBound:Set(self)
 end
 
