@@ -70,6 +70,16 @@ showMacros:SetScript('OnClick', function(self)
 end)
 showMacros:SetPoint('TOP', showBindings, 'BOTTOM', 0, -10)
 
+--show tooltips
+local showTooltips = Options:NewCheckButton(L.ShowTooltips)
+showTooltips:SetScript('OnShow', function(self)
+	self:SetChecked(Dominos:ShowTooltips())
+end)
+showTooltips:SetScript('OnClick', function(self)
+	Dominos:SetShowTooltips(self:GetChecked())
+end)
+showTooltips:SetPoint('TOP', showMacros, 'BOTTOM', 0, -10)
+
 
 --[[ Sliders ]]--
 
