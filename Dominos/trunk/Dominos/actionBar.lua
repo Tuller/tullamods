@@ -65,6 +65,7 @@ function ActionButton:Create(id)
 		b:ClearAllPoints()
 		b:SetAttribute('useparent-statebutton', true)
 		b:SetAttribute('useparent-actionbar', nil)
+		b:SetAttribute('useparent-unit', true)
 		b:EnableMouseWheel(true)
 		b:SetScript('OnEnter', self.OnEnter)
 
@@ -329,15 +330,20 @@ function ActionBar:GetPage(condition)
 	return self.pages[condition]
 end
 
+--note to self:
+--if you leave a ; on the end of a statebutton string, it causes evaluation issues, especially if you're doing right click selfcast on the base state
 function ActionBar:UpdateStateDriver()
 	UnregisterStateDriver(self.header, 'state', 0)
 
-	local header, sb1, sb2 = '', '', ''
+	local header, sb1, sb2 = ''
 	for state,condition in ipairs(self.conditions) do
 		if self:GetPage(condition) then
 			header = header .. condition .. state .. ';'
-			sb1 = sb1 .. (state .. ':S' .. state .. ';')
-			sb2 = sb2 .. (state .. ':S' .. state .. 's;')
+
+			local newSB1 = state .. ':S' .. state
+			local newSBself = state .. ':S' .. state .. 's'
+			sb1 = (sb1 and sb1 .. ';' .. newSB1) or newSB1
+			sb2 = (sb2 and sb2 .. ';' .. newSBself) or newSBself
 		end
 	end
 
@@ -346,11 +352,13 @@ function ActionBar:UpdateStateDriver()
 		sb1 = sb1 .. '999:possess;'
 	end
 
-	self.header:SetAttribute('statebutton', sb1)
-	self.header:SetAttribute('*statebutton2', sb2)
-
 	if header ~= '' then
+		self.header:SetAttribute('statebutton', sb1:sub(1, #sb1 - 1))
+		self.header:SetAttribute('*statebutton2', sb2:sub(1, #sb2 - 1))
 		RegisterStateDriver(self.header, 'state', header .. 0)
+	else
+		self.header:SetAttribute('statebutton', nil)
+		self.header:SetAttribute('*statebutton2', nil)
 	end
 
 	self:UpdateActions()
@@ -444,9 +452,6 @@ function ActionBar:UpdateGrid()
 	end
 end
 
-function ActionBar:UpdateMacroText()
-end
-
 --keybound support
 function ActionBar:KEYBOUND_ENABLED()
 	self:ShowGrid()
@@ -462,7 +467,6 @@ function ActionBar:UpdateRightClickUnit()
 	local unit = Dominos:GetRightClickUnit()
 
 	self.header:SetAttribute('*unit2', unit)
-
 	for state in ipairs(self.conditions) do
 		self.header:SetAttribute(format('*unit-s%ds', state), unit)
 	end
@@ -614,7 +618,7 @@ do
 
 	function ActionBar:CreateMenu()
 		local menu = Dominos:NewMenu(self.id)
-		
+
 		L = LibStub('AceLocale-3.0'):GetLocale('Dominos-Config')
 		AddLayout(menu)
 		AddClass(menu)
