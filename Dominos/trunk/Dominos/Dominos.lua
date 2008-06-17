@@ -170,18 +170,14 @@ end
 
 --[[ Button Facade Events ]]--
 
-function Dominos:OnSkin(skin, glossAlpha, gloss, group, button, colors)
+function Dominos:OnSkin(skin, glossAlpha, gloss, group, _, colors)
 	local styleDB
-	if group == ACTIONBAR_LABEL then
+	if group == 'Action Bar' then
 		styleDB = self.db.profile.ab.style
 	elseif group == 'Pet Bar' then
 		styleDB = self.db.profile.petStyle
 	elseif group == 'Class Bar' then
 		styleDB = self.db.profile.classStyle
---[[
-	elseif group == 'Bag Bar' then
-		styleDB = self.db.profile.bagStyle
---]]
 	end
 
 	if styleDB then
