@@ -361,9 +361,9 @@ function ActionBar:UpdateStateDriver()
 	if self:IsPossessBar() then
 		header = header .. '[bonusbar:5]999;'
 
-		local newSB1 = '999:possess;'
+		local newSB1 = '999:possess'
 		if sb1 then
-			sb1 = sb1 .. newSB1
+			sb1 = sb1 .. ';' .. newSB1
 		else
 			sb1 = newSB1
 		end
