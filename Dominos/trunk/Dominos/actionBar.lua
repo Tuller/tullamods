@@ -343,12 +343,13 @@ function ActionBar:UpdateStateDriver()
 			header = header .. condition .. state .. ';'
 
 			local newSB1 = state .. ':S' .. state
-			local newSB2 = state .. ':S' .. state .. 's'
 			if sb1 then
 				sb1 = sb1 .. ';' .. newSB1
 			else
 				sb1 = newSB1
 			end
+
+			local newSB2 = state .. ':S' .. state .. 's'
 			if sb2 then
 				sb2 = sb2 .. ';' .. newSB2
 			else
@@ -373,7 +374,7 @@ function ActionBar:UpdateStateDriver()
 	Dominos:Print(header or '')
 	self.header:SetAttribute('statebutton', sb1)
 	self.header:SetAttribute('*statebutton2', sb2)
-	
+
 	if header ~= '' then
 		RegisterStateDriver(self.header, 'state', header .. 0)
 	end
