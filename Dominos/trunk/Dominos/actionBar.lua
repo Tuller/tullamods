@@ -341,9 +341,17 @@ function ActionBar:UpdateStateDriver()
 			header = header .. condition .. state .. ';'
 
 			local newSB1 = state .. ':S' .. state
-			local newSBself = state .. ':S' .. state .. 's'
-			sb1 = (sb1 and sb1 .. ';' .. newSB1) or newSB1
-			sb2 = (sb2 and sb2 .. ';' .. newSBself) or newSBself
+			local newSB2 = state .. ':S' .. state .. 's'
+			if sb1 then
+				sb1 = sb1 .. ';' .. newSB1
+			else
+				sb1 = newSB1
+			end
+			if sb2 then
+				sb2 = sb2 .. ';' .. newSB2
+			else
+				sb2 = newSB2
+			end
 		end
 	end
 
@@ -352,13 +360,11 @@ function ActionBar:UpdateStateDriver()
 		sb1 = sb1 .. '999:possess;'
 	end
 
+	self.header:SetAttribute('statebutton', sb1)
+	self.header:SetAttribute('*statebutton2', sb2)
+	
 	if header ~= '' then
-		self.header:SetAttribute('statebutton', sb1:sub(1, #sb1 - 1))
-		self.header:SetAttribute('*statebutton2', sb2:sub(1, #sb2 - 1))
 		RegisterStateDriver(self.header, 'state', header .. 0)
-	else
-		self.header:SetAttribute('statebutton', nil)
-		self.header:SetAttribute('*statebutton2', nil)
 	end
 
 	self:UpdateActions()
