@@ -187,6 +187,7 @@ function Frame:LoadSettings(defaults)
 		self:Unlock()
 	end
 
+	self:UpdateShowStates()
 	self:UpdateAlpha()
 	self:UpdateFader()
 end
