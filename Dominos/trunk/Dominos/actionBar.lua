@@ -9,6 +9,7 @@ local ceil = math.ceil
 local min = math.min
 local format = string.format
 local MAX_BUTTONS = 120
+local NUM_POSSESS_BAR_BUTTONS = 12
 local KeyBound = LibStub('LibKeyBound-1.0')
 local LBF = LibStub('LibButtonFacade', true)
 
@@ -123,11 +124,13 @@ function ActionButton:OnEnter()
 	KeyBound:Set(self)
 end
 
-function ActionButton:UpdateHotkey(abType)
-	abType = abType or 'ACTIONBUTTON'
+function ActionButton:UpdateHotkey(actionButtonType)
+    if not actionButtonType then
+        actionButtonType = 'ACTIONBUTTON'
+    end
 
-	local hotkey = _G[self:GetName()..'HotKey']
-	local key = KeyBound:ToShortKey(GetBindingKey(abType..self:GetID()) or GetBindingKey(format('CLICK %s:LeftButton', self:GetName()))) or ''
+    local hotkey = _G[self:GetName()..'HotKey']
+	local key = KeyBound:ToShortKey(GetBindingKey(actionButtonType..self:GetID()) or GetBindingKey('CLICK '..self:GetName()..':LeftButton'))
 	hotkey:SetText(key)
 
 	if key ~= ''  and Dominos:ShowBindingText() then
@@ -138,7 +141,7 @@ function ActionButton:UpdateHotkey(abType)
 end
 
 function ActionButton:GetHotkey()
-	return KeyBound:ToShortKey(GetBindingKey(format('CLICK %s:LeftButton', self:GetName())))
+	return KeyBound:ToShortKey(GetBindingKey(format('CLICK %s:LeftButton', self:GetName()))) or ''
 end
 
 function ActionButton:UpdateGrid()
@@ -168,7 +171,7 @@ end
 
 --hotkey code override
 --done to allow hiding of keys, and also for keybinding name shortening
-ActionButton_UpdateHotkeys = function(abType) ActionButton.UpdateHotkey(this, abType) end
+ActionButton_UpdateHotkeys = function(actionButtonType) ActionButton.UpdateHotkey(this, actionButtonType) end
 
 
 --[[ Action Bar ]]--
@@ -396,7 +399,7 @@ function ActionBar:UpdateAction(i)
 		b:SetAttribute('*action-S' .. state .. 's', id)
 	end
 
-	if self:IsPossessBar() and i <= 12 then
+	if self:IsPossessBar() and i <= NUM_POSSESS_BAR_BUTTONS then
 		b:SetAttribute('*action-possess', MAX_BUTTONS + i)
 	else
 		b:SetAttribute('*action-possess', nil)
@@ -421,10 +424,10 @@ function ActionBar:UpdateActions()
 	end
 
 	if self:IsPossessBar() then
-		for i = 1, min(#self.buttons, 10) do
+		for i = 1, min(#self.buttons, NUM_POSSESS_BAR_BUTTONS) do
 			self.buttons[i]:SetAttribute('*action-possess', MAX_BUTTONS + i)
 		end
-		for i = 11, #self.buttons do
+		for i = NUM_POSSESS_BAR_BUTTONS + 1, #self.buttons do
 			self.buttons[i]:SetAttribute('*action-possess', nil)
 		end
 	else
