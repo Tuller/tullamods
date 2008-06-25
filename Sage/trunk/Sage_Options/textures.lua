@@ -4,47 +4,23 @@
 
 local L = SAGE_LOCALS
 
---Texture options
-local textures = {
-	"Blizzard",
-	"Aluminium",
-	"Armory",
-	"Armory2",
-	"BantoBar",
-	"Bars",
-	"Button",
-	"Charcoal",
-	"Cilo",
-	"Glaze",
-	"Gloss",
-	"Healbot",
-	"MelliDark",
-	"Minimalist",
-	"Perl",
-	"Perl2",
-	"Skewed",
-	"Smooth",
-	"Steel",
-	"XPerl7",
-}
-if(AceLibrary) then
-	local SML = AceLibrary:HasInstance("SharedMedia-1.0") and AceLibrary("SharedMedia-1.0")
-	if(SML) then
-		for _,id in pairs(SML:List("statusbar")) do
-			local found = false
-			for _,tID in pairs(textures) do
-				if(tID == id) then
-					found = true; break
-				end
+local textures = {'Blizzard'}
+local SML = LibStub('LibSharedMedia-3.0') --shared media library
+if SML then
+	for _,id in pairs(SML:List("statusbar")) do
+		local found = false
+		for _,tID in pairs(textures) do
+			if(tID == id) then
+				found = true; break
 			end
-			if(not found) then
-				table.insert(textures, id)
-			end
+		end
+		if(not found) then
+			table.insert(textures, id)
 		end
 	end
 end
-
 table.sort(textures)
+
 local BUTTON_HEIGHT = 24
 local DISPLAY_SIZE = 10
 local panel, scrollFrame
