@@ -388,14 +388,9 @@ end
 function Sage:GetBarTexture(texID)
 	local texID = texID or (self.profile.barTexture or 'blizzard')
 
-	if(AceLibrary) then
-		local SML = AceLibrary:HasInstance('SharedMedia-1.0') and AceLibrary('SharedMedia-1.0')
-		if(SML) then
-			local texture = SML:Fetch('statusbar', texID, true)
-			if(texture) then
-				return texture
-			end
-		end
+	local SML = LibStub('LibSharedMedia-3.0', true) --shared media library
+	if SML then
+		return SML:Fetch('statusbar', texID)
 	end
 	return (texID:lower() == 'blizzard' and BLIZZ_TEXTURE) or format(TEXTURE_PATH, texID)
 end
