@@ -130,7 +130,7 @@ function SDragFrame_New(parent)
 	frame:SetScript('OnEnter', DragFrame_OnEnter)
 	frame:SetScript('OnLeave', DragFrame_OnLeave)
 	frame:Hide()
-
+--[[
 	local scale = CreateFrame('Button', nil, frame)
 	scale:SetPoint('BOTTOMRIGHT', frame)
 	scale:SetHeight(16); scale:SetWidth(16)
@@ -143,6 +143,6 @@ function SDragFrame_New(parent)
 	scale:SetScript('OnMouseDown', Scale_StartScaling)
 	scale:SetScript('OnMouseUp', Scale_StopScaling)
 	scale.parent = frame.parent
-
+--]]
 	return frame
 end
