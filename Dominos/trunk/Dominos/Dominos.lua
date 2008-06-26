@@ -151,20 +151,34 @@ end
 
 function Dominos:HideBlizzard()
 	RANGE_INDICATOR = ''
+	MultiActionBar_UpdateGrid = Multibar_EmptyFunc
 
 	UIPARENT_MANAGED_FRAME_POSITIONS['MultiBarRight'] = nil
 	UIPARENT_MANAGED_FRAME_POSITIONS['MultiBarLeft'] = nil
 	UIPARENT_MANAGED_FRAME_POSITIONS['MultiBarBottomLeft'] = nil
 	UIPARENT_MANAGED_FRAME_POSITIONS['MultiBarBottomRight'] = nil
 	UIPARENT_MANAGED_FRAME_POSITIONS['MainMenuBar'] = nil
+	UIPARENT_MANAGED_FRAME_POSITIONS['ShapeshiftBarFrame'] = nil
+	UIPARENT_MANAGED_FRAME_POSITIONS['PossessBarFrame'] = nil
+	UIPARENT_MANAGED_FRAME_POSITIONS['PETACTIONBAR_YPOS'] = nil
 
-	MultiActionBar_UpdateGrid = Multibar_EmptyFunc
 	MainMenuBar:UnregisterAllEvents()
 	MainMenuBar:Hide()
 
-	BonusActionBarFrame:UnregisterAllEvents()
+	MainMenuBarArtFrame:UnregisterAllEvents()
+	MainMenuBarArtFrame:Hide()
+
+	MainMenuExpBar:UnregisterAllEvents()
+	MainMenuExpBar:Hide()
+
 	ShapeshiftBarFrame:UnregisterAllEvents()
+	ShapeshiftBarFrame:Hide()
+
+	BonusActionBarFrame:UnregisterAllEvents()
 	BonusActionBarFrame:Hide()
+
+	PossessBarFrame:UnregisterAllEvents()
+	PossessBarFrame:Hide()
 end
 
 
