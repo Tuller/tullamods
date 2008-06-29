@@ -194,7 +194,7 @@ function SageParty:Load()
 	self:RegisterEvent("RAID_ROSTER_UPDATE", "UpdateMembers")
 	self:RegisterEvent("UNIT_DYNAMIC_FLAGS", "UpdateAggro")
 	self:RegisterEvent("UNIT_FLAGS", "UpdateAggro")
-	self:SetRangeSpell(self:GetRangeSpell())
+	self:UpdateRangeCheck()
 	self:UpdateMembers()
 end
 
@@ -259,34 +259,6 @@ function SageParty:LoadOptions()
 		self:SetChecked(SageParty:CheckingRange())
 	end
 	local button = panel:AddCheckButton(L.EnableRangeCheck, RangeCheck_OnClick, RangeCheck_OnShow)
-	
-	--range check button
-	local icon = CreateFrame("Button", nil, button)
-	icon:SetWidth(24); icon:SetHeight(24)
-	icon:SetPoint("LEFT", button:GetName() .. "Text", "RIGHT", 4, 0)
-	icon:SetNormalTexture("Interface\\Buttons\\UI-Quickslot2")
-	icon:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square")
-	icon:RegisterForDrag("LeftButton")
-	icon:SetScript("OnReceiveDrag", function(self)
-		if CursorHasSpell() then
-			local id, book = select(2, GetCursorInfo())
-			if(SpellHasRange(GetSpellName(id, book))) then
-				self:SetNormalTexture(GetSpellTexture(id, book))
-				SageParty:SetRangeSpell(GetSpellName(id, book))
-			end
-			ClearCursor()
-		end
-	end)
-	icon:SetScript("OnShow", function(self)
-		self:SetNormalTexture(SageParty:GetRangeSpellIcon())
-	end)
-	icon:SetScript("OnClick", function() 
-		if(SpellBookFrame:IsShown()) then 
-			HideUIPanel(SpellBookFrame) 
-		else 
-			ShowUIPanel(SpellBookFrame)
-		end
-	end)
 
 	panel:AddUnitOptions("party")
 end
@@ -304,17 +276,16 @@ end
 --[[ Out of Range Checking ]]--
 
 local function RangeCheck_OnUpdate(self, elapsed)
-	self.nextUpdate = (self.nextUpdate or 0) - elapsed
-	if(self.nextUpdate <= 0) then
+	self.nextUpdate = self.nextUpdate - elapsed
+	if self.nextUpdate < 0 then
 		self.nextUpdate = 1
-		local spell = self.spell
 		for i = 1, MAX_PARTY_MEMBERS do
-			local frame = SageFrame:Get("party" .. i)
-			if(frame) then
-				if(IsSpellInRange(spell, frame.id) == 1) then
-					frame:SetAlpha(frame:GetFrameAlpha())
+			local f = SageFrame:Get("party" .. i)
+			if f then
+				if UnitInRange(f.id) then
+					f:SetAlpha(f:GetFrameAlpha())
 				else
-					frame:SetAlpha(0.6 * frame:GetFrameAlpha())
+					f:SetAlpha(0.6 * f:GetFrameAlpha())
 				end
 			end
 		end
@@ -330,38 +301,10 @@ function SageParty:CheckingRange()
 	return Sage.profile.rangeCheck
 end
 
-function SageParty:SetRangeSpell(spell)
-	Sage.profile.rangeSpell = spell
-	self:UpdateRangeCheck()
-end
-
-function SageParty:GetRangeSpell()
-	return Sage.profile.rangeSpell
-end
-
-function SageParty:GetRangeSpellIcon()
-	local unknown = "Interface\\Icons\\INV_Misc_QuestionMark"
-	local spell = self:GetRangeSpell()
-	if(spell and spell ~= "") then
-		local id = 1
-	
-		local spellName = GetSpellName(id, BOOKTYPE_SPELL)
-		while(spellName) do
-			if(spellName == spell) then
-				return GetSpellTexture(id, BOOKTYPE_SPELL)
-			end
-			id = id + 1
-			spellName = GetSpellName(id, BOOKTYPE_SPELL)
-		end
-	end
-	return unknown
-end
-
 function SageParty:UpdateRangeCheck()
-	local spell = self:CheckingRange() and self:GetRangeSpell()
-	if(spell) then
-		self.motherFrame.spell = spell
+	if self:CheckingRange() then
 		self.motherFrame:SetScript("OnUpdate", RangeCheck_OnUpdate)
+		self.motherFrame.nextUpdate = 1 
 	else
 		self.motherFrame:SetScript("OnUpdate", nil)
 		for i = 1, MAX_PARTY_MEMBERS do
