@@ -28,7 +28,6 @@ function Sage:Enable()
 			showPvP = true,
 			fontSize = 14,
 			barTexture = 'Armory2',
-			rangeSpell = L.RangeCheckSpells[select(2, UnitClass('player'))],
 			rangeCheck = true,
 			frames = {}
 		}

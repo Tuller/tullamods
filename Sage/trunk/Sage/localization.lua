@@ -58,11 +58,3 @@ L.Rare = "Rare"
 L.Elite = "Elite"
 L.RareElite = "Rare Elite"
 L.UnknownCreature = "Not specified"
-
---default spells to use for out of range checking
-L.RangeCheckSpells = {
-	["DRUID"] = "Healing Touch",
-	["SHAMAN"] =  "Healing Wave",
-	["PRIEST"] = "Lesser Heal",
-	["PALADIN"] = "Holy Light"
-}

@@ -17,7 +17,7 @@ function SageBar:Create(parent, id, font, alwaysShow)
 	if(font) then
 		bar.mode = Sage:GetTextMode(bar.id)
 		bar.text = bar:CreateFontString(name .. 'text', 'OVERLAY')
-		bar.text:SetPoint('CENTER', bar)
+		bar.text:SetPoint('RIGHT', -2, 0)
 		bar.text:SetFontObject(font)
 	end
 	self:Register(bar)

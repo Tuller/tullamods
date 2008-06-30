@@ -37,8 +37,8 @@ function SageFont:UpdateOutsideFonts()
 	local outline = Sage:OutlineOutsideFonts()
 
 	Font_Update(self:GetOutsideFont(), fontSize, outline)
-	Font_Update(self:GetSmallOutsideFont(), fontSize * 0.84, outline)
-	Font_Update(self:GetLevelFont(), fontSize * 0.84, true)
+	Font_Update(self:GetSmallOutsideFont(), fontSize, outline)
+	Font_Update(self:GetLevelFont(), fontSize, true)
 end
 
 --access
