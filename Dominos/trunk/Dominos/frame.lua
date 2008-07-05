@@ -603,7 +603,7 @@ function Frame:ShowMenu()
 	if menu then
 		menu:Hide()
 		menu:SetOwner(self)
-		menu:ShowPanel('Layout')
+		menu:ShowPanel(LibStub('AceLocale-3.0'):GetLocale('Dominos-Config').Layout)
 		menu:Show()
 	end
 end
