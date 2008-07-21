@@ -282,8 +282,9 @@ end
 	Texture Picker
 --]]
 
+--yeah I know I'm bad in that I didn't capitialize some constants
 local NUM_ITEMS = 9
-local width, height, offset = 134, 20, 2
+local width, height, offset = 140, 20, 2
 
 local function TextureButton_OnClick(self)
 	DXP.frame:SetTexture(self:GetText())
@@ -353,8 +354,8 @@ local function AddTexturePanel(menu)
 	scroll:SetScript('OnVerticalScroll', function() FauxScrollFrame_OnVerticalScroll(height + offset, function() p:UpdateList() end) end)
 	scroll:SetScript('OnShow', function() p.buttons[1]:SetWidth(width) end)
 	scroll:SetScript('OnHide', function() p.buttons[1]:SetWidth(width + 20) end)
-	scroll:SetPoint('TOPLEFT', 6, 0)
-	scroll:SetPoint('BOTTOMRIGHT', -28, 0)
+	scroll:SetPoint('TOPLEFT', 8, 0)
+	scroll:SetPoint('BOTTOMRIGHT', -24, 2)
 	p.scroll = scroll
 
 	--add list buttons
