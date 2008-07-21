@@ -17,6 +17,7 @@ local XP
 
 function DXP:Load()
 	self.frame = XP:New()
+	self.frame:SetFrameStrata('BACKGROUND')
 end
 
 function DXP:Unload()
