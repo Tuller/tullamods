@@ -1,0 +1,9 @@
+## Interface: 20400
+## Title: Dominos XP
+## Notes: A movable experience/reputation bar
+## Author: Tuller
+## Dependencies: Dominos
+## OptionalDeps: LibSharedMedia-3.0
+embeds.xml
+localization.lua
+xp.lua
