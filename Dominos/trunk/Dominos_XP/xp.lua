@@ -34,8 +34,11 @@ function XP:New()
 	if not f.bar then
 		f:Load()
 	end
+
 	f:Layout()
+	f:UpdateTexture()
 	f:UpdateWatch()
+	f:UpdateTextShown()
 
 	return f
 end
@@ -185,11 +188,6 @@ end
 --[[ Layout ]]--
 
 function XP:Layout()
-	self:UpdateTexture()
-	self:UpdateSize()
-end
-
-function XP:UpdateSize()
 	self:SetWidth(GetScreenWidth() * self.sets.width)
 	self:SetHeight(self.sets.height)
 end
@@ -242,7 +240,7 @@ local function CreateWidthSlider(p)
 	s.UpdateValue = function(self, value)
 		local f = self:GetParent().owner
 		f.sets.width = value/100
-		f:UpdateSize()
+		f:Layout()
 	end
 end
 
@@ -377,6 +375,7 @@ end
 
 
 --[[ Menu Code ]]--
+
 function XP:CreateMenu()
 	local menu = Dominos:NewMenu(self.id)
 	AddLayoutPanel(menu)
