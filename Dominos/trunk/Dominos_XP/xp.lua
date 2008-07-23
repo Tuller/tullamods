@@ -106,12 +106,11 @@ function XP:WatchExperience()
 
 	if not self.sets.alwaysShowXP then
 		self:RegisterEvent('UPDATE_FACTION')
-	else
-		self:RegisterEvent('UPDATE_EXHAUSTION')
-		self:RegisterEvent('PLAYER_XP_UPDATE')
-		self:RegisterEvent('PLAYER_LEVEL_UP')
-		self:RegisterEvent('PLAYER_LOGIN')
 	end
+	self:RegisterEvent('UPDATE_EXHAUSTION')
+	self:RegisterEvent('PLAYER_XP_UPDATE')
+	self:RegisterEvent('PLAYER_LEVEL_UP')
+	self:RegisterEvent('PLAYER_LOGIN')
 
 	self.rest:SetStatusBarColor(0.25, 0.25, 1)
 	self.value:SetStatusBarColor(0.6, 0, 0.6)
