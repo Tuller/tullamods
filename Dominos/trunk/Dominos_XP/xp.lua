@@ -253,7 +253,7 @@ local function CreateHeightSlider(p)
 	s.UpdateValue = function(self, value)
 		local f = self:GetParent().owner
 		f.sets.height = value
-		f:UpdateSize()
+		f:Layout()
 	end
 end
 
