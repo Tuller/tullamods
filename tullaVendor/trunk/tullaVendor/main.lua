@@ -34,7 +34,7 @@ do
 	end)
 	
 	MiniMapWorldMapButton:Hide()
-	GameTimeFrame:Hide()
+--	GameTimeFrame:Hide()
 	MinimapZoomIn:Hide()
 	MinimapZoomOut:Hide()
 	
