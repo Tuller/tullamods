@@ -228,6 +228,7 @@ ActionBar.conditions = {
 	'[mod:ctrl]',
 	'[mod:alt]',
 	'[mod:shift]',
+	'[bonusbar:5]',
 	'[bar:2]',
 	'[bar:3]',
 	'[bar:4]',
@@ -342,7 +343,19 @@ function ActionBar:UpdateStateDriver()
 	local sb1, sb2
 
 	for state,condition in ipairs(self.conditions) do
-		if self:GetPage(condition) then
+		if condition == '[bonusbar:5]' then
+			--possess bar: special case
+			if self:IsPossessBar() then
+				header = header .. condition .. '999;'
+
+				local newSB1 = '999:possess'
+				if sb1 then
+					sb1 = sb1 .. ';' .. newSB1
+				else
+					sb1 = newSB1
+				end
+			end
+		elseif self:GetPage(condition) then
 			header = header .. condition .. state .. ';'
 
 			local newSB1 = state .. ':S' .. state
@@ -358,17 +371,6 @@ function ActionBar:UpdateStateDriver()
 			else
 				sb2 = newSB2
 			end
-		end
-	end
-
-	if self:IsPossessBar() then
-		header = header .. '[bonusbar:5]999;'
-
-		local newSB1 = '999:possess'
-		if sb1 then
-			sb1 = sb1 .. ';' .. newSB1
-		else
-			sb1 = newSB1
 		end
 	end
 
