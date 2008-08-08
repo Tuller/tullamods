@@ -1,0 +1,6 @@
+﻿## Interface: 20400
+## Title: Dominos Buff
+## Title-zhCN: |cFF0099FF[Dominos]|r Buff增强模块
+## Notes: Adds borders around action buttons when a buff or debuff is cast on your target or yourself
+## Author: Tuller
+main.lua
