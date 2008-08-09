@@ -25,6 +25,9 @@ function ActionButton:New(id)
 	local b = self:Restore(id) or self:Create(id)
 	if b then
 		b:SetAttribute('showgrid', 0)
+		b:SetAttribute('action--base', id)
+		b:SetAttribute('_childupdate', [[self:SetAttribute('action', self:GetAttribute('action--' .. newABState) or self:GetAttribute('action--base'))]])
+
 		b:UpdateGrid()
 		b:UpdateHotkey(b.buttonType)
 		b:UpdateMacro()
@@ -64,7 +67,6 @@ function ActionButton:Create(id)
 		b:SetAttribute('action', id)
 		b:SetID(0)
 		b:ClearAllPoints()
-		b:SetAttribute('useparent-statebutton', true)
 		b:SetAttribute('useparent-actionbar', nil)
 		b:SetAttribute('useparent-unit', true)
 		b:EnableMouseWheel(true)
@@ -130,7 +132,8 @@ function ActionButton:UpdateHotkey(actionButtonType)
     end
 
     local hotkey = _G[self:GetName()..'HotKey']
-	local key = KeyBound:ToShortKey(GetBindingKey(actionButtonType..self:GetID()) or GetBindingKey('CLICK '..self:GetName()..':LeftButton'))
+	local baseID = (self:GetAttribute('action--base') or self:GetID())
+	local key = KeyBound:ToShortKey(GetBindingKey(actionButtonType .. baseID) or GetBindingKey('CLICK '..self:GetName()..':LeftButton'))
 	hotkey:SetText(key)
 
 	if key ~= ''  and Dominos:ShowBindingText() then
@@ -244,7 +247,12 @@ function ActionBar:New(id)
 
 	f.pages = f.sets.pages[f.class]
 	f.baseID = f:MaxLength() * (id-1)
-	f.header:SetAttribute('statemap-state', '$input')
+
+	f.header:SetAttribute('_onstate-page', [[
+		newABState = 'S' .. (newstate or 0)
+		self:SetAttribute('state', newABState)
+		return true
+	]])
 
 	f:LoadButtons()
 	f:UpdateStateDriver()
@@ -328,48 +336,22 @@ end
 --note to self:
 --if you leave a ; on the end of a statebutton string, it causes evaluation issues, especially if you're doing right click selfcast on the base state
 function ActionBar:UpdateStateDriver()
-	UnregisterStateDriver(self.header, 'state', 0)
+	UnregisterStateDriver(self.header, 'page', 0)
 
 	local header = ''
-	local sb1, sb2
-
 	for state,condition in ipairs(self.conditions) do
+		--possess bar: special case
 		if condition == '[bonusbar:5]' then
-			--possess bar: special case
 			if self:IsPossessBar() then
 				header = header .. condition .. '999;'
-
-				local newSB1 = '999:possess'
-				if sb1 then
-					sb1 = sb1 .. ';' .. newSB1
-				else
-					sb1 = newSB1
-				end
 			end
 		elseif self:GetPage(condition) then
 			header = header .. condition .. state .. ';'
-
-			local newSB1 = state .. ':S' .. state
-			if sb1 then
-				sb1 = sb1 .. ';' .. newSB1
-			else
-				sb1 = newSB1
-			end
-
-			local newSB2 = state .. ':S' .. state .. 's'
-			if sb2 then
-				sb2 = sb2 .. ';' .. newSB2
-			else
-				sb2 = newSB2
-			end
 		end
 	end
 
-	self.header:SetAttribute('statebutton', sb1)
-	self.header:SetAttribute('*statebutton2', sb2)
-
 	if header ~= '' then
-		RegisterStateDriver(self.header, 'state', header .. 0)
+		RegisterStateDriver(self.header, 'page', header .. 0)
 	end
 
 	self:UpdateActions()
@@ -386,19 +368,18 @@ function ActionBar:UpdateAction(i)
 
 	for state,condition in ipairs(self.conditions) do
 		local page = self:GetPage(condition)
-		local id = page and ToValidID(b:GetAttribute('action') + (self.id + page - 1)*maxSize) or nil
+		local id = page and ToValidID(b:GetAttribute('action--base') + (self.id + page - 1)*maxSize) or nil
 
-		b:SetAttribute('*action-S' .. state, id)
-		b:SetAttribute('*action-S' .. state .. 's', id)
+		b:SetAttribute('action--S' .. state, id)
 	end
 
 	if self:IsPossessBar() and i <= NUM_POSSESS_BAR_BUTTONS then
-		b:SetAttribute('*action-possess', MAX_BUTTONS + i)
+		b:SetAttribute('action--possess', MAX_BUTTONS + i)
 	else
-		b:SetAttribute('*action-possess', nil)
+		b:SetAttribute('action--possess', nil)
 	end
 
-	self.header:SetAttribute('addchild', b)
+	self.header:SetAttribute('_adopt', b)
 end
 
 --updates the actionID of all buttons for all states
@@ -411,26 +392,25 @@ function ActionBar:UpdateActions()
 			local page = self:GetPage(condition)
 			local id = page and ToValidID(i + (self.id + page - 1)*maxSize) or nil
 
-			b:SetAttribute('*action-S' .. state, id)
-			b:SetAttribute('*action-S' .. state .. 's', id)
+			b:SetAttribute('action--S' .. state, id)
 		end
 	end
 
 	if self:IsPossessBar() then
 		for i = 1, min(#self.buttons, NUM_POSSESS_BAR_BUTTONS) do
-			self.buttons[i]:SetAttribute('*action-possess', MAX_BUTTONS + i)
+			self.buttons[i]:SetAttribute('action--possess', MAX_BUTTONS + i)
 		end
 		for i = NUM_POSSESS_BAR_BUTTONS + 1, #self.buttons do
-			self.buttons[i]:SetAttribute('*action-possess', nil)
+			self.buttons[i]:SetAttribute('action--possess', nil)
 		end
 	else
 		for _,b in pairs(self.buttons) do
-			b:SetAttribute('*action-possess', nil)
+			b:SetAttribute('action--possess', nil)
 		end
 	end
 
 	for _,b in pairs(self.buttons) do
-		self.header:SetAttribute('addchild', b)
+		self.header:SetAttribute('_adopt', b)
 	end
 end
 
@@ -475,12 +455,7 @@ end
 
 --right click targeting support
 function ActionBar:UpdateRightClickUnit()
-	local unit = Dominos:GetRightClickUnit()
-
-	self.header:SetAttribute('*unit2', unit)
-	for state in ipairs(self.conditions) do
-		self.header:SetAttribute(format('*unit-s%ds', state), unit)
-	end
+	self.header:SetAttribute('*unit2', Dominos:GetRightClickUnit())
 end
 
 --utility functions
