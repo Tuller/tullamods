@@ -57,7 +57,7 @@
 
 		<Scripts>
 			<OnLoad>
-				CastingBarFrame_OnLoad('player', true)
+				CastingBarFrame_OnLoad(self, 'player', true)
 			</OnLoad>
 		</Scripts>
 
