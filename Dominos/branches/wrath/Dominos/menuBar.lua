@@ -7,8 +7,10 @@ local menuButtons = {
 	CharacterMicroButton,
 	SpellbookMicroButton,
 	TalentMicroButton,
+	AchievementMicroButton,
 	QuestLogMicroButton,
 	SocialsMicroButton,
+	PVPMicroButton,
 	LFGMicroButton,
 	MainMenuMicroButton,
 	HelpMicroButton
@@ -46,6 +48,7 @@ Dominos.MenuBar  = MenuBar
 
 function MenuBar:New()
 	local f = self.super.New(self, 'menu')
+	f.sets.numButtons = #menuButtons --hack of doom
 	f:LoadButtons()
 	f:Layout()
 

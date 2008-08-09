@@ -59,7 +59,7 @@ end
 --keybound support
 function PetButton:OnEnter()
 	if Dominos:ShowTooltips() then
-		self:RCall(PetActionButton_OnEnter)
+		PetActionButton_OnEnter(self)
 	end
 	KeyBound:Set(self)
 end
@@ -80,15 +80,7 @@ function PetButton:GetHotkey()
 	return KeyBound:ToShortKey(GetBindingKey(format('CLICK %s:LeftButton', self:GetName())))
 end
 
---you can hopefully guess what the 'R' stands for
-function PetButton:RCall(f, ...)
-	local pThis = this
-	this = self
-	f(...)
-	this = pThis
-end
-
-PetActionButton_SetHotkeys = function() PetButton.UpdateHotkey(this) end
+PetActionButton_SetHotkeys = function(self) PetButton.UpdateHotkey(self) end
 
 
 --[[ Pet Bar ]]--
