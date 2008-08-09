@@ -149,11 +149,11 @@ local hooks = {
 	SetAuctionSellItem = function()
 		return select(2, GetItemInfo(GetAuctionSellItemInfo())), select(3, GetAuctionSellItemInfo())
 	end,
-
+--[[
 	SetCraftItem = function(skill, id)
 		return GetCraftReagentItemLink(skill, id), select(3, GetCraftReagentInfo(skill, id))
 	end,
-
+--]]
 	SetTradeSkillItem = function(skill, id)
 		if id then
 			return GetTradeSkillReagentItemLink(skill, id), select(3, GetTradeSkillReagentInfo(skill, id))
