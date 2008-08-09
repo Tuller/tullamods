@@ -1,4 +1,4 @@
-## Interface: 20400
+## Interface: 30000
 ## Title: Combuctor
 ## Author: Tuller
 ## Notes: Pants are a dangerous foe

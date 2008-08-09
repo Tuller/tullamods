@@ -230,8 +230,8 @@
 			</OnLeave>
 		</Scripts>
 
-		<NormalFont font="GameFontNormal"/>
-		<HighlightFont font="GameFontHighlight"/>
+		<NormalFont style="GameFontNormal"/>
+		<HighlightFont style="GameFontHighlight"/>
 	</Button>
 
 

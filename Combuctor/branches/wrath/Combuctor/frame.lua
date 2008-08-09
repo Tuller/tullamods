@@ -634,7 +634,7 @@ function InventoryFrame:SetTab(id, rule)
 	tab:SetText(rule.name)
 	tab:Show()
 
-	PanelTemplates_TabResize(0, tab)
+	PanelTemplates_TabResize(tab, 0)
 	getglobal(tab:GetName()..'HighlightTexture'):SetWidth(tab:GetTextWidth() + 30)
 end
 
