@@ -279,7 +279,7 @@ hooksecurefunc('ActionButton_UpdateState', function(self)
 end)
 
 hooksecurefunc('ActionButton_Update', function(self)
-	ActionButton_UpdateSpell(self or this)
+	ActionButton_UpdateSpell(self)
 end)
 
 
@@ -296,6 +296,6 @@ for id = 1, 12 do
 end
 
 --register any stock action buttons created after this addon is loaded
-hooksecurefunc('ActionButton_OnLoad', function()
-	table.insert(Updater.buttons, this)
+hooksecurefunc('ActionButton_OnLoad', function(self)
+	table.insert(Updater.buttons, self)
 end)
