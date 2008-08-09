@@ -139,10 +139,6 @@ function LudwigUI_UpdateList(changed)
 			button:SetText(Ludwig:GetItemName(id, true))
 			button:SetID(id)
 			button:Show()
-
-			if(GameTooltip:IsOwned(button)) then
-				LudwigUI_OnItemEnter(button)
-			end
 		end
 	end
 end
@@ -215,18 +211,18 @@ local function Quality_GetText(index)
 	return ALL
 end
 
-local function Quality_OnClick()
-	if(this.value == ALL) then
+local function Quality_OnClick(self)
+	if(self.value == ALL) then
 		filter.quality = nil
 	else
-		filter.quality = this.value
+		filter.quality = self.value
 	end
 	LudwigUI_UpdateQualityText()
 	LudwigUI_UpdateList(true)
 end
 
 --add all buttons to the dropdown menu
-local function Quality_Initialize()
+local function Quality_Initialize(self)
 	AddItem(ALL, ALL, Quality_OnClick)
 	for i = 6, 0, -1 do
 		AddItem(Quality_GetText(i), i, Quality_OnClick)
@@ -235,7 +231,7 @@ end
 
 function LudwigUI_OnQualityShow(self)
 	UIDropDownMenu_Initialize(self, Quality_Initialize)
-	UIDropDownMenu_SetWidth(90, self)
+	UIDropDownMenu_SetWidth(self, 90)
 	LudwigUI_UpdateQualityText()
 end
 
@@ -246,24 +242,24 @@ end
 
 --[[ Type ]]--
 
-local function Type_OnClick(type, subType)
+local function Type_OnClick(self, type, subType)
 	filter.type = nil
 	filter.subType = nil
 	filter.equipLoc = nil
 
 	if not type then
-		if this.value == ALL then
+		if self.value == ALL then
 			filter.type = nil
 		else
-			filter.type = select(this.value, GetAuctionItemClasses())
+			filter.type = select(self.value, GetAuctionItemClasses())
 		end
 	else
 		filter.type = select(type, GetAuctionItemClasses())
 		if not subType then
-			filter.subType = select(this.value, GetAuctionItemSubClasses(type))
+			filter.subType = select(self.value, GetAuctionItemSubClasses(type))
 		else
 			filter.subType = select(subType, GetAuctionItemSubClasses(type))
-			filter.equipLoc = select(this.value, GetAuctionInvTypes(type, subType))
+			filter.equipLoc = select(self.value, GetAuctionInvTypes(type, subType))
 		end
 	end
 
@@ -301,7 +297,7 @@ local function AddEquipLocations(level, type, subType, ...)
 end
 
 local selectedType, selectedSubType
-local function Type_Initialize(level)
+local function Type_Initialize(self, level)
 	local level = level or 1
 	if level == 1 then
 		AddTypes(level, GetAuctionItemClasses())
@@ -333,6 +329,6 @@ end
 
 function LudwigUI_OnTypeShow(self)
 	UIDropDownMenu_Initialize(self, Type_Initialize)
-	UIDropDownMenu_SetWidth(200, self)
+	UIDropDownMenu_SetWidth(self, 200)
 	LudwigUI_UpdateTypeText()
 end

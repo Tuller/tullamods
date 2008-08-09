@@ -43,7 +43,7 @@
 			</OnLeave>
 		</Scripts>
 
-		<NormalFont font="GameFontNormal" justifyH="LEFT"/>
+		<NormalFont style="GameFontNormalLeft"/>
 		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
 	</Button>
 
@@ -309,7 +309,7 @@
 						LudwigUI_OnScrollFrameHide()
 					</OnHide>
 					<OnVerticalScroll>
-						FauxScrollFrame_OnVerticalScroll(LWUI_SHOWN, LudwigUI_UpdateList)
+						FauxScrollFrame_OnVerticalScroll(self, arg1, LWUI_SHOWN, LudwigUI_UpdateList)
 					</OnVerticalScroll>
 				</Scripts>
 			</ScrollFrame>
