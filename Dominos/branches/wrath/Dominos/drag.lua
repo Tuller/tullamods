@@ -28,7 +28,7 @@ function Drag:New(owner)
 	t:SetAllPoints(f)
 	f:SetHighlightTexture(t)
 
-	f:SetNormalFontObject('GameFontHighlightLarge')
+	f:SetNormalFontObject('GameFontNormalLarge')
 	f:SetText(owner.id)
 
 	f:RegisterForClicks('AnyUp')
