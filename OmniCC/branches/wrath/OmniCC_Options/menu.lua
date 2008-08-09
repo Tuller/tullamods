@@ -216,7 +216,7 @@ do
 	end
 
 	local function Dropdown_OnShow(self)
-		UIDropDownMenu_SetWidth(132, self)
+		UIDropDownMenu_SetWidth(self, 132)
 		UIDropDownMenu_Initialize(self, self.Initialize)
 
 		local selected = OmniCC:GetFontOutline()
@@ -233,12 +233,12 @@ do
 		local dropdown = self:CreateDropdown(L.FontOutline, parent)
 		dropdown:SetScript('OnShow', Dropdown_OnShow)
 
-		function dropdown.Initialize()
-			local function Button_OnClick()
-				OmniCC:SetFontOutline(outlines[this.value])
-				UIDropDownMenu_SetSelectedValue(dropdown, this.value)
-			end
-
+		local function Button_OnClick(self)
+			OmniCC:SetFontOutline(outlines[self.value])
+			UIDropDownMenu_SetSelectedValue(dropdown, self.value)
+		end
+			
+		function dropdown:Initialize()
 			local selected = OmniCC:GetFontOutline()
 			for i,style in ipairs(styles) do
 				AddItem(style, i, Button_OnClick, outlines[i] == selected)
@@ -371,8 +371,8 @@ do
 		local scroll = CreateFrame('ScrollFrame', frame:GetName() .. 'ScrollFrame', frame, 'FauxScrollFrameTemplate')
 		scroll:SetPoint('TOPLEFT', 12, -14)
 		scroll:SetPoint('BOTTOMRIGHT', -36, 13)
-		scroll:SetScript('OnVerticalScroll', function()
-			FauxScrollFrame_OnVerticalScroll(UIDROPDOWNMENU_BUTTON_HEIGHT, function() List_Update(frame) end)
+		scroll:SetScript('OnVerticalScroll', function(self, arg1)
+			FauxScrollFrame_OnVerticalScroll(self, arg1, UIDROPDOWNMENU_BUTTON_HEIGHT, function() List_Update(frame) end)
 		end)
 		frame.scrollFrame = scroll
 
@@ -407,7 +407,7 @@ do
 	end
 
 	local function Dropdown_OnShow(self)
-		UIDropDownMenu_SetWidth(132, self)
+		UIDropDownMenu_SetWidth(self, 132)
 		getglobal(self:GetName() .. 'Text'):SetText(OmniCC:GetFontName())
 	end
 
