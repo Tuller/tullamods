@@ -308,14 +308,8 @@ local function TextureButton_Create(name, parent)
 	button:EnableMouseWheel(true)
 	button:SetScript('OnClick', TextureButton_OnClick)
 	button:SetScript('OnMouseWheel', TextureButton_OnMouseWheel)
-	button:SetTextColor(1, 0.82, 0)
-	button:SetHighlightTextColor(1, 1, 1)
-
-	local text = button:CreateFontString()
-	text:SetFontObject('GameFontNormal')
-	text:SetJustifyH('LEFT')
-	text:SetAllPoints(button)
-	button:SetFontString(text)
+	button:SetNormalFontObject('GameFontNormalLeft')
+	button:SetHighlightFontObject('GameFontHighlightLeft')
 
 	return button
 end
@@ -349,7 +343,7 @@ local function AddTexturePanel(menu)
 
 	local name = p:GetName()
 	local scroll = CreateFrame('ScrollFrame', name .. 'ScrollFrame', p, 'FauxScrollFrameTemplate')
-	scroll:SetScript('OnVerticalScroll', function() FauxScrollFrame_OnVerticalScroll(height + offset, function() p:UpdateList() end) end)
+	scroll:SetScript('OnVerticalScroll', function(self, arg1) FauxScrollFrame_OnVerticalScroll(self, arg1, height + offset, function() p:UpdateList() end) end)
 	scroll:SetScript('OnShow', function() p.buttons[1]:SetWidth(width) end)
 	scroll:SetScript('OnHide', function() p.buttons[1]:SetWidth(width + 20) end)
 	scroll:SetPoint('TOPLEFT', 8, 0)
