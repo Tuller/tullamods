@@ -86,7 +86,7 @@ function ActionButton:Restore(id)
 	if b then
 		self.unused[id] = nil
 		b:LoadEvents()
-		b:RCall(ActionButton_Update)
+		ActionButton_Update(b)
 		b:Show()
 		self.active[id] = b
 		return b
@@ -146,9 +146,9 @@ end
 
 function ActionButton:UpdateGrid()
 	if self:GetAttribute('showgrid') > 0 then
-		self:RCall(ActionButton_ShowGrid)
+		ActionButton_ShowGrid(self)
 	else
-		self:RCall(ActionButton_HideGrid)
+		ActionButton_HideGrid(self)
 	end
 end
 
@@ -160,18 +160,9 @@ function ActionButton:UpdateMacro()
 	end
 end
 
---I use this to call any blizzard function which still uses 'this'
---to be removed once Wrath is out
-function ActionButton:RCall(f, ...)
-	local pThis = this
-	this = self
-	f(...)
-	this = pThis
-end
-
 --hotkey code override
 --done to allow hiding of keys, and also for keybinding name shortening
-ActionButton_UpdateHotkeys = function(actionButtonType) ActionButton.UpdateHotkey(this, actionButtonType) end
+ActionButton_UpdateHotkeys = function(self, actionButtonType) ActionButton.UpdateHotkey(self, actionButtonType) end
 
 
 --[[ Action Bar ]]--

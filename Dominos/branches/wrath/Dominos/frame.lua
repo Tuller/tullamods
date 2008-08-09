@@ -129,7 +129,7 @@ function Frame:Create(id)
 	f:SetMovable(true)
 	f.id = id
 
-	f.header = CreateFrame('Frame', nil, f, 'SecureStateHeaderTemplate')
+	f.header = CreateFrame('Frame', nil, f, 'SecureHandlerStateTemplate')
 	f.header:SetAllPoints(f)
 
 	f.drag = Dominos.DragFrame:New(f)
