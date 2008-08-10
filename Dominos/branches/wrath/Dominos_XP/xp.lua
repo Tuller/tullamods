@@ -31,7 +31,7 @@ XP = Dominos:CreateClass('Frame', Dominos.Frame)
 
 function XP:New()
 	local f = self.super.New(self, 'xp')
-	if not f.bar then
+	if not f.value then
 		f:Load()
 	end
 
