@@ -64,16 +64,15 @@ Updater:SetScript('OnEvent', function(self, event, unit)
 	elseif event == 'UNIT_AURA' then
 		if unit == 'target' then
 			self:UpdateTargetBuffs()
+		elseif unit == 'player' then
+			self:UpdatePlayerBuffs()
 		end
-	elseif event == 'PLAYER_AURAS_CHANGED' then
-		self:UpdatePlayerBuffs()
 	elseif event == 'PLAYER_ENTERING_WORLD' then
 		self:UpdateTargetBuffs()
 		self:UpdatePlayerBuffs()
 	end
 end)
 Updater:RegisterEvent('UNIT_AURA')
-Updater:RegisterEvent('PLAYER_AURAS_CHANGED')
 Updater:RegisterEvent('PLAYER_TARGET_CHANGED')
 Updater:RegisterEvent('PLAYER_ENTERING_WORLD')
 
@@ -254,7 +253,7 @@ end
 
 local function ActionButton_UpdateSpell(self)
 	if self.action then
-		local type, arg1, arg2 = GetActionInfo(self.action)
+		local type, arg1, arg2 = GetActionInfo(ActionButton_GetPagedID(self))
 
 		self.type = type
 		if type == 'spell' then
@@ -274,7 +273,6 @@ local function ActionButton_UpdateSpell(self)
 end
 
 hooksecurefunc('ActionButton_UpdateState', function(self)
-	local self = self or this
 	self:SetChecked(ActionButton_IsSpellInUse(self) or self:GetChecked())
 end)
 
