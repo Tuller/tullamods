@@ -6,9 +6,12 @@
 CombuctorFrame = Combuctor:NewModule('Frame')
 
 local L = LibStub('AceLocale-3.0'):GetLocale('Combuctor')
-local ITEM_FRAME_WIDTH = 312
-local ITEM_FRAME_HEIGHT = 346
-local BANK_FRAME_WIDTH = 568
+
+local BASE_WIDTH = 384
+local ITEM_FRAME_WIDTH_OFFSET = 312 - BASE_WIDTH
+
+local BASE_HEIGHT = 512
+local ITEM_FRAME_HEIGHT_OFFSET = 346 - BASE_HEIGHT
 
 
 function CombuctorFrame:OnEnable()
@@ -234,18 +237,7 @@ local InventoryFrame = CombuctorFrame.obj
 do
 	local lastID = 1
 	function InventoryFrame:Create(titleText, settings, isBank)
-		local template
-		if isBank then
-			template = 'CombuctorBankTemplate'
-		else
-			template = 'CombuctorInventoryTemplate'
-		end
-
-		local f = self:New(CreateFrame('Frame', format('CombuctorFrame%d', lastID), UIParent, template))
-		if isBank then
-			f:AddTextures()
-		end
-
+		local f = self:New(CreateFrame('Frame', format('CombuctorFrame%d', lastID), UIParent, 'CombuctorInventoryTemplate'))
 		f:SetScript('OnShow', self.OnShow)
 		f:SetScript('OnHide', self.OnHide)
 
@@ -256,6 +248,9 @@ do
 		f.bagButtons = {}
 		f.tabs = {}
 		f.filter = {}
+		
+		f:SetWidth(settings.w or BASE_WIDTH)
+		f:SetHeight(settings.h or BASE_HEIGHT)
 
 		f.title = getglobal(f:GetName() .. 'Title')
 
@@ -270,7 +265,6 @@ do
 
 		f.itemFrame = CombuctorItemFrame:Create(f)
 		f.itemFrame:SetPoint('TOPLEFT', 24, -78)
-		f.itemFrame:SetHeight(ITEM_FRAME_HEIGHT)
 
 		f.moneyFrame = CombuctorMoneyFrame:Create(f)
 		f.moneyFrame:SetPoint('BOTTOMRIGHT', -40, 67)
@@ -287,59 +281,75 @@ do
 	end
 end
 
-function InventoryFrame:AddTextures()
-	local tl = self:CreateTexture(nil, 'ARTWORK')
-	tl:SetTexture('Interface/MerchantFrame/UI-Merchant-TopLeft')
-	tl:SetWidth(256); tl:SetHeight(256)
-	tl:SetPoint('TOPLEFT')
-	
-	local tm = self:CreateTexture(nil, 'ARTWORK')
-	tm:SetTexture('Interface/MerchantFrame/UI-Merchant-TopLeft')
-	tm:SetWidth(256); tm:SetHeight(256)
-	tm:SetPoint('TOPLEFT', 256, 0)
-	tm:SetTexCoordModifiesRect(true)
-	tm:SetTexCoord(0.5, 1, 0, 1)
-	
-	local tm = self:CreateTexture(nil, 'ARTWORK')
-	tm:SetTexture('Interface/MerchantFrame/UI-Merchant-TopLeft')
-	tm:SetWidth(256); tm:SetHeight(256)
-	tm:SetPoint('TOPLEFT', 512 - 128, 0)
-	tm:SetTexCoordModifiesRect(true)
-	tm:SetTexCoord(0.5, 1, 0, 1)
-	
-	local tr = self:CreateTexture(nil, 'ARTWORK')
-	tr:SetTexture('Interface/MerchantFrame/UI-Merchant-TopRight')
-	tr:SetWidth(128); tl:SetHeight(256)
-	tr:SetPoint('TOPRIGHT')
-	
-	
-	local bl = self:CreateTexture(nil, 'ARTWORK')
-	bl:SetTexture('Interface/MerchantFrame/UI-Merchant-BotLeft')
-	bl:SetWidth(256); bl:SetHeight(256)
-	bl:SetPoint('BOTTOMLEFT')
-	bl:SetTexCoordModifiesRect(true)
-	bl:SetTexCoord(0, 0.25, 0, 1)
-	
-	for i = 1, 5 do
-		local bm = self:CreateTexture(nil, 'ARTWORK')
-		bm:SetTexture('Interface/MerchantFrame/UI-Merchant-BotLeft')
-		bm:SetWidth(256); bm:SetHeight(256)
-		bm:SetPoint('BOTTOMLEFT', i * 64, 0)
-		bm:SetTexCoordModifiesRect(true)
-		bm:SetTexCoord(0.25, 0.5, 0, 1)
+function InventoryFrame:OnSizeChanged()
+	local w, h = self:GetWidth(), self:GetHeight()
+	self.sets.w = w
+	self.sets.h = h
+
+	--topleft
+	local t = getglobal(self:GetName() .. 'TLRight')
+	t:SetWidth(128 + (w - BASE_WIDTH)/2)
+
+	local t = getglobal(self:GetName() .. 'TLBottom')
+	t:SetHeight(128 + (h - BASE_HEIGHT)/2)
+
+	local t = getglobal(self:GetName() .. 'TLBottomRight')
+	t:SetWidth(128 + (w - BASE_WIDTH)/2)
+	t:SetHeight(128 + (h - BASE_HEIGHT)/2)
+
+
+	--bottomleft
+	local t = getglobal(self:GetName() .. 'BLRight')
+	t:SetWidth(128 + (w - BASE_WIDTH)/2)
+
+	local t = getglobal(self:GetName() .. 'BLTop')
+	t:SetHeight(128 + (h - BASE_HEIGHT)/2)
+
+	local t = getglobal(self:GetName() .. 'BLTopRight')
+	t:SetWidth(128 + (w - BASE_WIDTH)/2)
+	t:SetHeight(128 + (h - BASE_HEIGHT)/2)
+
+
+	--topright
+	local t = getglobal(self:GetName() .. 'TRLeft')
+	t:SetWidth(64 + (w - BASE_WIDTH)/2)
+
+	local t = getglobal(self:GetName() .. 'TRBottom')
+	t:SetHeight(128 + (h - BASE_HEIGHT)/2)
+
+	local t = getglobal(self:GetName() .. 'TRBottomLeft')
+	t:SetWidth(64 + (w - BASE_WIDTH)/2)
+	t:SetHeight(128 + (h - BASE_HEIGHT)/2)
+
+
+	--bottomright
+	local t = getglobal(self:GetName() .. 'BRLeft')
+	t:SetWidth(64 + (w - BASE_WIDTH)/2)
+
+	local t = getglobal(self:GetName() .. 'BRTop')
+	t:SetHeight(128 + (h - BASE_HEIGHT)/2)
+
+	local t = getglobal(self:GetName() .. 'BRTopLeft')
+	t:SetWidth(64 + (w - BASE_WIDTH)/2)
+	t:SetHeight(128 + (h - BASE_HEIGHT)/2)
+
+	self:UpdateItemFrameSize()
+end
+
+function InventoryFrame:UpdateItemFrameSize()
+	local prevW, prevH = self.itemFrame:GetWidth(), self.itemFrame:GetHeight()
+	local newW = self:GetWidth() + ITEM_FRAME_WIDTH_OFFSET
+	if next(self.bagButtons) then
+		newW = newW - 36
 	end
-	
-	local bm = self:CreateTexture(nil, 'ARTWORK')
-	bm:SetTexture('Interface/MerchantFrame/UI-Merchant-BotLeft')
-	bm:SetWidth(256); bm:SetHeight(256)
-	bm:SetPoint('BOTTOMLEFT', 6 * 64, 0)
-	bm:SetTexCoordModifiesRect(true)
-	bm:SetTexCoord(0.5, 1, 0, 1)
-	
-	local br = self:CreateTexture(nil, 'ARTWORK')
-	br:SetTexture('Interface/MerchantFrame/UI-Merchant-BotRight')
-	br:SetWidth(128); tl:SetHeight(256)
-	br:SetPoint('BOTTOMRIGHT')
+
+	local newH = self:GetHeight() + ITEM_FRAME_HEIGHT_OFFSET
+
+	if not((prevW == newW) and (prevH == newH)) then
+		self.itemFrame:SetWidth(newW)
+		self.itemFrame:SetHeight(newH)
+		self.itemFrame:Layout()
+	end
 end
 
 function InventoryFrame:AddCategory(name, icon, rule)
@@ -578,17 +588,7 @@ function InventoryFrame:UpdateBagFrame()
 		end
 	end
 
-	local prevWidth = self.itemFrame:GetWidth()
-	local width = self.isBank and BANK_FRAME_WIDTH or ITEM_FRAME_WIDTH
-	if next(self.bagButtons) then
-		self.itemFrame:SetWidth(width - 36)
-	else
-		self.itemFrame:SetWidth(width)
-	end
-
-	if prevWidth ~= self.itemFrame:GetWidth() then
-		self.itemFrame:Layout()
-	end
+	self:UpdateItemFrameSize()
 end
 
 function InventoryFrame:UpdateBagToggle()

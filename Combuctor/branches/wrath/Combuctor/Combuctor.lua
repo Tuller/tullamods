@@ -22,10 +22,14 @@ function Combuctor:OnEnable()
 				bags = {-2, 0, 1, 2, 3, 4},
 				position = {'RIGHT'},
 				showBags = false,
+				w = 384,
+				h = 512
 			},
 			bank = {
 				bags = {-1, 5, 6, 7, 8, 9, 10, 11},
 				showBags = true,
+				w = 512,
+				h = 512
 			}
 		}
 	}
