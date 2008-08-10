@@ -37,7 +37,7 @@ local function AddItem(text, value, func, level, arg1, arg2)
 	UIDropDownMenu_AddButton(info, level)
 end
 
-local function CharSelect_OnClick(player, delete)
+local function CharSelect_OnClick(self, player, delete)
 	local newPlayer
 	if delete then
 		--remove the selected player
@@ -51,15 +51,16 @@ local function CharSelect_OnClick(player, delete)
 
 	--show the given player, and check the selected one
 	currentFrame:SetPlayer(newPlayer)
-
+--[[
 	--hide the previous dropdown menus (hack)
 	for i = 1, UIDROPDOWNMENU_MENU_LEVEL-1 do
 		getglobal("DropDownList"..i):Hide()
 	end
+--]]
 end
 
 --populate the list, add a delete button to all characters that aren't the current player
-local function CharSelect_Initialize(level)
+local function CharSelect_Initialize(self, level)
 	local playerList = BagnonDB:GetPlayerList()
 	local level = level or 1
 
