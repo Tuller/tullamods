@@ -123,7 +123,7 @@ function CastingBar:OnUpdate(elapsed)
 		self.time:SetFormattedText('%.1f', self.maxValue - self.value)
 		self:AdjustWidth()
 	elseif self.channeling then
-		self.time:SetFormattedText('%.1f', self.endTime - self.value)
+		self.time:SetFormattedText('%.1f', self.value)
 		self:AdjustWidth()
 	end
 end
