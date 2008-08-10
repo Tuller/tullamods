@@ -34,7 +34,7 @@ function Menu:Load()
 	--title text
 	self.text = self:CreateFontString(nil, 'OVERLAY')
 	self.text:SetPoint('TOP', 0, -15)
-	self.text:SetFontObject('GameFontHighlight')
+	self.text:SetFontObject('GameFontHighlightLeft')
 	self.text:SetText(L.Title)
 
 	--close button
@@ -107,25 +107,24 @@ do
 	end
 
 	local function Dropdown_OnShow(self)
-		UIDropDownMenu_SetWidth(110, self)
+		UIDropDownMenu_SetWidth(self, 110)
 		UIDropDownMenu_Initialize(self, self.Initialize)
 		UIDropDownMenu_SetSelectedValue(self, self:GetParent():GetSelectedPanel())
 	end
 
 	function Menu:CreatePanelSelector()
 		local f = CreateFrame('Frame', self:GetName() .. 'PanelSelector', self, 'UIDropDownMenuTemplate')
-		--getglobal(f:GetName() .. 'Text'):SetJustifyH('LEFT')
-
 		f:SetScript('OnShow', Dropdown_OnShow)
 
-		local function Item_OnClick(name)
+		local function Item_OnClick(item, name)
 			self:ShowPanel(name)
-			UIDropDownMenu_SetSelectedValue(f, this.value)
+			UIDropDownMenu_SetSelectedValue(f, item.value)
 		end
 
-		function f.Initialize()
-			local selected = self:GetSelectedPanel()
-			for i,panel in ipairs(self.panels) do
+		function f:Initialize()
+			local parent = self:GetParent()
+			local selected = parent:GetSelectedPanel()
+			for i,panel in ipairs(parent.panels) do
 				AddItem(panel.name, i, Item_OnClick, i == selected)
 			end
 		end
