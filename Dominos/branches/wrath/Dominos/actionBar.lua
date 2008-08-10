@@ -26,7 +26,10 @@ function ActionButton:New(id)
 	if b then
 		b:SetAttribute('showgrid', 0)
 		b:SetAttribute('action--base', id)
-		b:SetAttribute('_childupdate', [[self:SetAttribute('action', self:GetAttribute('action--' .. newABState) or self:GetAttribute('action--base'))]])
+		b:SetAttribute('_childupdate', [[
+			local action = newABState and self:GetAttribute('action--' .. newABState) or self:GetAttribute('action--base')
+			self:SetAttribute('action', action)
+		]])
 
 		b:UpdateGrid()
 		b:UpdateHotkey(b.buttonType)
@@ -248,10 +251,10 @@ function ActionBar:New(id)
 	f.pages = f.sets.pages[f.class]
 	f.baseID = f:MaxLength() * (id-1)
 
-	f.header:SetAttribute('_onstate-page', [[
-		newABState = 'S' .. (newstate or 0)
+	f.header:SetAttribute('_onstate-page', [[ 
+		newABState = newstate
 		self:SetAttribute('state', newABState)
-		return true
+		return true 
 	]])
 
 	f:LoadButtons()
@@ -343,10 +346,10 @@ function ActionBar:UpdateStateDriver()
 		--possess bar: special case
 		if condition == '[bonusbar:5]' then
 			if self:IsPossessBar() then
-				header = header .. condition .. '999;'
+				header = header .. condition .. 'possess;'
 			end
 		elseif self:GetPage(condition) then
-			header = header .. condition .. state .. ';'
+			header = header .. condition .. 'S' .. state .. ';'
 		end
 	end
 
