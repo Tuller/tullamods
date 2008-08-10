@@ -3,6 +3,8 @@
 		Some sort of crazy visual inventory management system
 --]]
 
+LoadAddOn('Bagnon_Forever')
+
 Combuctor = LibStub('AceAddon-3.0'):NewAddon('Combuctor', 'AceEvent-3.0', 'AceConsole-3.0')
 Combuctor:SetDefaultModuleLibraries('AceEvent-3.0')
 
