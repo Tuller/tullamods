@@ -4,6 +4,6 @@
 ## Notes: Pants are a dangerous foe
 ## Version: 1.0.0
 ## OptionalDeps: Ace3, Bagnon_Forever
-## SavedVariables: CombuctorDB
+## SavedVariablesPerCharacter: CombuctorDB
 embeds.xml
 load.xml
