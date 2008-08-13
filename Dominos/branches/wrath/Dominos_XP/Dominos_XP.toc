@@ -7,5 +7,6 @@
 ## OptionalDeps: LibSharedMedia-3.0
 embeds.xml
 localization\localization.lua
+localization\localization.fr.lua
 localization\localization.cn.lua
 xp.lua
