@@ -1,4 +1,4 @@
-## Interface: 20400
+## Interface: 30000
 ## Title: Dominos Config
 ## Title-zhCN: |cFF0099FF[Dominos]|r ???????
 ## Notes: GUI based configuration for Dominos
