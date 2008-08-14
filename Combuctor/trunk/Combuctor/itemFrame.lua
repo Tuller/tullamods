@@ -10,7 +10,7 @@ CombuctorItemFrame.obj:SetScript('OnUpdate', function(self) CombuctorItemFrame:L
 
 local listeners = {}
 local currentPlayer = UnitName('player')
-local MIN_COLS = 6
+local MAX_SCALE = 2
 
 
 --[[
@@ -409,14 +409,14 @@ function ItemFrame:Layout(spacing)
 	local spacing = spacing or 2
 	local count = self.count
 	local size = 36 + spacing*2
-	local cols = (self:GetParent().isBank and 10) or 6 - 1
+	local cols = 0
 	local scale, rows
 
 	repeat
 		cols = cols + 1
 		scale = width / (size*cols)
 		rows = floor(height / (size*scale))
-	until(cols*rows >= count)
+	until(scale <= MAX_SCALE and cols*rows >= count)
 
 	--layout the items
 	local player = self:GetPlayer()
