@@ -62,4 +62,4 @@ L.PrintVersionDesc = 'Afficher la version'
 L.ShowConfig = '<Clic droit> pour configurer'
 L.HideBar = '<Clic milieu ou Shift-Clic droit> pour cacher'
 L.ShowBar = '<Clic milieu ou Shift-Clic droit> pour montrer'
-L.SetAlpha = '<Roue de souris> pour régler l'opacit\195\169 (|cffffffff%d|r)'
+L.SetAlpha = "<Roue de souris> pour régler l'opacit\195\169 (|cffffffff%d|r)"
