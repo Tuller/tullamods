@@ -51,12 +51,11 @@ local function CharSelect_OnClick(self, player, delete)
 
 	--show the given player, and check the selected one
 	currentFrame:SetPlayer(newPlayer)
---[[
+
 	--hide the previous dropdown menus (hack)
 	for i = 1, UIDROPDOWNMENU_MENU_LEVEL-1 do
 		getglobal("DropDownList"..i):Hide()
 	end
---]]
 end
 
 --populate the list, add a delete button to all characters that aren't the current player
