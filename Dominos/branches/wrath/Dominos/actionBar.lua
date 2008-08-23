@@ -26,11 +26,6 @@ function ActionButton:New(id)
 	if b then
 		b:SetAttribute('showgrid', 0)
 		b:SetAttribute('action--base', id)
-		b:SetAttribute('_childupdate', [[
-			local action = newABState and self:GetAttribute('action--' .. newABState) or self:GetAttribute('action--base')
-			self:SetAttribute('action', action)
-		]])
-
 		b:UpdateGrid()
 		b:UpdateHotkey(b.buttonType)
 		b:UpdateMacro()
@@ -251,10 +246,14 @@ function ActionBar:New(id)
 	f.pages = f.sets.pages[f.class]
 	f.baseID = f:MaxLength() * (id-1)
 
-	f.header:SetAttribute('_onstate-page', [[ 
-		newABState = newstate
-		self:SetAttribute('state', newABState)
-		return true 
+	f.header:SetAttribute('_onattributechanged', [[
+		if name == 'state-page' then
+			for i = 1, select('#', self:GetChildren()) do
+				local child = select(i, self:GetChildren())
+				local id = value and child:GetAttribute('action--' .. value) or child:GetAttribute('action--base')
+				child:SetAttribute('action', id)
+			end
+		end
 	]])
 
 	f:LoadButtons()
@@ -358,6 +357,18 @@ function ActionBar:UpdateStateDriver()
 	end
 
 	self:UpdateActions()
+	self:RefreshActions()
+end
+
+function ActionBar:RefreshActions()
+	self.header:Execute([[
+		local value = self:GetAttribute('state-page')
+		for i = 1, select('#', self:GetChildren()) do
+			local child = select(i, self:GetChildren())
+			local id = value and child:GetAttribute('action--' .. value) or child:GetAttribute('action--base')
+			child:SetAttribute('action', id)
+		end
+	]])
 end
 
 local function ToValidID(id)
@@ -381,8 +392,6 @@ function ActionBar:UpdateAction(i)
 	else
 		b:SetAttribute('action--possess', nil)
 	end
-
-	self.header:SetAttribute('_adopt', b)
 end
 
 --updates the actionID of all buttons for all states
@@ -410,10 +419,6 @@ function ActionBar:UpdateActions()
 		for _,b in pairs(self.buttons) do
 			b:SetAttribute('action--possess', nil)
 		end
-	end
-
-	for _,b in pairs(self.buttons) do
-		self.header:SetAttribute('_adopt', b)
 	end
 end
 
