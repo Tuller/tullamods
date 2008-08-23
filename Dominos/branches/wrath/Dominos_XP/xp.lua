@@ -9,6 +9,14 @@ local REP_FORMAT = '%s:  %s / %s (%s)'
 local L = LibStub('AceLocale-3.0'):GetLocale('Dominos-XP')
 local _G = getfenv(0)
 
+--taken from http://lua-users.org/wiki/FormattingNumbers 
+--a semi clever way to format numbers with commas (ex, 1,000,000)
+local function comma_value(n)
+	local left,num,right = string.match(tostring(n),'^([^%d]*%d)(%d*)(.-)$')
+	return left .. (num:reverse():gsub('(%d%d%d)','%1,'):reverse()) .. right
+end
+
+
 
 --[[ Module Stuff ]]--
 
@@ -129,7 +137,6 @@ end
 function XP:UpdateExperience()
 	local value = UnitXP('player')
 	local max = UnitXPMax('player')
-	local percent = floor(value / max * 1000 + 0.5) / 10
 
 	self.value:SetMinMaxValues(0, max)
 	self.value:SetValue(value)
@@ -139,10 +146,10 @@ function XP:UpdateExperience()
 
 	if rest then
 		self.rest:SetValue(value + rest)
-		self.text:SetFormattedText(REST_FORMAT, value, max, rest)
+		self.text:SetFormattedText(REST_FORMAT, comma_value(value), comma_value(max), comma_value(rest))
 	else
 		self.rest:SetValue(0)
-		self.text:SetFormattedText(XP_FORMAT, value, max)
+		self.text:SetFormattedText(XP_FORMAT, comma_value(value), comma_value(max))
 	end
 end
 
