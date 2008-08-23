@@ -96,6 +96,8 @@ function CastingBar:New(parent)
 	local _G = getfenv(0)
 	f.time = _G[name .. 'Time']
 	f.text = _G[name .. 'Text']
+	f.borderTexture = _G[name .. 'Border']
+	f.flashTexture = _G[name .. 'Flash']
 
 	f.normalWidth = f:GetWidth()
 	f:SetScript('OnUpdate', f.OnUpdate)
