@@ -12,7 +12,7 @@ local CURRENT_VERSION = GetAddOnMetadata('Dominos', 'Version')
 
 function Dominos:OnInitialize()
 	--register database events
-	self.db = LibStub('AceDB-3.0'):New('DominosDB', self:GetDefaults(), 'Default')
+	self.db = LibStub('AceDB-3.0'):New('DominosDB', self:GetDefaults(), UnitClass('player'))
 	self.db.RegisterCallback(self, 'OnNewProfile')
 	self.db.RegisterCallback(self, 'OnProfileChanged')
 	self.db.RegisterCallback(self, 'OnProfileCopied')
