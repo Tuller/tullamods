@@ -12,8 +12,10 @@ local _G = getfenv(0)
 --taken from http://lua-users.org/wiki/FormattingNumbers 
 --a semi clever way to format numbers with commas (ex, 1,000,000)
 local function comma_value(n)
-	local left,num,right = string.match(tostring(n),'^([^%d]*%d)(%d*)(.-)$')
-	return left .. (num:reverse():gsub('(%d%d%d)','%1,'):reverse()) .. right
+	if n < 1000 then
+		return n
+	end
+	return tostring(n):reverse():gsub('(%d%d%d)','%1,'):reverse()
 end
 
 
@@ -187,7 +189,7 @@ function XP:UpdateReputation()
 	self.value:SetValue(value)
 
 	local repLevel = _G['FACTION_STANDING_LABEL' .. reaction]
-	self.text:SetFormattedText(REP_FORMAT, name, value, max, repLevel)
+	self.text:SetFormattedText(REP_FORMAT, name, comma_value(value), comma_value(max), repLevel)
 end
 
 
