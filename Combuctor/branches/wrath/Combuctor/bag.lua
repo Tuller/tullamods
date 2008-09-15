@@ -3,7 +3,10 @@
 		A bag button object
 --]]
 
-CombuctorBag = CombuctorUtil:CreateWidgetClass('Button')
+local CombuctorBag = Combuctor:CreateClass('Button')
+Combuctor.Bag = CombuctorBag
+
+local CombuctorUtil = Combuctor:GetModule('Utility')
 local L = LibStub('AceLocale-3.0'):GetLocale('Combuctor')
 
 local SIZE = 30
@@ -11,8 +14,8 @@ local NORMAL_TEXTURE_SIZE = 64 * (SIZE/36)
 local unused = {}
 local id = 1
 
-function CombuctorBag:Create()
-	local bag = self:New(CreateFrame('Button', format('CombuctorBag%d', id)))
+function CombuctorBag:New()
+	local bag = self:Bind(CreateFrame('Button', format('CombuctorBag%d', id)))
 	local name = bag:GetName()
 	bag:SetWidth(SIZE); bag:SetHeight(SIZE)
 
@@ -61,11 +64,12 @@ function CombuctorBag:Get()
 		unused[f] = nil
 		return f
 	end
-	return self:Create()
+	return self:New()
 end
 
 function CombuctorBag:Set(parent, id)
-	self:SetID(id); self:SetParent(parent)
+	self:SetID(id)
+	self:SetParent(parent)
 
 	if id == BACKPACK_CONTAINER or id == BANK_CONTAINER then
 		SetItemButtonTexture(self, 'Interface/Buttons/Button-Backpack-Up')

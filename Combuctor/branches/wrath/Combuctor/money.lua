@@ -3,24 +3,25 @@
 		Money frames for Combuctor windows
 --]]
 
-CombuctorMoneyFrame = {}
+local CombuctorMoneyFrame = Combuctor:CreateClass('Frame')
+Combuctor.MoneyFrame = CombuctorMoneyFrame
+
 local L = LibStub('AceLocale-3.0'):GetLocale('Combuctor')
 
-function CombuctorMoneyFrame:Create(parent)
-	local frame = CreateFrame('Frame', parent:GetName() .. 'MoneyFrame', parent, 'SmallMoneyFrameTemplate')
-	frame:SetScript('OnShow', self.Update)
-	frame.Update = self.Update
-	frame:Update()
+function CombuctorMoneyFrame:New(parent)
+	local f = self:Bind(CreateFrame('Frame', parent:GetName() .. 'MoneyFrame', parent, 'SmallMoneyFrameTemplate'))
+	f:SetScript('OnShow', self.Update)
+	f:Update()
 
-	local click = CreateFrame('Button', frame:GetName() .. 'Click', frame)
-	click:SetFrameLevel(frame:GetFrameLevel() + 3)
-	click:SetAllPoints(frame)
+	local click = CreateFrame('Button', f:GetName() .. 'Click', f)
+	click:SetFrameLevel(f:GetFrameLevel() + 3)
+	click:SetAllPoints(f)
 
 	click:SetScript('OnClick', self.OnClick)
 	click:SetScript('OnEnter', self.OnEnter)
 	click:SetScript('OnLeave', self.OnLeave)
 
-	return frame
+	return f
 end
 
 function CombuctorMoneyFrame:Update()

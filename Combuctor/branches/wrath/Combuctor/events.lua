@@ -37,7 +37,7 @@
 		called when a bag is gained/lost or changes from one type to another
 --]]
 
-local BagEvents = Combuctor:NewModule('Combuctor-BagEvents')
+local BagEvents = Combuctor:NewModule('Events', 'AceEvent-3.0')
 local atBank = false
 local loading = true
 local firstVisit = true

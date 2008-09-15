@@ -3,14 +3,13 @@
 		The combuctor frame
 --]]
 
-CombuctorItemFrame = Combuctor:NewModule('ItemFrame')
-CombuctorItemFrame.obj = CombuctorUtil:CreateWidgetClass('Button')
-CombuctorItemFrame.obj:Hide()
-CombuctorItemFrame.obj:SetScript('OnUpdate', function(self) CombuctorItemFrame:LayoutFrames() self:Hide() end)
+local CombuctorItemFrame = Combuctor:NewModule('ItemFrame', 'AceEvent-3.0')
+CombuctorItemFrame.obj = Combuctor:CreateClass('Button')
 
+local CombuctorItem = Combuctor.Item
+local CombuctorUtil = Combuctor:GetModule('Utility')
 local listeners = {}
 local currentPlayer = UnitName('player')
-local MAX_SCALE = 2
 
 
 --[[
@@ -18,6 +17,10 @@ local MAX_SCALE = 2
 --]]
 
 function CombuctorItemFrame:OnEnable()
+	--hacky code to perform delayed updates
+	self.obj:Hide()
+	self.obj:SetScript('OnUpdate', function() self:LayoutFrames(); self.obj:Hide() end)
+
 	self:RegisterEvent('BAG_UPDATE_COOLDOWN', 'UpdateSlotCooldowns')
 
 	self:RegisterMessage('COMBUCTOR_SLOT_ADD', 'UpdateSlot')
@@ -29,8 +32,8 @@ function CombuctorItemFrame:OnEnable()
 	self:RegisterMessage('COMBUCTOR_BANK_CLOSED', 'UpdateBankFrames')
 end
 
-function CombuctorItemFrame:Create(parent)
-	return self.obj:Create(parent)
+function CombuctorItemFrame:New(parent)
+	return self.obj:New(parent)
 end
 
 function CombuctorItemFrame:UpdateSlot(msg, ...)
@@ -104,8 +107,8 @@ end
 
 local ItemFrame = CombuctorItemFrame.obj
 
-function ItemFrame:Create(parent)
-	local f = self:New()
+function ItemFrame:New(parent)
+	local f = self:Bind(CreateFrame('Button'))
 	f:SetParent(parent)
 	f.items = {}
 	f.bags = parent.sets.bags
@@ -162,7 +165,10 @@ function ItemFrame:HasItem(bag, slot, link)
 	--do filter checks
 	local f = self.filter
 	if next(f) then
-		local link = link or CombuctorUtil:GetItemLink(bag, slot, self:GetPlayer())
+		local player = self:GetPlayer()
+		local link = link or CombuctorUtil:GetItemLink(bag, slot, player)
+		local bagType = CombuctorUtil:GetBagType(bag, player)
+
 		local name, quality, level, ilvl, type, subType, stackCount, equipLoc
 		if link then
 			name, link, quality, level, ilvl, type, subType, stackCount, equipLoc = GetItemInfo(link)
@@ -170,9 +176,9 @@ function ItemFrame:HasItem(bag, slot, link)
 
 		if f.quality and quality ~= f.quality then
 			return false
-		elseif f.rule and not f.rule(bag, link, type, subType, equipLoc) then
+		elseif f.rule and not f.rule(player, bagType, name, link, quality, level, ilvl, type, subType, stackCount, equipLoc) then
 			return false
-		elseif f.subRule and not f.subRule(bag, link, type, subType, equipLoc) then
+		elseif f.subRule and not f.subRule(player, bagType, name, link, quality, level, ilvl, type, subType, stackCount, equipLoc) then
 			return false
 		--'smart' text search: will attempt to match type, subtype, and equip locations in addition to names
 		elseif f.name then
@@ -404,19 +410,19 @@ end
 --layout all the item buttons, scaling ot fit inside the fram
 --todo: dividers for bags v bank
 function ItemFrame:Layout(spacing)
-	--figure out the layout
 	local width, height = self:GetWidth(), self:GetHeight()
 	local spacing = spacing or 2
 	local count = self.count
 	local size = 36 + spacing*2
 	local cols = 0
 	local scale, rows
+	local maxScale = Combuctor:GetMaxItemScale()
 
 	repeat
 		cols = cols + 1
 		scale = width / (size*cols)
 		rows = floor(height / (size*scale))
-	until(scale <= MAX_SCALE and cols*rows >= count)
+	until(scale <= maxScale and cols*rows >= count)
 
 	--layout the items
 	local player = self:GetPlayer()
@@ -453,8 +459,8 @@ end
 
 --[[ Item Placement Functions ]]--
 
---places the item in the first available slot in the current player's visible bags\
---TODO: make this work on the tabs, too
+--places the item in the first available slot in the current player's visible bags
+--TODO: make this work on tabs? also make this smarter
 function ItemFrame:PlaceItem()
 	if CursorHasItem() then
 		local player = self:GetPlayer()

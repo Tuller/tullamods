@@ -3,7 +3,11 @@
 		An item button
 --]]
 
-CombuctorItem = CombuctorUtil:CreateWidgetClass('Button')
+local CombuctorItem = Combuctor:CreateClass('Button')
+Combuctor.Item = CombuctorItem
+
+local CombuctorUtil = Combuctor:GetModule('Utility')
+
 CombuctorItem.SIZE = 37
 
 --create a dummy item slot for tooltips and modified clicks of cached items
@@ -59,8 +63,8 @@ end
 local itemID = 1
 local unused = {}
 
-function CombuctorItem:Create()
-	local item = self:New(self:GetBlizzard(itemID) or CreateFrame('Button', format('CombuctorItem%d', itemID), nil, 'ContainerFrameItemButtonTemplate'))
+function CombuctorItem:New()
+	local item = self:Bind(self:GetBlizzard(itemID) or CreateFrame('Button', format('CombuctorItem%d', itemID), nil, 'ContainerFrameItemButtonTemplate'))
 	item:ClearAllPoints()
 
 	local border = item:CreateTexture(nil, 'OVERLAY')
@@ -103,7 +107,7 @@ function CombuctorItem:Get()
 		unused[item] = nil
 		return item
 	end
-	return self:Create()
+	return self:New()
 end
 
 function CombuctorItem:Set(parent, bag, slot)

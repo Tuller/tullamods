@@ -1,9 +1,9 @@
 ## Interface: 30000
 ## Title: Combuctor
 ## Author: Tuller
-## Notes: Pants are a dangerous foe
-## Version: 1.0.2
+## Notes: All in one displays for you inventory and bank, now featuring filters!
+## Version: 2.0.0
 ## OptionalDeps: Ace3, Bagnon_Forever
-## SavedVariablesPerCharacter: CombuctorDB
+## SavedVariables: CombuctorDB2, CombuctorVersion
 embeds.xml
 load.xml

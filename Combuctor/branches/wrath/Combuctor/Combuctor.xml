@@ -97,16 +97,7 @@
 				getglobal(self:GetName() .. "Border"):SetAlpha(0.6)
 			</OnLoad>
 			<OnClick>
-				if button == 'LeftButton' then
-					getglobal(self:GetName() .. "Icon"):SetTexCoord(0.075,0.925,0.075,0.925)
-					self:GetParent():ToggleBagFrame()
-				else
-					if self:GetParent().isBank then
-						Combuctor:Toggle(BACKPACK_CONTAINER)
-					else
-						Combuctor:Toggle(BANK_CONTAINER)
-					end
-				end
+				self:GetParent():OnBagToggleClick(self, button)
 			</OnClick>
 			<OnMouseDown>
 				getglobal(self:GetName() .. "Icon"):SetTexCoord(0,1,0,1)
@@ -115,7 +106,7 @@
 				getglobal(self:GetName() .. "Icon"):SetTexCoord(0.075,0.925,0.075,0.925)
 			</OnMouseUp>
 			<OnEnter>
-				CombuctorFrame.OnBagToggleEnter(self)
+				self:GetParent():OnBagToggleEnter(self)
 			</OnEnter>
 			<OnLeave>
 				GameTooltip:Hide()
@@ -226,7 +217,7 @@
 				end
 			</OnMouseUp>
 			<OnEnter>
-				CombuctorFrame.OnTitleEnter(self)
+				self:GetParent():OnTitleEnter(self)
 			</OnEnter>
 			<OnLeave>
 				GameTooltip:Hide()
