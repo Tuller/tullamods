@@ -346,7 +346,7 @@ end
 
 function Dominos:ShowOptions()
 	if LoadAddOn('Dominos_Config') then
-		InterfaceOptionsFrame_OpenToFrame('Dominos')
+		InterfaceOptionsFrame_OpenToCategory('Dominos')
 		return true
 	end
 	return false
