@@ -170,11 +170,8 @@ do
 		return dd
 	end
 
-	local selfCast = AddClickActionSelector(Options, L.SelfcastKey, 'SELFCAST')
-	selfCast:SetPoint('TOPRIGHT', -10, -120)
-
 	local quickMove = AddClickActionSelector(Options, L.QuickMoveKey, 'PICKUPACTION')
-	quickMove:SetPoint('TOP', selfCast, 'BOTTOM', 0, -16)
+	quickMove:SetPoint('TOPRIGHT', -10, -120)
 
 	local rightClickUnit = AddRightClickTargetSelector(Options)
 	rightClickUnit:SetPoint('TOP', quickMove, 'BOTTOM', 0, -16)
