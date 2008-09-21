@@ -55,7 +55,7 @@ function OmniCC:Enable()
 	--load slash commands
 	SlashCmdList["OmniCCCOMMAND"] = function()
 		if LoadAddOn('OmniCC_Options') then
-			InterfaceOptionsFrame_OpenToFrame('OmniCC')
+			InterfaceOptionsFrame_OpenToCategory('OmniCC')
 		end
 	end
 	SLASH_OmniCCCOMMAND1 = "/omnicc"
