@@ -139,7 +139,7 @@ end
 
 --panel
 function Options:CreatePanel(name)
-	local panel = CreateFrame('Frame', self:GetName() .. name, self, 'OptionFrameBoxTemplate')
+	local panel = CreateFrame('Frame', self:GetName() .. name, self, 'OptionsBoxTemplate')
 	panel:SetBackdropBorderColor(0.4, 0.4, 0.4)
 	panel:SetBackdropColor(0.15, 0.15, 0.15, 0.5)
 	getglobal(panel:GetName() .. 'Title'):SetText(name)
