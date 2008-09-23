@@ -79,7 +79,7 @@ function Menu:ShowPanel(name)
 				UIDropDownMenu_SetSelectedValue(self.dropdown, i)
 			end
 			panel:Show()
-			self:SetWidth(max(186, panel.width + self.extraWidth))
+			self:SetWidth(max(200, panel.width + self.extraWidth))
 			self:SetHeight(max(40, panel.height + self.extraHeight))
 		else
 			panel:Hide()
@@ -197,16 +197,16 @@ end
 
 --checkbutton
 function Panel:NewCheckButton(name)
-	local button = CreateFrame('CheckButton', self:GetName() .. name, self, 'OptionsCheckButtonTemplate')
+	local button = CreateFrame('CheckButton', self:GetName() .. name, self, 'InterfaceOptionsCheckButtonTemplate')
 	_G[button:GetName() .. 'Text']:SetText(name)
 
 	local prev = self.checkbutton
 	if prev then
-		button:SetPoint('TOP', prev, 'BOTTOM', 0, 2)
+		button:SetPoint('TOP', prev, 'BOTTOM', 0, -2)
 	else
-		button:SetPoint('TOPLEFT', 0, 2)
+		button:SetPoint('TOPLEFT', 2, 0)
 	end
-	self.height = self.height + 30
+	self.height = self.height + 28
 	self.checkbutton = button
 
 	return button
@@ -256,6 +256,7 @@ do
 		slider:SetMinMaxValues(low, high)
 		slider:SetValueStep(step)
 		slider:EnableMouseWheel(true)
+		BlizzardOptionsPanel_Slider_Enable(slider) --colors the slider properly
 
 		_G[name .. 'Text']:SetText(text)
 		_G[name .. 'Low']:SetText('')
@@ -276,11 +277,11 @@ do
 
 		local prev = self.slider
 		if prev then
-			slider:SetPoint('BOTTOM', prev, 'TOP', 0, 12)
-			self.height = self.height + 30
+			slider:SetPoint('BOTTOM', prev, 'TOP', 0, 16)
+			self.height = self.height + 34
 		else
-			slider:SetPoint('BOTTOMLEFT', 4, 6)
-			self.height = self.height + 36
+			slider:SetPoint('BOTTOMLEFT', 4, 4)
+			self.height = self.height + 38
 		end
 		self.slider = slider
 
