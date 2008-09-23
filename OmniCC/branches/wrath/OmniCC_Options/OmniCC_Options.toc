@@ -5,4 +5,5 @@
 ## Dependencies: OmniCC
 ## LoadOnDemand: 1
 localization.lua
+localization.ru.lua
 menu.lua

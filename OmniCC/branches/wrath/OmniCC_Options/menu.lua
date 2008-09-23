@@ -5,19 +5,31 @@
 
 local Options = CreateFrame('Frame', 'OmniCCOptionsFrame', UIParent)
 
+
 local SML = LibStub('LibSharedMedia-3.0')
 local L = OMNICC_LOCALS
 
-function Options:Load()
-	self.name = 'OmniCC'
+function Options:Load(title, subtitle)
+	self.name = title
+	
+	local text = self:CreateFontString(nil, 'ARTWORK', 'GameFontNormalLarge')
+	text:SetPoint('TOPLEFT', 16, -16)
+	text:SetText(title)
 
-	local display = self:AddDisplayPanel()
-	display:SetPoint('TOPLEFT', 10, -24)
+	local subtext = self:CreateFontString(nil, 'ARTWORK', 'GameFontHighlightSmall')
+	subtext:SetHeight(32)
+	subtext:SetPoint('TOPLEFT', text, 'BOTTOMLEFT', 0, -8)
+	subtext:SetPoint('RIGHT', self, -32, 0)
+	subtext:SetNonSpaceWrap(true)
+	subtext:SetJustifyH('LEFT')
+	subtext:SetJustifyV('TOP')
+	subtext:SetText(subtitle)
 
-	local font = self:AddFontPanel()
-	font:SetPoint('TOPRIGHT', -10, -24)
+	self:AddDisplayPanel()
 
-	local color = Options:AddColorPanel()
+	self:AddFontPanel()
+
+	local color = self:AddColorPanel()
 	color:SetPoint('BOTTOMLEFT', 10, 10)
 	
 	InterfaceOptions_AddCategory(self) 
@@ -28,29 +40,26 @@ end
 
 --Display
 function Options:AddDisplayPanel()
-	local panel = self:CreatePanel(L.Display)
-	panel:SetWidth(180); panel:SetHeight(200)
-
 	--show models
-	local showModels = self:CreateCheckButton(L.ShowModels, panel)
+	local showModels = self:CreateCheckButton(L.ShowModels, self)
 	showModels:SetScript('OnShow', function(self) self:SetChecked(OmniCC:ShowingModels()) end)
 	showModels:SetScript('OnClick', function(self) OmniCC:SetShowModels(self:GetChecked()) end)
-	showModels:SetPoint('TOPLEFT', 10, -8)
+	showModels:SetPoint('TOPLEFT', 10, -72)
 
 	--show cooldown pulse
-	local showPulse = self:CreateCheckButton(L.ShowPulse, panel)
+	local showPulse = self:CreateCheckButton(L.ShowPulse, self)
 	showPulse:SetScript('OnShow', function(self) self:SetChecked(OmniCC:ShowingPulse()) end)
 	showPulse:SetScript('OnClick', function(self) OmniCC:SetShowPulse(self:GetChecked()) end)
-	showPulse:SetPoint('TOP', showModels, 'BOTTOM')
+	showPulse:SetPoint('TOP', showModels, 'BOTTOM', 0, -2)
 
 	--use MM:SS format
-	local useMMSS = self:CreateCheckButton(L.UseMMSS, panel)
+	local useMMSS = self:CreateCheckButton(L.UseMMSS, self)
 	useMMSS:SetScript('OnShow', function(self) self:SetChecked(OmniCC:UsingMMSS()) end)
 	useMMSS:SetScript('OnClick', function(self) OmniCC:SetUseMMSS(self:GetChecked()) end)
-	useMMSS:SetPoint('TOP', showPulse, 'BOTTOM')
+	useMMSS:SetPoint('TOP', showPulse, 'BOTTOM', 0, -2)
 
 	--minimum duration slider
-	local minDuration = self:CreateSlider(L.MinDuration, panel, 0, 30, 0.5)
+	local minDuration = self:CreateSlider(L.MinDuration, self, 0, 30, 0.5)
 	minDuration:SetScript('OnShow', function(self)
 		self.onShow = true
 		self:SetValue(OmniCC:GetMinDuration())
@@ -62,10 +71,10 @@ function Options:AddDisplayPanel()
 			OmniCC:SetMinDuration(value)
 		end
 	end)
-	minDuration:SetPoint('TOPLEFT', useMMSS, 'BOTTOMLEFT', 0, -15)
+	minDuration:SetPoint('TOPLEFT', useMMSS, 'BOTTOMLEFT', 2, -24)
 
 	--minimum scale slider
-	local minScale = self:CreateSlider(L.MinScale, panel, 0, 2, 0.05)
+	local minScale = self:CreateSlider(L.MinScale, self, 0, 2, 0.05)
 	minScale:SetScript('OnShow', function(self)
 		self.onShow = true
 		self:SetValue(OmniCC:GetMinScale())
@@ -78,22 +87,17 @@ function Options:AddDisplayPanel()
 		end
 	end)
 	minScale:SetPoint('TOPLEFT', minDuration, 'BOTTOMLEFT', 0, -20)
-
-	return panel
 end
 
 --font
 function Options:AddFontPanel()
-	local panel = self:CreatePanel(L.Font)
-	panel:SetWidth(180); panel:SetHeight(200)
+	local fontFace = self:CreateFontSelector(self)
+	fontFace:SetPoint('TOPRIGHT', -24, -72)
 
-	local fontFace = self:CreateFontSelector(panel)
-	fontFace:SetPoint('TOPLEFT', -5, -25)
+	local fontOutline = self:CreateFontOutlineDropdown(self)
+	fontOutline:SetPoint('TOPLEFT', fontFace, 'BOTTOMLEFT', 0, -24)
 
-	local fontOutline = self:CreateFontOutlineDropdown(panel)
-	fontOutline:SetPoint('TOPLEFT', fontFace, 'BOTTOMLEFT', 0, -14)
-
-	local fontSize = self:CreateSlider(L.FontSize, panel, 8, 32, 0.5)
+	local fontSize = self:CreateSlider(L.FontSize, self, 8, 32, 0.5)
 	fontSize:SetScript('OnShow', function(self)
 		self.onShow = true
 		self:SetValue(OmniCC:GetFontSize())
@@ -105,29 +109,27 @@ function Options:AddFontPanel()
 			OmniCC:SetFontSize(value)
 		end
 	end)
-	fontSize:SetPoint('TOPLEFT', fontOutline, 'BOTTOMLEFT', 15, -15)
-
-	return panel
+	fontSize:SetPoint('TOPLEFT', fontOutline, 'BOTTOMLEFT', 15, -18)
 end
 
 function Options:AddColorPanel()
 	local panel = self:CreatePanel(L.ColorsAndScaling)
-	panel:SetWidth(367); panel:SetHeight(156)
+	panel:SetWidth(392); panel:SetHeight(148)
 
 	local short = self:CreateFormatSlider(L.UnderFiveSeconds, panel, 'short')
-	short:SetPoint('TOPLEFT', 10, -28)
+	short:SetPoint('TOPLEFT', 10, -32)
 
 	local seconds = self:CreateFormatSlider(SECONDS, panel, 'secs')
-	seconds:SetPoint('TOPLEFT', short, 'BOTTOMLEFT', 0, -20)
+	seconds:SetPoint('TOPLEFT', short, 'BOTTOMLEFT', 0, -24)
 
 	local mins = self:CreateFormatSlider(MINUTES, panel, 'mins')
-	mins:SetPoint('TOPLEFT', seconds, 'BOTTOMLEFT', 0, -20)
+	mins:SetPoint('TOPLEFT', seconds, 'BOTTOMLEFT', 0, -24)
 
 	local hours = self:CreateFormatSlider(HOURS, panel, 'hrs')
-	hours:SetPoint('TOPRIGHT', -48, -28)
+	hours:SetPoint('TOPRIGHT', -42, -32)
 
 	local days = self:CreateFormatSlider(DAYS, panel, 'days')
-	days:SetPoint('TOPLEFT', hours, 'BOTTOMLEFT', 0, -20)
+	days:SetPoint('TOPLEFT', hours, 'BOTTOMLEFT', 0, -24)
 
 	return panel
 end
@@ -168,6 +170,7 @@ do
 		slider:SetMinMaxValues(low, high)
 		slider:SetValueStep(step)
 		slider:EnableMouseWheel(true)
+		BlizzardOptionsPanel_Slider_Enable(slider) --colors the slider properly
 
 		getglobal(name .. 'Text'):SetText(text)
 		getglobal(name .. 'Low'):SetText('')
@@ -184,7 +187,7 @@ end
 
 --check button
 function Options:CreateCheckButton(name, parent)
-	local button = CreateFrame('CheckButton', parent:GetName() .. name, parent, 'OptionsCheckButtonTemplate')
+	local button = CreateFrame('CheckButton', parent:GetName() .. name, parent, 'InterfaceOptionsCheckButtonTemplate')
 	getglobal(button:GetName() .. 'Text'):SetText(name)
 
 	return button
@@ -551,7 +554,7 @@ do
 
 	function Options:CreateFormatSlider(name, parent, duration)
 		local slider = self:CreateSlider(name, parent, 0.5, 2, 0.05)
-		slider:SetWidth(120); slider:SetHeight(18)
+--		slider:SetWidth(120); slider:SetHeight(18)
 		slider.duration = duration
 
 		local text = getglobal(slider:GetName() .. 'Text')
@@ -570,4 +573,4 @@ do
 	end
 end
 
-Options:Load()
+Options:Load(select(2, GetAddOnInfo('OmniCC')))
