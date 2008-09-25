@@ -212,6 +212,8 @@ ActionBar.mainbarOffsets = {
 			pages['[bonusbar:3]'] = 8
 		elseif i == 'PRIEST' or i == 'ROGUE' then
 			pages['[bonusbar:1]'] = 6
+		elseif i == 'WARLOCK' then
+			pages['[form:2]'] = 6 --demon form, need to watch this to make sure blizzard doesn't change the page
 		end
 
 		t[i] = pages
@@ -232,6 +234,7 @@ ActionBar.conditions = {
 	'[bar:5]',
 	'[bar:6]',
 	'[bonusbar:1,stealth]',
+	'[form:2]',
 	'[bonusbar:1]',
 	'[bonusbar:2]',
 	'[bonusbar:3]',
@@ -532,7 +535,7 @@ do
 	--GetSpellInfo(spellID) is awesome for localization
 	local function AddClass(self)
 		local lClass, class = UnitClass('player')
-		if class == 'WARRIOR' or class == 'DRUID' or class == 'PRIEST' or class == 'ROGUE' then
+		if class == 'WARRIOR' or class == 'DRUID' or class == 'PRIEST' or class == 'ROGUE' or class == 'WARLOCK' then
 			local p = self:NewPanel(lClass)
 			if class == 'WARRIOR' then
 				ConditionSlider_New(p, '[bonusbar:3]', GetSpellInfo(2458))
@@ -548,6 +551,8 @@ do
 				ConditionSlider_New(p, '[bonusbar:1]', GetSpellInfo(15473))
 			elseif class == 'ROGUE' then
 				ConditionSlider_New(p, '[bonusbar:1]', GetSpellInfo(1784))
+			elseif class == 'WARLOCK' then
+				ConditionSlider_New(p, '[form:2]', GetSpellInfo(47241))
 			end
 		end
 	end
