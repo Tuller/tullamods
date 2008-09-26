@@ -49,7 +49,7 @@ do
 			GameTooltip:Hide()
 		end)
 
-		getglobal(b:GetName() .. 'IconTexture'):SetTexture('Interface\\Icons\\INV_Misc_Bag_16')
+		getglobal(b:GetName() .. 'IconTexture'):SetTexture('Interface\\Icons\\KeyRing-Bag-Icon')
 
 		return b
 	end
