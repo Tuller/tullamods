@@ -6,16 +6,27 @@
 --libs and omgspeed
 --local LBF = LibStub('LibButtonFacade', true)
 
+local NT_RATIO = 64/37
+
 --load up the bag set...
 local bags = {}
 do
 	local function Add(b)
---[[
-		if LBF then
-			LBF:Group('Dominos', 'Bag Bar'):AddButton(b)
-		end
---]]
 		table.insert(bags, b)
+	end
+
+	local function ResizeItemButton(b, size)
+		b:SetWidth(size)
+		b:SetHeight(size)
+		b:GetNormalTexture():SetWidth(size * NT_RATIO)
+		b:GetNormalTexture():SetHeight(size * NT_RATIO)
+
+		local count = getglobal(b:GetName() .. 'Count')
+		count:SetFontObject('NumberFontNormalSmall')
+		count:SetPoint('BOTTOMRIGHT', 0, 2)
+
+		getglobal(b:GetName() .. 'Stock'):SetFontObject('NumberFontNormalSmall')
+		getglobal(b:GetName() .. 'Stock'):SetVertexColor(1, 1, 0)
 	end
 
 	local function CreateKeyRing()
@@ -49,7 +60,10 @@ do
 			GameTooltip:Hide()
 		end)
 
-		getglobal(b:GetName() .. 'IconTexture'):SetTexture('Interface\\Icons\\INV_Misc_Bag_16')
+		getglobal(b:GetName() .. 'IconTexture'):SetTexture('Interface\\ContainerFrame\\KeyRing-Bag-Icon')
+		getglobal(b:GetName() .. 'IconTexture'):SetTexCoord(0, 0.9, 0.1, 1)
+
+		ResizeItemButton(b, 30)
 
 		return b
 	end
@@ -59,6 +73,8 @@ do
 	Add(CharacterBag2Slot)
 	Add(CharacterBag1Slot)
 	Add(CharacterBag0Slot)
+
+	ResizeItemButton(MainMenuBarBackpackButton, 30)
 	Add(MainMenuBarBackpackButton)
 end
 
@@ -81,7 +97,7 @@ function BagBar:GetDefaults()
 	return {
 		point = 'BOTTOMRIGHT',
 		numButtons = #bags,
-		spacing = 4
+		spacing = 2
 	}
 end
 
