@@ -25,20 +25,18 @@ bind:SetPoint('LEFT', lock, 'RIGHT', 4, 0)
 --[[ Check Buttons ]]--
 
 --local action bar button positions
+--[[
 local lockButtons = Options:NewCheckButton(L.LockActionButtons)
 lockButtons:SetScript('OnShow', function(self)
-	self:SetChecked(LOCK_ACTIONBAR == '1')
+	self:SetChecked(GetCVarBool('lockActionBars'))
 end)
 lockButtons:SetScript('OnClick', function(self)
-	if self:GetChecked() then
-		SetCVar('lockActionBars', 1)
-		LOCK_ACTIONBAR = '1'
-	else
-		SetCVar('lockActionBars', 0)
-		LOCK_ACTIONBAR = '0'
-	end
+	local value = self:GetChecked() and '1' or '0'
+	SetCVar('lockActionBars', value)
+	setglobal('LOCK_ACTIONBAR', value)
 end)
 lockButtons:SetPoint('TOPLEFT', lock, 'BOTTOMLEFT', 0, -24)
+--]]
 
 --show empty buttons
 local showEmpty = Options:NewCheckButton(L.ShowEmptyButtons)
@@ -48,7 +46,8 @@ end)
 showEmpty:SetScript('OnClick', function(self)
 	Dominos:SetShowGrid(self:GetChecked())
 end)
-showEmpty:SetPoint('TOP', lockButtons, 'BOTTOM', 0, -10)
+showEmpty:SetPoint('TOPLEFT', lock, 'BOTTOMLEFT', 0, -24)
+--showEmpty:SetPoint('TOP', lockButtons, 'BOTTOM', 0, -10)
 
 --show keybinding text
 local showBindings = Options:NewCheckButton(L.ShowBindingText)
