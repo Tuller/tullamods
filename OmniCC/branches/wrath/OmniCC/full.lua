@@ -312,7 +312,7 @@ function OmniCC:StartPulse(timer)
 	local icon = timer.icon
 	local parent = timer:GetParent()
 
-	if icon and parent:IsVisible() then
+	if icon and icon.GetTexture and parent:IsVisible() then
 		local pulse = pulses[parent] or self:CreatePulse(parent)
 		if pulse and not activePulses[pulse] then
 			pulse.scale = 1
