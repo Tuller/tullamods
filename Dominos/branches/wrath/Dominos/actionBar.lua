@@ -392,7 +392,7 @@ function ActionBar:UpdateStateDriver()
 end
 
 function ActionBar:RefreshActions()
-	self.header:Execute([[ control:ChildUpdate() ]] )
+	self.header:Execute([[ control:ChildUpdate() ]])
 end
 
 local function ToValidID(id)
