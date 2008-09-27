@@ -9,10 +9,10 @@ local _G = getfenv(0)
 local min = math.min
 local max = math.max
 
-function Panel:New(name, title, subtitle, icon)
+function Panel:New(name, title, subtitle, icon, parent)
 	local f = self:Bind(CreateFrame('Frame', name, UIParent))
 	f.name = title
-	f.parent = self.name
+	f.parent = parent
 	
 	local text = f:CreateFontString(nil, 'ARTWORK', 'GameFontNormalLarge')
 	text:SetPoint('TOPLEFT', 16, -16)

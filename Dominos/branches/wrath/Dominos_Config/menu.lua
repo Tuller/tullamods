@@ -141,7 +141,7 @@ do
 	function Menu:NewPanelSelector()
 		local f = CreateFrame('Frame', self:GetName() .. 'PanelSelector', self, 'UIDropDownMenuTemplate')
 		_G[f:GetName() .. 'Text']:SetJustifyH('LEFT')
-	
+
 		f:SetScript('OnShow', Dropdown_OnShow)
 
 		local function Item_OnClick(item, name)
@@ -231,9 +231,11 @@ do
 
 	local function Slider_OnShow(self)
 		self.showing = true
+
 		if self.OnShow then
 			self:OnShow()
 		end
+
 		self.showing = nil
 	end
 
