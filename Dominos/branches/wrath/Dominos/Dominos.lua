@@ -416,6 +416,8 @@ function Dominos:OnCmd(args)
 	--actionbar functions
 	elseif cmd == 'numbars' then
 		self:SetNumBars(tonumber(select(2, string.split(' ', args))))
+	elseif cmd == 'numbuttons' then
+		self:SetNumButtons(tonumber(select(2, string.split(' ', args))))
 	--profile functions
 	elseif cmd == 'save' then
 		local profileName = string.join(' ', select(2, string.split(' ', args)))
@@ -677,6 +679,10 @@ function Dominos:SetNumBars(count)
 			self.ActionBar:New(i)
 		end
 	end
+end
+
+function Dominos:SetNumButtons(count)
+	self:SetNumBars(120 / count)
 end
 
 function Dominos:NumBars()
