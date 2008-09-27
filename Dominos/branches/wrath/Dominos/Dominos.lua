@@ -50,9 +50,16 @@ function Dominos:OnInitialize()
 	if LBF then
 		LBF:RegisterSkinCallback('Dominos', self.OnSkin, self)
 	end
+
+	--hide blizzard junk
+	self:HideBlizzard()
+end
+
+function Dominos:OnEnable()
+	self:Load()
 	
 	--databroker launcher
-	local LDB = LibStub:GetLibrary("LibDataBroker-1.1")
+	local LDB = LibStub:GetLibrary("LibDataBroker-1.1", true)
 	if LDB then
 		local dataobj = LibStub:GetLibrary("LibDataBroker-1.1"):NewDataObject("Dominos", {
 			type = "launcher",
@@ -70,13 +77,6 @@ function Dominos:OnInitialize()
 			end,
 		})
 	end
-
-	--hide blizzard junk
-	self:HideBlizzard()
-end
-
-function Dominos:OnEnable()
-	self:Load()
 end
 
 --[[ Version Updating ]]--
