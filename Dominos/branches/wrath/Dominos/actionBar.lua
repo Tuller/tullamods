@@ -129,25 +129,52 @@ function ActionButton:OnEnter()
 	KeyBound:Set(self)
 end
 
+--the call here is wacky because this functionality is actually called for the blizzard buttons _before_ I'm able to bind the action button methods to them
 function ActionButton:UpdateHotkey(actionButtonType)
-    if not actionButtonType then
-        actionButtonType = 'ACTIONBUTTON'
-    end
-
-    local hotkey = _G[self:GetName()..'HotKey']
-	local baseID = (self:GetAttribute('action--base') or self:GetID())
-	local key = KeyBound:ToShortKey(GetBindingKey(actionButtonType .. baseID) or GetBindingKey('CLICK '..self:GetName()..':LeftButton'))
-	hotkey:SetText(key)
-
+	local key = ActionButton.GetHotkey(self, actionButtonType)
 	if key ~= ''  and Dominos:ShowBindingText() then
-		hotkey:Show()
+		_G[self:GetName()..'HotKey']:SetText(key)
+		_G[self:GetName()..'HotKey']:Show()
 	else
-		hotkey:Hide()
+		_G[self:GetName()..'HotKey']:Hide()
 	end
 end
 
-function ActionButton:GetHotkey()
-	return KeyBound:ToShortKey(GetBindingKey(format('CLICK %s:LeftButton', self:GetName()))) or ''
+function ActionButton:GetHotkey(actionButtonType)
+	local type = actionButtonType or self.buttonType or 'ACTIONBUTTON'
+	local baseID = self:GetAttribute('action--base') or self:GetID()
+
+	local key = GetBindingKey(type .. baseID) or GetBindingKey(format('CLICK %s:LeftButton', self:GetName()))
+	return key and KeyBound:ToShortKey(key) or ''
+end
+
+local function getKeyStrings(...)
+	local keys 
+	for i = 1, select('#', ...) do
+		local key = select(i, ...)
+		if keys then
+			keys = keys .. ", " .. GetBindingText(key, "KEY_")
+		else
+			keys = GetBindingText(key, "KEY_")
+		end
+	end
+	return keys
+end
+
+function ActionButton:GetBindings()
+	local type = actionButtonType or self.buttonType or 'ACTIONBUTTON'
+	local baseID = self:GetAttribute('action--base') or self:GetID()
+	local blizzKeys = getKeyStrings(GetBindingKey(type .. baseID))
+	local clickKeys = getKeyStrings(GetBindingKey(format('CLICK %s:LeftButton', self:GetName())))
+	
+	if blizzKeys then
+		if clickKeys then
+			return blizzKeys .. ', ' .. clickKeys
+		end
+		return blizzKeys
+	else
+		return clickKeys
+	end
 end
 
 function ActionButton:UpdateGrid()

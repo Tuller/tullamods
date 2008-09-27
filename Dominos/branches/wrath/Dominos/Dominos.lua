@@ -50,6 +50,26 @@ function Dominos:OnInitialize()
 	if LBF then
 		LBF:RegisterSkinCallback('Dominos', self.OnSkin, self)
 	end
+	
+	--databroker launcher
+	local LDB = LibStub:GetLibrary("LibDataBroker-1.1")
+	if LDB then
+		local dataobj = LibStub:GetLibrary("LibDataBroker-1.1"):NewDataObject("Dominos", {
+			type = "launcher",
+			icon = "Interface\\Addons\\Dominos\\Dominos",
+			OnClick = function(_, button) 
+				if button == 'LeftButton' then
+					if IsModifierKeyDown() then
+						kb:Toggle()
+					else
+						self:ToggleLockedFrames()
+					end
+				else
+					self:ShowOptions() 
+				end
+			end,
+		})
+	end
 
 	--hide blizzard junk
 	self:HideBlizzard()
@@ -80,7 +100,7 @@ function Dominos:GetDefaults()
 
 			classStyle = {'Entropy: Silver', 0.5, nil},
 
---			bagStyle = {'Entropy: Bronze', 0.5, nil},
+			bagStyle = {'Entropy: Bronze', 0.5, nil},
 
 			frames = {}
 		}
@@ -120,7 +140,7 @@ function Dominos:Load()
 		bf:Group('Dominos', 'Action Bar'):Skin(unpack(self.db.profile.ab.style))
 		bf:Group('Dominos', 'Pet Bar'):Skin(unpack(self.db.profile.petStyle))
 		bf:Group('Dominos', 'Class Bar'):Skin(unpack(self.db.profile.classStyle))
---		bf:Group('Dominos', 'Bag Bar'):Skin(unpack(self.db.profile.bagStyle))
+		-- bf:Group('Dominos', 'Bag Bar'):Skin(unpack(self.db.profile.bagStyle))
 	end
 
 	--load in extra functionality
@@ -194,6 +214,8 @@ function Dominos:OnSkin(skin, glossAlpha, gloss, group, _, colors)
 		styleDB = self.db.profile.petStyle
 	elseif group == 'Class Bar' then
 		styleDB = self.db.profile.classStyle
+	-- elseif group == 'Bag Bar' then
+		-- styleDB = self.db.profile.bagStyle
 	end
 
 	if styleDB then

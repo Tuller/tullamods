@@ -4,7 +4,7 @@
 --]]
 
 --libs and omgspeed
---local LBF = LibStub('LibButtonFacade', true)
+-- local LBF = LibStub('LibButtonFacade', true)
 
 local NT_RATIO = 64/37
 
@@ -12,6 +12,9 @@ local NT_RATIO = 64/37
 local bags = {}
 do
 	local function Add(b)
+		-- if LBF then
+			-- LBF:Group('Dominos', 'Bag Bar'):AddButton(b)
+		-- end
 		table.insert(bags, b)
 	end
 
