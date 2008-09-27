@@ -8,7 +8,7 @@ local CombuctorSets = Combuctor:GetModule('Sets')
 
 function BottomTab:New(parent, id)
 	local tab = self:Bind(CreateFrame('Button', parent:GetName() .. 'Tab' .. id, parent, 'CombuctorFrameTabButtonTemplate'))
-	tab:SetFrameStrata('LOW')
+--	tab:SetFrameStrata('LOW')
 	tab:SetScript('OnClick', self.OnClick)
 	tab:SetID(id)
 
@@ -101,6 +101,7 @@ function BottomFilter:UpdateFilters()
 		end
 
 		PanelTemplates_SetNumTabs(self, numFilters)
+		PanelTemplates_SetTab(self, 1)
 	--at most one filter active, hide all tabs
 	else
 		for _,button in pairs(self.buttons) do

@@ -75,7 +75,6 @@ do
 		f.titleText = titleText
 
 		f.bagButtons = {}
-		f.tabs = {}
 		f.filter = {}
 
 		f:SetWidth(settings.w or BASE_WIDTH)

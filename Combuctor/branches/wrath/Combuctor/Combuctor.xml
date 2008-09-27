@@ -4,7 +4,13 @@
 		Widget Templates
 	-->
 
-	<Button name="CombuctorFrameTabButtonTemplate" inherits="CharacterFrameTabButtonTemplate" virtual="true"/>
+	<Button name="CombuctorFrameTabButtonTemplate" inherits="CharacterFrameTabButtonTemplate" virtual="true">
+		<Scripts>
+			<OnLoad>
+				self:SetFrameLevel(self:GetFrameLevel() + 4);
+			</OnLoad>
+		</Scripts>
+	</Button>
 
 	<Button name="CombuctorIconButtonTemplate" virtual="true">
 		<Size x="64" y="64"/>
