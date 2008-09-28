@@ -13,7 +13,7 @@ local buttons = {VehicleMenuBarLeaveButton, VehicleMenuBarPitchUpButton, Vehicle
 
 function VehicleBar:New()
 	local f = self.super.New(self, 'vehicle')
-	f:SetShowStates('[bonusbar:5,target=vehicle,exists]')
+	f:SetShowStates('[target=vehicle,exists]')
 	f:SkinButtons()
 	f:LoadButtons()
 	f:Layout()

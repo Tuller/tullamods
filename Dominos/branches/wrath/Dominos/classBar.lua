@@ -246,12 +246,10 @@ function ClassBar:RemoveButton(i)
 end
 
 function ClassBar:UpdateForms()
-	self.sets.numButtons = GetNumShapeshiftForms()
-
 	for i = 1, self.sets.numButtons do
 		local b = self.buttons[i] or self:AddButton(i)
 		b:UpdateSpell()
 		b:Show()
 	end
-	self:Layout()
+	self:SetNumButtons(GetNumShapeshiftForms())
 end
