@@ -133,6 +133,7 @@ function Dominos:Load()
 	self.PetBar:New()
 	self.BagBar:New()
 	self.MenuBar:New()
+	self.VehicleBar:New()
 
 	--button facade support
 	local bf = LibStub('LibButtonFacade', true)
