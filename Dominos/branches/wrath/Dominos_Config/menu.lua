@@ -369,7 +369,14 @@ end
 --columns
 do
 	local function Slider_OnShow(self)
-		self:SetMinMaxValues(1, self:GetParent().owner:NumButtons())
+		local min, max = 1, self:GetParent().owner:NumButtons()
+		if max > min then
+			BlizzardOptionsPanel_Slider_Enable(self)
+			self:SetMinMaxValues(min, max)
+		else
+			BlizzardOptionsPanel_Slider_Disable(self)
+			self:SetMinMaxValues(1, 1)
+		end
 		self:SetValue(self:GetParent().owner:NumColumns())
 	end
 
