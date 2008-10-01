@@ -3,12 +3,11 @@
 		Used to filter within categories
 --]]
 
-local BottomTab = Combuctor:CreateClass('Button')
+local BottomTab = Combuctor:NewClass('Button')
 local CombuctorSets = Combuctor:GetModule('Sets')
 
 function BottomTab:New(parent, id)
 	local tab = self:Bind(CreateFrame('Button', parent:GetName() .. 'Tab' .. id, parent, 'CombuctorFrameTabButtonTemplate'))
---	tab:SetFrameStrata('LOW')
 	tab:SetScript('OnClick', self.OnClick)
 	tab:SetID(id)
 
@@ -52,7 +51,7 @@ end
 	Side Filter Object
 --]]
 
-local BottomFilter = Combuctor:CreateClass('Frame')
+local BottomFilter = Combuctor:NewClass('Frame')
 Combuctor.BottomFilter = BottomFilter
 
 function BottomFilter:New(parent)

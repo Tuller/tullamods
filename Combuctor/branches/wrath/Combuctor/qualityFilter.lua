@@ -3,7 +3,7 @@
 		used for setting what quality of items to show
 --]]
 
-local FilterButton = Combuctor:CreateClass('Button')
+local FilterButton = Combuctor:NewClass('Button')
 local SIZE = 20
 local _G = getfenv(0)
 
@@ -70,7 +70,7 @@ end
 	QualityFilter, A group of filter buttons
 --]]
 
-local QualityFilter = Combuctor:CreateClass('Frame')
+local QualityFilter = Combuctor:NewClass('Frame')
 Combuctor.QualityFilter = QualityFilter
 
 function QualityFilter:New(parent)

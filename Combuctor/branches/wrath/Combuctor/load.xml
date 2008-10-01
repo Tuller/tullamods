@@ -6,6 +6,7 @@
 	<Script file="events.lua"/>
 	<Script file="sets.lua"/>
 	<Script file="item.lua"/>
+	<Script file="itemFrameEvents.lua"/>
 	<Script file="itemFrame.lua"/>
 	<Script file="bag.lua"/>
 	<Script file="money.lua"/>
@@ -13,6 +14,7 @@
 	<Script file="sideFilter.lua"/>
 	<Script file="bottomFilter.lua"/>
 	<Script file="setData.lua"/>
+	<Script file="frameEvents.lua"/>
 	<Script file="frame.lua"/>
 	
 	<Include file="Combuctor.xml"/>

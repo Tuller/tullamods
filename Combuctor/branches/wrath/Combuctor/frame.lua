@@ -1,61 +1,16 @@
 --[[
 	frame.lua
-		A combuctor frame
+		A combuctor frame object
 --]]
 
-local CombuctorFrame = Combuctor:NewModule('Frame', 'AceEvent-3.0')
+local InventoryFrame  = Combuctor:NewClass('Frame')
+Combuctor.Frame = InventoryFrame
 
+--local references
 local _G = getfenv(0)
 local L = LibStub('AceLocale-3.0'):GetLocale('Combuctor')
 
-function CombuctorFrame:OnEnable()
-	self:RegisterMessage('COMBUCTOR_BAG_TYPE_CHANGED')
-end
-
-function CombuctorFrame:COMBUCTOR_BAG_TYPE_CHANGED(msg, bag)
-	if self.frames then
-		for frame in pairs(self.frames) do
-			for _,bagID in pairs(frame.sets.bags) do
-				if bag == bagID then
-					frame.needsBagUpdate = true
-					break
-				end
-			end
-		end
-		self.obj:Show()
-	end
-end
-
-function CombuctorFrame:New(...)
-	local frame = self.obj:New(...)
-
-	if not self.frames then
-		self.frames = {}
-	end
-	self.frames[frame] = true
-
-	return frame
-end
-
-function CombuctorFrame:UpdateBagSets()
-	for frame in pairs(self.frames) do
-		if frame.needsBagUpdate then
-			frame.needsBagUpdate = nil
-			frame:GenerateBagSets()
-		end
-	end
-end
-
-
---[[
-	Inventory Frame Object
---]]
-
-
-local InventoryFrame  = Combuctor:CreateClass('Frame')
-CombuctorFrame.obj = InventoryFrame
-
---constants that define frame sizes
+--constants
 local BASE_WIDTH = 384
 local ITEM_FRAME_WIDTH_OFFSET = 312 - BASE_WIDTH
 local BASE_HEIGHT = 512
@@ -63,49 +18,48 @@ local ITEM_FRAME_HEIGHT_OFFSET = 346 - BASE_HEIGHT
 
 
 --frame constructor
-do
-	local lastID = 1
-	function InventoryFrame:New(titleText, settings, isBank)
-		local f = self:Bind(CreateFrame('Frame', format('CombuctorFrame%d', lastID), UIParent, 'CombuctorInventoryTemplate'))
-		f:SetScript('OnShow', self.OnShow)
-		f:SetScript('OnHide', self.OnHide)
+local lastID = 1
+function InventoryFrame:New(titleText, settings, isBank)
+	local f = self:Bind(CreateFrame('Frame', format('CombuctorFrame%d', lastID), UIParent, 'CombuctorInventoryTemplate'))
+	f:SetScript('OnShow', self.OnShow)
+	f:SetScript('OnHide', self.OnHide)
 
-		f.sets = settings
-		f.isBank = isBank
-		f.titleText = titleText
+	f.sets = settings
+	f.isBank = isBank
+	f.titleText = titleText
 
-		f.bagButtons = {}
-		f.filter = {}
+	f.bagButtons = {}
+	f.filter = {}
 
-		f:SetWidth(settings.w or BASE_WIDTH)
-		f:SetHeight(settings.h or BASE_HEIGHT)
+	f:SetWidth(settings.w or BASE_WIDTH)
+	f:SetHeight(settings.h or BASE_HEIGHT)
 
-		f.title = _G[f:GetName() .. 'Title']
+	f.title = _G[f:GetName() .. 'Title']
 
-		f.sideFilter = Combuctor.SideFilter:New(f)
-		f.bottomFilter = Combuctor.BottomFilter:New(f)
+	f.sideFilter = Combuctor.SideFilter:New(f)
+	f.bottomFilter = Combuctor.BottomFilter:New(f)
 
-		f.nameFilter = _G[f:GetName() .. 'Search']
+	f.nameFilter = _G[f:GetName() .. 'Search']
 
-		f.qualityFilter = Combuctor.QualityFilter:New(f)
-		f.qualityFilter:SetPoint('BOTTOMLEFT', 24, 65)
+	f.qualityFilter = Combuctor.QualityFilter:New(f)
+	f.qualityFilter:SetPoint('BOTTOMLEFT', 24, 65)
 
-		f.itemFrame = Combuctor:GetModule('ItemFrame'):New(f)
-		f.itemFrame:SetPoint('TOPLEFT', 24, -78)
+	f.itemFrame = Combuctor.ItemFrame:New(f)
+	f.itemFrame:SetPoint('TOPLEFT', 24, -78)
 
-		f.moneyFrame = Combuctor.MoneyFrame:New(f)
-		f.moneyFrame:SetPoint('BOTTOMRIGHT', -40, 67)
+	f.moneyFrame = Combuctor.MoneyFrame:New(f)
+	f.moneyFrame:SetPoint('BOTTOMRIGHT', -40, 67)
 
-		f:UpdateTitleText()
-		f:UpdateBagFrame()
-		f:LoadPosition()
+	f:UpdateTitleText()
+	f:UpdateBagFrame()
+	f:LoadPosition()
 
-		lastID = lastID + 1
+	lastID = lastID + 1
 
-		table.insert(UISpecialFrames, f:GetName())
-
-		return f
-	end
+	table.insert(UISpecialFrames, f:GetName())
+	Combuctor:GetModule('InventoryFrameEvents'):Register(f)
+	
+	return f
 end
 
 
@@ -132,7 +86,7 @@ end
 
 function InventoryFrame:OnBagToggleClick(toggle, button)
 	if button == 'LeftButton' then
-		getglobal(toggle:GetName() .. "Icon"):SetTexCoord(0.075, 0.925, 0.075, 0.925)
+		_G[toggle:GetName() .. "Icon"]:SetTexCoord(0.075, 0.925, 0.075, 0.925)
 		self:ToggleBagFrame()
 	else
 		if self.isBank then
@@ -217,8 +171,6 @@ function InventoryFrame:SetPlayer(player)
 		self.player = player
 		self:UpdateBagFrame()
 		self:UpdateTitleText()
---		self:UpdateSets()
---		self:UpdateSubSets()
 
 		self.itemFrame:SetPlayer(player)
 		self.moneyFrame:Update()

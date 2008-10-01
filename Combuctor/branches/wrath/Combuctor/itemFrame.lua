@@ -1,102 +1,18 @@
 --[[
-	Combuctor.lua
-		The combuctor frame
+	itemFrame.lua
+		A thingy that displays items
 --]]
 
-local CombuctorItemFrame = Combuctor:NewModule('ItemFrame', 'AceEvent-3.0')
-CombuctorItemFrame.obj = Combuctor:CreateClass('Button')
+local ItemFrame = Combuctor:NewClass('Button')
+Combuctor.ItemFrame = ItemFrame
 
-local CombuctorItem = Combuctor.Item
-local CombuctorUtil = Combuctor:GetModule('Utility')
-local listeners = {}
-local currentPlayer = UnitName('player')
-
-
---[[
-	Module Functions
---]]
-
-function CombuctorItemFrame:OnEnable()
-	--hacky code to perform delayed updates
-	self.obj:Hide()
-	self.obj:SetScript('OnUpdate', function() self:LayoutFrames(); self.obj:Hide() end)
-
-	self:RegisterEvent('BAG_UPDATE_COOLDOWN', 'UpdateSlotCooldowns')
-
-	self:RegisterMessage('COMBUCTOR_SLOT_ADD', 'UpdateSlot')
-	self:RegisterMessage('COMBUCTOR_SLOT_REMOVE', 'RemoveItem')
-	self:RegisterMessage('COMBUCTOR_SLOT_UPDATE', 'UpdateSlot')
-	self:RegisterMessage('COMBUCTOR_SLOT_UPDATE_LOCK', 'UpdateSlotLock')
-
-	self:RegisterMessage('COMBUCTOR_BANK_OPENED', 'UpdateBankFrames')
-	self:RegisterMessage('COMBUCTOR_BANK_CLOSED', 'UpdateBankFrames')
-end
-
-function CombuctorItemFrame:New(parent)
-	return self.obj:New(parent)
-end
-
-function CombuctorItemFrame:UpdateSlot(msg, ...)
-	for frame in pairs(listeners) do
-		if frame:GetPlayer() == currentPlayer then
-			if frame:UpdateSlot(...) then
-				frame.needsLayout = true
-				self.obj:Show()
-			end
-		end
-	end
-end
-
-function CombuctorItemFrame:RemoveItem(msg, ...)
-	for frame in pairs(listeners) do
-		if frame:GetPlayer() == currentPlayer then
-			if frame:RemoveItem(...) then
-				frame.needsLayout = true
-				self.obj:Show()
-			end
-		end
-	end
-end
-
-function CombuctorItemFrame:UpdateSlotLock(msg, ...)
-	for frame in pairs(listeners) do
-		if frame:GetPlayer() == currentPlayer then
-			frame:UpdateSlotLock(...)
-		end
-	end
-end
-
-function CombuctorItemFrame:UpdateSlotCooldowns(msg, ...)
-	for frame in pairs(listeners) do
-		if frame:GetPlayer() == currentPlayer then
-			frame:UpdateSlotCooldowns()
-		end
-	end
-end
-
-function CombuctorItemFrame:UpdateBankFrames()
-	for frame in pairs(listeners) do
-		if frame.isBank then
-			frame:Regenerate()
-		end
-	end
-end
-
-function CombuctorItemFrame:LayoutFrames()
-	for frame in pairs(listeners) do
-		if frame.needsLayout then
-			frame.needsLayout = nil
-			frame:Layout()
-		end
-	end
-end
+--local bindings
+local FrameEvents = Combuctor:GetModule('ItemFrameEvents')
+local Util = Combuctor:GetModule('Utility')
+local Item = Combuctor.Item
 
 
---[[
-	ItemFrame Widget
---]]
-
---local functions
+--utility functions
 local function ToIndex(bag, slot)
 	return (bag<0 and bag*100 - slot) or (bag*100 + slot)
 end
@@ -105,11 +21,13 @@ local function ToBag(index)
 	return (index > 0 and floor(index/100)) or ceil(index/100)
 end
 
-local ItemFrame = CombuctorItemFrame.obj
+
+--[[
+	Constructor
+--]]
 
 function ItemFrame:New(parent)
-	local f = self:Bind(CreateFrame('Button'))
-	f:SetParent(parent)
+	local f = self:Bind(CreateFrame('Button', nil, parent))
 	f.items = {}
 	f.bags = parent.sets.bags
 	f.filter = parent.filter
@@ -130,11 +48,15 @@ function ItemFrame:OnShow()
 end
 
 function ItemFrame:UpdateListening()
-	listeners[self] = self:IsVisible()
+	if self:IsVisible() then
+		FrameEvents:Register(self)
+	else
+		FrameEvents:Unregister(self)
+	end
 end
 
 
---[[ Player Selection ]]--
+--[[ Player Filtering ]]--
 
 function ItemFrame:SetPlayer(player)
 	self.player = player
@@ -166,8 +88,8 @@ function ItemFrame:HasItem(bag, slot, link)
 	local f = self.filter
 	if next(f) then
 		local player = self:GetPlayer()
-		local link = link or CombuctorUtil:GetItemLink(bag, slot, player)
-		local bagType = CombuctorUtil:GetBagType(bag, player)
+		local link = link or Util:GetItemLink(bag, slot, player)
+		local bagType = Util:GetBagType(bag, player)
 
 		local name, quality, level, ilvl, type, subType, stackCount, equipLoc
 		if link then
@@ -217,7 +139,7 @@ function ItemFrame:AddItem(bag, slot)
 		item:Update()
 		item:Highlight(self.highlightBag == bag)
 	else
-		local item = CombuctorItem:Get()
+		local item = Item:Get()
 		item:Set(self, bag, slot)
 		item:Highlight(self.highlightBag == bag)
 
@@ -267,7 +189,9 @@ function ItemFrame:UpdateSlotCooldowns()
 end
 
 
---[[ Mass Item Changes ]]--
+--[[
+	Mass Item Changes
+--]]
 
 --update all items and layout the frame
 function ItemFrame:Regenerate()
@@ -275,7 +199,7 @@ function ItemFrame:Regenerate()
 	local player = self:GetPlayer()
 
 	for _,bag in pairs(self.bags) do
-		for slot = 1, CombuctorUtil:GetBagSize(bag, player) do
+		for slot = 1, Util:GetBagSize(bag, player) do
 			if self:UpdateSlot(bag, slot) then
 				changed = true
 			end
@@ -295,7 +219,7 @@ function ItemFrame:SetBags(newBags)
 	--go through newbags and determine if we have bank slots or not
 	self.isBank = false
 	for _,bag in pairs(newBags) do
-		if CombuctorUtil:IsBankBag(bag) then
+		if Util:IsBankBag(bag) then
 			self.isBank = true
 			break
 		end
@@ -350,7 +274,7 @@ function ItemFrame:AddBag(bag, layout)
 	local player = self:GetPlayer()
 	local changed = false
 
-	for slot = 1, CombuctorUtil:GetBagSize(bag, player) do
+	for slot = 1, Util:GetBagSize(bag, player) do
 		if self:UpdateSlot(bag, slot) then
 			changed = true
 		end
@@ -430,7 +354,7 @@ function ItemFrame:Layout(spacing)
 	local i = 0
 
 	for _,bag in ipairs(self.bags) do
-		for slot = 1, CombuctorUtil:GetBagSize(bag, player) do
+		for slot = 1, Util:GetBagSize(bag, player) do
 			local item = items[ToIndex(bag, slot)]
 			if item then
 				i = i + 1
@@ -457,15 +381,18 @@ function ItemFrame:HighlightBag(bag)
 end
 
 
---[[ Item Placement Functions ]]--
+--[[
+	Item Placement Functionality
+--]]
 
 --places the item in the first available slot in the current player's visible bags
---TODO: make this work on tabs? also make this smarter
+--todo: make smarter
 function ItemFrame:PlaceItem()
 	if CursorHasItem() then
 		local player = self:GetPlayer()
 		for _,bag in ipairs(self.bags) do
-			if not CombuctorUtil:IsCachedBag(bag, player) then
+			--this check is basically in case i decide, "you know what would be awesome? bank and items in the same frame" again
+			if not Util:IsCachedBag(bag, player) then
 				for slot = 1, GetContainerNumSlots(bag) do
 					if not GetContainerItemLink(bag, slot) then
 						PickupContainerItem(bag, slot)

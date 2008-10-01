@@ -46,11 +46,9 @@ function Combuctor:OnInitialize()
 end
 
 function Combuctor:OnEnable()
-	local Frame = self:GetModule('Frame')
-
 	self.frames = {
-		Frame:New(L.InventoryTitle, self.db.profile.inventory),
-		Frame:New(L.BankTitle, self.db.profile.bank, true)
+		self.Frame:New(L.InventoryTitle, self.db.profile.inventory),
+		self.Frame:New(L.BankTitle, self.db.profile.bank, true)
 	}
 
 	self:HookBagEvents()
@@ -226,7 +224,7 @@ function Combuctor:GetMaxItemScale()
 end
 
 --utility function: create a widget class
-function Combuctor:CreateClass(type, parentClass)
+function Combuctor:NewClass(type, parentClass)
 	local class = CreateFrame(type)
 	class.mt = {__index = class}
 

@@ -1,14 +1,14 @@
 --[[
-	Combuctor\moneyFrame.lua
-		Money frames for Combuctor windows
+	moneyFrame.lua
+		A money frame object
 --]]
 
-local CombuctorMoneyFrame = Combuctor:CreateClass('Frame')
-Combuctor.MoneyFrame = CombuctorMoneyFrame
+local MoneyFrame = Combuctor:NewClass('Frame')
+Combuctor.MoneyFrame = MoneyFrame
 
 local L = LibStub('AceLocale-3.0'):GetLocale('Combuctor')
 
-function CombuctorMoneyFrame:New(parent)
+function MoneyFrame:New(parent)
 	local f = self:Bind(CreateFrame('Frame', parent:GetName() .. 'MoneyFrame', parent, 'SmallMoneyFrameTemplate'))
 	f:SetScript('OnShow', self.Update)
 	f:Update()
@@ -24,7 +24,7 @@ function CombuctorMoneyFrame:New(parent)
 	return f
 end
 
-function CombuctorMoneyFrame:Update()
+function MoneyFrame:Update()
 	local player = self:GetParent():GetPlayer()
 	if player == UnitName('player') or not BagnonDB then
 		MoneyFrame_Update(self:GetName(), GetMoney())
@@ -34,7 +34,7 @@ function CombuctorMoneyFrame:Update()
 end
 
 --frame events
-function CombuctorMoneyFrame:OnClick()
+function MoneyFrame:OnClick()
 	local parent = self:GetParent()
 	local name = parent:GetName()
 
@@ -50,7 +50,7 @@ function CombuctorMoneyFrame:OnClick()
 	end
 end
 
-function CombuctorMoneyFrame:OnEnter()
+function MoneyFrame:OnEnter()
 	if BagnonDB then
 		GameTooltip:SetOwner(self, 'ANCHOR_TOPRIGHT')
 		GameTooltip:SetText(format(L.TotalOnRealm, GetRealmName()))
@@ -65,6 +65,6 @@ function CombuctorMoneyFrame:OnEnter()
 	end
 end
 
-function CombuctorMoneyFrame:OnLeave()
+function MoneyFrame:OnLeave()
 	GameTooltip:Hide()
 end

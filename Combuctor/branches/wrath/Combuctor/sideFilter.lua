@@ -7,7 +7,7 @@
 	A side filter button, switches parent filters on click
 --]]
 
-local SideFilterButton = Combuctor:CreateClass('CheckButton')
+local SideFilterButton = Combuctor:NewClass('CheckButton')
 do
 	local nextID = 0
 
@@ -51,7 +51,7 @@ end
 	Side Filter Object
 --]]
 
-local SideFilter = Combuctor:CreateClass('Frame')
+local SideFilter = Combuctor:NewClass('Frame')
 Combuctor.SideFilter = SideFilter
 local CombuctorSets = Combuctor:GetModule('Sets')
 
