@@ -1,6 +1,6 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
-	<Script file="localization.lua"/>
-	<Script file="localization.zhCN.lua"/>
+	<Script file="localization\localization.lua"/>
+	<Script file="localization\localization.zhCN.lua"/>
 	<Script file="Combuctor.lua"/>
 	<Script file="utility.lua"/>
 	<Script file="events.lua"/>
