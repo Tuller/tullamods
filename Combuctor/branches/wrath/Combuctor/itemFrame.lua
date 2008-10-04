@@ -21,10 +21,6 @@ local function ToBag(index)
 	return (index > 0 and floor(index/100)) or ceil(index/100)
 end
 
-local function print(...)
-	_G.print('ItemFrame:     ', ...)
-end
-
 
 --[[
 	Constructor
@@ -66,8 +62,6 @@ end
 --[[ Player Filtering ]]--
 
 function ItemFrame:SetPlayer(player)
-	print('SetPlayer', player)
-
 	self.player = player
 	self:ReloadAllItems()
 end
@@ -202,8 +196,6 @@ end
 
 --update all items and layout the frame
 function ItemFrame:Regenerate()
-	print('Regenerate')
-
 	local changed = false
 	local player = self:GetPlayer()
 
@@ -222,8 +214,6 @@ end
 
 --remove all items from the frame
 function ItemFrame:RemoveAllItems()
-	print('RemoveAllItems')
-
 	local items = self.items
 	local changed = true
 
@@ -239,8 +229,6 @@ end
 
 --completely regenerate the frame
 function ItemFrame:ReloadAllItems()
-	print('ReloadAllItems')
-
 	if self:RemoveAllItems() and self:IsVisible() then
 		self:Regenerate()
 	end
@@ -263,8 +251,6 @@ end
 --layout all the item buttons, scaling ot fit inside the fram
 --todo: dividers for bags v bank
 function ItemFrame:Layout(spacing)
-	print('Layout')
-
 	local width, height = self:GetWidth(), self:GetHeight()
 	local spacing = spacing or 2
 	local count = self.count

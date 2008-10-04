@@ -3,9 +3,7 @@
 		Used for setting what types of items to show
 --]]
 
---[[
-	A side filter button, switches parent filters on click
---]]
+--[[ A side filter button, switches parent filters on click ]]--
 
 local SideFilterButton = Combuctor:NewClass('CheckButton')
 do
