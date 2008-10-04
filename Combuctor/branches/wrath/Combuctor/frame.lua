@@ -178,6 +178,7 @@ function InventoryFrame:SetPlayer(player)
 		self:UpdateBagFrame()
 		self:UpdateTitleText()
 		self.sideFilter:UpdateFilters()
+		self.bottomFilter:UpdateFilters()
 		self.moneyFrame:Update()
 		self.itemFrame:SetPlayer(player)
 	end
