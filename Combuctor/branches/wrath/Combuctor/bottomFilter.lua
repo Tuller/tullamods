@@ -54,10 +54,6 @@ end
 local BottomFilter = Combuctor:NewClass('Frame')
 Combuctor.BottomFilter = BottomFilter
 
-local function print(...)
-	_G.print('BottomFilter:     ', ...)
-end
-
 function BottomFilter:New(parent)
 	local f = self:Bind(CreateFrame('Frame', parent:GetName() .. 'BottomFilter', parent))
 
@@ -79,8 +75,6 @@ function BottomFilter:New(parent)
 end
 
 function BottomFilter:UpdateFilters()
-	print('UpdateFilters')
-
 	local numFilters = 0
 	local parent = self:GetParent()
 	local currentSet = parent:GetCategory()
@@ -111,6 +105,7 @@ function BottomFilter:UpdateFilters()
 		self:Hide()
 	end
 	
+	self:GetParent():SetSubCategory(self.buttons[1].set)
 	self:GetParent():UpdateClampInsets()
 end
 

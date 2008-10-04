@@ -44,6 +44,7 @@ end
 function ItemFrame:OnShow()
 	self:UpdateUpdatable()
 	self:Regenerate()
+--	self:TriggerLayout()
 end
 
 function ItemFrame:OnHide()
@@ -196,6 +197,9 @@ end
 
 --update all items and layout the frame
 function ItemFrame:Regenerate()
+	--no need to regenerate if we're hidden, since we're forcing one when shown
+	if not self:IsVisible() then return end
+
 	local changed = false
 	local player = self:GetPlayer()
 

@@ -9,9 +9,6 @@ Combuctor.Frame = InventoryFrame
 --local references
 local _G = getfenv(0)
 local L = LibStub('AceLocale-3.0'):GetLocale('Combuctor')
-local function print(...)
-	_G.print('Frame:     ', ...)
-end
 
 --constants
 local BASE_WIDTH = 384
@@ -62,7 +59,6 @@ function InventoryFrame:New(titleText, settings, isBank, key)
 	f:UpdateBagFrame()
 	
 	--place the frame
-	f.bottomFilter:UpdateFilters()
 	f.sideFilter:UpdateFilters()
 	f:LoadPosition()
 
@@ -181,7 +177,6 @@ function InventoryFrame:SetPlayer(player)
 		self.player = player
 		self:UpdateBagFrame()
 		self:UpdateTitleText()
-		self.bottomFilter:UpdateFilters()
 		self.sideFilter:UpdateFilters()
 		self.moneyFrame:Update()
 		self.itemFrame:SetPlayer(player)
@@ -228,14 +223,10 @@ end
 
 --general
 function InventoryFrame:SetCategory(set)
-	print('SetCategory', set.name)
-
 	if self:SetFilter('rule', set.rule) then
 		self.category = set.name
 		self.sideFilter:UpdateHighlight()
-
 		self.bottomFilter:UpdateFilters()
-		self:SetSubCategory(self.bottomFilter.buttons[1].set)
 	end
 end
 
@@ -244,8 +235,6 @@ function InventoryFrame:GetCategory()
 end
 
 function InventoryFrame:SetSubCategory(set)
-	print('SetSubCategory', set.name)
-
 	if self:SetFilter('subRule', set.rule) then
 		self.subCategory = set.name
 		self.bottomFilter:UpdateHighlight()
@@ -253,7 +242,7 @@ function InventoryFrame:SetSubCategory(set)
 end
 
 function InventoryFrame:GetSubCategory()
-	return self.subCategory or L.Normal
+	return self.subCategory or L.All
 end
 
 

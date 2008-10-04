@@ -104,6 +104,7 @@ function SideFilter:UpdateFilters()
 		self:Hide()
 	end
 	
+	self:GetParent():SetCategory(self.buttons[1].set)
 	self:GetParent():UpdateClampInsets()
 end
 
