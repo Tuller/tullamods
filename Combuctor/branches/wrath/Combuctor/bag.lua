@@ -8,7 +8,7 @@ Combuctor.Bag = Bag
 
 --local bindings
 local L = LibStub('AceLocale-3.0'):GetLocale('Combuctor')
-local Util = Combuctor:GetModule('Utility')
+local InvData = Combuctor:GetModule('InventoryData')
 
 
 --[[ Constructor/Destructor ]]--
@@ -87,7 +87,7 @@ function Bag:Set(parent, id)
 		self:RegisterEvent('BAG_UPDATE')
 		self:RegisterEvent('PLAYERBANKSLOTS_CHANGED')
 
-		if Util:IsBankBag(self:GetID()) then
+		if InvData:IsBankBag(self:GetID()) then
 			self:RegisterEvent('BANKFRAME_OPENED')
 			self:RegisterEvent('BANKFRAME_CLOSED')
 			self:RegisterEvent('PLAYERBANKBAGSLOTS_CHANGED')
@@ -112,7 +112,7 @@ end
 function Bag:OnEvent(event)
 	if event == 'BANKFRAME_OPENED' or event == 'BANKFRAME_CLOSED' then
 		self:Update()
-	elseif not Util:IsCachedBag(self:GetID(), self:GetParent():GetPlayer()) then
+	elseif not InvData:IsCachedBag(self:GetID(), self:GetParent():GetPlayer()) then
 		if event == 'ITEM_LOCK_CHANGED' then
 			self:UpdateLock()
 		elseif event == 'CURSOR_UPDATE' then
@@ -146,10 +146,10 @@ function Bag:Update()
 end
 
 function Bag:UpdateLock()
-	local bagID = self:GetID()
+	local id = self:GetID()
 	local player = self:GetParent():GetPlayer()
 
-	if IsInventoryItemLocked(Util:GetInvSlot(bagID)) and not Util:IsCachedBag(bagID, player) then
+	if IsInventoryItemLocked(InvData:GetInvSlot(id)) and not InvData:IsCachedBag(id, player) then
 		getglobal(self:GetName() .. 'IconTexture'):SetDesaturated(true)
 	else
 		getglobal(self:GetName() .. 'IconTexture'):SetDesaturated(false)
@@ -157,8 +157,8 @@ function Bag:UpdateLock()
 end
 
 function Bag:UpdateCursor()
-	local invID = Util:GetInvSlot(self:GetID())
-	if CursorCanGoInSlot(invID) then
+	local invSlot = InvData:GetInvSlot(self:GetID())
+	if CursorCanGoInSlot(invSlot) then
 		self:LockHighlight()
 	else
 		self:UnlockHighlight()
@@ -167,54 +167,68 @@ end
 
 --actually, update texture and count
 function Bag:UpdateTexture()
-	local bagID = self:GetID()
-	if bagID > 0 then
-		local parent = self:GetParent()
-		local player = parent:GetPlayer()
-
-		if Util:IsCachedBag(bagID, player) then
+	local id = self:GetID()
+	if id > 0 then
+		if InvData:IsCachedBag(id, self:GetParent():GetPlayer()) then
 			if BagnonDB then
-				local link, count, texture = select(2, BagnonDB:GetBagData(self:GetID(), player))
-				if link then
-					self.hasItem = true
-					SetItemButtonTexture(self, texture)
-					SetItemButtonTextureVertexColor(self, 1, 1, 1)
-				else
-					SetItemButtonTexture(self, 'Interface/PaperDoll/UI-PaperDoll-Slot-Bag')
-
-					--color red if the bag can be purchased
-					local numBankSlots = BagnonDB:GetNumBankSlots(player)
-					if numBankSlots and bagID > (numBankSlots + 4) then
-						SetItemButtonTextureVertexColor(self, 1, 0.1, 0.1)
-					else
-						SetItemButtonTextureVertexColor(self, 1, 1, 1)
-					end
-
-					self.hasItem = nil
-				end
-				self:SetCount(count)
+				self:UpdateTextureFromCache()
 			end
 		else
-			local texture = GetInventoryItemTexture('player', Util:GetInvSlot(self:GetID()))
-			if texture then
-				self.hasItem = true
-
-				SetItemButtonTexture(self, texture)
-				SetItemButtonTextureVertexColor(self, 1, 1, 1)
-			else
-				self.hasItem = nil
-
-				--color red if the bag can be purchased
-				SetItemButtonTexture(self, 'Interface/PaperDoll/UI-PaperDoll-Slot-Bag')
-				if bagID > (GetNumBankSlots() + 4) then
-					SetItemButtonTextureVertexColor(self, 1, 0.1, 0.1)
-				else
-					SetItemButtonTextureVertexColor(self, 1, 1, 1)
-				end
-			end
-			self:SetCount(GetInventoryItemCount('player', Util:GetInvSlot(self:GetID())))
+			self:UpdateTextureFromLive()
 		end
 	end
+end
+
+function Bag:UpdateTextureFromLive()
+	local id = self:GetID()
+	local texture = GetInventoryItemTexture('player', InvData:GetInvSlot(id))
+
+	if texture then
+		self.hasItem = true
+
+		SetItemButtonTexture(self, texture)
+		SetItemButtonTextureVertexColor(self, 1, 1, 1)
+	else
+		self.hasItem = nil
+
+		--color red if the bag can be purchased
+		SetItemButtonTexture(self, 'Interface/PaperDoll/UI-PaperDoll-Slot-Bag')
+		if id > (GetNumBankSlots() + 4) then
+			SetItemButtonTextureVertexColor(self, 1, 0.1, 0.1)
+		else
+			SetItemButtonTextureVertexColor(self, 1, 1, 1)
+		end
+	end
+
+	--update count
+	self:SetCount(GetInventoryItemCount('player', InvData:GetInvSlot(id)))
+end
+
+function Bag:UpdateTextureFromCache()
+	local id = self:GetID()
+	local player = self:GetParent():GetPlayer()
+
+	local size, link, count, texture = BagnonDB:GetBagData(id, player)
+	if link then
+		self.hasItem = true
+		SetItemButtonTexture(self, texture)
+		SetItemButtonTextureVertexColor(self, 1, 1, 1)
+	else
+		SetItemButtonTexture(self, 'Interface/PaperDoll/UI-PaperDoll-Slot-Bag')
+
+		--color red if the bag can be purchased
+		local numBankSlots = BagnonDB:GetNumBankSlots(player)
+		if numBankSlots and id > (numBankSlots + 4) then
+			SetItemButtonTextureVertexColor(self, 1, 0.1, 0.1)
+		else
+			SetItemButtonTextureVertexColor(self, 1, 1, 1)
+		end
+
+		self.hasItem = nil
+	end
+
+	--update count
+	self:SetCount(count)
 end
 
 function Bag:SetCount(count)
@@ -239,10 +253,10 @@ function Bag:OnClick(button)
 	local parent = self:GetParent()
 	local player = parent:GetPlayer()
 	local bagID = self:GetID()
-	local link = Util:GetBagLink(bagID, player)
+	local link = InvData:GetBagLink(bagID, player)
 
-	if not((link and HandleModifiedItemClick(link)) or Util:IsCachedBag(bagID, player)) then
-		if CursorHasItem() and not Util:IsCachedBag(bagID, player) then
+	if not((link and HandleModifiedItemClick(link)) or InvData:IsCachedBag(bagID, player)) then
+		if CursorHasItem() and not InvData:IsCachedBag(bagID, player) then
 			if bagID == KEYRING_CONTAINER then
 				PutKeyInKeyRing()
 			elseif bagID == BACKPACK_CONTAINER then
@@ -254,7 +268,7 @@ function Bag:OnClick(button)
 			self:PurchaseSlot()
 		elseif bagID > 0 then
 			PlaySound('BAGMENUBUTTONPRESS')
-			PickupBagFromSlot(Util:GetInvSlot(bagID))
+			PickupBagFromSlot(InvData:GetInvSlot(bagID))
 		end
 	end
 end
@@ -264,9 +278,9 @@ function Bag:OnDrag()
 	local player = parent:GetPlayer()
 	local bagID = self:GetID()
 
-	if not(Util:IsCachedBag(bagID, player) or bagID <= 0) then
+	if not(InvData:IsCachedBag(bagID, player) or bagID <= 0) then
 		PlaySound('BAGMENUBUTTONPRESS')
-		PickupBagFromSlot(Util:GetInvSlot(bagID))
+		PickupBagFromSlot(InvData:GetInvSlot(bagID))
 	end
 end
 
@@ -288,7 +302,7 @@ function Bag:OnEnter()
 	elseif bagID == KEYRING_CONTAINER then
 		GameTooltip:SetText(KEYRING, 1, 1, 1)
 	--cached bags
-	elseif Util:IsCachedBag(bagID, player) then
+	elseif InvData:IsCachedBag(bagID, player) then
 		if BagnonDB then
 			local link = select(2, BagnonDB:GetBagData(bagID, player))
 			if link then
@@ -309,7 +323,7 @@ function Bag:OnEnter()
 	else
 		--if we don't set a tooltip (meaning there's an item) then determine if the slot is just empty, or an unpurchased bank slot
 		--show the purchase cost if its unpurchased
-		if not GameTooltip:SetInventoryItem('player', Util:GetInvSlot(bagID)) then
+		if not GameTooltip:SetInventoryItem('player', InvData:GetInvSlot(bagID)) then
 			if bagID > (GetNumBankSlots() + 4) then
 				GameTooltip:SetText(BANK_BAG_PURCHASE, 1, 1, 1)
 				GameTooltip:AddLine(L.ClickToPurchase)
@@ -332,7 +346,7 @@ function Bag:OnLeave()
 end
 
 
---[[ Utility Functions ]]--
+--[[ InvDataity Functions ]]--
 
 --place the tooltip
 function Bag:AnchorTooltip()
@@ -351,9 +365,9 @@ function Bag:PurchaseSlot()
 			button1 = TEXT(YES),
 			button2 = TEXT(NO),
 
-			OnAccept = function() PurchaseSlot() end,
+			OnAccept = function(self) PurchaseSlot() end,
 
-			OnShow = function() MoneyFrame_Update(this:GetName().. 'MoneyFrame', GetBankSlotCost(GetNumBankSlots())) end,
+			OnShow = function(self) MoneyFrame_Update(self:GetName().. 'MoneyFrame', GetBankSlotCost(GetNumBankSlots())) end,
 
 			hasMoneyFrame = 1,
 			timeout = 0,

@@ -11,12 +11,12 @@ local L = LibStub('AceLocale-3.0'):GetLocale('Combuctor')
 
 --the all category (player, bagType filters)
 CombuctorSet:Register(L.All, 'Interface/Icons/INV_Misc_EngGizmos_17', function() return true end)
---CombuctorSet:RegisterSubSet(L.All, L.All)
+CombuctorSet:RegisterSubSet(L.All, L.All)
 CombuctorSet:RegisterSubSet(L.Normal, L.All, nil, function(player, bagType) return bagType == 0 end)
 CombuctorSet:RegisterSubSet(L.Trade, L.All, nil, function(player, bagType) return bagType > 4 and bagType ~= 256 end)
 CombuctorSet:RegisterSubSet(L.Shards, L.All, nil, function(player, bagType) return bagType == 4 end)
 CombuctorSet:RegisterSubSet(L.Ammo, L.All, nil, function(player, bagType) return bagType == 1 or bagType == 2 end)
---CombuctorSet:RegisterSubSet(L.Keys, L.All, nil, function(player, bagType) return bagType == 256 end)
+CombuctorSet:RegisterSubSet(L.Keys, L.All, nil, function(player, bagType) return bagType == 256 end)
 
 
 --equipment filters (armor, weapon, trinket)

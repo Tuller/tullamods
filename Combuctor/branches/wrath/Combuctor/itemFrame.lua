@@ -8,11 +8,11 @@ Combuctor.ItemFrame = ItemFrame
 
 --local bindings
 local FrameEvents = Combuctor:GetModule('ItemFrameEvents')
-local Util = Combuctor:GetModule('Utility')
+local InvData = Combuctor:GetModule('InventoryData')
 local Item = Combuctor.Item
 
 
---utility functions
+--InvDataity functions
 local function ToIndex(bag, slot)
 	return (bag<0 and bag*100 - slot) or (bag*100 + slot)
 end
@@ -88,8 +88,8 @@ function ItemFrame:HasItem(bag, slot, link)
 	local f = self.filter
 	if next(f) then
 		local player = self:GetPlayer()
-		local link = link or Util:GetItemLink(bag, slot, player)
-		local bagType = Util:GetBagType(bag, player)
+		local link = link or InvData:GetItemLink(bag, slot, player)
+		local bagType = InvData:GetBagType(bag, player)
 
 		local name, quality, level, ilvl, type, subType, stackCount, equipLoc
 		if link then
@@ -199,7 +199,7 @@ function ItemFrame:Regenerate()
 	local player = self:GetPlayer()
 
 	for _,bag in pairs(self.bags) do
-		for slot = 1, Util:GetBagSize(bag, player) do
+		for slot = 1, InvData:GetBagSize(bag, player) do
 			if self:UpdateSlot(bag, slot) then
 				changed = true
 			end
@@ -219,7 +219,7 @@ function ItemFrame:SetBags(newBags)
 	--go through newbags and determine if we have bank slots or not
 	self.isBank = false
 	for _,bag in pairs(newBags) do
-		if Util:IsBankBag(bag) then
+		if InvData:IsBankBag(bag) then
 			self.isBank = true
 			break
 		end
@@ -274,7 +274,7 @@ function ItemFrame:AddBag(bag, layout)
 	local player = self:GetPlayer()
 	local changed = false
 
-	for slot = 1, Util:GetBagSize(bag, player) do
+	for slot = 1, InvData:GetBagSize(bag, player) do
 		if self:UpdateSlot(bag, slot) then
 			changed = true
 		end
@@ -354,7 +354,7 @@ function ItemFrame:Layout(spacing)
 	local i = 0
 
 	for _,bag in ipairs(self.bags) do
-		for slot = 1, Util:GetBagSize(bag, player) do
+		for slot = 1, InvData:GetBagSize(bag, player) do
 			local item = items[ToIndex(bag, slot)]
 			if item then
 				i = i + 1
@@ -391,8 +391,8 @@ function ItemFrame:PlaceItem()
 	if CursorHasItem() then
 		local player = self:GetPlayer()
 		for _,bag in ipairs(self.bags) do
-			--this check is basically in case i decide, "you know what would be awesome? bank and items in the same frame" again
-			if not Util:IsCachedBag(bag, player) then
+			--this check is basically in case i decide, 'you know what would be awesome? bank and items in the same frame' again
+			if not InvData:IsCachedBag(bag, player) then
 				for slot = 1, GetContainerNumSlots(bag) do
 					if not GetContainerItemLink(bag, slot) then
 						PickupContainerItem(bag, slot)

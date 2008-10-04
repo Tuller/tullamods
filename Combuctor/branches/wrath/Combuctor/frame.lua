@@ -19,13 +19,14 @@ local ITEM_FRAME_HEIGHT_OFFSET = 346 - BASE_HEIGHT
 
 --frame constructor
 local lastID = 1
-function InventoryFrame:New(titleText, settings, isBank)
+function InventoryFrame:New(titleText, settings, isBank, key)
 	local f = self:Bind(CreateFrame('Frame', format('CombuctorFrame%d', lastID), UIParent, 'CombuctorInventoryTemplate'))
 	f:SetScript('OnShow', self.OnShow)
 	f:SetScript('OnHide', self.OnHide)
 
 	f.sets = settings
 	f.isBank = isBank
+	f.key = key --backthingy to get our sv index
 	f.titleText = titleText
 
 	f.bagButtons = {}
@@ -57,8 +58,7 @@ function InventoryFrame:New(titleText, settings, isBank)
 	lastID = lastID + 1
 
 	table.insert(UISpecialFrames, f:GetName())
-	Combuctor:GetModule('InventoryFrameEvents'):Register(f)
-	
+
 	return f
 end
 
@@ -86,7 +86,7 @@ end
 
 function InventoryFrame:OnBagToggleClick(toggle, button)
 	if button == 'LeftButton' then
-		_G[toggle:GetName() .. "Icon"]:SetTexCoord(0.075, 0.925, 0.075, 0.925)
+		_G[toggle:GetName() .. 'Icon']:SetTexCoord(0.075, 0.925, 0.075, 0.925)
 		self:ToggleBagFrame()
 	else
 		if self.isBank then
@@ -171,8 +171,10 @@ function InventoryFrame:SetPlayer(player)
 		self.player = player
 		self:UpdateBagFrame()
 		self:UpdateTitleText()
-
 		self.itemFrame:SetPlayer(player)
+
+		self.bottomFilter:UpdateFilters()
+		self.sideFilter:UpdateFilters()
 		self.moneyFrame:Update()
 	end
 end
@@ -208,8 +210,10 @@ function InventoryFrame:HasSubSet(setName, parentSetName)
 	return false
 end
 
+--this code is incredibly hacky and dependent on what the layout of the db looks like
 function InventoryFrame:GetSets()
-	return ipairs(self.sets.sets)
+	local profile = Combuctor:GetProfile(self:GetPlayer()) or Combuctor:GetProfile(UnitName('player'))
+	return pairs(profile[self.key].sets)
 end
 
 

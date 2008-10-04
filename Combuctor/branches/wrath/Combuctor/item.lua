@@ -6,8 +6,7 @@
 local Item = Combuctor:NewClass('Button')
 Combuctor.Item = Item
 
-
-local Util = Combuctor:GetModule('Utility')
+local InvData = Combuctor:GetModule('InventoryData')
 Item.SIZE = 37
 
 --create a dummy item slot for tooltips and modified clicks of cached items
@@ -151,24 +150,14 @@ end
 
 -- Update the texture, lock status, and other information about an item
 function Item:Update()
-	local _, link, texture, count, locked, readable, quality
 	local slot = self:GetID()
 	local bag = self:GetBag()
 	local player = self:GetPlayer()
+	local link, count, texture, quality, locked, readable, cached = InvData:GetItemInfo(bag, slot, player)
 
-	if Util:IsCachedBag(bag, player) then
-		if BagnonDB then
-			link, count, texture, quality = BagnonDB:GetItemData(bag, slot, player)
-			self.readable = nil
-			self.cached = true
-		end
-	else
-		texture, count, locked, _, readable = GetContainerItemInfo(bag, slot)
-		self.readable = readable
-		self.cached = nil
-	end
-
-	self.hasItem = texture and (link or GetContainerItemLink(bag, slot))
+	self.readable = readable
+	self.cached = cached
+	self.hasItem = texture and link
 
 	SetItemButtonDesaturated(self, locked)
 	SetItemButtonTexture(self, texture or 'Interface/PaperDoll/UI-Backpack-EmptySlot')
@@ -187,15 +176,10 @@ function Item:UpdateBorder(quality)
 	local border = self.border
 	local link = self.hasItem
 
-	if link then
-		local quality = quality or select(3, GetItemInfo(link))
-		if quality and quality > 1 then
-			local r, g, b = GetItemQualityColor(quality)
-			border:SetVertexColor(r, g, b, 0.5)
-			border:Show()
-		else
-			border:Hide()
-		end
+	if link and quality and quality > 1 then
+		local r, g, b = GetItemQualityColor(quality)
+		border:SetVertexColor(r, g, b, 0.5)
+		border:Show()
 	else
 		border:Hide()
 	end
@@ -229,9 +213,9 @@ function Item:OnModifiedClick(button)
 		if self.hasItem then
 			if button == 'LeftButton' then
 				if IsModifiedClick('DRESSUP') then
-					DressUpItemLink((BagnonDB:GetItemData(self:GetBag(), self:GetID(), self:GetPlayer())))
+					DressUpItemLink(InvData:GetItemLink(self:GetBag(), self:GetID(), self:GetPlayer()))
 				elseif IsModifiedClick('CHATLINK') then
-					ChatFrameEditBox:Insert(BagnonDB:GetItemData(self:GetBag(), self:GetID(), self:GetPlayer()))
+					ChatFrameEditBox:Insert(InvData:GetItemLink(self:GetBag(), self:GetID(), self:GetPlayer()))
 				end
 			end
 		end

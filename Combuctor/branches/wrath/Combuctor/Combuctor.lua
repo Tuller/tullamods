@@ -19,25 +19,18 @@ BINDING_NAME_COMBUCTOR_TOGGLE_BANK = L.ToggleBank
 --]]
 
 function Combuctor:OnInitialize()
-	--register database events
-	self.db = LibStub('AceDB-3.0'):New('CombuctorDB2', self:GetDefaults())
---[[
-	self.db.RegisterCallback(self, 'OnNewProfile')
-	self.db.RegisterCallback(self, 'OnProfileChanged')
-	self.db.RegisterCallback(self, 'OnProfileCopied')
-	self.db.RegisterCallback(self, 'OnProfileReset')
-	self.db.RegisterCallback(self, 'OnProfileDeleted')
---]]
+	self.profile = self:InitDB()
 
 	--version update
-	if CombuctorVersion then
-		if CombuctorVersion ~= CURRENT_VERSION then
-			self:UpdateSettings(CombuctorVersion:match('(%w+)%.(%w+)%.(%w+)'))
+	local version = self.db.version
+	if version then
+		if version ~= CURRENT_VERSION then
+			self:UpdateSettings(version:match('(%w+)%.(%w+)%.(%w+)'))
 			self:UpdateVersion()
 		end
 	--new user
 	else
-		CombuctorVersion = CURRENT_VERSION
+		version = CURRENT_VERSION
 	end
 
 	--slash command support
@@ -45,67 +38,113 @@ function Combuctor:OnInitialize()
 	self:RegisterChatCommand('cbt', 'OnSlashCommand')
 end
 
-function Combuctor:OnEnable()
-	self.frames = {
-		self.Frame:New(L.InventoryTitle, self.db.profile.inventory),
-		self.Frame:New(L.BankTitle, self.db.profile.bank, true)
-	}
-
-	self:HookBagEvents()
-end
-
-function Combuctor:GetDefaults()
-	local defaults = {
-		profile = {
-			maxItemScale = 1.5,
-
-			inventory = {
-				bags = {-2, 0, 1, 2, 3, 4},
-				position = {'RIGHT'},
-				showBags = false,
-				w = 384,
-				h = 512,
-
-				sets = {
-					{name = L.All},
-				}
+function Combuctor:InitDB()
+	if not CombuctorDB2 then
+		CombuctorDB2 = {
+			version = CURRENT_VERSION,
+			global = {
+				maxScale = 1.5,
 			},
-
-			bank = {
-				bags = {-1, 5, 6, 7, 8, 9, 10, 11},
-				showBags = false,
-				w = 512,
-				h = 512,
-
-				--the reason i'm using an exclude syntax is so that this shit can work in the case of itemrack, where one might want a per outfit subfilters
-				--so if someone add and removes them a lot, then they'll have to add and remove them from combuctor a lot too, which we don't want
-				sets = {
-					{name = L.All, exclude = {L.Keys}},
-					{name = L.Equipment},
-					{name = L.Usable},
-					{name = L.TradeGood}
-				}
+			profiles = {
 			}
 		}
+	end
+	self.db = CombuctorDB2
+
+	return self:GetProfile() or self:InitProfile()
+end
+
+function Combuctor:GetProfile(player)
+	if not player then
+		player = UnitName('player')
+	end
+	return self.db.profiles[player .. ' - ' .. GetRealmName()]
+end
+
+
+local function addSet(sets, name, ...)
+	if select('#', ...) > 0 then
+		table.insert(sets, {['name'] = name, ['exclude'] = {...}})
+	else
+		table.insert(sets, {['name'] = name})
+	end
+end
+
+local function getDefaultInventorySets(class)
+	local sets = {}
+	if class == 'HUNTER' then
+		addSet(sets, L.All, L.All, L.Shards)
+	elseif class == 'WARLOCK' then
+		addSet(sets, L.All, L.All, L.Ammo)
+	else
+		addSet(sets, L.All, L.All, L.Ammo, L.Shards)
+	end
+	return sets
+end
+
+local function getDefaultBankSets(class)
+	local sets = {}
+	addSet(sets, L.All, L.All, L.Shards, L.Ammo, L.Keys)
+	addSet(sets, L.Equipment)
+	addSet(sets, L.TradeGood)
+	addSet(sets, L.Misc)
+
+	return sets
+end
+
+function Combuctor:InitProfile()
+	local player, realm = UnitName('player'), GetRealmName()
+	local class = select(2, UnitClass('player'))
+	local profile = self:GetBaseProfile()
+
+	profile.inventory.sets = getDefaultInventorySets(class)
+	profile.bank.sets = getDefaultBankSets(class)
+
+	self.db.profiles[player .. ' - ' .. realm] = profile
+	return profile
+end
+
+function Combuctor:GetBaseProfile()
+	return {
+		inventory = {
+			bags = {-2, 0, 1, 2, 3, 4},
+			position = {'RIGHT'},
+			showBags = false,
+			w = 384,
+			h = 512,
+		},
+
+		bank = {
+			bags = {-1, 5, 6, 7, 8, 9, 10, 11},
+			showBags = false,
+			w = 512,
+			h = 512,
+		}
 	}
-
-
-	return defaults
 end
 
 function Combuctor:UpdateSettings(major, minor, bugfix)
-	--do stuff
 end
 
 function Combuctor:UpdateVersion()
-	CombuctorVersion = CURRENT_VERSION
-	self:Print(format(L.Updated, CombuctorVersion))
+	self.db.version = CURRENT_VERSION
+	self:Print(format(L.Updated, self.db.version))
 end
 
 
 --[[
 	Events
 --]]
+
+function Combuctor:OnEnable()
+	local profile = Combuctor:GetProfile(UnitName('player'))
+	self.frames = {
+		self.Frame:New(L.InventoryTitle, profile.inventory, false, 'inventory'),
+		self.Frame:New(L.BankTitle, profile.bank, true, 'bank')
+	}
+
+	self:HookBagEvents()
+end
 
 function Combuctor:HookBagEvents()
 	local AutoShowInventory = function()
@@ -216,11 +255,11 @@ end
 --[[ Utility Functions ]]--
 
 function Combuctor:SetMaxItemScale(scale)
-	self.db.profile.maxItemScale = scale or 1
+	self.db.global.maxScale = scale or 1
 end
 
 function Combuctor:GetMaxItemScale()
-	return self.db.profile.maxItemScale
+	return self.db.global.maxScale
 end
 
 --utility function: create a widget class
