@@ -54,6 +54,10 @@ end
 local BottomFilter = Combuctor:NewClass('Frame')
 Combuctor.BottomFilter = BottomFilter
 
+local function print(...)
+	_G.print('BottomFilter:     ', ...)
+end
+
 function BottomFilter:New(parent)
 	local f = self:Bind(CreateFrame('Frame', parent:GetName() .. 'BottomFilter', parent))
 
@@ -68,16 +72,15 @@ function BottomFilter:New(parent)
 		end
 
 		t[k] = tab
-
 		return tab
 	end})
-
-	f:UpdateFilters()
 
 	return f
 end
 
 function BottomFilter:UpdateFilters()
+	print('UpdateFilters')
+
 	local numFilters = 0
 	local parent = self:GetParent()
 	local currentSet = parent:GetCategory()
@@ -101,13 +104,14 @@ function BottomFilter:UpdateFilters()
 
 		PanelTemplates_SetNumTabs(self, numFilters)
 		PanelTemplates_SetTab(self, 1)
+		self:Show()
 	--at most one filter active, hide all tabs
 	else
-		for _,button in pairs(self.buttons) do
-			button:Hide()
-		end
 		PanelTemplates_SetNumTabs(self, 0)
+		self:Hide()
 	end
+	
+	self:GetParent():UpdateClampInsets()
 end
 
 function BottomFilter:UpdateHighlight()

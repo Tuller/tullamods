@@ -140,7 +140,7 @@ function Combuctor:OnEnable()
 	local profile = Combuctor:GetProfile(UnitName('player'))
 	self.frames = {
 		self.Frame:New(L.InventoryTitle, profile.inventory, false, 'inventory'),
-		self.Frame:New(L.BankTitle, profile.bank, true, 'bank')
+--		self.Frame:New(L.BankTitle, profile.bank, true, 'bank')
 	}
 
 	self:HookBagEvents()

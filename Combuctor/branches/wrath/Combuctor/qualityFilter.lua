@@ -11,13 +11,14 @@ function FilterButton:Create(parent, quality)
 	local button = self:Bind(CreateFrame('Button', nil, parent, 'UIRadioButtonTemplate'))
 	button:SetWidth(SIZE)
 	button:SetHeight(SIZE)
-	button:SetScript('OnClick', self.OnButtonClick)
-	button:SetScript('OnEnter', self.OnButtonEnter)
-	button:SetScript('OnLeave', self.OnButtonLeave)
+	button:SetScript('OnClick', self.OnClick)
+	button:SetScript('OnEnter', self.OnEnter)
+	button:SetScript('OnLeave', self.OnLeave)
 
 	if quality > -1 then
 		local bg = button:CreateTexture(nil, 'BACKGROUND')
-		bg:SetWidth(SIZE/2); bg:SetHeight(SIZE/2)
+		bg:SetWidth(SIZE/2)
+		bg:SetHeight(SIZE/2)
 		bg:SetPoint('CENTER')
 		bg:SetTexture(GetItemQualityColor(quality))
 		button.bg = bg
@@ -78,7 +79,7 @@ function QualityFilter:New(parent)
 
 	local prev
 	for quality = -1, 5 do
-		local button = FilterButton:Create(self, quality)
+		local button = FilterButton:Create(f, quality)
 		if prev then
 			button:SetPoint('LEFT', prev, 'RIGHT', 1, 0)
 		else
@@ -87,7 +88,7 @@ function QualityFilter:New(parent)
 		prev = button
 	end
 
-	f:SetWidth(SIZE * 5)
+	f:SetWidth(SIZE * 6)
 	f:SetHeight(SIZE)
 	f:UpdateHighlight()
 

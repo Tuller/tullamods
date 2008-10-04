@@ -7,6 +7,7 @@ local FrameEvents = Combuctor:NewModule('ItemFrameEvents', 'AceEvent-3.0')
 local currentPlayer = UnitName('player')
 local frames = {}
 
+
 --a widget for performing delayed updates
 --if you ever see how many times the combuctor slot add/remove/update events are called, you'll know why this exists
 local Updater = CreateFrame('Frame')
@@ -32,7 +33,7 @@ function FrameEvents:UpdateSlot(msg, ...)
 	for f in self:GetFrames() do
 		if f:GetPlayer() == currentPlayer then
 			if f:UpdateSlot(...) then
-				self:RequestLayout(f)
+				f:RequestLayout()
 			end
 		end
 	end
@@ -42,7 +43,7 @@ function FrameEvents:RemoveItem(msg, ...)
 	for f in self:GetFrames() do
 		if f:GetPlayer() == currentPlayer then
 			if f:RemoveItem(...) then
-				self:RequestLayout(f)
+				f:RequestLayout()
 			end
 		end
 	end
@@ -81,8 +82,7 @@ function FrameEvents:LayoutFrames()
 	end
 end
 
-function FrameEvents:RequestLayout(f)
-	f.needsLayout = true
+function FrameEvents:RequestLayout()
 	Updater:Show()
 end
 

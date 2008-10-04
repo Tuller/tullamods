@@ -74,8 +74,6 @@ function SideFilter:New(parent)
 		return button
 	end})
 
-	f:UpdateFilters()
-
 	return f
 end
 
@@ -102,12 +100,13 @@ function SideFilter:UpdateFilters()
 		end
 
 		self:UpdateHighlight()
+		self:Show()
 	--at most one filter active, hide all side buttons
 	else
-		for _,button in pairs(self.buttons) do
-			button:Hide()
-		end
+		self:Hide()
 	end
+	
+	self:GetParent():UpdateClampInsets()
 end
 
 function SideFilter:UpdateHighlight()

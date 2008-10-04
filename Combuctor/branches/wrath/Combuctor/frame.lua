@@ -9,6 +9,9 @@ Combuctor.Frame = InventoryFrame
 --local references
 local _G = getfenv(0)
 local L = LibStub('AceLocale-3.0'):GetLocale('Combuctor')
+local function print(...)
+	_G.print('Frame:     ', ...)
+end
 
 --constants
 local BASE_WIDTH = 384
@@ -51,8 +54,16 @@ function InventoryFrame:New(titleText, settings, isBank, key)
 	f.moneyFrame = Combuctor.MoneyFrame:New(f)
 	f.moneyFrame:SetPoint('BOTTOMRIGHT', -40, 67)
 
+	--load what the title says
 	f:UpdateTitleText()
+
+	--update if bags are shown or not
+	f:UpdateBagToggleHighlight()
 	f:UpdateBagFrame()
+	
+	--place the frame
+	f.bottomFilter:UpdateFilters()
+	f.sideFilter:UpdateFilters()
 	f:LoadPosition()
 
 	lastID = lastID + 1
@@ -99,9 +110,9 @@ end
 
 function InventoryFrame:OnBagToggleEnter(toggle)
 	GameTooltip:SetOwner(toggle, 'ANCHOR_LEFT')
-
 	GameTooltip:SetText(L.Bags, 1, 1, 1)
 	GameTooltip:AddLine(L.Bags)
+
 	if self.isBank then
 		GameTooltip:AddLine(L.InventoryToggle)
 	else
@@ -117,12 +128,11 @@ end
 
 function InventoryFrame:ToggleBagFrame()
 	self.sets.showBags = not self.sets.showBags
+	self:UpdateBagToggleHighlight()
 	self:UpdateBagFrame()
 end
 
 function InventoryFrame:UpdateBagFrame()
-	self:UpdateBagToggle()
-
 	--remove all the current bags
 	for i,bag in pairs(self.bagButtons) do
 		self.bagButtons[i] = nil
@@ -152,7 +162,7 @@ function InventoryFrame:UpdateBagFrame()
 	self:UpdateItemFrameSize()
 end
 
-function InventoryFrame:UpdateBagToggle()
+function InventoryFrame:UpdateBagToggleHighlight()
 	if self.sets.showBags then
 		_G[self:GetName() .. 'BagToggle']:LockHighlight()
 	else
@@ -171,11 +181,10 @@ function InventoryFrame:SetPlayer(player)
 		self.player = player
 		self:UpdateBagFrame()
 		self:UpdateTitleText()
-		self.itemFrame:SetPlayer(player)
-
 		self.bottomFilter:UpdateFilters()
 		self.sideFilter:UpdateFilters()
 		self.moneyFrame:Update()
+		self.itemFrame:SetPlayer(player)
 	end
 end
 
@@ -219,6 +228,8 @@ end
 
 --general
 function InventoryFrame:SetCategory(set)
+	print('SetCategory', set.name)
+
 	if self:SetFilter('rule', set.rule) then
 		self.category = set.name
 		self.sideFilter:UpdateHighlight()
@@ -233,6 +244,8 @@ function InventoryFrame:GetCategory()
 end
 
 function InventoryFrame:SetSubCategory(set)
+	print('SetSubCategory', set.name)
+
 	if self:SetFilter('subRule', set.rule) then
 		self.subCategory = set.name
 		self.bottomFilter:UpdateHighlight()
@@ -240,7 +253,7 @@ function InventoryFrame:SetSubCategory(set)
 end
 
 function InventoryFrame:GetSubCategory()
-	return self.subCategory or L.All
+	return self.subCategory or L.Normal
 end
 
 
@@ -346,8 +359,31 @@ function InventoryFrame:UpdateItemFrameSize()
 	if not((prevW == newW) and (prevH == newH)) then
 		self.itemFrame:SetWidth(newW)
 		self.itemFrame:SetHeight(newH)
-		self.itemFrame:Layout()
+		self.itemFrame:RequestLayout()
 	end
+end
+
+--updates where we can position the frame based on if the side and bottom filters are shown
+function InventoryFrame:UpdateClampInsets()
+	local l, r, t, b
+	
+	if self.bottomFilter:IsShown() then
+		t = -15
+		b = 35
+	else
+		t = -15
+		b = 65
+	end
+
+	if self.sideFilter:IsShown() then
+		l = 15
+		r = 0
+	else
+		l = 15
+		r = -35
+	end
+	
+	self:SetClampRectInsets(l, r, t, b)
 end
 
 
@@ -414,7 +450,6 @@ end
 --]]
 
 function InventoryFrame:OnShow()
-	self:SetCategory(self:GetCategory())
 	PlaySound('igMainMenuOpen')
 end
 
@@ -424,7 +459,7 @@ function InventoryFrame:OnHide()
 	if self.isBank then
 		CloseBankFrame()
 	end
-	self:SetPlayer(nil)
+	self:SetPlayer(UnitName('player'))
 end
 
 function InventoryFrame:ToggleFrame(auto)

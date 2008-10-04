@@ -21,6 +21,10 @@ local function ToBag(index)
 	return (index > 0 and floor(index/100)) or ceil(index/100)
 end
 
+local function print(...)
+	_G.print('ItemFrame:     ', ...)
+end
+
 
 --[[
 	Constructor
@@ -35,19 +39,22 @@ function ItemFrame:New(parent)
 
 	f:RegisterForClicks('anyUp')
 	f:SetScript('OnShow', self.OnShow)
-	f:SetScript('OnHide', self.UpdateListening)
+	f:SetScript('OnHide', self.OnHide)
 	f:SetScript('OnClick', self.PlaceItem)
-	f:UpdateListening()
 
 	return f
 end
 
 function ItemFrame:OnShow()
-	self:UpdateListening()
+	self:UpdateUpdatable()
 	self:Regenerate()
 end
 
-function ItemFrame:UpdateListening()
+function ItemFrame:OnHide()
+	self:UpdateUpdatable()
+end
+
+function ItemFrame:UpdateUpdatable()
 	if self:IsVisible() then
 		FrameEvents:Register(self)
 	else
@@ -59,12 +66,14 @@ end
 --[[ Player Filtering ]]--
 
 function ItemFrame:SetPlayer(player)
+	print('SetPlayer', player)
+
 	self.player = player
 	self:ReloadAllItems()
 end
 
 function ItemFrame:GetPlayer()
-	return self.player or currentPlayer
+	return self.player or UnitName('player')
 end
 
 
@@ -189,12 +198,12 @@ function ItemFrame:UpdateSlotCooldowns()
 end
 
 
---[[
-	Mass Item Changes
---]]
+--[[ Mass Item Changes ]]--
 
 --update all items and layout the frame
 function ItemFrame:Regenerate()
+	print('Regenerate')
+
 	local changed = false
 	local player = self:GetPlayer()
 
@@ -207,107 +216,14 @@ function ItemFrame:Regenerate()
 	end
 
 	if changed then
-		self:Layout()
+		self:RequestLayout()
 	end
-end
-
-function ItemFrame:SetBags(newBags)
-	local visible = self:IsVisible()
-	local bags = self.bags
-	local changed = false
-
-	--go through newbags and determine if we have bank slots or not
-	self.isBank = false
-	for _,bag in pairs(newBags) do
-		if InvData:IsBankBag(bag) then
-			self.isBank = true
-			break
-		end
-	end
-
-	--go through all bags in newBags, inserting and removing when necessary
-	--requires that both bag sets be sorted
-	local i = 1
-	repeat
-		local bag, newBag = bags[i], newBags[i]
-		if bag then
-			if bag < newBag then
-				table.remove(bags, i)
-				if self:RemoveBag(bag) then
-					changed = true
-				end
-			else
-				if bag > newBag then
-					table.insert(bags, i, newBag)
-					if visible and self:AddBag(newBag) then
-						changed = true
-					end
-				end
-				i = i + 1
-			end
-		else
-			bags[i] = newBag
-			if visible and self:AddBag(newBag) then
-				changed = true
-			end
-			i = i + 1
-		end
-	until i > #newBags
-
-	--remove any extra bags from newBags
-	local size = #bags
-	for i = #newBags + 1, size do
-		if self:RemoveBag(bags[i]) then
-			changed = true
-		end
-		bags[i] = nil
-	end
-
-	--layout the frame if we're shown and the bag set changed
-	if visible and changed then
-		self:Layout()
-	end
-end
-
---add all items in the givem bag
-function ItemFrame:AddBag(bag, layout)
-	local player = self:GetPlayer()
-	local changed = false
-
-	for slot = 1, InvData:GetBagSize(bag, player) do
-		if self:UpdateSlot(bag, slot) then
-			changed = true
-		end
-	end
-
-	if layout and changed then
-		self:Layout()
-	end
-	return changed
-end
-
---remove all items in the given bag
-function ItemFrame:RemoveBag(bag, layout)
-	local items = self.items
-	local changed = false
-
-	for index,item in pairs(items) do
-		if bag == ToBag(index) then
-			changed = true
-			item:Release()
-			items[index] = nil
-			self.count = self.count - 1
-		end
-	end
-
-	if(layout and changed) then
-		self:Layout()
-	end
-	return changed
 end
 
 --remove all items from the frame
 function ItemFrame:RemoveAllItems()
+	print('RemoveAllItems')
+
 	local items = self.items
 	local changed = true
 
@@ -323,6 +239,8 @@ end
 
 --completely regenerate the frame
 function ItemFrame:ReloadAllItems()
+	print('ReloadAllItems')
+
 	if self:RemoveAllItems() and self:IsVisible() then
 		self:Regenerate()
 	end
@@ -331,9 +249,22 @@ end
 
 --[[ Item Layout ]]--
 
+function ItemFrame:RequestLayout()
+	self.needsLayout = true
+	self:TriggerLayout()
+end
+
+function ItemFrame:TriggerLayout()
+	if self:IsVisible() and self.needsLayout then
+		FrameEvents:RequestLayout(self)
+	end
+end
+
 --layout all the item buttons, scaling ot fit inside the fram
 --todo: dividers for bags v bank
 function ItemFrame:Layout(spacing)
+	print('Layout')
+
 	local width, height = self:GetWidth(), self:GetHeight()
 	local spacing = spacing or 2
 	local count = self.count
@@ -381,9 +312,7 @@ function ItemFrame:HighlightBag(bag)
 end
 
 
---[[
-	Item Placement Functionality
---]]
+--[[ Item Placement ]]--
 
 --places the item in the first available slot in the current player's visible bags
 --todo: make smarter
