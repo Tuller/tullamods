@@ -157,8 +157,12 @@ To change your paging settings, enter configuration mode, right click the action
 Configuring paging settings is best done in the form you want a bar to change in.  So, for example, if I wanted to make actionbar 3 show the buttons on actionbar 4 when in bear form, I'd hop into bear form, enter config mode, right click bar 3 to open up its config menu, select Druid from the panel dropdown, and swt the bear form slider to 4.  When you do that, the slider should instantly show the buttons on bar 4.
 
 
-=== Hiding and showing actionbars under certain conditions ===
+=== The posses bar ===
 
+The possess bar is a special state which causes your action bar to change when you lose control of your character and gain control of another. This is used, for example, during the Karazhan chess event, the Priest's Mind Control ability, or Hunter's Eyes of the Beast ability.  You can configure which bar to use as the possess bar via the possess bar option in the main options menu (/dominos).
+
+
+=== Hiding and showing actionbars under certain conditions ===
 
 [http://tullamods.googlecode.com/svn/images/showStates.png]
 
@@ -167,21 +171,7 @@ Suppose, for example, you wish to make an action bar show only when in combat. T
 All [http://www.wowwiki.com/Making_a_macro macro options] are valid conditions for show states.
 
 
-=== 15 Button Bars (and More) ===
-
-
-Though its not really present in the GUI for Dominos, its possible to change the maximum number of buttons per bar (and in turn, determine how many bars you have).  Simply use the slash commands /dom numbuttons <1-120> to determine how many bars you want based on the maximum number of buttons per bar, or /dom numbars <1-120> to determine exactly how many bars you want.  Be aware that both command will reset your actionbar layout.
-
-Dominos is limited to a maximum of 120 action buttons due to some hardcoded limitations by Blizzard.  
-
-
-=== The Possess Bar ===
-
-
-The possess bar is a special state which causes your action bar to change when you lose control of your character and gain control of another. This is used, for example, during the Karazhan chess event, the Priest's Mind Control ability, or Hunter's Eyes of the Beast ability.  You can configure which bar to use as the possess bar via the possess bar option in the main options menu (/dominos).
-
-
-=== Autofading Bars ===
+=== Making a bar transparent when your mouse is not over it ===
 
 Dominos includes a feature that allows you to set a bar to become partially, or even fully transparent when the bar does not have focus.  To use this feature, enter cofiguration mode and right click the bar you wish to fade.  Then, mess with the faded opacity slider until the bar is as transparent as you want it to be.
 
@@ -194,3 +184,11 @@ So, if you have a bar's opacity set to 50% (0.5), and its faded opacity's value 
 
 Note 2:
 Due to some weird things on blizzard's end, auto fading will *not* work when the options menu is open.
+
+
+=== 15 button bars (and more) ===
+
+
+Though its not really present in the GUI for Dominos, its possible to change the maximum number of buttons per bar (and in turn, determine how many bars you have).  Simply use the slash commands /dom numbuttons <1-120> to determine how many bars you want based on the maximum number of buttons per bar, or /dom numbars <1-120> to determine exactly how many bars you want.  Be aware that both command will reset your actionbar layout.
+
+Dominos is limited to a maximum of 120 action buttons due to some hardcoded limitations by Blizzard.  
