@@ -66,14 +66,14 @@ All [http://www.wowwiki.com/Making_a_macro macro options] are valid conditions f
 
 Dominos includes a feature that allows you to set a bar to become partially, or even fully transparent when the bar does not have focus.  To use this feature, enter cofiguration mode and right click the bar you wish to fade.  Then, mess with the faded opacity slider until the bar is as transparent as you want it to be.
 
-Note:
+*Note:*
 Dominos uses the following formula to calculate the opacity of a bar when it does not have focus:
 {{{
 effectiveOpacity = normalOpacity * fadedOpacity
 }}}
 So, if you have a bar's opacity set to 50% (0.5), and its faded opacity's value is set to 50% (0.5) then its opacity when the mouse is not over the bar will be *25%* (50% x 50%)
 
-Note 2:
+*Note 2:*
 Due to some weird things on blizzard's end, auto fading will *not* work when the options menu is open.
 ----
 
