@@ -1,9 +1,7 @@
 #summary Getting around the interface
 #labels Dominos
 
-  * [DominosBasics Getting around the interface]
-  * [DominosAdvanced Doing more advanced things]
-  * [DominosPlugins Adding extra functionality]
+|| [DominosBasics Getting around the interface] || [DominosAdvanced Doing more advanced things] || [DominosPlugins Adding extra functionality] ||
 ----
 
 
