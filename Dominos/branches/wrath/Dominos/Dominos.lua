@@ -59,11 +59,11 @@ function Dominos:OnEnable()
 	self:Load()
 	
 	--databroker launcher
-	local LDB = LibStub:GetLibrary("LibDataBroker-1.1", true)
+	local LDB = LibStub:GetLibrary('LibDataBroker-1.1', true)
 	if LDB then
-		local dataobj = LibStub:GetLibrary("LibDataBroker-1.1"):NewDataObject("Dominos", {
-			type = "launcher",
-			icon = "Interface\\Addons\\Dominos\\Dominos",
+		local dataobj = LibStub:GetLibrary('LibDataBroker-1.1'):NewDataObject('Dominos', {
+			type = 'launcher',
+			icon = 'Interface\\Addons\\Dominos\\Dominos',
 			OnClick = function(_, button) 
 				if button == 'LeftButton' then
 					if IsModifierKeyDown() then
@@ -186,9 +186,16 @@ function Dominos:HideBlizzard()
 	MainMenuBar:UnregisterAllEvents()
 	MainMenuBar:Hide()
 
-	MainMenuBarArtFrame:UnregisterAllEvents()
-	MainMenuBarArtFrame:RegisterEvent('KNOWN_CURRENCY_TYPES_UPDATE')
-	MainMenuBarArtFrame:RegisterEvent('CURRENCY_DISPLAY_UPDATE')
+	MainMenuBarArtFrame:UnregisterEvent('PLAYER_ENTERING_WORLD')
+--	MainMenuBarArtFrame:UnregisterEvent('BAG_UPDATE') --needed to display stuff on the backpack button
+	MainMenuBarArtFrame:UnregisterEvent('ACTIONBAR_PAGE_CHANGED')
+--	MainMenuBarArtFrame:UnregisterEvent('KNOWN_CURRENCY_TYPES_UPDATE') --needed to display the token tab
+--	MainMenuBarArtFrame:UnregisterEvent('CURRENCY_DISPLAY_UPDATE')
+	MainMenuBarArtFrame:UnregisterEvent('ADDON_LOADED')
+	MainMenuBarArtFrame:UnregisterEvent('UNIT_ENTERING_VEHICLE')
+	MainMenuBarArtFrame:UnregisterEvent('UNIT_ENTERED_VEHICLE')
+	MainMenuBarArtFrame:UnregisterEvent('UNIT_EXITING_VEHICLE')
+	MainMenuBarArtFrame:UnregisterEvent('UNIT_EXITED_VEHICLE')
 	MainMenuBarArtFrame:Hide()
 
 	MainMenuExpBar:UnregisterAllEvents()
