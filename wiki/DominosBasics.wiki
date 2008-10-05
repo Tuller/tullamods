@@ -33,7 +33,7 @@ To manage profiles, you need to access the profiles management panel, which is a
 Four profile operations are implemented: *set*, *save*, *copy*, and *delete*.  Set will change the current active character to the selected profile. This allows the user to have multiple characters set to using the same settings.  Save will create a copy of the user's current profile as a given name, then set the current user to that profile.  Copy will copy all settings from the selected profile to the current profile.  Delete will well, delete a profile.
 
 A final option is only implemented as a slash command, /dominos reset.  This command will return your current profile to default settings.
-
+----
 
 == Configuration mode ==
 
@@ -47,7 +47,7 @@ You can access configuration mode via doing any of the following
   * Clicking the Enter Config Mode... button in the main options menu
 
 To exit configuration mode, just use the same command you used to enter it. 
-
+----
 
 
 == Binding Mode ==
@@ -62,7 +62,7 @@ You can access bindings mode by doing any of the following:
   * Clicking the Bind Keys... button in the main options menu
 
 To exit binding mode, use whichever command you used to enter it. 
-
+----
 
 == Slash Commands ==
 
