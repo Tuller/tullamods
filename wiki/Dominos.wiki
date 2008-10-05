@@ -1,10 +1,7 @@
 #summary The Dominos guide
 #labels Dominos
 
-  * [DominosBasics Getting around the interface]
-  * [DominosAdvanced Doing more advanced things]
-  * [DominosPlugins Adding extra functionality]
-----
+|| [DominosBasics Getting around the interface] || [DominosAdvanced Doing more advanced things] || [DominosPlugins Adding extra functionality] ||
 
 ==== So what the heck is Dominos? ====
 
