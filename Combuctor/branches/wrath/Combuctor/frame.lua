@@ -45,46 +45,47 @@
 --]]
 
 local FrameEvents = Combuctor:NewModule('FrameEvents', 'AceEvent-3.0')
-local currentPlayer = UnitName('player')
-local frames = {}
+do
+	local frames = {}
 
-function FrameEvents:OnEnable()
-	self:RegisterMessage('COMBUCTOR_SET_ADD', 'UpdateSets')
-	self:RegisterMessage('COMBUCTOR_SET_UPDATE', 'UpdateSets')
-	self:RegisterMessage('COMBUCTOR_SET_REMOVE', 'UpdateSets')
+	function FrameEvents:OnEnable()
+		self:RegisterMessage('COMBUCTOR_SET_ADD', 'UpdateSets')
+		self:RegisterMessage('COMBUCTOR_SET_UPDATE', 'UpdateSets')
+		self:RegisterMessage('COMBUCTOR_SET_REMOVE', 'UpdateSets')
 
-	self:RegisterMessage('COMBUCTOR_SUBSET_ADD', 'UpdateSubSets')
-	self:RegisterMessage('COMBUCTOR_SUBSET_UPDATE', 'UpdateSubSets')
-	self:RegisterMessage('COMBUCTOR_SUBSET_REMOVE', 'UpdateSubSets')
-end
+		self:RegisterMessage('COMBUCTOR_SUBSET_ADD', 'UpdateSubSets')
+		self:RegisterMessage('COMBUCTOR_SUBSET_UPDATE', 'UpdateSubSets')
+		self:RegisterMessage('COMBUCTOR_SUBSET_REMOVE', 'UpdateSubSets')
+	end
 
-function FrameEvents:UpdateSets(msg, name)
-	for f in self:GetFrames() do
-		if f:HasSet(name) then
-			f:UpdateSets()
+	function FrameEvents:UpdateSets(msg, name)
+		for f in self:GetFrames() do
+			if f:HasSet(name) then
+				f:UpdateSets()
+			end
 		end
 	end
-end
 
-function FrameEvents:UpdateSubSets(msg, name, parent)
-	for f in self:GetFrames() do
-		if f:GetCategory() == parent then
-			f:UpdateSubSets()
+	function FrameEvents:UpdateSubSets(msg, name, parent)
+		for f in self:GetFrames() do
+			if f:GetCategory() == parent then
+				f:UpdateSubSets()
+			end
 		end
 	end
-end
 
 
-function FrameEvents:Register(f)
-	frames[f] = true
-end
+	function FrameEvents:Register(f)
+		frames[f] = true
+	end
 
-function FrameEvents:Unregister(f)
-	frames[f] = nil
-end
+	function FrameEvents:Unregister(f)
+		frames[f] = nil
+	end
 
-function FrameEvents:GetFrames()
-	return pairs(frames)
+	function FrameEvents:GetFrames()
+		return pairs(frames)
+	end
 end
 
 
@@ -340,7 +341,7 @@ end
 
 --Set
 function InventoryFrame:SetCategory(name)
-	if not CombuctorSet:Get(name) then
+	if not(self:HasSet(name) and CombuctorSet:Get(name)) then
 		name = self:GetDefaultCategory()
 	end
 
@@ -368,7 +369,7 @@ end
 --Subset
 function InventoryFrame:SetSubCategory(name)
 	local parent = self:GetCategory()
-	if not(parent and CombuctorSet:Get(name, parent)) then
+	if not(parent and self:HasSubSet(name, parent) and CombuctorSet:Get(name, parent)) then
 		name = self:GetDefaultSubCategory()
 	end
 	
