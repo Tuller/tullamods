@@ -1,11 +1,7 @@
 #summary Enhancing Dominos (Plug-Ins)
 #labels Dominos
 
-  * [DominosBasics Getting around the interface]
-  * [DominosAdvanced Doing more advanced things]
-  * [DominosPlugins Adding extra functionality]
-----
-
+|| [DominosBasics Getting around the interface] || [DominosAdvanced Doing more advanced things] || [DominosPlugins Adding extra functionality] ||
 
 ==== Changing the look of action buttons ====
 
