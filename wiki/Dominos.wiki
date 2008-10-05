@@ -4,6 +4,8 @@
 
 == So what the heck is Dominos? == 
 
+[http://tullamods.googlecode.com/svn/images/sampleSetup.jpg http://tullamods.googlecode.com/svn/images/sampleSetupThumb.jpg]
+
 Dominos is an action bar addon developed with the following goals in mind:
   * Reuse as much standard Blizzard action button code as possible.
   * Contain a relatively minimal feature set
@@ -13,11 +15,6 @@ Dominos is an action bar addon developed with the following goals in mind:
 The main action bar, as you know, is that thing at the bottom of the screen that acts as your main interface for accessing your inventory, opening a few panels, making your pet do things, and of course using spells and ability.
 
 What Dominos does is take that interface, split it up into a series of customizable "bars" (a bar for your bags, one for your pet, an experience bar, etc), and add a few more features, like access to all 120 action buttons.
-
-[http://tullamods.googlecode.com/svn/images/sampleSetup.jpg http://tullamods.googlecode.com/svn/images/sampleSetupThumb.jpg]
-
-A sample Dominos setup
-
 ----
 
 
@@ -52,6 +49,8 @@ A final option is only implemented as a slash command, /dominos reset.  This com
 
 === Configuration mode ===
 
+[http://tullamods.googlecode.com/svn/images/configMode.jpg http://tullamods.googlecode.com/svn/images/configModeThumb.jpg]
+
 Configuration mode is where it is possible to move bars around, adjust a bar's settings, or create new action bars.  To adjust a bar's settings, enter configuration mode, then right click the desired bar to bring up the bar's right click menu.  *Every Dominos bar has a right click menu for adjusting settings.*  I *highly* encourage all users to look through the right click menus for each bar to discover all configuration options.
 
 You can access configuration mode via doing any of the following
@@ -60,8 +59,6 @@ You can access configuration mode via doing any of the following
 
 To exit configuration mode, just use the same command you used to enter it. 
 
-[http://tullamods.googlecode.com/svn/images/configMode.jpg http://tullamods.googlecode.com/svn/images/configModeThumb.jpg]
-Configuration mode
 
 
 === Binding Mode ===
