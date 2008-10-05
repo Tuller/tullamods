@@ -8,7 +8,9 @@
 
 [http://tullamods.googlecode.com/svn/images/hiddenVsShown.png]
 
-I'm putting this here because I've gotten more than one "Dominos sucks!  You cannot even hide bars using the thing!" post in my life :P  To hide or show a bar in Dominos, enter configuration mode and then either middle click or shift right click the bar you wish to hide/show.  Now, the actual frame for moving the bar around will not go away when you hide the bar (else, how would you show the bar again?), but you should notice that the stuff inside does disappear.  Beyond color coding, that's the way to know that the bar is hidden.
+I'm putting this here because I've gotten more than one "Dominos sucks!  You cannot even hide bars using the thing!" post in my life :P  
+
+To hide or show a bar in Dominos, enter configuration mode and then either middle click or shift right click the bar you wish to hide/show.  Now, the actual frame for moving the bar around will not go away when you hide the bar (else, how would you show the bar again?), but you should notice that the stuff inside does disappear.  Beyond color coding, that's the way to know that the bar is hidden.
 ----
 
 ==== Moving Things Without Sticking Them to Other Things ====
