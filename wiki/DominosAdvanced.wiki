@@ -8,16 +8,14 @@
 [http://tullamods.googlecode.com/svn/images/hiddenVsShown.png]
 
 I'm putting this here because I've gotten more than one "Dominos sucks!  You cannot even hide bars using the thing!" post in my life :P  To hide or show a bar in Dominos, enter configuration mode and then either middle click or shift right click the bar you wish to hide/show.  Now, the actual frame for moving the bar around will not go away when you hide the bar (else, how would you show the bar again?), but you should notice that the stuff inside does disappear.  Beyond color coding, that's the way to know that the bar is hidden.
-
-
+----
 
 
 === Moving things without sticking them to other things ===
 
 
 Dominos includes a feature that causes bars to auto anchor to each other, or even certain points on the edge of the screen, after moving them.  Some people don't like that, so I've added a bypass:  Hold down alt when moving a bar to disable the sticky behavior.
-
-
+----
 
 
 === Changing what buttons are displayed on a bar under certain conditions (Paging) ===
@@ -43,13 +41,13 @@ So if you're holding down alt, in stealth, and targeting a friendly unit, Domino
 To change your paging settings, enter configuration mode, right click the action bar you want to change, and mess with the sliders for either your class, quick paging, targeting, or modifiers.  Disabled means that the bar will no longer change in that state, bar <x> means that the bar will show the buttons on the given action bar when in the given state.  
 
 Configuring paging settings is best done in the form you want a bar to change in.  So, for example, if I wanted to make actionbar 3 show the buttons on actionbar 4 when in bear form, I'd hop into bear form, enter config mode, right click bar 3 to open up its config menu, select Druid from the panel dropdown, and swt the bear form slider to 4.  When you do that, the slider should instantly show the buttons on bar 4.
-
+----
 
 
 === The posses bar ===
 
 The possess bar is a special state which causes your action bar to change when you lose control of your character and gain control of another. This is used, for example, during the Karazhan chess event, the Priest's Mind Control ability, or Hunter's Eyes of the Beast ability.  You can configure which bar to use as the possess bar via the possess bar option in the main options menu (/dominos).
-
+----
 
 
 === Hiding and showing actionbars under certain conditions ===
@@ -59,7 +57,7 @@ The possess bar is a special state which causes your action bar to change when y
 Suppose, for example, you wish to make an action bar show only when in combat. This is possible in Dominos.  First, enter configuration mode, and right click the bar you wish to edit. Next, choose the show states option from the dropdown. You'll see an edit box and an okay button. In the text box, enter in [[combat]], then press the okay button. If you're not in combat, then the bar should immediately hide. To remove the setting, simply clear the edit box, and press okay. The bar should then immediately reappear.
 
 All [http://www.wowwiki.com/Making_a_macro macro options] are valid conditions for show states.
-
+----
 
 
 === Making a bar transparent when your mouse is not over it ===
@@ -75,7 +73,7 @@ So, if you have a bar's opacity set to 50% (0.5), and its faded opacity's value 
 
 Note 2:
 Due to some weird things on blizzard's end, auto fading will *not* work when the options menu is open.
-
+----
 
 
 === 15 button bars (and more) ===
