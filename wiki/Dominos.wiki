@@ -16,7 +16,7 @@ What Dominos does is take that interface, split it up into a series of customiza
 
 [http://tullamods.googlecode.com/svn/images/sampleSetup.jpg http://tullamods.googlecode.com/svn/images/sampleSetupThumb.jpg]
 
-A sample dominos setup
+A sample Dominos setup
 
 ----
 
