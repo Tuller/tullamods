@@ -1,5 +1,5 @@
 #summary The Dominos guide
-#labels Dominos
+#labels Dominos,Featured
 
 || [DominosBasics Getting around the interface] || [DominosAdvanced Doing more advanced things] || [DominosPlugins Adding extra functionality] ||
 ----
