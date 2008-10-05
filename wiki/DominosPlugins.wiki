@@ -1,20 +1,21 @@
 #summary Enhancing Dominos (Plug-Ins)
+#labels Dominos
 
-= Changing the look of action buttons =
+==== Changing the look of action buttons =====
 
 You can change the looks of the action buttons in Dominos using an addon called [http://www.wowace.com/projects/buttonfacade/pages/main/ Button Facade].  A wide variety of [http://www.wowinterface.com/downloads/search.php?search=button+facade&title&author&page=1&so=asc&sb=title styles] are available for the addon.
 
 
-= Out of range coloring =
+===== Out of range coloring =====
 
 Ever want the entire button to become red when the skill associated it is out of range?  Look no further than [http://www.wowinterface.com/downloads/info4166-RedRange.html RedRange].  I may eventually include a version in the Dominos download, but until then, I suggest RedRange.
 
 
-= Cooldown count =
+===== Cooldown count =====
 
 My own [http://www.wowinterface.com/downloads/info4836-OmniCC.html OmniCC] will display text on your action buttons display exactly when the ability will be ready to use.  [http://www.wowace.com/projects/cooldown-count/ Cooldown Count] is a well known alternative.
 
 
-= Buff and debuff highlighting ==
+===== Buff and debuff highlighting =====
 
 This is actually included in the Dominos download as Dominos_Buff.  What this addon does is add a green border around buttons that contain buffs that you currently have on yourself, or a friendly target.  It also displays a purple border around debuffs you've cast on an enemy target.
