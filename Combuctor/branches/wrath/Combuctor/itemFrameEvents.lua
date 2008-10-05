@@ -67,9 +67,7 @@ end
 
 function FrameEvents:UpdateBankFrames()
 	for f in self:GetFrames() do
-		if f.isBank then
-			f:Regenerate()
-		end
+		f:Regenerate()
 	end
 end
 

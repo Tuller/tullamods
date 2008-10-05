@@ -56,7 +56,7 @@ end
 
 --returns all information about an item
 function InvData:GetItemInfo(bag, slot, player)
-	local link, count, texture, quality, readable, cached, locked
+	local link, count, texture, quality, readable, cached, locked, _
 
 	if self:IsCachedBag(bag, player) then
 		if BagnonDB then
@@ -66,7 +66,8 @@ function InvData:GetItemInfo(bag, slot, player)
 	else
 		link = GetContainerItemLink(bag, slot)
 		if link then
-			texture, count, locked, quality, readable = GetContainerItemInfo(bag, slot)
+			texture, count, locked, _, readable = GetContainerItemInfo(bag, slot)
+			quality = select(3, GetItemInfo(link))
 		end
 	end
 
