@@ -1,4 +1,4 @@
-#summary The Dominos Guide
+#summary The Dominos guide
 #labels Dominos
 
 
