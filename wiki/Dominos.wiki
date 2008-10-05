@@ -63,6 +63,8 @@ To exit configuration mode, just use the same command you used to enter it.
 
 === Binding Mode ===
 
+[http://tullamods.googlecode.com/svn/images/bindingMode.jpg]
+
 Bindings mode is where it is possible to set hotkeys for all action bars, the pet bar, the class bar, the macro menu, and the spell book. To bind a key, hover over the button and press desired key combination, such as Alt + 1, W, or Mouse Wheel down.  It is possible to bind keys to any mouse button recognized by the game, other than the left and right buttons.  All bindings, except for the action bar, are saved in the same way as the standard binding system does, and respects the same per character option.
 
 You can access bindings mode by doing any of the following:
@@ -70,8 +72,6 @@ You can access bindings mode by doing any of the following:
   * Clicking the Bind Keys... button in the main options menu
 
 To exit binding mode, use whichever command you used to enter it. 
-
-http://tullamods.googlecode.com/svn/images/bindingMode.jpg
 
 
 === Slash Commands ===
@@ -109,9 +109,9 @@ Here's the complete list of commands:
 
 === Hiding and showing bars ===
 
-I'm putting this here because I've gotten more than one "Dominos sucks!  You cannot even hide bars using the thing!" post in my life :P  To hide or show a bar in Dominos, enter configuration mode and then either middle click or shift right click the bar you wish to hide/show.  Now, the actual frame for moving the bar around will not go away when you hide the bar (else, how would you show the bar again?), but you should notice that the stuff inside does disappear.  Beyond color coding, that's the way to know that the bar is hidden.
+[http://tullamods.googlecode.com/svn/images/hiddenVsShown.png]
 
-TODO: Include SS of hidden versus shown bars
+I'm putting this here because I've gotten more than one "Dominos sucks!  You cannot even hide bars using the thing!" post in my life :P  To hide or show a bar in Dominos, enter configuration mode and then either middle click or shift right click the bar you wish to hide/show.  Now, the actual frame for moving the bar around will not go away when you hide the bar (else, how would you show the bar again?), but you should notice that the stuff inside does disappear.  Beyond color coding, that's the way to know that the bar is hidden.
 
 
 
