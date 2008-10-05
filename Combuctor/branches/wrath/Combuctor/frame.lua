@@ -44,6 +44,50 @@
 			Switch to given subset
 --]]
 
+local FrameEvents = Combuctor:NewModule('FrameEvents', 'AceEvent-3.0')
+local currentPlayer = UnitName('player')
+local frames = {}
+
+function FrameEvents:OnEnable()
+	self:RegisterMessage('COMBUCTOR_SET_ADD', 'UpdateSets')
+	self:RegisterMessage('COMBUCTOR_SET_UPDATE', 'UpdateSets')
+	self:RegisterMessage('COMBUCTOR_SET_REMOVE', 'UpdateSets')
+
+	self:RegisterMessage('COMBUCTOR_SUBSET_ADD', 'UpdateSubSets')
+	self:RegisterMessage('COMBUCTOR_SUBSET_UPDATE', 'UpdateSubSets')
+	self:RegisterMessage('COMBUCTOR_SUBSET_REMOVE', 'UpdateSubSets')
+end
+
+function FrameEvents:UpdateSets(msg, name)
+	for f in self:GetFrames() do
+		if f:HasSet(name) then
+			f:UpdateSets()
+		end
+	end
+end
+
+function FrameEvents:UpdateSubSets(msg, name, parent)
+	for f in self:GetFrames() do
+		if f:GetCategory() == parent then
+			f:UpdateSubSets()
+		end
+	end
+end
+
+
+function FrameEvents:Register(f)
+	frames[f] = true
+end
+
+function FrameEvents:Unregister(f)
+	frames[f] = nil
+end
+
+function FrameEvents:GetFrames()
+	return pairs(frames)
+end
+
+
 local InventoryFrame  = Combuctor:NewClass('Frame')
 Combuctor.Frame = InventoryFrame
 
@@ -238,10 +282,6 @@ function InventoryFrame:SetPlayer(player)
 		self:UpdateTitleText()
 		self:UpdateBagFrame()
 
-		self:SetCategory(self:GetDefaultCategory().name)
-		self.sideFilter:UpdateFilters()
-		self.bottomFilter:UpdateFilters()
-
 		self.itemFrame:SetPlayer(player)
 		self.moneyFrame:Update()
 	end
@@ -253,6 +293,17 @@ end
 
 
 --[[ Sets and Subsets ]]--
+
+function InventoryFrame:UpdateSets(category)
+	self.sideFilter:UpdateFilters()
+	self:SetCategory(category or self:GetCategory())
+	self:UpdateSubSets()
+end
+
+function InventoryFrame:UpdateSubSets()
+	self.bottomFilter:UpdateFilters()
+	self:SetSubCategory(self:GetSubCategory())
+end
 
 function InventoryFrame:HasSet(setName)
 	for i,set in self:GetSets() do
@@ -289,19 +340,15 @@ end
 
 --Set
 function InventoryFrame:SetCategory(name)
-	local set
-	if self:HasSet(name) then
-		set = CombuctorSet:Get(name)
-	else
-		set = self:GetDefaultCategory()
+	if not CombuctorSet:Get(name) then
+		name = self:GetDefaultCategory()
 	end
 
-	if self:SetFilter('rule', set.rule) then
-		self.category = set
+	local set = name and CombuctorSet:Get(name)
+	if self:SetFilter('rule', (set and set.rule) or nil) then
+		self.category = name
 		self.sideFilter:UpdateHighlight()
-
-		self.bottomFilter:UpdateFilters()
-		self:SetSubCategory(self:GetDefaultSubCategory().name)
+		self:UpdateSubSets()
 	end
 end
 
@@ -311,9 +358,8 @@ end
 
 function InventoryFrame:GetDefaultCategory()
 	for _,set in self:GetSets() do
-		local info = CombuctorSet:Get(set.name)
-		if info then
-			return info
+		if CombuctorSet:Get(set.name) then
+			return set.name
 		end
 	end
 end
@@ -322,16 +368,13 @@ end
 --Subset
 function InventoryFrame:SetSubCategory(name)
 	local parent = self:GetCategory()
-	local set
-
-	if self:HasSubSet(name, parent.name) then
-		set = CombuctorSet:Get(name, parent.name)
-	else
-		set = self:GetDefaultSubCategory()
+	if not(parent and CombuctorSet:Get(name, parent)) then
+		name = self:GetDefaultSubCategory()
 	end
-
-	if self:SetFilter('subRule', set.rule) then
-		self.subCategory = set
+	
+	local set = name and CombuctorSet:Get(name, parent)
+	if self:SetFilter('subRule', (set and set.rule) or nil) then
+		self.subCategory = name
 		self.bottomFilter:UpdateHighlight()
 	end
 end
@@ -342,9 +385,11 @@ end
 
 function InventoryFrame:GetDefaultSubCategory()
 	local parent = self:GetCategory()
-	for _,set in CombuctorSet:GetChildSets(parent.name) do
-		if self:HasSubSet(set.name, parent.name) then
-			return set
+	if parent then
+		for _,set in CombuctorSet:GetChildSets(parent) do
+			if self:HasSubSet(set.name, parent) then
+				return set.name
+			end
 		end
 	end
 end
@@ -530,11 +575,13 @@ end
 
 function InventoryFrame:OnShow()
 	PlaySound('igMainMenuOpen')
-	self:SetCategory(self:GetDefaultCategory().name)
+	FrameEvents:Register(self)
+	self:UpdateSets()
 end
 
 function InventoryFrame:OnHide()
 	PlaySound('igMainMenuClose')
+	FrameEvents:Unregister(self)
 
 	--return to showing the current player on close
 	self:SetPlayer(UnitName('player'))
