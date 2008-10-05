@@ -16,7 +16,7 @@ Ever want the entire button to become red when the skill associated it is out of
 
 ==== Cooldown Count ====
 
-My own [http://www.wowinterface.com/downloads/info4836-OmniCC.html OmniCC] will display text on your action buttons display exactly when the ability will be ready to use.  [http://www.wowace.com/projects/cooldown-count/ Cooldown Count] is a well known alternative.
+My own addon, [http://www.wowinterface.com/downloads/info4836-OmniCC.html OmniCC], will display text on your action buttons display exactly when the ability will be ready to use.  [http://www.wowace.com/projects/cooldown-count/ Cooldown Count] is a well known alternative.
 
 
 ==== Buff and Debuff Highlighting ====
