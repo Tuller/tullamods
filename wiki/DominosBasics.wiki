@@ -92,4 +92,3 @@ Here's the complete list of commands:
   * version: Prints the current Dominos version
   * help or ?: Shows a list of slash commands
   * /keybound or /kb: Toggles binding mode
-----
