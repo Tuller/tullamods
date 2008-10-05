@@ -4,19 +4,19 @@
 || [DominosBasics Getting around the interface] || [DominosAdvanced Doing more advanced things] || [DominosPlugins Adding extra functionality] ||
 ----
 
-=== Hiding and showing bars ===
+==== Hiding and showing bars ====
 
 [http://tullamods.googlecode.com/svn/images/hiddenVsShown.png]
 
 I'm putting this here because I've gotten more than one "Dominos sucks!  You cannot even hide bars using the thing!" post in my life :P  To hide or show a bar in Dominos, enter configuration mode and then either middle click or shift right click the bar you wish to hide/show.  Now, the actual frame for moving the bar around will not go away when you hide the bar (else, how would you show the bar again?), but you should notice that the stuff inside does disappear.  Beyond color coding, that's the way to know that the bar is hidden.
 ----
 
-=== Moving things without sticking them to other things ===
+==== Moving things without sticking them to other things ====
 
 Dominos includes a feature that causes bars to auto anchor to each other, or even certain points on the edge of the screen, after moving them.  Some people don't like that, so I've added a bypass:  Hold down alt when moving a bar to disable the sticky behavior.
 ----
 
-=== Changing what buttons are displayed on a bar under certain conditions (Paging) ===
+==== Changing what buttons are displayed on a bar under certain conditions (Paging) ====
 
 [http://tullamods.googlecode.com/svn/images/paging.png]
 
@@ -41,14 +41,14 @@ Configuring paging settings is best done in the form you want a bar to change in
 ----
 
 
-=== The posses bar ===
+==== The posses bar ====
 
 
 The possess bar is a special state which causes your action bar to change when you lose control of your character and gain control of another. This is used, for example, during the Karazhan chess event, the Priest's Mind Control ability, or Hunter's Eyes of the Beast ability.  You can configure which bar to use as the possess bar via the possess bar option in the main options menu (/dominos).
 ----
 
 
-=== Hiding and showing actionbars under certain conditions ===
+==== Hiding and showing actionbars under certain conditions ====
 
 [http://tullamods.googlecode.com/svn/images/showStates.png]
 
@@ -59,7 +59,7 @@ All [http://www.wowwiki.com/Making_a_macro macro options] are valid conditions f
 ----
 
 
-=== Making a bar transparent when your mouse is not over it ===
+==== Making a bar transparent when your mouse is not over it ====
 
 
 Dominos includes a feature that allows you to set a bar to become partially, or even fully transparent when the bar does not have focus.  To use this feature, enter cofiguration mode and right click the bar you wish to fade.  Then, mess with the faded opacity slider until the bar is as transparent as you want it to be.
@@ -76,7 +76,7 @@ Due to some weird things on blizzard's end, auto fading will *not* work when the
 ----
 
 
-=== 15 button bars (and more) ===
+==== 15 button bars (and more) ====
 
 
 Though its not really present in the GUI for Dominos, its possible to change the maximum number of buttons per bar (and in turn, determine how many bars you have).  Simply use the slash commands /dom numbuttons <1-120> to determine how many bars you want based on the maximum number of buttons per bar, or /dom numbars <1-120> to determine exactly how many bars you want.  Be aware that both command will reset your actionbar layout.
