@@ -60,8 +60,8 @@ You can access configuration mode via doing any of the following
 
 To exit configuration mode, just use the same command you used to enter it. 
 
-TODO:
-Include SS of config mode
+[http://tullamods.googlecode.com/svn/images/configMode.jpg http://tullamods.googlecode.com/svn/images/configModeThumb.jpg]
+Configuration mode
 
 
 === Binding Mode ===
