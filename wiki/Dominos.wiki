@@ -4,6 +4,7 @@
   * [DominosBasics Getting around the interface]
   * [DominosAdvanced Doing more advanced things]
   * [DominosPlugins Adding extra functionality]
+----
 
 ==== So what the heck is Dominos? ====
 
