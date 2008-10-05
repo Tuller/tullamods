@@ -1,0 +1,81 @@
+#summary Advanced Stuff and Frequently Asked Questions
+#labels Dominos
+
+
+=== Hiding and showing bars ===
+
+
+[http://tullamods.googlecode.com/svn/images/hiddenVsShown.png]
+
+I'm putting this here because I've gotten more than one "Dominos sucks!  You cannot even hide bars using the thing!" post in my life :P  To hide or show a bar in Dominos, enter configuration mode and then either middle click or shift right click the bar you wish to hide/show.  Now, the actual frame for moving the bar around will not go away when you hide the bar (else, how would you show the bar again?), but you should notice that the stuff inside does disappear.  Beyond color coding, that's the way to know that the bar is hidden.
+
+
+
+=== Moving things without sticking them to other things ===
+
+
+Dominos includes a feature that causes bars to auto anchor to each other, or even certain points on the edge of the screen, after moving them.  Some people don't like that, so I've added a bypass:  Hold down alt when moving a bar to disable the sticky behavior.
+
+
+
+=== Changing what buttons are displayed on a bar under certain conditions (Paging) ===
+
+
+[http://tullamods.googlecode.com/svn/images/paging.png]
+
+Dominos has a feature that allows one action bar to display the buttons on another action bar when under a certain condition, such as when in bear form, or holding down a modifier key.  I call this concept "bar mirroring," but its more commonly known as "paging".  
+
+Beyond mirroring the functionality of the stock interface (which also changes based on what form you're in), paging is nice for the following reasons:
+  * While the buttons on your action bar change what they do, the bindings used to trigger those buttons do not change.  This allows you to do nifty things, like have button 1 cast rejuvenation when targeting a friendly unit, moonfire when targeting an enemy, or maul when in bear form.  So, you can do more actions without having to remember as many hotkeys.
+  * You can minimize how many buttons you have visible on screen.  If you know you only need to see your shadow spells when in shadow form, and your holy spells when not, why not put those shadow skills on a hidden bar and have your holy bar page to it when in shadow form
+
+Here are the following conditions you can switch a bar on, and in what order they are checked:
+  * <Modifier> Down: Occurs when you press control, alt, or shift.  Sliders for these pages are listed under Modifiers
+  * Quick Page <Number>: Occurs when you press a paging binding. These are bound, by default, to shift + 1-6 and shift + mouse wheel. Shift + 1 returns to your normal state.  Sliders for these pages are listed under Quick Paging.
+  * Prowl (Druids Only): Occurs when prowling.
+  * Stances, Forms, Stealth: Occurs when you're in Defensive stance, Cat form, stealth, etc.  Listed under the class name they're applicable to. 
+  * Friendly/Enemy Target: Occurs when you're targeting a friendly or enemy target.  Listed under targeting.
+
+So if you're holding down alt, in stealth, and targeting a friendly unit, Dominos will try to find a page for alt down, then if it does not find one check for one for stealth, then if it cannot find one, check for a page for enemy target.  If none are found, then the bar will not change.
+
+To change your paging settings, enter configuration mode, right click the action bar you want to change, and mess with the sliders for either your class, quick paging, targeting, or modifiers.  Disabled means that the bar will no longer change in that state, bar <x> means that the bar will show the buttons on the given action bar when in the given state.  
+
+Configuring paging settings is best done in the form you want a bar to change in.  So, for example, if I wanted to make actionbar 3 show the buttons on actionbar 4 when in bear form, I'd hop into bear form, enter config mode, right click bar 3 to open up its config menu, select Druid from the panel dropdown, and swt the bear form slider to 4.  When you do that, the slider should instantly show the buttons on bar 4.
+
+
+=== The posses bar ===
+
+The possess bar is a special state which causes your action bar to change when you lose control of your character and gain control of another. This is used, for example, during the Karazhan chess event, the Priest's Mind Control ability, or Hunter's Eyes of the Beast ability.  You can configure which bar to use as the possess bar via the possess bar option in the main options menu (/dominos).
+
+
+=== Hiding and showing actionbars under certain conditions ===
+
+[http://tullamods.googlecode.com/svn/images/showStates.png]
+
+Suppose, for example, you wish to make an action bar show only when in combat. This is possible in Dominos.  First, enter configuration mode, and right click the bar you wish to edit. Next, choose the show states option from the dropdown. You'll see an edit box and an okay button. In the text box, enter in [[combat]], then press the okay button. If you're not in combat, then the bar should immediately hide. To remove the setting, simply clear the edit box, and press okay. The bar should then immediately reappear.
+
+All [http://www.wowwiki.com/Making_a_macro macro options] are valid conditions for show states.
+
+
+=== Making a bar transparent when your mouse is not over it ===
+
+Dominos includes a feature that allows you to set a bar to become partially, or even fully transparent when the bar does not have focus.  To use this feature, enter cofiguration mode and right click the bar you wish to fade.  Then, mess with the faded opacity slider until the bar is as transparent as you want it to be.
+
+Note:
+Dominos uses the following formula to calculate the opacity of a bar when it does not have focus:
+{{{
+effectiveOpacity = normalOpacity * fadedOpacity
+}}}
+So, if you have a bar's opacity set to 50% (0.5), and its faded opacity's value is set to 50% (0.5) then its opacity when the mouse is not over the bar will be *25%* (50% x 50%)
+
+Note 2:
+Due to some weird things on blizzard's end, auto fading will *not* work when the options menu is open.
+
+
+=== 15 button bars (and more) ===
+
+
+Though its not really present in the GUI for Dominos, its possible to change the maximum number of buttons per bar (and in turn, determine how many bars you have).  Simply use the slash commands /dom numbuttons <1-120> to determine how many bars you want based on the maximum number of buttons per bar, or /dom numbars <1-120> to determine exactly how many bars you want.  Be aware that both command will reset your actionbar layout.
+
+Dominos is limited to a maximum of 120 action buttons due to some hardcoded limitations by Blizzard.  If you require more buttons than this, take a look at TrinityBars, Macaroon, or FlexBar2
+----
