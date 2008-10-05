@@ -14,8 +14,7 @@ The main action bar, as you know, is that thing at the bottom of the screen that
 
 What Dominos does is take that interface, split it up into a series of customizable "bars" (a bar for your bags, one for your pet, an experience bar, etc), and add a few more features, like access to all 120 action buttons.
 
-TODO:
-Include SS of a setup Dominos versus the classic interface
+[http://tullamods.googlecode.com/svn/images/sampleSetup.jpg http://tullamods.googlecode.com/svn/images/sampleSetupThumb.jpg]
 ----
 
 
