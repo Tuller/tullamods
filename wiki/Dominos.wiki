@@ -190,7 +190,7 @@ Dominos uses the following formula to calculate the opacity of a bar when it doe
 {{{
 effectiveOpacity = normalOpacity * fadedOpacity
 }}}
-So, if you have a bar's opacity set to 50% (0.5), and its faded opacity's value is set to 50% (0.5) then its opacity when the mouse is not over the bar will be *25%* (0.5 * 0.5)
+So, if you have a bar's opacity set to 50% (0.5), and its faded opacity's value is set to 50% (0.5) then its opacity when the mouse is not over the bar will be *25%* (50% x 50%)
 
 Note 2:
 Due to some weird things on blizzard's end, auto fading will *not* work when the options menu is open.
