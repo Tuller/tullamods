@@ -25,7 +25,7 @@ You can do a lot of things with Dominos.  The intent of this guide is to give on
 
 === The Main Options Menu ===
 
-[http://tullamods.googlecode.com/svn/images/optionsMenu.png]
+[http://tullamods.googlecode.com/svn/images/optionsMenu.png http://tullamods.googlecode.com/svn/images/optionsMenuThumb.jpg]
 
 The options menu is your main hub for configuration in Dominos.  With it you can:
   * Configure non bar specific settings, like locking action button positions, selfcast settings, hiding and showing macro text
@@ -37,6 +37,9 @@ The options menu is located in the addons portion of the Blizzard interface opti
 
 
 === Profiles ===
+
+[http://tullamods.googlecode.com/svn/images/profiles.jpg
+http://tullamods.googlecode.com/svn/images/profilesThumb.jpg]
 
 A profile contains Dominos specific settings.  This does not include key bindings, or what actions are on each bar (To save action button positions, try out the addon Action Bar Saver 2.  Action bar paging settings are saved on a per profile basis, but are also class specific.  By default, Dominos assigns each class a separate profile.
   
