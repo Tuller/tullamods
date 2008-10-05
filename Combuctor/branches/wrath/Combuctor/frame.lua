@@ -282,6 +282,7 @@ function InventoryFrame:SetPlayer(player)
 
 		self:UpdateTitleText()
 		self:UpdateBagFrame()
+		self:UpdateSets()
 
 		self.itemFrame:SetPlayer(player)
 		self.moneyFrame:Update()
@@ -301,9 +302,9 @@ function InventoryFrame:UpdateSets(category)
 	self:UpdateSubSets()
 end
 
-function InventoryFrame:UpdateSubSets()
+function InventoryFrame:UpdateSubSets(subCategory)
 	self.bottomFilter:UpdateFilters()
-	self:SetSubCategory(self:GetSubCategory())
+	self:SetSubCategory(subCategory or self:GetSubCategory())
 end
 
 function InventoryFrame:HasSet(setName)
@@ -577,7 +578,7 @@ end
 function InventoryFrame:OnShow()
 	PlaySound('igMainMenuOpen')
 	FrameEvents:Register(self)
-	self:UpdateSets()
+	self:UpdateSets(self:GetDefaultCategory())
 end
 
 function InventoryFrame:OnHide()

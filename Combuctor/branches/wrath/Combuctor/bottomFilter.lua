@@ -77,9 +77,8 @@ end
 function BottomFilter:UpdateFilters()
 	local numFilters = 0
 	local parent = self:GetParent()
-	local category = parent:GetCategory()
 
-	for _,set in CombuctorSets:GetChildSets(category) do
+	for _,set in CombuctorSets:GetChildSets(parent:GetCategory()) do
 		if parent:HasSubSet(set.name, set.parent) then
 			numFilters = numFilters + 1
 			self.buttons[numFilters]:Set(set)
@@ -102,7 +101,7 @@ function BottomFilter:UpdateFilters()
 	--at most one filter active, hide all tabs
 	else
 		PanelTemplates_SetNumTabs(self, 0)
-		self:Hide()
+		syelf:Hide()
 	end
 	self:GetParent():UpdateClampInsets()
 end
@@ -111,6 +110,8 @@ function BottomFilter:UpdateHighlight()
 	local category = self:GetParent():GetSubCategory()
 
 	for _,button in pairs(self.buttons) do
-		button:UpdateHighlight(category)
+		if button:IsShown() then
+			button:UpdateHighlight(category)
+		end
 	end
 end

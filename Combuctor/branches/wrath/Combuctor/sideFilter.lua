@@ -111,6 +111,8 @@ function SideFilter:UpdateHighlight()
 	local category = self:GetParent():GetCategory()
 
 	for _,button in pairs(self.buttons) do
-		button:UpdateHighlight(category)
+		if button:IsShown() then
+			button:UpdateHighlight(category)
+		end
 	end
 end
