@@ -18,7 +18,7 @@ The options menu is your main hub for configuration in Dominos.  With it you can
   * Enter and exit binding mode
   * Manage profiles
 
-The options menu is located in the addons portion of the Blizzard interface options menu.  Alternatively, you can access it via the slash command /dominos.
+The options menu is located in the addons portion of the Blizzard interface options menu.  Alternatively, you can access it via the slash command _/dominos_.
 
 
 ==== Profiles ====
@@ -32,7 +32,7 @@ To manage profiles, you need to access the profiles management panel, which is a
 
 Four profile operations are implemented: *set*, *save*, *copy*, and *delete*.  Set will change the current active character to the selected profile. This allows the user to have multiple characters set to using the same settings.  Save will create a copy of the user's current profile as a given name, then set the current user to that profile.  Copy will copy all settings from the selected profile to the current profile.  Delete will well, delete a profile.
 
-A final option is only implemented as a slash command, /dominos reset.  This command will return your current profile to default settings.
+A final option is only implemented as a slash command, _/dominos reset_.  This command will return your current profile to default settings.
 ----
 
 ==== Configuration mode ====
@@ -45,7 +45,7 @@ Configuration mode is where it is possible to move bars around and adjust a bar'
 To adjust a bar's settings, enter configuration mode, then right click the desired bar to bring up the bar's right click menu.  *Every Dominos bar has a right click menu for adjusting settings.*  I highly encourage all users to look through the right click menus for each bar to discover all configuration options.
 
 You can access configuration mode via doing any of the following
-  * The /dominos lock  or /dominos config slash commands
+  * The _/dominos lock_  or _/dominos config_ slash commands
   * Clicking the Enter Config Mode... button in the main options menu
 
 To exit configuration mode, just use the same command you used to enter it. 
@@ -60,7 +60,7 @@ To exit configuration mode, just use the same command you used to enter it.
 Bindings mode is where it is possible to set hotkeys for all action bars, the pet bar, the class bar, the macro menu, and the spell book. To bind a key, hover over the button and press desired key combination, such as Alt + 1, W, or Mouse Wheel down.  It is possible to bind keys to any mouse button recognized by the game, other than the left and right buttons.  All bindings, except for the action bar, are saved in the same way as the standard binding system does, and respects the same per character option.
 
 You can access bindings mode by doing any of the following:
-  * Typing the /keybound or /kb slash command
+  * Typing the _/keybound_ or _/kb_ slash command
   * Clicking the Bind Keys... button in the main options menu
 
 To exit binding mode, use whichever command you used to enter it. 
