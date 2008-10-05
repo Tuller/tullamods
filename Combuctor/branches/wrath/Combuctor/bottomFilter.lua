@@ -20,7 +20,7 @@ function BottomTab:OnClick()
 		PlaySound('igCharacterInfoTab')
 	end
 
-	frame:SetSubCategory(self.set)
+	frame:SetSubCategory(self.set.name)
 end
 
 function BottomTab:Set(set)
@@ -77,9 +77,9 @@ end
 function BottomFilter:UpdateFilters()
 	local numFilters = 0
 	local parent = self:GetParent()
-	local currentSet = parent:GetCategory()
+	local category = parent:GetCategory()
 
-	for _,set in CombuctorSets:GetChildSets(currentSet) do
+	for _,set in CombuctorSets:GetChildSets(category.name) do
 		if parent:HasSubSet(set.name, set.parent) then
 			numFilters = numFilters + 1
 			self.buttons[numFilters]:Set(set)
@@ -97,15 +97,14 @@ function BottomFilter:UpdateFilters()
 		end
 
 		PanelTemplates_SetNumTabs(self, numFilters)
-		PanelTemplates_SetTab(self, 1)
 		self:Show()
 	--at most one filter active, hide all tabs
 	else
 		PanelTemplates_SetNumTabs(self, 0)
 		self:Hide()
 	end
-	
-	self:GetParent():SetSubCategory(self.buttons[1].set)
+
+	self:UpdateHighlight()
 	self:GetParent():UpdateClampInsets()
 end
 
@@ -113,6 +112,6 @@ function BottomFilter:UpdateHighlight()
 	local category = self:GetParent():GetSubCategory()
 
 	for _,button in pairs(self.buttons) do
-		button:UpdateHighlight(category)
+		button:UpdateHighlight(category.name)
 	end
 end

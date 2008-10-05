@@ -1,6 +1,47 @@
 --[[
 	frame.lua
 		A combuctor frame object
+
+	Set Events:
+		COMBUCTOR_SET_ADD:
+			name
+				If visible, then update side tabs + highlight
+
+		COMBUCTOR_SET_UPDATE:
+			name, icon, rule
+				if visible, then update side tabs + highlight
+				If we're showing set, then need to update rule
+
+		COMBUCTOR_SUBSET_ADD:
+			name, parent, icon, rule
+				if visible and we're showing parent set, then update bottom tabs + highlight
+
+		COMBUCTOR_SUBSET_UPDATE:
+			name, parent, icon, rule
+				if visible and we're showing parent set, then update bottom tabs + highlight
+				If on subset, then need to update rule
+
+		COMBUCTOR_SET_REMOVE:
+			name
+				If visible, then update side tabs + highlight
+				If on set, then need to switch to default set
+
+		COMBUCTOR_SUBSET_REMOVE
+			name, parent:
+				If visible and on parent set, then need to update subsets
+				If on subset, then need to switch to default subset
+
+
+	User Events:
+		User shows frame:
+			Show default set + subset
+			In the future, should create events (show keys) that map to set + subset
+
+		User clicks on set:
+			Switch to set, switch to default subset of that set
+
+		User clicks on subset:
+			Switch to given subset
 --]]
 
 local InventoryFrame  = Combuctor:NewClass('Frame')
@@ -9,6 +50,7 @@ Combuctor.Frame = InventoryFrame
 --local references
 local _G = getfenv(0)
 local L = LibStub('AceLocale-3.0'):GetLocale('Combuctor')
+local CombuctorSet = Combuctor:GetModule('Sets')
 
 --constants
 local BASE_WIDTH = 384
@@ -57,7 +99,7 @@ function InventoryFrame:New(titleText, settings, isBank, key)
 	--update if bags are shown or not
 	f:UpdateBagToggleHighlight()
 	f:UpdateBagFrame()
-	
+
 	--place the frame
 	f.sideFilter:UpdateFilters()
 	f:LoadPosition()
@@ -171,94 +213,8 @@ end
 	Filtering
 --]]
 
---player
-function InventoryFrame:SetPlayer(player)
-	if self:GetPlayer() ~= player then
-		self.player = player
-		self:UpdateBagFrame()
-		self:UpdateTitleText()
-		self.sideFilter:UpdateFilters()
-		self.bottomFilter:UpdateFilters()
-		self.moneyFrame:Update()
-		self.itemFrame:SetPlayer(player)
-	end
-end
+--[[ Generic ]]--
 
-function InventoryFrame:GetPlayer()
-	return self.player or UnitName('player')
-end
-
-function InventoryFrame:HasSet(setName)
-	for i,set in self:GetSets() do
-		if set.name == setName then
-			return i
-		end
-	end
-	return false
-end
-
-function InventoryFrame:HasSubSet(setName, parentSetName)
-	for _,set in self:GetSets() do
-		--parent set found...
-		if set.name == parentSetName then
-			--see if the  child set is excluded or not, if so then blow up
-			if set.exclude then
-				for _,childSetName in pairs(set.exclude) do
-					if childSetName == setName then
-						return false
-					end
-				end
-			end
-			return true
-		end
-	end
-	return false
-end
-
---this code is incredibly hacky and dependent on what the layout of the db looks like
-function InventoryFrame:GetSets()
-	local profile = Combuctor:GetProfile(self:GetPlayer()) or Combuctor:GetProfile(UnitName('player'))
-	return pairs(profile[self.key].sets)
-end
-
-
---general
-function InventoryFrame:SetCategory(set)
-	if self:SetFilter('rule', set.rule) then
-		self.category = set.name
-		self.sideFilter:UpdateHighlight()
-		self.bottomFilter:UpdateFilters()
-	end
-end
-
-function InventoryFrame:GetCategory()
-	return self.category or L.All
-end
-
-function InventoryFrame:SetSubCategory(set)
-	if self:SetFilter('subRule', set.rule) then
-		self.subCategory = set.name
-		self.bottomFilter:UpdateHighlight()
-	end
-end
-
-function InventoryFrame:GetSubCategory()
-	return self.subCategory or L.All
-end
-
-
-function InventoryFrame:SetQuality(quality)
-	if self:SetFilter('quality', quality) then
-		self.qualityFilter:UpdateHighlight()
-	end
-end
-
-function InventoryFrame:GetQuality()
-	return self:GetFilter('quality') or -1
-end
-
-
---update our filter stuff,  make a request for the item frame to regenerate itself
 function InventoryFrame:SetFilter(key, value)
 	if self.filter[key] ~= value then
 		self.filter[key] = value
@@ -270,6 +226,139 @@ end
 
 function InventoryFrame:GetFilter(key)
 	return self.filter[key]
+end
+
+
+--[[ Player ]]--
+
+function InventoryFrame:SetPlayer(player)
+	if self:GetPlayer() ~= player then
+		self.player = player
+
+		self:UpdateTitleText()
+		self:UpdateBagFrame()
+
+		self:SetCategory(self:GetDefaultCategory().name)
+		self.sideFilter:UpdateFilters()
+		self.bottomFilter:UpdateFilters()
+
+		self.itemFrame:SetPlayer(player)
+		self.moneyFrame:Update()
+	end
+end
+
+function InventoryFrame:GetPlayer()
+	return self.player or UnitName('player')
+end
+
+
+--[[ Sets and Subsets ]]--
+
+function InventoryFrame:HasSet(setName)
+	for i,set in self:GetSets() do
+		if set.name == setName then
+			return i
+		end
+	end
+	return false
+end
+
+function InventoryFrame:HasSubSet(setName, parentName)
+	for _,set in self:GetSets() do
+		--parent set found...
+		if set.name == parentName then
+			--see if the  child set is excluded or not, if so then blow up
+			if set.exclude then
+				for _,childName in pairs(set.exclude) do
+					if childName == setName then
+						return false
+					end
+				end
+			end
+			return true
+		end
+	end
+	return false
+end
+
+function InventoryFrame:GetSets()
+	local profile = Combuctor:GetProfile(self:GetPlayer()) or Combuctor:GetProfile(UnitName('player'))
+	return ipairs(profile[self.key].sets)
+end
+
+
+--Set
+function InventoryFrame:SetCategory(name)
+	local set
+	if self:HasSet(name) then
+		set = CombuctorSet:Get(name)
+	else
+		set = self:GetDefaultCategory()
+	end
+
+	if self:SetFilter('rule', set.rule) then
+		self.category = set
+		self.sideFilter:UpdateHighlight()
+
+		self.bottomFilter:UpdateFilters()
+		self:SetSubCategory(self:GetDefaultSubCategory().name)
+	end
+end
+
+function InventoryFrame:GetCategory()
+	return self.category or self:GetDefaultCategory()
+end
+
+function InventoryFrame:GetDefaultCategory()
+	for _,set in self:GetSets() do
+		local info = CombuctorSet:Get(set.name)
+		if info then
+			return info
+		end
+	end
+end
+
+
+--Subset
+function InventoryFrame:SetSubCategory(name)
+	local parent = self:GetCategory()
+	local set
+
+	if self:HasSubSet(name, parent.name) then
+		set = CombuctorSet:Get(name, parent.name)
+	else
+		set = self:GetDefaultSubCategory()
+	end
+
+	if self:SetFilter('subRule', set.rule) then
+		self.subCategory = set
+		self.bottomFilter:UpdateHighlight()
+	end
+end
+
+function InventoryFrame:GetSubCategory()
+	return self.subCategory or self:GetDefaultSubCategory()
+end
+
+function InventoryFrame:GetDefaultSubCategory()
+	local parent = self:GetCategory()
+	for _,set in CombuctorSet:GetChildSets(parent.name) do
+		if self:HasSubSet(set.name, parent.name) then
+			return set
+		end
+	end
+end
+
+
+--Quality
+function InventoryFrame:SetQuality(quality)
+	if self:SetFilter('quality', quality) then
+		self.qualityFilter:UpdateHighlight()
+	end
+end
+
+function InventoryFrame:GetQuality()
+	return self:GetFilter('quality') or -1
 end
 
 
@@ -356,7 +445,7 @@ end
 --updates where we can position the frame based on if the side and bottom filters are shown
 function InventoryFrame:UpdateClampInsets()
 	local l, r, t, b
-	
+
 	if self.bottomFilter:IsShown() then
 		t = -15
 		b = 35
@@ -372,7 +461,7 @@ function InventoryFrame:UpdateClampInsets()
 		l = 15
 		r = -35
 	end
-	
+
 	self:SetClampRectInsets(l, r, t, b)
 end
 
@@ -441,15 +530,17 @@ end
 
 function InventoryFrame:OnShow()
 	PlaySound('igMainMenuOpen')
+	self:SetCategory(self:GetDefaultCategory().name)
 end
 
 function InventoryFrame:OnHide()
 	PlaySound('igMainMenuClose')
 
+	--return to showing the current player on close
+	self:SetPlayer(UnitName('player'))
 	if self.isBank then
 		CloseBankFrame()
 	end
-	self:SetPlayer(UnitName('player'))
 end
 
 function InventoryFrame:ToggleFrame(auto)

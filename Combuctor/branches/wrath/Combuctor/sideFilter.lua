@@ -22,7 +22,7 @@ do
 end
 
 function SideFilterButton:OnClick()
-	self:GetParent():GetParent():SetCategory(self.set)
+	self:GetParent():GetParent():SetCategory(self.set.name)
 end
 
 function SideFilterButton:OnEnter()
@@ -75,7 +75,7 @@ function SideFilter:New(parent)
 	return f
 end
 
-function SideFilter:UpdateFilters()
+function SideFilter:UpdateFilters(forceUpdateCategory)
 	local numFilters = 0
 	local parent = self:GetParent()
 
@@ -104,7 +104,7 @@ function SideFilter:UpdateFilters()
 		self:Hide()
 	end
 	
-	self:GetParent():SetCategory(self.buttons[1].set)
+	self:UpdateHighlight()
 	self:GetParent():UpdateClampInsets()
 end
 
@@ -112,6 +112,6 @@ function SideFilter:UpdateHighlight()
 	local category = self:GetParent():GetCategory()
 
 	for _,button in pairs(self.buttons) do
-		button:UpdateHighlight(category)
+		button:UpdateHighlight(category.name)
 	end
 end
