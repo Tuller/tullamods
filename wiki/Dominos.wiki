@@ -1,6 +1,10 @@
 #summary The Dominos guide
 #labels Dominos
 
+  * [DominosBasics Getting around the interface]
+  * [DominosAdvanced Doing more advanced things]
+  * [DominosPlugins Adding extra functionality]
+
 ==== So what the heck is Dominos? ====
 
 [http://tullamods.googlecode.com/svn/images/sampleSetup.jpg http://tullamods.googlecode.com/svn/images/sampleSetupThumb.jpg]
@@ -14,10 +18,3 @@ Dominos is an action bar addon developed with the following goals in mind:
 The main action bar, as you know, is that thing at the bottom of the screen that acts as your main interface for accessing your inventory, opening a few panels, making your pet do things, and of course using spells and ability.
 
 What Dominos does is take that interface, split it up into a series of customizable "bars" (a bar for your bags, one for your pet, an experience bar, etc), and add a few more features, like access to all 120 action buttons.
-
-
-==== Gee, that's awesome!  So how do I use the thing? ====
-
-  * [DominosBasics Getting around the interface]
-  * [DominosAdvanced Doing more advanced things]
-  * [DominosPlugins Adding extra functionality]
