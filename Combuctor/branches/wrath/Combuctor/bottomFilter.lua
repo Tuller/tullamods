@@ -101,7 +101,7 @@ function BottomFilter:UpdateFilters()
 	--at most one filter active, hide all tabs
 	else
 		PanelTemplates_SetNumTabs(self, 0)
-		syelf:Hide()
+		self:Hide()
 	end
 	self:GetParent():UpdateClampInsets()
 end
