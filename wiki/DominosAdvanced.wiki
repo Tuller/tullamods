@@ -1,6 +1,11 @@
 #summary Advanced Stuff and Frequently Asked Questions
 #labels Dominos
 
+  * [DominosBasics Getting around the interface]
+  * [DominosAdvanced Doing more advanced things]
+  * [DominosPlugins Adding extra functionality]
+----
+
 
 === Hiding and showing bars ===
 
