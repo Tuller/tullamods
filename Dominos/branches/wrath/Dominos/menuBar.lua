@@ -30,7 +30,7 @@ do
 	TalentMicroButton:RegisterEvent('PLAYER_LEVEL_UP')
 	TalentMicroButton:RegisterEvent('PLAYER_LOGIN')
 	TalentMicroButton:RegisterEvent('UPDATE_BINDINGS')
-	
+
 	--simialr thing, but the achievement button
 	AchievementMicroButton:UnregisterAllEvents()
 end
@@ -43,7 +43,6 @@ Dominos.MenuBar  = MenuBar
 
 function MenuBar:New()
 	local f = self.super.New(self, 'menu')
-	f.sets.numButtons = #menuButtons --hack of doom
 	f:LoadButtons()
 	f:Layout()
 
@@ -55,8 +54,11 @@ function MenuBar:GetDefaults()
 		point = 'BOTTOMRIGHT',
 		x = -244,
 		y = 0,
-		numButtons = #menuButtons,
 	}
+end
+
+function MenuBar:NumButtons()
+	return #menuButtons
 end
 
 function MenuBar:AddButton(i)
