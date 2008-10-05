@@ -1,4 +1,4 @@
-#summary Basic Information
+#summary Getting around the interface
 #labels Dominos
 
 
