@@ -151,7 +151,7 @@ Configuring paging settings is best done in the form you want a bar to change in
 
 [http://tullamods.googlecode.com/svn/images/showStates.png]
 
-Suppose, for example, you wish to make an action bar show only when in combat. This is possible in Dominos.  First, enter configuration mode, and right click the bar you wish to edit. Next, choose the show states option from the dropdown. You'll see an edit box and an okay button. In the text box, enter in [combat], then press the okay button. If you're not in combat, then the bar should immediately hide. To remove the setting, simply clear the edit box, and press okay. The bar should then immediately reappear.
+Suppose, for example, you wish to make an action bar show only when in combat. This is possible in Dominos.  First, enter configuration mode, and right click the bar you wish to edit. Next, choose the show states option from the dropdown. You'll see an edit box and an okay button. In the text box, enter in *![combat]*, then press the okay button. If you're not in combat, then the bar should immediately hide. To remove the setting, simply clear the edit box, and press okay. The bar should then immediately reappear.
 
 All [http://www.wowwiki.com/Making_a_macro macro options] are valid conditions for show states.
 
