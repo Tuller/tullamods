@@ -26,7 +26,7 @@ The options menu is located in the addons portion of the Blizzard interface opti
 
 [http://tullamods.googlecode.com/svn/images/profiles.jpg http://tullamods.googlecode.com/svn/images/profilesThumb.jpg]
 
-A profile contains Dominos specific settings.  This does not include key bindings, or what actions are on each bar (To save action button positions, try out the addon Action Bar Saver 2.  Action bar paging settings are saved on a per profile basis, but are also class specific.  By default, Dominos assigns each class a separate profile.
+A profile contains Dominos specific settings.  This does _not_ include key bindings, or what actions are on each bar (To save action button positions, try out the addon Action Bar Saver 2.  Action bar paging settings are saved on a per profile basis, but are also class specific.  By default, Dominos assigns each class a separate profile.
   
 To manage profiles, you need to access the profiles management panel, which is a sub panel of the main options panel for Dominos.  Simply click the + near the Dominos tab in interface options, then click the profiles button.
 
