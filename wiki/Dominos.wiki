@@ -28,6 +28,8 @@ You can do a lot of things with Dominos.  The intent of this guide is to give on
 
 === The Main Options Menu ===
 
+[http://tullamods.googlecode.com/svn/images/optionsMenu.png]
+
 The options menu is your main hub for configuration in Dominos.  With it you can:
   * Configure non bar specific settings, like locking action button positions, selfcast settings, hiding and showing macro text
   * Enter and exit configuration mode
@@ -35,9 +37,6 @@ The options menu is your main hub for configuration in Dominos.  With it you can
   * Manage profiles
 
 The options menu is located in the addons portion of the Blizzard interface options menu.  Alternatively, you can access it via the slash command /dominos.
-
-TODO:
-Include SS of options menu
 
 
 === Profiles ===
