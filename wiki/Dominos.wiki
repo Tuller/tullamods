@@ -179,3 +179,18 @@ Dominos is limited to a maximum of 120 action buttons due to some hardcoded limi
 
 
 The possess bar is a special state which causes your action bar to change when you lose control of your character and gain control of another. This is used, for example, during the Karazhan chess event, the Priest's Mind Control ability, or Hunter's Eyes of the Beast ability.  You can configure which bar to use as the possess bar via the possess bar option in the main options menu (/dominos).
+
+
+=== Autofading Bars ===
+
+Dominos includes a feature that allows you to set a bar to become partially, or even fully transparent when the bar does not have focus.  To use this feature, enter cofiguration mode and right click the bar you wish to fade.  Then, mess with the faded opacity slider until the bar is as transparent as you want it to be.
+
+Note:
+Dominos uses the following formula to calculate the opacity of a bar when it does not have focus:
+{{{
+effectiveOpacity = normalOpacity * fadedOpacity
+}}}
+So, if you have a bar's opacity set to 50% (0.5), and its faded opacity's value is set to 50% (0.5) then its opacity when the mouse is not over the bar will be *25%* (0.5 * 0.5)
+
+Note 2:
+Due to some weird things on blizzard's end, auto fading will *not* work when the options menu is open.
