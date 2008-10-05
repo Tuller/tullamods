@@ -73,8 +73,7 @@ You can access bindings mode by doing any of the following:
 
 To exit binding mode, use whichever command you used to enter it. 
 
-TODO:
-Include SS of binding mode, highlight binding a key.
+http://code.google.com/p/tullamods/source/browse/images/bindingMode.jpg
 
 
 === Slash Commands ===
