@@ -73,7 +73,7 @@ You can access bindings mode by doing any of the following:
 
 To exit binding mode, use whichever command you used to enter it. 
 
-http://code.google.com/p/tullamods/source/browse/images/bindingMode.jpg
+http://tullamods.googlecode.com/svn/images/bindingMode.jpg
 
 
 === Slash Commands ===
