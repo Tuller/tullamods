@@ -31,6 +31,11 @@
 				If visible and on parent set, then need to update subsets
 				If on subset, then need to switch to default subset
 
+		COMBUCTOR_CONFIG_SET_ADD
+		COMBUCTOR_CONFIG_SET_REMOVE
+			key, name
+				If visible, and self.key == key, then update sets
+
 
 	User Events:
 		User shows frame:
@@ -53,15 +58,37 @@ do
 		self:RegisterMessage('COMBUCTOR_SET_UPDATE', 'UpdateSets')
 		self:RegisterMessage('COMBUCTOR_SET_REMOVE', 'UpdateSets')
 
+		self:RegisterMessage('COMBUCTOR_CONFIG_SET_ADD', 'UpdateSetConfig')
+		self:RegisterMessage('COMBUCTOR_CONFIG_SET_REMOVE', 'UpdateSetConfig')
+
 		self:RegisterMessage('COMBUCTOR_SUBSET_ADD', 'UpdateSubSets')
 		self:RegisterMessage('COMBUCTOR_SUBSET_UPDATE', 'UpdateSubSets')
 		self:RegisterMessage('COMBUCTOR_SUBSET_REMOVE', 'UpdateSubSets')
+
+		self:RegisterMessage('COMBUCTOR_CONFIG_SUBSET_ADD', 'UpdateSubSetConfig')
+		self:RegisterMessage('COMBUCTOR_CONFIG_SUBSET_REMOVE', 'UpdateSubSetConfig')
 	end
 
 	function FrameEvents:UpdateSets(msg, name)
 		for f in self:GetFrames() do
 			if f:HasSet(name) then
 				f:UpdateSets()
+			end
+		end
+	end
+	
+	function FrameEvents:UpdateSetConfig(msg, key, name)
+		for f in self:GetFrames() do
+			if f.key == key then
+				f:UpdateSets()
+			end
+		end
+	end
+	
+	function FrameEvents:UpdateSubSetConfig(msg, key, name, parent)
+		for f in self:GetFrames() do
+			if f.key == key and f:GetCategory() == parent then
+				f:UpdateSubSets()
 			end
 		end
 	end
@@ -373,7 +400,7 @@ function InventoryFrame:SetSubCategory(name)
 	if not(parent and self:HasSubSet(name, parent) and CombuctorSet:Get(name, parent)) then
 		name = self:GetDefaultSubCategory()
 	end
-	
+
 	local set = name and CombuctorSet:Get(name, parent)
 	if self:SetFilter('subRule', (set and set.rule) or nil) then
 		self.subCategory = name

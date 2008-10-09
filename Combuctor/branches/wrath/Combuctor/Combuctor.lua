@@ -32,6 +32,13 @@ function Combuctor:OnInitialize()
 	else
 		version = CURRENT_VERSION
 	end
+	
+	--create a loader for the options menu
+	local f = CreateFrame('Frame', nil, InterfaceOptionsFrame)
+	f:SetScript('OnShow', function(self)
+		self:SetScript('OnShow', nil)
+		LoadAddOn('Dominos_Config')
+	end)
 
 	--slash command support
 	self:RegisterChatCommand('combuctor', 'OnSlashCommand')
@@ -238,6 +245,14 @@ function Combuctor:Toggle(bag, auto)
 	end
 end
 
+function Combuctor:ShowOptions()
+	if LoadAddOn('Combuctor_Config') then
+		InterfaceOptionsFrame_OpenToCategory(self.Options)
+		return true
+	end
+	return false
+end
+
 function Combuctor:OnSlashCommand(msg)
 	local msg = msg and msg:lower()
 
@@ -245,10 +260,13 @@ function Combuctor:OnSlashCommand(msg)
 		self:Toggle(BANK_CONTAINER)
 	elseif msg == 'bags' then
 		self:Toggle(BACKPACK_CONTAINER)
+	elseif msg == '' or msg == 'config' or msg == 'options' then
+		self:ShowOptions()
 	else
 		self:Print('Commands (/cbt or /combuctor)')
-		DEFAULT_CHAT_FRAME:AddMessage('- bank: Toggle bank')
-		DEFAULT_CHAT_FRAME:AddMessage('- bags: Toggle inventory')
+		print('- bank: Toggle bank')
+		print('- bags: Toggle inventory')
+		print('- options: Shows the options menu')
 	end
 end
 
