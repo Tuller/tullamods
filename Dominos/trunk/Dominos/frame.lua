@@ -129,7 +129,7 @@ function Frame:Create(id)
 	f:SetMovable(true)
 	f.id = id
 
-	f.header = CreateFrame('Frame', nil, f, 'SecureStateHeaderTemplate')
+	f.header = CreateFrame('Frame', nil, f, 'SecureHandlerAttributeTemplate')
 	f.header:SetAllPoints(f)
 
 	f.drag = Dominos.DragFrame:New(f)
@@ -202,17 +202,19 @@ function Frame:LoadButtons()
 	end
 end
 
-function Frame:SetNumButtons(numButtons)
-	self.sets.numButtons = numButtons
-
-	for i = #self.buttons + 1, self:NumButtons() do
-		self:AddButton(i)
-	end
-
-	for i = self:NumButtons() + 1, #self.buttons do
+function Frame:UpdateButtonCount(numButtons)
+	for i = numButtons + 1, #self.buttons do
 		self:RemoveButton(i)
 	end
 
+	for i = #self.buttons + 1, numButtons do
+		self:AddButton(i)
+	end
+end
+
+function Frame:SetNumButtons(numButtons)
+	self.sets.numButtons = numButtons
+	self:UpdateButtonCount(self:NumButtons())
 	self:Layout()
 end
 

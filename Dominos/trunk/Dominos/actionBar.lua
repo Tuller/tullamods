@@ -25,6 +25,12 @@ function ActionButton:New(id)
 	local b = self:Restore(id) or self:Create(id)
 	if b then
 		b:SetAttribute('showgrid', 0)
+		b:SetAttribute('action--base', id)
+		b:SetAttribute('_childupdate', [[
+			local id = newABState and self:GetAttribute('action--' .. newABState) or self:GetAttribute('action--base')
+			self:SetAttribute('action', id)
+		]])
+
 		b:UpdateGrid()
 		b:UpdateHotkey(b.buttonType)
 		b:UpdateMacro()
@@ -64,7 +70,6 @@ function ActionButton:Create(id)
 		b:SetAttribute('action', id)
 		b:SetID(0)
 		b:ClearAllPoints()
-		b:SetAttribute('useparent-statebutton', true)
 		b:SetAttribute('useparent-actionbar', nil)
 		b:SetAttribute('useparent-unit', true)
 		b:EnableMouseWheel(true)
@@ -86,7 +91,7 @@ function ActionButton:Restore(id)
 	if b then
 		self.unused[id] = nil
 		b:LoadEvents()
-		b:RCall(ActionButton_Update)
+		ActionButton_Update(b)
 		b:Show()
 		self.active[id] = b
 		return b
@@ -124,31 +129,59 @@ function ActionButton:OnEnter()
 	KeyBound:Set(self)
 end
 
+--the call here is wacky because this functionality is actually called for the blizzard buttons _before_ I'm able to bind the action button methods to them
 function ActionButton:UpdateHotkey(actionButtonType)
-    if not actionButtonType then
-        actionButtonType = 'ACTIONBUTTON'
-    end
-
-    local hotkey = _G[self:GetName()..'HotKey']
-	local key = KeyBound:ToShortKey(GetBindingKey(actionButtonType..self:GetID()) or GetBindingKey('CLICK '..self:GetName()..':LeftButton'))
-	hotkey:SetText(key)
-
+	local key = ActionButton.GetHotkey(self, actionButtonType)
 	if key ~= ''  and Dominos:ShowBindingText() then
-		hotkey:Show()
+		_G[self:GetName()..'HotKey']:SetText(key)
+		_G[self:GetName()..'HotKey']:Show()
 	else
-		hotkey:Hide()
+		_G[self:GetName()..'HotKey']:Hide()
 	end
 end
 
-function ActionButton:GetHotkey()
-	return KeyBound:ToShortKey(GetBindingKey(format('CLICK %s:LeftButton', self:GetName()))) or ''
+function ActionButton:GetHotkey(actionButtonType)
+	local type = actionButtonType or self.buttonType or 'ACTIONBUTTON'
+	local baseID = self:GetAttribute('action--base') or self:GetID()
+
+	local key = GetBindingKey(type .. baseID) or GetBindingKey(format('CLICK %s:LeftButton', self:GetName()))
+	return key and KeyBound:ToShortKey(key) or ''
+end
+
+local function getKeyStrings(...)
+	local keys 
+	for i = 1, select('#', ...) do
+		local key = select(i, ...)
+		if keys then
+			keys = keys .. ", " .. GetBindingText(key, "KEY_")
+		else
+			keys = GetBindingText(key, "KEY_")
+		end
+	end
+	return keys
+end
+
+function ActionButton:GetBindings()
+	local type = actionButtonType or self.buttonType or 'ACTIONBUTTON'
+	local baseID = self:GetAttribute('action--base') or self:GetID()
+	local blizzKeys = getKeyStrings(GetBindingKey(type .. baseID))
+	local clickKeys = getKeyStrings(GetBindingKey(format('CLICK %s:LeftButton', self:GetName())))
+	
+	if blizzKeys then
+		if clickKeys then
+			return blizzKeys .. ', ' .. clickKeys
+		end
+		return blizzKeys
+	else
+		return clickKeys
+	end
 end
 
 function ActionButton:UpdateGrid()
 	if self:GetAttribute('showgrid') > 0 then
-		self:RCall(ActionButton_ShowGrid)
+		ActionButton_ShowGrid(self)
 	else
-		self:RCall(ActionButton_HideGrid)
+		ActionButton_HideGrid(self)
 	end
 end
 
@@ -160,18 +193,9 @@ function ActionButton:UpdateMacro()
 	end
 end
 
---I use this to call any blizzard function which still uses 'this'
---to be removed once Wrath is out
-function ActionButton:RCall(f, ...)
-	local pThis = this
-	this = self
-	f(...)
-	this = pThis
-end
-
 --hotkey code override
 --done to allow hiding of keys, and also for keybinding name shortening
-ActionButton_UpdateHotkeys = function(actionButtonType) ActionButton.UpdateHotkey(this, actionButtonType) end
+ActionButton_UpdateHotkeys = function(self, actionButtonType) ActionButton.UpdateHotkey(self, actionButtonType) end
 
 
 --[[ Action Bar ]]--
@@ -215,6 +239,8 @@ ActionBar.mainbarOffsets = {
 			pages['[bonusbar:3]'] = 8
 		elseif i == 'PRIEST' or i == 'ROGUE' then
 			pages['[bonusbar:1]'] = 6
+		elseif i == 'WARLOCK' then
+			pages['[form:2]'] = 6 --demon form, need to watch this to make sure blizzard doesn't change the page
 		end
 
 		t[i] = pages
@@ -235,6 +261,7 @@ ActionBar.conditions = {
 	'[bar:5]',
 	'[bar:6]',
 	'[bonusbar:1,stealth]',
+	'[form:2]',
 	'[bonusbar:1]',
 	'[bonusbar:2]',
 	'[bonusbar:3]',
@@ -253,8 +280,13 @@ function ActionBar:New(id)
 
 	f.pages = f.sets.pages[f.class]
 	f.baseID = f:MaxLength() * (id-1)
-	f.header:SetAttribute('statemap-state', '$input')
 
+	f.header:SetAttribute('_onattributechanged', [[ 
+		if name == 'state-page' then 
+			newABState = value; 
+			control:ChildUpdate() 
+		end 
+	]] )
 	f:LoadButtons()
 	f:UpdateStateDriver()
 	f:Layout()
@@ -337,51 +369,30 @@ end
 --note to self:
 --if you leave a ; on the end of a statebutton string, it causes evaluation issues, especially if you're doing right click selfcast on the base state
 function ActionBar:UpdateStateDriver()
-	UnregisterStateDriver(self.header, 'state', 0)
+	UnregisterStateDriver(self.header, 'page', 0)
 
 	local header = ''
-	local sb1, sb2
-
 	for state,condition in ipairs(self.conditions) do
+		--possess bar: special case
 		if condition == '[bonusbar:5]' then
-			--possess bar: special case
 			if self:IsPossessBar() then
-				header = header .. condition .. '999;'
-
-				local newSB1 = '999:possess'
-				if sb1 then
-					sb1 = sb1 .. ';' .. newSB1
-				else
-					sb1 = newSB1
-				end
+				header = header .. condition .. 'possess;'
 			end
 		elseif self:GetPage(condition) then
-			header = header .. condition .. state .. ';'
-
-			local newSB1 = state .. ':S' .. state
-			if sb1 then
-				sb1 = sb1 .. ';' .. newSB1
-			else
-				sb1 = newSB1
-			end
-
-			local newSB2 = state .. ':S' .. state .. 's'
-			if sb2 then
-				sb2 = sb2 .. ';' .. newSB2
-			else
-				sb2 = newSB2
-			end
+			header = header .. condition .. 'S' .. state .. ';'
 		end
 	end
 
-	self.header:SetAttribute('statebutton', sb1)
-	self.header:SetAttribute('*statebutton2', sb2)
-
 	if header ~= '' then
-		RegisterStateDriver(self.header, 'state', header .. 0)
+		RegisterStateDriver(self.header, 'page', header .. 0)
 	end
 
 	self:UpdateActions()
+	self:RefreshActions()
+end
+
+function ActionBar:RefreshActions()
+	self.header:Execute([[ control:ChildUpdate() ]])
 end
 
 local function ToValidID(id)
@@ -395,19 +406,16 @@ function ActionBar:UpdateAction(i)
 
 	for state,condition in ipairs(self.conditions) do
 		local page = self:GetPage(condition)
-		local id = page and ToValidID(b:GetAttribute('action') + (self.id + page - 1)*maxSize) or nil
+		local id = page and ToValidID(b:GetAttribute('action--base') + (self.id + page - 1)*maxSize) or nil
 
-		b:SetAttribute('*action-S' .. state, id)
-		b:SetAttribute('*action-S' .. state .. 's', id)
+		b:SetAttribute('action--S' .. state, id)
 	end
 
 	if self:IsPossessBar() and i <= NUM_POSSESS_BAR_BUTTONS then
-		b:SetAttribute('*action-possess', MAX_BUTTONS + i)
+		b:SetAttribute('action--possess', MAX_BUTTONS + i)
 	else
-		b:SetAttribute('*action-possess', nil)
+		b:SetAttribute('action--possess', nil)
 	end
-
-	self.header:SetAttribute('addchild', b)
 end
 
 --updates the actionID of all buttons for all states
@@ -420,26 +428,21 @@ function ActionBar:UpdateActions()
 			local page = self:GetPage(condition)
 			local id = page and ToValidID(i + (self.id + page - 1)*maxSize) or nil
 
-			b:SetAttribute('*action-S' .. state, id)
-			b:SetAttribute('*action-S' .. state .. 's', id)
+			b:SetAttribute('action--S' .. state, id)
 		end
 	end
 
 	if self:IsPossessBar() then
 		for i = 1, min(#self.buttons, NUM_POSSESS_BAR_BUTTONS) do
-			self.buttons[i]:SetAttribute('*action-possess', MAX_BUTTONS + i)
+			self.buttons[i]:SetAttribute('action--possess', MAX_BUTTONS + i)
 		end
 		for i = NUM_POSSESS_BAR_BUTTONS + 1, #self.buttons do
-			self.buttons[i]:SetAttribute('*action-possess', nil)
+			self.buttons[i]:SetAttribute('action--possess', nil)
 		end
 	else
 		for _,b in pairs(self.buttons) do
-			b:SetAttribute('*action-possess', nil)
+			b:SetAttribute('action--possess', nil)
 		end
-	end
-
-	for _,b in pairs(self.buttons) do
-		self.header:SetAttribute('addchild', b)
 	end
 end
 
@@ -484,12 +487,7 @@ end
 
 --right click targeting support
 function ActionBar:UpdateRightClickUnit()
-	local unit = Dominos:GetRightClickUnit()
-
-	self.header:SetAttribute('*unit2', unit)
-	for state in ipairs(self.conditions) do
-		self.header:SetAttribute(format('*unit-s%ds', state), unit)
-	end
+	self.header:SetAttribute('*unit2', Dominos:GetRightClickUnit())
 end
 
 --utility functions
@@ -564,7 +562,7 @@ do
 	--GetSpellInfo(spellID) is awesome for localization
 	local function AddClass(self)
 		local lClass, class = UnitClass('player')
-		if class == 'WARRIOR' or class == 'DRUID' or class == 'PRIEST' or class == 'ROGUE' then
+		if class == 'WARRIOR' or class == 'DRUID' or class == 'PRIEST' or class == 'ROGUE' or class == 'WARLOCK' then
 			local p = self:NewPanel(lClass)
 			if class == 'WARRIOR' then
 				ConditionSlider_New(p, '[bonusbar:3]', GetSpellInfo(2458))
@@ -580,6 +578,8 @@ do
 				ConditionSlider_New(p, '[bonusbar:1]', GetSpellInfo(15473))
 			elseif class == 'ROGUE' then
 				ConditionSlider_New(p, '[bonusbar:1]', GetSpellInfo(1784))
+			elseif class == 'WARLOCK' then
+				ConditionSlider_New(p, '[form:2]', GetSpellInfo(47241))
 			end
 		end
 	end

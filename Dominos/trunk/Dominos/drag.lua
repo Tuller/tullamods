@@ -7,6 +7,7 @@ Dominos.DragFrame = Drag
 
 local L = LibStub('AceLocale-3.0'):GetLocale('Dominos')
 
+
 function Drag:New(owner)
 	local f = self:Bind(CreateFrame('Button', nil, UIParent))
 	f.owner = owner
@@ -23,12 +24,11 @@ function Drag:New(owner)
 	f:SetNormalTexture(bg)
 
 	local t = f:CreateTexture(nil, 'BACKGROUND')
-	t:SetTexture(0, 0, 0.6, 0.5)
+	t:SetTexture(0.2, 0.3, 0.4, 0.5)
 	t:SetAllPoints(f)
 	f:SetHighlightTexture(t)
 
-	f:SetTextFontObject('GameFontNormalLarge')
-	f:SetHighlightTextColor(1, 1, 1)
+	f:SetNormalFontObject('GameFontNormalLarge')
 	f:SetText(owner.id)
 
 	f:RegisterForClicks('AnyUp')
@@ -110,19 +110,17 @@ end
 
 --updates the drag button color of a given bar if its attached to another bar
 function Drag:UpdateColor()
-	if not self.owner:IsShown() then
+	if self.owner:IsShown() then
 		if self.owner:GetAnchor() then
-			self:SetTextColor(0.4, 0.4, 0.4)
+			self:GetNormalTexture():SetTexture(0, 0.2, 0.2, 0.4)
 		else
-			self:SetTextColor(0.8, 0.8, 0.8)
+			self:GetNormalTexture():SetTexture(0, 0.5, 0.7, 0.4)
 		end
-		self:GetHighlightTexture():SetTexture(0.2, 0.3, 0.4, 0.5)
 	else
 		if self.owner:GetAnchor() then
-			self:SetTextColor(0.1, 0.5, 0.1)
+			self:GetNormalTexture():SetTexture(0.1, 0.1, 0.1, 0.4)
 		else
-			self:SetTextColor(0.2, 1, 0.2)
+			self:GetNormalTexture():SetTexture(0.5, 0.5, 0.5, 0.4)
 		end
-		self:GetHighlightTexture():SetTexture(0, 0, 0.6, 0.5)
 	end
 end

@@ -12,7 +12,7 @@ local CURRENT_VERSION = GetAddOnMetadata('Dominos', 'Version')
 
 function Dominos:OnInitialize()
 	--register database events
-	self.db = LibStub('AceDB-3.0'):New('DominosDB', self:GetDefaults(), 'Default')
+	self.db = LibStub('AceDB-3.0'):New('DominosDB', self:GetDefaults(), UnitClass('player'))
 	self.db.RegisterCallback(self, 'OnNewProfile')
 	self.db.RegisterCallback(self, 'OnProfileChanged')
 	self.db.RegisterCallback(self, 'OnProfileCopied')
@@ -57,6 +57,26 @@ end
 
 function Dominos:OnEnable()
 	self:Load()
+	
+	--databroker launcher
+	local LDB = LibStub:GetLibrary('LibDataBroker-1.1', true)
+	if LDB then
+		local dataobj = LibStub:GetLibrary('LibDataBroker-1.1'):NewDataObject('Dominos', {
+			type = 'launcher',
+			icon = 'Interface\\Addons\\Dominos\\Dominos',
+			OnClick = function(_, button) 
+				if button == 'LeftButton' then
+					if IsModifierKeyDown() then
+						kb:Toggle()
+					else
+						self:ToggleLockedFrames()
+					end
+				else
+					self:ShowOptions() 
+				end
+			end,
+		})
+	end
 end
 
 --[[ Version Updating ]]--
@@ -80,7 +100,7 @@ function Dominos:GetDefaults()
 
 			classStyle = {'Entropy: Silver', 0.5, nil},
 
---			bagStyle = {'Entropy: Bronze', 0.5, nil},
+			bagStyle = {'Entropy: Bronze', 0.5, nil},
 
 			frames = {}
 		}
@@ -100,7 +120,7 @@ end
 --Load is called  when the addon is first enabled, and also whenever a profile is loaded
 local function HasClassBar()
 	local _,class = UnitClass('player')
-	return class == 'PALADIN' or class == 'DRUID' or class == 'WARRIOR' or class == 'ROGUE'
+	return class == 'PALADIN' or class == 'DRUID' or class == 'WARRIOR' or class == 'ROGUE' or class == 'DEATHKNIGHT' or class == 'WARLOCK'
 end
 
 function Dominos:Load()
@@ -113,6 +133,7 @@ function Dominos:Load()
 	self.PetBar:New()
 	self.BagBar:New()
 	self.MenuBar:New()
+	self.VehicleBar:New()
 
 	--button facade support
 	local bf = LibStub('LibButtonFacade', true)
@@ -120,7 +141,7 @@ function Dominos:Load()
 		bf:Group('Dominos', 'Action Bar'):Skin(unpack(self.db.profile.ab.style))
 		bf:Group('Dominos', 'Pet Bar'):Skin(unpack(self.db.profile.petStyle))
 		bf:Group('Dominos', 'Class Bar'):Skin(unpack(self.db.profile.classStyle))
---		bf:Group('Dominos', 'Bag Bar'):Skin(unpack(self.db.profile.bagStyle))
+		-- bf:Group('Dominos', 'Bag Bar'):Skin(unpack(self.db.profile.bagStyle))
 	end
 
 	--load in extra functionality
@@ -165,7 +186,16 @@ function Dominos:HideBlizzard()
 	MainMenuBar:UnregisterAllEvents()
 	MainMenuBar:Hide()
 
-	MainMenuBarArtFrame:UnregisterAllEvents()
+	MainMenuBarArtFrame:UnregisterEvent('PLAYER_ENTERING_WORLD')
+--	MainMenuBarArtFrame:UnregisterEvent('BAG_UPDATE') --needed to display stuff on the backpack button
+	MainMenuBarArtFrame:UnregisterEvent('ACTIONBAR_PAGE_CHANGED')
+--	MainMenuBarArtFrame:UnregisterEvent('KNOWN_CURRENCY_TYPES_UPDATE') --needed to display the token tab
+--	MainMenuBarArtFrame:UnregisterEvent('CURRENCY_DISPLAY_UPDATE')
+	MainMenuBarArtFrame:UnregisterEvent('ADDON_LOADED')
+	MainMenuBarArtFrame:UnregisterEvent('UNIT_ENTERING_VEHICLE')
+	MainMenuBarArtFrame:UnregisterEvent('UNIT_ENTERED_VEHICLE')
+	MainMenuBarArtFrame:UnregisterEvent('UNIT_EXITING_VEHICLE')
+	MainMenuBarArtFrame:UnregisterEvent('UNIT_EXITED_VEHICLE')
 	MainMenuBarArtFrame:Hide()
 
 	MainMenuExpBar:UnregisterAllEvents()
@@ -192,6 +222,8 @@ function Dominos:OnSkin(skin, glossAlpha, gloss, group, _, colors)
 		styleDB = self.db.profile.petStyle
 	elseif group == 'Class Bar' then
 		styleDB = self.db.profile.classStyle
+	-- elseif group == 'Bag Bar' then
+		-- styleDB = self.db.profile.bagStyle
 	end
 
 	if styleDB then
@@ -344,7 +376,7 @@ end
 
 function Dominos:ShowOptions()
 	if LoadAddOn('Dominos_Config') then
-		InterfaceOptionsFrame_OpenToFrame('Dominos')
+		InterfaceOptionsFrame_OpenToCategory(self.Options)
 		return true
 	end
 	return false
@@ -392,6 +424,8 @@ function Dominos:OnCmd(args)
 	--actionbar functions
 	elseif cmd == 'numbars' then
 		self:SetNumBars(tonumber(select(2, string.split(' ', args))))
+	elseif cmd == 'numbuttons' then
+		self:SetNumButtons(tonumber(select(2, string.split(' ', args))))
 	--profile functions
 	elseif cmd == 'save' then
 		local profileName = string.join(' ', select(2, string.split(' ', args)))
@@ -653,6 +687,10 @@ function Dominos:SetNumBars(count)
 			self.ActionBar:New(i)
 		end
 	end
+end
+
+function Dominos:SetNumButtons(count)
+	self:SetNumBars(120 / count)
 end
 
 function Dominos:NumBars()

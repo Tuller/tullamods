@@ -9,14 +9,18 @@ local _G = getfenv(0)
 local min = math.min
 local max = math.max
 
-function Panel:New(name, title, subtitle)
+function Panel:New(name, title, subtitle, icon, parent)
 	local f = self:Bind(CreateFrame('Frame', name, UIParent))
 	f.name = title
-	f.parent = self.name
+	f.parent = parent
 	
 	local text = f:CreateFontString(nil, 'ARTWORK', 'GameFontNormalLarge')
 	text:SetPoint('TOPLEFT', 16, -16)
-	text:SetText(title)
+	if icon then
+		text:SetFormattedText('|T%s:%d|t %s', icon, 32, title)
+	else
+		text:SetText(title)
+	end
 
 	local subtext = f:CreateFontString(nil, 'ARTWORK', 'GameFontHighlightSmall')
 	subtext:SetHeight(32)
@@ -96,4 +100,7 @@ function Panel:NewButton(name, width, height)
 end
 
 --load up the options menu
-Dominos.Options = Panel:New('DominosOptions', select(2, GetAddOnInfo('Dominos')))
+do
+	local name, desc = select(2, GetAddOnInfo('Dominos'))
+	Dominos.Options = Panel:New('DominosOptions', name, desc, [[Interface\Addons\Dominos\Dominos]])
+end

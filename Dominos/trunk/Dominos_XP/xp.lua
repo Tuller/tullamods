@@ -9,6 +9,14 @@ local REP_FORMAT = '%s:  %s / %s (%s)'
 local L = LibStub('AceLocale-3.0'):GetLocale('Dominos-XP')
 local _G = getfenv(0)
 
+--taken from http://lua-users.org/wiki/FormattingNumbers 
+--a semi clever way to format numbers with commas (ex, 1,000,000)
+local function comma_value(n)
+	local left,num,right = string.match(tostring(n), '^([^%d]*%d)(%d*)(.-)$')
+	return left..(num:reverse():gsub('(%d%d%d)','%1,'):reverse())..right
+end
+
+
 
 --[[ Module Stuff ]]--
 
@@ -31,7 +39,7 @@ XP = Dominos:CreateClass('Frame', Dominos.Frame)
 
 function XP:New()
 	local f = self.super.New(self, 'xp')
-	if not f.bar then
+	if not f.value then
 		f:Load()
 	end
 
@@ -129,7 +137,6 @@ end
 function XP:UpdateExperience()
 	local value = UnitXP('player')
 	local max = UnitXPMax('player')
-	local percent = floor(value / max * 1000 + 0.5) / 10
 
 	self.value:SetMinMaxValues(0, max)
 	self.value:SetValue(value)
@@ -139,10 +146,10 @@ function XP:UpdateExperience()
 
 	if rest then
 		self.rest:SetValue(value + rest)
-		self.text:SetFormattedText(REST_FORMAT, value, max, rest)
+		self.text:SetFormattedText(REST_FORMAT, comma_value(value), comma_value(max), comma_value(rest))
 	else
 		self.rest:SetValue(0)
-		self.text:SetFormattedText(XP_FORMAT, value, max)
+		self.text:SetFormattedText(XP_FORMAT, comma_value(value), comma_value(max))
 	end
 end
 
@@ -180,7 +187,7 @@ function XP:UpdateReputation()
 	self.value:SetValue(value)
 
 	local repLevel = _G['FACTION_STANDING_LABEL' .. reaction]
-	self.text:SetFormattedText(REP_FORMAT, name, value, max, repLevel)
+	self.text:SetFormattedText(REP_FORMAT, name, comma_value(value), comma_value(max), repLevel)
 end
 
 
@@ -308,14 +315,8 @@ local function TextureButton_Create(name, parent)
 	button:EnableMouseWheel(true)
 	button:SetScript('OnClick', TextureButton_OnClick)
 	button:SetScript('OnMouseWheel', TextureButton_OnMouseWheel)
-	button:SetTextColor(1, 0.82, 0)
-	button:SetHighlightTextColor(1, 1, 1)
-
-	local text = button:CreateFontString()
-	text:SetFontObject('GameFontNormal')
-	text:SetJustifyH('LEFT')
-	text:SetAllPoints(button)
-	button:SetFontString(text)
+	button:SetNormalFontObject('GameFontNormalLeft')
+	button:SetHighlightFontObject('GameFontHighlightLeft')
 
 	return button
 end
@@ -349,7 +350,7 @@ local function AddTexturePanel(menu)
 
 	local name = p:GetName()
 	local scroll = CreateFrame('ScrollFrame', name .. 'ScrollFrame', p, 'FauxScrollFrameTemplate')
-	scroll:SetScript('OnVerticalScroll', function() FauxScrollFrame_OnVerticalScroll(height + offset, function() p:UpdateList() end) end)
+	scroll:SetScript('OnVerticalScroll', function(self, arg1) FauxScrollFrame_OnVerticalScroll(self, arg1, height + offset, function() p:UpdateList() end) end)
 	scroll:SetScript('OnShow', function() p.buttons[1]:SetWidth(width) end)
 	scroll:SetScript('OnHide', function() p.buttons[1]:SetWidth(width + 20) end)
 	scroll:SetPoint('TOPLEFT', 8, 0)

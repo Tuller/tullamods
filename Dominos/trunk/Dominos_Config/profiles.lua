@@ -21,25 +21,17 @@ local function ProfileButton_OnClick(self)
 	parent.selected = self
 end
 
-local function ProfileButton_OnMouseWheel(self, direction)
-	local scrollBar = _G[self:GetParent().scrollFrame:GetName() .. 'ScrollBar']
-
-	scrollBar:SetValue(scrollBar:GetValue() - direction * (scrollBar:GetHeight()/2))
-	parent:UpdateList()
-	parent:Highlight()
-end
-
 local function ProfileButton_Create(name, parent)
 	local button = CreateFrame('Button', name, parent)
 	button:SetWidth(width)
 	button:SetHeight(height)
 	button:SetScript('OnClick', ProfileButton_OnClick)
-	button:SetScript('OnMouseWheel', ProfileButton_OnMouseWheel)
 
 	local text = button:CreateFontString(nil, nil, 'GameFontNormalLarge')
 	text:SetJustifyH('LEFT')
 	text:SetAllPoints(button)
 	button:SetFontString(text)
+	button:SetHighlightFontObject('GameFontHighlightLarge')
 
 	local highlight = button:CreateTexture()
 	highlight:SetAllPoints(button)
@@ -79,11 +71,11 @@ local function Panel_Highlight(self, profile)
 
 	for _,button in pairs(self.buttons) do
 		if(button:GetText() == profile) then
-			button:SetTextColor(0.2, 1, 0.2)
-			button:SetHighlightTextColor(0.2, 1, 0.2)
+			button:SetNormalFontObject('GameFontGreenLarge')
+			button:SetHighlightFontObject('GameFontGreenLarge')
 		else
-			button:SetTextColor(1, 0.82, 0)
-			button:SetHighlightTextColor(1, 1, 1)
+			button:SetNormalFontObject('GameFontNormalLarge')
+			button:SetHighlightFontObject('GameFontHighlightLarge')
 		end
 	end
 end
@@ -129,7 +121,7 @@ local function Panel_CreatePopupDialog(panel)
 end
 
 do
-	local panel = Dominos.Options:New('DominosProfiles', L.Profiles, L.ProfilesPanelDesc)
+	local panel = Dominos.Options:New('DominosProfiles', L.Profiles, L.ProfilesPanelDesc, nil, 'Dominos')
 	panel.UpdateList = Panel_UpdateList
 	panel.Highlight = Panel_Highlight
 
@@ -141,7 +133,9 @@ do
 	end)
 
 	local scroll = CreateFrame('ScrollFrame', name .. 'ScrollFrame', panel, 'FauxScrollFrameTemplate')
-	scroll:SetScript('OnVerticalScroll', function() FauxScrollFrame_OnVerticalScroll(height + offset, function() panel:UpdateList() panel:Highlight() end) end)
+	scroll:SetScript('OnVerticalScroll', function(self, arg1) 
+		FauxScrollFrame_OnVerticalScroll(self, arg1, height + offset, function() panel:UpdateList() panel:Highlight() end) 
+	end)
 	scroll:SetScript('OnShow', function(self) panel.buttons[1]:SetWidth(width) end)
 	scroll:SetScript('OnHide', function() panel.buttons[1]:SetWidth(width + 20) end)
 	scroll:SetPoint('TOPLEFT', 6, -70)

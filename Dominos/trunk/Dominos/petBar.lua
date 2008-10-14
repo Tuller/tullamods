@@ -59,17 +59,17 @@ end
 --keybound support
 function PetButton:OnEnter()
 	if Dominos:ShowTooltips() then
-		self:RCall(PetActionButton_OnEnter)
+		PetActionButton_OnEnter(self)
 	end
 	KeyBound:Set(self)
 end
 
 function PetButton:UpdateHotkey()
+	local key = PetButton.GetHotkey(self)
 	local hotkey = _G[self:GetName() .. 'HotKey']
-	local key = KeyBound:ToShortKey(GetBindingKey('BONUSACTIONBUTTON'..self:GetID()) or GetBindingKey(format('CLICK %s:LeftButton', self:GetName()))) 
-	hotkey:SetText(key)
 
 	if key ~= ''  and Dominos:ShowBindingText() then
+		hotkey:SetText(key)
 		hotkey:Show()
 	else
 		hotkey:Hide()
@@ -77,18 +77,38 @@ function PetButton:UpdateHotkey()
 end
 
 function PetButton:GetHotkey()
-	return KeyBound:ToShortKey(GetBindingKey(format('CLICK %s:LeftButton', self:GetName())))
+	local key = GetBindingKey('BONUSACTIONBUTTON'..self:GetID()) or GetBindingKey(format('CLICK %s:LeftButton', self:GetName()))
+	return KeyBound:ToShortKey(key)
 end
 
---you can hopefully guess what the 'R' stands for
-function PetButton:RCall(f, ...)
-	local pThis = this
-	this = self
-	f(...)
-	this = pThis
+local function getKeyStrings(...)
+	local keys 
+	for i = 1, select('#', ...) do
+		local key = select(i, ...)
+		if keys then
+			keys = keys .. ", " .. GetBindingText(key, "KEY_")
+		else
+			keys = GetBindingText(key, "KEY_")
+		end
+	end
+	return keys
 end
 
-PetActionButton_SetHotkeys = function() PetButton.UpdateHotkey(this) end
+function PetButton:GetBindings()
+	local blizzKeys = getKeyStrings(GetBindingKey('BONUSACTIONBUTTON'..self:GetID()))
+	local clickKeys = getKeyStrings(GetBindingKey(format('CLICK %s:LeftButton', self:GetName())))
+	
+	if blizzKeys then
+		if clickKeys then
+			return blizzKeys .. ', ' .. clickKeys
+		end
+		return blizzKeys
+	else
+		return clickKeys
+	end
+end
+
+PetActionButton_SetHotkeys = function(self) PetButton.UpdateHotkey(self) end
 
 
 --[[ Pet Bar ]]--

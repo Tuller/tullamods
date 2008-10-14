@@ -7,35 +7,32 @@ local menuButtons = {
 	CharacterMicroButton,
 	SpellbookMicroButton,
 	TalentMicroButton,
+	AchievementMicroButton,
 	QuestLogMicroButton,
 	SocialsMicroButton,
+	PVPMicroButton,
 	LFGMicroButton,
 	MainMenuMicroButton,
 	HelpMicroButton
 }
 
 do
-	--mess with the talent button to make it hide properly, it causes layout issues otherwise
-	TalentMicroButton.UpdateShown = function(self)
-		if UnitLevel('player') < 10 then
-			self:Hide()
-		elseif Dominos.Frame:Get('menu') then
-			self:Show()
-		end
-	end
-
 	TalentMicroButton:SetScript('OnEvent', function(self, event)
-		if event == 'PLAYER_LEVEL_UP' then
-			self:UpdateShown()
-			if not CharacterFrame:IsShown() then
+		if (event == 'PLAYER_LEVEL_UP' or event == 'PLAYER_LOGIN') then
+			if UnitCharacterPoints('player') > 0 and not CharacterFrame:IsShown() then
 				SetButtonPulse(self, 60, 1)
 			end
-		elseif event == 'UNIT_LEVEL' or event == 'PLAYER_ENTERING_WORLD' then
-			self:UpdateShown()
 		elseif event == 'UPDATE_BINDINGS' then
 			self.tooltipText =  MicroButtonTooltipText(TALENTS_BUTTON, 'TOGGLETALENTS')
 		end
 	end)
+	TalentMicroButton:UnregisterAllEvents()
+	TalentMicroButton:RegisterEvent('PLAYER_LEVEL_UP')
+	TalentMicroButton:RegisterEvent('PLAYER_LOGIN')
+	TalentMicroButton:RegisterEvent('UPDATE_BINDINGS')
+
+	--simialr thing, but the achievement button
+	AchievementMicroButton:UnregisterAllEvents()
 end
 
 
@@ -57,19 +54,17 @@ function MenuBar:GetDefaults()
 		point = 'BOTTOMRIGHT',
 		x = -244,
 		y = 0,
-		numButtons = #menuButtons,
 	}
+end
+
+function MenuBar:NumButtons()
+	return #menuButtons
 end
 
 function MenuBar:AddButton(i)
 	local b = menuButtons[i]
 	b:SetParent(self.header)
-
-	if b.UpdateShown then
-		b:UpdateShown()
-	else
-		b:Show()
-	end
+	b:Show()
 
 	self.buttons[i] = b
 end

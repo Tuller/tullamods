@@ -79,7 +79,7 @@ function Menu:ShowPanel(name)
 				UIDropDownMenu_SetSelectedValue(self.dropdown, i)
 			end
 			panel:Show()
-			self:SetWidth(max(186, panel.width + self.extraWidth))
+			self:SetWidth(max(200, panel.width + self.extraWidth))
 			self:SetHeight(max(40, panel.height + self.extraHeight))
 		else
 			panel:Hide()
@@ -133,7 +133,7 @@ do
 	end
 
 	local function Dropdown_OnShow(self)
-		UIDropDownMenu_SetWidth(110, self)
+		UIDropDownMenu_SetWidth(self, 110)
 		UIDropDownMenu_Initialize(self, self.Initialize)
 		UIDropDownMenu_SetSelectedValue(self, self:GetParent():GetSelectedPanel())
 	end
@@ -141,17 +141,18 @@ do
 	function Menu:NewPanelSelector()
 		local f = CreateFrame('Frame', self:GetName() .. 'PanelSelector', self, 'UIDropDownMenuTemplate')
 		_G[f:GetName() .. 'Text']:SetJustifyH('LEFT')
-	
+
 		f:SetScript('OnShow', Dropdown_OnShow)
 
-		local function Item_OnClick(name)
+		local function Item_OnClick(item, name)
 			self:ShowPanel(name)
-			UIDropDownMenu_SetSelectedValue(f, this.value)
+			UIDropDownMenu_SetSelectedValue(f, item.value)
 		end
 
-		function f.Initialize()
-			local selected = self:GetSelectedPanel()
-			for i,panel in ipairs(self.panels) do
+		function f:Initialize()
+			local parent = self:GetParent()
+			local selected = parent:GetSelectedPanel()
+			for i,panel in ipairs(parent.panels) do
 				AddItem(panel.name, i, Item_OnClick, i == selected)
 			end
 		end
@@ -196,16 +197,16 @@ end
 
 --checkbutton
 function Panel:NewCheckButton(name)
-	local button = CreateFrame('CheckButton', self:GetName() .. name, self, 'OptionsCheckButtonTemplate')
+	local button = CreateFrame('CheckButton', self:GetName() .. name, self, 'InterfaceOptionsCheckButtonTemplate')
 	_G[button:GetName() .. 'Text']:SetText(name)
 
 	local prev = self.checkbutton
 	if prev then
-		button:SetPoint('TOP', prev, 'BOTTOM', 0, 2)
+		button:SetPoint('TOP', prev, 'BOTTOM', 0, -2)
 	else
-		button:SetPoint('TOPLEFT', 0, 2)
+		button:SetPoint('TOPLEFT', 2, 0)
 	end
-	self.height = self.height + 30
+	self.height = self.height + 28
 	self.checkbutton = button
 
 	return button
@@ -230,9 +231,11 @@ do
 
 	local function Slider_OnShow(self)
 		self.showing = true
+
 		if self.OnShow then
 			self:OnShow()
 		end
+
 		self.showing = nil
 	end
 
@@ -255,6 +258,7 @@ do
 		slider:SetMinMaxValues(low, high)
 		slider:SetValueStep(step)
 		slider:EnableMouseWheel(true)
+		BlizzardOptionsPanel_Slider_Enable(slider) --colors the slider properly
 
 		_G[name .. 'Text']:SetText(text)
 		_G[name .. 'Low']:SetText('')
@@ -275,11 +279,11 @@ do
 
 		local prev = self.slider
 		if prev then
-			slider:SetPoint('BOTTOM', prev, 'TOP', 0, 12)
-			self.height = self.height + 30
+			slider:SetPoint('BOTTOM', prev, 'TOP', 0, 16)
+			self.height = self.height + 34
 		else
-			slider:SetPoint('BOTTOMLEFT', 4, 6)
-			self.height = self.height + 36
+			slider:SetPoint('BOTTOMLEFT', 4, 4)
+			self.height = self.height + 38
 		end
 		self.slider = slider
 
@@ -365,7 +369,14 @@ end
 --columns
 do
 	local function Slider_OnShow(self)
-		self:SetMinMaxValues(1, self:GetParent().owner:NumButtons())
+		local min, max = 1, self:GetParent().owner:NumButtons()
+		if max > min then
+			BlizzardOptionsPanel_Slider_Enable(self)
+			self:SetMinMaxValues(min, max)
+		else
+			BlizzardOptionsPanel_Slider_Disable(self)
+			self:SetMinMaxValues(1, 1)
+		end
 		self:SetValue(self:GetParent().owner:NumColumns())
 	end
 
