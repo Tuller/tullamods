@@ -79,11 +79,10 @@ function SideFilter:UpdateFilters()
 	local numFilters = 0
 	local parent = self:GetParent()
 
-	for _,set in parent:GetSets() do
-		local setData = CombuctorSets:Get(set.name)
-		if setData then
+	for _,set in CombuctorSets:GetParentSets() do
+		if parent:HasSet(set.name) then
 			numFilters = numFilters + 1
-			self.buttons[numFilters]:Set(setData)
+			self.buttons[numFilters]:Set(set)
 		end
 	end
 

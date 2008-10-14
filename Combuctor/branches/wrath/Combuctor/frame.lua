@@ -334,29 +334,26 @@ function InventoryFrame:UpdateSubSets(subCategory)
 	self:SetSubCategory(subCategory or self:GetSubCategory())
 end
 
-function InventoryFrame:HasSet(setName)
-	for i,set in self:GetSets() do
-		if set.name == setName then
-			return i
+function InventoryFrame:HasSet(name)
+	for i,setName in self:GetSets() do
+		if setName == name then
+			return true
 		end
 	end
 	return false
 end
 
-function InventoryFrame:HasSubSet(setName, parentName)
-	for _,set in self:GetSets() do
-		--parent set found...
-		if set.name == parentName then
-			--see if the  child set is excluded or not, if so then blow up
-			if set.exclude then
-				for _,childName in pairs(set.exclude) do
-					if childName == setName then
-						return false
-					end
+function InventoryFrame:HasSubSet(name, parent)
+	if self:HasSet(parent) then
+		local excludeSets = self:GetExcludedSubsets(parent)
+		if excludeSets then
+			for _,childSet in pairs(excludeSets) do
+				if childSet == name then
+					return false
 				end
 			end
-			return true
 		end
+		return true
 	end
 	return false
 end
@@ -364,6 +361,11 @@ end
 function InventoryFrame:GetSets()
 	local profile = Combuctor:GetProfile(self:GetPlayer()) or Combuctor:GetProfile(UnitName('player'))
 	return ipairs(profile[self.key].sets)
+end
+
+function InventoryFrame:GetExcludedSubsets(parent)
+	local profile = Combuctor:GetProfile(self:GetPlayer()) or Combuctor:GetProfile(UnitName('player'))
+	return profile[self.key].exclude[parent]
 end
 
 
@@ -386,8 +388,8 @@ function InventoryFrame:GetCategory()
 end
 
 function InventoryFrame:GetDefaultCategory()
-	for _,set in self:GetSets() do
-		if CombuctorSet:Get(set.name) then
+	for _,set in CombuctorSet:GetParentSets() do
+		if self:HasSet(set.name) then
 			return set.name
 		end
 	end

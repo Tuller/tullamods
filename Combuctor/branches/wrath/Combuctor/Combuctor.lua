@@ -69,34 +69,44 @@ function Combuctor:GetProfile(player)
 end
 
 
-local function addSet(sets, name, ...)
-	if select('#', ...) > 0 then
-		table.insert(sets, {['name'] = name, ['exclude'] = {...}})
+local function addSet(sets, exclude, name, ...)
+	if sets then
+		table.insert(sets, name)
 	else
-		table.insert(sets, {['name'] = name})
+		sets = {name}
 	end
+	
+	if select('#', ...) > 0 then
+		if exclude then
+			table.insert(exclude, {[name] = {...}})
+		else
+			exclude = {[name] = {...}}
+		end
+	end
+
+	return sets, exclude
 end
 
 local function getDefaultInventorySets(class)
-	local sets = {}
+	local sets, exclude
+
 	if class == 'HUNTER' then
-		addSet(sets, L.All, L.All, L.Shards)
+		sets, exclude = addSet(sets, exclude, L.All, L.All, L.Shards)
 	elseif class == 'WARLOCK' then
-		addSet(sets, L.All, L.All, L.Ammo)
+		sets, exclude = addSet(sets, exclude, L.All, L.All, L.Ammo)
 	else
-		addSet(sets, L.All, L.All, L.Ammo, L.Shards)
+		sets, exclude = addSet(sets, exclude, L.All, L.All, L.Ammo, L.Shards)
 	end
-	return sets
+	return sets, exclude
 end
 
 local function getDefaultBankSets(class)
-	local sets = {}
-	addSet(sets, L.All, L.All, L.Shards, L.Ammo, L.Keys)
-	addSet(sets, L.Equipment)
-	addSet(sets, L.TradeGood)
-	addSet(sets, L.Misc)
+	local sets, exclude = addSet(sets, exclude, L.All, L.All, L.Shards, L.Ammo, L.Keys)
+	sets, exclude = addSet(sets, exclude, L.Equipment)
+	sets, exclude = addSet(sets, exclude, L.TradeGood)
+	sets, exclude = addSet(sets, exclude, L.Misc)
 
-	return sets
+	return sets, exclude
 end
 
 function Combuctor:InitProfile()
@@ -104,8 +114,8 @@ function Combuctor:InitProfile()
 	local class = select(2, UnitClass('player'))
 	local profile = self:GetBaseProfile()
 
-	profile.inventory.sets = getDefaultInventorySets(class)
-	profile.bank.sets = getDefaultBankSets(class)
+	profile.inventory.sets, profile.inventory.exclude = getDefaultInventorySets(class)
+	profile.bank.sets, profile.bank.exclude = getDefaultBankSets(class)
 
 	self.db.profiles[player .. ' - ' .. realm] = profile
 	return profile
