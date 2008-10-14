@@ -87,7 +87,7 @@ end
 
 local function HasSubSet(name, parent)
 	local info = Combuctor:GetProfile()[key]
-	local exclude = info.exclude[setName]
+	local exclude = info.exclude[parent]
 
 	if exclude then
 		for j,child in pairs(exclude) do
