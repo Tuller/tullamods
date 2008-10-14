@@ -5,7 +5,8 @@
 
 local function hookItem(tip)
 	local _G = getfenv(0)
-	tip:HookScript('OnTooltipSetItem', function(self, ...)
+	
+	local function OnSetItem(self, ...)
 		local link = select(2, self:GetItem())
 		if link and GetItemInfo(link) then
 			local text = _G[self:GetName() .. 'TextLeft1']
@@ -13,7 +14,13 @@ local function hookItem(tip)
 				text:SetFormattedText('|T%s:%d|t %s', GetItemIcon(link), TipachuSize or 24, text:GetText())
 			end
 		end
-	end)
+	end
+
+	if tip:GetScript('OnTooltipSetItem') then
+		tip:HookScript('OnTooltipSetItem', OnSetItem)
+	else
+		tip:SetScript('OnTooltipSetItem', OnSetItem)
+	end
 end
 hookItem(GameTooltip)
 hookItem(ItemRefTooltip)
