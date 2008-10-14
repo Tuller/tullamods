@@ -3,8 +3,11 @@
 		An item button
 --]]
 
-CombuctorItem = CombuctorUtil:CreateWidgetClass('Button')
-CombuctorItem.SIZE = 37
+local Item = Combuctor:NewClass('Button')
+Combuctor.Item = Item
+
+local InvData = Combuctor:GetModule('InventoryData')
+Item.SIZE = 37
 
 --create a dummy item slot for tooltips and modified clicks of cached items
 do
@@ -19,7 +22,7 @@ do
 
 		parent:LockHighlight()
 		if parent.cached and link then
-			CombuctorItem.AnchorTooltip(self)
+			Item.AnchorTooltip(self)
 			GameTooltip:SetHyperlink(link)
 			GameTooltip:Show()
 		end
@@ -48,7 +51,7 @@ do
 	slot:SetScript('OnShow', Slot_OnEnter)
 	slot:SetScript('OnHide', Slot_OnHide)
 
-	CombuctorItem.dummySlot = slot
+	Item.dummySlot = slot
 end
 
 
@@ -59,9 +62,13 @@ end
 local itemID = 1
 local unused = {}
 
-function CombuctorItem:Create()
-	local item = self:New(self:GetBlizzard(itemID) or CreateFrame('Button', format('CombuctorItem%d', itemID), nil, 'ContainerFrameItemButtonTemplate'))
-	item:ClearAllPoints()
+function Item:New()
+	local item = self:GetBlizzard(itemID)
+	if not item then
+		item = CreateFrame('Button', format('CombuctorItem%d', itemID), nil, 'ContainerFrameItemButtonTemplate')
+	end
+	item = self:Bind(item) --apply item methods
+	item:ClearAllPoints() --hack, to fix reusing blizzard buttons
 
 	local border = item:CreateTexture(nil, 'OVERLAY')
 	border:SetWidth(67); border:SetHeight(67)
@@ -86,7 +93,7 @@ function CombuctorItem:Create()
 	return item
 end
 
-function CombuctorItem:GetBlizzard(id)
+function Item:GetBlizzard(id)
 	local bag = ceil(id / MAX_CONTAINER_ITEMS)
 	local slot = (id-1) % MAX_CONTAINER_ITEMS + 1
 	local item = getglobal(format('ContainerFrame%dItem%d', bag, slot))
@@ -97,16 +104,16 @@ function CombuctorItem:GetBlizzard(id)
 	end
 end
 
-function CombuctorItem:Get()
+function Item:Get()
 	local item = next(unused)
 	if item then
 		unused[item] = nil
 		return item
 	end
-	return self:Create()
+	return self:New()
 end
 
-function CombuctorItem:Set(parent, bag, slot)
+function Item:Set(parent, bag, slot)
 	self:SetParent(self:GetDummyBag(parent, bag))
 	self:SetID(slot)
 	self:Update()
@@ -114,7 +121,7 @@ function CombuctorItem:Set(parent, bag, slot)
 	return item
 end
 
-function CombuctorItem:Release()
+function Item:Release()
 	unused[self] = true
 
 	self.cached = nil
@@ -123,7 +130,7 @@ function CombuctorItem:Release()
 	self:Hide()
 end
 
-function CombuctorItem:GetDummyBag(parent, id)
+function Item:GetDummyBag(parent, id)
 	if not parent.dummyBags then
 		parent.dummyBags = {}
 	end
@@ -142,25 +149,15 @@ end
 --[[ Update Functions ]]--
 
 -- Update the texture, lock status, and other information about an item
-function CombuctorItem:Update()
-	local _, link, texture, count, locked, readable, quality
+function Item:Update()
 	local slot = self:GetID()
 	local bag = self:GetBag()
 	local player = self:GetPlayer()
+	local link, count, texture, quality, locked, readable, cached = InvData:GetItemInfo(bag, slot, player)
 
-	if CombuctorUtil:IsCachedBag(bag, player) then
-		if BagnonDB then
-			link, count, texture, quality = BagnonDB:GetItemData(bag, slot, player)
-			self.readable = nil
-			self.cached = true
-		end
-	else
-		texture, count, locked, _, readable = GetContainerItemInfo(bag, slot)
-		self.readable = readable
-		self.cached = nil
-	end
-
-	self.hasItem = texture and (link or GetContainerItemLink(bag, slot))
+	self.readable = readable
+	self.cached = cached
+	self.hasItem = texture and link
 
 	SetItemButtonDesaturated(self, locked)
 	SetItemButtonTexture(self, texture or 'Interface/PaperDoll/UI-Backpack-EmptySlot')
@@ -175,30 +172,25 @@ function CombuctorItem:Update()
 end
 
 --colors the item border based on the quality of the item.  hides it for common/poor items
-function CombuctorItem:UpdateBorder(quality)
+function Item:UpdateBorder(quality)
 	local border = self.border
 	local link = self.hasItem
 
-	if link then
-		local quality = quality or select(3, GetItemInfo(link))
-		if quality and quality > 1 then
-			local r, g, b = GetItemQualityColor(quality)
-			border:SetVertexColor(r, g, b, 0.5)
-			border:Show()
-		else
-			border:Hide()
-		end
+	if link and quality and quality > 1 then
+		local r, g, b = GetItemQualityColor(quality)
+		border:SetVertexColor(r, g, b, 0.5)
+		border:Show()
 	else
 		border:Hide()
 	end
 end
 
-function CombuctorItem:UpdateLock(locked)
+function Item:UpdateLock(locked)
 	local locked = select(3, GetContainerItemInfo(self:GetBag(), self:GetID()))
 	SetItemButtonDesaturated(self, locked)
 end
 
-function CombuctorItem:UpdateCooldown()
+function Item:UpdateCooldown()
 	if (not self.cached) and self.hasItem then
 		local start, duration, enable = GetContainerItemCooldown(self:GetBag(), self:GetID())
 		CooldownFrame_SetTimer(self.cooldown, start, duration, enable)
@@ -210,27 +202,27 @@ end
 
 --[[ Frame Events ]]--
 
-function CombuctorItem:OnDragStart()
+function Item:OnDragStart()
 	if self.cached and CursorHasItem() then
 		ClearCursor()
 	end
 end
 
-function CombuctorItem:OnModifiedClick(button)
+function Item:OnModifiedClick(button)
 	if self.cached then
 		if self.hasItem then
 			if button == 'LeftButton' then
 				if IsModifiedClick('DRESSUP') then
-					DressUpItemLink((BagnonDB:GetItemData(self:GetBag(), self:GetID(), self:GetPlayer())))
+					DressUpItemLink(InvData:GetItemLink(self:GetBag(), self:GetID(), self:GetPlayer()))
 				elseif IsModifiedClick('CHATLINK') then
-					ChatFrameEditBox:Insert(BagnonDB:GetItemData(self:GetBag(), self:GetID(), self:GetPlayer()))
+					ChatFrameEditBox:Insert(InvData:GetItemLink(self:GetBag(), self:GetID(), self:GetPlayer()))
 				end
 			end
 		end
 	end
 end
 
-function CombuctorItem:OnEnter()
+function Item:OnEnter()
 	local bag, slot = self:GetBag(), self:GetID()
 	if self.cached then
 		self.dummySlot:SetParent(self)
@@ -251,15 +243,15 @@ function CombuctorItem:OnEnter()
 		end
 	end
 end
-CombuctorItem.UpdateTooltip = CombuctorItem.OnEnter
+Item.UpdateTooltip = Item.OnEnter
 
-function CombuctorItem:OnHide()
+function Item:OnHide()
 	if self.hasStackSplit and self.hasStackSplit == 1 then
 		StackSplitFrame:Hide()
 	end
 end
 
-function CombuctorItem:Highlight(enable)
+function Item:Highlight(enable)
 	if enable then
 		self:LockHighlight()
 	else
@@ -270,21 +262,21 @@ end
 
 --[[ Convenience Functions ]]--
 
-function CombuctorItem:GetPlayer()
+function Item:GetPlayer()
 	local bag = self:GetParent()
 	if bag then
 		local frame = bag:GetParent()
 		return frame and frame:GetPlayer()
 	end
-	return currentPlayer
+	return UnitName('player')
 end
 
-function CombuctorItem:GetBag()
+function Item:GetBag()
 	local bag = self:GetParent()
 	return bag and bag:GetID()
 end
 
-function CombuctorItem:AnchorTooltip()
+function Item:AnchorTooltip()
 	if self:GetRight() >= (GetScreenWidth() / 2) then
 		GameTooltip:SetOwner(self, 'ANCHOR_LEFT')
 	else

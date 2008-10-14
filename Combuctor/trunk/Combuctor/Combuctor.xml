@@ -4,7 +4,13 @@
 		Widget Templates
 	-->
 
-	<Button name="CombuctorFrameTabButtonTemplate" inherits="CharacterFrameTabButtonTemplate" virtual="true"/>
+	<Button name="CombuctorFrameTabButtonTemplate" inherits="CharacterFrameTabButtonTemplate" virtual="true">
+		<Scripts>
+			<OnLoad>
+				self:SetFrameLevel(self:GetFrameLevel() + 4);
+			</OnLoad>
+		</Scripts>
+	</Button>
 
 	<Button name="CombuctorIconButtonTemplate" virtual="true">
 		<Size x="64" y="64"/>
@@ -97,16 +103,7 @@
 				getglobal(self:GetName() .. "Border"):SetAlpha(0.6)
 			</OnLoad>
 			<OnClick>
-				if button == 'LeftButton' then
-					getglobal(self:GetName() .. "Icon"):SetTexCoord(0.075,0.925,0.075,0.925)
-					self:GetParent():ToggleBagFrame()
-				else
-					if self:GetParent().isBank then
-						Combuctor:Toggle(BACKPACK_CONTAINER)
-					else
-						Combuctor:Toggle(BANK_CONTAINER)
-					end
-				end
+				self:GetParent():OnBagToggleClick(self, button)
 			</OnClick>
 			<OnMouseDown>
 				getglobal(self:GetName() .. "Icon"):SetTexCoord(0,1,0,1)
@@ -115,7 +112,7 @@
 				getglobal(self:GetName() .. "Icon"):SetTexCoord(0.075,0.925,0.075,0.925)
 			</OnMouseUp>
 			<OnEnter>
-				CombuctorFrame.OnBagToggleEnter(self)
+				self:GetParent():OnBagToggleEnter(self)
 			</OnEnter>
 			<OnLeave>
 				GameTooltip:Hide()
@@ -226,15 +223,15 @@
 				end
 			</OnMouseUp>
 			<OnEnter>
-				CombuctorFrame.OnTitleEnter(self)
+				self:GetParent():OnTitleEnter(self)
 			</OnEnter>
 			<OnLeave>
 				GameTooltip:Hide()
 			</OnLeave>
 		</Scripts>
 
-		<NormalFont font="GameFontNormal"/>
-		<HighlightFont font="GameFontHighlight"/>
+		<NormalFont style="GameFontNormal"/>
+		<HighlightFont style="GameFontHighlight"/>
 	</Button>
 
 

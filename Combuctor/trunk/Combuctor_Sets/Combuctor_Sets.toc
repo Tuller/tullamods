@@ -1,0 +1,8 @@
+## Interface: 30000
+## Title: Combuctor: Basic Sets
+## Author: Tuller
+## Notes: Basic sets for Combuctor
+## Dependencies: Combuctor
+localization.lua
+localization.zhCN.lua
+sets.lua

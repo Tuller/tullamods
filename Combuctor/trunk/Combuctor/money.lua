@@ -1,29 +1,30 @@
 --[[
-	Combuctor\moneyFrame.lua
-		Money frames for Combuctor windows
+	moneyFrame.lua
+		A money frame object
 --]]
 
-CombuctorMoneyFrame = {}
+local MoneyFrame = Combuctor:NewClass('Frame')
+Combuctor.MoneyFrame = MoneyFrame
+
 local L = LibStub('AceLocale-3.0'):GetLocale('Combuctor')
 
-function CombuctorMoneyFrame:Create(parent)
-	local frame = CreateFrame('Frame', parent:GetName() .. 'MoneyFrame', parent, 'SmallMoneyFrameTemplate')
-	frame:SetScript('OnShow', self.Update)
-	frame.Update = self.Update
-	frame:Update()
+function MoneyFrame:New(parent)
+	local f = self:Bind(CreateFrame('Frame', parent:GetName() .. 'MoneyFrame', parent, 'SmallMoneyFrameTemplate'))
+	f:SetScript('OnShow', self.Update)
+	f:Update()
 
-	local click = CreateFrame('Button', frame:GetName() .. 'Click', frame)
-	click:SetFrameLevel(frame:GetFrameLevel() + 3)
-	click:SetAllPoints(frame)
+	local click = CreateFrame('Button', f:GetName() .. 'Click', f)
+	click:SetFrameLevel(f:GetFrameLevel() + 3)
+	click:SetAllPoints(f)
 
 	click:SetScript('OnClick', self.OnClick)
 	click:SetScript('OnEnter', self.OnEnter)
 	click:SetScript('OnLeave', self.OnLeave)
 
-	return frame
+	return f
 end
 
-function CombuctorMoneyFrame:Update()
+function MoneyFrame:Update()
 	local player = self:GetParent():GetPlayer()
 	if player == UnitName('player') or not BagnonDB then
 		MoneyFrame_Update(self:GetName(), GetMoney())
@@ -33,7 +34,7 @@ function CombuctorMoneyFrame:Update()
 end
 
 --frame events
-function CombuctorMoneyFrame:OnClick()
+function MoneyFrame:OnClick()
 	local parent = self:GetParent()
 	local name = parent:GetName()
 
@@ -49,7 +50,7 @@ function CombuctorMoneyFrame:OnClick()
 	end
 end
 
-function CombuctorMoneyFrame:OnEnter()
+function MoneyFrame:OnEnter()
 	if BagnonDB then
 		GameTooltip:SetOwner(self, 'ANCHOR_TOPRIGHT')
 		GameTooltip:SetText(format(L.TotalOnRealm, GetRealmName()))
@@ -64,6 +65,6 @@ function CombuctorMoneyFrame:OnEnter()
 	end
 end
 
-function CombuctorMoneyFrame:OnLeave()
+function MoneyFrame:OnLeave()
 	GameTooltip:Hide()
 end

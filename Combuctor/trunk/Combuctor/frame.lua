@@ -1,567 +1,248 @@
 --[[
 	frame.lua
-		A combuctor frame
+		A combuctor frame object
+
+	Set Events:
+		COMBUCTOR_SET_ADD:
+			name
+				If visible, then update side tabs + highlight
+
+		COMBUCTOR_SET_UPDATE:
+			name, icon, rule
+				if visible, then update side tabs + highlight
+				If we're showing set, then need to update rule
+
+		COMBUCTOR_SUBSET_ADD:
+			name, parent, icon, rule
+				if visible and we're showing parent set, then update bottom tabs + highlight
+
+		COMBUCTOR_SUBSET_UPDATE:
+			name, parent, icon, rule
+				if visible and we're showing parent set, then update bottom tabs + highlight
+				If on subset, then need to update rule
+
+		COMBUCTOR_SET_REMOVE:
+			name
+				If visible, then update side tabs + highlight
+				If on set, then need to switch to default set
+
+		COMBUCTOR_SUBSET_REMOVE
+			name, parent:
+				If visible and on parent set, then need to update subsets
+				If on subset, then need to switch to default subset
+
+		COMBUCTOR_CONFIG_SET_ADD
+		COMBUCTOR_CONFIG_SET_REMOVE
+			key, name
+				If visible, and self.key == key, then update sets
+
+
+	User Events:
+		User shows frame:
+			Show default set + subset
+			In the future, should create events (show keys) that map to set + subset
+
+		User clicks on set:
+			Switch to set, switch to default subset of that set
+
+		User clicks on subset:
+			Switch to given subset
 --]]
 
-CombuctorFrame = Combuctor:NewModule('Frame')
+local FrameEvents = Combuctor:NewModule('FrameEvents', 'AceEvent-3.0')
+do
+	local frames = {}
 
+	function FrameEvents:OnEnable()
+		self:RegisterMessage('COMBUCTOR_SET_ADD', 'UpdateSets')
+		self:RegisterMessage('COMBUCTOR_SET_UPDATE', 'UpdateSets')
+		self:RegisterMessage('COMBUCTOR_SET_REMOVE', 'UpdateSets')
+
+		self:RegisterMessage('COMBUCTOR_CONFIG_SET_ADD', 'UpdateSetConfig')
+		self:RegisterMessage('COMBUCTOR_CONFIG_SET_REMOVE', 'UpdateSetConfig')
+
+		self:RegisterMessage('COMBUCTOR_SUBSET_ADD', 'UpdateSubSets')
+		self:RegisterMessage('COMBUCTOR_SUBSET_UPDATE', 'UpdateSubSets')
+		self:RegisterMessage('COMBUCTOR_SUBSET_REMOVE', 'UpdateSubSets')
+
+		self:RegisterMessage('COMBUCTOR_CONFIG_SUBSET_ADD', 'UpdateSubSetConfig')
+		self:RegisterMessage('COMBUCTOR_CONFIG_SUBSET_REMOVE', 'UpdateSubSetConfig')
+	end
+
+	function FrameEvents:UpdateSets(msg, name)
+		for f in self:GetFrames() do
+			if f:HasSet(name) then
+				f:UpdateSets()
+			end
+		end
+	end
+	
+	function FrameEvents:UpdateSetConfig(msg, key, name)
+		for f in self:GetFrames() do
+			if f.key == key then
+				f:UpdateSets()
+			end
+		end
+	end
+	
+	function FrameEvents:UpdateSubSetConfig(msg, key, name, parent)
+		for f in self:GetFrames() do
+			if f.key == key and f:GetCategory() == parent then
+				f:UpdateSubSets()
+			end
+		end
+	end
+
+	function FrameEvents:UpdateSubSets(msg, name, parent)
+		for f in self:GetFrames() do
+			if f:GetCategory() == parent then
+				f:UpdateSubSets()
+			end
+		end
+	end
+
+
+	function FrameEvents:Register(f)
+		frames[f] = true
+	end
+
+	function FrameEvents:Unregister(f)
+		frames[f] = nil
+	end
+
+	function FrameEvents:GetFrames()
+		return pairs(frames)
+	end
+end
+
+
+local InventoryFrame  = Combuctor:NewClass('Frame')
+Combuctor.Frame = InventoryFrame
+
+--local references
+local _G = getfenv(0)
 local L = LibStub('AceLocale-3.0'):GetLocale('Combuctor')
+local CombuctorSet = Combuctor:GetModule('Sets')
 
+--constants
 local BASE_WIDTH = 384
 local ITEM_FRAME_WIDTH_OFFSET = 312 - BASE_WIDTH
-
 local BASE_HEIGHT = 512
 local ITEM_FRAME_HEIGHT_OFFSET = 346 - BASE_HEIGHT
 
 
-function CombuctorFrame:OnEnable()
-	self:RegisterMessage('COMBUCTOR_BAG_TYPE_CHANGED')
-end
-
-function CombuctorFrame:COMBUCTOR_BAG_TYPE_CHANGED(msg, bag)
-	if self.frames then
-		for frame in pairs(self.frames) do
-			for _,bagID in pairs(frame.sets.bags) do
-				if bag == bagID then
-					frame.needsBagUpdate = true
-					break
-				end
-			end
-		end
-		self.obj:Show()
-	end
-end
-
-function CombuctorFrame:Create(...)
-	local frame = self.obj:Create(...)
-
-	if not self.frames then
-		self.frames = {}
-	end
-	self.frames[frame] = true
-	table.insert(UISpecialFrames, frame:GetName())
-
-	return frame
-end
-
-function CombuctorFrame:UpdateBagSets()
-	for frame in pairs(self.frames) do
-		if frame.needsBagUpdate then
-			frame.needsBagUpdate = nil
-			frame:GenerateBagSets()
-		end
-	end
-end
-
-function CombuctorFrame:OnTitleEnter()
-	GameTooltip:SetOwner(self, 'ANCHOR_LEFT')
-	GameTooltip:SetText(self:GetText(), 1, 1, 1)
-	GameTooltip:AddLine('<Alt-LeftDrag> To Move')
-	GameTooltip:AddLine('<RightClick> To Reset Position')
-	GameTooltip:Show()
-end
-
-function CombuctorFrame:OnBagToggleEnter()
-	GameTooltip:SetOwner(self, 'ANCHOR_LEFT')
-
-	GameTooltip:SetText('Bags', 1, 1, 1)
-	GameTooltip:AddLine('<LeftClick> To Toggle Showing Bags')
-	if self:GetParent().isBank then
-		GameTooltip:AddLine('<RightClick> To Toggle the Inventory Frame')
-	else
-		GameTooltip:AddLine('<RightClick> To Toggle the Bank Frame')
-	end
-	GameTooltip:Show()
-end
-
---[[
-	Quality Filter Widget
-		used for setting what quality of items to show
---]]
-
-local QualityFilter = {}
-do
-	local SIZE = 20
-
-	function QualityFilter:Create(parent)
-		local f = CreateFrame('Frame', nil, parent)
-		f.UpdateHighlight = self.UpdateHighlight
-
-		local prev
-		for i = -1, 5 do
-			local button = CreateFrame('Button', nil, f, 'UIRadioButtonTemplate')
-			button:SetWidth(SIZE); button:SetHeight(SIZE)
-			button:SetScript('OnClick', self.OnButtonClick)
-			button:SetScript('OnEnter', self.OnButtonEnter)
-			button:SetScript('OnLeave', self.OnButtonLeave)
-
-			if i > -1 then
-				local bg = button:CreateTexture(nil, 'BACKGROUND')
-				bg:SetWidth(SIZE/2); bg:SetHeight(SIZE/2)
-				bg:SetPoint('CENTER')
-				bg:SetTexture(GetItemQualityColor(i))
-				button.bg = bg
-				button.quality = i
-			end
-
-			if prev then
-				button:SetPoint('LEFT', prev, 'RIGHT', 1, 0)
-			else
-				button:SetPoint('LEFT')
-			end
-			prev = button
-		end
-
-		f:SetWidth(SIZE * 5); f:SetHeight(SIZE)
-		f:UpdateHighlight()
-
-		return f
-	end
-
-	function QualityFilter:UpdateHighlight()
-		local quality = self:GetParent().filter.quality
-
-		for i = 1, select('#', self:GetChildren()) do
-			local child = select(i, self:GetChildren())
-			if child.quality == quality then
-				if child.bg then
-					child.bg:SetAlpha(1)
-				end
-				child:GetNormalTexture():SetVertexColor(1, 0.82, 0)
-				child:LockHighlight()
-			else
-				if child.bg then
-					child.bg:SetAlpha(0.5)
-				end
-				child:GetNormalTexture():SetVertexColor(1, 1, 1)
-				child:UnlockHighlight()
-			end
-		end
-	end
-
-	function QualityFilter:OnButtonClick()
-		self:GetParent():GetParent():SetFilter('quality', self.quality, true)
-		self:GetParent():UpdateHighlight()
-	end
-
-	function QualityFilter:OnButtonEnter()
-		GameTooltip:SetOwner(self, 'ANCHOR_RIGHT')
-
-		local quality = self.quality
-		if quality then
-			local r,g,b = GetItemQualityColor(quality)
-			GameTooltip:SetText(getglobal(format('ITEM_QUALITY%d_DESC', quality)), r, g, b)
-		else
-			GameTooltip:SetText(ALL)
-		end
-
-		GameTooltip:Show()
-	end
-
-	function QualityFilter:OnButtonLeave()
-		GameTooltip:Hide()
-	end
-end
-
-
---[[
-	Type Filter Widget:
-		Used for setting what types of items to show
---]]
-
-local SideFilter = {}
-do
-	local nextID = 0
-	function SideFilter:Create(parent)
-		local f = CreateFrame('Frame', nil, parent)
-		f.UpdateHighlight = self.UpdateHighlight
-
-		local prev
-		for i,category in ipairs(parent.cats) do
-			local button = CreateFrame('CheckButton', format('CombuctorItemFilter%d', nextID), f, 'SpellBookSkillLineTabTemplate')
-			button.category = category
-
-			button:SetNormalTexture(category.icon)
-			button:GetNormalTexture():SetTexCoord(0.06, 0.94, 0.06, 0.94)
-			button:SetScript('OnClick', self.OnButtonClick)
-			button:SetScript('OnEnter', self.OnButtonEnter)
-			button:SetScript('OnLeave', self.OnButtonLeave)
-			button:Show()
-
-			if prev then
-				button:SetPoint('TOPLEFT', prev, 'BOTTOMLEFT', 0, -17)
-			else
-				button:SetPoint('TOPLEFT', parent, 'TOPRIGHT', -32, -65)
-				button:SetChecked(true)
-			end
-			prev = button
-			nextID = nextID + 1
-		end
-		return f
-	end
-
-	function SideFilter:OnButtonClick()
-		self:GetParent():GetParent():SetCategory(self.category)
-	end
-
-	function SideFilter:OnButtonEnter()
-		GameTooltip:SetOwner(self, 'ANCHOR_RIGHT')
-		GameTooltip:SetText(self.category.name)
-		GameTooltip:Show()
-	end
-
-	function SideFilter:OnButtonLeave()
-		GameTooltip:Hide()
-	end
-
-	function SideFilter:UpdateHighlight()
-		local category = self:GetParent().category
-
-		for i = 1, select('#', self:GetChildren()) do
-			local child = select(i, self:GetChildren())
-			child:SetChecked(child.category == category)
-		end
-	end
-end
-
-
---[[
-	Inventory Frame Widget
---]]
-
---some crazy code, this is used for delayed updates when bag types change because of the possibility of updating in pairs
-CombuctorFrame.obj = CombuctorUtil:CreateWidgetClass('Frame')
-local InventoryFrame = CombuctorFrame.obj
-
 --frame constructor
-do
-	local lastID = 1
-	function InventoryFrame:Create(titleText, settings, isBank)
-		local f = self:New(CreateFrame('Frame', format('CombuctorFrame%d', lastID), UIParent, 'CombuctorInventoryTemplate'))
-		f:SetScript('OnShow', self.OnShow)
-		f:SetScript('OnHide', self.OnHide)
+local lastID = 1
+function InventoryFrame:New(titleText, settings, isBank, key)
+	local f = self:Bind(CreateFrame('Frame', format('CombuctorFrame%d', lastID), UIParent, 'CombuctorInventoryTemplate'))
+	f:SetScript('OnShow', self.OnShow)
+	f:SetScript('OnHide', self.OnHide)
 
-		f.sets = settings
-		f.isBank = isBank
-		f.titleText = titleText
+	f.sets = settings
+	f.isBank = isBank
+	f.key = key --backthingy to get our sv index
+	f.titleText = titleText
 
-		f.bagButtons = {}
-		f.tabs = {}
-		f.filter = {}
-		
-		f:SetWidth(settings.w or BASE_WIDTH)
-		f:SetHeight(settings.h or BASE_HEIGHT)
+	f.bagButtons = {}
+	f.filter = {}
 
-		f.title = getglobal(f:GetName() .. 'Title')
+	f:SetWidth(settings.w or BASE_WIDTH)
+	f:SetHeight(settings.h or BASE_HEIGHT)
 
-		--this must occur before we add the side buttons
-		f:AddCategories()
-		f.sideFilter = SideFilter:Create(f)
+	f.title = _G[f:GetName() .. 'Title']
 
-		f.nameFilter = getglobal(f:GetName() .. 'Search')
+	f.sideFilter = Combuctor.SideFilter:New(f)
+	f.bottomFilter = Combuctor.BottomFilter:New(f)
 
-		f.qualityFilter = QualityFilter:Create(f)
-		f.qualityFilter:SetPoint('BOTTOMLEFT', 24, 65)
+	f.nameFilter = _G[f:GetName() .. 'Search']
 
-		f.itemFrame = CombuctorItemFrame:Create(f)
-		f.itemFrame:SetPoint('TOPLEFT', 24, -78)
+	f.qualityFilter = Combuctor.QualityFilter:New(f)
+	f.qualityFilter:SetPoint('BOTTOMLEFT', 24, 65)
 
-		f.moneyFrame = CombuctorMoneyFrame:Create(f)
-		f.moneyFrame:SetPoint('BOTTOMRIGHT', -40, 67)
+	f.itemFrame = Combuctor.ItemFrame:New(f)
+	f.itemFrame:SetPoint('TOPLEFT', 24, -78)
 
-		f:UpdateTitleText()
-		f:UpdateBagFrame()
-		f:LoadPosition()
+	f.moneyFrame = Combuctor.MoneyFrame:New(f)
+	f.moneyFrame:SetPoint('BOTTOMRIGHT', -40, 67)
 
-		lastID = lastID + 1
+	--load what the title says
+	f:UpdateTitleText()
 
-		table.insert(UISpecialFrames, f:GetName())
+	--update if bags are shown or not
+	f:UpdateBagToggleHighlight()
+	f:UpdateBagFrame()
 
-		return f
-	end
+	--place the frame
+	f.sideFilter:UpdateFilters()
+	f:LoadPosition()
+
+	lastID = lastID + 1
+
+	table.insert(UISpecialFrames, f:GetName())
+
+	return f
 end
 
-function InventoryFrame:OnSizeChanged()
-	local w, h = self:GetWidth(), self:GetHeight()
-	self.sets.w = w
-	self.sets.h = h
 
-	--topleft
-	local t = getglobal(self:GetName() .. 'TLRight')
-	t:SetWidth(128 + (w - BASE_WIDTH)/2)
+--[[
+	Title Frame
+--]]
 
-	local t = getglobal(self:GetName() .. 'TLBottom')
-	t:SetHeight(128 + (h - BASE_HEIGHT)/2)
-
-	local t = getglobal(self:GetName() .. 'TLBottomRight')
-	t:SetWidth(128 + (w - BASE_WIDTH)/2)
-	t:SetHeight(128 + (h - BASE_HEIGHT)/2)
-
-
-	--bottomleft
-	local t = getglobal(self:GetName() .. 'BLRight')
-	t:SetWidth(128 + (w - BASE_WIDTH)/2)
-
-	local t = getglobal(self:GetName() .. 'BLTop')
-	t:SetHeight(128 + (h - BASE_HEIGHT)/2)
-
-	local t = getglobal(self:GetName() .. 'BLTopRight')
-	t:SetWidth(128 + (w - BASE_WIDTH)/2)
-	t:SetHeight(128 + (h - BASE_HEIGHT)/2)
-
-
-	--topright
-	local t = getglobal(self:GetName() .. 'TRLeft')
-	t:SetWidth(64 + (w - BASE_WIDTH)/2)
-
-	local t = getglobal(self:GetName() .. 'TRBottom')
-	t:SetHeight(128 + (h - BASE_HEIGHT)/2)
-
-	local t = getglobal(self:GetName() .. 'TRBottomLeft')
-	t:SetWidth(64 + (w - BASE_WIDTH)/2)
-	t:SetHeight(128 + (h - BASE_HEIGHT)/2)
-
-
-	--bottomright
-	local t = getglobal(self:GetName() .. 'BRLeft')
-	t:SetWidth(64 + (w - BASE_WIDTH)/2)
-
-	local t = getglobal(self:GetName() .. 'BRTop')
-	t:SetHeight(128 + (h - BASE_HEIGHT)/2)
-
-	local t = getglobal(self:GetName() .. 'BRTopLeft')
-	t:SetWidth(64 + (w - BASE_WIDTH)/2)
-	t:SetHeight(128 + (h - BASE_HEIGHT)/2)
-
-	self:UpdateItemFrameSize()
-end
-
-function InventoryFrame:UpdateItemFrameSize()
-	local prevW, prevH = self.itemFrame:GetWidth(), self.itemFrame:GetHeight()
-	local newW = self:GetWidth() + ITEM_FRAME_WIDTH_OFFSET
-	if next(self.bagButtons) then
-		newW = newW - 36
-	end
-
-	local newH = self:GetHeight() + ITEM_FRAME_HEIGHT_OFFSET
-
-	if not((prevW == newW) and (prevH == newH)) then
-		self.itemFrame:SetWidth(newW)
-		self.itemFrame:SetHeight(newH)
-		self.itemFrame:Layout()
-	end
-end
-
-function InventoryFrame:AddCategory(name, icon, rule)
-	local category = {['name'] = name, ['icon'] = icon, ['rule'] = rule}
-	self:AddSubCategory(category, L.All)
-
-	if self.cats then
-		table.insert(self.cats, category)
-	else
-		self.cats = {category}
-	end
-	return category
-end
-
-function InventoryFrame:AddSubCategory(category, name, rule)
-	local subCategory = {['name'] = name, ['rule'] = rule}
-	if category.subCats then
-		table.insert(category.subCats, subCategory)
-	else
-		category.subCats = {subCategory}
-	end
-end
-
-function InventoryFrame:AddCategories()
-	local class = select(2, UnitClass('player'))
-
-	--all items: this category is most like the old bagnon window, has tabs for bag types
-	--we should default to the second tab of this rule whenever we open up the window (ie, clear on close)
-	do
-		local category = self:AddCategory(L.All, 'Interface/Icons/INV_Misc_EngGizmos_17')
-
-		self:AddSubCategory(category, L.Normal, function(bag)
-			return CombuctorUtil:IsNormalBag(bag, self:GetPlayer())
-		end)
-
-		self:AddSubCategory(category, L.Trade, function(bag)
-			return CombuctorUtil:IsProfessionBag(bag, self:GetPlayer())
-		end)
-
-		--these filters are not relevant for the bank
-		if not self.isBank then
-			if class == 'WARLOCK' then
-				self:AddSubCategory(category, L.Shards, function(bag)
-					return CombuctorUtil:IsShardBag(bag, self:GetPlayer())
-				end)
-			elseif class == 'HUNTER' then
-				self:AddSubCategory(category, L.Ammo, function(bag)
-					return CombuctorUtil:IsAmmoBag(bag, self:GetPlayer())
-				end)
-			end
-
-			self:AddSubCategory(category, L.Keys, function(bag)
-				return bag == KEYRING_CONTAINER
-			end)
-		end
-	end
-
-	--equipment filters (armor, weapon, trinket)
-	do
-		local function IsEquipment(bag, link, type)
-			return (type == L.Armor or type == L.Weapon)
-		end
-
-		local category = self:AddCategory(L.Equipment, 'Interface/Icons/INV_Chest_Chain_04', IsEquipment)
-
-		self:AddSubCategory(category, L.Armor, function(bag, link, type, subType, equipLoc)
-			return type == L.Armor and equipLoc ~= 'INVTYPE_TRINKET'
-		end)
-
-		self:AddSubCategory(category, L.Weapon, function(bag, link, type)
-			return type == L.Weapon
-		end)
-
-		self:AddSubCategory(category, L.Trinket, function(bag, link, type, subType, equipLoc)
-			return type == L.Armor and equipLoc == 'INVTYPE_TRINKET'
-		end)
-	end
-
-	--usable items
-	--TODO: Need to add in mounts + hearthstone as a special category
-	do
-		local function IsUsable(bag, link, type, subType)
-			if type == L.Consumable then
-				return true
-			elseif type == L.TradeGood then
-				if subType == L.Devices or subType == L.Explosives then
-					return true
-				end
-			end
-		end
-
-		local category = self:AddCategory(L.Usable, 'Interface/Icons/INV_Potion_93', IsUsable)
-
-		self:AddSubCategory(category, L.Consumable, function(bag, link, type)
-			return type == L.Consumable
-		end)
-
-		self:AddSubCategory(category, L.Devices, function(bag, link, type)
-			return type == L.TradeGood
-		end)
-	end
-
-	--quest items
-	--TODO: Probably should use PT for this
-	do
-		local function IsQuest(bag, link, type)
-			return type == L.Quest
-		end
-		self:AddCategory(L.Quest, 'Interface/QuestFrame/UI-QuestLog-BookIcon', IsQuest)
-	end
-
-	--trade goods + gems
-	--TODO: move item gems to consumables as a tab
-	do
-		local category = self:AddCategory(L.TradeGood, 'Interface/Icons/INV_Fabric_Silk_02', function(bag, link, type, subType)
-			if type == L.TradeGood then
-				return not(subType == L.Devices or subType == L.Explosives)
-			end
-			return type == L.Recipe or type == L.Gem
-		end)
-
-		self:AddSubCategory(category, L.TradeGood, function(bag, link, type)
-			return type == L.TradeGood
-		end)
-
-		self:AddSubCategory(category, L.Gem, function(bag, link, type)
-			return type == L.Gem
-		end)
-
-		self:AddSubCategory(category, L.Recipe, function(bag, link, type)
-			return type == L.Recipe
-		end)
-	end
-
-	--class specific filters (not relevant to the bank)
-	if not self.isBank then
-		--hunter: ammo button
-		if class == 'HUNTER' then
-			self:AddCategory(L.Projectile, 'Interface/Icons/INV_Misc_Ammo_Bullet_01', function(bag, link, type)
-				return type == L.Projectile
-			end)
-		end
-
-		--warlock: shard button
-		if class == 'WARLOCK' then
-			local name,_, _, _, _,_,_,_,_,icon = GetItemInfo(6265)
-			if name then
-				self:AddCategory(name, icon, function(bag, link)
-					return link and GetItemInfo(link) == name
-				end)
-			else
-				self:AddCategory(L.SoulShard, 'Interface/Icons/INV_Misc_Gem_Amethyst_02', function(bag, link)
-					return link and (link:match('%d+') == '6265')
-				end)
-			end
-		end
-	end
-
-	self:AddCategory(L.Misc, 'Interface/Icons/INV_Misc_Rune_01', function(bag, link, type)
-		return type == L.Misc and (link:match('%d+') ~= '6265')
-	end)
-end
-
---title stuff
 function InventoryFrame:UpdateTitleText()
 	self.title:SetFormattedText(self.titleText, self:GetPlayer())
 end
 
---player filtering
-function InventoryFrame:SetPlayer(player)
-	if self:GetPlayer() ~= player then
-		self.player = player
-		self:UpdateBagFrame()
-		self:UpdateTitleText()
+function InventoryFrame:OnTitleEnter(title)
+	GameTooltip:SetOwner(title, 'ANCHOR_LEFT')
+	GameTooltip:SetText(title:GetText(), 1, 1, 1)
+	GameTooltip:AddLine(L.MoveTip)
+	GameTooltip:AddLine(L.ResetPositionTip)
+	GameTooltip:Show()
+end
 
-		self.itemFrame:SetPlayer(player)
-		self.moneyFrame:Update()
+
+--[[
+	Bag Toggle
+--]]
+
+function InventoryFrame:OnBagToggleClick(toggle, button)
+	if button == 'LeftButton' then
+		_G[toggle:GetName() .. 'Icon']:SetTexCoord(0.075, 0.925, 0.075, 0.925)
+		self:ToggleBagFrame()
+	else
+		if self.isBank then
+			Combuctor:Toggle(BACKPACK_CONTAINER)
+		else
+			Combuctor:Toggle(BANK_CONTAINER)
+		end
 	end
 end
 
-function InventoryFrame:GetPlayer()
-	return self.player or UnitName('player')
-end
-
-
---[[ Frame Events ]]--
-
-function InventoryFrame:OnShow()
-	self:SetCategory(self.cats[1])
-	PlaySound('igMainMenuOpen')
-end
-
-function InventoryFrame:OnHide()
-	PlaySound('igMainMenuClose')
+function InventoryFrame:OnBagToggleEnter(toggle)
+	GameTooltip:SetOwner(toggle, 'ANCHOR_LEFT')
+	GameTooltip:SetText(L.Bags, 1, 1, 1)
+	GameTooltip:AddLine(L.Bags)
 
 	if self.isBank then
-		CloseBankFrame()
+		GameTooltip:AddLine(L.InventoryToggle)
+	else
+		GameTooltip:AddLine(L.BankToggle)
 	end
-	self:SetPlayer(nil)
+	GameTooltip:Show()
 end
 
 
---[[ Bag Frame ]]--
+--[[
+	Bag Frame
+--]]
 
 function InventoryFrame:ToggleBagFrame()
 	self.sets.showBags = not self.sets.showBags
+	self:UpdateBagToggleHighlight()
 	self:UpdateBagFrame()
 end
 
 function InventoryFrame:UpdateBagFrame()
-	self:UpdateBagToggle()
-
 	--remove all the current bags
 	for i,bag in pairs(self.bagButtons) do
 		self.bagButtons[i] = nil
@@ -571,7 +252,7 @@ function InventoryFrame:UpdateBagFrame()
 	if self.sets.showBags then
 		for _,bagID in ipairs(self.sets.bags) do
 			if bagID ~= KEYRING_CONTAINER then
-				local bag = CombuctorBag:Get()
+				local bag = Combuctor.Bag:Get()
 				bag:Set(self, bagID)
 				table.insert(self.bagButtons, bag)
 			end
@@ -591,121 +272,279 @@ function InventoryFrame:UpdateBagFrame()
 	self:UpdateItemFrameSize()
 end
 
-function InventoryFrame:UpdateBagToggle()
+function InventoryFrame:UpdateBagToggleHighlight()
 	if self.sets.showBags then
-		getglobal(self:GetName() .. 'BagToggle'):LockHighlight()
+		_G[self:GetName() .. 'BagToggle']:LockHighlight()
 	else
-		getglobal(self:GetName() .. 'BagToggle'):UnlockHighlight()
+		_G[self:GetName() .. 'BagToggle']:UnlockHighlight()
 	end
 end
 
 
---[[ Tabs ]]--
+--[[
+	Filtering
+--]]
 
-local function Tab_OnClick(self)
-	local parent = self:GetParent()
+--[[ Generic ]]--
 
-	if parent.selectedTab ~= self:GetID() then
-		PlaySound("igCharacterInfoTab")
-	end
-
-	PanelTemplates_SetTab(parent, self:GetID())
-	parent:SetFilter('subRule', self.rule, true)
-end
-
-function InventoryFrame:CreateTab(id)
-	local tab = CreateFrame('Button', format('%sTab%d', self:GetName(), id), self, 'CombuctorFrameTabButtonTemplate')
-	tab:SetScript('OnClick', Tab_OnClick)
-	tab:SetID(id)
-
-	if(id > 1) then
-		tab:SetPoint('LEFT', self.tabs[id-1], 'RIGHT', -16, 0)
-	else
-		tab:SetPoint('CENTER', self, 'BOTTOMLEFT', 60, 46)
-	end
-
-	self.tabs[id] = tab
-	return tab
-end
-
-function InventoryFrame:SetTab(id, rule)
-	local tab = self.tabs[id] or self:CreateTab(id)
-	tab.rule = rule.rule
-	tab:SetText(rule.name)
-	tab:Show()
-
-	PanelTemplates_TabResize(0, tab)
-	getglobal(tab:GetName()..'HighlightTexture'):SetWidth(tab:GetTextWidth() + 30)
-end
-
-function InventoryFrame:UpdateTabs()
-	local subCat = self.category.subCats
-	if subCat and #subCat > 1 then
-		for i,rule in ipairs(subCat) do
-			self:SetTab(i, rule)
-		end
-
-		for i = #subCat + 1, #self.tabs do
-			self.tabs[i]:Hide()
-		end
-
-		PanelTemplates_SetNumTabs(self, #self.tabs)
-		PanelTemplates_SetTab(self, 1)
-	else
-		for _,tab in pairs(self.tabs) do
-			tab:Hide()
-		end
-		PanelTemplates_SetNumTabs(self, 0)
-	end
-end
-
-
---[[ Filtering ]]--
-
-function InventoryFrame:SetCategory(category)
-	local changed = false
-	self.category = category
-	self.sideFilter:UpdateHighlight()
-	self:UpdateTabs()
-
-	if self:SetFilter('rule', category.rule) then
-		changed = true
-	end
-
-	--nasty special case, the default tab for the all frame is the second, not the first
-	if category.name == L.All then
-		PanelTemplates_SetTab(self, 2)
-		if self:SetFilter('subRule', category.subCats[2].rule) then
-			changed = true
-		end
-	else
-		if self:SetFilter('subRule', category.subCats[1].rule) then
-			changed = true
-		end
-	end
-
-	if changed then
-		self.itemFrame:Regenerate()
-	end
-end
-
-function InventoryFrame:SetFilter(key, value, update)
+function InventoryFrame:SetFilter(key, value)
 	if self.filter[key] ~= value then
 		self.filter[key] = value
 
-		if key == 'quality' then
-			self.qualityFilter:UpdateHighlight()
-		end
-
-		if update then
-			self.itemFrame:Regenerate()
-		end
+		self.itemFrame:Regenerate()
 		return true
 	end
 end
 
+function InventoryFrame:GetFilter(key)
+	return self.filter[key]
+end
 
---[[ Positioning ]]--
+
+--[[ Player ]]--
+
+function InventoryFrame:SetPlayer(player)
+	if self:GetPlayer() ~= player then
+		self.player = player
+
+		self:UpdateTitleText()
+		self:UpdateBagFrame()
+		self:UpdateSets()
+
+		self.itemFrame:SetPlayer(player)
+		self.moneyFrame:Update()
+	end
+end
+
+function InventoryFrame:GetPlayer()
+	return self.player or UnitName('player')
+end
+
+
+--[[ Sets and Subsets ]]--
+
+function InventoryFrame:UpdateSets(category)
+	self.sideFilter:UpdateFilters()
+	self:SetCategory(category or self:GetCategory())
+	self:UpdateSubSets()
+end
+
+function InventoryFrame:UpdateSubSets(subCategory)
+	self.bottomFilter:UpdateFilters()
+	self:SetSubCategory(subCategory or self:GetSubCategory())
+end
+
+function InventoryFrame:HasSet(name)
+	for i,setName in self:GetSets() do
+		if setName == name then
+			return true
+		end
+	end
+	return false
+end
+
+function InventoryFrame:HasSubSet(name, parent)
+	if self:HasSet(parent) then
+		local excludeSets = self:GetExcludedSubsets(parent)
+		if excludeSets then
+			for _,childSet in pairs(excludeSets) do
+				if childSet == name then
+					return false
+				end
+			end
+		end
+		return true
+	end
+	return false
+end
+
+function InventoryFrame:GetSets()
+	local profile = Combuctor:GetProfile(self:GetPlayer()) or Combuctor:GetProfile(UnitName('player'))
+	return ipairs(profile[self.key].sets)
+end
+
+function InventoryFrame:GetExcludedSubsets(parent)
+	local profile = Combuctor:GetProfile(self:GetPlayer()) or Combuctor:GetProfile(UnitName('player'))
+	return profile[self.key].exclude[parent]
+end
+
+
+--Set
+function InventoryFrame:SetCategory(name)
+	if not(self:HasSet(name) and CombuctorSet:Get(name)) then
+		name = self:GetDefaultCategory()
+	end
+
+	local set = name and CombuctorSet:Get(name)
+	if self:SetFilter('rule', (set and set.rule) or nil) then
+		self.category = name
+		self.sideFilter:UpdateHighlight()
+		self:UpdateSubSets()
+	end
+end
+
+function InventoryFrame:GetCategory()
+	return self.category or self:GetDefaultCategory()
+end
+
+function InventoryFrame:GetDefaultCategory()
+	for _,set in CombuctorSet:GetParentSets() do
+		if self:HasSet(set.name) then
+			return set.name
+		end
+	end
+end
+
+
+--Subset
+function InventoryFrame:SetSubCategory(name)
+	local parent = self:GetCategory()
+	if not(parent and self:HasSubSet(name, parent) and CombuctorSet:Get(name, parent)) then
+		name = self:GetDefaultSubCategory()
+	end
+
+	local set = name and CombuctorSet:Get(name, parent)
+	if self:SetFilter('subRule', (set and set.rule) or nil) then
+		self.subCategory = name
+		self.bottomFilter:UpdateHighlight()
+	end
+end
+
+function InventoryFrame:GetSubCategory()
+	return self.subCategory or self:GetDefaultSubCategory()
+end
+
+function InventoryFrame:GetDefaultSubCategory()
+	local parent = self:GetCategory()
+	if parent then
+		for _,set in CombuctorSet:GetChildSets(parent) do
+			if self:HasSubSet(set.name, parent) then
+				return set.name
+			end
+		end
+	end
+end
+
+
+--Quality
+function InventoryFrame:SetQuality(quality)
+	if self:SetFilter('quality', quality) then
+		self.qualityFilter:UpdateHighlight()
+	end
+end
+
+function InventoryFrame:GetQuality()
+	return self:GetFilter('quality') or -1
+end
+
+
+--[[
+	Sizing
+--]]
+
+function InventoryFrame:OnSizeChanged()
+	local w, h = self:GetWidth(), self:GetHeight()
+	self.sets.w = w
+	self.sets.h = h
+
+	self:SizeTLTextures(w, h)
+	self:SizeBLTextures(w, h)
+	self:SizeTRTextures(w, h)
+	self:SizeBRTextures(w, h)
+	self:UpdateItemFrameSize()
+end
+
+function InventoryFrame:SizeTLTextures(w, h)
+	local t = _G[self:GetName() .. 'TLRight']
+	t:SetWidth(128 + (w - BASE_WIDTH)/2)
+
+	local t = _G[self:GetName() .. 'TLBottom']
+	t:SetHeight(128 + (h - BASE_HEIGHT)/2)
+
+	local t = _G[self:GetName() .. 'TLBottomRight']
+	t:SetWidth(128 + (w - BASE_WIDTH)/2)
+	t:SetHeight(128 + (h - BASE_HEIGHT)/2)
+end
+
+function InventoryFrame:SizeBLTextures(w, h)
+	local t = _G[self:GetName() .. 'BLRight']
+	t:SetWidth(128 + (w - BASE_WIDTH)/2)
+
+	local t = _G[self:GetName() .. 'BLTop']
+	t:SetHeight(128 + (h - BASE_HEIGHT)/2)
+
+	local t = _G[self:GetName() .. 'BLTopRight']
+	t:SetWidth(128 + (w - BASE_WIDTH)/2)
+	t:SetHeight(128 + (h - BASE_HEIGHT)/2)
+end
+
+function InventoryFrame:SizeTRTextures(w, h)
+	local t = _G[self:GetName() .. 'TRLeft']
+	t:SetWidth(64 + (w - BASE_WIDTH)/2)
+
+	local t = _G[self:GetName() .. 'TRBottom']
+	t:SetHeight(128 + (h - BASE_HEIGHT)/2)
+
+	local t = _G[self:GetName() .. 'TRBottomLeft']
+	t:SetWidth(64 + (w - BASE_WIDTH)/2)
+	t:SetHeight(128 + (h - BASE_HEIGHT)/2)
+end
+
+function InventoryFrame:SizeBRTextures(w, h)
+	local t = _G[self:GetName() .. 'BRLeft']
+	t:SetWidth(64 + (w - BASE_WIDTH)/2)
+
+	local t = _G[self:GetName() .. 'BRTop']
+	t:SetHeight(128 + (h - BASE_HEIGHT)/2)
+
+	local t = _G[self:GetName() .. 'BRTopLeft']
+	t:SetWidth(64 + (w - BASE_WIDTH)/2)
+	t:SetHeight(128 + (h - BASE_HEIGHT)/2)
+end
+
+function InventoryFrame:UpdateItemFrameSize()
+	local prevW, prevH = self.itemFrame:GetWidth(), self.itemFrame:GetHeight()
+	local newW = self:GetWidth() + ITEM_FRAME_WIDTH_OFFSET
+	if next(self.bagButtons) then
+		newW = newW - 36
+	end
+
+	local newH = self:GetHeight() + ITEM_FRAME_HEIGHT_OFFSET
+
+	if not((prevW == newW) and (prevH == newH)) then
+		self.itemFrame:SetWidth(newW)
+		self.itemFrame:SetHeight(newH)
+		self.itemFrame:RequestLayout()
+	end
+end
+
+--updates where we can position the frame based on if the side and bottom filters are shown
+function InventoryFrame:UpdateClampInsets()
+	local l, r, t, b
+
+	if self.bottomFilter:IsShown() then
+		t = -15
+		b = 35
+	else
+		t = -15
+		b = 65
+	end
+
+	if self.sideFilter:IsShown() then
+		l = 15
+		r = 0
+	else
+		l = 15
+		r = -35
+	end
+
+	self:SetClampRectInsets(l, r, t, b)
+end
+
+
+--[[
+	Positioning
+--]]
 
 function InventoryFrame:SavePosition(point, parent, relPoint, x, y)
 	if point then
@@ -761,7 +600,26 @@ function InventoryFrame:UpdateManagedPosition()
 end
 
 
---[[ Display ]]--
+--[[
+	Display
+--]]
+
+function InventoryFrame:OnShow()
+	PlaySound('igMainMenuOpen')
+	FrameEvents:Register(self)
+	self:UpdateSets(self:GetDefaultCategory())
+end
+
+function InventoryFrame:OnHide()
+	PlaySound('igMainMenuClose')
+	FrameEvents:Unregister(self)
+
+	--return to showing the current player on close
+	self:SetPlayer(UnitName('player'))
+	if self.isBank then
+		CloseBankFrame()
+	end
+end
 
 function InventoryFrame:ToggleFrame(auto)
 	if self:IsShown() then
