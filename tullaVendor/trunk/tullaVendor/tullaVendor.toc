@@ -1,4 +1,4 @@
-## Interface: 20300
+## Interface: 30000
 ## Title: tullaVendor
 ## Notes: Automatically repairs and sells junk when you visit a merchant
 main.lua
