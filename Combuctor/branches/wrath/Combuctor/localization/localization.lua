@@ -40,6 +40,7 @@ L.SoulShard = 'Soul Shard'
 L.Usable = 'Usable'
 
 --tooltips
+L.Inventory = 'Inventory'
 L.Bank = 'Bank'
 L.TotalOnRealm = 'Total on %s'
 L.ClickToPurchase = '<Click> to Purchase'

@@ -37,7 +37,7 @@ function Combuctor:OnInitialize()
 	local f = CreateFrame('Frame', nil, InterfaceOptionsFrame)
 	f:SetScript('OnShow', function(self)
 		self:SetScript('OnShow', nil)
-		LoadAddOn('Dominos_Config')
+		LoadAddOn('Combuctor_Config')
 	end)
 
 	--slash command support
