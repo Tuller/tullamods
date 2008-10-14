@@ -55,7 +55,7 @@ function OmniCC:Enable()
 	--load slash commands
 	SlashCmdList["OmniCCCOMMAND"] = function()
 		if LoadAddOn('OmniCC_Options') then
-			InterfaceOptionsFrame_OpenToFrame('OmniCC')
+			InterfaceOptionsFrame_OpenToCategory('OmniCC')
 		end
 	end
 	SLASH_OmniCCCOMMAND1 = "/omnicc"
@@ -113,7 +113,6 @@ do
 				HideTimer(self)
 			else
 				self:SetAlpha(OmniCC.sets.showModel and 1 or 0)
-
 				if start > 0 and duration > OmniCC.sets.minDuration then
 					OmniCC:StartTimer(self, start, duration)
 				else
@@ -138,6 +137,7 @@ function OmniCC:StartTimer(cooldown, start, duration)
 
 		timer.start = start
 		timer.duration = duration
+		timer.shouldPulse = duration > 30
 		timer.nextUpdate = 0
 		timer:Show()
 	end
@@ -240,7 +240,7 @@ function OmniCC:UpdateTimer(timer)
 		else
 			timer:Hide()
 
-			if self:ShowingPulse() then
+			if timer.shouldPulse and self:ShowingPulse() then
 				self:StartPulse(timer)
 			end
 		end
@@ -312,7 +312,7 @@ function OmniCC:StartPulse(timer)
 	local icon = timer.icon
 	local parent = timer:GetParent()
 
-	if icon and parent:IsVisible() then
+	if icon and icon.GetTexture and parent:IsVisible() then
 		local pulse = pulses[parent] or self:CreatePulse(parent)
 		if pulse and not activePulses[pulse] then
 			pulse.scale = 1
