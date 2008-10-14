@@ -21,10 +21,11 @@ local function OnPartialMatch(match)
 end
 
 local function Linkerator_OnChar(self, ...)
-        local obj = self;
-        if(WIM_EditBoxInFocus) then
-            obj = WIM_EditBoxInFocus;
-        end
+	local obj = self
+	if WIM_EditBoxInFocus then
+		obj = WIM_EditBoxInFocus
+	end
+
 	local text = obj:GetText()
 	if text ~= '' then
 		if text:match('%[%[(.+)%]') then
