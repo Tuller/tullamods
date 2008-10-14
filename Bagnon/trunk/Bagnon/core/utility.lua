@@ -6,10 +6,6 @@
 BagnonUtil = CreateFrame('Frame')
 local L = LibStub('AceLocale-3.0'):GetLocale('Bagnon')
 local currentPlayer = UnitName('player')
-local typeContainer = select(3, GetAuctionItemClasses())
-local typeQuiver = select(7, GetAuctionItemClasses())
-local subTypeBag = select(1, GetAuctionItemSubClasses(3))
-local subTypeSoulBag = select(2, GetAuctionItemSubClasses(3))
 
 
 --[[ Bank ]]--
@@ -43,6 +39,17 @@ function BagnonUtil:GetBagLink(bag, player)
 		return BagnonDB and (select(2, BagnonDB:GetBagData(bag, player)))
 	end
 	return GetInventoryItemLink('player', self:GetInvSlot(bag))
+end
+
+function BagnonUtil:GetBagType(bag, player)
+	if bag == KEYRING_CONTAINER then
+		return 256
+	elseif bag > 0 then
+		local link = self:GetBagLink(bag, player)
+		return link and GetItemFamily(link)
+	else
+		return 0
+	end
 end
 
 function BagnonUtil:GetItemLink(bag, slot, player)
@@ -85,25 +92,15 @@ end
 --returns if the given bag is an ammo bag/soul bag
 --bankslots, the main bag, and the keyring cannot be ammo slots
 function BagnonUtil:IsAmmoBag(bag, player)
-	if bag <= 0 then return nil end
-
-	local link = self:GetBagLink(bag, player)
-	if link then
-		local type, subType = select(6, GetItemInfo(link))
-		return (type == typeQuiver or subType == subTypeSoulBag)
-	end
+	local bagType = self:GetBagType(bag, player) 
+	return bagType == 1 or bagType == 2 or bagType == 4
 end
 
 --returns if the given bag is a profession bag (herb bag, engineering bag, etc)
 --bankslots, the main bag, and the keyring cannot be ammo slots
 function BagnonUtil:IsProfessionBag(bag, player)
-	if bag <= 0 then return nil end
-
-	local link = self:GetBagLink(bag, player)
-	if link then
-		local type, subType = select(6, GetItemInfo(link))
-		return type == typeContainer and not(subType == subTypeBag or subType == subTypeSoulBag)
-	end
+	local bagType = self:GetBagType(bag, player) 
+	return bagType > 4 and bagType ~= 256 
 end
 
 

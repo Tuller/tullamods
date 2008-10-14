@@ -151,7 +151,7 @@ end
 
 -- Update the texture, lock status, and other information about an item
 function BagnonItem:Update()
-	local _, link, texture, count, locked, readable, quality
+	local link, texture, count, locked, readable, quality
 	local slot = self:GetID()
 	local bag = self:GetBag()
 	local player = self:GetPlayer()
@@ -163,7 +163,7 @@ function BagnonItem:Update()
 			self.cached = true
 		end
 	else
-		texture, count, locked, _, readable = GetContainerItemInfo(bag, slot)
+		texture, count, locked, quality, readable = GetContainerItemInfo(bag, slot)
 		self.readable = readable
 		self.cached = nil
 	end
@@ -192,10 +192,6 @@ function BagnonItem:UpdateBorder(quality)
 	local link = self.hasItem
 
 	if link and BagnonUtil:ShowingBorders() then
-		if not quality then
-			quality = select(3, GetItemInfo(link))
-		end
-
 		if quality and quality > 1 then
 			local r, g, b = GetItemQualityColor(quality)
 			border:SetVertexColor(r, g, b, 0.5)
@@ -211,7 +207,7 @@ end
 function BagnonItem:UpdateSlotBorder()
 	local bag = self:GetBag()
 	local player = self:GetPlayer()
-	local normalTexture = getglobal(self:GetName() .. "NormalTexture")
+	local normalTexture = getglobal(self:GetName() .. 'NormalTexture')
 
 	if bag == KEYRING_CONTAINER then
 		normalTexture:SetVertexColor(1, 0.7, 0)
@@ -331,7 +327,7 @@ function BagnonItem:OnEnter()
 		if bag == BANK_CONTAINER then
 			if self.hasItem then
 				self:AnchorTooltip()
-				GameTooltip:SetInventoryItem("player", BankButtonIDToInvSlotID(slot))
+				GameTooltip:SetInventoryItem('player', BankButtonIDToInvSlotID(slot))
 				GameTooltip:Show()
 			end
 		else

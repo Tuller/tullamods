@@ -34,7 +34,7 @@ function Menu:Load()
 	--title text
 	self.text = self:CreateFontString(nil, 'OVERLAY')
 	self.text:SetPoint('TOP', 0, -15)
-	self.text:SetFontObject('GameFontHighlight')
+	self.text:SetFontObject('GameFontHighlightLeft')
 	self.text:SetText(L.Title)
 
 	--close button
@@ -65,7 +65,7 @@ function Menu:ShowPanel(name)
 				UIDropDownMenu_SetSelectedValue(self.dropdown, i)
 			end
 			panel:Show()
-			self:SetWidth(max(220, panel.width + self.extraWidth))
+			self:SetWidth(max(240, panel.width + self.extraWidth))
 			self:SetHeight(max(40, panel.height + self.extraHeight))
 		else
 			panel:Hide()
@@ -107,25 +107,24 @@ do
 	end
 
 	local function Dropdown_OnShow(self)
-		UIDropDownMenu_SetWidth(110, self)
+		UIDropDownMenu_SetWidth(self, 110)
 		UIDropDownMenu_Initialize(self, self.Initialize)
 		UIDropDownMenu_SetSelectedValue(self, self:GetParent():GetSelectedPanel())
 	end
 
 	function Menu:CreatePanelSelector()
 		local f = CreateFrame('Frame', self:GetName() .. 'PanelSelector', self, 'UIDropDownMenuTemplate')
-		--getglobal(f:GetName() .. 'Text'):SetJustifyH('LEFT')
-
 		f:SetScript('OnShow', Dropdown_OnShow)
 
-		local function Item_OnClick(name)
+		local function Item_OnClick(item, name)
 			self:ShowPanel(name)
-			UIDropDownMenu_SetSelectedValue(f, this.value)
+			UIDropDownMenu_SetSelectedValue(f, item.value)
 		end
 
-		function f.Initialize()
-			local selected = self:GetSelectedPanel()
-			for i,panel in ipairs(self.panels) do
+		function f:Initialize()
+			local parent = self:GetParent()
+			local selected = parent:GetSelectedPanel()
+			for i,panel in ipairs(parent.panels) do
 				AddItem(panel.name, i, Item_OnClick, i == selected)
 			end
 		end
@@ -172,16 +171,16 @@ end
 
 --checkbutton
 function Panel:CreateCheckButton(name)
-	local button = CreateFrame('CheckButton', self:GetName() .. name, self, 'OptionsCheckButtonTemplate')
+	local button = CreateFrame('CheckButton', self:GetName() .. name, self, 'InterfaceOptionsCheckButtonTemplate')
 	getglobal(button:GetName() .. 'Text'):SetText(name)
 
 	local prev = self.checkbutton
 	if prev then
-		button:SetPoint('TOP', prev, 'BOTTOM', 0, 2)
+		button:SetPoint('TOP', prev, 'BOTTOM', 0, -2)
 	else
-		button:SetPoint('TOPLEFT', 0, 2)
+		button:SetPoint('TOPLEFT', 2, 0)
 	end
-	self.height = self.height + 30
+	self.height = self.height + 28
 	self.checkbutton = button
 
 	return button
@@ -231,7 +230,8 @@ do
 		slider:SetMinMaxValues(low, high)
 		slider:SetValueStep(step)
 		slider:EnableMouseWheel(true)
-		slider:SetWidth(slider:GetWidth() + 20)
+		slider:SetWidth(slider:GetWidth() + 30)
+		BlizzardOptionsPanel_Slider_Enable(slider) --colors the slider properly
 
 		getglobal(name .. 'Text'):SetText(text)
 		getglobal(name .. 'Low'):SetText('')
@@ -252,11 +252,11 @@ do
 
 		local prev = self.slider
 		if prev then
-			slider:SetPoint('BOTTOM', prev, 'TOP', 0, 12)
-			self.height = self.height + 30
+			slider:SetPoint('BOTTOM', prev, 'TOP', 0, 16)
+			self.height = self.height + 34
 		else
-			slider:SetPoint('BOTTOMLEFT', 4, 6)
-			self.height = self.height + 36
+			slider:SetPoint('BOTTOMLEFT', 4, 4)
+			self.height = self.height + 38
 		end
 		self.slider = slider
 
@@ -270,8 +270,8 @@ do
 
 	function ColorSelect:Create(name, parent, hasOpacity, SaveColor, LoadColor)
 		local f = self:New(CreateFrame('Button', parent:GetName() .. name, parent))
-		f:SetWidth(24); f:SetHeight(24)
-		f:SetNormalTexture('Interface/ChatFrame/ChatFrameColorSwatch')
+		f:SetWidth(18); f:SetHeight(18)
+		f:SetNormalTexture('Interface\\ChatFrame\\ChatFrameColorSwatch')
 
 		f.SaveColor = SaveColor
 		f.LoadColor = LoadColor
@@ -287,26 +287,27 @@ do
 			f.opacityFunc = f.swatchFunc
 
 			f.cancelFunc = function()
-				f:SetColor(self.r, self.g, self.b, 1 - self.opacity)
+				local prev = ColorPickerFrame.previousValues
+				f:SetColor(prev.r, prev.g, prev.b, 1 - prev.opacity)
 			end
 		else
 			f.swatchFunc = function()
 				f:SetColor(ColorPickerFrame:GetColorRGB())
 			end
 			f.cancelFunc = function()
-				f:SetColor(self.r, self.g, self.b)
+				f:SetColor(ColorPicker_GetPreviousValues())
 			end
 		end
 
 		local bg = f:CreateTexture(nil, 'BACKGROUND')
-		bg:SetWidth(21); bg:SetHeight(21)
+		bg:SetWidth(16); bg:SetHeight(16)
 		bg:SetTexture(1, 1, 1)
 		bg:SetPoint('CENTER')
 		self.bg = bg
 
 		local text = f:CreateFontString(nil, 'ARTWORK')
-		text:SetFontObject('GameFontNormalSmall')
-		text:SetPoint('LEFT', f, 'RIGHT', 2, 0)
+		text:SetFontObject('GameFontHighlight')
+		text:SetPoint('LEFT', f, 'RIGHT', 4, 0)
 		text:SetText(name)
 		self.text = text
 
@@ -329,9 +330,9 @@ do
 			ColorPickerFrame:Hide()
 		else
 			self.r, self.g, self.b, self.opacity = self:LoadColor()
-			self.opacity = 1 - self.opacity --correction, since the color menu is crazy
+			self.opacity = 1 - (self.opacity or 1) --correction, since the color menu is crazy
 
-			UIDropDownMenuButton_OpenColorPicker(self)
+			OpenColorPicker(self)
 			ColorPickerFrame:SetFrameStrata('TOOLTIP')
 			ColorPickerFrame:Raise()
 		end
@@ -399,7 +400,7 @@ do
 		color.LoadColor = function(c)
 			return self.parent:GetBackgroundColor()
 		end
-		color:SetPoint('TOPLEFT', showBorders, 'BOTTOMLEFT', 4, 0)
+		color:SetPoint('TOPLEFT', showBorders, 'BOTTOMLEFT', 4, -4)
 		layout.height = layout.height + 30
 
 		--sliders

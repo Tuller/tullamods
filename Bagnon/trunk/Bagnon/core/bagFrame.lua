@@ -19,11 +19,10 @@ local function Toggle_Create(parent, shown)
 	local text = toggle:CreateFontString()
 	text:SetPoint('BOTTOMLEFT')
 	text:SetJustifyH('LEFT')
-	text:SetFontObject('GameFontNormal')
 
 	toggle:SetFontString(text)
-	toggle:SetTextColor(1, 0.82, 0)
-	toggle:SetHighlightTextColor(1, 1, 1)
+	toggle:SetNormalFontObject('GameFontNormal')
+	toggle:SetHighlightFontObject('GameFontHighlight')
 
 	toggle:RegisterForClicks('anyUp')
 	toggle:SetScript('OnClick', Toggle_OnClick)

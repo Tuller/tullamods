@@ -21,15 +21,8 @@ local TitleFrame = {}
 do
 	function TitleFrame:Create(parent)
 		local title = CreateFrame('Button', nil, parent)
-
-		local text = title:CreateFontString()
-		text:SetAllPoints(title)
-		text:SetJustifyH('LEFT')
-		text:SetFontObject('GameFontNormal')
-		title:SetFontString(text)
-
-		title:SetHighlightTextColor(1, 1, 1)
-		title:SetTextColor(1, 0.82, 0)
+		title:SetNormalFontObject('GameFontNormalLeft')
+		title:SetHighlightFontObject('GameFontHighlightLeft')
 		title:RegisterForClicks('anyUp')
 
 		title:SetScript('OnClick', self.OnClick)
