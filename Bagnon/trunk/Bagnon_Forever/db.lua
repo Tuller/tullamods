@@ -111,7 +111,7 @@ end
 
 function BagnonDB:UpdateVersion()
 	BagnonForeverDB.version = CURRENT_VERSION
-	self:Print(format('Updated to v%s', BagnonForeverDB.version))
+	print(format('BagnonForever: Updated to v%s', BagnonForeverDB.version))
 end
 
 
