@@ -7,6 +7,8 @@
 
 local L = LibStub("AceLocale-3.0"):NewLocale("Combuctor", "enUS", true)
 
+L.Updated = 'Updated to v%s'
+
 --binding actions
 L.ToggleInventory = "Toggle Inventory"
 L.ToggleBank = "Toggle Bank"
