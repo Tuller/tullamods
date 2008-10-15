@@ -43,7 +43,7 @@ Configuring paging settings is best done in the form you want a bar to change in
 ----
 
 
-==== The Posses Bar ====
+==== The Possess Bar ====
 
 
 The possess bar is a special state which causes your action bar to change when you lose control of your character and gain control of another. This is used, for example, during the Karazhan chess event, the Priest's Mind Control ability, or Hunter's Eyes of the Beast ability.  You can configure which bar to use as the possess bar via the possess bar option in the main options menu (/dominos).
