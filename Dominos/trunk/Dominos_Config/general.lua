@@ -11,32 +11,45 @@ local Options = Dominos.Options
 
 --toggle config mode
 local lock = Options:NewButton('Config Mode', 136, 22)
-lock.UpdateText = function(self) self:SetText(Dominos:Locked() and L.EnterConfigMode or L.ExitConfigMode) end
+lock.UpdateText = function(self) 
+	self:SetText(Dominos:Locked() and L.EnterConfigMode or L.ExitConfigMode) 
+end
 lock:SetScript('OnShow', lock.UpdateText)
-lock:SetScript('OnClick', function(self) Dominos:ToggleLockedFrames() self:UpdateText() end)
+lock:SetScript('OnClick', function(self) 
+	Dominos:ToggleLockedFrames() 
+	self:UpdateText() 
+end)
 lock:SetPoint('TOPLEFT', 12, -72)
 
 --toggle keybinding mode
 local bind = Options:NewButton(L.EnterBindingMode, 136, 22)
-bind:SetScript('OnClick', function(self) LibStub('LibKeyBound-1.0'):Activate() HideUIPanel(InterfaceOptionsFrame) end)
+bind:SetScript('OnClick', function(self) 
+	Dominos:ToggleBindingMode()
+	HideUIPanel(InterfaceOptionsFrame) 
+end)
 bind:SetPoint('LEFT', lock, 'RIGHT', 4, 0)
 
 
 --[[ Check Buttons ]]--
 
 --local action bar button positions
---[[
-local lockButtons = Options:NewCheckButton(L.LockActionButtons)
-lockButtons:SetScript('OnShow', function(self)
-	self:SetChecked(GetCVarBool('lockActionBars'))
+local stickyBars = Options:NewCheckButton(L.StickyBars)
+stickyBars:SetScript('OnShow', function(self)
+	self:SetChecked(Dominos:Sticky())
 end)
-lockButtons:SetScript('OnClick', function(self)
-	local value = self:GetChecked() and '1' or '0'
-	SetCVar('lockActionBars', value)
-	setglobal('LOCK_ACTIONBAR', value)
+stickyBars:SetScript('OnClick', function(self)
+	Dominos:SetSticky(self:GetChecked())
 end)
-lockButtons:SetPoint('TOPLEFT', lock, 'BOTTOMLEFT', 0, -24)
---]]
+stickyBars:SetPoint('TOPLEFT', lock, 'BOTTOMLEFT', 0, -24)
+
+local showMinimapButton = Options:NewCheckButton(L.ShowMinimapButton)
+showMinimapButton:SetScript('OnShow', function(self)
+	self:SetChecked(Dominos:ShowingMinimap())
+end)
+showMinimapButton:SetScript('OnClick', function(self)
+	Dominos:SetShowMinimap(self:GetChecked())
+end)
+showMinimapButton:SetPoint('TOP', stickyBars, 'BOTTOM', 0, -10)
 
 --show empty buttons
 local showEmpty = Options:NewCheckButton(L.ShowEmptyButtons)
@@ -46,8 +59,8 @@ end)
 showEmpty:SetScript('OnClick', function(self)
 	Dominos:SetShowGrid(self:GetChecked())
 end)
-showEmpty:SetPoint('TOPLEFT', lock, 'BOTTOMLEFT', 0, -24)
---showEmpty:SetPoint('TOP', lockButtons, 'BOTTOM', 0, -10)
+--showEmpty:SetPoint('TOPLEFT', lock, 'BOTTOMLEFT', 0, -24)
+showEmpty:SetPoint('TOP', showMinimapButton, 'BOTTOM', 0, -10)
 
 --show keybinding text
 local showBindings = Options:NewCheckButton(L.ShowBindingText)
