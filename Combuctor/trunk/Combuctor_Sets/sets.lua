@@ -6,7 +6,7 @@
 --]]
 
 local CombuctorSet = Combuctor:GetModule('Sets')
-local L = LibStub('AceLocale-3.0'):GetLocale('Combuctor-Sets')
+local L = LibStub('AceLocale-3.0'):GetLocale('Combuctor')
 
 
 --the all category (player, bagType filters)
