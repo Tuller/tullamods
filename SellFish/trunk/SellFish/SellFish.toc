@@ -8,5 +8,6 @@
 embeds.xml
 localization.lua
 localization.de.lua
+localization.zhCN.lua
 db.lua
 tooltips.lua
