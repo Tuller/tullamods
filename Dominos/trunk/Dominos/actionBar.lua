@@ -66,11 +66,9 @@ function ActionButton:Create(id)
 	local b = Create(id)
 	if b then
 		self:Bind(b)
-
-		b:SetAttribute('action', id)
 		b:SetID(0)
 		b:ClearAllPoints()
-		b:SetAttribute('useparent-actionbar', nil)
+		b:SetAttribute('useparent-actionpage', nil)
 		b:SetAttribute('useparent-unit', true)
 		b:EnableMouseWheel(true)
 		b:SetScript('OnEnter', self.OnEnter)
@@ -91,7 +89,7 @@ function ActionButton:Restore(id)
 	if b then
 		self.unused[id] = nil
 		b:LoadEvents()
-		ActionButton_Update(b)
+		ActionButton_UpdateAction(b)
 		b:Show()
 		self.active[id] = b
 		return b
@@ -100,7 +98,7 @@ end
 
 --destructor
 function ActionButton:Free()
-	local id = self:GetAttribute('action')
+	local id = self:GetAttribute('action--base')
 
 	self.active[id] = nil
 
@@ -108,6 +106,7 @@ function ActionButton:Free()
 	self:SetParent(nil)
 	self:Hide()
 	self.eventsRegistered = nil
+	self.action = nil
 	self.unused[id] = self
 end
 
