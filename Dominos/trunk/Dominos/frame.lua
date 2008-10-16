@@ -597,16 +597,19 @@ function Frame:CreateMenu()
 end
 
 function Frame:ShowMenu()
-	if not self.menu then
-		self:CreateMenu()
-	end
+	local enabled = select(4, GetAddOnInfo('Dominos_Config'))
+	if enabled then
+		if not self.menu then
+			self:CreateMenu()
+		end
 
-	local menu = self.menu
-	if menu then
-		menu:Hide()
-		menu:SetOwner(self)
-		menu:ShowPanel(LibStub('AceLocale-3.0'):GetLocale('Dominos-Config').Layout)
-		menu:Show()
+		local menu = self.menu
+		if menu then
+			menu:Hide()
+			menu:SetOwner(self)
+			menu:ShowPanel(LibStub('AceLocale-3.0'):GetLocale('Dominos-Config').Layout)
+			menu:Show()
+		end
 	end
 end
 

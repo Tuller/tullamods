@@ -391,7 +391,7 @@ function Dominos:NewMenu(id)
 	if not self.Menu then
 		LoadAddOn('Dominos_Config')
 	end
-	return self.Menu:New(id)
+	return self.Menu and self.Menu:New(id)
 end
 
 
