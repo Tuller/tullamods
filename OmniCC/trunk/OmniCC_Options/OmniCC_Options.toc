@@ -6,4 +6,5 @@
 ## LoadOnDemand: 1
 localization.lua
 localization.ru.lua
+localization.ko.lua
 menu.lua
