@@ -487,7 +487,7 @@ function Frame:Stick()
 	self.sets.anchor = nil
 
 	--only do sticky code if the alt key is not currently down
-	if not IsAltKeyDown() then
+	if Dominos:Sticky() and not IsAltKeyDown() then
 		--try to stick to a bar, then try to stick to a screen edge
 		for _, f in self:GetAll() do
 			if f ~= self then

@@ -51,3 +51,10 @@ L.ShowConfig = '<Right Click> to configure'
 L.HideBar = '<Middle Click or Shift-Right Click> to hide'
 L.ShowBar = '<Middle Click or Shift-Right Click> to show'
 L.SetAlpha = '<Mousewheel> to set opacity (|cffffffff%d|r)'
+
+--minimap button stuff
+L.ConfigEnterTip = '<Left Click> to enter configuration mode'
+L.ConfigExitTip = '<Left Click> to exit configuration mode'
+L.BindingEnterTip = '<Shift-Left Click> to enter binding mode'
+L.BindingExitTip = '<Shift-Left Click> to exit binding mode'
+L.ShowOptionsTip = '<Right Click> to show the options menu'

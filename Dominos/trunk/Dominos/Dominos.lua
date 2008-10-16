@@ -86,9 +86,11 @@ function Dominos:GetDefaults()
 		profile = {
 			possessBar = 1,
 
+			sticky = true,
 			showMacroText = true,
 			showBindingText = true,
 			showTooltips = true,
+			showMinimap = true,
 
 			ab = {
 				count = 10,
@@ -151,6 +153,9 @@ function Dominos:Load()
 
 	--anchor everything
 	self.Frame:ForAll('Reanchor')
+	
+	--minimap button
+	self:UpdateMinimapButton()
 end
 
 --unload is called when we're switching profiles
@@ -506,6 +511,12 @@ end
 
 function Dominos:ToggleLockedFrames()
 	self:SetLock(not self:Locked())
+	LibStub('LibKeyBound-1.0'):Deactivate()
+end
+
+function Dominos:ToggleBindingMode()
+	self:SetLock(true)
+	LibStub('LibKeyBound-1.0'):Toggle()
 end
 
 --scale
@@ -704,6 +715,46 @@ end
 
 function Dominos:SetShowTooltips(enable)
 	self.db.profile.showTooltips = enable or false
+end
+
+--minimap button
+function Dominos:SetShowMinimap(enable)
+	self.db.profile.showMinimap = enable or false
+	self:UpdateMinimapButton()
+end
+
+function Dominos:ShowingMinimap()
+	return self.db.profile.showMinimap
+end
+
+function Dominos:UpdateMinimapButton()
+	if self:ShowingMinimap() then
+		self.Minimap:UpdatePosition()
+		self.Minimap:Show()
+	else
+		self.Minimap:Hide()
+	end
+end
+
+function Dominos:SetMinimapButtonPosition(angle)
+	self.db.profile.minimapPos = angle
+end
+
+function Dominos:GetMinimapButtonPosition(angle)
+	return self.db.profile.minimapPos
+end
+
+--sticky bars
+function Dominos:SetSticky(enable)
+	self.db.profile.sticky = enable or false
+	if not enable then
+		self.Frame:ForAll('Stick')
+		self.Frame:ForAll('Reposition')
+	end
+end
+
+function Dominos:Sticky()
+	return self.db.profile.sticky
 end
 
 
