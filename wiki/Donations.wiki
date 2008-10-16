@@ -14,4 +14,4 @@ Note: That list does not include "implementing features you pay me to."
 
 [https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=266070 https://www.paypal.com/en_US/i/btn/btn_donate_LG.gif]
 
-If you don't want to donate money to myself, please consider donating to your favorite addons site where I host my projects.  Bandwidth is expensive, you know.
+If you don't want to donate money to myself, please consider subscribing to your favorite addons site where I host my projects.  All of us addon authors depend on them greatly.
