@@ -174,7 +174,7 @@ function BagnonItem:UpdateBorder(quality)
 	local link = self.hasItem
 
 	if link and BagnonUtil:ShowingBorders() then
-		if quality > 1 then
+		if quality and quality > 1 then
 			local r, g, b = GetItemQualityColor(quality)
 			border:SetVertexColor(r, g, b, 0.5)
 			border:Show()
