@@ -100,15 +100,15 @@ function Updater:UpdatePlayerBuffs()
 
 	ClearTable(newVals)
 
-	local buff
+	local name
 	local i = 1
 	repeat
-		buff = UnitBuff('player', i)
-		if buff then
-			newVals[buff] = true
+		name = UnitBuff('player', i)
+		if name then
+			newVals[name] = true
 		end
 		i = i + 1
-	until not buff
+	until not name
 
 	if CloneTable(newVals, self.playerBuffs) then
 		changed = true
@@ -147,14 +147,14 @@ function Updater:UpdateFriendlyTargetBuffs()
 	--add all target buffs into newVals
 	ClearTable(newVals)
 	local i = 1
-	local buff, isMine, _
+	local name, rank, icon, count, debuffType, duration, expirationTime, isMine, isStealable
 	repeat
-		buff, _, _, _, _, _, _, isMine = UnitBuff('target', i)
-		if buff and isMine then
-			newVals[buff] = true
+		name, rank, icon, count, debuffType, duration, expirationTime, isMine, isStealable = UnitBuff('target', i)
+		if name and isMine then
+			newVals[name] = true
 		end
 		i = i + 1
-	until not buff
+	until not name
 
 	--set changed to true if the target buffs table has changed
 	if CloneTable(newVals, self.targetBuffs) then
@@ -171,14 +171,14 @@ function Updater:UpdateEnemyTargetDebuffs()
 	--update debuffs on enemy targets
 	ClearTable(newVals)
 	local i = 1
-	local buff, isMine, _
+	local name, rank, icon, count, debuffType, duration, expirationTime, isMine, isStealable
 	repeat
-		buff, _, _, _, _, _, _, isMine = UnitDebuff('target', i)
-		if buff and isMine then
-			newVals[buff] = true
+		name, rank, icon, count, debuffType, duration, expirationTime, isMine, isStealable = UnitDebuff('target', i)
+		if name and isMine then
+			newVals[name] = true
 		end
 		i = i + 1
-	until not buff
+	until not name
 
 	--set changed to true if the target debuffs table has changed
 	if CloneTable(newVals, self.targetDebuffs) then
