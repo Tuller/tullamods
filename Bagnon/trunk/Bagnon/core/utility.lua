@@ -52,6 +52,27 @@ function BagnonUtil:GetBagType(bag, player)
 	end
 end
 
+--returns all information about an item
+function BagnonUtil:GetItemInfo(bag, slot, player)
+	local link, count, texture, quality, readable, cached, locked, _
+
+	if self:IsCachedBag(bag, player) then
+		if BagnonDB then
+			link, count, texture, quality = BagnonDB:GetItemData(bag, slot, player)
+			cached = true
+		end
+	else
+		link = GetContainerItemLink(bag, slot)
+		if link then
+			texture, count, locked, _, readable = GetContainerItemInfo(bag, slot)
+			quality = select(3, GetItemInfo(link))
+		end
+	end
+
+	return link, count, texture, quality, locked, readable, cached
+end
+
+
 function BagnonUtil:GetItemLink(bag, slot, player)
 	if self:IsCachedBag(bag, player) then
 		return BagnonDB and (BagnonDB:GetItemData(bag, slot, player))

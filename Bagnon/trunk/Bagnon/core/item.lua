@@ -150,25 +150,15 @@ end
 --[[ Update Functions ]]--
 
 -- Update the texture, lock status, and other information about an item
-function BagnonItem:Update()
-	local link, texture, count, locked, readable, quality
+function Item:Update()
 	local slot = self:GetID()
 	local bag = self:GetBag()
 	local player = self:GetPlayer()
+	local link, count, texture, quality, locked, readable, cached = BagnonUtil:GetItemInfo(bag, slot, player)
 
-	if BagnonUtil:IsCachedBag(bag, player) then
-		if BagnonDB then
-			link, count, texture, quality = BagnonDB:GetItemData(bag, slot, player)
-			self.readable = nil
-			self.cached = true
-		end
-	else
-		texture, count, locked, quality, readable = GetContainerItemInfo(bag, slot)
-		self.readable = readable
-		self.cached = nil
-	end
-
-	self.hasItem = texture and (link or GetContainerItemLink(bag, slot))
+	self.readable = readable
+	self.cached = cached
+	self.hasItem = texture and link
 
 	SetItemButtonDesaturated(self, locked)
 	SetItemButtonTexture(self, texture)
@@ -181,6 +171,7 @@ function BagnonItem:Update()
 	if GameTooltip:IsOwned(self) then
 		self:UpdateTooltip()
 	end
+
 	if BagnonSpot:Searching() then
 		self:UpdateSearch()
 	end
@@ -192,7 +183,7 @@ function BagnonItem:UpdateBorder(quality)
 	local link = self.hasItem
 
 	if link and BagnonUtil:ShowingBorders() then
-		if quality and quality > 1 then
+		if quality > 1 then
 			local r, g, b = GetItemQualityColor(quality)
 			border:SetVertexColor(r, g, b, 0.5)
 			border:Show()

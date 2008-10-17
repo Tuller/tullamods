@@ -251,36 +251,36 @@ end
 --]]
 
 local function FrameOpened(id, auto)
-	if Bagnon:InventoryHasBag(id) or (BagnonUtil:ReplacingBags() and BagnonUtil:IsInventoryBag(id)) then
+	if Bagnon:InventoryHasBag(id) and BagnonUtil:ReplacingBags() then
 		Bagnon:ShowInventory(auto)
 		return true
 	end
 
-	if Bagnon:BankHasBag(id) or (BagnonUtil:ReplacingBank() and BagnonUtil:IsBankBag(id)) then
+	if Bagnon:BankHasBag(id) and BagnonUtil:ReplacingBank() then
 		Bagnon:ShowBank(auto)
 		return true
 	end
 end
 
 local function FrameClosed(id, auto)
-	if Bagnon:InventoryHasBag(id) or (BagnonUtil:ReplacingBags() and BagnonUtil:IsInventoryBag(id)) then
+	if Bagnon:InventoryHasBag(id) and BagnonUtil:ReplacingBags() then
 		Bagnon:HideInventory(auto)
 		return true
 	end
 
-	if Bagnon:BankHasBag(id) or (BagnonUtil:ReplacingBank() and BagnonUtil:IsBankBag(id)) then
+	if Bagnon:BankHasBag(id) and BagnonUtil:ReplacingBank() then
 		Bagnon:HideBank(auto)
 		return true
 	end
 end
 
 local function FrameToggled(id, auto)
-	if Bagnon:InventoryHasBag(id) or (BagnonUtil:ReplacingBags() and BagnonUtil:IsInventoryBag(id)) then
+	if Bagnon:InventoryHasBag(id) and BagnonUtil:ReplacingBags() then
 		Bagnon:ToggleInventory(auto)
 		return true
 	end
 
-	if Bagnon:BankHasBag(id) or (BagnonUtil:ReplacingBank() and BagnonUtil:IsBankBag(id)) then
+	if Bagnon:BankHasBag(id) and BagnonUtil:ReplacingBank() then
 		Bagnon:ToggleBank(auto)
 		return true
 	end
@@ -323,9 +323,7 @@ function Bagnon:HookBagClicks()
 
 	--secure'd!
 	hooksecurefunc('CloseAllBags', function() 
-		if BagnonUtil:ReplacingBags() then
-			Bagnon:HideInventory()
-		end
+		Bagnon:HideInventory()
 	end)
 
 	local oToggleBag = ToggleBag
@@ -462,7 +460,7 @@ end
 
 function Bagnon:PrintHelp(cmd)
 	local function PrintCmd(cmd, desc)
-		DEFAULT_CHAT_FRAME:AddMessage(format(' - |cFF33FF99%s|r: %s', cmd, desc))
+		print(format(' - |cFF33FF99%s|r: %s', cmd, desc))
 	end
 
 	self:Print(L.Commands)
