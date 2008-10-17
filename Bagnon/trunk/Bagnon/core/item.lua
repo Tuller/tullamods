@@ -59,17 +59,8 @@ local itemID = 1
 local unused = {}
 
 function BagnonItem:Create()
-	local item
-	if BagnonUtil:ReplacingBags() then
-		local button = self:GetBlizzard(itemID)
-		if button then
-			item = self:New(button)
-		end
-	end
-	if not item then
-		local button = CreateFrame('Button', format('BagnonItem%d', itemID), nil, 'ContainerFrameItemButtonTemplate')
-		item = self:New(button)
-	end
+	local button = CreateFrame('Button', format('BagnonItem%d', itemID), nil, 'ContainerFrameItemButtonTemplate')
+	item = self:New(button)
 	item:ClearAllPoints()
 
 	local border = item:CreateTexture(nil, 'OVERLAY')
