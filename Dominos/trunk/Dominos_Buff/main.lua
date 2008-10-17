@@ -147,10 +147,10 @@ function Updater:UpdateFriendlyTargetBuffs()
 	--add all target buffs into newVals
 	ClearTable(newVals)
 	local i = 1
-	local buff
+	local buff, isMine, _
 	repeat
-		buff = UnitBuff('target', i)
-		if buff then
+		buff, _, _, _, _, _, _, isMine = UnitBuff('target', i)
+		if buff and isMine then
 			newVals[buff] = true
 		end
 		i = i + 1
@@ -171,10 +171,10 @@ function Updater:UpdateEnemyTargetDebuffs()
 	--update debuffs on enemy targets
 	ClearTable(newVals)
 	local i = 1
-	local buff, cooldown, _
+	local buff, isMine, _
 	repeat
-		buff, _, _, _, _, cooldown = UnitDebuff('target', i)
-		if buff and cooldown then
+		buff, _, _, _, _, _, _, isMine = UnitDebuff('target', i)
+		if buff and isMine then
 			newVals[buff] = true
 		end
 		i = i + 1
