@@ -192,6 +192,12 @@ function ActionButton:UpdateMacro()
 	end
 end
 
+function ActionButton:LoadAction()
+	local state = self:GetParent():GetAttribute('state-page')
+	local id = state and self:GetAttribute('action--' .. state) or self:GetAttribute('action--base')
+	self:SetAttribute('action', id)
+end
+
 --hotkey code override
 --done to allow hiding of keys, and also for keybinding name shortening
 ActionButton_UpdateHotkeys = function(self, actionButtonType) ActionButton.UpdateHotkey(self, actionButtonType) end
@@ -343,6 +349,7 @@ function ActionBar:AddButton(i)
 	if b then
 		self.buttons[i] = b
 		b:SetParent(self.header)
+		b:LoadAction()
 		self:UpdateAction(i)
 	end
 end
