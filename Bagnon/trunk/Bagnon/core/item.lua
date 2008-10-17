@@ -150,7 +150,7 @@ end
 --[[ Update Functions ]]--
 
 -- Update the texture, lock status, and other information about an item
-function Item:Update()
+function BagnonItem:Update()
 	local slot = self:GetID()
 	local bag = self:GetBag()
 	local player = self:GetPlayer()
