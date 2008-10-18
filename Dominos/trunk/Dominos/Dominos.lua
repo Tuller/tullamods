@@ -165,6 +165,7 @@ function Dominos:Unload()
 	self.Frame:ForFrame('class', 'Free')
 	self.Frame:ForFrame('menu', 'Free')
 	self.Frame:ForFrame('bags', 'Free')
+	self.Frame:ForFrame('vehicle', 'Free')
 
 	--unload any module stuff
 	for _,module in self:IterateModules() do
