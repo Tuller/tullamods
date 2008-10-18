@@ -122,7 +122,7 @@ CombuctorSet:RegisterSubSet(L.All, L.Projectile)
 local function isShard(player, bagType, name, link, quality, level, ilvl, type, subType, stackCount, equipLoc)
 	return link and (link:match('%d+') == '6265')
 end
-CombuctorSet:Register(L.SoulShard, 'Interface/Icons/INV_Misc_Ammo_Bullet_01', isShard)
+CombuctorSet:Register(L.SoulShard, 'Interface/Icons/INV_Misc_Gem_Amethyst_02', isShard)
 CombuctorSet:RegisterSubSet(L.All, L.SoulShard)
 
 
