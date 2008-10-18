@@ -50,12 +50,10 @@ function Dominos:OnInitialize()
 	if LBF then
 		LBF:RegisterSkinCallback('Dominos', self.OnSkin, self)
 	end
-
-	--hide blizzard junk
-	self:HideBlizzard()
 end
 
 function Dominos:OnEnable()
+	self:HideBlizzard()
 	self:Load()
 
 	if LibStub:GetLibrary('LibDataBroker-1.1', true) then
@@ -207,6 +205,7 @@ end
 
 function Dominos:HideBlizzard()
 	RANGE_INDICATOR = ''
+	MultiActionBar_Update = Multibar_EmptyFunc
 	MultiActionBar_UpdateGrid = Multibar_EmptyFunc
 
 	UIPARENT_MANAGED_FRAME_POSITIONS['MultiBarRight'] = nil
