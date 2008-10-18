@@ -76,8 +76,8 @@ function CastBar:CreateMenu()
 end
 
 function CastBar:Layout()
-	self:SetWidth(self.cast:GetWidth() + 4 + self:GetPadding()*2)
-	self:SetHeight(24 + self:GetPadding()*2)
+	self:SetWidth(max(self.cast:GetWidth() + 4 + self:GetPadding()*2, 8))
+	self:SetHeight(max(24 + self:GetPadding()*2, 8))
 end
 
 
