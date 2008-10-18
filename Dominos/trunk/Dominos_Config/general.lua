@@ -28,7 +28,9 @@ bind:SetPoint('LEFT', lock, 'RIGHT', 4, 0)
 
 --[[ Check Buttons ]]--
 
---local action bar button positions
+--[[ General Settings ]]--
+
+
 local stickyBars = Options:NewCheckButton(L.StickyBars)
 stickyBars:SetScript('OnShow', function(self)
 	self:SetChecked(Dominos:Sticky())
@@ -47,6 +49,20 @@ showMinimapButton:SetScript('OnClick', function(self)
 end)
 showMinimapButton:SetPoint('TOP', stickyBars, 'BOTTOM', 0, -10)
 
+
+--[[ Action Bar Settings ]]--
+
+--lock action button positions
+--this code is hacky because cvar stuff is seemingly secure now
+local lockActionButtons = Options:NewCheckButton(L.LockActionButtons)
+lockActionButtons:SetScript('OnShow', function(self)
+	self:SetChecked(LOCK_ACTIONBAR == '1')
+end)
+lockActionButtons:SetScript('OnClick', function(self, ...)
+	_G['InterfaceOptionsActionBarsPanelLockActionBars']:Click(...)
+end)
+lockActionButtons:SetPoint('TOP', showMinimapButton, 'BOTTOM', 0, -10)
+
 --show empty buttons
 local showEmpty = Options:NewCheckButton(L.ShowEmptyButtons)
 showEmpty:SetScript('OnShow', function(self)
@@ -56,7 +72,7 @@ showEmpty:SetScript('OnClick', function(self)
 	Dominos:SetShowGrid(self:GetChecked())
 end)
 --showEmpty:SetPoint('TOPLEFT', lock, 'BOTTOMLEFT', 0, -24)
-showEmpty:SetPoint('TOP', showMinimapButton, 'BOTTOM', 0, -10)
+showEmpty:SetPoint('TOP', lockActionButtons, 'BOTTOM', 0, -10)
 
 --show keybinding text
 local showBindings = Options:NewCheckButton(L.ShowBindingText)
