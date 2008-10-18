@@ -78,6 +78,13 @@ function Panel:NewCheckButton(name)
 	return b
 end
 
+function Panel:NewSecureCheckButton(name, template)
+	local b = CreateFrame('CheckButton', self:GetName() .. name, self, 'InterfaceOptionsCheckButtonTemplate,' .. template)
+	_G[b:GetName() .. 'Text']:SetText(name)
+
+	return b
+end
+
 --basic dropdown
 function Panel:NewDropdown(name)
 	local f = CreateFrame('Frame', self:GetName() .. name, self, 'UIDropDownMenuTemplate')

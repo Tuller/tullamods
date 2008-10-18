@@ -53,15 +53,25 @@ showMinimapButton:SetPoint('TOP', stickyBars, 'BOTTOM', 0, -10)
 --[[ Action Bar Settings ]]--
 
 --lock action button positions
---this code is hacky because cvar stuff is seemingly secure now
-local lockActionButtons = Options:NewCheckButton(L.LockActionButtons)
-lockActionButtons:SetScript('OnShow', function(self)
+--this option causes taint, but only for the session that the option is set in
+local lockButtons = Options:NewCheckButton(L.LockActionButtons)
+lockButtons:SetScript('OnShow', function(self)
 	self:SetChecked(LOCK_ACTIONBAR == '1')
 end)
-lockActionButtons:SetScript('OnClick', function(self, ...)
+lockButtons:SetScript('OnClick', function(self, ...)
 	_G['InterfaceOptionsActionBarsPanelLockActionBars']:Click(...)
 end)
-lockActionButtons:SetPoint('TOP', showMinimapButton, 'BOTTOM', 0, -10)
+lockButtons:SetPoint('TOP', showMinimapButton, 'BOTTOM', 0, -10)
+
+--[[
+--this method works without taint, but causes interface options to be secure, which is bad
+
+local lockButtons = Options:NewSecureCheckButton(L.LockActionButtons, 'SecureActionButtonTemplate')
+lockButtons:SetAttribute('type', 'click')
+lockButtons:SetAttribute('clickbutton', _G['InterfaceOptionsActionBarsPanelLockActionBars'])
+lockButtons:SetScript('OnShow', function(self) self:SetChecked(LOCK_ACTIONBAR == '1') end)
+lockButtons:SetPoint('TOP', showMinimapButton, 'BOTTOM', 0, -10)
+--]]
 
 --show empty buttons
 local showEmpty = Options:NewCheckButton(L.ShowEmptyButtons)
@@ -72,7 +82,7 @@ showEmpty:SetScript('OnClick', function(self)
 	Dominos:SetShowGrid(self:GetChecked())
 end)
 --showEmpty:SetPoint('TOPLEFT', lock, 'BOTTOMLEFT', 0, -24)
-showEmpty:SetPoint('TOP', lockActionButtons, 'BOTTOM', 0, -10)
+showEmpty:SetPoint('TOP', lockButtons, 'BOTTOM', 0, -10)
 
 --show keybinding text
 local showBindings = Options:NewCheckButton(L.ShowBindingText)
