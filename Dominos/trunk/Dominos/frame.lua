@@ -251,6 +251,7 @@ function Frame:GetPadding()
 end
 
 function Frame:Layout()
+	local width, height
 	if #self.buttons > 0 then
 		local cols = min(self:NumColumns(), #self.buttons)
 		local rows = ceil(#self.buttons / cols)
@@ -268,11 +269,15 @@ function Frame:Layout()
 			b:SetPoint('TOPLEFT', w*col + pW, -(h*row + pH))
 		end
 
-		self:SetWidth(w*cols - spacing + pW*2)
-		self:SetHeight(h*ceil(#self.buttons/cols) - spacing + pH*2)
+		width = w*cols - spacing + pW*2
+		height = h*ceil(#self.buttons/cols) - spacing + pH*2
 	else
-		self:SetWidth(30) self:SetHeight(30)
+		width = 30
+		height = 30
 	end
+
+	self:SetWidth(max(width, 8))
+	self:SetHeight(max(height, 8))
 end
 
 

@@ -99,8 +99,8 @@ function MenuBar:Layout()
 			b:SetPoint('TOPLEFT', w*col + pW, -(h*row + pH) + HEIGHT_OFFSET)
 		end
 
-		self:SetWidth(w*cols - spacing + pW*2 + WIDTH_OFFSET)
-		self:SetHeight(h*ceil(#self.buttons/cols) - spacing + pH*2)
+		self:SetWidth(max(w*cols - spacing + pW*2 + WIDTH_OFFSET, 8))
+		self:SetHeight(max(h*ceil(#self.buttons/cols) - spacing + pH*2, 8))
 	else
 		self:SetWidth(30); self:SetHeight(30)
 	end
