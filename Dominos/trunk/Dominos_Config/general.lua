@@ -10,22 +10,18 @@ local Options = Dominos.Options
 --[[ Buttons ]]--
 
 --toggle config mode
-local lock = Options:NewButton('Config Mode', 136, 22)
-lock.UpdateText = function(self) 
-	self:SetText(Dominos:Locked() and L.EnterConfigMode or L.ExitConfigMode) 
-end
-lock:SetScript('OnShow', lock.UpdateText)
-lock:SetScript('OnClick', function(self) 
-	Dominos:ToggleLockedFrames() 
-	self:UpdateText() 
+local lock = Options:NewButton(L.EnterConfigMode, 136, 22)
+lock:SetScript('OnClick', function(self)
+	Dominos:ToggleLockedFrames()
+	HideUIPanel(InterfaceOptionsFrame)
 end)
 lock:SetPoint('TOPLEFT', 12, -72)
 
 --toggle keybinding mode
 local bind = Options:NewButton(L.EnterBindingMode, 136, 22)
-bind:SetScript('OnClick', function(self) 
+bind:SetScript('OnClick', function(self)
 	Dominos:ToggleBindingMode()
-	HideUIPanel(InterfaceOptionsFrame) 
+	HideUIPanel(InterfaceOptionsFrame)
 end)
 bind:SetPoint('LEFT', lock, 'RIGHT', 4, 0)
 
