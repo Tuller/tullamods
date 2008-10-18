@@ -58,25 +58,54 @@ end
 function Dominos:OnEnable()
 	self:Load()
 	
-	--databroker launcher
-	local LDB = LibStub:GetLibrary('LibDataBroker-1.1', true)
-	if LDB then
-		local dataobj = LibStub:GetLibrary('LibDataBroker-1.1'):NewDataObject('Dominos', {
-			type = 'launcher',
-			icon = 'Interface\\Addons\\Dominos\\Dominos',
-			OnClick = function(_, button) 
-				if button == 'LeftButton' then
-					if IsModifierKeyDown() then
-						kb:Toggle()
-					else
-						self:ToggleLockedFrames()
-					end
-				else
-					self:ShowOptions() 
-				end
-			end,
-		})
+	if LibStub:GetLibrary('LibDataBroker-1.1', true) then
+		self:LoadDataBrokerPlugin()
 	end
+end
+
+function Dominos:LoadDataBrokerPlugin()
+	LibStub:GetLibrary('LibDataBroker-1.1'):NewDataObject('Dominos', {
+		type = 'launcher',
+
+		icon = 'Interface\\Addons\\Dominos\\Dominos',
+
+		OnClick = function(_, button) 
+			if button == 'LeftButton' then
+				if IsShiftKeyDown() then
+					Dominos:ToggleBindingMode()
+				else
+					Dominos:ToggleLockedFrames()
+				end
+			elseif button == 'RightButton' then
+				Dominos:ShowOptions()
+			end
+		end,
+
+		OnTooltipShow = function(tooltip)
+			if not tooltip or not tooltip.AddLine then return end
+			tooltip:AddLine('Dominos')
+
+			if Dominos:Locked() then
+				tooltip:AddLine(L.ConfigEnterTip)
+			else
+				tooltip:AddLine(L.ConfigExitTip)
+			end
+
+			local KB = LibStub('LibKeyBound-1.0', true)
+			if KB then
+				if KB:IsShown() then
+					tooltip:AddLine(L.BindingExitTip)
+				else
+					tooltip:AddLine(L.BindingEnterTip)
+				end
+			end
+
+			local enabled = select(4, GetAddOnInfo('Dominos_Config'))
+			if enabled then
+				tooltip:AddLine(L.ShowOptionsTip)
+			end
+		end,
+	})
 end
 
 --[[ Version Updating ]]--
