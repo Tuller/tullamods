@@ -149,7 +149,7 @@ end
 --Load is called  when the addon is first enabled, and also whenever a profile is loaded
 local function HasClassBar()
 	local _,class = UnitClass('player')
-	return class == 'PALADIN' or class == 'DRUID' or class == 'WARRIOR' or class == 'ROGUE' or class == 'DEATHKNIGHT' or class == 'WARLOCK'
+	return not(class == 'HUNTER' or class == 'MAGE' or class == 'SHAMAN')
 end
 
 function Dominos:Load()
