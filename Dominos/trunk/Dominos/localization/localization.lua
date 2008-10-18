@@ -55,6 +55,11 @@ L.SetAlpha = '<Mousewheel> to set opacity (|cffffffff%d|r)'
 --minimap button stuff
 L.ConfigEnterTip = '<Left Click> to enter configuration mode'
 L.ConfigExitTip = '<Left Click> to exit configuration mode'
-L.BindingEnterTip = '<Shift-Left Click> to enter binding mode'
-L.BindingExitTip = '<Shift-Left Click> to exit binding mode'
+L.BindingEnterTip = '<Shift Left Click> to enter binding mode'
+L.BindingExitTip = '<Shift Left Click> to exit binding mode'
 L.ShowOptionsTip = '<Right Click> to show the options menu'
+
+--helper dialog stuff
+L.ConfigMode = 'Configuration Mode'
+L.ConfigModeExit = 'Exit Config Mode'
+L.ConfigModeHelp = '<Drag> any bar to move it.  <Right Click> to configure.  <Middle Click> or <Shift-Right Click> to toggle visibility'

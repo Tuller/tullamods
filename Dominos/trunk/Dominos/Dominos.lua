@@ -57,7 +57,7 @@ end
 
 function Dominos:OnEnable()
 	self:Load()
-	
+
 	if LibStub:GetLibrary('LibDataBroker-1.1', true) then
 		self:LoadDataBrokerPlugin()
 	end
@@ -69,7 +69,7 @@ function Dominos:LoadDataBrokerPlugin()
 
 		icon = 'Interface\\Addons\\Dominos\\Dominos',
 
-		OnClick = function(_, button) 
+		OnClick = function(_, button)
 			if button == 'LeftButton' then
 				if IsShiftKeyDown() then
 					Dominos:ToggleBindingMode()
@@ -182,7 +182,7 @@ function Dominos:Load()
 
 	--anchor everything
 	self.Frame:ForAll('Reanchor')
-	
+
 	--minimap button
 	self:UpdateMinimapButton()
 end
@@ -526,12 +526,78 @@ end
 --moving
 Dominos.locked = true
 
+local function CreateConfigHelperDialog()
+	local f = CreateFrame('Frame', 'DominosConfigHelperDialog', UIParent)
+	f:SetFrameStrata('DIALOG')
+	f:SetToplevel(true)
+	f:EnableMouse(true)
+	f:SetClampedToScreen(true)
+	f:SetWidth(360)
+	f:SetHeight(120)
+	f:SetBackdrop{
+		bgFile='Interface\\DialogFrame\\UI-DialogBox-Background' ,
+		edgeFile='Interface\\DialogFrame\\UI-DialogBox-Border',
+		tile = true,
+		insets = {left = 11, right = 12, top = 12, bottom = 11},
+		tileSize = 32,
+		edgeSize = 32,
+	}
+	f:SetPoint('TOP', 0, -24)
+	f:Hide()
+	f:SetScript('OnShow', function() PlaySound('igMainMenuOption') end)
+	f:SetScript('OnHide', function() PlaySound('gsTitleOptionExit') end)
+
+	local tr = f:CreateTitleRegion()
+	tr:SetAllPoints(f)
+
+	local header = f:CreateTexture(nil, 'ARTWORK')
+	header:SetTexture('Interface\\DialogFrame\\UI-DialogBox-Header')
+	header:SetWidth(326); header:SetHeight(64)
+	header:SetPoint('TOP', 0, 12)
+
+	local title = f:CreateFontString('ARTWORK')
+	title:SetFontObject('GameFontNormal')
+	title:SetPoint('TOP', header, 'TOP', 0, -14)
+	title:SetText(L.ConfigMode)
+
+	local desc = f:CreateFontString('ARTWORK')
+	desc:SetFontObject('GameFontHighlight')
+	desc:SetJustifyV('TOP')
+	desc:SetJustifyH('LEFT')
+	desc:SetPoint('TOPLEFT', 18, -32)
+	desc:SetPoint('BOTTOMRIGHT', -18, 48)
+	desc:SetText(L.ConfigModeHelp)
+
+	local exitConfig = CreateFrame('CheckButton', f:GetName() .. 'ExitConfig', f, 'OptionsButtonTemplate')
+	_G[exitConfig:GetName() .. 'Text']:SetText(EXIT)
+	exitConfig:SetScript('OnClick', function() Dominos:SetLock(true) end)
+	exitConfig:SetPoint('BOTTOMRIGHT', -14, 14)
+
+	return f
+end
+
+function Dominos:ShowConfigHelper()
+	if not self.configHelper then
+		self.configHelper = CreateConfigHelperDialog()
+	end
+	self.configHelper:Show()
+end
+
+function Dominos:HideConfigHelper()
+	if self.configHelper then
+		self.configHelper:Hide()
+	end
+end
+
 function Dominos:SetLock(enable)
 	self.locked = enable or false
-	if self.locked then
+	if self:Locked() then
 		self.Frame:ForAll('Lock')
+		self:HideConfigHelper()
 	else
 		self.Frame:ForAll('Unlock')
+		LibStub('LibKeyBound-1.0'):Deactivate()
+		self:ShowConfigHelper()
 	end
 end
 
@@ -541,7 +607,6 @@ end
 
 function Dominos:ToggleLockedFrames()
 	self:SetLock(not self:Locked())
-	LibStub('LibKeyBound-1.0'):Deactivate()
 end
 
 function Dominos:ToggleBindingMode()
