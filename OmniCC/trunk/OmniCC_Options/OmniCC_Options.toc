@@ -7,4 +7,5 @@
 localization.lua
 localization.ru.lua
 localization.ko.lua
+localization.tw.lua
 menu.lua
