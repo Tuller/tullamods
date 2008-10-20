@@ -7,17 +7,5 @@
 ## OptionalDeps: Ace3, LibSharedMedia-3.0
 embeds.xml
 FlyPaper.lua
-localization.lua
-obj\fonts.lua
-obj\drag.lua
-obj\frame.lua
-obj\click.lua
-obj\info.lua
-obj\npc.lua
-obj\combat.lua
-obj\bar.lua
-obj\health.lua
-obj\mana.lua
-obj\buff.lua
-obj\cast.lua
+localization\localization.lua
 Sage.lua
