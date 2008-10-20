@@ -44,8 +44,7 @@ function Sage:OnInitialize()
 end
 
 function Sage:OnEnable()
-	self:RegisterEvents()
-	self:LoadModules()
+	self:Load()
 end
 
 --[[ Version Updating ]]--
@@ -98,13 +97,9 @@ function Sage:Unload()
 	end
 end
 
-function Sage:RegisterEvents()
-	--register events!
-end
-
 function Sage:RegisterSlashCommands()
-	self:RegisterChatCommand('dominos', 'OnCmd')
-	self:RegisterChatCommand('dom', 'OnCmd')
+	self:RegisterChatCommand('sage', 'OnCmd')
+	self:RegisterChatCommand('sg', 'OnCmd')
 end
 
 
@@ -130,7 +125,7 @@ function Sage:SetProfile(name)
 		self.isNewProfile = nil
 		self:Load()
 	else
-		self:Print(format(L.InvalidProfile, name or 'null'))
+		self:Print(format(L.InvalidProfile, name or 'nil'))
 	end
 end
 
@@ -216,10 +211,12 @@ end
 --[[ Slash Commands ]]--
 
 function Sage:OnCmd(args)
+	--do something
 end
 
 
---[[ The one true class configuration thingy ]]--
+
+--[[ The one true class thingy ]]--
 
 function Sage:CreateClass(type, parentClass)
 	local class = CreateFrame(type)
@@ -235,4 +232,39 @@ function Sage:CreateClass(type, parentClass)
 	end
 
 	return class
+end
+
+
+--[[ Settings...Setting ]]--
+
+function Sage:SetFrameSets(id, sets)
+	local id = tonumber(id) or id
+	self.db.profile.frames[id] = sets
+
+	return self.db.profile.frames[id]
+end
+
+function Sage:GetFrameSets(id)
+	return self.db.profile.frames[tonumber(id) or id]
+end
+
+
+--[[ Config Functions ]]--
+
+Sage.locked = false
+
+function Sage:SetLock(enable)
+	self.locked = enable or false
+end
+
+function Sage:Locked()
+	return self.locked
+end
+
+function Sage:SetSticky(enable)
+	self.db.profile.sticky = enable or false
+end
+
+function Sage:Sticky()
+	return self.db.profile.sticky
 end

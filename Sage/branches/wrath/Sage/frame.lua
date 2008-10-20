@@ -6,8 +6,6 @@
 local Frame = Sage:CreateClass('Frame')
 Sage.Frame = Frame
 
-local Config = Sage:GetModule('Config')
-
 local active = {}
 local unused = {}
 
@@ -31,6 +29,7 @@ function Frame:Create(id)
 	f.header:SetAllPoints(f)
 
 	f.drag = Sage.DragFrame:New(f)
+	f:SetWidth(32); f:SetHeight(32)
 
 	return f
 end
@@ -80,6 +79,12 @@ function Frame:LoadSettings(defaults)
 
 	self:UpdateShowStates()
 	self:UpdateAlpha()
+end
+
+function Frame:GetDefaults()
+	return {
+		point = 'CENTER'
+	}
 end
 
 

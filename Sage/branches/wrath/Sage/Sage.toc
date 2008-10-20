@@ -3,9 +3,11 @@
 ## Notes: Unitframe Framework
 ## Author: Tuller
 ## Version: 3.0.0
-## SavedVariables: Sage2DB, SageVersion
+## SavedVariables: SageDB, SageVersion
 ## OptionalDeps: Ace3, LibSharedMedia-3.0
 embeds.xml
 FlyPaper.lua
 localization\localization.lua
 Sage.lua
+frame.lua
+drag.lua
