@@ -73,26 +73,27 @@ To exit binding mode, use whichever command you used to enter it.
 
 Dominos features a fairly rich set of slash commands. All Dominos commands, with the exception of the binding mode toggle, can start with either /dominos or /dom.  The parameter <frameList> can be either a single bar id, ex 'menu'; a space separated list of bar ids, ex 'bags pet 1'; a range of bars, ex '1-10'; 'all'; or any combination, ex '1-10 menu bags pet all' 
 
-Here's the complete list of commands:
-  * *No arguments*: Shows the options menu, if enabled.
-  * *config or lock*: Toggles configuration mode
-  * *scale frameList scale*: Sets frameList's scale to scale. 1 is normal scale
-  * *setalpha frameList opacity*: Sets the opacity of barlist. 0 is completely transparent, 1 is completely opaque
-  * *fade frameList opacity*: Sets the faded opacity of frameList. A bar's faded opacity is what opacity a bar has when not moused over
-  * *setcols frameList columns*: Sets the number of columns for frameList
-  * *pad frameList padW padH*: Sets the padding levels for frameList
-  * *space frameList spacing*: Sets the spacing between buttons for frameList
-  * *show frameList*: Shows frameList
-  * *hide frameList*: Hides frameList
-  * *toggle frameList*: Toggles frameList
-  * *numbars 1-120*: Sets how many action bars to use.  This option will reset your action bar positions.
-  * *numbuttons 1-120*: Sets the maximum amount of buttons per actionbar.  This option will reset your action bar positions.
-  * *set profile*: Switches to frameList
-  * *save profile*: Saves current settings as, and switches to frameList
-  * *copy profile*: Copies settings from frameList to current profile
-  * *delete profile*: Deletes frameList
-  * *reset*: Returns the current profile to default settings
-  * *list*: Lists all available profiles
-  * *version*: Prints the current Dominos version
-  * *help or ?*: Shows a list of slash commands
-  * */keybound or /kb*: Toggles binding mode
+Here's the complete list of commands
+|| *Command* || *Action* ||
+|| /dom || Shows the options menu, if enabled ||
+|| /dom lock || Toggles configuration mode ||
+|| /dom scale frameList scale || Sets *frameList*'s scale to *scale*. 1 is normal scale ||
+|| /dom setalpha frameList opacity || Sets the opacity of barlist. 0 is completely transparent, 1 is completely opaque ||
+|| /dom fade frameList opacity || Sets the faded opacity of frameList. A bar's faded opacity is what opacity a bar has when not moused over ||
+|| /dom setcols frameList columns||  Sets the number of columns for frameList ||
+|| /dom pad frameList padW padH || Sets the padding levels for frameList ||
+|| /dom space frameList spacing || Sets the spacing between buttons for frameList ||
+|| /dom show frameList || Shows frameList ||
+|| /dom hide frameList || Hides frameList ||
+|| /dom toggle frameList || Toggles frameList ||
+|| /dom numbars 1-120||  Sets how many action bars to use.  This option will reset your action bar positions ||
+|| /dom numbuttons 1-120 || Sets the maximum amount of buttons per actionbar.  This option will reset your action bar positions ||
+|| /dom set profile || Switches to frameList ||
+|| /dom save profile||  Saves current settings as, and switches to frameList ||
+|| /dom copy profile || Copies settings from frameList to current profile ||
+|| /dom delete profile || Deletes frameList ||
+|| /dom reset || Returns the current profile to default settings ||
+|| /dom list || Lists all available profiles ||
+|| /dom version || Prints the current Dominos version ||
+|| /dom help or ? || Shows a list of slash commands ||
+|| /keybound or /kb || Toggles binding mode ||
