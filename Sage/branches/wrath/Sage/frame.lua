@@ -46,13 +46,7 @@ end
 function Frame:Free()
 	active[self.id] = nil
 
-	UnregisterStateDriver(self.header, 'state', 0)
 	UnregisterStateDriver(self.header, 'visibility', 'show')
-
-	for i in pairs(self.buttons) do
-		self:RemoveButton(i)
-	end
-	self.buttons = nil
 
 	self:ClearAllPoints()
 	self:SetUserPlaced(nil)
@@ -144,6 +138,7 @@ end
 function Frame:GetFrameAlpha()
 	return self.sets.alpha or 1
 end
+
 
 --[[ ShowStates ]]--
 
