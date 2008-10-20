@@ -1,12 +1,12 @@
-## Interface: 20300
+## Interface: 30000
 ## Title: Sage
-## Notes: Lightweight unit frame framework
+## Notes: Unitframe Framework
 ## Author: Tuller
-## Version: 1.0.4
+## Version: 3.0.0
 ## SavedVariables: Sage2DB, SageVersion
-## OptionalDeps: Dongle, SharedMedia, MobHealth, MobInfo2
-lib\FlyPaper.lua
-lib\Dongle.lua
+## OptionalDeps: Ace3, LibSharedMedia-3.0
+embeds.xml
+FlyPaper.lua
 localization.lua
 obj\fonts.lua
 obj\drag.lua
