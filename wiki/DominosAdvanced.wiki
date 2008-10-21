@@ -37,7 +37,7 @@ Here are the following conditions you can switch a bar on, and in what order the
 
 So if you're holding down alt, in stealth, and targeting a friendly unit, Dominos will try to find a page for alt down, then if it does not find one check for one for stealth, then if it cannot find one, check for a page for enemy target.  If none are found, then the bar will not change.
 
-To change your paging settings, enter configuration mode, right click the action bar you want to change, and mess with the sliders for either your class, quick paging, targeting, or modifiers.  Disabled means that the bar will no longer change in that state, bar <x> means that the bar will show the buttons on the given action bar when in the given state.  
+To change your paging settings, enter configuration mode, right click the action bar you want to change, and mess with the sliders for either your class, quick paging, targeting, or modifiers.  Disabled means that the bar will no longer change in that state, bar 'x' means that the bar will show the buttons on the given action bar when in the given state.  
 
 Configuring paging settings is best done in the form you want a bar to change in.  So, for example, if I wanted to make actionbar 3 show the buttons on actionbar 4 when in bear form, I'd hop into bear form, enter config mode, right click bar 3 to open up its config menu, select Druid from the panel dropdown, and swt the bear form slider to 4.  When you do that, the slider should instantly show the buttons on bar 4.
 ----
@@ -72,9 +72,6 @@ Dominos uses the following formula to calculate the opacity of a bar when it doe
 effectiveOpacity = normalOpacity * fadedOpacity
 }}}
 So, if you have a bar's opacity set to 50% (0.5), and its faded opacity's value is set to 50% (0.5) then its opacity when the mouse is not over the bar will be *25%* (50% x 50%)
-
-*Note 2:*
-Due to some weird things on blizzard's end, auto fading will *not* work when the options menu is open.
 ----
 
 
