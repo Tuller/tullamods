@@ -81,6 +81,6 @@ Due to some weird things on blizzard's end, auto fading will *not* work when the
 ==== 15 Button Bars (and More) ====
 
 
-Though its not really present in the GUI for Dominos, its possible to change the maximum number of buttons per bar (and in turn, determine how many bars you have).  Simply use the slash commands /dom numbuttons <1-120> to determine how many bars you want based on the maximum number of buttons per bar, or /dom numbars <1-120> to determine exactly how many bars you want.  Be aware that both command will reset your actionbar layout.
+Though its not really present in the GUI for Dominos, its possible to change the maximum number of buttons per bar (and in turn, determine how many bars you have).  Simply use the slash commands /dom numbuttons '1-120' to determine how many bars you want based on the maximum number of buttons per bar, or /dom numbars '1-120' to determine exactly how many bars you want.  Be aware that both command will reset your actionbar layout.
 
 Dominos is limited to a maximum of 120 action buttons due to some hardcoded limitations by Blizzard.  If you require more buttons than this, take a look at [http://www.wowinterface.com/downloads/info10636-Macaroon.html Macaroon].
