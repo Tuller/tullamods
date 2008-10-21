@@ -29,8 +29,8 @@ Beyond mirroring the functionality of the stock interface (which also changes ba
   * You can minimize how many buttons you have visible on screen.  If you know you only need to see your shadow spells when in shadow form, and your holy spells when not, why not put those shadow skills on a hidden bar and have your holy bar page to it when in shadow form
 
 Here are the following conditions you can switch a bar on, and in what order they are checked:
-  * *<Modifier> Down*: Occurs when you press control, alt, or shift.  Sliders for these pages are listed under Modifiers
-  * *Quick Page <Number>*: Occurs when you press a paging binding. These are bound, by default, to shift + 1-6 and shift + mouse wheel. Shift + 1 returns to your normal state.  Sliders for these pages are listed under Quick Paging.
+  * *'Modifier' Down*: Occurs when you press control, alt, or shift.  Sliders for these pages are listed under Modifiers
+  * *Quick Page 'Number'*: Occurs when you press a paging binding. These are bound, by default, to shift + 1-6 and shift + mouse wheel. Shift + 1 returns to your normal state.  Sliders for these pages are listed under Quick Paging.
   * *Prowl (Druids Only)*: Occurs when prowling.
   * *Stances, Forms, Stealth*: Occurs when you're in Defensive stance, Cat form, stealth, etc.  Listed under the class name they're applicable to. 
   * *Friendly/Enemy/No Target*: Occurs when you're targeting a friendly or enemy target.  Listed under targeting.
