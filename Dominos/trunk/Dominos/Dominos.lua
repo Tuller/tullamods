@@ -137,7 +137,11 @@ function Dominos:GetDefaults()
 end
 
 function Dominos:UpdateSettings(major, minor, bugfix)
-	--do stuff
+	for profile,sets in pairs(self.db.sv.profiles) do
+		if sets.possessBar == 'pet' then
+			sets.possessBar = 1
+		end
+	end
 end
 
 function Dominos:UpdateVersion()
