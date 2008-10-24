@@ -75,6 +75,7 @@ function PetButton:UpdateHotkey()
 		hotkey:Hide()
 	end
 end
+PetActionButton_SetHotkeys = PetButton.UpdateHotkey
 
 function PetButton:GetHotkey()
 	local key = GetBindingKey('BONUSACTIONBUTTON'..self:GetID()) or GetBindingKey(format('CLICK %s:LeftButton', self:GetName()))
@@ -108,8 +109,6 @@ function PetButton:GetBindings()
 	end
 end
 
-PetActionButton_SetHotkeys = function(self) PetButton.UpdateHotkey(self) end
-
 
 --[[ Pet Bar ]]--
 
@@ -126,11 +125,7 @@ function PetBar:New()
 end
 
 function PetBar:UpdateStateDriver()
-	if self == Dominos:GetPossessBar() then
-		self:SetShowStates('[target=pet,nodead,exists]')
-	else
-		self:SetShowStates('[target=pet,nodead,exists,nobonusbar:5]')
-	end
+	self:SetShowStates('[target=pet,nodead,exists,nobonusbar:5]')
 end
 
 function PetBar:GetDefaults()
