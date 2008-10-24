@@ -199,7 +199,6 @@ do
 			for i = 1, Dominos:NumBars() do
 				AddItem('Action Bar ' .. i, i, Item_OnClick, i == selected)
 			end
-			AddItem('Pet Bar', 'pet', Item_OnClick, 'pet' == selected)
 		end
 		return dd
 	end
