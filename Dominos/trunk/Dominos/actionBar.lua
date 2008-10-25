@@ -66,6 +66,10 @@ function ActionButton:Create(id)
 	local b = Create(id)
 	if b then
 		self:Bind(b)
+		--this is used to preserve the button's old id
+		--we cannot simply keep a button's id at > 0 or blizzard code will take control of paging
+		--but we need the button's id for the old bindings system
+		b:SetAttribute('bindingid', b:GetID())
 		b:SetID(0)
 		b:ClearAllPoints()
 		b:SetAttribute('useparent-actionpage', nil)
@@ -141,9 +145,9 @@ end
 
 function ActionButton:GetHotkey(actionButtonType)
 	local type = actionButtonType or self.buttonType or 'ACTIONBUTTON'
-	local baseID = self:GetAttribute('action--base') or self:GetID()
+	local id = self:GetAttribute('bindingid') or self:GetID()
 
-	local key = GetBindingKey(type .. baseID) or GetBindingKey(format('CLICK %s:LeftButton', self:GetName()))
+	local key = GetBindingKey(type .. id) or GetBindingKey(format('CLICK %s:LeftButton', self:GetName()))
 	return key and KeyBound:ToShortKey(key) or ''
 end
 
@@ -162,8 +166,9 @@ end
 
 function ActionButton:GetBindings()
 	local type = actionButtonType or self.buttonType or 'ACTIONBUTTON'
-	local baseID = self:GetAttribute('action--base') or self:GetID()
-	local blizzKeys = getKeyStrings(GetBindingKey(type .. baseID))
+	local id = self:GetAttribute('bindingid') or self:GetID()
+
+	local blizzKeys = getKeyStrings(GetBindingKey(type .. id))
 	local clickKeys = getKeyStrings(GetBindingKey(format('CLICK %s:LeftButton', self:GetName())))
 	
 	if blizzKeys then
