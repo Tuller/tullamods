@@ -1,39 +1,39 @@
 #summary Stuff I want to do
 
 Bagnon:
-* Reproduce and fix crash bug
-* Refactor code
+  * Reproduce and fix crash bug
+  * Refactor code
 
 Combuctor:
-* Implement better set API
-* Add in event-> tab event system (ex, show bank frame, normal tab when showing the bank, keyring when I click the keyring, trade bags...)
-* Add in a few configuration options?
+  * Implement better set API
+  * Add in event-> tab event system (ex, show bank frame, normal tab when showing the bank, keyring when I click the keyring, trade bags...)
+  * Add in a few configuration options?
 
 Dominos:
-* Add ability to unbind Blizzard bindings via KeyBound.
-* Add in a separate possess bar
-* Implement a better show state GUI
-* Implement linked bar autofading
-* Crazy town: Add in special bars (aspect, etc)
-* Crazy town: Implement a macaroon like system
+  * Add ability to unbind Blizzard bindings via KeyBound.
+  * Add in a separate possess bar
+  * Implement a better show state GUI
+  * Implement linked bar autofading
+  * Crazy town: Add in special bars (aspect, etc)
+  * Crazy town: Implement a macaroon like system
 
 Ludwig:
-* Refactor code
-* Look at adding in spell links
+  * Refactor code
+  * Look at adding in spell links
 
 OmniCC:
-* Return of the shine option?
+  * Return of the shine option?
 
 Sage:
-* Rewrite for 3.0
-* Incorporate new libs (ace3, lsm3.0, etc)
-* Incorporate some sort of threat display
-* Implement a new buff display: should give priority to my buffs/debuffs
-* Use a template system of some sort to make it easier to create new jambers
+  * Rewrite for 3.0
+  * Incorporate new libs (ace3, lsm3.0, etc)
+  * Incorporate some sort of threat display
+  * Implement a new buff display: should give priority to my buffs/debuffs
+  * Use a template system of some sort to make it easier to create new jambers
 
 
 Sellfish:
-* Establish a monthly update process (gmail calendar reminders?)
+  * Establish a monthly update process (gmail calendar reminders?)
 
 Tipachu:
-* Fix compatibility issues if they're actually my fault
+  * Fix compatibility issues if they're actually my fault
