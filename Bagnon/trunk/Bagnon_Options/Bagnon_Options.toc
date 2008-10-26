@@ -12,4 +12,5 @@ localization\localization.fr.lua
 localization\localization.de.lua
 localization\localization.cn.lua
 localization\localization.tw.lua
+localization\localization.ru.lua
 menu.lua
