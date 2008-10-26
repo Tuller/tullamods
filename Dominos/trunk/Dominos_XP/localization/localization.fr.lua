@@ -1,9 +1,9 @@
 --[[
 	Localization.lua
-		Translations for Dominos XP (English - Default Version)
+		Translations for Dominos XP 
 --]]
 
--- French version (by Kubik) 2008-08-11
+-- French version (by Kubik) 2008-10-19
 -- à = \195\160
 -- â = \195\162
 -- ç = \195\167
@@ -22,4 +22,4 @@ L.Texture = 'Texture'
 L.Width = 'Largeur'
 L.Height = 'Hauteur'
 L.AlwaysShowText = 'Toujours afficher le texte'
-L.AlwaysShowXP = [[Toujours afficher l'XP]]
+L.AlwaysShowXP = 'Toujours afficher l\'XP'
