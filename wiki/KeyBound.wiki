@@ -1,4 +1,4 @@
-KeyBound is the key binding interface used by Bongos.  Using KeyBound, keys are binded simply by hovering over a button and pressing a key.
+KeyBound is the key binding interface used by Bongos.  Using KeyBound, keys are bound simply by hovering over a button and pressing a key.
 
 KeyBound is based on the key binding system used by [http://www.wowinterface.com/downloads/info6391-TrinityBars.html Trinity Bars].
  
