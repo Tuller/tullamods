@@ -5,4 +5,5 @@
 ## RequiredDeps: Bagnon_Forever
 localization\localization.lua
 localization\localization.tw.lua
+localization\localization.ru.lua
 tooltips.lua
