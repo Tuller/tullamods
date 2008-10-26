@@ -4,7 +4,7 @@
 
 	French
 --]]
--- French version (by Kubik) 2008-08-11
+-- French version (by Kubik) 2008-10-19
 -- à = \195\160
 -- â = \195\162
 -- ç = \195\167
@@ -62,4 +62,16 @@ L.PrintVersionDesc = 'Afficher la version'
 L.ShowConfig = '<Clic droit> pour configurer'
 L.HideBar = '<Clic milieu ou Shift-Clic droit> pour cacher'
 L.ShowBar = '<Clic milieu ou Shift-Clic droit> pour montrer'
-L.SetAlpha = "<Roue de souris> pour régler l'opacit\195\169 (|cffffffff%d|r)"
+L.SetAlpha = "<Roue de souris> pour r\195\169gler l'opacit\195\169 (|cffffffff%d|r)"
+
+--minimap button stuff
+L.ConfigEnterTip = '<Clic gauche> mode configuration'
+L.ConfigExitTip = '<Clic gauche> sortir du mode configuration'
+L.BindingEnterTip = '<Shift clic gauche> configurer les raccourcis'
+L.BindingExitTip = '<Shift clic gauche> arr\195\170ter la config. des raccourcis'
+L.ShowOptionsTip = '<Clic droit> afficher le menu d\'options'
+
+--helper dialog stuff
+L.ConfigMode = 'Mode Configuration'
+L.ConfigModeExit = 'Sortir du Mode Config.'
+L.ConfigModeHelp = '<Clic-drag> d\195\169place la barre.  <Clic droit> configurer.  <Clic milieu> ou <Shift-Clic droit> visible/invisible'
