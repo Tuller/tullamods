@@ -14,6 +14,7 @@ localization\localization.fr.lua
 localization\localization.cn.lua
 localization\localization.es.lua
 localization\localization.tw.lua
+localization\localization.ru.lua
 core\utility.lua
 core\item.lua
 core\bag.lua
