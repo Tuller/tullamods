@@ -27,6 +27,7 @@ Dominos:
   * Super crazy town extreme edition: Implement a secure modal layout system.
 
 Ludwig:
+  * Fix crash bug, if possible
   * Refactor code
   * Look at adding in spell links
 
