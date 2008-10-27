@@ -1,6 +1,8 @@
 #summary Enhancing Dominos with other addons
 #labels Dominos
 
+#sidebar Dominos
+
 || [DominosBasics Getting around the interface] || [DominosAdvanced Doing more advanced things] || [DominosPlugins Adding extra functionality] || [Donations] ||
 ----
 
