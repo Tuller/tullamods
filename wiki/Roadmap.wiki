@@ -5,6 +5,11 @@ Bagnon:
   * Reproduce and fix crash bug
   * Refactor code
 
+Bagnon_Forever:
+  * Need to deal with links that include player levels
+  * Store token information
+  * Crazy town: Implement guild bank support
+
 Combuctor:
   * Switch to using bag sounds instead of merchant frame sounds
   * Implement better set API
