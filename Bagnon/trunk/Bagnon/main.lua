@@ -3,8 +3,6 @@
 		Handles settings management, and bank and inventory viewing
 --]]
 
-LoadAddOn('Bagnon_Forever')
-
 Bagnon = LibStub('AceAddon-3.0'):NewAddon('Bagnon', 'AceEvent-3.0', 'AceConsole-3.0')
 local L = LibStub('AceLocale-3.0'):GetLocale('Bagnon')
 local CURRENT_VERSION = GetAddOnMetadata("Bagnon", "Version")
