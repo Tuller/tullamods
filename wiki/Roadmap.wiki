@@ -1,21 +1,30 @@
 #summary Stuff I want to do
+#labels Featured
 
 Bagnon:
   * Reproduce and fix crash bug
   * Refactor code
 
 Combuctor:
+  * Switch to using bag sounds instead of merchant frame sounds
   * Implement better set API
   * Add in event-> tab event system (ex, show bank frame, normal tab when showing the bank, keyring when I click the keyring, trade bags...)
   * Add in a few configuration options?
 
 Dominos:
-  * Add ability to unbind Blizzard bindings via KeyBound.
-  * Add in a separate possess bar
+  * Add ability to unbind Blizzard bindings via KeyBound.  Bonus points if I add the ability to bind directly to Blizzard bindings, too.
+  * Make Dominos have a saner layout for 1-120 bars
+  * Add in a separate possess bar (optional addon)
+  * If I implement a saner layout for variable numbers of bars, along with the separate possess bar option, then put in sliders for numbars/numbuttons.  These should have a confirmation, since they'll toast layouts.
+  * Implement a RedRange type addon (potentially, and mainly for coloring)
   * Implement a better show state GUI
-  * Implement linked bar autofading
+  * Implement linked bar auto fading
+  * Implement state based opacity
+  * Crazy town: The ability to customize state headers (like Bartender4)
+  * Crazy town: Implement bar toggle bindings
   * Crazy town: Add in special bars (aspect, etc)
   * Crazy town: Implement a macaroon like system
+  * Super crazy town extreme edition: Implement a secure modal layout system.
 
 Ludwig:
   * Refactor code
@@ -26,13 +35,13 @@ OmniCC:
 
 Sage:
   * Rewrite for 3.0
-  * Incorporate new libs (ace3, lsm3.0, etc)
+  * Incorporate new libraries (ace3, lsm3.0, etc)
   * Incorporate some sort of threat display
   * Implement a new buff display: should give priority to my buffs/debuffs
   * Use a template system of some sort to make it easier to create new jambers
 
 
-Sellfish:
+SellFish:
   * Establish a monthly update process (gmail calendar reminders?)
 
 Tipachu:
