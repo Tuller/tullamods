@@ -494,10 +494,6 @@ do
 	function Menu:AddEventsPanel()
 		local panel = self:AddPanel(L.Events)
 
-		local replaceBags = panel:CreateCheckButton(L.ReplaceBags)
-		replaceBags:SetScript('OnShow', function(self) self:SetChecked(BagnonUtil:ReplacingBags()) end)
-		replaceBags:SetScript('OnClick', function(self) BagnonUtil:SetReplaceBags(self:GetChecked()) end)
-
 		EventButton_Create(panel, L.AtBank, 'Bank')
 		EventButton_Create(panel, L.AtVendor, 'Vendor')
 		EventButton_Create(panel, L.AtAH, 'AH')
