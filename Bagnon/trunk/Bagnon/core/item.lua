@@ -72,7 +72,6 @@ function BagnonItem:Create()
 	item.border = border
 
 	item.cooldown = getglobal(item:GetName() .. 'Cooldown')
---	item.cooldown:SetFrameLevel(4)
 
 	item:UnregisterAllEvents()
 	item:SetScript('OnEvent', nil)
@@ -84,17 +83,6 @@ function BagnonItem:Create()
 	itemID = itemID + 1
 
 	return item
-end
-
-function BagnonItem:GetBlizzard(id)
-	local bag = ceil(id / MAX_CONTAINER_ITEMS)
-	local slot = (id-1) % MAX_CONTAINER_ITEMS + 1
-	local item = getglobal(format('ContainerFrame%dItem%d', bag, slot))
-
-	if item then
-		item:SetID(0)
-		return item
-	end
 end
 
 function BagnonItem:Get()

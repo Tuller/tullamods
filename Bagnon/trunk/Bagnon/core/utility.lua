@@ -113,15 +113,15 @@ end
 --returns if the given bag is an ammo bag/soul bag
 --bankslots, the main bag, and the keyring cannot be ammo slots
 function BagnonUtil:IsAmmoBag(bag, player)
-	local bagType = self:GetBagType(bag, player) 
+	local bagType = self:GetBagType(bag, player)
 	return bagType == 1 or bagType == 2 or bagType == 4
 end
 
 --returns if the given bag is a profession bag (herb bag, engineering bag, etc)
 --bankslots, the main bag, and the keyring cannot be ammo slots
 function BagnonUtil:IsProfessionBag(bag, player)
-	local bagType = self:GetBagType(bag, player) 
-	return bagType > 4 and bagType ~= 256 
+	local bagType = self:GetBagType(bag, player)
+	return bagType > 4 and bagType ~= 256
 end
 
 
@@ -167,26 +167,6 @@ end
 
 function BagnonUtil:ShowingBorders()
 	return Bagnon.sets.showBorders
-end
-
-function BagnonUtil:SetReplaceBags(enable)
-	if not StaticPopupDialogs['BAGNON_CONFIRM_RELOADUI'] then
-		StaticPopupDialogs['BAGNON_CONFIRM_RELOADUI'] = {
-			text = TEXT(L.ConfirmReloadUI),
-			button1 = TEXT(ACCEPT),
-			timeout = 0,
-			hideOnEscape = 1,
-		}
-	end
-	PlaySound('igMainMenuOption')
-	StaticPopup_Show('BAGNON_CONFIRM_RELOADUI')
-	
-	Bagnon.updateReplaceBags = true
-	Bagnon.replaceBags = enable or nil
-end
-
-function BagnonUtil:ReplacingBags()
-	return Bagnon.sets.replaceBags
 end
 
 function BagnonUtil:ReplacingBank()

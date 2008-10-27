@@ -184,8 +184,10 @@ function Bagnon:CreateBank()
 
 	local OnHide = bank:GetScript("OnHide")
 	bank:SetScript("OnHide", function(self)
+		if BagnonUtil:AtBank() and BagnonUtil:ReplacingBank() then
+			CloseBankFrame()
+		end
 		PlaySound("igBagnonMenuClose")
-		CloseBankFrame()
 		OnHide(self)
 	end)
 
@@ -251,36 +253,36 @@ end
 --]]
 
 local function FrameOpened(id, auto)
-	if Bagnon:InventoryHasBag(id) and BagnonUtil:ReplacingBags() then
+	if Bagnon:InventoryHasBag(id) then
 		Bagnon:ShowInventory(auto)
 		return true
 	end
 
-	if Bagnon:BankHasBag(id) and BagnonUtil:ReplacingBank() then
+	if Bagnon:BankHasBag(id) then
 		Bagnon:ShowBank(auto)
 		return true
 	end
 end
 
 local function FrameClosed(id, auto)
-	if Bagnon:InventoryHasBag(id) and BagnonUtil:ReplacingBags() then
+	if Bagnon:InventoryHasBag(id) then
 		Bagnon:HideInventory(auto)
 		return true
 	end
 
-	if Bagnon:BankHasBag(id) and BagnonUtil:ReplacingBank() then
+	if Bagnon:BankHasBag(id) then
 		Bagnon:HideBank(auto)
 		return true
 	end
 end
 
 local function FrameToggled(id, auto)
-	if Bagnon:InventoryHasBag(id) and BagnonUtil:ReplacingBags() then
+	if Bagnon:InventoryHasBag(id) then
 		Bagnon:ToggleInventory(auto)
 		return true
 	end
 
-	if Bagnon:BankHasBag(id) and BagnonUtil:ReplacingBank() then
+	if Bagnon:BankHasBag(id) then
 		Bagnon:ToggleBank(auto)
 		return true
 	end
