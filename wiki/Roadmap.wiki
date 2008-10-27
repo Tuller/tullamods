@@ -16,7 +16,7 @@ Combuctor:
   * Add in event-> tab event system (ex, show bank frame, normal tab when showing the bank, keyring when I click the keyring, trade bags...)
   * Add in a few configuration options?
 
-Dominos:
+[Dominos]:
   * Add ability to unbind Blizzard bindings via KeyBound.  Bonus points if I add the ability to bind directly to Blizzard bindings, too.
   * Make Dominos have a saner layout for 1-120 bars
   * Add in a separate possess bar (optional addon)
