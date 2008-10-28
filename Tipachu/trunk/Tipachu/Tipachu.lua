@@ -26,7 +26,6 @@ local function hookItem(tip)
 		end
 	end)
 end
-
 hookItem(GameTooltip)
 hookItem(ItemRefTooltip)
 
@@ -47,7 +46,7 @@ local function hookSpell(tip)
 				title:SetFormattedText('|T%s:%d|t %s', icon, TipachuSize or 24, title:GetText())
 			end
 		end
-	
+
 		if set then
 			return set(self, ...)
 		end
