@@ -1,4 +1,5 @@
 #summary Version History for OmniCC
+#labels Deprecated
 
 2.1.1
   * Rethrottled the updates
