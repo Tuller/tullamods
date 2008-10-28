@@ -188,6 +188,10 @@ local hooks = {
 	SetSendMailItem = function(id)
 		return select(2, GetItemInfo(GetSendMailItem(id))), select(3, GetSendMailItem(id))
 	end,
+	
+	SetGuildBankItem = function(tab, slot)
+		return GetGuildBankItemLink(tab, slot), select(2, GetGuildBankItemInfo(tab, slot))
+	end,
 }
 
 local function hookTip(tooltip, method, action)
