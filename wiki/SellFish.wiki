@@ -1,6 +1,6 @@
 A lightweight addon for displaying sell value data for items, originally based on ColaLight. The addon includes sell values for the vast majority of items by default, and will automatically update prices whenever you visit a vendor.
 
 Commands: (All start with /sf or /sellfish)
-/sf ? - displays help messages
-/sf reset - resets the item database
-/sf style - cycles between graphical and text displays for sell value
+  * /sf ? - displays help messages
+  * /sf reset - resets the item database
+  * /sf style - cycles between graphical and text displays for sell value
