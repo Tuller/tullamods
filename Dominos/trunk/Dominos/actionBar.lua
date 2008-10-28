@@ -69,24 +69,19 @@ function ActionButton:Create(id)
 	local b = Create(id)
 	if b then
 		self:Bind(b)
+
 		--this is used to preserve the button's old id
 		--we cannot simply keep a button's id at > 0 or blizzard code will take control of paging
 		--but we need the button's id for the old bindings system
 		b:SetAttribute('bindingid', b:GetID())
 		b:SetID(0)
+
 		b:ClearAllPoints()
 		b:SetAttribute('useparent-actionpage', nil)
 		b:SetAttribute('useparent-unit', true)
 		b:EnableMouseWheel(true)
 		b:SetScript('OnEnter', self.OnEnter)
-
-		--skin buttons
-		if LBF then
-			LBF:Group('Dominos', 'Action Bar'):AddButton(b)
-		else
-			_G[b:GetName() .. 'Icon']:SetTexCoord(0.06, 0.94, 0.06, 0.94)
-			b:GetNormalTexture():SetVertexColor(1, 1, 1, 0.5)
-		end
+		b:Skin()
 	end
 	return b
 end
@@ -114,6 +109,7 @@ function ActionButton:Free()
 	self:Hide()
 	self.eventsRegistered = nil
 	self.action = nil
+
 	self.unused[id] = self
 end
 
@@ -163,6 +159,15 @@ function ActionButton:LoadAction()
 	self:SetAttribute('action', id)
 end
 
+function ActionButton:Skin()
+	if LBF then
+		LBF:Group('Dominos', 'Action Bar'):AddButton(self)
+	else
+		_G[self:GetName() .. 'Icon']:SetTexCoord(0.06, 0.94, 0.06, 0.94)
+		self:GetNormalTexture():SetVertexColor(1, 1, 1, 0.5)
+	end
+end
+
 
 --[[ Action Bar ]]--
 
@@ -194,7 +199,7 @@ ActionBar.mainbarOffsets = {
 		}
 
 		if i == 'DRUID' then
-			pages['[bonusbar:1,stealth]'] = 5
+--			pages['[bonusbar:1,stealth]'] = 5
 			pages['[bonusbar:1]'] = 6
 			pages['[bonusbar:2]'] = 7
 			pages['[bonusbar:3]'] = 8
@@ -205,8 +210,10 @@ ActionBar.mainbarOffsets = {
 			pages['[bonusbar:3]'] = 8
 		elseif i == 'PRIEST' or i == 'ROGUE' then
 			pages['[bonusbar:1]'] = 6
+--[[
 		elseif i == 'WARLOCK' then
 			pages['[form:2]'] = 6 --demon form, need to watch this to make sure blizzard doesn't change the page
+--]]
 		end
 
 		t[i] = pages
@@ -247,12 +254,7 @@ function ActionBar:New(id)
 	f.pages = f.sets.pages[f.class]
 	f.baseID = f:MaxLength() * (id-1)
 
-	f.header:SetAttribute('_onattributechanged', [[
-		if name == 'state-page' then
-			newABState = value;
-			control:ChildUpdate()
-		end
-	]] )
+	f:LoadStateController()
 	f:LoadButtons()
 	f:UpdateStateDriver()
 	f:Layout()
@@ -358,10 +360,6 @@ function ActionBar:UpdateStateDriver()
 	self:RefreshActions()
 end
 
-function ActionBar:RefreshActions()
-	self.header:Execute([[ control:ChildUpdate() ]])
-end
-
 local function ToValidID(id)
 	return (id - 1) % MAX_BUTTONS + 1
 end
@@ -411,6 +409,19 @@ function ActionBar:UpdateActions()
 			b:SetAttribute('action--possess', nil)
 		end
 	end
+end
+
+function ActionBar:LoadStateController()
+	self.header:SetAttribute('_onattributechanged', [[
+		if name == 'state-page' then
+			newABState = value
+			control:ChildUpdate()
+		end
+	]])
+end
+
+function ActionBar:RefreshActions()
+	self.header:Execute([[ control:ChildUpdate() ]])
 end
 
 --returns true if the possess bar, false otherwise
