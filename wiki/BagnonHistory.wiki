@@ -1,4 +1,5 @@
 #summary Version History for Bagnon
+#labels Deprecated
 
 = Bagnon Version History =
 
