@@ -49,6 +49,7 @@ Sage:
 
 SellFish:
   * Establish a monthly update process (gmail calendar reminders?)
+  * Add guild bank hooks
 
 Tipachu:
   * Fix compatibility issues if they're actually my fault
