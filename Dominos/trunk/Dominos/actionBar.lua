@@ -16,7 +16,7 @@ local LBF = LibStub('LibButtonFacade', true)
 
 --[[ Action Button ]]--
 
-local ActionButton = Dominos:CreateClass('CheckButton')
+local ActionButton = Dominos:CreateClass('CheckButton', Dominos.BindableButton)
 ActionButton.unused = {}
 ActionButton.active = {}
 
@@ -43,7 +43,9 @@ end
 
 local function Create(id)
 	if id <= 12 then
-		return _G['ActionButton' .. id]
+		local b = _G['ActionButton' .. id]
+		b.buttonType = 'ACTIONBUTTON'
+		return b
 	elseif id <= 24 then
 		local b = _G['BonusActionButton' .. (id - 12)]
 		b:UnregisterEvent('UPDATE_BONUS_ACTIONBAR')
@@ -133,55 +135,10 @@ function ActionButton:OnEnter()
 	KeyBound:Set(self)
 end
 
---the call here is wacky because this functionality is actually called for the blizzard buttons _before_ I'm able to bind the action button methods to them
-function ActionButton:UpdateHotkey(actionButtonType)
-	local key = ActionButton.GetHotkey(self, actionButtonType)
-	if key ~= ''  and Dominos:ShowBindingText() then
-		_G[self:GetName()..'HotKey']:SetText(key)
-		_G[self:GetName()..'HotKey']:Show()
-	else
-		_G[self:GetName()..'HotKey']:Hide()
-	end
-end
+--override the old update hotkeys function
+ActionButton_UpdateHotkeys = ActionButton.UpdateHotkey
 
-function ActionButton:GetHotkey(actionButtonType)
-	local type = actionButtonType or self.buttonType or 'ACTIONBUTTON'
-	local id = self:GetAttribute('bindingid') or self:GetID()
-
-	local key = GetBindingKey(type .. id) or GetBindingKey(format('CLICK %s:LeftButton', self:GetName()))
-	return key and KeyBound:ToShortKey(key) or ''
-end
-
-local function getKeyStrings(...)
-	local keys 
-	for i = 1, select('#', ...) do
-		local key = select(i, ...)
-		if keys then
-			keys = keys .. ", " .. GetBindingText(key, "KEY_")
-		else
-			keys = GetBindingText(key, "KEY_")
-		end
-	end
-	return keys
-end
-
-function ActionButton:GetBindings()
-	local type = actionButtonType or self.buttonType or 'ACTIONBUTTON'
-	local id = self:GetAttribute('bindingid') or self:GetID()
-
-	local blizzKeys = getKeyStrings(GetBindingKey(type .. id))
-	local clickKeys = getKeyStrings(GetBindingKey(format('CLICK %s:LeftButton', self:GetName())))
-	
-	if blizzKeys then
-		if clickKeys then
-			return blizzKeys .. ', ' .. clickKeys
-		end
-		return blizzKeys
-	else
-		return clickKeys
-	end
-end
-
+--button visibility
 function ActionButton:UpdateGrid()
 	if self:GetAttribute('showgrid') > 0 then
 		ActionButton_ShowGrid(self)
@@ -190,6 +147,7 @@ function ActionButton:UpdateGrid()
 	end
 end
 
+--macro text
 function ActionButton:UpdateMacro()
 	if Dominos:ShowMacroText() then
 		_G[self:GetName() .. 'Name']:Show()
@@ -198,15 +156,12 @@ function ActionButton:UpdateMacro()
 	end
 end
 
+--utility function, resyncs the button's current action, modified by state
 function ActionButton:LoadAction()
 	local state = self:GetParent():GetAttribute('state-page')
 	local id = state and self:GetAttribute('action--' .. state) or self:GetAttribute('action--base')
 	self:SetAttribute('action', id)
 end
-
---hotkey code override
---done to allow hiding of keys, and also for keybinding name shortening
-ActionButton_UpdateHotkeys = function(self, actionButtonType) ActionButton.UpdateHotkey(self, actionButtonType) end
 
 
 --[[ Action Bar ]]--
@@ -292,11 +247,11 @@ function ActionBar:New(id)
 	f.pages = f.sets.pages[f.class]
 	f.baseID = f:MaxLength() * (id-1)
 
-	f.header:SetAttribute('_onattributechanged', [[ 
-		if name == 'state-page' then 
-			newABState = value; 
-			control:ChildUpdate() 
-		end 
+	f.header:SetAttribute('_onattributechanged', [[
+		if name == 'state-page' then
+			newABState = value;
+			control:ChildUpdate()
+		end
 	]] )
 	f:LoadButtons()
 	f:UpdateStateDriver()

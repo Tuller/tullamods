@@ -13,7 +13,7 @@ local unused
 
 --[[ Pet Button ]]--
 
-local PetButton = Dominos:CreateClass('CheckButton')
+local PetButton = Dominos:CreateClass('CheckButton', Dominos.BindableButton)
 
 function PetButton:New(id)
 	local b = self:Restore(id) or self:Create(id)
@@ -24,6 +24,7 @@ end
 
 function PetButton:Create(id)
 	local b = self:Bind(_G['PetActionButton' .. id])
+	b.buttonType = 'BONUSACTIONBUTTON'
 	b:SetScript('OnEnter', self.OnEnter)
 	b:Skin()
 
@@ -69,52 +70,8 @@ function PetButton:OnEnter()
 	KeyBound:Set(self)
 end
 
-function PetButton:UpdateHotkey()
-	--this syntax is necessary since I override PetActionButton_SetHotkeys
-	--which may be called before I have a chance to make every blizzard pet button a dominos pet button object
-	local key = PetButton.GetHotkey(self)
-	local hotkey = _G[self:GetName() .. 'HotKey']
-
-	if key ~= ''  and Dominos:ShowBindingText() then
-		hotkey:SetText(key)
-		hotkey:Show()
-	else
-		hotkey:Hide()
-	end
-end
+--override keybinding display
 PetActionButton_SetHotkeys = PetButton.UpdateHotkey
-
-function PetButton:GetHotkey()
-	local key = GetBindingKey('BONUSACTIONBUTTON'..self:GetID()) or GetBindingKey(format('CLICK %s:LeftButton', self:GetName()))
-	return KeyBound:ToShortKey(key)
-end
-
-local function getKeyStrings(...)
-	local keys
-	for i = 1, select('#', ...) do
-		local key = select(i, ...)
-		if keys then
-			keys = keys .. ", " .. GetBindingText(key, "KEY_")
-		else
-			keys = GetBindingText(key, "KEY_")
-		end
-	end
-	return keys
-end
-
-function PetButton:GetBindings()
-	local blizzKeys = getKeyStrings(GetBindingKey('BONUSACTIONBUTTON'..self:GetID()))
-	local clickKeys = getKeyStrings(GetBindingKey(format('CLICK %s:LeftButton', self:GetName())))
-
-	if blizzKeys then
-		if clickKeys then
-			return blizzKeys .. ', ' .. clickKeys
-		end
-		return blizzKeys
-	else
-		return clickKeys
-	end
-end
 
 
 --[[ Pet Bar ]]--

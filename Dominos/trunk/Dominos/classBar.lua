@@ -15,7 +15,7 @@ local LBF = LibStub('LibButtonFacade', true)
 
 --[[ Class Button ]]--
 
-local ClassButton = Dominos:CreateClass('CheckButton')
+local ClassButton = Dominos:CreateClass('CheckButton', Dominos.BindableButton)
 
 
 --[[ Constructor ]]--
@@ -176,24 +176,6 @@ end
 function ClassButton:UpdateSpell()
 	self:SetAttribute('spell', select(2, GetShapeshiftFormInfo(self:GetID())))
 	self:Update()
-end
-
-
---[[ Hotkey Functions ]]--
-
-function ClassButton:UpdateHotkey()
-	local key = KeyBound:ToShortKey(GetBindingKey(format('CLICK %s:LeftButton', self:GetName()))) or ''
-	self.hotkey:SetText(key)
-
-	if key ~= ''  and Dominos:ShowBindingText() then
-		self.hotkey:Show()
-	else
-		self.hotkey:Hide()
-	end
-end
-
-function ClassButton:GetHotkey()
-	return KeyBound:ToShortKey(GetBindingKey(format('CLICK %s:LeftButton', self:GetName())))
 end
 
 
