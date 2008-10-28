@@ -1,4 +1,5 @@
 #summary Version history for Bongos3
+#labels Deprecated
 
 1.2e
   * Fixed a petbar error
