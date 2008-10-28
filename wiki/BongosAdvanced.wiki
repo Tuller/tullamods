@@ -1,4 +1,5 @@
 #summary Advanced Bongos configuration (WIP)
+#labels Deprecated
 
 So, you've figured out what right click menus are, you can move and scale things like a champ, and you know how to get to the options window.  Here's some more info to help you get the most out of Bongos:
 
