@@ -1,4 +1,5 @@
 #summary Version History for Ludwig
+#labels Deprecated
 
 1.6.0
   * Updated for 2.4
