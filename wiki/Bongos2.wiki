@@ -1,4 +1,5 @@
 #summary Bongos2 for Dummies
+#labels Deprecated
 
 
 = So what the heck is Bongos? =
