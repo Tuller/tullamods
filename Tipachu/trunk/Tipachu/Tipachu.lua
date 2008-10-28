@@ -3,17 +3,21 @@
 		Adds item icons to tooltips
 --]]
 
+--[[
+	Item Hooking
+--]]
 
 local function hookItem(tip)
-	local _G = getfenv(0)
+	local _G = _G
 	local set = tip:GetScript('OnTooltipSetItem')
 
 	tip:SetScript('OnTooltipSetItem', function(self, ...)
-		local link = select(2, self:GetItem())
-		if link and GetItemInfo(link) then
-			local text = _G[self:GetName() .. 'TextLeft1']
-			if text and text:GetText():sub(1, 2) ~= '|T' then --make sure the icon does not display twice on recipies, which fire OnTooltipSetItem twice
-				text:SetFormattedText('|T%s:%d|t%s', GetItemIcon(link), TipachuSize or 24, text:GetText())
+		local name, link = self:GetItem()
+		local icon = link and GetItemIcon(link)
+		if icon then
+			local title = _G[self:GetName() .. 'TextLeft1']
+			if title and not title:GetText():find('|T' .. icon) then --make sure the icon does not display twice on recipies, which fire OnTooltipSetItem twice
+				title:SetFormattedText('|T%s:%d|t %s', icon, TipachuSize or 24, title:GetText())
 			end
 		end
 
@@ -25,3 +29,29 @@ end
 
 hookItem(GameTooltip)
 hookItem(ItemRefTooltip)
+
+
+--[[
+	Spell Hooking
+--]]
+
+local function hookSpell(tip)
+	local _G = _G
+	local set = tip:GetScript('OnTooltipSetSpell')
+
+	tip:SetScript('OnTooltipSetSpell', function(self, ...)
+		local name, rank, icon = GetSpellInfo(self:GetSpell())
+		if icon then
+			local title = _G[self:GetName() .. 'TextLeft1']
+			if title and not title:GetText():find('|T' .. icon) then --make sure the icon does not display twice on recipies, which fire OnTooltipSetItem twice
+				title:SetFormattedText('|T%s:%d|t %s', icon, TipachuSize or 24, title:GetText())
+			end
+		end
+	
+		if set then
+			return set(self, ...)
+		end
+	end)
+end
+hookSpell(GameTooltip)
+hookSpell(ItemRefTooltip)
