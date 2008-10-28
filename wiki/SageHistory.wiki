@@ -1,4 +1,5 @@
 #summary Version History for Sage.
+#labels Deprecated
 
 1.0.4
   * Updated for 2.3
