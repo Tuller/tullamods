@@ -48,6 +48,7 @@ local function Create(id)
 		local b = _G['BonusActionButton' .. (id - 12)]
 		b:UnregisterEvent('UPDATE_BONUS_ACTIONBAR')
 		b.isBonus = nil
+		b.buttonType = nil --this is done because blizzard displays action bar 1 bindings on the bonus bar, which is incorrect in the case of Dominos
 		return b
 	elseif id <= 36 then
 		return _G['MultiBarRightButton' .. (id-24)]
