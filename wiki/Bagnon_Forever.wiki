@@ -1,3 +1,1 @@
-#summary What Bagnon_Forever is
-
 An addon that stores inventory information about your characters.  It was originally designed for Bagnon (hence the name) but is also now used by Combuctor.  The name comes from _Batman Forever_.
