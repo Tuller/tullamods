@@ -310,14 +310,10 @@ function Bagnon:HookBagClicks()
 
 	local oOpenAllBags = OpenAllBags
 	OpenAllBags = function(force)
-		if BagnonUtil:ReplacingBags() then
-			if force then
-				Bagnon:ShowInventory()
-			else
-				Bagnon:ToggleInventory()
-			end
+		if force then
+			Bagnon:ShowInventory()
 		else
-			oOpenAllBags(force)
+			Bagnon:ToggleInventory()
 		end
 	end
 
