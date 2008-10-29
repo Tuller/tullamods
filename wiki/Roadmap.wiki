@@ -1,7 +1,7 @@
 #summary Stuff I want to do
 #labels Featured
 
-Bagnon:
+===Bagnon===
   * Modernize codebase
 
 Bagnon_Forever:
