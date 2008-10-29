@@ -16,6 +16,7 @@ Combuctor:
   * Add in a few configuration options
 
 [Dominos]:
+  * Revise wiki, add FAQ
   * Make Dominos have a saner layout for 1-120 bars
   * Add in a separate possess bar (optional addon)
   * If I implement a saner layout for variable numbers of bars, along with the separate possess bar option, then put in sliders for numbars/numbuttons.  These should have a confirmation, since they'll toast layouts.
