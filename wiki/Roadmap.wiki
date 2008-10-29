@@ -2,11 +2,10 @@
 #labels Featured
 
 Bagnon:
-  * Reproduce and fix crash bug
-  * Refactor code
+  * Modernize codebase
 
 Bagnon_Forever:
-  * Need to deal with links that include player levels
+  * Need to deal with links that include player levels (maybe)
   * Store token information
   * Crazy town: Implement guild bank support
 
@@ -14,10 +13,9 @@ Combuctor:
   * Switch to using bag sounds instead of merchant frame sounds
   * Implement better set API
   * Add in event-> tab event system (ex, show bank frame, normal tab when showing the bank, keyring when I click the keyring, trade bags...)
-  * Add in a few configuration options?
+  * Add in a few configuration options
 
 [Dominos]:
-  * Add ability to unbind Blizzard bindings via KeyBound.  Bonus points if I add the ability to bind directly to Blizzard bindings, too.
   * Make Dominos have a saner layout for 1-120 bars
   * Add in a separate possess bar (optional addon)
   * If I implement a saner layout for variable numbers of bars, along with the separate possess bar option, then put in sliders for numbars/numbuttons.  These should have a confirmation, since they'll toast layouts.
@@ -32,9 +30,8 @@ Combuctor:
   * Super crazy town extreme edition: Implement a secure modal layout system.
 
 Ludwig:
-  * Fix crash bug, if possible
-  * Refactor code
-  * Look at adding in spell links
+  * Modernize codebase
+  * Add in spell and talent link support
 
 OmniCC:
   * Return of the shine option?
@@ -49,7 +46,7 @@ Sage:
 
 SellFish:
   * Establish a monthly update process (gmail calendar reminders?)
-  * Add guild bank hooks
 
 Tipachu:
+  * Add support for talents & spells, if possible
   * Fix compatibility issues if they're actually my fault
