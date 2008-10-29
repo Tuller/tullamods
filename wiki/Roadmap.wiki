@@ -26,7 +26,7 @@ Combuctor:
   * Implement state based opacity
   * Crazy town: The ability to customize state headers (like Bartender4)
   * Crazy town: Implement bar toggle bindings
-  * Crazy town: Add in special bars (aspect, etc)
+  * Crazy town: Add in special class bars (aspect, etc)
   * Crazy town: Implement a macaroon like system
   * Super crazy town extreme edition: Implement a secure modal layout system.
 
