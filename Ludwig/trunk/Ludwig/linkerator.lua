@@ -28,10 +28,10 @@ local function Linkerator_OnChar(self, ...)
 
 	local text = obj:GetText()
 	if text ~= '' then
-		if text:match('%[%[(.+)%]') then
-			obj:SetText(text:gsub('%[%[(.+)%]', OnFullMatch))
+		if text:match('%[%[(.+)%]$') then
+			obj:SetText(text:gsub('%[%[(.+)%]$', OnFullMatch))
 		else
-			obj:SetText(text:gsub('%[%[(.+)', OnPartialMatch))
+			obj:SetText(text:gsub('%[%[(.+)$', OnPartialMatch))
 			obj:HighlightText(#text, -1)
 		end
 	end
