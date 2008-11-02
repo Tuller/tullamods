@@ -10,17 +10,16 @@ local active = {}
 local unused = {}
 
 --constructor
-function Frame:New(id)
-	local id = tonumber(id) or id
-	local f = self:Restore(id) or self:Create(id)
+function Frame:New(id, template)
+	local f = self:Restore(id) or self:Create(id, template)
 	f:LoadSettings()
 
 	active[id] = f
 	return f
 end
 
-function Frame:Create(id)
-	local f = self:Bind(CreateFrame('Frame', nil, UIParent))
+function Frame:Create(id, template)
+	local f = self:Bind(CreateFrame('Frame', nil, UIParent, template))
 	f:SetClampedToScreen(true)
 	f:SetMovable(true)
 	f.id = id
@@ -62,7 +61,7 @@ function Frame:Delete()
 end
 
 function Frame:LoadSettings(defaults)
-	self.sets = Sage:GetFrameSets(self.id) or Sage:SetFrameSets(self.id, self:GetDefaults()) --get defaults must be provided by anything implementing the Frame type
+	self.sets = Sage:GetFrameSets(self.id) or Sage:SetFrameSets(self.id, self:GetDefaults())
 	self:Reposition()
 
 	if Sage:Locked() then
@@ -140,6 +139,13 @@ function Frame:GetFrameAlpha()
 end
 
 
+--[[ Unit Attribute ]]--
+
+function Frame:SetUnit(unit)
+	self:SetAttribute('unit', unit)
+end
+
+
 --[[ ShowStates ]]--
 
 function Frame:SetShowStates(states)
@@ -157,7 +163,7 @@ function Frame:UpdateShowStates()
 
 	local showstates = self:GetShowStates()
 	if showstates then
-		RegisterStateDriver(self.header, 'visibility', showstates .. 'show;hide')
+		RegisterStateDriver(self.header, 'visibility', showstates)
 	end
 end
 
@@ -359,7 +365,7 @@ function Frame:ForAll(method, ...)
 end
 
 --takes a frameID, and performs the specified action on that frame
---this adds two special IDs, 'all' for all frames, and 'party for all party frames
+--this adds two special IDs, 'all' for all frames, and 'party' for all party frames
 function Frame:ForFrame(id, method, ...)
 	if id == 'all' then
 		self:ForAll(method, ...)

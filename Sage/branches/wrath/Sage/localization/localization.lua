@@ -1,4 +1,4 @@
---[[
+﻿--[[
 	Localization.lua
 		Translations for Sage
 

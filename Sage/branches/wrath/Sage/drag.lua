@@ -88,6 +88,6 @@ function Drag:UpdateColor()
 	if self.owner:GetAnchor() then
 		self:GetNormalTexture():SetTexture(0, 0.2, 0.3, 0.4)
 	else
-		self:GetNormalTexture():SetTexture(0, 0.7, 0.5, 0.4)
+		self:GetNormalTexture():SetTexture(0, 0.8, 0.4, 0.4)
 	end
 end

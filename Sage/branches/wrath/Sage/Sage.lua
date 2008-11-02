@@ -83,7 +83,7 @@ end
 
 function Sage:Load()
 	for _,module in self:IterateModules() do
-		module:Load()
+		module:OnLoad()
 	end
 
 	--anchor everything
@@ -93,7 +93,7 @@ end
 --unload is called when we're switching profiles
 function Sage:Unload()
 	for _,module in self:IterateModules() do
-		module:Unload()
+		module:OnUnload()
 	end
 end
 
@@ -208,15 +208,148 @@ function Sage:OnProfileReset(msg, db)
 end
 
 
---[[ Slash Commands ]]--
+--[[
+	Slash Commands
+--]]
 
 function Sage:OnCmd(args)
-	--do something
+	local cmd = string.split(' ', args):lower() or args:lower()
+
+	--frame functions
+	if cmd == 'config' or cmd == 'lock' then
+		self:ToggleLockedFrames()
+	elseif cmd == 'scale' then
+		self:ScaleFrames(select(2, string.split(' ', args)))
+	elseif cmd == 'setalpha' then
+		self:SetOpacityForFrames(select(2, string.split(' ', args)))
+	--profile functions
+	elseif cmd == 'save' then
+		local name = string.join(' ', select(2, string.split(' ', args)))
+		self:SaveProfile(name)
+	elseif cmd == 'set' then
+		local name = string.join(' ', select(2, string.split(' ', args)))
+		self:SetProfile(name)
+	elseif cmd == 'copy' then
+		local name = string.join(' ', select(2, string.split(' ', args)))
+		self:CopyProfile(name)
+	elseif cmd == 'delete' then
+		local name = string.join(' ', select(2, string.split(' ', args)))
+		self:DeleteProfile(name)
+	elseif cmd == 'reset' then
+		self:ResetProfile()
+	elseif cmd == 'list' then
+		self:ListProfiles()
+	elseif cmd == 'version' then
+		self:PrintVersion()
+	elseif cmd == 'help' or cmd == '?' then
+		self:PrintHelp()
+	--options stuff
+	else
+		if not self:ShowOptions() then
+			self:PrintHelp()
+		end
+	end
+end
+
+function Sage:ShowOptions()
+	if LoadAddOn('Sage_Config') then
+		InterfaceOptionsFrame_OpenToCategory(self.Options)
+		return true
+	end
+	return false
+end
+
+function Sage:PrintHelp(cmd)
+	local function PrintCmd(cmd, desc)
+		DEFAULT_CHAT_FRAME:AddMessage(format(' - |cFF33FF99%s|r: %s', cmd, desc))
+	end
+
+	self:Print('Commands (/sg, /sage)')
+	PrintCmd('config', L.ConfigDesc)
+	PrintCmd('scale <frameList> <scale>', L.SetScaleDesc)
+	PrintCmd('setalpha <frameList> <opacity>', L.SetAlphaDesc)
+	PrintCmd('save <profile>', L.SaveDesc)
+	PrintCmd('set <profile>', L.SetDesc)
+	PrintCmd('copy <profile>', L.CopyDesc)
+	PrintCmd('delete <profile>', L.DeleteDesc)
+	PrintCmd('reset', L.ResetDesc)
+	PrintCmd('list', L.ListDesc)
+	PrintCmd('version', L.PrintVersionDesc)
 end
 
 
+--version info
+function Sage:PrintVersion()
+	self:Print(SageVersion)
+end
 
---[[ The one true class thingy ]]--
+
+--[[
+	Configuration Functions
+--]]
+
+--config mode toggle
+Sage.locked = false
+
+function Sage:SetLock(enable)
+	self.locked = enable or false
+	if self:Locked() then
+		self.Frame:ForAll('Lock')
+	else
+		self.Frame:ForAll('Unlock')
+	end
+end
+
+function Sage:Locked()
+	return self.locked
+end
+
+function Sage:ToggleLockedFrames()
+	self:SetLock(not self:Locked())
+end
+
+
+--sticky bars
+function Sage:SetSticky(enable)
+	self.db.profile.sticky = enable or false
+	if not enable then
+		self.Frame:ForAll('Stick')
+		self.Frame:ForAll('Reposition')
+	end
+end
+
+function Sage:Sticky()
+	return self.db.profile.sticky
+end
+
+
+--scale
+function Sage:ScaleFrames(...)
+	local numArgs = select('#', ...)
+	local scale = tonumber(select(numArgs, ...))
+
+	if scale and scale > 0 and scale <= 10 then
+		for i = 1, numArgs - 1 do
+			self.Frame:ForFrame(select(i, ...), 'SetFrameScale', scale)
+		end
+	end
+end
+
+
+--opacity
+function Sage:SetOpacityForFrames(...)
+	local numArgs = select('#', ...)
+	local alpha = tonumber(select(numArgs, ...))
+
+	if alpha and alpha >= 0 and alpha <= 1 then
+		for i = 1, numArgs - 1 do
+			self.Frame:ForFrame(select(i, ...), 'SetFrameAlpha', alpha)
+		end
+	end
+end
+
+
+--[[ Utility Methods ]]--
 
 function Sage:CreateClass(type, parentClass)
 	local class = CreateFrame(type)
@@ -234,9 +367,6 @@ function Sage:CreateClass(type, parentClass)
 	return class
 end
 
-
---[[ Settings...Setting ]]--
-
 function Sage:SetFrameSets(id, sets)
 	local id = tonumber(id) or id
 	self.db.profile.frames[id] = sets
@@ -246,25 +376,4 @@ end
 
 function Sage:GetFrameSets(id)
 	return self.db.profile.frames[tonumber(id) or id]
-end
-
-
---[[ Config Functions ]]--
-
-Sage.locked = false
-
-function Sage:SetLock(enable)
-	self.locked = enable or false
-end
-
-function Sage:Locked()
-	return self.locked
-end
-
-function Sage:SetSticky(enable)
-	self.db.profile.sticky = enable or false
-end
-
-function Sage:Sticky()
-	return self.db.profile.sticky
 end
