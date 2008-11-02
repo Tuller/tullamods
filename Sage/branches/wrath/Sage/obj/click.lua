@@ -1,61 +1,61 @@
 --[[
-	SageClick
-		The clickable portion of a SageFrame
+	ClickFrame
+		The portion of a Sage frame that responds to mouseover events
 --]]
 
-SageClick = CreateFrame('Button')
-local Frame_mt = {__index = SageClick}
+local ClickFrame = Sage:CreateClass('Button')
+Sage.Click = ClickFrame
 
-local function Frame_OnEnter(self) self:OnEnter() end
-local function Frame_OnLeave(self) self:OnLeave() end
+local id = 1
+function ClickFrame:New(parent)
+	local f = self:Bind(CreateFrame('Button', 'SageClick' .. id, parent, 'SecureUnitButtonTemplate'))
+	f:UpdateUnit()
 
-function SageClick:Create(parent, id)
-	local frame = CreateFrame('Button', format('SageClick%s', id or parent.id), parent, 'SecureUnitButtonTemplate')
-	setmetatable(frame, Frame_mt)
-	frame.unit = id or parent.id
+	SecureUnitButton_OnLoad(f, parent:GetAttribute('unit'), function() f:ShowMenu() end)
 
-	SecureUnitButton_OnLoad(frame, id or parent.id, function() frame:ShowMenu() end)
 	--support for click casting mods that use the clique standard
 	ClickCastFrames = ClickCastFrames or {}
-    ClickCastFrames[frame] = true
+	ClickCastFrames[f] = true
 
-	frame:RegisterForClicks('anyUp')
-	frame:SetScript('OnEnter', Frame_OnEnter)
-	frame:SetScript('OnLeave', Frame_OnLeave)
+	f:RegisterForClicks('anyUp')
+	f:SetScript('OnEnter', self.OnEnter)
+	f:SetScript('OnLeave', self.OnLeave)
 
-	return frame
+	id = id + 1
+	return f
 end
 
 --show tooltip, show text if its not always shown
-function SageClick:OnEnter()
+function ClickFrame:OnEnter()
 	UnitFrame_OnEnter(self)
-	SageBar:UpdateText(self.unit, true)
+	Sage.StatusBar:OnFrameEnter(self:GetParent():GetAttribute('unit'))
 end
 
 --hide tooltip, and text if its not always shown
-function SageClick:OnLeave()
+function ClickFrame:OnLeave()
 	UnitFrame_OnLeave(self)
-	SageBar:UpdateText(self.unit, false)
+	Sage.StatusBar:OnFrameLeave(self:GetParent():GetAttribute('unit'))
 end
 
 --credit goes to agUF for this function
-function SageClick:ShowMenu()
-	local unit = self:GetAttribute('unit')
+function ClickFrame:ShowMenu()
+	local unit = self:GetParent():GetAttribute('unit')
 	local menu
-	
+
 	if unit == 'player' then
-		menu = PlayerFrameDropDown
+		menu = _G['PlayerFrameDropDown']
 	elseif unit == 'target' then
-		menu = TargetFrameDropDown
+		menu = _G['TargetFrameDropDown']
+	elseif unit == 'focus' then
+		menu = _G['FocusFrameDropDown']
 	elseif unit == 'pet' then
-		menu = PetFrameDropDown
+		menu = _G['PetFrameDropDown']
 	else
-		local partyID = unit:match('party(%d)')
-		if partyID then
-			menu = getglobal(format('PartyMemberFrame%sDropDown', partyID))
-		end
+		local id = unit:match('party(%d+)')
+		menu = id and _G['PartyMemberFrame' .. id .. 'DropDown']
 	end
 
+	--magic numbers evil
 	if menu then
 		HideDropDownMenu(1)
 		ToggleDropDownMenu(1, nil, menu, 'cursor')
