@@ -19,16 +19,13 @@ function Frame:New(id, template)
 end
 
 function Frame:Create(id, template)
-	local f = self:Bind(CreateFrame('Frame', nil, UIParent, template))
+	local f = self:Bind(CreateFrame('Frame', format('Sage%sFrame', id), UIParent, 'SecureHandlerAttributeTemplate'))
+	f:SetAttribute('unit', id)
 	f:SetClampedToScreen(true)
 	f:SetMovable(true)
+
 	f.id = id
-
-	f.header = CreateFrame('Frame', nil, f, 'SecureHandlerAttributeTemplate')
-	f.header:SetAllPoints(f)
-
 	f.drag = Sage.DragFrame:New(f)
-	f:SetWidth(32); f:SetHeight(32)
 
 	return f
 end
@@ -45,8 +42,7 @@ end
 function Frame:Free()
 	active[self.id] = nil
 
-	UnregisterStateDriver(self.header, 'visibility', 'show')
-
+	self:UnregisterAllEvents()
 	self:ClearAllPoints()
 	self:SetUserPlaced(nil)
 	self.drag:Hide()
@@ -70,8 +66,9 @@ function Frame:LoadSettings(defaults)
 		self:Unlock()
 	end
 
-	self:UpdateShowStates()
+--	self:UpdateShowStates()
 	self:UpdateAlpha()
+	self:Show()
 end
 
 function Frame:GetDefaults()
@@ -143,6 +140,10 @@ end
 
 function Frame:SetUnit(unit)
 	self:SetAttribute('unit', unit)
+
+	if not UnitWatchRegistered(self) then
+		RegisterUnitWatch(self)
+	end
 end
 
 
@@ -158,12 +159,12 @@ function Frame:GetShowStates()
 end
 
 function Frame:UpdateShowStates()
-	UnregisterStateDriver(self.header, 'visibility', 'show')
-	self.header:Show()
+	UnregisterStateDriver(self, 'visibility', 'show')
+	self:Show()
 
 	local showstates = self:GetShowStates()
 	if showstates then
-		RegisterStateDriver(self.header, 'visibility', showstates)
+		RegisterStateDriver(self, 'visibility', showstates)
 	end
 end
 

@@ -1,167 +1,96 @@
 --[[
-	SageHealth
-		Handles healthbars
-
-	MobHealth Versions Supported:
-		Telos' MobHealth (preferred)
-		MobInfo2
-		MobInfo3
+	Healthbar Object
 --]]
 
-SageHealth = CreateFrame('StatusBar')
-local Bar_MT = {__index = SageHealth}
-local L = SAGE_LOCALS
+--omgspeed
+local _G = _G
+local UnitHealth = _G['UnitHealth']
+local UnitHealthMax = _G['UnitHealthMax']
+local UnitIsFriend = _G['UnitIsFriend']
+local UnitDebuff = _G['UnitDebuff']
+local UnitIsFeignDeath = _G['UnitIsFeignDeath']
+local UnitIsDead = _G['UnitIsDead']
+local UnitIsGhost = _G['UnitIsGhost']
+local UnitIsConnected = _G['UnitIsConnected']
 
 
---[[ Local Functions ]]--
+local HealthBar = Sage:CreateClass('StatusBar', Sage.StatusBar)
+Sage.HealthBar = HealthBar
 
---update's the bar's color based on how much health the bar's parent unit has
-local function Bar_UpdateHealthColor(self, value)
-	if not value then return end
-
-	local r, g
-	local min, max = self:GetMinMaxValues()
-
-	if (value < min) or (value > max) then
-		return
-	end
-
-	if max - min > 0 then
-		value = (value - min) / (max - min)
-	else
-		value = 0
-	end
-
-	if value > 0.5 then
-		r = (1.0 - value) * 2
-		g = 1.0
-	else
-		r = 1.0
-		g = value * 2
-	end
-
-	self:SetStatusBarColor(r, g, 0)
-end
-
-function HealthBar_OnValueChanged(value)
-	Bar_UpdateHealthColor(this, value)
-end
-
-
---[[ Setup the GetUnitHealth function based on which MobInfo addon is loaded, if any ]]--
-
-local GetUnitHealth
-if MobHealth3 then
-	GetUnitHealth = function(unit)
-		local value = UnitHealth(unit)
-		local maxValue = UnitHealthMax(unit)
-
-		if maxValue == 100 then
-			value, maxValue = MobHealth3:GetUnitHealth(unit)
-		end
-		return value, maxValue
-	end
-elseif MobHealthFrame then
-	local GetMobHealth;
-
-	if MobHealth_PPP then
-		--MobInfo2
-		GetMobHealth = function(unit)
-			local ppp = MobHealth_PPP(format('%s:%s', UnitName(unit), UnitLevel(unit)))
-			if ppp and ppp ~= 0 then
-				return floor(UnitHealth(unit) * ppp + 0.5), floor(UnitHealthMax(unit) * ppp + 0.5)
-			end
-			return UnitHealth(unit), UnitHealthMax(unit)
-		end
-	else
-		--Telos' Mobhealth
-		GetMobHealth = function(unit)
-			local index = format('%s:%s', UnitName(unit), UnitLevel(unit))
-			local health, healthMax = UnitHealth(unit), UnitHealthMax(unit)
-			if MobHealthDB[index] then
-				local pts, pct = MobHealthDB[index]:match('^(%d+)/(%d+)$')
-				if(tonumber(pts) and tonumber(pct)) then
-					local ppp = tonumber(pts) / tonumber(pct)
-					return floor(health * ppp + 0.5), floor(healthMax * ppp + 0.5)
-				end
-			end
-			return health, healthMax
-		end
-	end
-
-	GetUnitHealth = function(unit)
-		local value = UnitHealth(unit)
-		local maxValue = UnitHealthMax(unit)
-
-		if maxValue == 100 then
-			value, maxValue = GetMobHealth(unit)
-		end
-		return value, maxValue
-	end
-else
-	--default case
-	GetUnitHealth = function(unit)
-		return UnitHealth(unit), UnitHealthMax(unit)
-	end
-end
-
-
---[[ Frame Events ]]--
-
-local function Bar_OnValueChanged(self, value)
-	if not self.debuff then
-		self:UpdateHealthColor(value)
-	end
-end
-
-local function Bar_OnShow(self)
-	self:UpdateAll()
-end
-
-
---[[ Usable Stuff ]]--
-
-function SageHealth:Create(parent, id)
-	local bar = setmetatable(SageBar:Create(parent, id, SageFont:GetBarFont()), Bar_MT)
+local bars = {}
+function HealthBar:New(parent, font)
+	local bar = self.super.New(self, 'Health', parent, font)
 	bar:SetStatusBarColor(0, 1, 0)
 	bar.bg:SetVertexColor(0.6, 0, 0, 0.6)
 
-	bar:SetScript('OnValueChanged', Bar_OnValueChanged)
-	bar:SetScript('OnShow', Bar_OnShow)
+	bar:SetScript('OnValueChanged', self.OnValueChanged)
+	bar:SetScript('OnShow', self.OnShow)
 	bar:UpdateAll()
-	bar:UpdateTexture()
 
-	if(not self.bars) then self.bars = {} end
-	self.bars[bar.id] = bar
-
+	table.insert(bars, bar)
 	return bar
 end
 
-function SageHealth:UpdateAll()
+
+--[[
+	Event Handlers
+--]]
+
+function HealthBar:OnShow()
+	self:UpdateAll()
+end
+
+function HealthBar:OnValueChanged(value)
+	if not self.debuff then
+		_G['HealthBar_OnValueChanged'](self, value, true)
+	end
+end
+
+function HealthBar:UNIT_HEALTH(unit)
+	if self:GetAttribute('unit') == unit then
+		self:Update()
+	end
+end
+HealthBar.UNIT_MAXHEALTH = HealthBar.UNIT_HEALTH
+
+function HealthBar:UNIT_AURA(unit)
+	if self:GetAttribute('unit') == unit then
+		self:UpdateDebuff()
+	end
+end
+
+
+--[[
+	Update Methods
+--]]
+
+function HealthBar:UpdateAll()
 	self:Update()
 	self:UpdateDebuff()
 end
 
-function SageHealth:Update()
-	local unit = self.id
-	local value, maxValue = GetUnitHealth(unit)
+function HealthBar:Update()
+	local unit = self:GetAttribute('unit')
+
+	local value, maxValue = UnitHealth(unit), UnitHealthMax(unit)
 	self:SetMinMaxValues(0, maxValue)
 	self:SetValue(value)
 
 	--Change displayed text depending on if disconnected/dead/ghost/etc
-	self:UpdateText()
+	if self.text then
+		self:UpdateText()
+	end
 end
 
-function SageHealth:UpdateDebuff()
-	local unit = self.id
-	if(Sage:DebuffColoring() and UnitIsFriend('player', unit)) then
-		local sets = Sage:GetFrameSets(unit)
-		local showCurable = sets and sets.showCurable
+function HealthBar:UpdateDebuff()
+	local unit = self:GetAttribute('unit')
+
+	if UnitIsFriend('player', unit) then
 		local i = 1
-		local name, _, _, _, type = UnitDebuff(unit, i, showCurable)
+		local name, _, _, _, type = UnitDebuff(unit, i)
 		while(name and not type) do
 			i = i + 1
-			name, _, _, _, type = UnitDebuff(unit, i, showCurable)
+			name, _, _, _, type = UnitDebuff(unit, i)
 		end
 		self.debuff = type
 	else
@@ -169,88 +98,90 @@ function SageHealth:UpdateDebuff()
 	end
 
 	if self.debuff then
-		local color = DebuffTypeColor[self.debuff or 'none']
+		local color = _G['DebuffTypeColor'][self.debuff or 'none']
 		self:SetStatusBarColor(color.r, color.g, color.b)
 	else
 		self:UpdateHealthColor(self:GetValue())
 	end
 end
 
-function SageHealth:UpdateHealthColor(value)
-	if(not self.debuff) then
-		if UnitIsFeignDeath(self.id) then
+function HealthBar:UpdateHealthColor(value)
+	if not self.debuff then
+		if UnitIsFeignDeath(self:GetAttribute('unit')) then
 			self:SetStatusBarColor(0, 0.9, 0.78)
 		else
-			Bar_UpdateHealthColor(self, value)
+			self:OnValueChanged(value)
 		end
 	end
 end
 
---mode 1 = show only on mouseover, 2 = compact, 3 = full
-function SageHealth:UpdateText()
-	local unit, mode, text, entered = self.id, self.mode, self.text, self.entered
+function HealthBar:UpdateText()
+	local text = self.text
+	local unit = self:GetAttribute('unit')
 	local value = self:GetValue()
 	local min, max = self:GetMinMaxValues()
 
-	if(mode == 1 and not entered) then
-		text:Hide()
+	if UnitIsFeignDeath(unit) then
+		text:SetText('Feign Death')
+	elseif UnitIsDead(unit) then
+		text:SetText('Dead')
+	elseif UnitIsGhost(unit) then
+		text:SetText('Ghost')
+	elseif not UnitIsConnected(unit) then
+		text:SetText('Offline')
 	else
-		if UnitIsFeignDeath(unit) then
-			text:SetText(L.FeignDeath)
-		elseif UnitIsDead(unit) then
-			text:SetText(L.Dead)
-		elseif UnitIsGhost(unit) then
-			text:SetText(L.Ghost)
-		elseif not UnitIsConnected(unit) then
-			text:SetText(L.Offline)
-		elseif(entered or mode == 3) then
-			if(Sage:ShowingMaxValues()) then
-				text:SetText(format('%d / %d', value, max))
+		if value == max then
+			text:SetText('')
+		elseif UnitIsFriend(unit, 'player') then
+			local missing = value - max
+			if missing > -1000 then
+				text:SetText(missing)
 			else
-				text:SetText(value)
+				text:SetFormattedText('%.1fk', missing/1000)
 			end
-		elseif(mode == 2) then
-			if(value == max) then
-				text:SetText('')
-			elseif(UnitIsFriend(unit, 'player')) then
-				text:SetText(value - max)
-			else
+		else
+			if value < 1000 then
 				text:SetText(value)
+			else
+				text:SetFormattedText('%.1fk', value/1000)
 			end
 		end
-		text:Show()
 	end
+--	text:Show()
 end
-SageHealth.UpdateTexture = SageBar.UpdateTexture
+
 
 --[[ Utility Functions ]]--
 
-function SageHealth:ForAll(method, ...)
-	local bars = self.bars
-	if(bars) then
-		for _,bar in pairs(bars) do
-			bar[method](bar, ...)
+function HealthBar:ForAll(method, ...)
+	for _,f in self:GetAll() do
+		f[method](f, ...)
+	end
+end
+
+function HealthBar:ForAllShown(method, ...)
+	for _,f in self:GetAll() do
+		if f:IsVisible() then
+			f[method](f, ...)
 		end
 	end
 end
 
-function SageHealth:Get(id)
-	return self.bars and self.bars[id]
+function HealthBar:GetAll()
+	return pairs(bars)
 end
 
 
---[[ Events ]]--
+--[[ Event Handler ]]--
 
-function SageHealth:OnEvent(unit)
-	local bar = self:Get(unit)
-	if bar and bar:IsVisible() then
-		bar:Update()
-	end
-end
+do
+	local f = CreateFrame('Frame')
 
-function SageHealth:OnBuffEvent(unit)
-	local bar = self:Get(unit)
-	if bar and bar:IsVisible() then
-		bar:UpdateDebuff()
-	end
+	f:SetScript('OnEvent', function(self, event, ...)
+		HealthBar:ForAllShown(event, ...)
+	end)
+
+	f:RegisterEvent('UNIT_HEALTH')
+	f:RegisterEvent('UNIT_MAXHEALTH')
+	f:RegisterEvent('UNIT_AURA')
 end

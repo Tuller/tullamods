@@ -3,80 +3,41 @@
 		Shared statusbar functions
 --]]
 
-SageBar = {}
+local StatusBar = Sage:CreateClass('StatusBar')
+Sage.StatusBar = StatusBar
 
-local lastCreated = 0
-function SageBar:Create(parent, id, font, alwaysShow)
-	local name = format('SageBar%s', tonumber(lastCreated, 36))
-	local bar = CreateFrame('StatusBar', name, parent)
-	bar.id = id or parent.id
+local bars = {}
+
+function StatusBar:New(type, parent, font)
+	local name =  parent:GetName() .. type
+
+	local bar = self:Bind(CreateFrame('StatusBar', name, parent))
+	bar:SetAttribute('unit', parent:GetAttribute('unit'))
 
 	bar.bg = bar:CreateTexture(name .. 'bg', 'BACKGROUND')
 	bar.bg:SetAllPoints(bar)
+	
+	bar:UpdateTexture()
 
-	if(font) then
-		bar.mode = Sage:GetTextMode(bar.id)
-		bar.text = bar:CreateFontString(name .. 'text', 'OVERLAY')
-		bar.text:SetPoint('RIGHT', -2, 0)
-		bar.text:SetFontObject(font)
+	if font then
+		local text = bar:CreateFontString(name .. 'text', 'OVERLAY')
+		text:SetPoint('RIGHT', -2, 0)
+		text:SetFontObject(font)
+		bar.text = text
 	end
-	self:Register(bar)
-	lastCreated = lastCreated + 1
 
+	table.insert(bars, bar)
 	return bar
 end
 
-function SageBar:Register(bar)
-	if(not self.bars) then self.bars = {} end
-	self.bars[bar] = true
-end
-
-function SageBar:UpdateTexture()
-	local texture = Sage:GetBarTexture()
+function StatusBar:UpdateTexture(texture)
+	local texture = texture or Sage:GetStatusBarTexture()
 	self:SetStatusBarTexture(texture)
 	self.bg:SetTexture(texture)
 end
 
-function SageBar:UpdateAllTextures()
-	if(self.bars) then
-		for bar in pairs(self.bars) do
-			bar:UpdateTexture()
-		end
-	end
-end
-
-function SageBar:SetTextMode(unit, mode)
-	if(self.bars) then
-		for bar in pairs(self.bars) do
-			if(not unit or bar.id == unit) then
-				if(bar.UpdateText) then
-					bar.mode = mode
-					bar:UpdateText()
-				end
-			end
-		end
-	end
-end
-
-function SageBar:UpdateText(unit, entered)
-	if(self.bars) then
-		for bar in pairs(self.bars) do
-			if(not unit or bar.id == unit) then
-				if(bar.UpdateText) then
-					bar.entered = entered
-					bar:UpdateText()
-				end
-			end
-		end
-	end
-end
-
-function SageBar:UpdateAll()
-	if(self.bars) then
-		for bar in pairs(self.bars) do
-			if(bar.UpdateText) then
-				bar:UpdateText()
-			end
-		end
+function StatusBar:ForAll(method, ...)
+	for _,bar in pairs(bars) do
+		bar[method](bar, ...)
 	end
 end

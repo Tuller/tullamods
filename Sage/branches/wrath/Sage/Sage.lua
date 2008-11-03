@@ -289,7 +289,7 @@ end
 --]]
 
 --config mode toggle
-Sage.locked = false
+Sage.locked = true
 
 function Sage:SetLock(enable)
 	self.locked = enable or false
@@ -348,6 +348,18 @@ function Sage:SetOpacityForFrames(...)
 	end
 end
 
+function Sage:SetStatusBarTexture(texture)
+	self.db.profile.texture = texture
+	self:UpdateStatusBarTexture()
+end
+
+function Sage:GetStatusBarTexture()
+	return LibStub('LibSharedMedia-3.0'):Fetch('statusbar', self.db.profile.texture)
+end
+
+function Sage:UpdateStatusBarTexture()
+	self.StatusBar:ForAll('UpdateTexture', self:GetStatusBarTexture())
+end
 
 --[[ Utility Methods ]]--
 
@@ -368,12 +380,10 @@ function Sage:CreateClass(type, parentClass)
 end
 
 function Sage:SetFrameSets(id, sets)
-	local id = tonumber(id) or id
 	self.db.profile.frames[id] = sets
-
 	return self.db.profile.frames[id]
 end
 
 function Sage:GetFrameSets(id)
-	return self.db.profile.frames[tonumber(id) or id]
+	return self.db.profile.frames[id]
 end

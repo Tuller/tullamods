@@ -26,9 +26,9 @@ function SageNPC:Create(parent, id)
 end
 
 function SageNPC:Update()
-	local unit = self.id
-	self.class:SetText(SageNPC:GetClass(unit))
-	self.type:SetText(SageNPC:GetClassification(unit))
+	local unit = self:GetAttribute('unit')
+	self.class:SetText(self:GetClass(unit))
+	self.type:SetText(self:GetClassification(unit))
 end
 
 --If not an NPC, this returns the unit's class.  Else, it returns the given unit's creature type
@@ -38,19 +38,19 @@ function SageNPC:GetClass(unit)
 	end
 
 	local type = UnitCreatureFamily(unit) or UnitCreatureType(unit)
-	return (type == L.UnknownCreature and '') or type
+	return (type == 'Unknown Creature' and '') or type
 end
 
 --Returns a string with the given's classification if the target special
 function SageNPC:GetClassification(unit)
 	local class = UnitClassification(unit)
 	if class == 'worldboss' then
-		return L.Boss
+		return 'Boss'
 	elseif class == 'rareelite' then
-		return L.RareElite
+		return 'Rare Elite'
 	elseif class == 'elite' then
-		return L.Elite
+		return 'Elite'
 	elseif class == 'rare' then
-		return L.Rare
+		return 'Rare'
 	end
 end

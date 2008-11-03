@@ -11,3 +11,7 @@ localization\localization.lua
 Sage.lua
 frame.lua
 drag.lua
+obj\bar.lua
+obj\health.lua
+obj\power.lua
+test.lua
