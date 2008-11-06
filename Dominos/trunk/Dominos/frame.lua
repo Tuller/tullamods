@@ -129,7 +129,7 @@ function Frame:Create(id)
 	f:SetMovable(true)
 	f.id = id
 
-	f.header = CreateFrame('Frame', nil, f, 'SecureHandlerAttributeTemplate')
+	f.header = CreateFrame('Frame', nil, f, 'SecureHandlerStateTemplate')
 	f.header:SetAllPoints(f)
 
 	f.drag = Dominos.DragFrame:New(f)
@@ -149,7 +149,6 @@ end
 function Frame:Free()
 	active[self.id] = nil
 
-	UnregisterStateDriver(self.header, 'state', 0)
 	UnregisterStateDriver(self.header, 'visibility', 'show')
 	Fader:Remove(self)
 
