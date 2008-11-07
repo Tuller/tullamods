@@ -5,21 +5,28 @@
 local PowerBar = Sage:CreateClass('StatusBar', Sage.StatusBar)
 Sage.PowerBar = PowerBar
 
+
 local bars = {}
 function PowerBar:New(parent, font)
 	local bar = self.super.New(self, 'Power', parent, font)
 	bar:SetScript('OnShow', self.Update)
-	bar:SetScript('OnUpdate', self.OnUpdate)
-	bar:Update()
+	bar:UpdateUnit()
 
 	table.insert(bars, bar)
 	return bar
 end
 
+function PowerBar:NewFrequent(parent, font)
+	local f = self:New(parent, font)
+	f:SetScript('OnUpdate', self.OnUpdate)
+
+	return f
+end
+
 --[[ Events ]]--
 
 function PowerBar:OnUpdate()
-	local unit = self:GetAttribute('unit')
+	local unit = self.unit
 
 	if UnitIsConnected(unit) then
 		local powerType, powerToken = UnitPowerType(unit)
@@ -33,10 +40,32 @@ function PowerBar:OnUpdate()
 	end
 end
 
+function PowerBar:UNIT_MANA(unit)
+	if self.unit == unit then
+		self:Update()
+	end
+end
+
+
 --[[ Update Methods ]]--
 
+function PowerBar:UpdateUnit(newUnit)
+	local newUnit = newUnit or self:GetParent():GetAttribute('unit')
+	if self.unit ~= newUnit then
+		self.unit = newUnit
+
+		if self:IsVisible() then
+			self:Update()
+		end
+	end
+end
+
+function PowerBar:GetUnit()
+	return self.unit
+end
+
 function PowerBar:Update()
-	local unit = self:GetAttribute('unit')
+	local unit = self.unit
 	local powerType, powerToken = UnitPowerType(unit)
 	local value, max = UnitPower(unit, powerType), UnitPowerMax(unit, powerType)
 
@@ -45,9 +74,7 @@ function PowerBar:Update()
 
 	if UnitIsConnected(unit) then
 		local color = _G['PowerBarColor'][powerToken]
-		self:SetStatusBarColor(color.r, color.g, color.b)
-		self.bg:SetTexture(0.6, 0.3, 0.1, 0.6)
-
+		self:SetColor(color.r, color.g, color.b)
 		self:SetValue(value)
 	else
 		self:SetValue(max)
@@ -61,7 +88,7 @@ end
 
 function PowerBar:UpdateText()
 	local text = self.text
-	local unit = self:GetAttribute('unit')
+	local unit = self:GetUnit()
 	local value = self:GetValue()
 	local min, max = self:GetMinMaxValues()
 
@@ -99,4 +126,25 @@ end
 
 function PowerBar:GetAll()
 	return pairs(bars)
+end
+
+--[[ Event Handler ]]--
+
+do
+	local f = CreateFrame('Frame')
+
+	f:SetScript('OnEvent', function(self, event, ...)
+		PowerBar:ForAllShown('UNIT_MANA', ...)
+	end)
+
+	f:RegisterEvent('UNIT_MANA')
+	f:RegisterEvent('UNIT_MAXMANA')
+	f:RegisterEvent('UNIT_RAGE')
+	f:RegisterEvent('UNIT_MAXRAGE')
+	f:RegisterEvent('UNIT_FOCUS')
+	f:RegisterEvent('UNIT_MAXFOCUS')
+	f:RegisterEvent('UNIT_ENERGY')
+	f:RegisterEvent('UNIT_RUNIC_POWER')
+	f:RegisterEvent('UNIT_MAXRUNIC_POWER')
+	f:RegisterEvent('UNIT_DISPLAYPOWER')
 end

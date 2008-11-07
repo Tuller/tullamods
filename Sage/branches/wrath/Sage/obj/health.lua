@@ -20,12 +20,9 @@ Sage.HealthBar = HealthBar
 local bars = {}
 function HealthBar:New(parent, font)
 	local bar = self.super.New(self, 'Health', parent, font)
-	bar:SetStatusBarColor(0, 1, 0)
-	bar.bg:SetVertexColor(0.6, 0, 0, 0.6)
-
-	bar:SetScript('OnValueChanged', self.OnValueChanged)
+	bar:SetColor(0, 0.8, 0)
 	bar:SetScript('OnShow', self.OnShow)
-	bar:UpdateAll()
+	bar:UpdateUnit()
 
 	table.insert(bars, bar)
 	return bar
@@ -47,14 +44,14 @@ function HealthBar:OnValueChanged(value)
 end
 
 function HealthBar:UNIT_HEALTH(unit)
-	if self:GetAttribute('unit') == unit then
+	if self.unit == unit then
 		self:Update()
 	end
 end
 HealthBar.UNIT_MAXHEALTH = HealthBar.UNIT_HEALTH
 
 function HealthBar:UNIT_AURA(unit)
-	if self:GetAttribute('unit') == unit then
+	if self.unit == unit then
 		self:UpdateDebuff()
 	end
 end
@@ -64,13 +61,24 @@ end
 	Update Methods
 --]]
 
+function HealthBar:UpdateUnit(newUnit)
+	local newUnit = newUnit or self:GetParent():GetAttribute('unit')
+	if self.unit ~= newUnit then
+		self.unit = newUnit
+		
+		if self:IsVisible() then
+			self:UpdateAll()
+		end
+	end
+end
+
 function HealthBar:UpdateAll()
 	self:Update()
 	self:UpdateDebuff()
 end
 
 function HealthBar:Update()
-	local unit = self:GetAttribute('unit')
+	local unit = self.unit
 
 	local value, maxValue = UnitHealth(unit), UnitHealthMax(unit)
 	self:SetMinMaxValues(0, maxValue)
@@ -83,7 +91,7 @@ function HealthBar:Update()
 end
 
 function HealthBar:UpdateDebuff()
-	local unit = self:GetAttribute('unit')
+	local unit = self.unit
 
 	if UnitIsFriend('player', unit) then
 		local i = 1
@@ -97,27 +105,31 @@ function HealthBar:UpdateDebuff()
 		self.debuff = nil
 	end
 
-	if self.debuff then
-		local color = _G['DebuffTypeColor'][self.debuff or 'none']
-		self:SetStatusBarColor(color.r, color.g, color.b)
-	else
-		self:UpdateHealthColor(self:GetValue())
-	end
+	self:UpdateHealthColor()
 end
 
-function HealthBar:UpdateHealthColor(value)
-	if not self.debuff then
-		if UnitIsFeignDeath(self:GetAttribute('unit')) then
-			self:SetStatusBarColor(0, 0.9, 0.78)
+function HealthBar:UpdateHealthColor()
+	local unit = self.unit
+
+	if self.debuff then
+		local color = _G['DebuffTypeColor'][self.debuff]
+		self:SetColor(color.r, color.g, color.b)
+	elseif UnitIsFeignDeath(unit)  then
+		self:SetColor(0, 0.9, 0.78)
+	else
+		local _, class = UnitClass(unit)
+		if class then
+			local color = _G['RAID_CLASS_COLORS'][class]
+			self:SetColor(color.r, color.g, color.b)
 		else
-			self:OnValueChanged(value)
+			self:SetColor(0, 1, 0)
 		end
 	end
 end
 
 function HealthBar:UpdateText()
 	local text = self.text
-	local unit = self:GetAttribute('unit')
+	local unit = self.unit
 	local value = self:GetValue()
 	local min, max = self:GetMinMaxValues()
 

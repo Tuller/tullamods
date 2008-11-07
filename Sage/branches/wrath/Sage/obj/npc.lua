@@ -1,49 +1,69 @@
 --[[
-	SageNPC
+	NPC Info Bar
 		Displays target info (class & type)
 --]]
 
-SageNPC = {}
-local L = SAGE_LOCALS
+local NPCInfoBar = Sage:CreateClass('Frame')
+Sage.NPCInfoBar = NPCInfoBar
 
-function SageNPC:Create(parent, id)
-	local npc = CreateFrame('Frame', nil, parent)
-	npc.id = id or parent.id
+local L = LibStub('AceLocale-3.0'):GetLocale('Sage')
 
-	npc.class = npc:CreateFontString(nil, 'OVERLAY')
-	npc.class:SetFontObject(SageFont:GetSmallOutsideFont())
-	npc.class:SetJustifyH('LEFT')
-	npc.class:SetPoint('TOPLEFT', npc)
-	
-	npc.type = npc:CreateFontString(nil, 'OVERLAY')
-	npc.type:SetFontObject(SageFont:GetSmallOutsideFont())
-	npc.type:SetJustifyH('RIGHT')
-	npc.type:SetPoint('TOPRIGHT', npc)
+function NPCInfoBar:New(parent, font)
+	local f = self:Bind(CreateFrame('Frame', parent:GetName() .. 'NPCInfo', parent))
+	f:SetScript('OnShow', self.OnShow)
 
-	npc.Update = self.Update
+	f.class = f:CreateFontString(nil, 'OVERLAY')
+	f.class:SetFontObject(font)
+	f.class:SetJustifyH('LEFT')
+	f.class:SetPoint('TOPLEFT')
 
-	return npc
+	f.type = f:CreateFontString(nil, 'OVERLAY')
+	f.type:SetFontObject(font)
+	f.type:SetJustifyH('RIGHT')
+	f.type:SetPoint('TOPRIGHT')
+
+	f:UpdateUnit()
+
+	return f
 end
 
-function SageNPC:Update()
-	local unit = self:GetAttribute('unit')
-	self.class:SetText(self:GetClass(unit))
-	self.type:SetText(self:GetClassification(unit))
+function NPCInfoBar:OnShow()
+	self:Update()
+end
+
+function NPCInfoBar:UpdateUnit(newUnit)
+	local newUnit = newUnit or self:GetParent():GetAttribute('unit')
+	if self.unit ~= newUnit then
+		self.unit = newUnit
+
+		if self:IsVisible() then
+			self:Update()
+		end
+	end
+end
+
+function NPCInfoBar:Update()
+	self.class:SetText(self:GetClass())
+	self.type:SetText(self:GetClassification())
 end
 
 --If not an NPC, this returns the unit's class.  Else, it returns the given unit's creature type
-function SageNPC:GetClass(unit)
+function NPCInfoBar:GetClass()
+	local unit = self.unit
+
 	if UnitRace(unit) then
 		return UnitClass(unit)
+	else
+		local type = UnitCreatureFamily(unit) or UnitCreatureType(unit)
+		return (type == 'Unknown Creature' and '') or type
 	end
-
-	local type = UnitCreatureFamily(unit) or UnitCreatureType(unit)
-	return (type == 'Unknown Creature' and '') or type
 end
 
 --Returns a string with the given's classification if the target special
-function SageNPC:GetClassification(unit)
+function NPCInfoBar:GetClassification()
+	local unit = self.unit
 	local class = UnitClassification(unit)
+
 	if class == 'worldboss' then
 		return 'Boss'
 	elseif class == 'rareelite' then

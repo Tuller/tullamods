@@ -14,4 +14,8 @@ drag.lua
 obj\bar.lua
 obj\health.lua
 obj\power.lua
+obj\click.lua
+obj\npc.lua
+obj\info.lua
+obj\threat.lua
 test.lua

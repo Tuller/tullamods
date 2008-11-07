@@ -4,13 +4,12 @@
 --]]
 
 local ClickFrame = Sage:CreateClass('Button')
-Sage.Click = ClickFrame
+Sage.ClickFrame = ClickFrame
 
-local id = 1
 function ClickFrame:New(parent)
-	local f = self:Bind(CreateFrame('Button', 'SageClick' .. id, parent, 'SecureUnitButtonTemplate'))
-	f:UpdateUnit()
-
+	local f = self:Bind(CreateFrame('Button', parent:GetName() .. 'Click', parent, 'SecureUnitButtonTemplate'))
+	f:SetScript('OnAttributeChanged', self.OnAttributeChanged)
+	f:SetAttribute('_childupdate-unit', [[ self:SetAttribute('unit', message) ]])
 	SecureUnitButton_OnLoad(f, parent:GetAttribute('unit'), function() f:ShowMenu() end)
 
 	--support for click casting mods that use the clique standard
@@ -21,25 +20,30 @@ function ClickFrame:New(parent)
 	f:SetScript('OnEnter', self.OnEnter)
 	f:SetScript('OnLeave', self.OnLeave)
 
-	id = id + 1
 	return f
+end
+
+function ClickFrame:OnAttributeChanged()
+	self.unit = self:GetAttribute('unit')
+
+	if GameTooltip:IsOwned(self) then
+		self:OnEnter()
+	end
 end
 
 --show tooltip, show text if its not always shown
 function ClickFrame:OnEnter()
 	UnitFrame_OnEnter(self)
-	Sage.StatusBar:OnFrameEnter(self:GetParent():GetAttribute('unit'))
 end
 
 --hide tooltip, and text if its not always shown
 function ClickFrame:OnLeave()
-	UnitFrame_OnLeave(self)
-	Sage.StatusBar:OnFrameLeave(self:GetParent():GetAttribute('unit'))
+	GameTooltip:Hide()
 end
 
 --credit goes to agUF for this function
 function ClickFrame:ShowMenu()
-	local unit = self:GetParent():GetAttribute('unit')
+	local unit = self.unit
 	local menu
 
 	if unit == 'player' then

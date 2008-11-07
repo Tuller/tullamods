@@ -55,14 +55,10 @@ function Sage:GetDefaults()
 			locked = true,
 			sticky = true,
 			showCastBars = true,
-			showPercents = false,
-			outlineBarFonts = false,
-			outlineOutsideFonts = false,
 			debuffColoring = true,
 			showMaxValues = true,
-			showPvP = true,
-			fontSize = 14,
-			barTexture = 'Armory2',
+			showPvPIcons = true,
+			barTexture = 'Diagonal',
 			rangeCheck = true,
 			frames = {}
 		}
@@ -359,6 +355,10 @@ end
 
 function Sage:UpdateStatusBarTexture()
 	self.StatusBar:ForAll('UpdateTexture', self:GetStatusBarTexture())
+end
+
+function Sage:ShowingPVPIcons()
+	return self.db.profile.showPvPIcons
 end
 
 --[[ Utility Methods ]]--

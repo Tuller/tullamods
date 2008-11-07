@@ -9,78 +9,94 @@
 		The max height of an infobar with party information should be 20, and 16 without
 --]]
 
-SageInfo = CreateFrame('Frame')
-local Frame_MT = {__index = SageInfo}
-local L = SAGE_LOCALS
+local InfoBar = Sage:CreateClass('Frame')
+Sage.InfoBar = InfoBar
 
 local LEVEL_OFFSET = 2
-local RAID_CLASS_COLORS = RAID_CLASS_COLORS
-local UnitReactionColor = UnitReactionColor
+local frames = {}
 
---this is an exercise in
 local function IndexToUnit(index)
-	if(index) then
+	if index then
 		return ((index == 0) and 'player') or 'party' .. index
 	end
 end
 
 local function GetLeaderIndex()
 	local leader = GetPartyLeaderIndex()
-	if(leader == 0) then
+	if leader == 0 then
 		leader = IsPartyLeader() and 0
 	end
 	return IndexToUnit(leader)
 end
 
-local function Bar_CreateStrings(self)
+
+--[[ Usable Functions ]]--
+
+function InfoBar:New(parent, font, levelFont, hasPartyInfo)
+	local f = self:Bind(CreateFrame('Frame', parent:GetName() .. 'Info', parent))
+	f.hasPartyInfo = hasPartyInfo
+
+	f:SetScript('OnShow', self.OnShow)
+	f:SetScript('OnSizeChanged', self.OnSizeChanged)
+	f:AddStrings(font, levelFont)
+	f:AddIcons(hasPartyInfo)
+	f:UpdateUnit()
+
+	frames[f] = true
+	return f
+end
+
+function InfoBar:NewPartyMember(parent, font, levelFont)
+	return self:New(parent, font, levelFont, true)
+end
+
+function InfoBar:AddStrings(font, levelFont)
 	local level = self:CreateFontString(nil, 'OVERLAY')
-	level:SetFontObject(SageFont:GetLevelFont())
+	level:SetFontObject(levelFont or font)
 	level:SetPoint('BOTTOMLEFT', self, 'BOTTOMLEFT', LEVEL_OFFSET, 0)
 	level:SetHeight(12)
-	level:SetJustifyH('LEFT'); level:SetJustifyV('BOTTOM')
+	level:SetJustifyH('LEFT')
+	level:SetJustifyV('BOTTOM')
 	self.level = level
 
-	local percent = self:CreateFontString(nil, 'OVERLAY')
-	percent:SetFontObject(SageFont:GetSmallOutsideFont())
-	percent:SetPoint('BOTTOMRIGHT', self)
-	percent:SetHeight(12)
-	percent:SetJustifyH('RIGHT'); percent:SetJustifyV('BOTTOM')
-	if not Sage:ShowingPercents() then percent:Hide() end
-	self.percent = percent
-
 	local name = self:CreateFontString(nil, 'OVERLAY')
-	name:SetFontObject(SageFont:GetOutsideFont())
+	name:SetFontObject(font)
 	name:SetHeight(12)
-	name:SetJustifyH('LEFT'); name:SetJustifyV('BOTTOM')
-	name:SetPoint('BOTTOMLEFT', level, 'BOTTOMRIGHT')
-	name:SetPoint('BOTTOMRIGHT', percent, 'BOTTOMLEFT')
+	name:SetJustifyH('LEFT')
+	name:SetJustifyV('BOTTOM')
+	name:SetPoint('BOTTOMLEFT', level, 'BOTTOMRIGHT', LEVEL_OFFSET, 0)
+	name:SetPoint('BOTTOMRIGHT')
 	self.name = name
 end
 
-local function Bar_CreateIcons(self, hasPartyInfo)
+function InfoBar:AddIcons(hasPartyInfo)
 	local pvp = self:CreateTexture(nil, 'OVERLAY')
-	pvp:SetWidth(48); pvp:SetHeight(48)
+	pvp:SetWidth(48)
+	pvp:SetHeight(48)
 	pvp:SetPoint('CENTER', self.level, 'CENTER', 7, -10)
 	pvp:Hide()
 	self.pvp = pvp
 
 	local target = self:CreateTexture(nil, 'OVERLAY')
 	target:SetTexture('Interface\\TargetingFrame\\UI-RaidTargetingIcons')
-	target:SetWidth(25); target:SetHeight(26)
+	target:SetWidth(25)
+	target:SetHeight(26)
 	target:SetPoint('CENTER', self.level, 'CENTER', -1, 0)
 	target:Hide()
 	self.target = target
 
 	if hasPartyInfo then
 		local leader = self:CreateTexture(nil, 'OVERLAY')
-		leader:SetWidth(20); leader:SetHeight(18)
+		leader:SetWidth(20)
+		leader:SetHeight(18)
 		leader:SetPoint('BOTTOM', self.level, 'TOP', -0.5, -4)
 		leader:SetTexture('Interface\\GroupFrame\\UI-Group-LeaderIcon')
 		leader:Hide()
 		self.leader = leader
 
 		local masterLoot = self:CreateTexture(nil, 'OVERLAY')
-		masterLoot:SetWidth(16); masterLoot:SetHeight(16)
+		masterLoot:SetWidth(16)
+		masterLoot:SetHeight(16)
 		masterLoot:SetPoint('TOP', self.level, 'BOTTOMLEFT', 0, 0)
 		masterLoot:SetTexture('Interface\\GroupFrame\\UI-Group-MasterLooter')
 		masterLoot:Hide()
@@ -88,138 +104,165 @@ local function Bar_CreateIcons(self, hasPartyInfo)
 	end
 end
 
-local function Bar_OnShow(self)
+
+--[[
+	Events
+--]]
+
+function InfoBar:OnShow()
 	self:UpdateAll()
 end
 
+function InfoBar:OnSizeChanged()
+	self:UpdateWidth()
+end
 
---[[ Usable Functions ]]--
+function InfoBar:UNIT_FACTION()
+	self:UpdatePvP()
+end
 
-function SageInfo:Create(parent, id, hasPartyInfo)
-	local bar = setmetatable(CreateFrame('Frame', nil, parent), Frame_MT)
-	bar.id = id or parent.id
-	bar:SetScript('OnShow', Bar_OnShow)
+function InfoBar:UNIT_NAME_UPDATE()
+	self:UpdateName()
+end
 
-	Bar_CreateStrings(bar)
-	Bar_CreateIcons(bar, hasPartyInfo)
+function InfoBar:UNIT_CLASSIFICATION_CHANGED()
+	self:UpdateNameColor()
+end
 
-	bar:UpdateAll()
+function InfoBar:UNIT_LEVEL()
+	self:UpdateLevel()
+end
 
-	if(not self.bars) then self.bars = {} end
-	self.bars[bar.id] = bar
+function InfoBar:RAID_TARGET_UPDATE()
+	self:UpdateUnitIcon()
+end
 
-	return bar
+function InfoBar:PARTY_LEADER_CHANGED()
+	if self.hasPartyInfo then
+		self:UpdatePartyLeader(GetLeaderIndex())
+	end
+end
+
+function InfoBar:PARTY_MEMBERS_CHANGED()
+	if self.hasPartyInfo and GetNumPartyMembers() == 0 then
+		self:UpdatePartyLeader(nil)
+	end
+end
+
+function InfoBar:PARTY_LOOT_METHOD_CHANGED()
+	if self.hasPartyInfo then
+		self:UpdateMasterLooter(IndexToUnit(select(2, GetLootMethod())))
+	end
+end
+
+function InfoBar:UNIT_THREAT_SITUATION_UPDATE()
+	self:UpdateNameColor()
 end
 
 
---[[ Update Functions ]]--
+--[[
+	Update Methods
+--]]
 
-function SageInfo:UpdateAll()
+function InfoBar:UpdateUnit(newUnit)
+	local newUnit = newUnit or self:GetParent():GetAttribute('unit')
+	if self.unit ~= newUnit then
+		self.unit = newUnit
+
+		if self:IsVisible() then
+			self:UpdateAll()
+		end
+	end
+end
+
+function InfoBar:UpdateAll()
 	self:UpdateLevel()
 	self:UpdateUnitIcon()
 	self:UpdateName()
-	self:UpdatePartyLeader(GetLeaderIndex())
-	self:UpdateMasterLooter(IndexToUnit(select(2, GetLootMethod())))
 
-	if Sage:ShowingPercents() then
-		self:UpdateHealthPercent()
+	if self.hasPartyInfo then
+		self:UpdatePartyLeader(GetLeaderIndex())
+		self:UpdateMasterLooter(IndexToUnit(select(2, GetLootMethod())))
 	end
 end
 
 --Updates the name of the player and resizes the unitframe, if needed.
-function SageInfo:UpdateName()
-	self.name:SetText(UnitName(self.id))
+function InfoBar:UpdateName()
+	self.name:SetText(UnitName(self.unit))
 	self:UpdateNameColor()
 end
 
+function InfoBar:UpdateNameColor()
+	self.name:SetVertexColor(self:GetNameStatusColor())
+end
+
 --Colors the name of the unit based on a bunch of different criteria
-function SageInfo:UpdateNameColor()
-	local unit = self.id
+function InfoBar:GetNameStatusColor()
+	local unit = self.unit
 	local r, g, b
 
 	-- player controlled units (party units are checked because they're not considered player controlled if far away for some reason)
 	if UnitPlayerControlled(unit) or UnitInParty(unit) then
-		if self.isResting then
-			r = 0.6; g = 0.6; b = 1;
-		elseif self.inCombat then
-			r = 1; g = 0.4; b = 0.4;
-		elseif UnitCanAttack(unit, 'player') then
-			--hostile units
-			r = UnitReactionColor[2].r
-			g = UnitReactionColor[2].g + 0.3
-			b = UnitReactionColor[2].b + 0.3
-		elseif UnitCanAttack('player', unit) then
-			--pvp flagged players, when we're not in pvp
-			r = UnitReactionColor[4].r
-			g = UnitReactionColor[4].g
-			b = UnitReactionColor[4].b
-		-- elseif UnitIsPVP(unit) then
-			--friendly flagged players
-			-- r = UnitReactionColor[6].r
-			-- g = UnitReactionColor[6].g
-			-- b = UnitReactionColor[6].b
+		if UnitIsUnit(unit, 'player') and IsResting() then
+			r, g, b = UnitSelectionColor(unit)
+		elseif UnitCanAttack(unit, 'player') or UnitCanAttack('player', unit) then
+			r, g, b = UnitSelectionColor(unit)
+		elseif UnitThreatSituation(unit) > 0 then
+			r, g, b = GetThreatStatusColor(UnitThreatSituation(unit))
 		else
 			--update the player's name color based on their class
-			local class = select(2, UnitClass(unit))
+			local _, class = UnitClass(unit)
 			if class then
-				r = RAID_CLASS_COLORS[class].r
-				g = RAID_CLASS_COLORS[class].g
-				b = RAID_CLASS_COLORS[class].b
-			else
-				r = 0.6; g = 0.6; b = 1
+				local color = _G['RAID_CLASS_COLORS'][class]
+				r = color.r
+				g = color.g
+				b = color.b
 			end
 		end
 	--tapped NPCs
 	elseif UnitIsTapped(unit) and not UnitIsTappedByPlayer(unit) then
-		r = 0.6; g = 0.6; b = 0.6
+		r = 0.7
+		g = 0.7
+		b = 0.7
 	--all other NPCs
 	else
-		local reaction = UnitReaction(unit, 'player')
-		if reaction then
-			r = UnitReactionColor[reaction].r + 0.3
-			g = UnitReactionColor[reaction].g + 0.3
-			b = UnitReactionColor[reaction].b + 0.3
-		else
-			r = 0.6; g = 0.6; b = 1
-		end
+		r, g, b = UnitSelectionColor(unit)
 	end
-	self.name:SetVertexColor(r, g, b)
+
+	return max(r or 0, 0.4), max(g or 0, 0.4), max(b or 1, 0.4)
 end
 
 --adds/hides a flag if the unit is flagged for pvp
-function SageInfo:UpdatePvP()
-	if Sage:ShowingPvP() then
-		if(self.target:IsShown()) then
+function InfoBar:UpdatePvP()
+	if Sage:ShowingPVPIcons() then
+		if self.target:IsShown() then
 			self.pvp:Hide()
 		else
-			local unit = self.id
+			local unit = self.unit
 			local pvpIcon = self.pvp
 			local factionGroup = UnitFactionGroup(unit)
 
 			if UnitIsPVPFreeForAll(unit) then
-				self.level:SetFontObject(SageFont:GetLevelFont())
 				pvpIcon:SetTexture('Interface\\TargetingFrame\\UI-PVP-FFA')
 				pvpIcon:Show()
 			elseif factionGroup and UnitIsPVP(unit) then
-				self.level:SetFontObject(SageFont:GetLevelFont())
 				pvpIcon:SetTexture('Interface\\TargetingFrame\\UI-PVP-' .. factionGroup)
 				pvpIcon:Show()
 			else
-				self.level:SetFontObject(SageFont:GetSmallOutsideFont())
 				pvpIcon:Hide()
 			end
 		end
 	elseif self.pvp:IsShown() then
 		self.pvp:Hide()
-		self.level:SetFontObject(SageFont:GetSmallOutsideFont())
 	end
+
 	self:UpdateNameColor()
 end
 
 --updates the level display for the unit, colors depending on relative level to the player
-function SageInfo:UpdateLevel()
+function InfoBar:UpdateLevel()
 	local levelText = self.level
-	local level = UnitLevel(self.id)
+	local level = UnitLevel(self.unit)
 
 	if level and level > 0 then
 		local color = GetDifficultyColor(level)
@@ -232,138 +275,82 @@ function SageInfo:UpdateLevel()
 end
 
 --updates the raid target icon, hides the pvp icon if necessary
-function SageInfo:UpdateUnitIcon()
-	local index = GetRaidTargetIndex(self.id)
+function InfoBar:UpdateUnitIcon()
+	local index = GetRaidTargetIndex(self.unit)
 	if index then
 		SetRaidTargetIconTexture(self.target, index)
 		self.target:Show()
-		self.level:SetFontObject(SageFont:GetLevelFont())
 	else
 		self.target:Hide()
 	end
 	self:UpdatePvP()
 end
 
-function SageInfo:UpdateHealthPercent()
-	local unit = self.id
-	self.percent:SetText(floor(UnitHealth(unit) / UnitHealthMax(unit) * 100 + 0.5) .. '%')
-end
-
-function SageInfo:UpdatePercents()
-	if Sage:ShowingPercents() then
-		self.percent:Show()
-		self:UpdateHealthPercent()
-	else
-		self.percent:SetText('')
-		self.percent:Hide()
-	end
-	self:UpdateWidth()
-end
-
-function SageInfo:UpdateWidth()
-	local parent = self:GetParent()
-	local width = parent:GetFrameWidth()
+function InfoBar:UpdateWidth()
+	local width = self:GetParent():GetWidth()
 
 	self.level:SetText('00')
-	--the +2 here is from the offset of level text
 	local textWidth = self.level:GetStringWidth() + LEVEL_OFFSET
-
-	if Sage:ShowingPercents() then
-		self.percent:SetText('100%')
-		textWidth = textWidth + self.percent:GetStringWidth()
-	end
-	self.name:SetWidth(max(width-textWidth, 0))
+	self.name:SetWidth(max(width - textWidth, 0))
 
 	self:UpdateAll()
-	parent:SetWidth(max(width, textWidth) + (parent.extraWidth or 0))
 end
 
-function SageInfo:UpdatePartyLeader(leader)
+function InfoBar:UpdatePartyLeader(leader)
 	local leaderIcon = self.leader
-	if(leaderIcon) then
-		if(leader and UnitIsUnit(self.id, leader)) then
-			leaderIcon:Show()
-		else
-			leaderIcon:Hide()
-		end
+	if leader and UnitIsUnit(self.unit, leader) then
+		leaderIcon:Show()
+	else
+		leaderIcon:Hide()
 	end
 end
 
-function SageInfo:UpdateMasterLooter(looter)
+function InfoBar:UpdateMasterLooter(looter)
 	local lootIcon = self.masterLoot
-	if(lootIcon) then
-		if(looter and UnitIsUnit(self.id, looter)) then
-			lootIcon:Show()
-		else
-			lootIcon:Hide()
-		end
+	if looter and UnitIsUnit(self.unit, looter) then
+		lootIcon:Show()
+	else
+		lootIcon:Hide()
 	end
-end
-
-
---[[ Events ]]--
-
-function SageInfo:OnHealthEvent(unit)
-	local frame = self:Get(unit)
-	if frame and frame:IsVisible() then
-		frame:UpdateHealthPercent()
-	end
-end
-
-function SageInfo:UNIT_FACTION(unit)
-	self:ForUnit(unit, 'UpdatePvP')
-end
-
-function SageInfo:UNIT_NAME_UPDATE(unit)
-	self:ForUnit(unit, 'UpdateName')
-	self:ForUnit(unit, 'UpdateNameColor')
-end
-
-function SageInfo:UNIT_CLASSIFICATION_CHANGED(unit)
-	self:ForUnit(unit, 'UpdateNameColor')
-end
-
-function SageInfo:UNIT_LEVEL(unit)
-	self:ForUnit(unit, 'UpdateLevel')
-end
-
-function SageInfo:RAID_TARGET_UPDATE()
-	self:ForAll('UpdateUnitIcon')
-end
-
-function SageInfo:PARTY_LEADER_CHANGED()
-	self:ForAll('UpdatePartyLeader', GetLeaderIndex())
-end
-
-function SageInfo:PARTY_MEMBERS_CHANGED()
-	if(GetNumPartyMembers() == 0) then
-		self:ForAll('UpdatePartyLeader', nil)
-	end
-end
-
-function SageInfo:PARTY_LOOT_METHOD_CHANGED()
-	self:ForAll('UpdateMasterLooter', IndexToUnit(select(2, GetLootMethod())))
 end
 
 
 --[[ Utility Functions ]]--
 
-function SageInfo:ForAll(method, ...)
-	local bars = self.bars
-	if(bars) then
-		for _,bar in pairs(bars) do
-			bar[method](bar, ...)
+function InfoBar:ForAll(method, ...)
+	for frame in pairs(frames) do
+		frame[method](frame, ...)
+	end
+end
+
+function InfoBar:ForVisibleUnit(unit, method, ...)
+	for frame in pairs(frames) do
+		if frame.unit == unit and frame:IsVisible() then
+			frame[method](frame, ...)
 		end
 	end
 end
 
-function SageInfo:ForUnit(unit, method, ...)
-	local bar = self:Get(unit)
-	if(bar and bar:IsVisible()) then
-		bar[method](bar, ...)
-	end
+function InfoBar:Get(id)
+	return frames[id]
 end
 
-function SageInfo:Get(id)
-	return self.bars and self.bars[id]
+
+--[[ Events ]]--
+
+do
+	local f = CreateFrame('Frame')
+	f:SetScript('OnEvent', function(self, event, unit, ...)
+		InfoBar:ForVisibleUnit(unit, event, ...)
+	end)
+
+	f:RegisterEvent('UNIT_THREAT_SITUATION_UPDATE')
+	f:RegisterEvent('UNIT_FACTION')
+	f:RegisterEvent('UNIT_NAME_UPDATE')
+	f:RegisterEvent('UNIT_CLASSIFICATION_CHANGED')
+	f:RegisterEvent('UNIT_LEVEL')
+	f:RegisterEvent('RAID_TARGET_UPDATE')
+	f:RegisterEvent('PARTY_LEADER_CHANGED')
+	f:RegisterEvent('PARTY_MEMBERS_CHANGED')
+	f:RegisterEvent('PARTY_LOOT_METHOD_CHANGED')
 end

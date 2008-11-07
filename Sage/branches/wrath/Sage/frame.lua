@@ -12,6 +12,7 @@ local unused = {}
 --constructor
 function Frame:New(id, template)
 	local f = self:Restore(id) or self:Create(id, template)
+	f:SetUnit(id)
 	f:LoadSettings()
 
 	active[id] = f
@@ -19,7 +20,7 @@ function Frame:New(id, template)
 end
 
 function Frame:Create(id, template)
-	local f = self:Bind(CreateFrame('Frame', format('Sage%sFrame', id), UIParent, 'SecureHandlerAttributeTemplate'))
+	local f = self:Bind(CreateFrame('Frame', format('Sage%sFrame', id), UIParent, 'SecureHandlerStateTemplate'))
 	f:SetAttribute('unit', id)
 	f:SetClampedToScreen(true)
 	f:SetMovable(true)
@@ -28,6 +29,19 @@ function Frame:Create(id, template)
 	f.drag = Sage.DragFrame:New(f)
 
 	return f
+end
+
+local function setChildUnits(unit, ...)
+	for i = 1, select('#', ...) do
+		local f = select(i, ...)
+		if f.UpdateUnit then
+			f:UpdateUnit(unit)
+		end
+	end
+end
+
+function Frame:UpdateChildUnit()
+	setChildUnits(self:GetAttribute('unit'), self:GetChildren())
 end
 
 function Frame:Restore(id)
@@ -143,28 +157,6 @@ function Frame:SetUnit(unit)
 
 	if not UnitWatchRegistered(self) then
 		RegisterUnitWatch(self)
-	end
-end
-
-
---[[ ShowStates ]]--
-
-function Frame:SetShowStates(states)
-	self.sets.showstates = states
-	self:UpdateShowStates()
-end
-
-function Frame:GetShowStates()
-	return self.sets.showstates
-end
-
-function Frame:UpdateShowStates()
-	UnregisterStateDriver(self, 'visibility', 'show')
-	self:Show()
-
-	local showstates = self:GetShowStates()
-	if showstates then
-		RegisterStateDriver(self, 'visibility', showstates)
 	end
 end
 
