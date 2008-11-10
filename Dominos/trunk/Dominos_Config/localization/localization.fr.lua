@@ -1,10 +1,10 @@
 --[[
-	Localization.lua
+	Localization.fr.lua
 		Translations for Dominos
 
-	English: Default language
+	French
 --]]
--- French version (by Kubik) 2008-10-19
+-- French version (by Kubik) 2008-11-04
 -- à = \195\160
 -- â = \195\162
 -- ç = \195\167
@@ -21,7 +21,6 @@ if not L then return end
 
 L.Scale = 'Echelle'
 L.Opacity = 'Opacit\195\169'
---L.FadedOpacity = 'Opacit\195\169 att\195\169nu\195\169e'
 L.FadedOpacity = 'Opacit\195\169 hors survol souris'
 L.Visibility = 'Visibilit\195\169'
 L.Spacing = 'Espacement'
@@ -31,21 +30,21 @@ L.Columns = 'Colonnes'
 L.Size = 'Taille'
 L.Modifiers = 'Modificateurs'
 L.QuickPaging = 'Quick Paging'
-L.Help = 'Aide'
-L.Harm = 'Dommage'
-L.Targeting = 'Ciblage'
-L.ShowStates = 'Montrer \195\169tats'
+L.Help = 'Ami'
+L.Harm = 'Ennemi'
+L.Targeting = 'Cible'
+L.ShowStates = 'Afficher quand...'
 L.Set = 'Fixe'
 L.Save = 'Sauve'
 L.Copy = 'Copie'
 L.Delete = 'Efface'
 L.Bar = 'Barre %d'
-L.RightClickUnit = 'Clic droit sur cible'
+L.RightClickUnit = 'Clic droit sur la cible'
 L.RCUPlayer = 'Soi'
 L.RCUFocus = 'Focus'
 L.RCUToT = 'Cible de la cible'
 L.EnterName = 'Entrer Nom'
-L.PossessBar = 'Barre des possessions'
+L.PossessBar = 'Barre quand poss\195\169d\195\169'
 L.Profiles = 'Profils'
 L.ProfilesPanelDesc = 'Gestion des affichages Dominos enregistr\195\169s'
 L.SelfcastKey = 'Touche auto-ciblage'
