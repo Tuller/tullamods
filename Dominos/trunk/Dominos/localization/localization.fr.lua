@@ -4,7 +4,7 @@
 
 	French
 --]]
--- French version (by Kubik) 2008-10-19
+-- French version (by Kubik) 2008-11-04
 -- à = \195\160
 -- â = \195\162
 -- ç = \195\167

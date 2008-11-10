@@ -12,6 +12,10 @@ local MAX_BUTTONS = 120
 local NUM_POSSESS_BAR_BUTTONS = 12
 local KeyBound = LibStub('LibKeyBound-1.0')
 local LBF = LibStub('LibButtonFacade', true)
+--[[
+CONTAINER_OFFSET_X = 100
+UIPARENT_MANAGED_FRAME_POSITIONS['CONTAINER_OFFSET_X'].baseX = 100
+--]]
 
 
 --[[ Action Button ]]--
