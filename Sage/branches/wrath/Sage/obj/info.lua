@@ -46,7 +46,7 @@ function InfoBar:New(parent, font, levelFont, hasPartyInfo)
 	return f
 end
 
-function InfoBar:NewPartyMember(parent, font, levelFont)
+function InfoBar:NewParty(parent, font, levelFont)
 	return self:New(parent, font, levelFont, true)
 end
 
