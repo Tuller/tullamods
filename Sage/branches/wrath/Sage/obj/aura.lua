@@ -7,6 +7,8 @@ local AuraButton = Sage:CreateClass('Button')
 local DebuffTypeColor = _G['DebuffTypeColor']
 local ICON_SIZE = 17
 
+--todo, replace with my own, prettier buff icon template
+--needs to be XML based since blizzard forgot to make the brighter cooldown model attribute able to be set via lua
 function AuraButton:New(id, parent)
 	local name = parent:GetName() . id
 	local f = self:Bind('Button', name, parent, 'TargetDebuffButtonTemplate')
