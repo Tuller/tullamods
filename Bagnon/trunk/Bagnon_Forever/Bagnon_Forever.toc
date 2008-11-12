@@ -6,5 +6,6 @@
 ## Author: Tuller
 ## Version: 1.1.1
 ## SavedVariables: BagnonForeverDB
+## LoadOnDemand: 1
 db.lua
 ui.xml
