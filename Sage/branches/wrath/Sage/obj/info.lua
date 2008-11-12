@@ -1,12 +1,8 @@
 --[[
-	The Infobar component of Sage
-		Infobars display the unit's level, name, health percentage, pvp status, targeting icon
-		Infobars can also includ master looter and party leadership status
-
-		Additionally, this frame actually controls how wide its parent unitframe is, due to it being related to name width
-
-		<frame>.extraWidth - an optional static amount to add to the width of a frame.
-		The max height of an infobar with party information should be 20, and 16 without
+	InfoBar
+		Displays level, name, and status icons (pvp, master loot, party leader, raid icon, ...)
+			Colors level by difficulty
+			Colors name by a lot of things (reaction, threat, etc)
 --]]
 
 local InfoBar = Sage:CreateClass('Frame')
@@ -29,6 +25,11 @@ local function GetLeaderIndex()
 	return IndexToUnit(leader)
 end
 
+local function GetMasterLooter()
+	local _,looter = GetLootMethod()
+	return IndexToUnit(looter)
+end
+
 
 --[[ Usable Functions ]]--
 
@@ -42,7 +43,7 @@ function InfoBar:New(parent, font, levelFont, hasPartyInfo)
 	f:AddIcons(hasPartyInfo)
 	f:UpdateUnit()
 
-	frames[f] = true
+	table.insert(frames, f)
 	return f
 end
 
@@ -117,20 +118,28 @@ function InfoBar:OnSizeChanged()
 	self:UpdateWidth()
 end
 
-function InfoBar:UNIT_FACTION()
-	self:UpdatePvP()
+function InfoBar:UNIT_FACTION(unit)
+	if self.unit == unit then
+		self:UpdatePvP()
+	end
 end
 
-function InfoBar:UNIT_NAME_UPDATE()
-	self:UpdateName()
+function InfoBar:UNIT_NAME_UPDATE(unit)
+	if self.unit == unit then
+		self:UpdateName()
+	end
 end
 
-function InfoBar:UNIT_CLASSIFICATION_CHANGED()
-	self:UpdateNameColor()
+function InfoBar:UNIT_CLASSIFICATION_CHANGED(unit)
+	if self.unit == unit then
+		self:UpdateNameColor()
+	end
 end
 
-function InfoBar:UNIT_LEVEL()
-	self:UpdateLevel()
+function InfoBar:UNIT_LEVEL(unit)
+	if self.unit == unit then
+		self:UpdateLevel()
+	end
 end
 
 function InfoBar:RAID_TARGET_UPDATE()
@@ -139,19 +148,19 @@ end
 
 function InfoBar:PARTY_LEADER_CHANGED()
 	if self.hasPartyInfo then
-		self:UpdatePartyLeader(GetLeaderIndex())
+		self:UpdatePartyLeader()
 	end
 end
 
 function InfoBar:PARTY_MEMBERS_CHANGED()
-	if self.hasPartyInfo and GetNumPartyMembers() == 0 then
-		self:UpdatePartyLeader(nil)
+	if self.hasPartyInfo then
+		self:UpdatePartyLeader()
 	end
 end
 
 function InfoBar:PARTY_LOOT_METHOD_CHANGED()
 	if self.hasPartyInfo then
-		self:UpdateMasterLooter(IndexToUnit(select(2, GetLootMethod())))
+		self:UpdateMasterLooter()
 	end
 end
 
@@ -181,8 +190,8 @@ function InfoBar:UpdateAll()
 	self:UpdateName()
 
 	if self.hasPartyInfo then
-		self:UpdatePartyLeader(GetLeaderIndex())
-		self:UpdateMasterLooter(IndexToUnit(select(2, GetLootMethod())))
+		self:UpdatePartyLeader()
+		self:UpdateMasterLooter()
 	end
 end
 
@@ -203,60 +212,71 @@ function InfoBar:GetNameStatusColor()
 
 	-- player controlled units (party units are checked because they're not considered player controlled if far away for some reason)
 	if UnitPlayerControlled(unit) or UnitInParty(unit) then
-		if UnitIsUnit(unit, 'player') and IsResting() then
-			r, g, b = UnitSelectionColor(unit)
-		elseif UnitCanAttack(unit, 'player') or UnitCanAttack('player', unit) then
-			r, g, b = UnitSelectionColor(unit)
-		elseif UnitThreatSituation(unit) > 0 then
-			r, g, b = GetThreatStatusColor(UnitThreatSituation(unit))
-		else
-			--update the player's name color based on their class
-			local _, class = UnitClass(unit)
-			if class then
-				local color = _G['RAID_CLASS_COLORS'][class]
-				r = color.r
-				g = color.g
-				b = color.b
-			end
-		end
-	--tapped NPCs
-	elseif UnitIsTapped(unit) and not UnitIsTappedByPlayer(unit) then
-		r = 0.7
-		g = 0.7
-		b = 0.7
-	--all other NPCs
+		r, g, b = self:GetPCColor(unit)
 	else
-		r, g, b = UnitSelectionColor(unit)
+		r, g, b = self:GetNPCColor(unit)
 	end
 
 	return max(r or 0, 0.4), max(g or 0, 0.4), max(b or 1, 0.4)
 end
 
---adds/hides a flag if the unit is flagged for pvp
-function InfoBar:UpdatePvP()
-	if Sage:ShowingPVPIcons() then
-		if self.target:IsShown() then
-			self.pvp:Hide()
-		else
-			local unit = self.unit
-			local pvpIcon = self.pvp
-			local factionGroup = UnitFactionGroup(unit)
-
-			if UnitIsPVPFreeForAll(unit) then
-				pvpIcon:SetTexture('Interface\\TargetingFrame\\UI-PVP-FFA')
-				pvpIcon:Show()
-			elseif factionGroup and UnitIsPVP(unit) then
-				pvpIcon:SetTexture('Interface\\TargetingFrame\\UI-PVP-' .. factionGroup)
-				pvpIcon:Show()
-			else
-				pvpIcon:Hide()
-			end
-		end
-	elseif self.pvp:IsShown() then
-		self.pvp:Hide()
+function InfoBar:GetPCColor(unit)
+	if UnitIsUnit(unit, 'player') and IsResting() then
+		return UnitSelectionColor(unit)
 	end
 
-	self:UpdateNameColor()
+	local threatLevel = UnitThreatSituation(unit)
+	if threatLevel > 0 then
+		return GetThreatStatusColor(threatLevel)
+	end
+
+	if UnitCanAttack(unit, 'player') or UnitCanAttack('player', unit) then
+		return UnitSelectionColor(unit)
+	end
+
+	--update the player's name color based on their class
+	local _, class = UnitClass(unit)
+	if class then
+		local color = _G['RAID_CLASS_COLORS'][class]
+		return color.r, color.g, color.b
+	end
+
+	return UnitSelectionColor(unit)
+end
+
+function InfoBar:GetNPCColor(unit)
+	if UnitIsTapped(unit) and not UnitIsTappedByPlayer(unit) then
+		return 0.7, 0.7, 0.7
+	end
+
+	local threatLevel = UnitThreatSituation('player', unit)
+	if threatLevel > 0 then
+		return GetThreatStatusColor(threatLevel)
+	end
+
+	return UnitSelectionColor(unit)
+end
+
+--adds/hides a flag if the unit is flagged for pvp
+function InfoBar:UpdatePvP()
+	if (not Sage:ShowingPVPIcons()) or self.target:IsShown() then
+		self.pvp:Hide()
+	else
+		local unit = self.unit
+		local pvpIcon = self.pvp
+		local factionGroup = UnitFactionGroup(unit)
+
+		if UnitIsPVPFreeForAll(unit) then
+			pvpIcon:SetTexture('Interface\\TargetingFrame\\UI-PVP-FFA')
+			pvpIcon:Show()
+		elseif factionGroup and UnitIsPVP(unit) then
+			pvpIcon:SetTexture('Interface\\TargetingFrame\\UI-PVP-' .. factionGroup)
+			pvpIcon:Show()
+		else
+			pvpIcon:Hide()
+		end
+	end
+--	self:UpdateNameColor()
 end
 
 --updates the level display for the unit, colors depending on relative level to the player
@@ -289,15 +309,18 @@ end
 function InfoBar:UpdateWidth()
 	local width = self:GetParent():GetWidth()
 
-	self.level:SetText('00')
+	self.level:SetText('00') --done to force a size
+
 	local textWidth = self.level:GetStringWidth() + LEVEL_OFFSET
 	self.name:SetWidth(max(width - textWidth, 0))
 
 	self:UpdateAll()
 end
 
-function InfoBar:UpdatePartyLeader(leader)
+function InfoBar:UpdatePartyLeader()
+	local leader = GetPartyLeader()
 	local leaderIcon = self.leader
+
 	if leader and UnitIsUnit(self.unit, leader) then
 		leaderIcon:Show()
 	else
@@ -305,9 +328,11 @@ function InfoBar:UpdatePartyLeader(leader)
 	end
 end
 
-function InfoBar:UpdateMasterLooter(looter)
+function InfoBar:UpdateMasterLooter()
+	local looter = GetMasterLooter()
 	local lootIcon = self.masterLoot
-	if looter and UnitIsUnit(self.unit, looter) then
+
+	if looter and UnitIsUnit(self.unit) then
 		lootIcon:Show()
 	else
 		lootIcon:Hide()
@@ -318,21 +343,25 @@ end
 --[[ Utility Functions ]]--
 
 function InfoBar:ForAll(method, ...)
-	for frame in pairs(frames) do
+	for _,frame in pairs(frames) do
 		frame[method](frame, ...)
 	end
 end
 
-function InfoBar:ForVisibleUnit(unit, method, ...)
-	for frame in pairs(frames) do
-		if frame.unit == unit and frame:IsVisible() then
+function InfoBar:ForAllVisible(method, ...)
+	for _,frame in pairs(frames) do
+		if frame:IsVisible() then
 			frame[method](frame, ...)
 		end
 	end
 end
 
-function InfoBar:Get(id)
-	return frames[id]
+function InfoBar:ForVisibleUnit(unit, method, ...)
+	for _,frame in pairs(frames) do
+		if frame.unit == unit and frame:IsVisible() then
+			frame[method](frame, ...)
+		end
+	end
 end
 
 
@@ -340,8 +369,8 @@ end
 
 do
 	local f = CreateFrame('Frame')
-	f:SetScript('OnEvent', function(self, event, unit, ...)
-		InfoBar:ForVisibleUnit(unit, event, ...)
+	f:SetScript('OnEvent', function(self, event, ...)
+		InfoBar:ForAllVisible(event, ...)
 	end)
 
 	f:RegisterEvent('UNIT_THREAT_SITUATION_UPDATE')
@@ -349,6 +378,8 @@ do
 	f:RegisterEvent('UNIT_NAME_UPDATE')
 	f:RegisterEvent('UNIT_CLASSIFICATION_CHANGED')
 	f:RegisterEvent('UNIT_LEVEL')
+
+	--non unit events
 	f:RegisterEvent('RAID_TARGET_UPDATE')
 	f:RegisterEvent('PARTY_LEADER_CHANGED')
 	f:RegisterEvent('PARTY_MEMBERS_CHANGED')
