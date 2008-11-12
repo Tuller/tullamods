@@ -4,10 +4,14 @@
 --]]
 
 local AuraButton = Sage:CreateClass('Button')
+
+local _G = _G
 local DebuffTypeColor = _G['DebuffTypeColor']
 local ICON_SIZE = 17
+local floor = math.floor
+local ceil = math.ceil
 
---todo, replace with my own, prettier buff icon template
+--TODO: replace with my own, prettier buff icon template
 --needs to be XML based since blizzard forgot to make the brighter cooldown model attribute able to be set via lua
 function AuraButton:New(id, parent)
 	local name = parent:GetName() . id
@@ -150,6 +154,7 @@ function AuraContainer:Update()
 		self.buttons[i]:Hide()
 	end
 
+	--only layout the frame if we now have a new number of auras
 	if count ~= self.count then
 		self.count = count
 		self:Layout()
@@ -165,6 +170,8 @@ function AuraContainer:SetFilter(filter)
 	end
 end
 
+--should be nearly identical to the combuctor layout code for items
+--basically this scales however many aura buttons you have to fit into whatever the size of the area that the auracontainer occupies
 function AuraContainer:Layout(spacing)
 	local width, height = self:GetWidth(), self:GetHeight()
 	local spacing = spacing or 2
@@ -192,23 +199,21 @@ function AuraContainer:Layout(spacing)
 	end
 end
 
-function AuraContainer:ForVisibleUnit(unit, method, ...)
-	for _,frame in pairs(frames) do
-		if frame.unit == unit and frame:IsVisible() then
-			frame[method](frame, ...)
-		end
-	end
-end
-
 
 --[[
-	Aura Event Handler
+	Aura event handler
+
+	TODO: Throttle unit aura events because they fire off a lot
 --]]
 
 do
 	local f = CreateFrame('Frame')
 	f:SetScript('OnEvent', function(self, event, unit)
-		AuraContainer:ForVisibleUnit(unit, 'Update')
+		for _,frame in pairs(frames) do
+			if frame.unit == unit and frame:IsVisible() then
+				frame:Update()
+			end
+		end
 	end)
 	f:RegisterEvent('UNIT_AURA')
 end
