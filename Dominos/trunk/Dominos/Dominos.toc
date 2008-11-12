@@ -7,7 +7,6 @@
 ## SavedVariables: DominosDB, DominosVersion
 ## OptionalDeps: Ace3, LibKeyBound-1.0, Dominos_Buff, ButtonFacade
 embeds.xml
-FlyPaper.lua
 localization\localization.lua
 localization\localization.fr.lua
 localization\localization.cn.lua
