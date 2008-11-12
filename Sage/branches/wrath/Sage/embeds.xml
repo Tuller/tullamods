@@ -7,4 +7,5 @@
 	<Include file="libs\AceLocale-3.0\AceLocale-3.0.xml"/>
 	<Include file="libs\AceDB-3.0\AceDB-3.0.xml"/>
 	<Include file="libs\LibSharedMedia-3.0\lib.xml"/>
+	<Script file="libs\FlyPaper\FlyPaper.lua"/>
 </Ui>

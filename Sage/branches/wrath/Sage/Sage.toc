@@ -6,7 +6,6 @@
 ## SavedVariables: SageDB, SageVersion
 ## OptionalDeps: Ace3, LibSharedMedia-3.0
 embeds.xml
-FlyPaper.lua
 localization\localization.lua
 Sage.lua
 frame.lua
@@ -19,4 +18,3 @@ obj\npc.lua
 obj\info.lua
 obj\threat.lua
 obj\aura.lua
-test.lua
