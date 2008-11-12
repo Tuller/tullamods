@@ -12,6 +12,7 @@ local UnitIsFeignDeath = _G['UnitIsFeignDeath']
 local UnitIsDead = _G['UnitIsDead']
 local UnitIsGhost = _G['UnitIsGhost']
 local UnitIsConnected = _G['UnitIsConnected']
+local playerClass = select(2, UnitClass('player'))
 
 
 local HealthBar = Sage:CreateClass('StatusBar', Sage.StatusBar)
@@ -112,18 +113,16 @@ function HealthBar:UpdateHealthColor()
 	local unit = self.unit
 
 	if self.debuff then
-		local color = _G['DebuffTypeColor'][self.debuff]
+		local color = Sage:GetDebuffColor(self.debuff)
 		self:SetColor(color.r, color.g, color.b)
 	elseif UnitIsFeignDeath(unit)  then
 		self:SetColor(0, 0.9, 0.78)
+	elseif UnitIsPlayer(unit) and UnitClass(unit) then
+		local _,enClass = UnitClass(unit)
+		local color = Sage:GetClassColor(enClass)
+		self:SetColor(color.r, color.g, color.b)
 	else
-		local _, class = UnitClass(unit)
-		if class then
-			local color = _G['RAID_CLASS_COLORS'][class]
-			self:SetColor(color.r, color.g, color.b)
-		else
-			self:SetColor(0, 1, 0)
-		end
+		self:SetColor(0.1, 0.8, 0.1)
 	end
 end
 
@@ -196,4 +195,5 @@ do
 	f:RegisterEvent('UNIT_HEALTH')
 	f:RegisterEvent('UNIT_MAXHEALTH')
 	f:RegisterEvent('UNIT_AURA')
+--	f:RegisterEvent('UNIT_HAPPINESS')
 end

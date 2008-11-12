@@ -39,7 +39,6 @@ end
 
 --[[
 	RGB and HSL transformations were obviously not written by me
---]]
 
 local RybWheel = {
 	0,  26,  52,
@@ -147,14 +146,16 @@ local function Complement(h, s, v)
 
 	return h, s, v
 end
+--]]
 
-local bgDarkness = 0.6
+local bgDarkness = 0.5
 function StatusBar:SetColor(r, g, b)
-	local h, s, v = RGBToHSV(r, g, b)
-	local cR, cG, cB = HSVToRGB(Complement(h, s, v))
-
+	r = min(r, 0.8)
+	g = min(g, 0.8)
+	b = min(b, 0.8)
+	
 	self:SetStatusBarColor(r, g, b)
-	self.bg:SetVertexColor(cR * bgDarkness, cG * bgDarkness, cB * bgDarkness, bgDarkness)
+	self.bg:SetVertexColor(r * bgDarkness, g * bgDarkness, b * bgDarkness, bgDarkness)
 end
 
 function StatusBar:ForAll(method, ...)

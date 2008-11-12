@@ -18,4 +18,5 @@ obj\click.lua
 obj\npc.lua
 obj\info.lua
 obj\threat.lua
+obj\aura.lua
 test.lua

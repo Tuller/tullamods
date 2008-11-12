@@ -71,9 +71,9 @@ end
 
 function InfoBar:AddIcons(hasPartyInfo)
 	local pvp = self:CreateTexture(nil, 'OVERLAY')
-	pvp:SetWidth(48)
-	pvp:SetHeight(48)
-	pvp:SetPoint('CENTER', self.level, 'CENTER', 7, -10)
+	pvp:SetWidth(36)
+	pvp:SetHeight(36)
+	pvp:SetPoint('CENTER', self.level, 'CENTER', 8, -8)
 	pvp:Hide()
 	self.pvp = pvp
 

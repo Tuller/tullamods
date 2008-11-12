@@ -7,9 +7,6 @@ Sage = LibStub('AceAddon-3.0'):NewAddon('Sage', 'AceEvent-3.0', 'AceConsole-3.0'
 local L = LibStub('AceLocale-3.0'):GetLocale('Sage')
 local CURRENT_VERSION = GetAddOnMetadata('Sage', 'Version')
 
-
---[[ Startup ]]--
-
 --[[ Startup ]]--
 
 function Sage:OnInitialize()
@@ -60,7 +57,9 @@ function Sage:GetDefaults()
 			showPvPIcons = true,
 			barTexture = 'Diagonal',
 			rangeCheck = true,
-			frames = {}
+			frames = {},
+			classColors = _G['RAID_CLASS_COLORS'],
+			debuffColors = _G['DebuffTypeColor'],	
 		}
 	}
 end
@@ -360,6 +359,15 @@ end
 function Sage:ShowingPVPIcons()
 	return self.db.profile.showPvPIcons
 end
+
+function Sage:GetClassColor(class)
+	return self.db.profile.classColors[class]
+end
+
+function Sage:GetDebuffColor(type)
+	return self.db.profile.debuffColors[type]
+end
+
 
 --[[ Utility Methods ]]--
 
