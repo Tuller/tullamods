@@ -3,7 +3,7 @@
 ## Author: Tuller
 ## Notes: Lets you view sell value data about items from anywhere
 ## SavedVariables: SellFishDB
-## Version: 2.1.2
+## Version: 2.1.3
 ## OptionalDeps: LibStub, ItemPrice-1.1
 embeds.xml
 localization.lua

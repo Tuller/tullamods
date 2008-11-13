@@ -149,11 +149,7 @@ local hooks = {
 	SetAuctionSellItem = function()
 		return select(2, GetItemInfo(GetAuctionSellItemInfo())), select(3, GetAuctionSellItemInfo())
 	end,
---[[
-	SetCraftItem = function(skill, id)
-		return GetCraftReagentItemLink(skill, id), select(3, GetCraftReagentInfo(skill, id))
-	end,
---]]
+
 	SetTradeSkillItem = function(skill, id)
 		if id then
 			return GetTradeSkillReagentItemLink(skill, id), select(3, GetTradeSkillReagentInfo(skill, id))
@@ -181,14 +177,15 @@ local hooks = {
 		return GetTradeTargetItemLink(id), select(3, GetTradeTargetItemInfo(id))
 	end,
 
-	SetInboxItem = function(id)
-		return GetInboxItemLink(id), select(3, GetInboxItem(id))
+	SetInboxItem = function(...)
+		return GetInboxItemLink(...), select(3, GetInboxItem(...))
 	end,
 
 	SetSendMailItem = function(id)
-		return select(2, GetItemInfo(GetSendMailItem(id))), select(3, GetSendMailItem(id))
+		local name, _, count = GetSendMailItem(id)
+		return select(2, GetItemInfo(name)), count
 	end,
-	
+
 	SetGuildBankItem = function(tab, slot)
 		return GetGuildBankItemLink(tab, slot), select(2, GetGuildBankItemInfo(tab, slot))
 	end,
