@@ -1,167 +1,62 @@
 --[[
-	SageCast.lua
+	SpellBar.lua
 		Unit casting bars
 --]]
 
-SageCast = CreateFrame('StatusBar')
-local Bar_MT = {__index = SageCast}
+local SpellBar = Sage:CreateClass('Frame')
+Sage.SpellBar = SpellBar
 
---[[ Constructor ]]--
+local min = math.min
+local GetTime = _G['GetTime']
+local frames = {}
 
-local function Frame_Update(self) self.bar:Update() end
-local function Bar_OnUpdate(self) self:OnUpdate() end
+function SpellBar:New(parent, font)
+	local f = self:Bind(CreateFrame('Frame', parent:GetName() .. 'Cast', parent))
+	f:SetScript('OnShow', self.OnShow)
+	f:SetScript('OnUpdate', self.OnUpdate)
+	f:SetScript('OnSizeChanged', self.OnSizeChanged)
+	f:SetFrameLevel(f:GetFrameLevel() + 1)
 
-function SageCast:Create(parent, id, noText)
-	local frame = CreateFrame('Frame', nil, parent)
-	frame.id = id or parent.id
-	frame.Update = Frame_Update
-	frame:SetScript('OnShow', Frame_Update)
-
-	local bar
-	if(noText) then
-		bar = setmetatable(SageBar:Create(frame, id), Bar_MT)
-	else
-		bar = setmetatable(SageBar:Create(frame, id, SageFont:GetSmallBarFont(), true), Bar_MT)
-	end
-	bar:Hide()
-	bar:SetScript('OnUpdate', Bar_OnUpdate)
-	bar:UpdateTexture()
-	frame.bar = bar
-
-	local icon = bar:CreateTexture(nil, 'OVERLAY')
+	local icon = f:CreateTexture(f:GetName() .. 'Icon', 'ARTWORK')
 	icon:SetTexCoord(0.06, 0.94, 0.06, 0.94)
-	icon:SetWidth(12); icon:SetHeight(12)
-	bar.icon = icon
+	icon:SetAlpha(0.4)
+	icon:SetPoint('BOTTOMLEFT', f)
+	f.icon = icon
 
-	icon:SetPoint('TOPLEFT', frame)
-	bar:SetPoint('TOPLEFT', icon, 'TOPRIGHT')
-	bar:SetPoint('BOTTOMRIGHT', frame)
+	local bar = Sage.StatusBar:New('Bar', f)
+	bar:SetPoint('BOTTOMLEFT', icon, 'BOTTOMRIGHT')
+	bar:SetPoint('BOTTOMRIGHT', f)
+	bar:SetScript('OnUpdate', self.OnUpdate)
+	f.bar = bar
 
-	if(not self.bars) then self.bars = {} end
-	self.bars[bar.id] = bar
-
-	return frame
-end
-
-function SageCast:Update()
-	if Sage:ShowingCastBars() then
-		if UnitCastingInfo(self.id) then
-			self:OnSpellStart()
-		elseif UnitChannelInfo(self.id) then
-			self:OnChannelStart()
-		else
-			self:Finish()
-		end
-	else
-		self:Finish()
-	end
-end
-
-SageCast.UpdateTexture = SageBar.UpdateTexture
-
-
---[[ Event Functions ]]--
-
-function SageCast:OnSpellStart()
-	local name, nameSubtext, text, texture, startTime, endTime, isTradeSkill = UnitCastingInfo(self.id)
-	if not(name) or isTradeSkill then self:Hide() return end
-
-	if IsHelpfulSpell(name) then
-		self:SetStatusBarColor(0, 1, 1)
-		self.bg:SetVertexColor(0, 0.6, 0.6, 0.4)
-	elseif IsHarmfulSpell(name) then
-		self:SetStatusBarColor(1, 0, 1)
-		self.bg:SetVertexColor(0.6, 0, 0.6, 0.4)
-	else
-		self:SetStatusBarColor(1, 1, 0)
-		self.bg:SetVertexColor(0.6, 0.6, 0, 0.4)
+	if font then
+		local text = f:CreateFontString(f:GetName() .. 'Text', 'OVERLAY')
+		text:SetPoint('CENTER', icon)
+		text:SetFontObject(font)
+		f.text = text
 	end
 
-	self.startTime = startTime / 1000
-	self.maxValue = endTime / 1000
+	table.insert(frames, f)
+	f:UpdateUnit()
 
-	self:SetMinMaxValues(self.startTime, self.maxValue)
-	self:SetValue(self.startTime)
-
-	self.icon:SetTexture(texture)
-
-	self.casting = true
-	self.channeling = nil
-	self:Show()
+	return f
 end
 
-function SageCast:OnSpellDelayed()
-	if self:IsShown() then
-		local name, nameSubtext, text, texture, startTime, endTime, isTradeSkill = UnitCastingInfo(self.id)
-		if not(name) or isTradeSkill then self:Hide() return end
-
-		self.startTime = startTime / 1000
-		self.maxValue = endTime / 1000
-		self:SetMinMaxValues(self.startTime, self.maxValue)
-
-		if not self.casting then
-			self:SetStatusBarColor(1, 0.7, 0)
-			self.casting = true
-			self.channeling = nil
-		end
-	end
+function SpellBar:OnShow()
+	self:Update()
 end
 
-function SageCast:OnChannelStart()
-	local name, nameSubtext, text, texture, startTime, endTime, isTradeSkill = UnitChannelInfo(self.id)
-	if not(name) or isTradeSkill then self:Hide() return end
-
-	if IsHelpfulSpell(name) then
-		self:SetStatusBarColor(0, 1, 1)
-		self.bg:SetVertexColor(0, 0.6, 0.6, 0.4)
-	elseif IsHarmfulSpell(name) then
-		self:SetStatusBarColor(1, 0, 1)
-		self.bg:SetVertexColor(0.6, 0, 0.6, 0.4)
-	else
-		self:SetStatusBarColor(1, 1, 0)
-		self.bg:SetVertexColor(0.6, 0.6, 0, 0.4)
-	end
-
-	self.startTime = startTime / 1000
-	self.endTime = endTime / 1000
-	self.duration = self.endTime - self.startTime
-	self.maxValue = self.startTime
-
-	self:SetMinMaxValues(self.startTime, self.endTime)
-	self:SetValue(self.endTime)
-
-	self.icon:SetTexture(texture)
-
-	self.casting = nil
-	self.channeling = true
-	self:Show()
-end
-
-function SageCast:OnChannelUpdate()
-	if self:IsShown() then
-		local name, nameSubtext, text, texture, startTime, endTime, isTradeSkill = UnitChannelInfo(self.id)
-		if not(name) or isTradeSkill then self:Hide() return end
-
-		self.startTime = startTime / 1000
-		self.endTime = endTime / 1000
-		self.maxValue = self.startTime
-		self:SetMinMaxValues(self.startTime, self.endTime)
-	end
-end
-
-
---[[ On Update Functions ]]--
-
-function SageCast:OnUpdate()
+function SpellBar:OnUpdate()
 	if self.casting then
 		local value = min(GetTime(), self.maxValue)
 
 		if value == self.maxValue then
 			self:Finish()
 		else
-			self:SetValue(value)
-			if(self.text) then
-				self.text:SetText(format('%.1fs', self.maxValue - value))
+			self.bar:SetValue(value)
+
+			if self.text then
+				self.text:SetFormattedText('%.1f', self.maxValue - value)
 			end
 		end
 	elseif self.channeling then
@@ -170,25 +65,146 @@ function SageCast:OnUpdate()
 		if value == self.endTime then
 			self:Finish()
 		else
-			self:SetValue(self.startTime + (self.endTime - value))
-			if(self.text) then
-				self.text:SetText(format('%.1fs', self.endTime - value))
+			self.bar:SetValue(self.startTime + (self.endTime - value))
+
+			if self.text then
+				self.text:SetFormattedText('%.1f', self.endTime - value)
 			end
 		end
 	end
 end
 
-function SageCast:OnSpellStop()
-	if(not self.channeling) then
+function SpellBar:OnSizeChanged()
+	local height = self:GetHeight()
+	self.icon:SetWidth(height * 2/3)
+	self.icon:SetHeight(height * 2/3)
+	self.bar:SetHeight(height/4)
+end
+
+function SpellBar:Update()
+	if UnitCastingInfo(self.unit) then
+		self:OnSpellStart()
+	elseif UnitChannelInfo(self.unit) then
+		self:OnChannelStart()
+	else
 		self:Finish()
 	end
 end
 
-function SageCast:Finish()
+function SpellBar:UpdateUnit(newUnit)
+	local newUnit = newUnit or self:GetParent():GetAttribute('unit')
+	if self.unit ~= newUnit then
+		self.unit = newUnit
+		self:Update()
+	end
+end
+
+
+--[[ Event Functions ]]--
+
+function SpellBar:OnSpellStart()
+	local name, nameSubtext, text, texture, startTime, endTime, isTradeSkill = UnitCastingInfo(self.unit)
+	if not(name) or isTradeSkill then
+		self:Hide()
+		return
+	end
+
+	if IsHelpfulSpell(name) then
+		self.bar:SetColor(0, 1, 1)
+	elseif IsHarmfulSpell(name) then
+		self.bar:SetColor(1, 0, 1)
+	else
+		self.bar:SetColor(1, 1, 0)
+	end
+
+	self.startTime = startTime / 1000
+	self.maxValue = endTime / 1000
+
+	self.bar:SetMinMaxValues(self.startTime, self.maxValue)
+	self.bar:SetValue(self.startTime)
+
+	self.icon:SetTexture(texture)
+
+	self.casting = true
+	self.channeling = nil
+	self:Show()
+end
+
+function SpellBar:OnSpellDelayed()
+	if self:IsVisible() then
+		local name, nameSubtext, text, texture, startTime, endTime, isTradeSkill = UnitCastingInfo(self.unit)
+		if not(name) or isTradeSkill then
+			self:Hide()
+			return
+		end
+
+		self.startTime = startTime / 1000
+		self.maxValue = endTime / 1000
+
+		self.bar:SetMinMaxValues(self.startTime, self.maxValue)
+
+		if not self.casting then
+			self.bar:SetColor(1, 0.7, 0)
+			self.casting = true
+			self.channeling = nil
+		end
+	end
+end
+
+function SpellBar:OnChannelStart()
+	local name, nameSubtext, text, texture, startTime, endTime, isTradeSkill = UnitChannelInfo(self.unit)
+	if not(name) or isTradeSkill then
+		self:Hide()
+		return
+	end
+
+	if IsHelpfulSpell(name) then
+		self.bar:SetColor(0, 1, 1)
+	elseif IsHarmfulSpell(name) then
+		self.bar:SetColor(1, 0, 1)
+	else
+		self.bar:SetColor(1, 1, 0)
+	end
+
+	self.startTime = startTime / 1000
+	self.endTime = endTime / 1000
+	self.duration = self.endTime - self.startTime
+	self.maxValue = self.startTime
+
+	self.bar:SetMinMaxValues(self.startTime, self.endTime)
+	self.bar:SetValue(self.endTime)
+	self.icon:SetTexture(texture)
+
+	self.casting = nil
+	self.channeling = true
+	self:Show()
+end
+
+function SpellBar:OnChannelUpdate()
+	if self:IsVisible() then
+		local name, nameSubtext, text, texture, startTime, endTime, isTradeSkill = UnitChannelInfo(self.unit)
+		if not(name) or isTradeSkill then
+			self:Hide()
+			return
+		end
+
+		self.startTime = startTime / 1000
+		self.endTime = endTime / 1000
+		self.maxValue = self.startTime
+		self.bar:SetMinMaxValues(self.startTime, self.endTime)
+	end
+end
+
+function SpellBar:OnSpellStop()
+	if not self.channeling then
+		self:Finish()
+	end
+end
+
+function SpellBar:Finish()
 	self.casting = nil
 	self.channeling = nil
-
-	self:SetStatusBarColor(0, 1, 0)
+	self.bar:SetColor(0, 1, 0)
 	self:Hide()
 end
 
@@ -196,62 +212,51 @@ end
 --[[ Utility Functions ]]--
 
 --sets whether to color health when debuffed or not
-function SageCast:ForAll(method, ...)
-	local bars = self.bars
-	if(bars) then
-		for _,bar in pairs(bars) do
-			bar[method](bar, ...)
+function SpellBar:ForVisibleUnit(unit, method, ...)
+	for _,f in pairs(frames) do
+		if f.unit == unit and f:GetParent():IsVisible() then
+			f[method](f, ...)
 		end
 	end
 end
 
-function SageCast:ForUnit(unit, method, ...)
-	local bar = self:Get(unit)
-	if(bar) then
-		bar[method](bar, ...)
+function SpellBar:ForAllVisible(method, ...)
+	for _,f in pairs(frames) do
+		if f:GetParent():IsVisible() then
+			f[method](f, ...)
+		end
 	end
 end
 
-function SageCast:Get(id)
-	return self.bars and self.bars[id]
-end
-
-
 --[[ Events ]]--
 
-function SageCast:PLAYER_ENTERING_WORLD()
-	self:ForAll('Update')
-end
+do
+	local f = CreateFrame('Frame')
+	f:SetScript('OnEvent', function(self, event, unit)
+		if event == 'UNIT_SPELLCAST_START' then
+			SpellBar:ForVisibleUnit(unit, 'OnSpellStart')
+		elseif event == 'UNIT_SPELLCAST_DELAYED' then
+			SpellBar:ForVisibleUnit(unit, 'OnSpellDelayed')
+		elseif event == 'UNIT_SPELLCAST_CHANNEL_START' then
+			SpellBar:ForVisibleUnit(unit, 'OnChannelStart')
+		elseif event == 'UNIT_SPELLCAST_CHANNEL_UPDATE' then
+			SpellBar:ForVisibleUnit(unit, 'OnChannelUpdate')
+		elseif event == 'UNIT_SPELLCAST_STOP' then
+			SpellBar:ForVisibleUnit(unit, 'OnSpellStop')
+		elseif event == 'UNIT_SPELLCAST_FAILED' or event == 'UNIT_SPELLCAST_INTERRUPTED' or event == 'UNIT_SPELLCAST_CHANNEL_STOP' then
+			SpellBar:ForVisibleUnit(unit, 'Finish')
+		elseif event == 'PLAYER_ENTERING_WORLD' then
+			SpellBar:ForAllVisible('Update')
+		end
+	end)
 
-function SageCast:UNIT_SPELLCAST_START(unit)
-	self:ForUnit(unit, 'OnSpellStart')
-end
-
-function SageCast:UNIT_SPELLCAST_DELAYED(unit)
-	self:ForUnit(unit, 'OnSpellDelayed')
-end
-
-function SageCast:UNIT_SPELLCAST_CHANNEL_START(unit)
-	self:ForUnit(unit, 'OnChannelStart')
-end
-
-function SageCast:UNIT_SPELLCAST_CHANNEL_UPDATE(unit)
-	self:ForUnit(unit, 'OnChannelUpdate')
-end
-
---finish events
-function SageCast:UNIT_SPELLCAST_STOP(unit)
-	self:ForUnit(unit, 'OnSpellStop')
-end
-
-function SageCast:UNIT_SPELLCAST_FAILED(unit)
-	self:ForUnit(unit, 'Finish')
-end
-
-function SageCast:UNIT_SPELLCAST_INTERRUPTED(unit)
-	self:ForUnit(unit, 'Finish')
-end
-
-function SageCast:UNIT_SPELLCAST_CHANNEL_STOP(unit)
-	self:ForUnit(unit, 'Finish')
+	f:RegisterEvent('PLAYER_ENTERING_WORLD')
+	f:RegisterEvent('UNIT_SPELLCAST_START')
+	f:RegisterEvent('UNIT_SPELLCAST_DELAYED')
+	f:RegisterEvent('UNIT_SPELLCAST_CHANNEL_START')
+	f:RegisterEvent('UNIT_SPELLCAST_CHANNEL_UPDATE')
+	f:RegisterEvent('UNIT_SPELLCAST_STOP')
+	f:RegisterEvent('UNIT_SPELLCAST_FAILED')
+	f:RegisterEvent('UNIT_SPELLCAST_INTERRUPTED')
+	f:RegisterEvent('UNIT_SPELLCAST_CHANNEL_STOP')
 end

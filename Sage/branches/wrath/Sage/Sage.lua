@@ -395,3 +395,33 @@ end
 function Sage:GetFrameSets(id)
 	return self.db.profile.frames[id]
 end
+
+--this code is shamelessly taken from oUF
+function Sage:UnregisterUnitFrame(name)
+	_G[name]:UnregisterAllEvents()
+	_G[name]:Hide()
+	_G[name..'HealthBar']:UnregisterAllEvents()
+	_G[name..'ManaBar']:UnregisterAllEvents()
+	
+	if _G[name .. 'SpellBar'] then
+		_G[name .. 'SpellBar']:UnregisterAllEvents()
+	end
+end
+
+function Sage:UnregisterUnit(unit)
+	if unit == 'player' then
+		self:UnregisterUnitFrame('PlayerFrame')
+	elseif unit == 'pet' then
+		self:UnregisterUnitFrame('PetFrame')
+	elseif unit == 'target' then
+		self:UnregisterUnitFrame('TargetFrame')
+		ComboFrame:UnregisterAllEvents()
+		ComboFrame:Hide()
+	elseif unit == 'focus' then
+		self:UnregisterUnitFrame('FocusFrame')
+	elseif unit == 'targettarget' then
+		self:UnregisterUnitFrame('TargetofTargetFrame')
+	elseif unit:match('party%d') then
+		self:UnregisterUnitFrame('PartyMemberFrame' .. unit:match('party(%d)'))
+	end
+end

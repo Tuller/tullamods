@@ -164,8 +164,10 @@ function InfoBar:PARTY_LOOT_METHOD_CHANGED()
 	end
 end
 
-function InfoBar:UNIT_THREAT_SITUATION_UPDATE()
-	self:UpdateNameColor()
+function InfoBar:UNIT_THREAT_SITUATION_UPDATE(unit)
+	if unit == self.unit or unit == 'player' then
+		self:UpdateNameColor()
+	end
 end
 
 
@@ -211,7 +213,7 @@ function InfoBar:GetNameStatusColor()
 	local r, g, b
 
 	-- player controlled units (party units are checked because they're not considered player controlled if far away for some reason)
-	if UnitPlayerControlled(unit) or UnitInParty(unit) then
+	if UnitPlayerControlled(unit) then
 		r, g, b = self:GetPCColor(unit)
 	else
 		r, g, b = self:GetNPCColor(unit)
@@ -318,7 +320,7 @@ function InfoBar:UpdateWidth()
 end
 
 function InfoBar:UpdatePartyLeader()
-	local leader = GetPartyLeader()
+	local leader = GetLeaderIndex()
 	local leaderIcon = self.leader
 
 	if leader and UnitIsUnit(self.unit, leader) then

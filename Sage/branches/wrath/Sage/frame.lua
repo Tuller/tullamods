@@ -14,6 +14,7 @@ function Frame:New(id, template)
 	local f = self:Restore(id) or self:Create(id, template)
 	f:SetUnit(id)
 	f:LoadSettings()
+	Sage:UnregisterUnit(id)
 
 	active[id] = f
 	return f

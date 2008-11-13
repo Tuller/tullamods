@@ -7,6 +7,7 @@ local AuraButton = Sage:CreateClass('Button')
 
 local _G = _G
 local DebuffTypeColor = _G['DebuffTypeColor']
+local UnitAura = _G['UnitAura']
 local ICON_SIZE = 17
 local floor = math.floor
 local ceil = math.ceil
@@ -14,14 +15,15 @@ local ceil = math.ceil
 --TODO: replace with my own, prettier buff icon template
 --needs to be XML based since blizzard forgot to make the brighter cooldown model attribute able to be set via lua
 function AuraButton:New(id, parent)
-	local name = parent:GetName() . id
-	local f = self:Bind('Button', name, parent, 'TargetDebuffButtonTemplate')
+	local name = parent:GetName() .. id
+	local f = self:Bind(CreateFrame('Button', name, parent, 'TargetDebuffButtonTemplate'))
 
 	f:SetID(id)
 	f.count = _G[name .. 'Count']
 	f.icon = _G[name .. 'Icon']
 	f.border = _G[name .. 'Border']
 	f.cooldown = _G[name .. 'Cooldown']
+	f.cooldown.noCooldownCount = true
 
 	f:SetScript('OnUpdate', nil)
 	f:SetScript('OnEnter', self.OnEnter)
@@ -48,7 +50,7 @@ end
 
 function AuraButton:UpdateDebuffBorder(type)
 	if type then
-		local color = _G['DebuffTypeColor'][type]
+		local color = DebuffTypeColor[type]
 		self.border:SetVertexColor(color.r, color.g, color.b)
 		self.border:Show()
 	else
@@ -98,6 +100,7 @@ Sage.AuraContainer = AuraContainer
 
 function AuraContainer:New(id, parent, filter)
 	local f = self:Bind(CreateFrame('Frame', parent:GetName() .. id, parent))
+	f.filter = filter
 
 	f.buttons = setmetatable({}, {__index = function(t, k)
 		local b = AuraButton:New(k, f)
@@ -134,21 +137,18 @@ function AuraContainer:UpdateUnit(newUnit)
 end
 
 function AuraContainer:Update()
-	local count = 0
 	local unit = self.unit
 	local filter = self.filter
+	local count = 0
 
-	local name, rank, icon, count, debuffType, duration, expirationTime, isMine, isStealable
-	repeat
-		name, rank, icon, count, debuffType, duration, expirationTime, isMine, isStealable = UnitAura(unit, count + 1, filter)
-		if name then
-			count = count + 1
 
-			local b = self.buttons[count]
-			b:Update(name, rank, icon, count, debuffType, duration, expirationTime, isMine, isStealable)
-			b:Show()
-		end
-	until not name
+	while UnitAura(unit, count + 1, filter) do
+		count = count + 1
+
+		local b = self.buttons[count]
+		b:Update(UnitAura(unit, count, filter))
+		b:Show()
+	end
 
 	for i = count + 1, #self.buttons do
 		self.buttons[i]:Hide()
@@ -174,28 +174,29 @@ end
 --basically this scales however many aura buttons you have to fit into whatever the size of the area that the auracontainer occupies
 function AuraContainer:Layout(spacing)
 	local width, height = self:GetWidth(), self:GetHeight()
-	local spacing = spacing or 2
+	local spacing = spacing or 1
 	local count = self.count or 0
 	local size = ICON_SIZE + spacing*2
 	local cols = 0
 	local scale, rows
 
-	--figure out the proper scale for things
-	repeat
-		cols = cols + 1
-		scale = width / (size*cols)
-		rows = floor(height / (size*scale))
-	until(cols*rows >= count)
+	if count > 0 and width > 0 and height > 0 then
+		repeat
+			cols = cols + 1
+			scale = width / (size*cols)
+			rows = floor(height / (size*scale))
+		until(cols*rows >= count)
 
-	--layout the stuff
-	for i = 1, count do
-		local row = (i-1) % cols
-		local col = ceil(i/cols)-1
-		local button = self.buttons[i]
+		--layout the stuff
+		for i = 1, count do
+			local row = (i-1) % cols
+			local col = ceil(i/cols)-1
+			local button = self.buttons[i]
 
-		button:ClearAllPoints()
-		button:SetScale(scale)
-		button:SetPoint('TOPLEFT', size*row + spacing, -(size*col + spacing))
+			button:ClearAllPoints()
+			button:SetScale(scale)
+			button:SetPoint('TOPLEFT', size*row + spacing, -(size*col + spacing))
+		end
 	end
 end
 

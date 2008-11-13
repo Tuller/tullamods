@@ -68,6 +68,11 @@ function PowerBar:Update()
 	local unit = self.unit
 	local powerType, powerToken = UnitPowerType(unit)
 	local value, max = UnitPower(unit, powerType), UnitPowerMax(unit, powerType)
+	if powerToken == 'RAGE' and not UnitIsPlayer(unit) then
+		self:Hide()
+	else
+		self:Show()
+	end
 
 	self:SetMinMaxValues(0, max)
 	self.powerToken = powerToken
@@ -118,7 +123,7 @@ end
 
 function PowerBar:ForAllShown(method, ...)
 	for _,f in self:GetAll() do
-		if f:IsVisible() then
+		if f:GetParent():IsVisible() then
 			f[method](f, ...)
 		end
 	end

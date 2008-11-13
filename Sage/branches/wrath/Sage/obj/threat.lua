@@ -24,6 +24,12 @@ function ThreatDisplay:OnShow()
 	self:Update()
 end
 
+function ThreatDisplay:UNIT_THREAT_SITUATION_UPDATE(unit)
+	if unit == self.unit or unit == 'player' then
+		self:Update()
+	end
+end
+
 
 --[[ Update Methods ]]--
 
@@ -51,15 +57,9 @@ end
 
 --[[ Utility Functions ]]--
 
-function ThreatDisplay:ForAll(method, ...)
+function ThreatDisplay:ForAllVisible(method, ...)
 	for f in pairs(frames) do
-		f[method](f, ...)
-	end
-end
-
-function ThreatDisplay:ForVisibleUnit(unit, method, ...)
-	for f in pairs(frames) do
-		if f.unit == unit and f:IsVisible() then
+		if f:IsVisible() then
 			f[method](f, ...)
 		end
 	end
@@ -71,8 +71,8 @@ end
 
 do
 	local f = CreateFrame('Frame')
-	f:SetScript('OnEvent', function(self, event, unit)
-		ThreatDisplay:ForVisibleUnit(unit, 'Update')
+	f:SetScript('OnEvent', function(self, event, ...)
+		ThreatDisplay:ForAllVisible(event, ...)
 	end)
 	f:RegisterEvent('UNIT_THREAT_SITUATION_UPDATE')
 end

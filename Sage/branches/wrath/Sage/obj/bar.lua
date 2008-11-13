@@ -38,10 +38,6 @@ end
 
 local bgDarkness = 0.5
 function StatusBar:SetColor(r, g, b)
-	r = min(r, 0.8)
-	g = min(g, 0.8)
-	b = min(b, 0.8)
-
 	self:SetStatusBarColor(r, g, b)
 	self.bg:SetVertexColor(r * bgDarkness, g * bgDarkness, b * bgDarkness, bgDarkness)
 end
