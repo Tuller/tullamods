@@ -213,7 +213,7 @@ function InfoBar:GetNameStatusColor()
 	local r, g, b
 
 	-- player controlled units (party units are checked because they're not considered player controlled if far away for some reason)
-	if UnitPlayerControlled(unit) then
+	if UnitPlayerControlled(unit) or UnitInParty(unit) then
 		r, g, b = self:GetPCColor(unit)
 	else
 		r, g, b = self:GetNPCColor(unit)

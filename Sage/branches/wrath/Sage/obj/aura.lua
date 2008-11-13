@@ -21,6 +21,7 @@ function AuraButton:New(id, parent)
 	f:SetID(id)
 	f.count = _G[name .. 'Count']
 	f.icon = _G[name .. 'Icon']
+	f.icon:SetTexCoord(0.06, 0.94, 0.06, 0.94)
 	f.border = _G[name .. 'Border']
 	f.cooldown = _G[name .. 'Cooldown']
 	f.cooldown.noCooldownCount = true
@@ -85,7 +86,7 @@ function AuraButton:GetUnit()
 end
 
 function AuraButton:GetFilter()
-	return UnitCanAssist('player', self:GetUnit()) and self:GetParent().friendFilter or self:GetParent().filter
+	return UnitIsFriend('player', self:GetUnit()) and self:GetParent().friendFilter or self:GetParent().filter
 end
 
 
@@ -139,7 +140,7 @@ end
 
 function AuraContainer:Update()
 	local unit = self.unit
-	local filter = UnitCanAssist('player', unit) and self.friendFilter or self.filter
+	local filter = UnitIsFriend('player', unit) and self.friendFilter or self.filter
 	local count = 0
 
 
@@ -187,6 +188,7 @@ function AuraContainer:Layout(spacing)
 			scale = width / (size*cols)
 			rows = floor(height / (size*scale))
 		until(cols*rows >= count)
+		scale = min(scale, 1)
 
 		--layout the stuff
 		for i = 1, count do

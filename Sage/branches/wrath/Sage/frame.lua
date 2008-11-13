@@ -22,6 +22,11 @@ end
 
 function Frame:Create(id, template)
 	local f = self:Bind(CreateFrame('Frame', format('Sage%sFrame', id), UIParent, 'SecureHandlerStateTemplate'))
+	f:SetAttribute('_onstate-unit', [[
+		self:SetAttribute('unit', newstate)
+		control:ChildUpdate(stateid, newstate)
+		control:CallMethod('UpdateChildUnit')
+	]])
 	f:SetAttribute('unit', id)
 	f:SetClampedToScreen(true)
 	f:SetMovable(true)

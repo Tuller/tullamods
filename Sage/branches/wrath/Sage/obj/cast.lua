@@ -20,6 +20,7 @@ function SpellBar:New(parent, font)
 	local icon = f:CreateTexture(f:GetName() .. 'Icon', 'ARTWORK')
 	icon:SetTexCoord(0.06, 0.94, 0.06, 0.94)
 	icon:SetPoint('BOTTOMLEFT', f)
+	icon:SetAlpha(0.5)
 	f.icon = icon
 
 	local bar = Sage.StatusBar:New('Bar', f)
@@ -75,8 +76,8 @@ end
 
 function SpellBar:OnSizeChanged()
 	local height = self:GetHeight()
-	self.icon:SetWidth(height * 0.75)
-	self.icon:SetHeight(height * 0.75)
+	self.icon:SetWidth(height)
+	self.icon:SetHeight(height)
 	self.bar:SetHeight(height * 0.25)
 end
 
