@@ -19,7 +19,6 @@ function SpellBar:New(parent, font)
 
 	local icon = f:CreateTexture(f:GetName() .. 'Icon', 'ARTWORK')
 	icon:SetTexCoord(0.06, 0.94, 0.06, 0.94)
-	icon:SetAlpha(0.4)
 	icon:SetPoint('BOTTOMLEFT', f)
 	f.icon = icon
 
@@ -76,9 +75,9 @@ end
 
 function SpellBar:OnSizeChanged()
 	local height = self:GetHeight()
-	self.icon:SetWidth(height * 2/3)
-	self.icon:SetHeight(height * 2/3)
-	self.bar:SetHeight(height/4)
+	self.icon:SetWidth(height * 0.75)
+	self.icon:SetHeight(height * 0.75)
+	self.bar:SetHeight(height * 0.25)
 end
 
 function SpellBar:Update()

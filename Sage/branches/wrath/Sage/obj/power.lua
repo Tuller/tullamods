@@ -67,13 +67,14 @@ end
 function PowerBar:Update()
 	local unit = self.unit
 	local powerType, powerToken = UnitPowerType(unit)
-	local value, max = UnitPower(unit, powerType), UnitPowerMax(unit, powerType)
-	if powerToken == 'RAGE' and not UnitIsPlayer(unit) then
-		self:Hide()
-	else
+	if powerType == 0 or UnitIsPlayer(unit) then
 		self:Show()
+	else
+		self:Hide()
+		return
 	end
 
+	local value, max = UnitPower(unit, powerType), UnitPowerMax(unit, powerType)
 	self:SetMinMaxValues(0, max)
 	self.powerToken = powerToken
 

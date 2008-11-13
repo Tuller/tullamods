@@ -72,17 +72,17 @@ end
 
 function InfoBar:AddIcons(hasPartyInfo)
 	local pvp = self:CreateTexture(nil, 'OVERLAY')
-	pvp:SetWidth(36)
-	pvp:SetHeight(36)
-	pvp:SetPoint('CENTER', self.level, 'CENTER', 8, -8)
+	pvp:SetWidth(24)
+	pvp:SetHeight(24)
+	pvp:SetPoint('RIGHT', 0, -8)
 	pvp:Hide()
 	self.pvp = pvp
 
 	local target = self:CreateTexture(nil, 'OVERLAY')
 	target:SetTexture('Interface\\TargetingFrame\\UI-RaidTargetingIcons')
-	target:SetWidth(25)
-	target:SetHeight(26)
-	target:SetPoint('CENTER', self.level, 'CENTER', -1, 0)
+	target:SetWidth(24)
+	target:SetHeight(24)
+	target:SetPoint('RIGHT', -2, -6)
 	target:Hide()
 	self.target = target
 

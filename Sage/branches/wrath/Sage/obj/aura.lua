@@ -40,7 +40,7 @@ function AuraButton:Update(name, rank, icon, count, debuffType, duration, expira
 end
 
 function AuraButton:UpdateCount(count)
-	if count and count > 0 then
+	if count and count > 1 then
 		self.count:SetText(count)
 		self.count:Show()
 	else

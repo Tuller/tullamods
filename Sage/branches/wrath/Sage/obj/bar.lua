@@ -36,7 +36,7 @@ function StatusBar:UpdateTexture(texture)
 	self.bg:SetTexture(texture)
 end
 
-local bgDarkness = 0.5
+local bgDarkness = 0.6
 function StatusBar:SetColor(r, g, b)
 	self:SetStatusBarColor(r, g, b)
 	self.bg:SetVertexColor(r * bgDarkness, g * bgDarkness, b * bgDarkness, bgDarkness)
