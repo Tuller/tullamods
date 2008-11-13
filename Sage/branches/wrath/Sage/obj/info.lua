@@ -326,7 +326,7 @@ function InfoBar:UpdateMasterLooter()
 	local looter = GetMasterLooter()
 	local lootIcon = self.masterLoot
 
-	if looter and UnitIsUnit(self.unit) then
+	if looter and UnitIsUnit(self.unit, looter) then
 		lootIcon:Show()
 	else
 		lootIcon:Hide()
