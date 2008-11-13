@@ -3,9 +3,7 @@
 		The database portion Of Ludwig
 --]]
 
-local MAXID = 40000 --probably need to increase this to 40k by Wrath
-local MAXIMUM_LEVEL = 70
-
+local MAXID = 60000 --probably need to increase this to 40k by Wrath
 local lastSearch --this is a hack to allow for 3 variables when sorting.  Its used to give the name filter
 local filteredList = {}
 local searchList = {}
