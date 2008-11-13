@@ -85,7 +85,7 @@ function AuraButton:GetUnit()
 end
 
 function AuraButton:GetFilter()
-	return self:GetParent().filter
+	return UnitCanAssist('player', self:GetUnit()) and self:GetParent().friendFilter or self:GetParent().filter
 end
 
 
@@ -98,9 +98,10 @@ local AuraContainer = Sage:CreateClass('Frame')
 local frames = {}
 Sage.AuraContainer = AuraContainer
 
-function AuraContainer:New(id, parent, filter)
+function AuraContainer:New(id, parent, filter, friendFilter)
 	local f = self:Bind(CreateFrame('Frame', parent:GetName() .. id, parent))
 	f.filter = filter
+	f.friendFilter = friendFilter
 
 	f.buttons = setmetatable({}, {__index = function(t, k)
 		local b = AuraButton:New(k, f)
@@ -138,7 +139,7 @@ end
 
 function AuraContainer:Update()
 	local unit = self.unit
-	local filter = self.filter
+	local filter = UnitCanAssist('player', unit) and self.friendFilter or self.filter
 	local count = 0
 
 
