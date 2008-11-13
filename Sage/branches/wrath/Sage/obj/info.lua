@@ -38,7 +38,6 @@ function InfoBar:New(parent, font, levelFont, hasPartyInfo)
 	f.hasPartyInfo = hasPartyInfo
 
 	f:SetScript('OnShow', self.OnShow)
-	f:SetScript('OnSizeChanged', self.OnSizeChanged)
 	f:AddStrings(font, levelFont)
 	f:AddIcons(hasPartyInfo)
 	f:UpdateUnit()
@@ -72,16 +71,16 @@ end
 
 function InfoBar:AddIcons(hasPartyInfo)
 	local pvp = self:CreateTexture(nil, 'OVERLAY')
-	pvp:SetWidth(24)
-	pvp:SetHeight(24)
-	pvp:SetPoint('RIGHT', 0, -8)
+	pvp:SetWidth(32)
+	pvp:SetHeight(32)
+	pvp:SetPoint('RIGHT', 10, -10)
 	pvp:Hide()
 	self.pvp = pvp
 
 	local target = self:CreateTexture(nil, 'OVERLAY')
 	target:SetTexture('Interface\\TargetingFrame\\UI-RaidTargetingIcons')
-	target:SetWidth(24)
-	target:SetHeight(24)
+	target:SetWidth(18)
+	target:SetHeight(18)
 	target:SetPoint('RIGHT', -2, -6)
 	target:Hide()
 	self.target = target
@@ -112,10 +111,6 @@ end
 
 function InfoBar:OnShow()
 	self:UpdateAll()
-end
-
-function InfoBar:OnSizeChanged()
-	self:UpdateWidth()
 end
 
 function InfoBar:UNIT_FACTION(unit)
@@ -278,7 +273,7 @@ function InfoBar:UpdatePvP()
 			pvpIcon:Hide()
 		end
 	end
---	self:UpdateNameColor()
+	self:UpdateNamePosition()
 end
 
 --updates the level display for the unit, colors depending on relative level to the player
@@ -308,15 +303,12 @@ function InfoBar:UpdateUnitIcon()
 	self:UpdatePvP()
 end
 
-function InfoBar:UpdateWidth()
-	local width = self:GetParent():GetWidth()
-
-	self.level:SetText('00') --done to force a size
-
-	local textWidth = self.level:GetStringWidth() + LEVEL_OFFSET
-	self.name:SetWidth(max(width - textWidth, 0))
-
-	self:UpdateAll()
+function InfoBar:UpdateNamePosition()
+	if self.target:IsShown() or self.pvp:IsShown() then
+		self.name:SetPoint('BOTTOMRIGHT', -20, 0)
+	else
+		self.name:SetPoint('BOTTOMRIGHT')
+	end
 end
 
 function InfoBar:UpdatePartyLeader()

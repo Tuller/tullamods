@@ -19,3 +19,4 @@ obj\info.lua
 obj\threat.lua
 obj\aura.lua
 obj\cast.lua
+obj\combo.lua
