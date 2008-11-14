@@ -144,12 +144,34 @@ function AuraContainer:Update()
 	local count = 0
 
 
-	while UnitAura(unit, count + 1, filter) do
-		count = count + 1
+	local id = 1
+	local name, rank, icon, applications, debuffType, duration, expirationTime, isMine, isStealable = UnitAura(unit, id, filter)
+	while name do
+		if isMine then
+			count = count + 1
 
-		local b = self.buttons[count]
-		b:Update(UnitAura(unit, count, filter))
-		b:Show()
+			local b = self.buttons[count]
+			b:Update(name, rank, icon, applications, debuffType, duration, expirationTime, isMine, isStealable)
+			b:Show()
+		end
+
+		id = id + 1
+		name, rank, icon, applications, debuffType, duration, expirationTime, isMine, isStealable = UnitAura(unit, id, filter)
+	end
+
+	local id = 1
+	local name, rank, icon, applications, debuffType, duration, expirationTime, isMine, isStealable = UnitAura(unit, id, filter)
+	while name do
+		if not isMine then
+			count = count + 1
+
+			local b = self.buttons[count]
+			b:Update(name, rank, icon, applications, debuffType, duration, expirationTime, isMine, isStealable)
+			b:Show()
+		end
+
+		id = id + 1
+		name, rank, icon, applications, debuffType, duration, expirationTime, isMine, isStealable = UnitAura(unit, id, filter)
 	end
 
 	for i = count + 1, #self.buttons do
