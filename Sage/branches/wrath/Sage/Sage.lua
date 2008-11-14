@@ -53,13 +53,14 @@ function Sage:GetDefaults()
 			sticky = true,
 			showCastBars = true,
 			debuffColoring = true,
+			colorHealthByClass = true,
 			showMaxValues = true,
 			showPvPIcons = true,
 			barTexture = 'Diagonal',
 			rangeCheck = true,
 			frames = {},
 			classColors = _G['RAID_CLASS_COLORS'],
-			debuffColors = _G['DebuffTypeColor'],	
+			debuffColors = _G['DebuffTypeColor'],
 		}
 	}
 end
@@ -368,6 +369,15 @@ function Sage:GetDebuffColor(type)
 	return self.db.profile.debuffColors[type]
 end
 
+function Sage:SetColorHealthByClass(enable)
+	self.db.profile.colorHealthByClass = enable or false
+	self.HealthBar:ForAllShown('UpdateAll')
+end
+
+function Sage:ColorHealthByClass()
+	return self.db.profile.colorHealthByClass
+end
+
 
 --[[ Utility Methods ]]--
 
@@ -397,12 +407,15 @@ function Sage:GetFrameSets(id)
 end
 
 --this code is shamelessly taken from oUF
+--it works stupidly well
+local noop = function() end
 function Sage:UnregisterUnitFrame(name)
 	_G[name]:UnregisterAllEvents()
 	_G[name]:Hide()
+	_G[name].Show = noop
+
 	_G[name..'HealthBar']:UnregisterAllEvents()
 	_G[name..'ManaBar']:UnregisterAllEvents()
-	
 	if _G[name .. 'SpellBar'] then
 		_G[name .. 'SpellBar']:UnregisterAllEvents()
 	end
@@ -415,13 +428,13 @@ function Sage:UnregisterUnit(unit)
 		self:UnregisterUnitFrame('PetFrame')
 	elseif unit == 'target' then
 		self:UnregisterUnitFrame('TargetFrame')
-		ComboFrame:UnregisterAllEvents()
-		ComboFrame:Hide()
+		_G['ComboFrame']:UnregisterAllEvents()
+		_G['ComboFrame']:Hide()
 	elseif unit == 'focus' then
 		self:UnregisterUnitFrame('FocusFrame')
 	elseif unit == 'targettarget' then
 		self:UnregisterUnitFrame('TargetofTargetFrame')
-	elseif unit:match('party%d') then
-		self:UnregisterUnitFrame('PartyMemberFrame' .. unit:match('party(%d)'))
+	elseif unit:match('party(%d+)') then
+		self:UnregisterUnitFrame('PartyMemberFrame' .. unit:match('party(%d+)'))
 	end
 end

@@ -4,6 +4,7 @@
 
 --omgspeed
 local _G = _G
+local Sage = _G['Sage']
 local UnitHealth = _G['UnitHealth']
 local UnitHealthMax = _G['UnitHealthMax']
 local UnitIsFriend = _G['UnitIsFriend']
@@ -117,12 +118,10 @@ function HealthBar:UpdateHealthColor()
 		self:SetColor(color.r, color.g, color.b)
 	elseif UnitIsFeignDeath(unit)  then
 		self:SetColor(0, 0.9, 0.78)
---[[
-	elseif UnitIsPlayer(unit) and UnitClass(unit) then
+	elseif Sage:ColorHealthByClass() and UnitIsPlayer(unit) and UnitClass(unit) then
 		local _,enClass = UnitClass(unit)
 		local color = Sage:GetClassColor(enClass)
 		self:SetColor(color.r, color.g, color.b)
---]]
 	else
 		self:SetColor(0.1, 0.8, 0.1)
 	end
