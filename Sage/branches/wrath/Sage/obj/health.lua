@@ -58,6 +58,12 @@ function HealthBar:UNIT_AURA(unit)
 	end
 end
 
+function HealthBar:UNIT_HAPPINESS(unit)
+	if unit == 'player' and UnitIsUnit(self.unit, 'pet') then
+		self:UpdateHealthColor()
+	end
+end
+
 
 --[[
 	Update Methods
@@ -67,7 +73,7 @@ function HealthBar:UpdateUnit(newUnit)
 	local newUnit = newUnit or self:GetParent():GetAttribute('unit')
 	if self.unit ~= newUnit then
 		self.unit = newUnit
-		
+
 		if self:IsVisible() then
 			self:UpdateAll()
 		end
@@ -110,18 +116,38 @@ function HealthBar:UpdateDebuff()
 	self:UpdateHealthColor()
 end
 
+local function IsHunterPet()
+	local _,hunterPet = HasPetUI()
+	return hunterPet
+end
+
+function HealthBar:GetHappinessColor()
+	local happiness = GetPetHappiness() or 1
+	if happiness == 3 then
+		return 0.1, 0.8, 0.1
+	elseif happiness == 2 then
+		return 0.8, 0.8, 0.1
+	end
+	return 0.8, 0.1, 0.1
+end
+
+function HealthBar:GetClassColor(unit)
+	local _,enClass = UnitClass(unit)
+	local color = Sage:GetClassColor(enClass)
+	return color.r, color.g, color.b
+end
+
 function HealthBar:UpdateHealthColor()
 	local unit = self.unit
-
 	if self.debuff then
 		local color = Sage:GetDebuffColor(self.debuff)
 		self:SetColor(color.r, color.g, color.b)
 	elseif UnitIsFeignDeath(unit)  then
 		self:SetColor(0, 0.9, 0.78)
-	elseif Sage:ColorHealthByClass() and UnitIsPlayer(unit) and UnitClass(unit) then
-		local _,enClass = UnitClass(unit)
-		local color = Sage:GetClassColor(enClass)
-		self:SetColor(color.r, color.g, color.b)
+	elseif UnitIsUnit(unit, 'pet') and IsHunterPet() then
+		self:SetColor(self:GetHappinessColor())
+	elseif UnitIsPlayer(unit) and UnitClass(unit) and Sage:ColorHealthByClass() then
+		self:SetColor(self:GetClassColor(unit))
 	else
 		self:SetColor(0.1, 0.8, 0.1)
 	end
@@ -196,5 +222,5 @@ do
 	f:RegisterEvent('UNIT_HEALTH')
 	f:RegisterEvent('UNIT_MAXHEALTH')
 	f:RegisterEvent('UNIT_AURA')
---	f:RegisterEvent('UNIT_HAPPINESS')
+	f:RegisterEvent('UNIT_HAPPINESS')
 end
