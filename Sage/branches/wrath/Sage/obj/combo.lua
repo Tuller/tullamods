@@ -2,6 +2,7 @@
 local ComboFrame = Sage:CreateClass('Frame')
 Sage.ComboFrame = ComboFrame
 
+local MAX_COMBO_POINTS = 5
 local COMBO_TEXT = {
 	'C',
 	'C O',
