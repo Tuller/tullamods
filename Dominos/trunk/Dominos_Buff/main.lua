@@ -149,7 +149,7 @@ function Updater:UpdateFriendlyTargetBuffs()
 	local i = 1
 	local name, rank, icon, count, debuffType, duration, expirationTime, isMine, isStealable
 	repeat
-		name, rank, icon, count, debuffType, duration, expirationTime, isMine, isStealable = UnitBuff('target', i)
+		name, rank, icon, count, debuffType, duration, expirationTime, isMine, isStealable = UnitAura('target', i, 'HELPFUL|PLAYER')
 		if name and isMine then
 			newVals[name] = true
 		end
@@ -173,7 +173,7 @@ function Updater:UpdateEnemyTargetDebuffs()
 	local i = 1
 	local name, rank, icon, count, debuffType, duration, expirationTime, isMine, isStealable
 	repeat
-		name, rank, icon, count, debuffType, duration, expirationTime, isMine, isStealable = UnitDebuff('target', i)
+		name, rank, icon, count, debuffType, duration, expirationTime, isMine, isStealable = UnitAura('target', i, 'HARMFUL|PLAYER')
 		if name and isMine then
 			newVals[name] = true
 		end
