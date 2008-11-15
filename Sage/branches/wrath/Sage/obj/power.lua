@@ -67,7 +67,7 @@ end
 function PowerBar:Update()
 	local unit = self.unit
 	local powerType, powerToken = UnitPowerType(unit)
-	if powerType == 0 or UnitIsPlayer(unit) then
+	if powerType == 0 or UnitPlayerControlled(unit) or UnitInParty(unit) then
 		self:Show()
 	else
 		self:Hide()
