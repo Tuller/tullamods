@@ -33,12 +33,13 @@ end
 
 function VehicleBar:UpdateButtonVisibility()
 	if IsVehicleAimAngleAdjustable() then
-		VehicleMenuBarPitchUpButton:Show()
-		VehicleMenuBarPitchDownButton:Show()
+		_G['VehicleMenuBarPitchUpButton']:Show()
+		_G['VehicleMenuBarPitchDownButton']:Show()
 	else
-		VehicleMenuBarPitchUpButton:Hide()
-		VehicleMenuBarPitchDownButton:Hide()
+		_G['VehicleMenuBarPitchUpButton']:Hide()
+		_G['VehicleMenuBarPitchDownButton']:Hide()
 	end
+	_G['VehicleMenuBarLeaveButton']:Show()
 end
 
 function VehicleBar:SkinButtons()
