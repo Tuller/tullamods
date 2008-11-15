@@ -121,7 +121,7 @@ local function Panel_CreatePopupDialog(panel)
 end
 
 do
-	local panel = Dominos.Options:New('DominosProfiles', L.Profiles, L.ProfilesPanelDesc, nil, 'Dominos')
+	local panel = Dominos.Options:New('DominosProfiles', L.Profiles, L.ProfilesPanelDesc, nil, GetAddOnMetadata('Dominos', 'title'))
 	panel.UpdateList = Panel_UpdateList
 	panel.Highlight = Panel_Highlight
 
