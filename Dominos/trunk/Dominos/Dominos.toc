@@ -10,6 +10,7 @@ embeds.xml
 localization\localization.lua
 localization\localization.fr.lua
 localization\localization.cn.lua
+localization\localization.ko.lua
 Dominos.lua
 drag.lua
 frame.lua
