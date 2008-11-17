@@ -8,6 +8,7 @@
 localization\localization.lua
 localization\localization.cn.lua
 localization\localization.fr.lua
+localization\localization.ko.lua
 menu.lua
 panel.lua
 general.lua
