@@ -223,18 +223,20 @@ function BagnonItem:UpdateSearch()
 			if link then
 				--smart text search: will attempt to match type, subtype, and equip locations in addition to names
 				local name, _, quality, itemLevel, minLevel, type, subType, _, equipLoc = GetItemInfo(link)
-				local text = text:lower()
-				local name = name:lower()
+				if name then
+					text = text:lower()
+					name = name:lower()
 
-				if not(text == name or name:find(text)) then
-					local type = type:lower()
-					if not(text == type or type:find(text)) then
-						local subType = subType:lower()
-						if not(text == subType or subType:find(text)) then
-							local equipLoc = getglobal(equipLoc) and getglobal(equipLoc):lower()
-							if not(equipLoc and (text == equipLoc or equipLoc:find(text))) then
-								self:Fade()
-								return
+					if not(text == name or name:find(text)) then
+						local type = type:lower()
+						if not(text == type or type:find(text)) then
+							local subType = subType:lower()
+							if not(text == subType or subType:find(text)) then
+								local equipLoc = _G[equipLoc] and _G[equipLoc]:lower()
+								if not(equipLoc and (text == equipLoc or equipLoc:find(text))) then
+									self:Fade()
+									return
+								end
 							end
 						end
 					end
