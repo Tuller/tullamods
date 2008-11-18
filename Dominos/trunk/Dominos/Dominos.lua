@@ -208,9 +208,12 @@ end
 --[[ Blizzard Stuff Hiding ]]--
 
 function Dominos:HideBlizzard()
+	local noop = Multibar_EmptyFunc
+	
 	RANGE_INDICATOR = ''
-	MultiActionBar_Update = Multibar_EmptyFunc
-	MultiActionBar_UpdateGrid = Multibar_EmptyFunc
+	MultiActionBar_Update = noop
+	MultiActionBar_UpdateGrid = noop
+	ShowBonusActionBar = noop
 
 	UIPARENT_MANAGED_FRAME_POSITIONS['MultiBarRight'] = nil
 	UIPARENT_MANAGED_FRAME_POSITIONS['MultiBarLeft'] = nil

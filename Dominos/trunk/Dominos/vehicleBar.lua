@@ -17,8 +17,8 @@ function VehicleBar:New()
 	f:SkinButtons()
 	f:LoadButtons()
 	f:Layout()
-	f:SetScript('OnEvent', f.OnEvent)
-	f:RegisterEvent('UNIT_ENTERED_VEHICLE')
+--	f:SetScript('OnEvent', f.OnEvent)
+--	f:RegisterEvent('UNIT_ENTERED_VEHICLE')
 
 	return f
 end
@@ -32,13 +32,8 @@ function VehicleBar:OnEvent(event, arg1)
 end
 
 function VehicleBar:UpdateButtonVisibility()
-	if IsVehicleAimAngleAdjustable() then
-		_G['VehicleMenuBarPitchUpButton']:Show()
-		_G['VehicleMenuBarPitchDownButton']:Show()
-	else
-		_G['VehicleMenuBarPitchUpButton']:Hide()
-		_G['VehicleMenuBarPitchDownButton']:Hide()
-	end
+	_G['VehicleMenuBarPitchUpButton']:Show()
+	_G['VehicleMenuBarPitchDownButton']:Show()
 	_G['VehicleMenuBarLeaveButton']:Show()
 end
 
@@ -48,12 +43,12 @@ function VehicleBar:SkinButtons()
 	self:ApplySkin('LeaveButton')
 end
 
-function VehicleBar:ApplySkin(frameName)	
+function VehicleBar:ApplySkin(frameName)
 	local skin = self:GetSkinData(frameName)
-	local frame = getglobal("VehicleMenuBar" .. frameName)
+	local frame = _G['VehicleMenuBar' .. frameName]
 	frame:SetWidth(30)
 	frame:SetHeight(30)
-	
+
 	if skin.normalTexture then
 		frame:GetNormalTexture():SetTexture(skin.normalTexture);
 		frame:GetNormalTexture():SetTexCoord(unpack(skin.normalTexCoord));
@@ -71,7 +66,7 @@ function VehicleBar:ApplySkin(frameName)
 end
 
 function VehicleBar:GetSkinData(frameName)
-	if frameName == 'PitchUpButton' then 
+	if frameName == 'PitchUpButton' then
 		return {	--Pitch up button
 			height = 36,
 			width = 38,
