@@ -55,7 +55,7 @@ function NPCInfoBar:GetClass()
 		return UnitClass(unit)
 	else
 		local type = UnitCreatureFamily(unit) or UnitCreatureType(unit)
-		return (type == 'Unknown Creature' and '') or type
+		return (type == 'Not specified' and '') or type
 	end
 end
 
