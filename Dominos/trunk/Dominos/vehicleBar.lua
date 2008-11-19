@@ -17,8 +17,9 @@ function VehicleBar:New()
 	f:SkinButtons()
 	f:LoadButtons()
 	f:Layout()
---	f:SetScript('OnEvent', f.OnEvent)
---	f:RegisterEvent('UNIT_ENTERED_VEHICLE')
+	f:SetScript('OnEvent', f.OnEvent)
+	f:RegisterEvent('UNIT_ENTERED_VEHICLE')
+	f:RegisterEvent('UNIT_ENTERING_VEHICLE')
 
 	return f
 end
@@ -32,9 +33,19 @@ function VehicleBar:OnEvent(event, arg1)
 end
 
 function VehicleBar:UpdateButtonVisibility()
-	_G['VehicleMenuBarPitchUpButton']:Show()
-	_G['VehicleMenuBarPitchDownButton']:Show()
-	_G['VehicleMenuBarLeaveButton']:Show()
+	if IsVehicleAimAngleAdjustable() then
+		_G['VehicleMenuBarPitchUpButton']:Show()
+		_G['VehicleMenuBarPitchDownButton']:Show()
+	else
+		_G['VehicleMenuBarPitchUpButton']:Hide()
+		_G['VehicleMenuBarPitchDownButton']:Hide()
+	end
+
+	if CanExitVehicle() then
+		_G['VehicleMenuBarLeaveButton']:Show()
+	else
+		_G['VehicleMenuBarLeaveButton']:Hide()
+	end
 end
 
 function VehicleBar:SkinButtons()
