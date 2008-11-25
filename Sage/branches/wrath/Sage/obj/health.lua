@@ -39,6 +39,16 @@ function HealthBar:OnShow()
 	self:UpdateAll()
 end
 
+function HealthBar:OnParentEnter()
+	self.entered = true
+	self:UpdateText()
+end
+
+function HealthBar:OnParentLeave()
+	self.entered = nil
+	self:UpdateText()
+end
+
 function HealthBar:OnValueChanged(value)
 	if not self.debuff then
 		_G['HealthBar_OnValueChanged'](self, value, true)
@@ -167,6 +177,8 @@ function HealthBar:UpdateText()
 		text:SetText('Ghost')
 	elseif not UnitIsConnected(unit) then
 		text:SetText('Offline')
+	elseif self.entered then
+		text:SetFormattedText('%s / %s', value, max)
 	else
 		if value == max then
 			text:SetText('')

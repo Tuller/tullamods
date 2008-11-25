@@ -40,6 +40,16 @@ function PowerBar:OnUpdate()
 	end
 end
 
+function PowerBar:OnParentEnter()
+	self.entered = true
+	self:UpdateText()
+end
+
+function PowerBar:OnParentLeave()
+	self.entered = nil
+	self:UpdateText()
+end
+
 function PowerBar:UNIT_MANA(unit)
 	if self.unit == unit then
 		self:Update()
@@ -100,6 +110,8 @@ function PowerBar:UpdateText()
 
 	if UnitIsGhost(unit) or UnitIsDead(unit) or not UnitIsConnected(unit) then
 		text:SetText('')
+	elseif self.entered then
+		text:SetFormattedText('%d / %d', value, max)
 	else
 		if self.powerToken == 'RAGE' and value == 0 then
 			text:SetText('')
