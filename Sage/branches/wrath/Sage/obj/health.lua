@@ -41,12 +41,18 @@ end
 
 function HealthBar:OnParentEnter()
 	self.entered = true
-	self:UpdateText()
+
+	if self.text then
+		self:UpdateText()
+	end
 end
 
 function HealthBar:OnParentLeave()
 	self.entered = nil
-	self:UpdateText()
+
+	if self.text then
+		self:UpdateText()
+	end
 end
 
 function HealthBar:OnValueChanged(value)
@@ -197,7 +203,6 @@ function HealthBar:UpdateText()
 			end
 		end
 	end
---	text:Show()
 end
 
 

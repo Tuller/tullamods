@@ -42,12 +42,16 @@ end
 
 function PowerBar:OnParentEnter()
 	self.entered = true
-	self:UpdateText()
+	if self.text then
+		self:UpdateText()
+	end
 end
 
 function PowerBar:OnParentLeave()
 	self.entered = nil
-	self:UpdateText()
+	if self.text then
+		self:UpdateText()
+	end
 end
 
 function PowerBar:UNIT_MANA(unit)
