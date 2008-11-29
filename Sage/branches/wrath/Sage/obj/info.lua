@@ -160,7 +160,13 @@ function InfoBar:PARTY_LOOT_METHOD_CHANGED()
 end
 
 function InfoBar:UNIT_THREAT_SITUATION_UPDATE(unit)
-	if unit == self.unit or unit == 'player' then
+	if unit == self.unit or UnitIsUnit(self.unit, 'player') then
+		self:UpdateNameColor()
+	end
+end
+
+function InfoBar:PLAYER_UPDATE_RESTING()
+	if UnitIsUnit(self.unit, 'player') then
 		self:UpdateNameColor()
 	end
 end
@@ -367,6 +373,7 @@ do
 		InfoBar:ForAllVisible(event, ...)
 	end)
 
+	f:RegisterEvent('PLAYER_UPDATE_RESTING')
 	f:RegisterEvent('UNIT_THREAT_SITUATION_UPDATE')
 	f:RegisterEvent('UNIT_FACTION')
 	f:RegisterEvent('UNIT_NAME_UPDATE')
