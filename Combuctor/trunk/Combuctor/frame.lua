@@ -221,7 +221,6 @@ end
 function InventoryFrame:OnBagToggleEnter(toggle)
 	GameTooltip:SetOwner(toggle, 'ANCHOR_LEFT')
 	GameTooltip:SetText(L.Bags, 1, 1, 1)
-	GameTooltip:AddLine(L.Bags)
 
 	if self.isBank then
 		GameTooltip:AddLine(L.InventoryToggle)
