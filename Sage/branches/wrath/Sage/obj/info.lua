@@ -373,14 +373,12 @@ do
 		InfoBar:ForAllVisible(event, ...)
 	end)
 
-	f:RegisterEvent('PLAYER_UPDATE_RESTING')
 	f:RegisterEvent('UNIT_THREAT_SITUATION_UPDATE')
 	f:RegisterEvent('UNIT_FACTION')
 	f:RegisterEvent('UNIT_NAME_UPDATE')
 	f:RegisterEvent('UNIT_CLASSIFICATION_CHANGED')
 	f:RegisterEvent('UNIT_LEVEL')
-
-	--non unit events
+	f:RegisterEvent('PLAYER_UPDATE_RESTING')
 	f:RegisterEvent('RAID_TARGET_UPDATE')
 	f:RegisterEvent('PARTY_LEADER_CHANGED')
 	f:RegisterEvent('PARTY_MEMBERS_CHANGED')
