@@ -3,8 +3,8 @@
 		Based on SellValueLite and ColaLight, allows viewing of sell values from anywhere
 		This portion provides sell value data access
 
-	Copyright (C) 2007 Tuller
-	ColaLight (C) 2006  Murazorz
+	Copyright (C) 2008 Tuller
+	ColaLight (C) 2006 Murazorz
 	ItemPrice (C) 2007 Bam
 
 	This program is free software; you can redistribute it and/or
@@ -23,7 +23,11 @@
 	02110-1301, USA.
 --]]
 
-local ItemPrice, IP_REVISION = LibStub and LibStub('ItemPrice-1.1', true)
+local ItemPrice, IP_REVISION
+if LibStub then
+	ItemPrice, IP_REVISION = LibStub('ItemPrice-1.1', true)
+end
+
 local CURRENT_VERSION = GetAddOnMetadata('SellFish', 'Version')
 local L = SELLFISH_LOCALS
 
