@@ -20,22 +20,22 @@ function LudwigUI_OnLoad(self)
 
 	local item = CreateFrame('Button', name .. 1, self, 'LudwigItemButtonTemplate')
 	item:SetPoint('TOPLEFT', self, 'TOPLEFT', 19, -75)
-	item.icon = getglobal(item:GetName() .. 'Icon')
+	item.icon = _G[item:GetName() .. 'Icon']
 	items[1] = item
 
 	for i = 2, LWUI_SHOWN do
 		item = CreateFrame('Button', name .. i, self, 'LudwigItemButtonTemplate')
 		item:SetPoint('TOPLEFT', items[i-1], 'BOTTOMLEFT')
 		item:SetPoint('TOPRIGHT', items[i-1], 'BOTTOMRIGHT')
-		item.icon = getglobal(item:GetName() .. 'Icon')
+		item.icon = _G[item:GetName() .. 'Icon']
 		items[i] = item
 	end
 
 	self.items = items
-	self.title = getglobal(name .. 'Text')
-	self.scrollFrame = getglobal(name.. 'Scroll')
-	self.quality = getglobal(name .. 'Quality')
-	self.type = getglobal(name .. 'Type')
+	self.title = _G[name .. 'Text']
+	self.scrollFrame = _G[name.. 'Scroll']
+	self.quality = _G[name .. 'Quality']
+	self.type = _G[name .. 'Type']
 	self.frame = frame
 	uiFrame = self
 end
@@ -63,15 +63,15 @@ function LudwigUI_Reset()
 	end
 
 	--reset search text
-	local search = getglobal(uiFrame:GetName() .. 'Search')
+	local search = _G[uiFrame:GetName() .. 'Search']
 	if(search:HasFocus()) then
 		search:SetText('')
 	else
 		search:SetText(SEARCH)
 	end
 
-	getglobal(uiFrame:GetName() .. 'MinLevel'):SetText('')
-	getglobal(uiFrame:GetName() .. 'MaxLevel'):SetText('')
+	_G[uiFrame:GetName() .. 'MinLevel']:SetText('')
+	_G[uiFrame:GetName() .. 'MaxLevel']:SetText('')
 
 	LudwigUI_UpdateTypeText()
 	LudwigUI_UpdateQualityText()
@@ -206,7 +206,7 @@ end
 local function Quality_GetText(index)
 	if tonumber(index) then
 		local hex = select(4, GetItemQualityColor(index))
-		return hex .. getglobal('ITEM_QUALITY' .. index .. '_DESC') .. '|r'
+		return hex .. _G['ITEM_QUALITY' .. index .. '_DESC'] .. '|r'
 	end
 	return ALL
 end
@@ -236,7 +236,7 @@ function LudwigUI_OnQualityShow(self)
 end
 
 function LudwigUI_UpdateQualityText()
-	getglobal(uiFrame.quality:GetName() .. 'Text'):SetText(Quality_GetText(filter.quality))
+	_G[uiFrame.quality:GetName() .. 'Text']:SetText(Quality_GetText(filter.quality))
 end
 
 
@@ -268,7 +268,7 @@ local function Type_OnClick(self, type, subType)
 
 	--hack to hide the previous dropdown menu levels
 	for i = 1, UIDROPDOWNMENU_MENU_LEVEL - 1 do
-		getglobal('DropDownList'..i):Hide()
+		_G['DropDownList'..i]:Hide()
 	end
 end
 
@@ -291,7 +291,7 @@ local function AddEquipLocations(level, type, subType, ...)
 	for i = 1, select('#', ...), 2 do
 		local equipLoc, used = select(i, ...)
 		if used then
-			AddItem(getglobal(equipLoc), i, Type_OnClick, false, level, type, subType)
+			AddItem(_G[equipLoc], i, Type_OnClick, false, level, type, subType)
 		end
 	end
 end
@@ -316,7 +316,7 @@ function LudwigUI_UpdateTypeText()
 		if filter.subType then
 			text = format('%s - %s', filter.type, filter.subType)
 			if filter.equipLoc then
-				text = format('%s - %s', filter.subType, getglobal(filter.equipLoc))
+				text = format('%s - %s', filter.subType, _G[filter.equipLoc])
 			end
 		else
 			text = filter.type
@@ -324,7 +324,7 @@ function LudwigUI_UpdateTypeText()
 	else
 		text = ALL
 	end
-	getglobal(uiFrame.type:GetName() .. 'Text'):SetText(text)
+	_G[uiFrame.type:GetName() .. 'Text']:SetText(text)
 end
 
 function LudwigUI_OnTypeShow(self)
