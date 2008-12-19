@@ -27,7 +27,8 @@ function ActionButton:New(id)
 		b:SetAttribute('showgrid', 0)
 		b:SetAttribute('action--base', id)
 		b:SetAttribute('_childupdate-action', [[
-			local id = message and self:GetAttribute('action--' .. message) or self:GetAttribute('action--base')
+			local state = message or self:GetParent():GetAttribute('state-page')
+			local id = state and self:GetAttribute('action--' .. state) or self:GetAttribute('action--base')
 			self:SetAttribute('action', id)
 		]])
 
