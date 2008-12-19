@@ -1,6 +1,6 @@
 ﻿--[[
 	Localization_zhCN.lua
-	2008/5/14 Modified by xuxianhe@gmail.com
+	2008/12/4 Modified by xuxianhe@gmail.com
 
 	Simple Chinese : 简体中文
 --]]
