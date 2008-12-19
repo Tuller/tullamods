@@ -42,4 +42,4 @@ L.TipShowBag = "<单击>显示"
 L.TipHideBag = "<单击>隐藏"
 L.TipGoldOnRealm = "%s服务器上的总资产"
 
-L.ConfirmReloadUI = '这个设置讲在你下次登录时生效'
+L.ConfirmReloadUI = '这个设置将在你下次登录时生效'

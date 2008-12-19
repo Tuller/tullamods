@@ -1,6 +1,7 @@
 --[[
 	Bagnon Localization Information: Traditional Chinese Language
-	20071117 by matini< yiting.jheng <at> gmail <dot> com
+		20071117 by matini< yiting.jheng <at> gmail <dot> com
+		20081201 by yleaf@cwdg(yaroot@gmail.com)
 --]]
 
 local L = LibStub('AceLocale-3.0'):NewLocale('Bagnon', 'zhTW')
@@ -37,3 +38,5 @@ L.TipShowSearch = "<雙擊>搜尋"
 L.TipShowBag = "<點擊>顯示"
 L.TipHideBag = "<點擊>隱藏"
 L.TipGoldOnRealm = "總計%s"
+
+L.ConfirmReloadUI = '這個設置將在下次登陸時生效'
