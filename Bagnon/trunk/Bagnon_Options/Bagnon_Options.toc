@@ -1,4 +1,4 @@
-﻿## Interface: 30000
+## Interface: 30000
 ## Title: Bagnon Options
 ## Notes: A configuration menu for Bagnon
 ## Notes-zhTW: Bagnon 的設定選單
