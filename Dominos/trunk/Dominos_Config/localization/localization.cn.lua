@@ -1,6 +1,6 @@
 ﻿--[[
 	Localization_zhCN.lua
-	2008/5/14 Modified by xuxianhe@gmail.com
+	2008/12/4 Modified by xuxianhe@gmail.com
 
 	Simple Chinese : 简体中文
 --]]
@@ -44,7 +44,10 @@ L.ShowEmptyButtons = '显示空按钮'
 L.LockActionButtons = '锁定动作条位置'
 L.EnterBindingMode = '绑定按键...'
 L.EnterConfigMode = '进入设置模式'
-L.ExitConfigMode = '退出设置模式'
 L.ActionBarSettings = '动作条 %d 设置'
 L.BarSettings = '%s 动作条设置'
 L.ShowTooltips = '显示提示'
+L.OneBag = '完整背包'
+L.ShowKeyring = '显示钥匙链'
+L.StickyBars = '粘附动作条'
+L.ShowMinimapButton = '显示小地图按钮'
