@@ -27,8 +27,7 @@ function ActionButton:New(id)
 		b:SetAttribute('showgrid', 0)
 		b:SetAttribute('action--base', id)
 		b:SetAttribute('_childupdate-action', [[
-			local state = message or self:GetParent():GetAttribute('state-page')
-			local id = state and self:GetAttribute('action--' .. state) or self:GetAttribute('action--base')
+			local id = message and self:GetAttribute('action--' .. message) or self:GetAttribute('action--base')
 			self:SetAttribute('action', id)
 		]])
 
@@ -417,7 +416,12 @@ function ActionBar:LoadStateController()
 end
 
 function ActionBar:RefreshActions()
-	self.header:Execute([[ control:ChildUpdate('action') ]])
+	local state = self.header:GetAttribute('state-page')
+	if state then
+		self.header:Execute(format([[ control:ChildUpdate('action', '%s') ]], state))
+	else
+		self.header:Execute([[ control:ChildUpdate('action', nil) ]])
+	end
 end
 
 --returns true if the possess bar, false otherwise
