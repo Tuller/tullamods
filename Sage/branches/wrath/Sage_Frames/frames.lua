@@ -1,4 +1,4 @@
-﻿local Frame = Sage:CreateClass('Frame', Sage.Frame)
+﻿local MajorFrame = Sage:CreateClass('Frame', Sage.Frame)
 local HEALTHBAR_HEIGHT = 20
 local POWERBAR_HEIGHT = 12
 local INFOBAR_HEIGHT = 18
@@ -8,7 +8,7 @@ local function IsFriendlyUnit(unit)
 	return unit == 'player' or unit == 'pet' or unit:match('party%d')
 end
 
-function Frame:New(unit)
+function MajorFrame:New(unit)
 	local f = self.super.New(self, unit)
 	f:SetWidth(140)
 	f:SetHeight(INFOBAR_HEIGHT + HEALTHBAR_HEIGHT + POWERBAR_HEIGHT + BORDER_SIZE*2)
@@ -101,7 +101,7 @@ function Frame:New(unit)
 	return f
 end
 
-function Frame:UpdateAll()
+function MajorFrame:UpdateAll()
 	self.info:UpdateAll()
 	self.health:UpdateAll()
 	self.power:Update()
@@ -123,7 +123,7 @@ end
 	Module Code
 --]]
 
-local module = Sage:NewModule('defaultFrames')
+local module = Sage:NewModule('BasicFrames')
 
 function module:OnEnable()
 	local function Fade(f)
@@ -150,24 +150,24 @@ function module:OnEnable()
 end
 
 function module:OnLoad()
-	local player = Frame:New('player')
+	local player = MajorFrame:New('player')
 	RegisterStateDriver(player, 'unit', '[target=vehicle,exists]vehicle;player')
 
-	local target = Frame:New('target')
+	local target = MajorFrame:New('target')
 	target:SetScript('OnEvent', target.UpdateAll)
 	target:RegisterEvent('PLAYER_TARGET_CHANGED')
 
-	local focus = Frame:New('focus')
+	local focus = MajorFrame:New('focus')
 	focus:SetScript('OnEvent', focus.UpdateAll)
 	focus:RegisterEvent('PLAYER_FOCUS_CHANGED')
 
-	local pet = Frame:New('pet')
+	local pet = MajorFrame:New('pet')
 	RegisterStateDriver(pet, 'unit', '[target=vehicle,exists]player;pet')
 	pet:SetScript('OnEvent', pet.UpdateAll)
 	pet:RegisterEvent('UNIT_PET')
 
 	for i = 1, MAX_PARTY_MEMBERS do
-		local f = Frame:New('party' .. i)
+		local f = MajorFrame:New('party' .. i)
 		f:RegisterEvent('PARTY_MEMBERS_CHANGED')
 		f:RegisterEvent('RAID_ROSTER_UPDATE')
 		f:SetScript('OnEvent', f.UpdateAll)
