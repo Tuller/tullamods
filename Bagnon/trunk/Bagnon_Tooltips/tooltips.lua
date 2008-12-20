@@ -95,27 +95,20 @@ local function AddOwners(frame, link)
 	frame:Show()
 end
 
---hook the tooltips
-local SetItem = GameTooltip:GetScript('OnTooltipSetItem')
-GameTooltip:SetScript('OnTooltipSetItem', function(self, ...)
-	if SetItem then
-		SetItem(self, ...)
-	end
+local function HookTip(tooltip)
+	local SetItem = tooltip:GetScript('OnTooltipSetItem')
+	tooltip:SetScript('OnTooltipSetItem', function(self, ...)
+		if SetItem then
+			SetItem(self, ...)
+		end
 
-	local itemLink = select(2, self:GetItem())
-	if itemLink and GetItemInfo(itemLink) then --fix for blizzard doing craziness when doing getiteminfo
-		AddOwners(self, itemLink)
-	end
-end)
+		local itemLink = select(2, self:GetItem())
+		if itemLink and GetItemInfo(itemLink) and self.bagnonTooltipItem ~= itemLink  then --fix for blizzard doing craziness when doing getiteminfo
+			self.bagnonTooltipItem = itemLink
+			AddOwners(self, itemLink)
+		end
+	end)
+end
 
-local SetItem = ItemRefTooltip:GetScript('OnTooltipSetItem')
-ItemRefTooltip:SetScript('OnTooltipSetItem', function(self, ...)
-	if SetItem then
-		SetItem(self, ...)
-	end
-
-	local itemLink = select(2, self:GetItem())
-	if itemLink and GetItemInfo(itemLink) then --fix for blizzard doing craziness when doing getiteminfo
-		AddOwners(self, itemLink)
-	end
-end)
+HookTip(GameTooltip)
+HookTip(ItemRefTooltip)
