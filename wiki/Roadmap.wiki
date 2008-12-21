@@ -2,7 +2,7 @@
 #labels Featured
 
 Bagnon:
-  * Modernize codebase
+  * Modernize codebase.
 
 Bagnon_Forever:
   * Need to deal with links that include player levels (maybe)
@@ -17,18 +17,11 @@ Combuctor:
 
 [Dominos]:
   * Revise wiki, add FAQ
-  * Make Dominos have a saner layout for 1-120 bars
-  * Add in a separate possess bar (optional addon)
-  * If I implement a saner layout for variable numbers of bars, along with the separate possess bar option, then put in sliders for numbars/numbuttons.  These should have a confirmation, since they'll toast layouts.
-  * Implement a RedRange type addon (potentially, and mainly for coloring)
-  * Implement a better show state GUI
-  * Implement linked bar auto fading
-  * Implement state based opacity
-  * Crazy town: The ability to customize state headers (like Bartender4)
-  * Crazy town: Implement bar toggle bindings
-  * Crazy town: Add in special class bars (aspect, etc)
-  * Crazy town: Implement a macaroon like system
-  * Super crazy town extreme edition: Implement a secure modal layout system.
+  * Make a possess bar.  By a possess bar, I mean a bar that hijacks either the pet or action bar buttons (including stealing hotkeys while its up) when controlling a vehicle/possessing a dude.
+  * Implement cooldown displays for buffs/debuffs on buttons.
+  * Make Dominos have a saner layout when switching between 1-120 bars.  This includes adding a slider for numbars/numbuttons
+  * Clean up the auto fading and showstate interfaces.  
+  * Crazy town: custom state headers.
 
 Ludwig:
   * Modernize codebase
@@ -39,15 +32,18 @@ OmniCC:
 
 Sage:
   * Rewrite for 3.0
-  * Incorporate new libraries (ace3, lsm3.0, etc)
-  * Incorporate some sort of threat display
-  * Implement a new buff display: should give priority to my buffs/debuffs
+  * Make buff display better (fix icons, show all debuffs, but give mine a bigger icon)
+  * Implement forced visibility state code (so that I can make party frames not show wheen in a raid, etc)
   * Use a template system of some sort to make it easier to create new jambers
-
+  * Refactor code.  Events -> processor -> unit widgets
 
 SellFish:
-  * Establish a monthly update process (gmail calendar reminders?)
+  * Update whenever there's an itemprice update
+  * Write an armory scraper if itemprice updates stop again
 
 Tipachu:
-  * Add support for talents & spells, if possible
-  * Fix compatibility issues if they're actually my fault
+  * Fix if it breaks
+
+Crazy Town - These are ideas I have that may either be entirely new things, impossible, or some combination of both:
+  * Build a unit frame designer & runner pair of addons.  Suck at making unitframes? Just download ones someone else has used the designer to make.
+  * Create an action bar addon based on a modal layout system.  Instead of telling Dominos: "switch to this bar when in form x" you instead specify a state ([form1]), then draw your bars, and attach spells.  Basically, in this system, you have a completely different UI based on what state you're in.  Blizzard implemented such a system with the vehicle and non vehicle UIs.
