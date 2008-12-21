@@ -11,10 +11,11 @@ local unused = {}
 
 --constructor
 function Frame:New(id, template)
+	Sage:UnregisterUnit(id)
+
 	local f = self:Restore(id) or self:Create(id, template)
 	f:SetUnit(id)
 	f:LoadSettings()
-	Sage:UnregisterUnit(id)
 
 	active[id] = f
 	return f
@@ -22,11 +23,34 @@ end
 
 function Frame:Create(id, template)
 	local f = self:Bind(CreateFrame('Frame', format('Sage%sFrame', id), UIParent, 'SecureHandlerStateTemplate'))
+
 	f:SetAttribute('_onstate-unit', [[
 		self:SetAttribute('unit', newstate)
 		control:ChildUpdate(stateid, newstate)
 		control:CallMethod('UpdateChildUnit')
 	]])
+
+	f:SetAttribute('_onstate-unitexists', [[
+		self:SetAttribute('unitexists', newstate)
+		control:RunAttribute('updatevisibility')
+	]])
+	
+	f:SetAttribute('_onstate-forcevis', [[
+		self:SetAttribute('forcevis', newstate)
+		control:RunAttribute('updatevisibility')
+	]])
+	
+	f:SetAttribute('updatevisibility', [[
+		local forcehide = self:GetAttribute('forcevis') == 'hide'
+		local forceshow = self:GetAttribute('forcevis') == 'show'
+		
+		if forceshow or (not forcehide and self:GetAttribute('unitexists')) then
+			self:Show()
+		else
+			self:Hide()
+		end
+	]])
+
 	f:SetAttribute('unit', id)
 	f:SetClampedToScreen(true)
 	f:SetMovable(true)
@@ -88,7 +112,6 @@ function Frame:LoadSettings(defaults)
 
 --	self:UpdateShowStates()
 	self:UpdateAlpha()
-	self:Show()
 end
 
 function Frame:GetDefaults()
@@ -162,7 +185,7 @@ function Frame:SetUnit(unit)
 	self:SetAttribute('unit', unit)
 
 	if not UnitWatchRegistered(self) then
-		RegisterUnitWatch(self)
+		RegisterUnitWatch(self, true)
 	end
 end
 
