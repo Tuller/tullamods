@@ -16,12 +16,6 @@ function PowerBar:New(parent, font)
 	return bar
 end
 
-function PowerBar:NewFrequent(parent, font)
-	local f = self:New(parent, font)
-	f:SetScript('OnUpdate', self.OnUpdate)
-
-	return f
-end
 
 --[[ Events ]]--
 
@@ -69,13 +63,26 @@ function PowerBar:UpdateUnit(newUnit)
 		self.unit = newUnit
 
 		if self:IsVisible() then
-			self:Update()
+			self:UpdateAll()
 		end
+	end
+end
+
+function PowerBar:UpdateFrequent()
+	if UnitIsUnit(self.unit, 'player') then
+		self:SetScript('OnUpdate', self.OnUpdate)
+	else
+		self:SetScript('OnUpdate', nil)
 	end
 end
 
 function PowerBar:GetUnit()
 	return self.unit
+end
+
+function PowerBar:UpdateAll()
+	self:UpdateFrequent()
+	self:Update()
 end
 
 function PowerBar:Update()
