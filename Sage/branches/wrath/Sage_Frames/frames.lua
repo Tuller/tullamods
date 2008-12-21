@@ -147,58 +147,107 @@ function TargetFrame:UpdateAll()
 end
 
 
+--[[ Out of range fading ]]--
+
+local RangeFader = CreateFrame('Frame')
+RangeFader.nextUpdate = 0
+RangeFader.delay = 0.05
+RangeFader.frames = {}
+
+function RangeFader:OnUpdate(elapsed)
+	self.nextUpdate = self.nextUpdate - elapsed
+
+	if self.nextUpdate < 0 then
+		self.nextUpdate = self.delay
+
+		for _,f in pairs(self.frames) do
+			self:Fade(f)
+		end
+	end
+end
+
+function RangeFader:Fade(f)
+	local unit = f:GetAttribute('unit')
+	if (not UnitInRange(unit)) and (UnitIsUnit(unit, 'pet') or UnitInParty(unit) or UnitInRaid(unit)) then
+		f:SetAlpha(0.6 * f:GetFrameAlpha())
+	else
+		f:SetAlpha(f:GetFrameAlpha())
+	end
+end
+
+function RangeFader:Register(f)
+	local found = false
+	for _,frame in pairs(self.frames) do
+		if f == frame then
+			found = true
+			break
+		end
+	end
+
+	if not found then
+		table.insert(self.frames, f)
+		self:Show()
+	end
+end
+
+function RangeFader:Unregister(f)
+	local found = false
+
+	for i,frame in pairs(self.frames) do
+		if f == frame then
+			found = true
+			table.remove(self.frames, i)
+			break
+		end
+	end
+
+	if found and #self.frames == 0 then
+		self:Hide()
+	end
+end
+
+RangeFader:SetScript('OnUpdate', RangeFader.OnUpdate)
+RangeFader:Hide()
+
+
 --[[
 	Module Code
 --]]
 
 local module = Sage:NewModule('BasicFrames')
 
-function module:OnEnable()
-	local function Fade(f)
-		if f then
-			if UnitInRange(f:GetAttribute('unit')) then
-				f:SetAlpha(f:GetFrameAlpha())
-			else
-				f:SetAlpha(0.6 * f:GetFrameAlpha())
-			end
-		end
-	end
+local function PartyFrame_Create(id)
+	local f = FriendFrame:New('party' .. id)
+	RegisterStateDriver(f, 'forcevis', '[raid]hide;nil')
 
-	CreateFrame('Frame'):SetScript('OnUpdate', function(self, elapsed)
-		self.nextUpdate = (self.nextUpdate or 0) - elapsed
-		if self.nextUpdate < 0 then
-			self.nextUpdate = 1
+	f:RegisterEvent('PARTY_MEMBERS_CHANGED')
+	f:RegisterEvent('RAID_ROSTER_UPDATE')
+	f:SetScript('OnEvent', f.UpdateAll)
 
-			Fade(Sage.Frame:Get('pet'))
-			for i = 1, MAX_PARTY_MEMBERS do
-				Fade(Sage.Frame:Get('party' .. i))
-			end
-		end
-	end)
+	RangeFader:Register(f)
 end
 
 function module:OnLoad()
 	local player = MajorFrame:New('player')
 	RegisterStateDriver(player, 'unit', '[target=vehicle,exists]vehicle;player')
 
+	local pet = FriendFrame:New('pet')
+	pet:SetScript('OnEvent', pet.UpdateAll)
+	pet:RegisterEvent('UNIT_PET')
+	RangeFader:Register(pet)
+
 	local target = TargetFrame:New('target')
 	target:SetScript('OnEvent', target.UpdateAll)
 	target:RegisterEvent('PLAYER_TARGET_CHANGED')
+	RangeFader:Register(target)
 
 	local focus = TargetFrame:New('focus')
 	focus:SetScript('OnEvent', focus.UpdateAll)
 	focus:RegisterEvent('PLAYER_FOCUS_CHANGED')
+	RangeFader:Register(focus)
 
-	local pet = FriendFrame:New('pet')
-	RegisterStateDriver(pet, 'unit', '[target=vehicle,exists]player;pet')
-	pet:SetScript('OnEvent', pet.UpdateAll)
-	pet:RegisterEvent('UNIT_PET')
-
-	for i = 1, MAX_PARTY_MEMBERS do
-		local f = FriendFrame:New('party' .. i)
-		f:RegisterEvent('PARTY_MEMBERS_CHANGED')
-		f:RegisterEvent('RAID_ROSTER_UPDATE')
-		f:SetScript('OnEvent', f.UpdateAll)
+	for id = 1, MAX_PARTY_MEMBERS do
+		PartyFrame_Create(id)
 	end
 end
 
@@ -208,7 +257,7 @@ function module:OnUnload()
 	Sage.Frame:Get('focus'):Free()
 	Sage.Frame:Get('pet'):Free()
 
-	for i = 1, MAX_PARTY_MEMBERS do
-		Sage.Frame:Get('party' .. i):Free()
+	for id = 1, MAX_PARTY_MEMBERS do
+		Sage.Frame:Get('party' .. id):Free()
 	end
 end
