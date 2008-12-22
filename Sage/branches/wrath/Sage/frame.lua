@@ -35,14 +35,18 @@ function Frame:Create(id, template)
 		control:RunAttribute('updatevisibility')
 	]])
 	
-	f:SetAttribute('_onstate-forcevis', [[
-		self:SetAttribute('forcevis', newstate)
+	f:SetAttribute('_onstate-forcevisibility', [[
+		if newstate == 'nil' then
+			self:SetAttribute('forcevisibility', nil)
+		else
+			self:SetAttribute('forcevisibility', newstate)
+		end
 		control:RunAttribute('updatevisibility')
 	]])
 	
 	f:SetAttribute('updatevisibility', [[
-		local forcehide = self:GetAttribute('forcevis') == 'hide'
-		local forceshow = self:GetAttribute('forcevis') == 'show'
+		local forcehide = self:GetAttribute('forcevisibility') == 'hide'
+		local forceshow = self:GetAttribute('forcevisibility') == 'show'
 		
 		if forceshow or (not forcehide and self:GetAttribute('unitexists')) then
 			self:Show()
@@ -187,6 +191,10 @@ function Frame:SetUnit(unit)
 	if not UnitWatchRegistered(self) then
 		RegisterUnitWatch(self, true)
 	end
+end
+
+function Frame:SetVisibilityStates(states)
+	RegisterStateDriver(self, 'forcevisibility', states)
 end
 
 
