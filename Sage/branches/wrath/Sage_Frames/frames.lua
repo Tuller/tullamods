@@ -218,8 +218,7 @@ local module = Sage:NewModule('BasicFrames')
 
 local function PartyFrame_Create(id)
 	local f = FriendFrame:New('party' .. id)
-	RegisterStateDriver(f, 'forcevis', '[raid]hide;nil')
-
+	f:SetVisibilityStates('[target=player,raid]hide;nil')
 	f:RegisterEvent('PARTY_MEMBERS_CHANGED')
 	f:RegisterEvent('RAID_ROSTER_UPDATE')
 	f:SetScript('OnEvent', f.UpdateAll)
