@@ -100,7 +100,7 @@ function PowerBar:Update()
 	self.powerToken = powerToken
 
 	if UnitIsConnected(unit) then
-		local color = _G['PowerBarColor'][powerToken] or _G['PowerBarColor'][powerType]
+		local color = _G['PowerBarColor'][powerToken] or _G['PowerBarColor'][powerType] or _G['PowerBarColor']['MANA']
 		self:SetColor(color.r, color.g, color.b)
 		self:SetValue(value)
 	else
