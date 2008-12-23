@@ -103,8 +103,7 @@ local function HookTip(tooltip)
 		end
 
 		local itemLink = select(2, self:GetItem())
-		if itemLink and GetItemInfo(itemLink) and self.bagnonTooltipItem ~= itemLink  then --fix for blizzard doing craziness when doing getiteminfo
-			self.bagnonTooltipItem = itemLink
+		if itemLink and GetItemInfo(itemLink) then --fix for blizzard doing craziness when doing getiteminfo
 			AddOwners(self, itemLink)
 		end
 	end)
