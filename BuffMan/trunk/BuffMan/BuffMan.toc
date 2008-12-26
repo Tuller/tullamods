@@ -1,0 +1,7 @@
+## Interface: 30000
+## Title: BuffMan
+## Notes: Buffhud thingy of some sort
+## Author: Tuller
+## Version: 5000.0.0
+## SavedVariables: BuffmanDB
+buffman.lua
