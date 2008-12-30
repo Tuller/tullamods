@@ -6,7 +6,7 @@
 	01Dec2008	Irene Wang <xares.vossen@gmail.com>
 --]]
 
-local L = LibStub("AceLocale-3.0"):NewLocale("Combuctor", "zhTW", true)
+local L = LibStub("AceLocale-3.0"):NewLocale("Combuctor", "zhTW")
 
 L.Updated = '更新到%s版'
 

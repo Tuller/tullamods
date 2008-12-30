@@ -5,7 +5,7 @@
 --]]
 
 
-local L = LibStub("AceLocale-3.0"):NewLocale("Combuctor", "zhCN", true)
+local L = LibStub("AceLocale-3.0"):NewLocale("Combuctor", "zhCN")
 
 L.Updated = 'Updated to v%s'
 
