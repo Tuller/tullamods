@@ -7,6 +7,8 @@
 --]]
 
 local L = LibStub("AceLocale-3.0"):NewLocale("Combuctor", "zhTW")
+if not L then return end
+
 
 L.Updated = '更新到%s版'
 

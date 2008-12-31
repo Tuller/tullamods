@@ -6,6 +6,7 @@
 
 
 local L = LibStub("AceLocale-3.0"):NewLocale("Combuctor", "zhCN")
+if not L then return end
 
 L.Updated = 'Updated to v%s'
 
