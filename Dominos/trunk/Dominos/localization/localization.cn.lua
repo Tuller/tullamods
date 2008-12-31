@@ -1,8 +1,9 @@
---[[
-	zhCN
-		xuxianhe@gmail.com
-		yleaf(yaroot@gmail.com)
-]]
+﻿--[[
+	Localization_zhCN.lua
+	2008/12/4 Modified by xuxianhe@gmail.com
+
+	Simple Chinese : 简体中文
+--]]
 
 local L = LibStub('AceLocale-3.0'):NewLocale('Dominos', 'zhCN')
 if not L then return end
@@ -51,15 +52,14 @@ L.ShowConfig = '<右键> 设置'
 L.HideBar = '<中键或者Shift+右键> 隐藏'
 L.ShowBar = '<中键或者Shift+右键> 显示'
 L.SetAlpha = '<滚轮> 设置透明度 (|cffffffff%d|r)'
-
 --minimap button stuff
 L.ConfigEnterTip = '<左键> 进入设置模式'
-L.ConfigExitTip = '<右键> 离开设置模式'
-L.BindingEnterTip = '<Shift+左键> 进入按键绑定模式'
-L.BindingExitTip = '<Shift+左键> 退出按键绑定模式'
-L.ShowOptionsTip = '<Right Click> to show the options menu'
+L.ConfigExitTip = '<左键> 退出设置模式'
+L.BindingEnterTip = '<Shift+左键> 进入绑定模式'
+L.BindingExitTip = '<Shift+左键> 退出绑定模式'
+L.ShowOptionsTip = '<右键> 显示设置菜单'
 
 --helper dialog stuff
 L.ConfigMode = '设置模式'
-L.ConfigModeExit = '离开设置模式'
-L.ConfigModeHelp = '<拖动> 动作条.  <右键> 打开设置.  <中键> 或 <Shift-右键> 隐藏/显示动作条'
+L.ConfigModeExit = '退出设置模式'
+L.ConfigModeHelp = '<拖动> 移动技能条.  <右键> 进入设置.  <中键> 或 <Shift+右键> 设置是否显示'
