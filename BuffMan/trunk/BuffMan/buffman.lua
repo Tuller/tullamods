@@ -357,7 +357,8 @@ function AuraButton:OnUpdate(elapsed)
 		self.elapsed = 0.1
 
 		local first = self.info.details[1]
-		self:SetAlpha(1 - ((first.expirationTime - GetTime()) / first.duration))
+		local alpha = math.max(1 - ((first.expirationTime - GetTime()) / first.duration), 0.1)
+		self:SetAlpha(alpha)
 	end
 end
 
