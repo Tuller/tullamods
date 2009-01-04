@@ -434,19 +434,15 @@ function Bagnon:RegisterSlashCommands()
 end
 
 function Bagnon:OnCmd(cmd)
-	if cmd ~= '' then
-		cmd = cmd:lower()
-		if cmd == 'bank' then
-			self:ToggleBank()
-		elseif cmd == 'bags' then
-			self:ToggleInventory()
-		elseif cmd == 'version' then
-			self:PrintVersion()
-		else
-			self:PrintHelp()
-		end
+	cmd = cmd and cmd:lower() or ''
+	if cmd == 'bank' then
+		self:ToggleBank()
+	elseif cmd == 'bags' then
+		self:ToggleInventory()
+	elseif cmd == 'version' then
+		self:PrintVersion()
 	else
-		self:ShowMenu()
+		self:PrintHelp()
 	end
 end
 
@@ -478,7 +474,7 @@ function Bagnon:ShowMenu()
 			LoadAddOn("Bagnon_Options")
 		end
 	else
-		self:ShowHelp()
+		self:PrintHelp()
 	end
 end
 
