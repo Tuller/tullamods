@@ -4,6 +4,14 @@ local POWERBAR_HEIGHT = 12
 local INFOBAR_HEIGHT = 18
 local BORDER_SIZE = 2
 
+local function HookScript(f, method, func)
+	if f:GetScript(method) then
+		f:HookScript(method, func)
+	else
+		f:SetScript(method, func)
+	end
+end
+
 
 --[[ Generic Major Frame ]]--
 
@@ -51,9 +59,6 @@ function MajorFrame:UpdateAll()
 	self.health:UpdateAll()
 	self.power:UpdateAll()
 
-	self.debuff:Update()
-	self.buff:Update()
-
 	if self.cast then
 		self.cast:Update()
 	end
@@ -67,7 +72,7 @@ local FriendFrame = Sage:CreateClass('Frame', MajorFrame)
 function FriendFrame:New(unit)
 	local f = FriendFrame.super.New(self, unit)
 
-	local buff = Sage.AuraContainer:New('Buffs', f, 'HELPFUL')
+	local buff = Sage.AuraContainer:New('Buffs', f, 'HELPFUL', nil, 1.25)
 	buff:SetPoint('TOPLEFT', power, 'BOTTOMLEFT', 0, -2)
 	buff:SetPoint('BOTTOMRIGHT', power, 'BOTTOMRIGHT', 0, -(17*2 + 2))
 	f.buff = buff
@@ -119,7 +124,7 @@ function TargetFrame:New(unit)
 		threat:SetPoint('BOTTOMRIGHT', health, BORDER_SIZE, -BORDER_SIZE)
 	end)
 
-	local debuff = Sage.AuraContainer:New('Debuffs', f, 'HARMFUL|PLAYER', 'HELPFUL|PLAYER')
+	local debuff = Sage.AuraContainer:New('Debuffs', f, 'HARMFUL|PLAYER', 'HELPFUL|PLAYER', 1.25)
 	debuff:SetPoint('TOPLEFT', npc, 'BOTTOMLEFT', 0, -2)
 	debuff:SetPoint('BOTTOMRIGHT', npc, 'BOTTOMRIGHT', 0, -(17*2 + 2))
 	f.debuff = debuff
