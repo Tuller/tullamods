@@ -23,8 +23,9 @@ function AuraButton:New(id, parent)
 	f.icon = _G[name .. 'Icon']
 	f.icon:SetTexCoord(0.06, 0.94, 0.06, 0.94)
 	f.border = _G[name .. 'Border']
+
 	f.cooldown = _G[name .. 'Cooldown']
-	f.cooldown.noCooldownCount = true
+	f.cooldown.noCooldownCount = true --disable omnicc
 
 	f:SetScript('OnUpdate', nil)
 	f:SetScript('OnEnter', self.OnEnter)
@@ -96,14 +97,17 @@ end
 --]]
 
 local AuraContainer = Sage:CreateClass('Frame')
-local frames = {}
 Sage.AuraContainer = AuraContainer
 
-function AuraContainer:New(id, parent, filter, friendFilter)
+local visibleFrames = {}
+
+function AuraContainer:New(id, parent, filter, friendFilter, maxIconScale)
 	local f = self:Bind(CreateFrame('Frame', parent:GetName() .. id, parent))
 	f.filter = filter
 	f.friendFilter = friendFilter
+	f.maxIconScale = maxIconScale or math.huge
 
+	--creat aura icons on demand
 	f.buttons = setmetatable({}, {__index = function(t, k)
 		local b = AuraButton:New(k, f)
 		t[k] = b
@@ -111,15 +115,24 @@ function AuraContainer:New(id, parent, filter, friendFilter)
 	end})
 
 	f:SetScript('OnShow', self.OnShow)
+	f:SetScript('OnHide', self.OnHide)
 	f:SetScript('OnSizeChanged', self.OnSizeChanged)
 	f:UpdateUnit()
-	table.insert(frames, f)
 
+	visibleFrames[f] = true
 	return f
 end
 
+
+--[[ Frame Events ]]--
+
 function AuraContainer:OnShow()
+	visibleFrames[self] = true
 	self:Update()
+end
+
+function AuraContainer:OnHide()
+	visibleFrames[self] = nil
 end
 
 function AuraContainer:OnSizeChanged()
@@ -128,17 +141,13 @@ function AuraContainer:OnSizeChanged()
 	end
 end
 
-function AuraContainer:UpdateUnit(newUnit)
-	local newUnit = newUnit or self:GetParent():GetAttribute('unit')
-	if newUnit ~= self.unit then
-		self.unit = newUnit
-		if self:IsVisible() then
-			self:Update()
-		end
-	end
-end
+
+
+--[[ Update Methods ]]--
 
 function AuraContainer:Update()
+	self.needsUpdate = nil
+
 	local unit = self.unit
 	local filter = UnitIsFriend('player', unit) and self.friendFilter or self.filter
 	local count = 0
@@ -185,15 +194,6 @@ function AuraContainer:Update()
 	end
 end
 
-function AuraContainer:SetFilter(filter)
-	if self.filter ~= filter then
-		self.filter = filter
-		if self:IsVisible() then
-			self:Update()
-		end
-	end
-end
-
 --should be nearly identical to the combuctor layout code for items
 --basically this scales however many aura buttons you have to fit into whatever the size of the area that the auracontainer occupies
 function AuraContainer:Layout(spacing)
@@ -210,7 +210,7 @@ function AuraContainer:Layout(spacing)
 			scale = width / (size*cols)
 			rows = floor(height / (size*scale))
 		until(cols*rows >= count)
-		scale = min(scale, 1)
+		scale = min(scale, self.maxIconScale)
 
 		--layout the stuff
 		for i = 1, count do
@@ -225,21 +225,93 @@ function AuraContainer:Layout(spacing)
 	end
 end
 
+function AuraContainer:RequestUpdate()
+	if self:IsVisible() then
+		self.needsUpdate = true
+		AuraContainer:Show()
+	end
+end
+
+
+--[[ Container Attributes ]]--
+
+function AuraContainer:UpdateUnit(newUnit)
+	local newUnit = newUnit or self:GetParent():GetAttribute('unit')
+	if newUnit ~= self.unit then
+		self.unit = newUnit
+		self:RequestUpdate()
+	end
+end
+
+function AuraContainer:SetFilter(filter)
+	if self.filter ~= filter then
+		self.filter = filter
+		self:RequestUpdate()
+	end
+end
+
+function AuraContainer:SetFriendFilter(filter)
+	if self.friendFilter ~= filter then
+		self.friendFilter = filter
+		self:RequestUpdate()
+	end
+end
+
+function AuraContainer:SetMaxIconScale(scale)
+	if self.maxIconScale ~= scale then
+		self.maxIconScale = scale
+		if self:IsVisible() then
+			self:Layout()
+		end
+	end
+end
+
+function AuraContainer:ForVisibleUnit(unit, method, ...)
+	for f in pairs(visibleFrames) do
+		if f.unit == unit then
+			f[method](f, ...)
+		end
+	end
+end
+
 
 --[[
 	Aura event handler
-
-	TODO: Throttle unit aura events because they fire off a lot
 --]]
 
 do
-	local f = CreateFrame('Frame')
-	f:SetScript('OnEvent', function(self, event, unit)
-		for _,frame in pairs(frames) do
-			if frame.unit == unit and frame:IsVisible() then
-				frame:Update()
-			end
+	AuraContainer:SetScript('OnEvent', function(self, event, ...)
+		if event == 'UNIT_AURA' then
+			local unit = ...
+			self:ForVisibleUnit(unit, 'RequestUpdate')
+		elseif event == 'PLAYER_TARGET_CHANGED' then
+			self:ForVisibleUnit('target', 'RequestUpdate')
+		elseif event == 'PLAYER_FOCUS_CHANGED' then
+			self:ForVisibleUnit('focus', 'RequestUpdate')
 		end
 	end)
-	f:RegisterEvent('UNIT_AURA')
+	AuraContainer:RegisterEvent('UNIT_AURA')
+	AuraContainer:RegisterEvent('PLAYER_TARGET_CHANGED')
+	AuraContainer:RegisterEvent('PLAYER_FOCUS_CHANGED')
+
+
+	--update everything that needs an update on the next rendered frame
+	AuraContainer:SetScript('OnUpdate', function(self, elapsed)
+		self.nextUpdate = self.nextUpdate - elapsed
+
+		if self.nextUpdate < 0 then
+			for f in pairs(visibleFrames) do
+				if f.needsUpdate then
+					f:Update()
+				end
+			end
+			self:Hide()
+		end
+	end)
+
+	AuraContainer:SetScript('OnShow', function(self)
+		self.nextUpdate = 0.03 --aura updating delay
+	end)
+
+	AuraContainer:Hide()
 end
