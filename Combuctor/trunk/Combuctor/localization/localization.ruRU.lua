@@ -29,7 +29,7 @@ L.BagToggle = '<ЛеваяКнопкаМыши> Показать сумки'
 L.InventoryToggle = '<ПраваяКнопкаМыши> Показать окно инвентаря'
 L.BankToggle = '<ПраваяКнопкаМыши> Показать окно банка'
 L.MoveTip = '<Alt+ЛеваяКнопкаМыши> Переместить'
-L.ResetPositionTip = '<ПраваяКнопкаМыши> Сбросить Позицию'
+L.ResetPositionTip = '<ПраваяКнопкаМыши> Позиция по умолчанию'
 
 --default sets (need to be here because of a flaw in how I save things
 --these are automatically localized (aka, don't translate them :)
@@ -47,9 +47,9 @@ do
 end
 
 L.Normal = 'Обычное'
-L.Equipment = 'Амуниция'
+L.Equipment = 'Обмундирование'
 L.Keys = 'Ключи'
-L.Trade = 'Иное'
+L.Trade = 'Товары'
 L.Ammo = 'Боеприпасы'
 L.Shards = 'Камни'
 L.SoulShard = 'Камни душ'
