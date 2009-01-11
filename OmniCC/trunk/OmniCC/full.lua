@@ -15,6 +15,9 @@ local pulses = {}
 local showers = {}
 local activePulses = {}
 
+--this was a fun constant to come up with
+local WOW_TIME = time{year = 2008, month = 11, day = 23, hour = 1, min = 43, sec = 28}
+
 --[[
 	Addon Loading
 --]]
@@ -128,8 +131,22 @@ end
 	Timer Code
 --]]
 
+local datetbl
 function OmniCC:StartTimer(cooldown, start, duration)
 	local timer = timers[cooldown] or self:CreateTimer(cooldown)
+	
+	--[[
+		voodoo formula
+		basically: start is based on the time since you've booted your computer
+		if the elapsed time of a cooldown is longer than the time since you've rebooted, then crazy things happen
+		blizzard instead passes start as when the cooldown started, relative to the wow anniversary date
+		this should handle cooldowns under that case
+	--]]
+	if (start - GetTime()) > duration then
+		local secondsSinceAnniversary = time() - WOW_TIME)
+		start = GetTime() - (secondsSinceAnniversary - start)
+	end
+
 	if timer then
 		if not showers[cooldown] then
 			self:CreateShower(cooldown)
@@ -176,7 +193,7 @@ do
 	--timer, the frame with cooldown text
 	local function Timer_OnUpdate(self, elapsed)
 		if self.nextUpdate <= 0 then
-			OmniCC:UpdateTimer(self)
+			OmniCC:UpdateTimer(self, elapsed)
 		else
 			self.nextUpdate = self.nextUpdate - elapsed
 		end
@@ -259,10 +276,10 @@ function OmniCC:GetFormattedTime(s)
 	elseif s >= HOUR then
 		return format('%dh', floor(s/HOUR + 0.5)), s % HOUR
 	elseif s >= MINUTE then
-		if s <= MINUTE*3 and self:UsingMMSS() then
+		--if s <= MINUTE*3 and self:UsingMMSS() then
 			return format('%d:%02d', floor(s/60), s % MINUTE), s - floor(s)
-		end
-		return format('%dm', floor(s/MINUTE + 0.5)), s % MINUTE
+		--end
+		--return format('%dm', floor(s/MINUTE + 0.5)), s % MINUTE
 	end
 	return floor(s + 0.5), s - floor(s)
 end
