@@ -53,14 +53,12 @@ function Sage:GetDefaults()
 			sticky = true,
 			showCastBars = true,
 			debuffColoring = true,
-			colorHealthByClass = true,
+			colorHealthByClass = false,
 			showMaxValues = true,
 			showPvPIcons = true,
-			barTexture = 'Diagonal',
+			texture = 'Diagonal',
 			rangeCheck = true,
-			frames = {},
-			classColors = _G['RAID_CLASS_COLORS'],
-			debuffColors = _G['DebuffTypeColor'],
+			frames = {}
 		}
 	}
 end
@@ -239,6 +237,12 @@ function Sage:OnCmd(args)
 		self:PrintVersion()
 	elseif cmd == 'help' or cmd == '?' then
 		self:PrintHelp()
+	--global options
+	elseif cmd == 'settexture' then
+		self:SetStatusBarTexture((select(2, string.split(' ', args))))
+		print('Set status bar texture to ' .. self.db.profile.texture)
+	elseif cmd == 'textures' then
+		self:ListStatusBarTextures()
 	--options stuff
 	else
 		if not self:ShowOptions() then
@@ -257,7 +261,7 @@ end
 
 function Sage:PrintHelp(cmd)
 	local function PrintCmd(cmd, desc)
-		DEFAULT_CHAT_FRAME:AddMessage(format(' - |cFF33FF99%s|r: %s', cmd, desc))
+		print(format(' - |cFF33FF99%s|r: %s', cmd, desc))
 	end
 
 	self:Print('Commands (/sg, /sage)')
@@ -289,11 +293,7 @@ Sage.locked = true
 
 function Sage:SetLock(enable)
 	self.locked = enable or false
-	if self:Locked() then
-		self.Frame:ForAll('Lock')
-	else
-		self.Frame:ForAll('Unlock')
-	end
+	self.DragFrame:ForAll('UpdateVisibility')
 end
 
 function Sage:Locked()
@@ -344,6 +344,8 @@ function Sage:SetOpacityForFrames(...)
 	end
 end
 
+
+--status bar textures
 function Sage:SetStatusBarTexture(texture)
 	self.db.profile.texture = texture
 	self:UpdateStatusBarTexture()
@@ -357,18 +359,26 @@ function Sage:UpdateStatusBarTexture()
 	self.StatusBar:ForAll('UpdateTexture', self:GetStatusBarTexture())
 end
 
+function Sage:ListAvailableStatusBarTextures()
+	self:Print('Available statusbar textures:')
+	for k,v in pairs(LibStub('LibSharedMedia-3.0'):List('statusbar')) do
+		print(' - ' .. v)
+	end
+end
+
+
+--pvp icon display
+function Sage:SetShowPVPIcons(enable)
+	self.db.profile.showPvPIcons = enable or false
+	self.InfoBar:ForAllVisible('UpdatePvP')
+end
+
 function Sage:ShowingPVPIcons()
 	return self.db.profile.showPvPIcons
 end
 
-function Sage:GetClassColor(class)
-	return self.db.profile.classColors[class]
-end
 
-function Sage:GetDebuffColor(type)
-	return self.db.profile.debuffColors[type]
-end
-
+--healthbar coloring
 function Sage:SetColorHealthByClass(enable)
 	self.db.profile.colorHealthByClass = enable or false
 	self.HealthBar:ForAllShown('UpdateAll')
@@ -406,10 +416,13 @@ function Sage:GetFrameSets(id)
 	return self.db.profile.frames[id]
 end
 
---this code is shamelessly taken from oUF
---it works stupidly well
+
+--[[ Stock Frame unregistration  - Code shamelessly stolen from oUF ]]--
+
 local noop = function() end
 function Sage:UnregisterUnitFrame(name)
+	if not _G[name] then return end
+
 	_G[name]:UnregisterAllEvents()
 	_G[name]:Hide()
 	_G[name].Show = noop
@@ -433,7 +446,7 @@ function Sage:UnregisterUnit(unit)
 	elseif unit == 'focus' then
 		self:UnregisterUnitFrame('FocusFrame')
 	elseif unit == 'targettarget' then
-		self:UnregisterUnitFrame('TargetofTargetFrame')
+		self:UnregisterUnitFrame('TargetOfTargetFrame')
 	elseif unit:match('party(%d+)') then
 		self:UnregisterUnitFrame('PartyMemberFrame' .. unit:match('party(%d+)'))
 	end

@@ -9,11 +9,15 @@ Sage.PowerBar = PowerBar
 local bars = {}
 function PowerBar:New(parent, font)
 	local bar = self.super.New(self, 'Power', parent, font)
-	bar:SetScript('OnShow', self.Update)
+	bar:SetScript('OnShow', bar.OnShow)
 	bar:UpdateUnit()
 
 	table.insert(bars, bar)
 	return bar
+end
+
+function PowerBar:OnShow()
+	self:UpdateAll()
 end
 
 

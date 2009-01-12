@@ -23,7 +23,7 @@ local bars = {}
 function HealthBar:New(parent, font)
 	local bar = self.super.New(self, 'Health', parent, font)
 	bar:SetColor(0, 0.8, 0)
-	bar:SetScript('OnShow', self.OnShow)
+	bar:SetScript('OnShow', bar.OnShow)
 	bar:UpdateUnit()
 
 	table.insert(bars, bar)
@@ -149,14 +149,14 @@ end
 
 function HealthBar:GetClassColor(unit)
 	local _,enClass = UnitClass(unit)
-	local color = Sage:GetClassColor(enClass)
+	local color = _G['RAID_CLASS_COLORS'][enClass]
 	return color.r, color.g, color.b
 end
 
 function HealthBar:UpdateHealthColor()
 	local unit = self.unit
 	if self.debuff then
-		local color = Sage:GetDebuffColor(self.debuff)
+		local color = _G['DebuffTypeColor'][self.debuff]
 		self:SetColor(color.r, color.g, color.b)
 	elseif UnitIsFeignDeath(unit)  then
 		self:SetColor(0, 0.9, 0.78)

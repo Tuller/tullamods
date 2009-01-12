@@ -31,25 +31,15 @@ function ClickFrame:OnAttributeChanged()
 	end
 end
 
---show tooltip, show text if its not always shown
-local function callMethodForFrames(method, ...)
-	for i = 1, select('#', ...) do
-		local f = select(i, ...)
-		if f[method] then
-			f[method](f)
-		end
-	end
-end
-
 function ClickFrame:OnEnter()
 	UnitFrame_OnEnter(self)
-	callMethodForFrames('OnParentEnter', self:GetParent():GetChildren())
+	self:GetParent():ForChildren('OnParentEnter')
 end
 
 --hide tooltip, and text if its not always shown
 function ClickFrame:OnLeave()
 	GameTooltip:Hide()
-	callMethodForFrames('OnParentLeave', self:GetParent():GetChildren())
+	self:GetParent():ForChildren('OnParentLeave')
 end
 
 --credit goes to agUF for this function

@@ -6,6 +6,7 @@ local Drag = Sage:CreateClass('Button')
 Sage.DragFrame = Drag
 
 local L = LibStub('AceLocale-3.0'):GetLocale('Sage')
+local frames = {}
 
 
 function Drag:New(owner)
@@ -38,8 +39,9 @@ function Drag:New(owner)
 	f:SetScript('OnMouseWheel', self.OnMouseWheel)
 	f:SetScript('OnEnter', self.OnEnter)
 	f:SetScript('OnLeave', self.OnLeave)
-	f:Hide()
+	f:UpdateVisibility()
 
+	table.insert(frames, f)
 	return f
 end
 
@@ -89,5 +91,19 @@ function Drag:UpdateColor()
 		self:GetNormalTexture():SetTexture(0, 0.2, 0.3, 0.4)
 	else
 		self:GetNormalTexture():SetTexture(0, 0.8, 0.4, 0.4)
+	end
+end
+
+function Drag:UpdateVisibility()
+	if Sage:Locked() then
+		self:Hide()
+	else
+		self:Show()
+	end
+end
+
+function Drag:ForAll(method, ...)
+	for _,f in pairs(frames) do
+		f[method](f, ...)
 	end
 end

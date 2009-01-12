@@ -28,8 +28,8 @@ function AuraButton:New(id, parent)
 	f.cooldown.noCooldownCount = true --disable omnicc
 
 	f:SetScript('OnUpdate', nil)
-	f:SetScript('OnEnter', self.OnEnter)
-	f:SetScript('OnLeave', self.OnLeave)
+	f:SetScript('OnEnter', f.OnEnter)
+	f:SetScript('OnLeave', f.OnLeave)
 
 	return f
 end

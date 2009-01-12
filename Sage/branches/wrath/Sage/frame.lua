@@ -1,6 +1,12 @@
 --[[
 	Sage Frame
-		A unitframe container object
+		A unitframe container. This object defines the following properties:
+			The frame's unit (can change based on state)
+			The frame's region/size/opacity/scale
+			The frame's visibility settings
+			The frame's faded opacity
+
+		The object also provides methods to do nifty things, like add other objects to the frame
 --]]
 
 local Frame = Sage:CreateClass('Frame')
@@ -10,72 +16,53 @@ local active = {}
 local unused = {}
 
 --constructor
-function Frame:New(id, template)
-	Sage:UnregisterUnit(id)
-
-	local f = self:Restore(id) or self:Create(id, template)
-	f:SetUnit(id)
+function Frame:New(unit)
+	local f = self:Restore(unit) or self:Create(unit)
+	f:SetUnit(unit)
 	f:LoadSettings()
+	
+	if f.created then
+		f.created = nil
+		f:OnCreate()
+	end
+	
+	if UnitExists(f:GetAttribute('unit')) then
+		f:Show()
+	end
 
-	active[id] = f
+	active[unit] = f
 	return f
 end
 
-function Frame:Create(id, template)
-	local f = self:Bind(CreateFrame('Frame', format('Sage%sFrame', id), UIParent, 'SecureHandlerStateTemplate'))
-
-	f:SetAttribute('_onstate-unit', [[
-		self:SetAttribute('unit', newstate)
-		control:ChildUpdate(stateid, newstate)
-		control:CallMethod('UpdateChildUnit')
-	]])
-
-	f:SetAttribute('_onstate-unitexists', [[
-		self:SetAttribute('unitexists', newstate)
-		control:RunAttribute('updatevisibility')
-	]])
-	
-	f:SetAttribute('_onstate-forcevisibility', [[
-		if newstate == 'nil' then
-			self:SetAttribute('forcevisibility', nil)
-		else
-			self:SetAttribute('forcevisibility', newstate)
-		end
-		control:RunAttribute('updatevisibility')
-	]])
-	
-	f:SetAttribute('updatevisibility', [[
-		local forcehide = self:GetAttribute('forcevisibility') == 'hide'
-		local forceshow = self:GetAttribute('forcevisibility') == 'show'
-		
-		if forceshow or (not forcehide and self:GetAttribute('unitexists')) then
-			self:Show()
-		else
-			self:Hide()
-		end
-	]])
-
-	f:SetAttribute('unit', id)
+function Frame:Create(unit)
+	local f = self:Bind(CreateFrame('Frame', format('Sage%sFrame', unit), UIParent, 'SecureHandlerStateTemplate'))
+	f:LoadUnitController()
+	f:LoadVisibilityController()
+	f:SetAttribute('unit', unit)
 	f:SetClampedToScreen(true)
 	f:SetMovable(true)
+	f:SetScript('OnShow', f.OnShow)
+	f:SetScript('OnHide', f.OnHide)
 
-	f.id = id
-	f.drag = Sage.DragFrame:New(f)
+	f.id = unit
 
+	--get rid of the blizzard unit for this frame
+	Sage:UnregisterUnit(unit)
+
+	f.created = true
 	return f
 end
 
-local function setChildUnits(unit, ...)
-	for i = 1, select('#', ...) do
-		local f = select(i, ...)
-		if f.UpdateUnit then
-			f:UpdateUnit(unit)
-		end
-	end
+function Frame:OnCreate()
+	--should be overridden, called when a frame is first created
 end
 
-function Frame:UpdateChildUnit()
-	setChildUnits(self:GetAttribute('unit'), self:GetChildren())
+function Frame:OnShow()
+	self:UpdateOORAlpha()
+end
+
+function Frame:OnHide()
+	self:UpdateOORAlpha()
 end
 
 function Frame:Restore(id)
@@ -93,7 +80,11 @@ function Frame:Free()
 	self:UnregisterAllEvents()
 	self:ClearAllPoints()
 	self:SetUserPlaced(nil)
-	self.drag:Hide()
+
+	if self.drag then
+		self.drag:Hide()
+	end
+
 	self:Hide()
 
 	unused[self.id] = self
@@ -106,22 +97,46 @@ end
 
 function Frame:LoadSettings(defaults)
 	self.sets = Sage:GetFrameSets(self.id) or Sage:SetFrameSets(self.id, self:GetDefaults())
+	self:UpdateWidth()
+	self:UpdateHeight()
 	self:Reposition()
-
-	if Sage:Locked() then
-		self:Lock()
-	else
-		self:Unlock()
-	end
-
---	self:UpdateShowStates()
 	self:UpdateAlpha()
+	self:UpdateOORAlpha()
+	self:UpdateUnitStates()
+	self:UpdateVisibilityStates()
 end
 
+--should be overridden, called when first initializing a frame's settings
 function Frame:GetDefaults()
 	return {
-		point = 'CENTER'
+		point = 'CENTER',
+		width = 200,
+		height = 200
 	}
+end
+
+
+--[[ Width ]]--
+
+function Frame:SetFrameWidth(width)
+	self.sets.width = width
+	self:UpdateWidth()
+end
+
+function Frame:UpdateWidth()
+	self:SetWidth(self.sets.width)
+end
+
+
+--[[ Height ]]--
+
+function Frame:SetFrameHeight(height)
+	self.sets.height = height
+	self:UpdateHeight()
+end
+
+function Frame:UpdateHeight()
+	self:SetHeight(self.sets.height)
 end
 
 
@@ -155,7 +170,10 @@ end
 
 function Frame:Rescale()
 	self:SetScale(self:GetScale())
-	self.drag:SetScale(self:GetScale())
+
+	if self.drag then
+		self.drag:SetScale(self:GetScale())
+	end
 end
 
 function Frame:GetScale()
@@ -183,7 +201,35 @@ function Frame:GetFrameAlpha()
 end
 
 
---[[ Unit Attribute ]]--
+--[[ Out of range opacity ]]
+
+function Frame:UpdateOORAlpha()
+	if self:IsVisible() and floor(self:GetFrameAlpha() * 100) == floor(self:GetOORAlpha() * 100) then
+		Sage.RangeFader:Unregister(self)
+	else
+		Sage.RangeFader:Register(self)
+	end
+end
+
+function Frame:SetOORAlpha(alpha)
+	self.sets.oorAlpha = alpha
+end
+
+function Frame:GetOORAlpha()
+	return self.sets.oorAlpha or self:GetFrameAlpha()
+end
+
+
+--[[ Unit ]]--
+
+function Frame:UpdateUnitStates()
+	RegisterStateDriver(self, 'unit', self.sets.unitStates)
+end
+
+function Frame:SetUnitStates(states)
+	self.sets.unitStates = unitStates
+	self:UpdateUnitStates()
+end
 
 function Frame:SetUnit(unit)
 	self:SetAttribute('unit', unit)
@@ -193,19 +239,51 @@ function Frame:SetUnit(unit)
 	end
 end
 
+function Frame:LoadUnitController()
+	self:SetAttribute('_onstate-unit', [[
+		self:SetAttribute('unit', newstate)
+		control:ChildUpdate(stateid, newstate)
+		control:CallMethod('ForChildren', 'UpdateUnit', newstate)
+	]])
+
+	self:SetAttribute('_onstate-unitexists', [[
+		self:SetAttribute('unitexists', newstate)
+		control:RunAttribute('updatevisibility')
+	]])
+end
+
+
+--[[ Visibility ]]--
+
+function Frame:LoadVisibilityController()
+	self:SetAttribute('_onstate-forcevisibility', [[
+		if newstate == 'nil' then
+			self:SetAttribute('forcevisibility', nil)
+		else
+			self:SetAttribute('forcevisibility', newstate)
+		end
+		control:RunAttribute('updatevisibility')
+	]])
+
+	self:SetAttribute('updatevisibility', [[
+		local forcehide = self:GetAttribute('forcevisibility') == 'hide'
+		local forceshow = self:GetAttribute('forcevisibility') == 'show'
+
+		if forceshow or (not forcehide and self:GetAttribute('unitexists')) then
+			self:Show()
+		else
+			self:Hide()
+		end
+	]])
+end
+
+function Frame:UpdateVisibilityStates()
+	RegisterStateDriver(self, 'forcevisibility', self.sets.visibilityStates)
+end
+
 function Frame:SetVisibilityStates(states)
-	RegisterStateDriver(self, 'forcevisibility', states)
-end
-
-
---[[ Lock/Unlock ]]--
-
-function Frame:Lock()
-	self.drag:Hide()
-end
-
-function Frame:Unlock()
-	self.drag:Show()
+	self.sets.forceVisibilityStates = states
+	self:UpdateVisibilityStates()
 end
 
 
@@ -291,7 +369,10 @@ function Frame:Stick()
 	end
 
 	self:SavePosition()
-	self.drag:UpdateColor()
+
+	if self.drag then
+		self.drag:UpdateColor()
+	end
 end
 
 function Frame:Reanchor()
@@ -305,7 +386,10 @@ function Frame:Reanchor()
 			self:SetPoint('CENTER')
 		end
 	end
-	self.drag:UpdateColor()
+
+	if self.drag then
+		self.drag:UpdateColor()
+	end
 end
 
 function Frame:GetAnchor()
@@ -377,6 +461,16 @@ end
 
 --[[ Metafunctions ]]--
 
+function Frame:ForChildren(method, ...)
+	for i = 1, select('#', self:GetChildren()) do
+		local f = select(i, self:GetChildren())
+		local action = f[method]
+		if action then
+			action(f, ...)
+		end
+	end
+end
+
 function Frame:Get(id)
 	return active[tonumber(id) or id]
 end
@@ -390,6 +484,17 @@ function Frame:ForAll(method, ...)
 		local action = f[method]
 		if action then
 			action(f, ...)
+		end
+	end
+end
+
+function Frame:ForAllVisibile(method, ...)
+	for _,f in self:GetAll() do
+		if f:IsVisible() then
+			local action = f[method]
+			if action then
+				action(f, ...)
+			end
 		end
 	end
 end
