@@ -16,7 +16,8 @@ local showers = {}
 local activePulses = {}
 
 --this was a fun constant to come up with
-local WOW_TIME = time{year = 2008, month = 11, day = 23, hour = 1, min = 43, sec = 28}
+--the anniversary date for wow
+local WOW_EPOCH = time{year = 2008, month = 11, day = 23, hour = 2, min = 0, sec = 0}
 
 --[[
 	Addon Loading
@@ -143,8 +144,9 @@ function OmniCC:StartTimer(cooldown, start, duration)
 		this should handle cooldowns under that case
 	--]]
 	if (start - GetTime()) > duration then
-		local secondsSinceAnniversary = time() - WOW_TIME)
-		start = GetTime() - (secondsSinceAnniversary - start)
+		local secondsSinceAnniversary = time() - WOW_EPOCH
+		local elapsed = secondsSinceAnniversary - start
+		start = GetTime() - elapsed
 	end
 
 	if timer then
