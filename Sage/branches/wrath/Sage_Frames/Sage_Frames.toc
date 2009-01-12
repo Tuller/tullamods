@@ -3,4 +3,9 @@
 ## Notes: A set of basic unitframes for Sage
 ## Author: Tuller
 ## RequiredDeps: Sage
-frames.lua
+player.lua
+target.lua
+focus.lua
+pet.lua
+targetOfTarget.lua
+party.lua
