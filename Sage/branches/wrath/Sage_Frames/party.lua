@@ -16,11 +16,11 @@ local PARTY_PET_SIZE = 12
 --[[ Party Pet Frame ]]--
 
 local function PartyPet_UpdateUnit(self, unit)
-	self:SetAttribute('unit', 'party' .. self:GetParent():GetID() .. 'pet')
+	self:SetAttribute('unit', 'partypet' .. self:GetParent():GetAttribute('unit'):match('%d'))
 end
 
 function PartyFrame:NewPartyPet()
-	local unit = self:GetAttribute('unit') .. 'pet'
+	local unit = 'partypet' .. self:GetAttribute('unit'):match('%d')
 
 	local f = Sage.Frame:Bind(CreateFrame('Frame', format('Sage%sFrame', unit), self, 'SecureHandlerStateTemplate'))
 	f.sets = setmetatable({}, {__index = self.sets})
@@ -96,10 +96,20 @@ function PartyFrame:OnCreate()
 	self.cast = cast
 
 	local partyPet = self:NewPartyPet()
-	partyPet:SetPoint('TOPLEFT', buff, 'BOTTOMLEFT')
-	partyPet:SetPoint('TOPRIGHT', buff, 'BOTTOMRIGHT')
-	partyPet:SetHeight(PARTY_PET_SIZE)
+	partyPet:SetPoint('TOPLEFT', power, 'BOTTOMLEFT', 0, -BORDER_SIZE)
+	partyPet:SetPoint('TOPRIGHT', power, 'BOTTOMRIGHT', 0, -BORDER_SIZE)
+	partyPet:SetHeight(POWER_HEIGHT)
 	self.pet = partyPet
+	
+	partyPet:HookScript('OnShow', function()
+		buff:SetPoint('TOPLEFT', partyPet, 'BOTTOMLEFT', 0, -BORDER_SIZE)
+		buff:SetPoint('TOPRIGHT', partyPet, 'BOTTOMRIGHT', 0, -BORDER_SIZE)
+	end)
+	
+	partyPet:HookScript('OnHide', function()
+		buff:SetPoint('TOPLEFT', power, 'BOTTOMLEFT', 0, -BORDER_SIZE)
+		buff:SetPoint('TOPRIGHT', power, 'BOTTOMRIGHT', 0, -BORDER_SIZE)
+	end)
 	
 	--add a drag frame
 	self.drag = Sage.DragFrame:New(self)
@@ -112,7 +122,7 @@ function PartyFrame:GetDefaults()
 		y = -40 - 100*tonumber(self:GetAttribute('unit'):match('%d')),
 		width = 120 + 16 + BUFF_SIZE*4 + 1,
 		oorAlpha = 0.6,
-		height = (BORDER_SIZE*2) + INFO_HEIGHT + HEALTH_HEIGHT + POWER_HEIGHT + BUFF_SIZE*2 + PARTY_PET_SIZE,
+		height = (BORDER_SIZE*2) + INFO_HEIGHT + HEALTH_HEIGHT + POWER_HEIGHT + BUFF_SIZE*2 + POWER_HEIGHT,
 		visibilityStates = format('[target=%s,raid]hide', self:GetAttribute('unit'))
 	}
 end
@@ -152,6 +162,6 @@ end
 
 function module:UNIT_PET(msg, unit)
 	if unit:match('party%d') then
-		Sage.Frame:Get(unit).pet:ForAllChildren('OnShow')
+		Sage.Frame:Get(unit).pet:ForChildren('OnShow')
 	end
 end
