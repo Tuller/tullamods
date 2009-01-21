@@ -5,6 +5,14 @@
 		setRule(player, bagType, name, link, quality, level, ilvl, type, subType, stackCount, equipLoc)
 --]]
 
+-- Stolen from OneBag, since my bitflag knowledge could be better
+-- BAGTYPE_QUIVER = Quiver + Ammo
+local BAGTYPE_QUIVER = 0x0001 + 0x0002 
+-- BAGTYPE_SOUL = Soul Bags
+local BAGTYPE_SOUL = 0x004
+-- BAGTYPE_PROFESSION = Leather + Inscription + Herb + Enchanting + Engineering + Gem + Mining
+local BAGTYPE_PROFESSION = 0x0008 + 0x0010 + 0x0020 + 0x0040 + 0x0080 + 0x0200 + 0x0400 
+
 local CombuctorSet = Combuctor:GetModule('Sets')
 local L = LibStub('AceLocale-3.0'):GetLocale('Combuctor')
 
@@ -16,13 +24,13 @@ CombuctorSet:RegisterSubSet(L.Normal, L.All, nil, function(player, bagType)
 	return bagType and bagType == 0 
 end)
 CombuctorSet:RegisterSubSet(L.Trade, L.All, nil, function(player, bagType) 
-	return bagType and bagType > 4 and bagType ~= 256 
+	return bagType and bit.band(bagType, BAGTYPE_PROFESSION) > 0
 end)
 CombuctorSet:RegisterSubSet(L.Shards, L.All, nil, function(player, bagType) 
-	return bagType and bagType == 4 
+	return bagType and bit.band(bagType, BAGTYPE_SOUL) > 0
 end)
 CombuctorSet:RegisterSubSet(L.Ammo, L.All, nil, function(player, bagType) 
-	return bagType and (bagType == 1 or bagType == 2) 
+	return bagType and bit.band(bagType, BAGTYPE_QUIVER) > 0
 end)
 CombuctorSet:RegisterSubSet(L.Keys, L.All, nil, function(player, bagType) 
 	return bagType and bagType == 256 
