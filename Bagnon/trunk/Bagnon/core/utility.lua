@@ -114,14 +114,14 @@ end
 --bankslots, the main bag, and the keyring cannot be ammo slots
 function BagnonUtil:IsAmmoBag(bag, player)
 	local bagType = self:GetBagType(bag, player)
-	return bagType == 1 or bagType == 2 or bagType == 4
+	return bagType and (bagType == 1 or bagType == 2 or bagType == 4)
 end
 
 --returns if the given bag is a profession bag (herb bag, engineering bag, etc)
 --bankslots, the main bag, and the keyring cannot be ammo slots
 function BagnonUtil:IsProfessionBag(bag, player)
 	local bagType = self:GetBagType(bag, player)
-	return bagType > 4 and bagType ~= 256
+	return bagType and bagType > 4 and bagType ~= 256
 end
 
 
