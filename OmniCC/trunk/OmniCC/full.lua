@@ -19,6 +19,11 @@ local activePulses = {}
 --the anniversary date for wow
 local WOW_EPOCH = time{year = 2008, month = 11, day = 23, hour = 2, min = 0, sec = 0}
 
+--omg speed constants
+local floor = math.floor
+local format = string.format
+local _G = _G
+
 --[[
 	Addon Loading
 --]]
@@ -33,8 +38,8 @@ function OmniCC:Enable()
 	if not(OmniCCDB and OmniCCDB.version) then
 		self:LoadDefaults()
 	else
-		local cMajor, cMinor = CURRENT_VERSION:match("(%d+)%.(%d+)")
-		local major, minor = OmniCCDB.version:match("(%d+)%.(%d+)")
+		local cMajor, cMinor = CURRENT_VERSION:match('(%d+)%.(%d+)')
+		local major, minor = OmniCCDB.version:match('(%d+)%.(%d+)')
 
 		if major ~= cMajor then
 			self:LoadDefaults()
@@ -57,18 +62,18 @@ function OmniCC:Enable()
 	f:SetScript('OnShow', function(self) LoadAddOn('OmniCC_Options') self:SetScript('OnShow', nil) end)
 
 	--load slash commands
-	SlashCmdList["OmniCCCOMMAND"] = function()
+	SlashCmdList['OmniCCCOMMAND'] = function()
 		if LoadAddOn('OmniCC_Options') then
 			InterfaceOptionsFrame_OpenToCategory('OmniCC')
 		end
 	end
-	SLASH_OmniCCCOMMAND1 = "/omnicc"
-	SLASH_OmniCCCOMMAND2 = "/occ"
+	SLASH_OmniCCCOMMAND1 = '/omnicc'
+	SLASH_OmniCCCOMMAND2 = '/occ'
 end
 
 function OmniCC:LoadDefaults()
 	OmniCCDB = {
-		font = SML:GetDefault("font"), --what font to use
+		font = SML:GetDefault('font'), --what font to use
 		fontOutline = 'OUTLINE', --what outline to use on fonts
 		fontSize = 18, --the base font size to use at a scale of 1
 
@@ -92,7 +97,7 @@ function OmniCC:LoadDefaults()
 end
 
 function OmniCC:UpdateSettings()
-	OmniCCDB.font = SML:GetDefault("font")
+	OmniCCDB.font = SML:GetDefault('font')
 end
 
 function OmniCC:UpdateVersion()
@@ -221,7 +226,7 @@ do
 			else
 				local name = parent:GetName()
 				if name then
-					timer.icon = getglobal(name .. 'Icon') or getglobal(name .. 'IconTexture')
+					timer.icon = _G[name .. 'Icon'] or _G[name .. 'IconTexture']
 				end
 			end
 		end
@@ -273,17 +278,19 @@ function OmniCC:UpdateAllTimers()
 end
 
 function OmniCC:GetFormattedTime(s)
-	if s >= DAY then
-		return format('%dd', floor(s/DAY + 0.5)), s % DAY
-	elseif s >= HOUR then
-		return format('%dh', floor(s/HOUR + 0.5)), s % HOUR
-	elseif s >= MINUTE then
-		--if s <= MINUTE*3 and self:UsingMMSS() then
-			return format('%d:%02d', floor(s/60), s % MINUTE), s - floor(s)
-		--end
-		--return format('%dm', floor(s/MINUTE + 0.5)), s % MINUTE
-	end
-	return floor(s + 0.5), s - floor(s)
+  if s >= DAY then
+    return format('%dd', floor(s/DAY + 0.5)), s % DAY
+  elseif s >= HOUR then
+    return format('%dh', floor(s/HOUR + 0.5)), s % HOUR
+  elseif s >= MINUTE then
+    if s <= MINUTE*3 and self:UsingMMSS() then
+      return format('%d:%02d', floor(s/60), s % MINUTE), s - floor(s)
+    end
+    return format('%dm', floor(s/MINUTE + 0.5)), s % MINUTE
+  elseif s > 2 then
+    return floor(s + 0.5), s - floor(s)
+  end
+  return format('%0.1f', s), 0.1
 end
 
 function OmniCC:GetFormattedFont(s)
@@ -494,8 +501,8 @@ end
 
 function OmniCC:Print(msg, showAddon)
 	if showAddon then
-		ChatFrame1:AddMessage(format('|cFF33FF99OmniCC|r: %s', tostring(msg)))
+		print(format('|cFF33FF99OmniCC|r: %s', tostring(msg)))
 	else
-		ChatFrame1:AddMessage(tostring(msg))
+		print(tostring(msg))
 	end
 end
