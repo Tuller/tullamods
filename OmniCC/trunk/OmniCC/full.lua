@@ -287,10 +287,8 @@ function OmniCC:GetFormattedTime(s)
       return format('%d:%02d', floor(s/60), s % MINUTE), s - floor(s)
     end
     return format('%dm', floor(s/MINUTE + 0.5)), s % MINUTE
-  elseif s > 2 then
-    return floor(s + 0.5), s - floor(s)
   end
-  return format('%0.1f', s), 0.1
+  return floor(s + 0.5), s - floor(s)
 end
 
 function OmniCC:GetFormattedFont(s)
