@@ -45,12 +45,14 @@ function ThreatDisplay:UpdateUnit(newUnit)
 end
 
 function ThreatDisplay:Update()
-	local state = max(UnitThreatSituation(self.unit), UnitThreatSituation('player', self.unit))
-	if state > 0 then
-		local r, g, b = GetThreatStatusColor(state)
-		self.bg:SetTexture(r, g, b, 0.5)
-	else
-		self.bg:SetTexture(0, 0, 0, 0.5)
+	if UnitExists(self.unit) then
+		local state = max(UnitThreatSituation(self.unit), UnitThreatSituation(self.unit, 'player'))
+		if state > 0 then
+			local r, g, b = GetThreatStatusColor(state)
+			self.bg:SetTexture(r, g, b, 0.5)
+		else
+			self.bg:SetTexture(0, 0, 0, 0.5)
+		end
 	end
 end
 
