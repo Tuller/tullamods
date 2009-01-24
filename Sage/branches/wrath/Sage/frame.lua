@@ -267,9 +267,8 @@ function Frame:LoadVisibilityController()
 
 	self:SetAttribute('updatevisibility', [[
 		local forcehide = self:GetAttribute('forcevisibility') == 'hide'
-		local forceshow = self:GetAttribute('forcevisibility') == 'show'
 
-		if forceshow or (not forcehide and self:GetAttribute('unitexists')) then
+		if self:GetAttribute('unitexists') and not forcehide then
 			self:Show()
 		else
 			self:Hide()

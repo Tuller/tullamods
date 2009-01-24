@@ -25,11 +25,7 @@ function ThreatDisplay:OnShow()
 end
 
 function ThreatDisplay:UNIT_THREAT_SITUATION_UPDATE(unit)
-	if self:IsFriendlyUnit() then
-		if unit == self.unit then
-			self:Update()
-		end
-	elseif unit == 'player' then
+	if self.unit == unit or unit == 'player' then
 		self:Update()
 	end
 end
@@ -49,11 +45,13 @@ function ThreatDisplay:UpdateUnit(newUnit)
 end
 
 function ThreatDisplay:Update()
-	local state
-	if self:IsFriendlyUnit() or UnitIsUnit(self.unit, 'player') then
-		state = UnitThreatSituation(self.unit)
-	else
-		state = UnitThreatSituation('player', self.unit)
+	local state = 0
+	if UnitExists(self.unit) then
+		if self:IsProbablyMob() then
+			state = UnitThreatSituation('player', self.unit)
+		else
+			state = UnitThreatSituation(self.unit)
+		end
 	end
 	
 	if state > 0 then
@@ -79,8 +77,9 @@ function ThreatDisplay:Get(id)
 	return frames[id]
 end
 
-function ThreatDisplay:IsFriendlyUnit()
-	return UnitCanAssist('player', self.unit) or UnitInParty(self.unit)
+--returns true if the given unit is an npc we can attack, and thus we should display our threat level for that unit
+function ThreatDisplay:IsProbablyMob()
+	return not(UnitPlayerControlled(self.unit) or UnitCanAssist('player', self.unit))
 end
 
 do
