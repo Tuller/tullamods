@@ -20,6 +20,16 @@ function PowerBar:OnShow()
 	self:UpdateAll()
 end
 
+function PowerBar:OnShowDisplay()
+	--dummy function, to be hooked/overriden by other addons
+	--called when the bar becomes opaque (the unit we're displaying power for actually has a power bar)
+end
+
+function PowerBar:OnHideDisplay()
+	--dummy function, to be hooked/overriden by other addons
+	--called when the bar becomes transparent (the unit we're displaying power for does not have a power bar)
+end
+
 
 --[[ Events ]]--
 
@@ -92,10 +102,17 @@ end
 function PowerBar:Update()
 	local unit = self.unit
 	local powerType, powerToken = UnitPowerType(unit)
+	
 	if powerType == 0 or UnitPlayerControlled(unit) or UnitInParty(unit) then
-		self:Show()
+		if self:GetAlpha() ~= 1 then
+			self:SetAlpha(1)
+			self:OnShowDisplay()
+		end
 	else
-		self:Hide()
+		if self:GetAlpha() ~= 0 then
+			self:SetAlpha(0)
+			self:OnHideDisplay()
+		end
 		return
 	end
 
