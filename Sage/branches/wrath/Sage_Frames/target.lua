@@ -100,8 +100,8 @@ end
 function TargetFrame:GetDefaults()
 	return {
 		point = 'TOPLEFT',
-		x = 410,
-		y = -20,
+		x = 400,
+		y = -30,
 		width = 150 + 16 + BUFF_SIZE * 4 + 1,
 		oorAlpha = 0.6,
 		height = (BORDER_SIZE*2) + INFO_HEIGHT + HEALTH_HEIGHT + POWER_HEIGHT + NPC_HEIGHT + BUFF_SIZE*2,

@@ -37,16 +37,26 @@ function TargetOfTarget:OnCreate()
 end
 
 function TargetOfTarget:GetDefaults()
-	return {
+	local settings = {
 		point = 'TOPLEFT',
-		x = 20,
-		y = -80,
+--		x = 20,
+--		y = -80,
 		alpha = 1,
 		oorAlpha = 0.6,
 		width = 100,
 		updateFreq = 0.5,
 		height = (BORDER_SIZE*2) + INFO_HEIGHT + HEALTH_HEIGHT,
 	}
+	
+	if self:GetAttribute('unit') == 'targettarget' then
+		settings.y = 0
+		settings.x = 420
+	elseif self:GetAttribute('unit') == 'focustarget' then
+		settings.y = 0
+		settings.x = 170
+	end
+	
+	return settings
 end
 
 function TargetOfTarget:OnUpdate(elapsed)

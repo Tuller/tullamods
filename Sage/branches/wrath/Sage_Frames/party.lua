@@ -119,7 +119,7 @@ function PartyFrame:GetDefaults()
 	return {
 		point = 'TOPLEFT',
 		x = 20,
-		y = -40 - 100*tonumber(self:GetAttribute('unit'):match('%d')),
+		y = -40 - 100 * tonumber(self:GetAttribute('unit'):match('%d')),
 		width = 120 + 16 + BUFF_SIZE*4 + 1,
 		oorAlpha = 0.6,
 		height = (BORDER_SIZE*2) + INFO_HEIGHT + HEALTH_HEIGHT + POWER_HEIGHT + BUFF_SIZE*2 + POWER_HEIGHT,
