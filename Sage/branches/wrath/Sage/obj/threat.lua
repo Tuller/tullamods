@@ -50,7 +50,7 @@ end
 
 function ThreatDisplay:Update()
 	local state
-	if self:IsFriendlyUnit() then
+	if self:IsFriendlyUnit() or UnitIsUnit(self.unit, 'player') then
 		state = UnitThreatSituation(self.unit)
 	else
 		state = UnitThreatSituation('player', self.unit)
