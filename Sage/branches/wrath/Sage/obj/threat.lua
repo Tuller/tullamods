@@ -25,7 +25,11 @@ function ThreatDisplay:OnShow()
 end
 
 function ThreatDisplay:UNIT_THREAT_SITUATION_UPDATE(unit)
-	if unit == self.unit or unit == 'player' then
+	if self:IsFriendlyUnit() then
+		if unit == self.unit then
+			self:Update()
+		end
+	elseif unit == 'player' then
 		self:Update()
 	end
 end
@@ -45,14 +49,18 @@ function ThreatDisplay:UpdateUnit(newUnit)
 end
 
 function ThreatDisplay:Update()
-	if UnitExists(self.unit) then
-		local state = max(UnitThreatSituation(self.unit), UnitThreatSituation(self.unit, 'player'))
-		if state > 0 then
-			local r, g, b = GetThreatStatusColor(state)
-			self.bg:SetTexture(r, g, b, 0.5)
-		else
-			self.bg:SetTexture(0, 0, 0, 0.5)
-		end
+	local state
+	if self:IsFriendlyUnit() then
+		state = UnitThreatSituation(self.unit)
+	else
+		state = UnitThreatSituation('player', self.unit)
+	end
+	
+	if state > 0 then
+		local r, g, b = GetThreatStatusColor(state)
+		self.bg:SetTexture(r, g, b, 0.5)
+	else
+		self.bg:SetTexture(0, 0, 0, 0.5)
 	end
 end
 
@@ -69,6 +77,10 @@ end
 
 function ThreatDisplay:Get(id)
 	return frames[id]
+end
+
+function ThreatDisplay:IsFriendlyUnit()
+	return UnitCanAssist('player', self.unit) or UnitInParty(self.unit)
 end
 
 do
