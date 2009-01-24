@@ -78,17 +78,15 @@ function FocusFrame:OnCreate()
 end
 
 function FocusFrame:LoadDynamicAnchoringScripts()
-	HookScript(self.power, 'OnShow', function()
+	hooksecurefunc(self.power, 'OnShowDisplay', function()
 		self.npc:SetPoint('TOPLEFT', self.power, 'BOTTOMLEFT', 0, -BORDER_SIZE)
 		self.npc:SetPoint('TOPRIGHT', self.power, 'BOTTOMRIGHT', 0, -BORDER_SIZE)
-		
 		self.threat:SetPoint('BOTTOMRIGHT', self.power, BORDER_SIZE, -BORDER_SIZE)
 	end)
 	
-	HookScript(self.power, 'OnHide', function()
+	hooksecurefunc(self.power, 'OnHideDisplay', function()
 		self.npc:SetPoint('TOPLEFT', self.health, 'BOTTOMLEFT', 0, -BORDER_SIZE)
 		self.npc:SetPoint('TOPRIGHT', self.health, 'BOTTOMRIGHT', 0, -BORDER_SIZE)
-		
 		self.threat:SetPoint('BOTTOMRIGHT', self.health, BORDER_SIZE, -BORDER_SIZE)
 	end)
 end

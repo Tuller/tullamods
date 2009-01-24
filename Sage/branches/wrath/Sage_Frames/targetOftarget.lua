@@ -50,7 +50,7 @@ function TargetOfTarget:GetDefaults()
 	
 	if self:GetAttribute('unit') == 'targettarget' then
 		settings.y = 0
-		settings.x = 420
+		settings.x = 416
 	elseif self:GetAttribute('unit') == 'focustarget' then
 		settings.y = 0
 		settings.x = 170

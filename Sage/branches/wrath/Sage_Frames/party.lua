@@ -79,7 +79,7 @@ function PartyFrame:OnCreate()
 	click:SetPoint('BOTTOMRIGHT', power)
 	self.click = click
 	
-	local buff = Sage.AuraContainer:New('Buffs', self, 'HELPFUL')
+	local buff = Sage.AuraContainer:New('Buffs', self, 'HELPFUL|PLAYER')
 	buff:SetPoint('TOPLEFT', power, 'BOTTOMLEFT', 0, -BORDER_SIZE)
 	buff:SetPoint('TOPRIGHT', power, 'BOTTOMRIGHT', 0, -BORDER_SIZE)
 	buff:SetHeight(BUFF_SIZE)
@@ -101,6 +101,7 @@ function PartyFrame:OnCreate()
 	partyPet:SetHeight(POWER_HEIGHT)
 	self.pet = partyPet
 	
+	--move buffs below the pet frame when its visible
 	partyPet:HookScript('OnShow', function()
 		buff:SetPoint('TOPLEFT', partyPet, 'BOTTOMLEFT', 0, -BORDER_SIZE)
 		buff:SetPoint('TOPRIGHT', partyPet, 'BOTTOMRIGHT', 0, -BORDER_SIZE)

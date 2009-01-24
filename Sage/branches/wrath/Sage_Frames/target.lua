@@ -49,6 +49,8 @@ function TargetFrame:OnCreate()
 	threat:SetPoint('BOTTOMRIGHT', power, BORDER_SIZE, -BORDER_SIZE)
 	self.threat = threat
 
+	--set the clickable region to cover where the health and mana bars would normally be
+	--but, don't anchor the click region to the power bar, since that hides under certain situations
 	local click = Sage.ClickFrame:New(self)
 	click:SetPoint('TOPLEFT', health)
 	click:SetPoint('BOTTOMRIGHT', power)
@@ -81,18 +83,17 @@ function TargetFrame:OnCreate()
 	self:LoadDynamicAnchoringScripts()
 end
 
+--adjust the positioning of the npc and threat displays when the mana bar becomes transparent due to not having anything to display
 function TargetFrame:LoadDynamicAnchoringScripts()
-	HookScript(self.power, 'OnShow', function()
+	hooksecurefunc(self.power, 'OnShowDisplay', function()
 		self.npc:SetPoint('TOPLEFT', self.power, 'BOTTOMLEFT', 0, -BORDER_SIZE)
 		self.npc:SetPoint('TOPRIGHT', self.power, 'BOTTOMRIGHT', 0, -BORDER_SIZE)
-		
 		self.threat:SetPoint('BOTTOMRIGHT', self.power, BORDER_SIZE, -BORDER_SIZE)
 	end)
 	
-	HookScript(self.power, 'OnHide', function()
+	hooksecurefunc(self.power, 'OnHideDisplay', function()
 		self.npc:SetPoint('TOPLEFT', self.health, 'BOTTOMLEFT', 0, -BORDER_SIZE)
 		self.npc:SetPoint('TOPRIGHT', self.health, 'BOTTOMRIGHT', 0, -BORDER_SIZE)
-		
 		self.threat:SetPoint('BOTTOMRIGHT', self.health, BORDER_SIZE, -BORDER_SIZE)
 	end)
 end

@@ -47,7 +47,7 @@ function PlayerFrame:GetDefaults()
 	return {
 		point = 'TOPLEFT',
 		x = 20,
-		y = -20,
+		y = -30,
 		width = 150,
 		height = (BORDER_SIZE*2) + INFO_HEIGHT + HEALTH_HEIGHT + POWER_HEIGHT,
 		unitStates = '[target=vehicle,exists,bonusbar:5]vehicle;player',
