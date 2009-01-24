@@ -46,6 +46,7 @@ function TargetOfTarget:GetDefaults()
 		width = 100,
 		updateFreq = 0.5,
 		height = (BORDER_SIZE*2) + INFO_HEIGHT + HEALTH_HEIGHT,
+		visibilityStates = '[target=player,nogroup]hide'
 	}
 	
 	if self:GetAttribute('unit') == 'targettarget' then

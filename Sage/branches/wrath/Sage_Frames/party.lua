@@ -124,7 +124,7 @@ function PartyFrame:GetDefaults()
 		width = 120 + 16 + BUFF_SIZE*4 + 1,
 		oorAlpha = 0.6,
 		height = (BORDER_SIZE*2) + INFO_HEIGHT + HEALTH_HEIGHT + POWER_HEIGHT + BUFF_SIZE*2 + POWER_HEIGHT,
-		visibilityStates = format('[target=%s,raid]hide', self:GetAttribute('unit'))
+		visibilityStates = '[target=player,raid]hide'
 	}
 end
 
