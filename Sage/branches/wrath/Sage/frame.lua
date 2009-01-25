@@ -284,6 +284,7 @@ end
 function Frame:UpdateVisibilityStates()
 	if self.sets.visibilityStates then
 		RegisterStateDriver(self, 'forcevisibility', self.sets.visibilityStates)
+		self:SetAttribute('state-forcevisibility', 'dummyValueToForceAnUpdate')
 	else
 		UnregisterStateDriver(self, 'forcevisibility')
 		self:SetAttribute('state-forcevisibility', 'show')
