@@ -2,7 +2,7 @@
 ## Title: Sage
 ## Notes: Unitframe Framework
 ## Author: Tuller
-## Version: 3.1.2
+## Version: 3.1.3
 ## SavedVariables: SageDB, SageVersion
 ## OptionalDeps: Ace3, LibSharedMedia-3.0
 embeds.xml
