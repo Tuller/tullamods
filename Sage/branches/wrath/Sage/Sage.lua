@@ -64,6 +64,10 @@ function Sage:GetDefaults()
 end
 
 function Sage:UpdateSettings(major, minor, bugfix)
+	--any version < 3.1 is poop
+	if major == '3' and minor < '1' then
+		self.db:Reset()
+	end
 	--do stuff
 end
 
@@ -154,9 +158,9 @@ function Sage:ListProfiles()
 	local current = self.db:GetCurrentProfile()
 	for _,k in ipairs(self.db:GetProfiles()) do
 		if k == current then
-			DEFAULT_CHAT_FRAME:AddMessage(' - ' .. k, 1, 1, 0)
+			print(' - ' .. k, 1, 1, 0)
 		else
-			DEFAULT_CHAT_FRAME:AddMessage(' - ' .. k)
+			print(' - ' .. k)
 		end
 	end
 end

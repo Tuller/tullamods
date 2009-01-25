@@ -223,7 +223,12 @@ end
 --[[ Unit ]]--
 
 function Frame:UpdateUnitStates()
-	RegisterStateDriver(self, 'unit', self.sets.unitStates)
+	if self.sets.unitStates then
+		RegisterStateDriver(self, 'unit', self.sets.unitStates)
+	else
+		UnregisterStateDriver(self, 'unit')
+		self:SetAttribute('unit', self.id)
+	end
 end
 
 function Frame:SetUnitStates(states)
@@ -277,11 +282,18 @@ function Frame:LoadVisibilityController()
 end
 
 function Frame:UpdateVisibilityStates()
-	RegisterStateDriver(self, 'forcevisibility', self.sets.visibilityStates)
+	if self.sets.visibilityStates then
+		RegisterStateDriver(self, 'forcevisibility', self.sets.visibilityStates)
+	else
+		UnregisterStateDriver(self, 'forcevisibility')
+		if UnitExists(self:GetAttribute('unit')) then
+			self:Show()
+		end
+	end
 end
 
 function Frame:SetVisibilityStates(states)
-	self.sets.forceVisibilityStates = states
+	self.sets.visibilityStates = states
 	self:UpdateVisibilityStates()
 end
 
