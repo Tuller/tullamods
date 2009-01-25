@@ -47,5 +47,4 @@ L.ShowOptionsTip = '<Right Click> to show the options menu'
 
 --helper dialog stuff
 L.ConfigMode = 'Configuration Mode'
-L.ConfigModeExit = 'Exit Config Mode'
-L.ConfigModeHelp = '<Drag> any bar to move it.  <Right Click> to configure.'
+L.ConfigModeHelp = [[<Left Drag> to move a frame. <Mousewheel> to alter a frame's opacity.]]

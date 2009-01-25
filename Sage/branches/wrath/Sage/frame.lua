@@ -534,3 +534,15 @@ function Frame:ForFrame(id, method, ...)
 		end
 	end
 end
+
+function Frame:GetSetting(id, setting)
+	local f
+	if id == 'all' then
+		f = self:Get('player')
+	elseif id == 'party' then
+		f = self:Get('party1')
+	else
+		f = self:Get(id)
+	end
+	return f and f.sets[setting]
+end
