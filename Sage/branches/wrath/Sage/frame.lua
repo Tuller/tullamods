@@ -286,9 +286,7 @@ function Frame:UpdateVisibilityStates()
 		RegisterStateDriver(self, 'forcevisibility', self.sets.visibilityStates)
 	else
 		UnregisterStateDriver(self, 'forcevisibility')
-		if UnitExists(self:GetAttribute('unit')) then
-			self:Show()
-		end
+		self:SetAttribute('state-forcevisibility', 'show')
 	end
 end
 
