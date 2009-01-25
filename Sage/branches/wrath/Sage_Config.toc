@@ -1,0 +1,11 @@
+## Interface: 30000
+## Title: Sage
+## Notes: Sage's configuration menu
+## Author: Tuller
+## RequiredDependencies: Sage
+## LoadOnDemand: 1
+localization\localization.lua
+widgets\radioGroup.lua
+widgets\panel.lua
+general.lua
+profiles.lua
