@@ -241,12 +241,6 @@ function Sage:OnCmd(args)
 		self:PrintVersion()
 	elseif cmd == 'help' or cmd == '?' then
 		self:PrintHelp()
-	--global options
-	elseif cmd == 'settexture' then
-		self:SetStatusBarTexture((select(2, string.split(' ', args))))
-		print('Set status bar texture to ' .. self.db.profile.texture)
-	elseif cmd == 'textures' then
-		self:ListStatusBarTextures()
 	--options stuff
 	else
 		if not self:ShowOptions() then
@@ -430,13 +424,6 @@ end
 
 function Sage:UpdateStatusBarTexture()
 	self.StatusBar:ForAll('UpdateTexture', self:GetStatusBarTexture())
-end
-
-function Sage:ListAvailableStatusBarTextures()
-	self:Print('Available statusbar textures:')
-	for k,v in pairs(LibStub('LibSharedMedia-3.0'):List('statusbar')) do
-		print(' - ' .. v)
-	end
 end
 
 
