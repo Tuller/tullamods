@@ -6,6 +6,7 @@
 ## LoadOnDemand: 1
 localization\localization.lua
 widgets\radioGroup.lua
+widgets\textureSelector.lua
 widgets\panel.lua
 general.lua
 profiles.lua

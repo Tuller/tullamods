@@ -13,6 +13,7 @@ L.EnableStickyFrames = 'Enable Sticky Frames'
 L.ColorHealthByClass = 'Color Health by Class'
 L.ColorHealthWhenDebuffed = 'Color Health When Debuffed'
 L.ShowPvPIcons = 'Show PvP Icons'
+L.Texture = 'Bar Texture'
 
 --frame settings
 L.Scale = 'Scale'

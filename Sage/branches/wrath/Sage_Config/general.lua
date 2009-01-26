@@ -72,3 +72,5 @@ showPvPIcons:SetPoint('TOPLEFT', debuffColoring, 'BOTTOMLEFT', 0, -2)
 
 --[[ Texture Selector ]]--
 
+local selector = Sage.TextureSelector:New(L.Texture, Options)
+selector:SetPoint('TOPRIGHT', -8, -72)
