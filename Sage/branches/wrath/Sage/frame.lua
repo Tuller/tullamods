@@ -124,7 +124,11 @@ function Frame:SetFrameWidth(width)
 end
 
 function Frame:UpdateWidth()
-	self:SetWidth(self.sets.width)
+	self:SetWidth(self.sets.width + self:GetExtraWidth())
+end
+
+function Frame:GetExtraWidth()
+	return self.sets.extraWidth or 0
 end
 
 

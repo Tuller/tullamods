@@ -37,6 +37,12 @@ function Sage:OnInitialize()
 	f:SetScript('OnShow', function(self)
 		self:SetScript('OnShow', nil)
 		LoadAddOn('Sage_Config')
+		
+		for _,module in Sage:IterateModules() do
+			if module.LoadOptions then
+				module:LoadOptions()
+			end
+		end
 	end)
 end
 
