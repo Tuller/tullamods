@@ -1,5 +1,5 @@
 ## Interface: 30000
-## Title: Sage
+## Title: Sage Config
 ## Notes: Sage's configuration menu
 ## Author: Tuller
 ## RequiredDependencies: Sage

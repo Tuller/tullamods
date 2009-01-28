@@ -21,6 +21,11 @@ L.Opacity = 'Opacity'
 L.OOROpacity = 'Out of Range Opacity'
 L.Width = 'Width'
 L.Height = 'Height'
+L.TextDisplay = 'Text Display'
+L.AlwaysShowText = 'Always Show Text'
+L.NeverShowText = 'Never Show Text'
+L.MouseoverText = 'Show Text on Mouseover Only'
+L.SmartText = 'Smart Text Display'
 
 --profile selection
 L.Profiles = 'Profiles'

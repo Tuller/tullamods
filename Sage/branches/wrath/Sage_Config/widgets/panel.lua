@@ -7,6 +7,7 @@
 local _G = _G
 local min = math.min
 local max = math.max
+local L = LibStub('AceLocale-3.0'):GetLocale('Sage-Config')
 
 --panel object
 local Panel = Sage:CreateClass('Frame')
@@ -34,7 +35,7 @@ function Panel:New(name, title, subtitle, icon, parent)
 	subtext:SetJustifyV('TOP')
 	subtext:SetText(subtitle)
 	
-	InterfaceOptions_AddCategory(f)
+	InterfaceOptions_AddCategory(f, 'Sage')
 
 	return f
 end
@@ -113,25 +114,108 @@ end
 		All of these sliders act on a unit group, which is the same as a <frameList>
 --]]
 
+
+--[[ Width ]]--
+
+local function WidthSlider_OnShow(self)
+	self.onShow = true
+	self:SetValue(Sage.Frame:GetSetting(self.unitGroup, 'width') or 150)
+	self.onShow = nil
+end
+
+local function WidthSlider_OnValueChanged(self, value)
+	if not self.onShow then
+		Sage.Frame:ForFrame(self.unitGroup, 'SetFrameWidth', value)
+	end
+	self.valText:SetText(value)
+end
+
 function Panel:NewWidthSlider(unitGroup)
+	local f = self:NewSlider(L.Width, 100, 300, 5)
+	f.unitGroup = unitGroup
+	f:SetScript('OnShow', WidthSlider_OnShow)	
+	f:SetScript('OnValueChanged', WidthSlider_OnValueChanged)
+
+	return f
+end
+
+
+--[[ Opacity ]]--
+
+local function OpacitySlider_OnShow(self)
+	self.onShow = true
+	local value = Sage.Frame:GetSetting(self.unitGroup, 'alpha') or 1
+	self:SetValue(value * 100)
+	self.onShow = nil
+end
+
+local function OpacitySlider_OnValueChanged(self, value)
+	if not self.onShow then
+		Sage.Frame:ForFrame(self.unitGroup, 'SetFrameAlpha', value/100)
+	end
+	self.valText:SetText(value)
 end
 
 function Panel:NewOpacitySlider(unitGroup)
+	local f = self:NewSlider(L.Opacity, 0, 100, 1)
+	f.unitGroup = unitGroup
+	f:SetScript('OnShow', OpacitySlider_OnShow)	
+	f:SetScript('OnValueChanged', OpacitySlider_OnValueChanged)
+
+	return f
+end
+
+
+--[[ Out of Range Opacity ]]--
+
+local function OOROpacitySlider_OnShow(self)
+	self.onShow = true
+	local value = Sage.Frame:GetSetting(self.unitGroup, 'oorAlpha') or Sage.Frame:GetSetting(self.unitGroup, 'alpha') or 1
+	self:SetValue(value * 100)
+	self.onShow = nil
+end
+
+local function OOROpacitySlider_OnValueChanged(self, value)
+	if not self.onShow then
+		Sage.Frame:ForFrame(self.unitGroup, 'SetOORAlpha', value/100)
+	end
+	self.valText:SetText(value)
 end
 
 function Panel:NewOOROpacitySlider(unitGroup)
+	local f = self:NewSlider(L.OOROpacity, 0, 100, 1)
+	f.unitGroup = unitGroup
+	f:SetScript('OnShow', OOROpacitySlider_OnShow)	
+	f:SetScript('OnValueChanged', OOROpacitySlider_OnValueChanged)
+
+	return f
 end
 
 
 --[[ Scale Slider ]]--
 
-local function ScaleSlider_GetScale(self)
+--out of range opacity (friendly units only)
+local function ScaleSlider_OnShow(self)
+	self.onShow = true
+	local value = Sage.Frame:GetSetting(self.unitGroup, 'scale') or 1
+	self:SetValue(value * 100)
+	self.onShow = nil
 end
 
-local function ScaleSlider_SetValue(self, value)
+local function ScaleSlider_OnValueChanged(self, value)
+	if not self.onShow then
+		Sage.Frame:ForFrame(self.unitGroup, 'SetFrameScale', value/100)
+	end
+	self.valText:SetText(value)
 end
 
 function Panel:NewScaleSlider(unitGroup)
+	local f = self:NewSlider(L.Scale, 50, 250, 1)
+	f.unitGroup = unitGroup
+	f:SetScript('OnShow', ScaleSlider_OnShow)	
+	f:SetScript('OnValueChanged', ScaleSlider_OnValueChanged)
+	
+	return f
 end
 
 
@@ -142,11 +226,11 @@ local function TextMode_OnSelect(self, value)
 end
 
 local function TextMode_GetSelectedValue(self)
-	return Sage.Frame:GetSetting(self.unitGroup, 'textMode')
+	return Sage.Frame:GetSetting(self.unitGroup, 'textMode') or 'smart'
 end
 
 function Panel:NewTextModeSelector(unitGroup)
-	local f = Options:NewRadioGroup(L.TextDisplay)
+	local f = self:NewRadioGroup(L.TextDisplay)
 	f.unitGroup = unitGroup
 
 	f:Add(L.AlwaysShowText, 'always')
