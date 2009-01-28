@@ -71,7 +71,7 @@ end
 
 function Sage:UpdateSettings(major, minor, bugfix)
 	--any version < 3.1 is poop
-	if major == '3' and minor < '1' then
+	if major == '3' and minor < '4' then
 		self.db:Reset()
 	end
 	--do stuff
