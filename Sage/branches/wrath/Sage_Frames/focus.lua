@@ -96,7 +96,8 @@ function FocusFrame:GetDefaults()
 		point = 'TOPLEFT',
 		x = 170,
 		y = -30,
-		width = 150 + BUFF_SIZE * 4 + 1,
+		width = 150,
+		extraWidth = BUFF_SIZE * 4 + 1,
 		oorAlpha = 0.6,
 		height = (BORDER_SIZE*2) + INFO_HEIGHT + HEALTH_HEIGHT + POWER_HEIGHT + NPC_HEIGHT + BUFF_SIZE*2,
 	}
@@ -118,7 +119,25 @@ function module:OnUnload()
 end
 
 function module:LoadOptions()
-	--create options panel code here
+	local panel = Sage.Options:New('SageFocusOptions', 'Focus', 'Configuration settings for the Sage focus frame', nil, GetAddOnMetadata('Sage', 'title'))
+	local group = 'focus'
+
+	--sliders
+	local scale = panel:NewScaleSlider(group)
+	scale:SetPoint('BOTTOMLEFT', 10, 10)
+	scale:SetPoint('BOTTOMRIGHT', -40, 10)
+	
+	local oorOpacity = panel:NewOOROpacitySlider(group)
+	oorOpacity:SetPoint('BOTTOMLEFT', scale, 'TOPLEFT', 0, 20)
+	oorOpacity:SetPoint('BOTTOMRIGHT', scale, 'TOPRIGHT', 0, 20)
+	
+	local opacity = panel:NewOpacitySlider(group)
+	opacity:SetPoint('BOTTOMLEFT', oorOpacity, 'TOPLEFT', 0, 20)
+	opacity:SetPoint('BOTTOMRIGHT', oorOpacity, 'TOPRIGHT', 0, 20)
+	
+	local width = panel:NewWidthSlider(group)
+	width:SetPoint('BOTTOMLEFT', opacity, 'TOPLEFT', 0, 20)
+	width:SetPoint('BOTTOMRIGHT', opacity, 'TOPRIGHT', 0, 20)
 end
 
 --force update of all child frames when the player's target changes

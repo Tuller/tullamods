@@ -70,7 +70,21 @@ function module:OnUnload()
 end
 
 function module:LoadOptions()
-	--create options panel code here
+	local panel = Sage.Options:New('SagePlayerOptions', 'Player', 'Configuration settings for the Sage player frame', nil, GetAddOnMetadata('Sage', 'title'))
+	local group = 'player'
+
+	--sliders
+	local scale = panel:NewScaleSlider(group)
+	scale:SetPoint('BOTTOMLEFT', 10, 10)
+	scale:SetPoint('BOTTOMRIGHT', -40, 10)
+
+	local opacity = panel:NewOpacitySlider(group)
+	opacity:SetPoint('BOTTOMLEFT', scale, 'TOPLEFT', 0, 20)
+	opacity:SetPoint('BOTTOMRIGHT', scale, 'TOPRIGHT', 0, 20)
+	
+	local width = panel:NewWidthSlider(group)
+	width:SetPoint('BOTTOMLEFT', opacity, 'TOPLEFT', 0, 20)
+	width:SetPoint('BOTTOMRIGHT', opacity, 'TOPRIGHT', 0, 20)
 end
 
 function module:PLAYER_ENTERING_WORLD()

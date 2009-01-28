@@ -92,7 +92,32 @@ function module:OnUnload()
 end
 
 function module:LoadOptions()
-	--create options panel code here
+	self:LoadUnitOptions('targettarget', 'Target of Target')
+	self:LoadUnitOptions('focustarget', 'Target of Focus')
+end
+
+function module:LoadUnitOptions(group, title)
+	local name = format('Sage%sOptions', group)
+	local desc = format('Configuration settings for the Sage %s frame', title:lower())
+	
+	local panel = Sage.Options:New(name, title, desc, nil, GetAddOnMetadata('Sage', 'title'))
+	
+	--sliders
+	local scale = panel:NewScaleSlider(group)
+	scale:SetPoint('BOTTOMLEFT', 10, 10)
+	scale:SetPoint('BOTTOMRIGHT', -40, 10)
+	
+	local oorOpacity = panel:NewOOROpacitySlider(group)
+	oorOpacity:SetPoint('BOTTOMLEFT', scale, 'TOPLEFT', 0, 20)
+	oorOpacity:SetPoint('BOTTOMRIGHT', scale, 'TOPRIGHT', 0, 20)
+	
+	local opacity = panel:NewOpacitySlider(group)
+	opacity:SetPoint('BOTTOMLEFT', oorOpacity, 'TOPLEFT', 0, 20)
+	opacity:SetPoint('BOTTOMRIGHT', oorOpacity, 'TOPRIGHT', 0, 20)
+	
+	local width = panel:NewWidthSlider(group)
+	width:SetPoint('BOTTOMLEFT', opacity, 'TOPLEFT', 0, 20)
+	width:SetPoint('BOTTOMRIGHT', opacity, 'TOPRIGHT', 0, 20)
 end
 
 function module:CreateTargetOfUnitFrame(unit)

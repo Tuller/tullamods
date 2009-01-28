@@ -121,7 +121,8 @@ function PartyFrame:GetDefaults()
 		point = 'TOPLEFT',
 		x = 20,
 		y = -40 - 100 * tonumber(self:GetAttribute('unit'):match('%d')),
-		width = 120 + 16 + BUFF_SIZE*4 + 1,
+		width = 120,
+		extraWidth = BUFF_SIZE * 4 + 1,
 		oorAlpha = 0.6,
 		height = (BORDER_SIZE*2) + INFO_HEIGHT + HEALTH_HEIGHT + POWER_HEIGHT + BUFF_SIZE*2 + POWER_HEIGHT,
 		visibilityStates = '[target=player,raid]hide'
@@ -152,7 +153,39 @@ function module:OnUnload()
 end
 
 function module:LoadOptions()
-	--create options panel code here
+	local panel = Sage.Options:New('SagePartyOptions', 'Party', 'Configuration settings for the Sage party frames', nil, GetAddOnMetadata('Sage', 'title'))
+	local group = 'party'
+
+	--sliders
+	local scale = panel:NewScaleSlider(group)
+	scale:SetPoint('BOTTOMLEFT', 10, 10)
+	scale:SetPoint('BOTTOMRIGHT', -40, 10)
+	
+	local oorOpacity = panel:NewOOROpacitySlider(group)
+	oorOpacity:SetPoint('BOTTOMLEFT', scale, 'TOPLEFT', 0, 20)
+	oorOpacity:SetPoint('BOTTOMRIGHT', scale, 'TOPRIGHT', 0, 20)
+	
+	local opacity = panel:NewOpacitySlider(group)
+	opacity:SetPoint('BOTTOMLEFT', oorOpacity, 'TOPLEFT', 0, 20)
+	opacity:SetPoint('BOTTOMRIGHT', oorOpacity, 'TOPRIGHT', 0, 20)
+	
+	local width = panel:NewWidthSlider(group)
+	width:SetPoint('BOTTOMLEFT', opacity, 'TOPLEFT', 0, 20)
+	width:SetPoint('BOTTOMRIGHT', opacity, 'TOPRIGHT', 0, 20)
+	
+	--buttons
+	local showInRaid = panel:NewCheckButton('Show in Raid')
+	showInRaid:SetScript('OnClick', function(self)
+		if self:GetChecked() then
+			Sage.Frame:ForFrame('party', 'SetVisibilityStates', nil)
+		else
+			Sage.Frame:ForFrame('party', 'SetVisibilityStates', '[target=player,raid]hide')
+		end
+	end)
+	showInRaid:SetScript('OnShow', function(self)
+		self:SetChecked(Sage.Frame:GetSetting('party', 'visibilityStates') == nil)
+	end)
+	showInRaid:SetPoint('TOPLEFT', 12, -72)
 end
 
 function module:PARTY_MEMBERS_CHANGED()
