@@ -171,6 +171,18 @@ function InfoBar:PLAYER_UPDATE_RESTING()
 	end
 end
 
+function InfoBar:UNIT_HEALTH(unit)
+	if unit == self.unit then
+		self:UpdateLevel()
+	end
+end
+
+function InfoBar:UNIT_HEALTH_MAX(unit)
+	if unit == self.unit then
+		self:UpdateLevel()
+	end
+end
+
 
 --[[
 	Update Methods
@@ -301,7 +313,12 @@ function InfoBar:UpdateLevel()
 		levelText:SetVertexColor(color.r, color.g, color.b)
 		levelText:SetText(level)
 	else
-		levelText:SetText('??')
+		local val, max = UnitHealth(self.unit), UnitHealthMax(self.unit)
+		if val > 0 and val < max then
+			levelText:SetFormattedText('%d', math.ceil(val / max * 100))
+		else
+			levelText:SetText('??')
+		end
 		levelText:SetVertexColor(1, 1, 1)
 	end
 end
@@ -392,4 +409,6 @@ do
 	f:RegisterEvent('PARTY_LEADER_CHANGED')
 	f:RegisterEvent('PARTY_MEMBERS_CHANGED')
 	f:RegisterEvent('PARTY_LOOT_METHOD_CHANGED')
+	f:RegisterEvent('UNIT_HEALTH')
+	f:RegisterEvent('UNIT_HEALTH_MAX');
 end
