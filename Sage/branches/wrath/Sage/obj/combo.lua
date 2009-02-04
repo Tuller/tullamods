@@ -18,6 +18,7 @@ function ComboFrame:New(parent, font)
 	f:SetScript('OnShow', f.Update)
 	f:SetWidth(16)
 	f:SetHeight(75)
+	f:UpdateUnit()
 
 	local text = f:CreateFontString(nil, 'OVERLAY')
 	text:SetFontObject(font)
@@ -35,8 +36,18 @@ function ComboFrame:SetNumeric(enable)
 	self:Update()
 end
 
+function ComboFrame:UpdateUnit(newUnit)
+	local newUnit = newUnit or self:GetParent():GetAttribute('unit')
+	if newUnit ~= self.unit then
+		self.unit = newUnit
+		if self:IsVisible() then
+			self:Update()
+		end
+	end
+end
+
 function ComboFrame:Update()
-	local points = GetComboPoints('player')
+	local points = GetComboPoints(self:GetPlayerUnit(), self.unit)
 	if points > 0 then
 		if self.numeric then
 			self.text:SetText(points)
@@ -63,10 +74,14 @@ function ComboFrame:UpdateAllVisible()
 	end
 end
 
+function ComboFrame:GetPlayerUnit()
+	return UnitExists('vehicle') and 'vehicle' or 'target'
+end
+
 do
 	local f = CreateFrame('Frame')
 	f:SetScript('OnEvent', function(self, event, unit)
-		if unit == 'player' then
+		if unit == ComboFrame:GetPlayerUnit() then
 			ComboFrame:UpdateAllVisible()
 		end
 	end)
