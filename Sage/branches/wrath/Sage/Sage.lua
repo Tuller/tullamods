@@ -395,7 +395,7 @@ function Sage:ScaleFrames(...)
 
 	if scale and scale > 0 and scale <= 10 then
 		for i = 1, numArgs - 1 do
-			self.Frame:ForFrame(select(i, ...), 'SetFrameScale', scale)
+			self.Frame:ForFrame(select(i, ...), 'SetSetting', 'scale', scale)		
 		end
 	end
 end
@@ -408,7 +408,7 @@ function Sage:SetOpacityForFrames(...)
 
 	if alpha and alpha >= 0 and alpha <= 1 then
 		for i = 1, numArgs - 1 do
-			self.Frame:ForFrame(select(i, ...), 'SetFrameAlpha', alpha)
+			self.Frame:ForFrame(select(i, ...), 'SetSetting', 'alpha', alpha)
 		end
 	end
 end

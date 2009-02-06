@@ -18,8 +18,6 @@ local unused = {}
 --constructor
 function Frame:New(unit)
 	local f = self:Restore(unit) or self:Create(unit)
-	f:SetUnit(unit)
-	f:LoadSettings()
 	
 	if f.created then
 		f.created = nil
@@ -29,6 +27,9 @@ function Frame:New(unit)
 	if UnitExists(f:GetAttribute('unit')) then
 		f:Show()
 	end
+	
+	f:LoadSettings()
+	f:SetUnit(unit)
 
 	active[unit] = f
 	return f
@@ -36,6 +37,17 @@ end
 
 function Frame:Create(unit)
 	local f = self:Bind(CreateFrame('Frame', format('Sage%sFrame', unit), UIParent, 'SecureHandlerStateTemplate'))
+	f.id = unit
+	f.sets = setmetatable({}, {
+		__index = function(t, k)
+			return f._sets[k]
+		end,
+		
+		__newindex = function(t, k, v)
+			f:SetSetting(k, v)
+		end
+	})
+	
 	f:LoadUnitController()
 	f:LoadVisibilityController()
 	f:SetAttribute('unit', unit)
@@ -43,8 +55,6 @@ function Frame:Create(unit)
 	f:SetMovable(true)
 	f:SetScript('OnShow', f.OnShow)
 	f:SetScript('OnHide', f.OnHide)
-
-	f.id = unit
 
 	--get rid of the blizzard unit for this frame
 	Sage:UnregisterUnit(unit)
@@ -96,14 +106,12 @@ function Frame:Delete()
 end
 
 function Frame:LoadSettings(defaults)
-	self.sets = Sage:GetFrameSets(self.id) or Sage:SetFrameSets(self.id, self:GetDefaults())
-	self:UpdateWidth()
-	self:UpdateHeight()
+	self._sets = Sage:GetFrameSets(self.id) or Sage:SetFrameSets(self.id, self:GetDefaults())
+	
+	for k, v in self:GetSettings() do
+		self:OnSettingChanged(k, v)
+	end
 	self:Reposition()
-	self:UpdateAlpha()
-	self:UpdateOORAlpha()
-	self:UpdateUnitStates()
-	self:UpdateVisibilityStates()
 end
 
 --should be overridden, called when first initializing a frame's settings
@@ -118,45 +126,66 @@ end
 
 --[[ Width ]]--
 
-function Frame:SetFrameWidth(width)
-	self.sets.width = width
+function Frame:width_Change(newWidth)
 	self:UpdateWidth()
 end
 
-function Frame:UpdateWidth()
-	self:SetWidth(self.sets.width + self:GetExtraWidth())
+function Frame:GetFrameWidth()
+	return max(0, self._sets.width or 0)
+end
+
+function Frame:extraWidth_Change(newWidth)
+	self:UpdateWidth()
 end
 
 function Frame:GetExtraWidth()
-	return self.sets.extraWidth or 0
+	return math.max(self._sets.extraWidth or 0, 0)
+end
+
+function Frame:UpdateWidth()
+	self:SetWidth(self:GetFrameWidth() + self:GetExtraWidth())
 end
 
 
 --[[ Height ]]--
 
-function Frame:SetFrameHeight(height)
-	self.sets.height = height
+function Frame:height_Change(newHeight)
 	self:UpdateHeight()
 end
 
 function Frame:UpdateHeight()
-	self:SetHeight(self.sets.height)
+	self:SetHeight(self:GetFrameHeight())
+end
+
+function Frame:GetFrameHeight()
+	return math.max(self._sets.height or 0, 0)
 end
 
 
 --[[ Scaling ]]--
 
-function Frame:GetScaledCoords(scale)
-	local ratio = self:GetScale() / scale
-	return (self:GetLeft() or 0) * ratio, (self:GetTop() or 0) * ratio
+function Frame:scale_Change(newScale)
+	if newScale == 1 and self._sets.scale ~= nil then
+		self._sets.scale = nil
+	end
+	self:UpdateScale()
 end
 
+function Frame:UpdateScale()
+	self:SetScale(self:GetScale())
+end
+
+function Frame:GetScale()
+	return self._sets.scale or 1
+end
+
+
+--should be used over a direct call to frame.sets.scale = scale to do proper reanchoring
 function Frame:SetFrameScale(scale, scaleAnchored)
+	local scale = max(0, scale or 1)
 	local x, y =  self:GetScaledCoords(scale)
-
-	self.sets.scale = scale
-	self:Rescale()
-
+	self.sets.scale = scale --implicit call to scale_Change
+	
 	if not self.sets.anchor then
 		self:ClearAllPoints()
 		self:SetPoint('TOPLEFT', self:GetParent(), 'BOTTOMLEFT', x, y)
@@ -172,73 +201,67 @@ function Frame:SetFrameScale(scale, scaleAnchored)
 	end
 end
 
-function Frame:Rescale()
-	self:SetScale(self:GetScale())
-
-	if self.drag then
-		self.drag:SetScale(self:GetScale())
-	end
-end
-
-function Frame:GetScale()
-	return self.sets.scale or 1
+function Frame:GetScaledCoords(scale)
+	local ratio = self:GetScale() / scale
+	return (self:GetLeft() or 0) * ratio, (self:GetTop() or 0) * ratio
 end
 
 
 --[[ Opacity ]]--
 
+function Frame:alpha_Change(newAlpha)
+	if newAlpha == 1 and self._sets.alpha ~= nil then
+		self._sets.alpha = nil
+	end
+	self:UpdateAlpha()
+end
+	
 function Frame:UpdateAlpha()
 	self:SetAlpha(self:GetFrameAlpha())
 end
 
-function Frame:SetFrameAlpha(alpha)
-	if alpha == 1 then
-		self.sets.alpha = nil
-	else
-		self.sets.alpha = alpha
-	end
-	self:UpdateAlpha()
-end
-
 function Frame:GetFrameAlpha()
-	return self.sets.alpha or 1
+	return max(0, self._sets.alpha or 1)
 end
 
 
 --[[ Out of range opacity ]]
 
+function Frame:oorAlpha_Change(newAlpha)
+	self:UpdateOORAlpha()
+end
+
 function Frame:UpdateOORAlpha()
-	if self:IsVisible() and floor(self:GetFrameAlpha() * 100) == floor(self:GetOORAlpha() * 100) then
+	local diff = floor(abs(self:GetFrameAlpha() - self:GetOORAlpha() * 100))
+	if self:IsVisible() and diff == 0 then
 		Sage.RangeFader:Unregister(self)
 	else
 		Sage.RangeFader:Register(self)
 	end
 end
 
-function Frame:SetOORAlpha(alpha)
-	self.sets.oorAlpha = alpha
-end
-
 function Frame:GetOORAlpha()
-	return self.sets.oorAlpha or self:GetFrameAlpha()
+	return self._sets.oorAlpha or self:GetFrameAlpha()
 end
 
 
---[[ Unit ]]--
+--[[ Unit State Controller ]]--
+
+function Frame:unitStates_Change(newStates)
+	self:UpdateUnitStates()
+end
 
 function Frame:UpdateUnitStates()
-	if self.sets.unitStates then
-		RegisterStateDriver(self, 'unit', self.sets.unitStates)
+	if self._sets.unitStates then
+		RegisterStateDriver(self, 'unit', self._sets.unitStates)
 	else
 		UnregisterStateDriver(self, 'unit')
 		self:SetAttribute('unit', self.id)
 	end
 end
 
-function Frame:SetUnitStates(states)
-	self.sets.unitStates = unitStates
-	self:UpdateUnitStates()
-end
+
+--[[ Unit Attribute ]]--
 
 function Frame:SetUnit(unit)
 	self:SetAttribute('unit', unit)
@@ -285,21 +308,19 @@ function Frame:LoadVisibilityController()
 	]])
 end
 
+function Frame:visibilityStates_Change(newStates)
+--	self:UpdateVisibilityStates()
+end
+
 function Frame:UpdateVisibilityStates()
-	if self.sets.visibilityStates then
-		RegisterStateDriver(self, 'forcevisibility', self.sets.visibilityStates)
-		self:SetAttribute('state-forcevisibility', 'dummyValueToForceAnUpdate')
+	if self._sets.visibilityStates then
+		RegisterStateDriver(self, 'forcevisibility', self._sets.visibilityStates)
+		self:SetAttribute('state-forcevisibility', 'dummyValueToForceAnUpdate') --does exactly what you think it does
 	else
 		UnregisterStateDriver(self, 'forcevisibility')
 		self:SetAttribute('state-forcevisibility', 'show')
 	end
 end
-
-function Frame:SetVisibilityStates(states)
-	self.sets.visibilityStates = states
-	self:UpdateVisibilityStates()
-end
-
 
 --[[ Sticky Bars ]]--
 
@@ -383,10 +404,6 @@ function Frame:Stick()
 	end
 
 	self:SavePosition()
-
-	if self.drag then
-		self.drag:UpdateColor()
-	end
 end
 
 function Frame:Reanchor()
@@ -400,14 +417,10 @@ function Frame:Reanchor()
 			self:SetPoint('CENTER')
 		end
 	end
-
-	if self.drag then
-		self.drag:UpdateColor()
-	end
 end
 
 function Frame:GetAnchor()
-	local anchorString = self.sets.anchor
+	local anchorString = self._sets.anchor
 	if anchorString then
 		local pointStart = #anchorString - 1
 		return self:Get(anchorString:sub(1, pointStart - 1)), anchorString:sub(pointStart)
@@ -453,7 +466,7 @@ end
 
 --place the frame at it's saved position
 function Frame:Reposition()
-	self:Rescale()
+	self:UpdateScale()
 
 	local sets = self.sets
 	local point, x, y = sets.point, sets.x, sets.y
@@ -539,7 +552,24 @@ function Frame:ForFrame(id, method, ...)
 	end
 end
 
-function Frame:GetSetting(id, setting)
+
+--[[
+	Settings...setting
+		The intent of this functionality is to allow components to listen for when a setting changes and react to it
+--]]
+
+function Frame:SetSetting(key, value)
+	if self._sets[key] ~= value then
+		self._sets[key] = value
+		self:OnSettingChanged(key, value)
+	end
+end
+
+function Frame:GetSettings()
+	return pairs(self._sets)
+end
+
+function Frame:GetSetting(id, key)
 	local f
 	if id == 'all' then
 		f = self:Get('player')
@@ -548,5 +578,20 @@ function Frame:GetSetting(id, setting)
 	else
 		f = self:Get(id)
 	end
-	return f and f.sets[setting]
+	return f and f.sets[key]
+end
+
+function Frame:OnSettingChanged(key, value)
+	local method = key .. '_Change'
+	
+	if self[method] then
+		self[method](self, value)
+	end
+	
+	--hack, since the drag frame is technically not a child frame
+	if self.drag and self.drag[method] then
+		self.drag[method](self.drag, value)
+	end
+	
+	self:ForChildren(method, value)
 end

@@ -79,10 +79,7 @@ end
 
 function Drag:OnMouseWheel(arg1)
 	local newAlpha = min(max(self.owner:GetAlpha() + (arg1 * 0.1), 0), 1)
-	if newAlpha ~= self.owner:GetAlpha() then
-		self.owner:SetFrameAlpha(newAlpha)
-		self:OnEnter()
-	end
+	self.owner.sets.alpha = newAlpha	
 end
 
 --updates the drag button color of a given bar if its attached to another bar
@@ -105,5 +102,19 @@ end
 function Drag:ForAll(method, ...)
 	for _,f in pairs(frames) do
 		f[method](f, ...)
+	end
+end
+
+function Drag:anchor_Change(newAnchor)
+	self:UpdateColor()
+end
+
+function Drag:scale_Change(newScale)
+	self:SetScale(newScale)
+end
+
+function Drag:alpha_Change(newAlpha)
+	if GameTooltip:IsOwned(self) then
+		self:OnEnter()
 	end
 end
