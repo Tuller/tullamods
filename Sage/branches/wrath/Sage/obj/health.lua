@@ -169,7 +169,57 @@ function HealthBar:UpdateHealthColor()
 	end
 end
 
-function HealthBar:UpdateText()
+--[[
+	Text Display Modes
+--]]
+
+function HealthBar:textMode_Change(mode)
+	if self.mode ~= mode then
+		self.mode = mode
+		
+		local func = self.TextDisplay[mode]
+		assert(func, string.format('Invalid text mode "%s"', mode or 'nil'))
+		self.UpdateText = func
+		self:UpdateText()
+	end
+end
+ 
+HealthBar.TextDisplay = {}
+
+HealthBar.TextDisplay['always'] = function(self)
+	local text = self.text
+	local unit = self.unit
+	local value = self:GetValue()
+	local min, max = self:GetMinMaxValues()
+
+	if UnitIsFeignDeath(unit) then
+		text:SetText('Feign Death')
+	elseif UnitIsDead(unit) then
+		text:SetText('Dead')
+	elseif UnitIsGhost(unit) then
+		text:SetText('Ghost')
+	elseif not UnitIsConnected(unit) then
+		text:SetText('Offline')
+	else
+		text:SetFormattedText('%s / %s', value, max)
+	end
+end
+
+HealthBar.TextDisplay['never'] = function(self)
+	if self.text:GetText() ~= '' then
+		self.text:SetText('')
+	end
+end
+
+HealthBar.TextDisplay['mouseover'] = function(self)
+	if self.entered then
+		self.TextDisplay['always'](self)
+	else
+		self.TextDisplay['never'](self)
+	end
+end
+
+HealthBar.TextDisplay['smart'] = function(self)
 	local text = self.text
 	local unit = self.unit
 	local value = self:GetValue()
@@ -204,6 +254,8 @@ function HealthBar:UpdateText()
 		end
 	end
 end
+
+HealthBar.UpdateText = HealthBar.TextDisplay['smart'] --default text display (needed for backward compatibility)
 
 
 --[[ Utility Functions ]]--

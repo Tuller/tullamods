@@ -31,9 +31,11 @@ function ComboFrame:New(parent, font)
 	return f
 end
 
-function ComboFrame:SetNumeric(enable)
-	self.numeric = enable or false
-	self:Update()
+function ComboFrame:numericComboPoints_Change(enable)
+	self.numeric = enable
+	if self:IsVisible() then
+		self:Update()
+	end
 end
 
 function ComboFrame:UpdateUnit(newUnit)
@@ -75,7 +77,7 @@ function ComboFrame:UpdateAllVisible()
 end
 
 function ComboFrame:GetPlayerUnit()
-	return UnitExists('vehicle') and 'vehicle' or 'target'
+	return UnitExists('vehicle') and 'vehicle' or 'player'
 end
 
 do

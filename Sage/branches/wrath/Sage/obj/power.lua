@@ -102,7 +102,7 @@ end
 function PowerBar:Update()
 	local unit = self.unit
 	local powerType, powerToken = UnitPowerType(unit)
-	
+
 	if powerType == 0 or UnitPlayerControlled(unit) or UnitInParty(unit) then
 		if self:GetAlpha() ~= 1 then
 			self:SetAlpha(1)
@@ -134,7 +134,53 @@ function PowerBar:Update()
 	end
 end
 
-function PowerBar:UpdateText()
+
+--[[ Text Display ]]--
+
+function PowerBar:textMode_Change(mode)
+	if self.mode ~= mode then
+		self.mode = mode
+
+		local func = self.TextDisplay[mode]
+		assert(func, string.format('Invalid text mode "%s"', mode or 'nil'))
+		self.UpdateText = func
+
+		if self.text then
+			self:UpdateText()
+		end
+	end
+end
+
+PowerBar.TextDisplay = {}
+
+PowerBar.TextDisplay['always'] = function(self)
+	local text = self.text
+	local unit = self:GetUnit()
+	local value = self:GetValue()
+	local min, max = self:GetMinMaxValues()
+
+	if UnitIsGhost(unit) or UnitIsDead(unit) or not UnitIsConnected(unit) then
+		text:SetText('')
+	else
+		text:SetFormattedText('%d / %d', value, max)
+	end
+end
+
+PowerBar.TextDisplay['never'] = function(self)
+	if self.text:GetText() ~= '' then
+		self.text:SetText('')
+	end
+end
+
+PowerBar.TextDisplay['mouseover'] = function(self)
+	if self.entered then
+		self.TextDisplay['always'](self)
+	else
+		self.TextDisplay['never'](self)
+	end
+end
+
+PowerBar.TextDisplay['smart'] = function(self)
 	local text = self.text
 	local unit = self:GetUnit()
 	local value = self:GetValue()
@@ -156,6 +202,8 @@ function PowerBar:UpdateText()
 		end
 	end
 end
+
+PowerBar.UpdateText = PowerBar.TextDisplay['smart'] --default text display (needed for backward compatibility)
 
 
 --[[ Utility Functions ]]--
