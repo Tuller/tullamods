@@ -559,6 +559,7 @@ end
 --]]
 
 function Frame:SetSetting(key, value)
+	assert(self._sets, format('Missing settings for frame "%s"', self.id or 'nil'))
 	if self._sets[key] ~= value then
 		self._sets[key] = value
 		self:OnSettingChanged(key, value)
