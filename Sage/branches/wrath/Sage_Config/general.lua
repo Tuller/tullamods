@@ -69,6 +69,9 @@ showPvPIcons:SetScript('OnClick', function(self)
 end)
 showPvPIcons:SetPoint('TOPLEFT', debuffColoring, 'BOTTOMLEFT', 0, -2)
 
+local textMode = Options:NewTextModeSelector('all')
+textMode:SetPoint('BOTTOMLEFT', 8, 6)
+
 
 --[[ Texture Selector ]]--
 

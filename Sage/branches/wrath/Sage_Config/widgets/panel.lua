@@ -82,6 +82,26 @@ function Panel:NewCheckButton(name)
 	return b
 end
 
+local function SettingCheckButton_OnShow(self)
+	self:SetChecked(Sage.Frame:GetSetting(self.unitGroup, self.setting) == self.checkedVal)
+end
+
+local function SettingCheckButton_OnClick(self)
+	Sage.Frame:ForFrame(self.unitGroup, 'SetSetting', self.setting, self:GetChecked() and self.checkedVal or self.uncheckedVal)
+end
+
+function Panel:NewSettingCheckButton(name, unitGroup, setting, checkedVal, uncheckedVal)
+	local b = self:NewCheckButton(name)
+	b.unitGroup = unitGroup
+	b.setting = setting
+	b.checkedVal = checkedVal or true
+	b.uncheckedVal = uncheckedVal or false
+	b:SetScript('OnShow', SettingCheckButton_OnShow)
+	b:SetScript('OnClick', SettingCheckButton_OnClick)
+	
+	return b
+end
+
 --basic dropdown
 function Panel:NewDropdown(name)
 	local f = CreateFrame('Frame', self:GetName() .. name, self, 'UIDropDownMenuTemplate')
@@ -114,107 +134,70 @@ end
 		All of these sliders act on a unit group, which is the same as a <frameList>
 --]]
 
-
---[[ Width ]]--
-
-local function WidthSlider_OnShow(self)
+--generic settings slider
+local function SettingsSlider_OnShow(self)
 	self.onShow = true
-	self:SetValue(Sage.Frame:GetSetting(self.unitGroup, 'width') or 150)
+	self:SetValue(Sage.Frame:GetSetting(self.unitGroup, self.setting) or self.defaultValue)
 	self.onShow = nil
 end
 
-local function WidthSlider_OnValueChanged(self, value)
+local function SettingsSlider_OnValueChanged(self, value)
 	if not self.onShow then
-		Sage.Frame:ForFrame(self.unitGroup, 'SetFrameWidth', value)
+		Sage.Frame:ForFrame(self.unitGroup, 'SetSetting', self.setting, value)
 	end
-	self.valText:SetText(value)
+	
+	if self.GetFormattedText then
+		self.valText:SetText(self:GetFormattedText(value))
+	else
+		self.valText:SetText(value)
+	end
 end
 
-function Panel:NewWidthSlider(unitGroup)
-	local f = self:NewSlider(L.Width, 100, 300, 5)
+function Panel:NewSettingSlider(name, unitGroup, setting, minValue, maxValue, step)
+	local f = self:NewSlider(name, minValue, maxValue, step)
 	f.unitGroup = unitGroup
-	f:SetScript('OnShow', WidthSlider_OnShow)	
-	f:SetScript('OnValueChanged', WidthSlider_OnValueChanged)
-
+	f.setting = setting
+	f:SetScript('OnShow', SettingsSlider_OnShow)	
+	f:SetScript('OnValueChanged', SettingsSlider_OnValueChanged)
+	
 	return f
 end
 
 
---[[ Opacity ]]--
+--[[ Specialized Sliders ]]--
 
-local function OpacitySlider_OnShow(self)
-	self.onShow = true
-	local value = Sage.Frame:GetSetting(self.unitGroup, 'alpha') or 1
-	self:SetValue(value * 100)
-	self.onShow = nil
+--width
+function Panel:NewWidthSlider(unitGroup)
+	local f = self:NewSettingSlider(L.Width, unitGroup, setting, 100, 300, 5)
+	f.defaultValue = 150
+	return f
 end
 
-local function OpacitySlider_OnValueChanged(self, value)
-	if not self.onShow then
-		Sage.Frame:ForFrame(self.unitGroup, 'SetFrameAlpha', value/100)
-	end
-	self.valText:SetText(value)
+--opacity
+local function ToPercentage(self, value)
+	return string.format('%d%%', floor(value * 100 + 0.5))
 end
 
 function Panel:NewOpacitySlider(unitGroup)
-	local f = self:NewSlider(L.Opacity, 0, 100, 1)
-	f.unitGroup = unitGroup
-	f:SetScript('OnShow', OpacitySlider_OnShow)	
-	f:SetScript('OnValueChanged', OpacitySlider_OnValueChanged)
-
+	local f = self:NewSettingSlider(L.Opacity, unitGroup, 'alpha', 0, 1, 0.01)
+	f.defaultValue = 1
+	f.GetFormattedText = ToPercentage
 	return f
 end
 
-
---[[ Out of Range Opacity ]]--
-
-local function OOROpacitySlider_OnShow(self)
-	self.onShow = true
-	local value = Sage.Frame:GetSetting(self.unitGroup, 'oorAlpha') or Sage.Frame:GetSetting(self.unitGroup, 'alpha') or 1
-	self:SetValue(value * 100)
-	self.onShow = nil
-end
-
-local function OOROpacitySlider_OnValueChanged(self, value)
-	if not self.onShow then
-		Sage.Frame:ForFrame(self.unitGroup, 'SetOORAlpha', value/100)
-	end
-	self.valText:SetText(value)
-end
-
+--out of range opacity
 function Panel:NewOOROpacitySlider(unitGroup)
-	local f = self:NewSlider(L.OOROpacity, 0, 100, 1)
-	f.unitGroup = unitGroup
-	f:SetScript('OnShow', OOROpacitySlider_OnShow)	
-	f:SetScript('OnValueChanged', OOROpacitySlider_OnValueChanged)
-
+	local f = self:NewSettingSlider(L.OOROpacity, unitGroup, 'oorAlpha', 0, 1, 0.01)
+	f.defaultValue = 1
+	f.GetFormattedText = ToPercentage
 	return f
 end
 
-
---[[ Scale Slider ]]--
-
---out of range opacity (friendly units only)
-local function ScaleSlider_OnShow(self)
-	self.onShow = true
-	local value = Sage.Frame:GetSetting(self.unitGroup, 'scale') or 1
-	self:SetValue(value * 100)
-	self.onShow = nil
-end
-
-local function ScaleSlider_OnValueChanged(self, value)
-	if not self.onShow then
-		Sage.Frame:ForFrame(self.unitGroup, 'SetFrameScale', value/100)
-	end
-	self.valText:SetText(value)
-end
-
+--scale
 function Panel:NewScaleSlider(unitGroup)
-	local f = self:NewSlider(L.Scale, 50, 250, 1)
-	f.unitGroup = unitGroup
-	f:SetScript('OnShow', ScaleSlider_OnShow)	
-	f:SetScript('OnValueChanged', ScaleSlider_OnValueChanged)
-	
+	local f = self:NewSettingSlider(L.Scale, unitGroup, 'scale', 0.5, 3, 0.05)
+	f.defaultValue = 1
+	f.GetFormattedText = ToPercentage
 	return f
 end
 
@@ -222,7 +205,7 @@ end
 --[[ Text Mode Selector ]]--
 
 local function TextMode_OnSelect(self, value)
-	return Sage.Frame:ForFrame(self.unitGroup, 'SetTextMode', value)
+	return Sage.Frame:ForFrame(self.unitGroup, 'SetSetting', 'textMode', value)
 end
 
 local function TextMode_GetSelectedValue(self)
