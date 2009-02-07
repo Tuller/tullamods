@@ -45,6 +45,7 @@ function PetFrame:OnCreate()
 	debuff:SetPoint('TOPLEFT', power, 'BOTTOMLEFT')
 	debuff:SetPoint('TOPRIGHT', power, 'BOTTOMRIGHT')
 	debuff:SetHeight(BUFF_SIZE * 2)
+	debuff.showOnlyMyBuffs_Change = debuff.SetFriendFilter
 	self.debuff = debuff
 
 	local buff = Sage.AuraContainer:New('Buffs', self, 'HELPFUL', 'HARMFUL')
@@ -92,6 +93,10 @@ end
 function module:LoadOptions()
 	local panel = Sage.Options:New('SagePetOptions', 'Pet', 'Configuration settings for the Sage pet frame', nil, GetAddOnMetadata('Sage', 'title'))
 	local group = 'pet'
+	
+	--buttons
+	local showOnlyMyBuffs = panel:NewSettingCheckButton("Show Only Buffs I've Cast", group, 'showOnlyMyBuffs', 'HELPFUL|PLAYER', 'HELPFUL')
+	showOnlyMyBuffs:SetPoint('TOPLEFT', 12, -72)
 
 	--sliders
 	local scale = panel:NewScaleSlider(group)

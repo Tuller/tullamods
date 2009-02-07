@@ -118,6 +118,13 @@ function module:LoadUnitOptions(group, title)
 	local width = panel:NewWidthSlider(group)
 	width:SetPoint('BOTTOMLEFT', opacity, 'TOPLEFT', 0, 20)
 	width:SetPoint('BOTTOMRIGHT', opacity, 'TOPRIGHT', 0, 20)
+
+	local updateFreq = panel:NewSettingSlider('Update Frequency', group, 'updateFreq', 0, 1, 0.1)
+	updateFreq:SetPoint('BOTTOMLEFT', width, 'TOPLEFT', 0, 20)
+	updateFreq:SetPoint('BOTTOMRIGHT', width, 'TOPRIGHT', 0, 20)
+	updateFreq.GetFormattedText = function(self, value) 
+		return string.format('%.1f', value) 
+	end
 end
 
 function module:CreateTargetOfUnitFrame(unit)

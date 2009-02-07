@@ -83,6 +83,7 @@ function PartyFrame:OnCreate()
 	buff:SetPoint('TOPLEFT', power, 'BOTTOMLEFT', 0, -BORDER_SIZE)
 	buff:SetPoint('TOPRIGHT', power, 'BOTTOMRIGHT', 0, -BORDER_SIZE)
 	buff:SetHeight(BUFF_SIZE)
+	buff.showOnlyMyBuffs_Change = buff.SetFriendFilter
 	self.buff = buff
 
 	local debuff = Sage.AuraContainer:New('Debuffs', self, 'HARMFUL')
@@ -155,6 +156,13 @@ end
 function module:LoadOptions()
 	local panel = Sage.Options:New('SagePartyOptions', 'Party', 'Configuration settings for the Sage party frames', nil, GetAddOnMetadata('Sage', 'title'))
 	local group = 'party'
+	
+	--buttons
+	local showInRaid = panel:NewSettingCheckButton('Display Party Frames When in a Raid', group, 'visibilityStates', nil, '[target=player,raid]hide')
+	showInRaid:SetPoint('TOPLEFT', 12, -72)
+	
+	local showOnlyMyBuffs = panel:NewSettingCheckButton("Show Only Buffs I've Cast", group, 'showOnlyMyBuffs', 'HELPFUL|PLAYER', 'HELPFUL')
+	showOnlyMyBuffs:SetPoint('TOP', showInRaid, 'BOTTOM', 0, -2)
 
 	--sliders
 	local scale = panel:NewScaleSlider(group)
@@ -172,20 +180,6 @@ function module:LoadOptions()
 	local width = panel:NewWidthSlider(group)
 	width:SetPoint('BOTTOMLEFT', opacity, 'TOPLEFT', 0, 20)
 	width:SetPoint('BOTTOMRIGHT', opacity, 'TOPRIGHT', 0, 20)
-	
-	--buttons
-	local showInRaid = panel:NewCheckButton('Show in Raid')
-	showInRaid:SetScript('OnClick', function(self)
-		if self:GetChecked() then
-			Sage.Frame:ForFrame('party', 'SetVisibilityStates', nil)
-		else
-			Sage.Frame:ForFrame('party', 'SetVisibilityStates', '[target=player,raid]hide')
-		end
-	end)
-	showInRaid:SetScript('OnShow', function(self)
-		self:SetChecked(Sage.Frame:GetSetting('party', 'visibilityStates') == nil)
-	end)
-	showInRaid:SetPoint('TOPLEFT', 12, -72)
 end
 
 function module:PARTY_MEMBERS_CHANGED()

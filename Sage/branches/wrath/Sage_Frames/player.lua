@@ -72,7 +72,10 @@ end
 function module:LoadOptions()
 	local panel = Sage.Options:New('SagePlayerOptions', 'Player', 'Configuration settings for the Sage player frame', nil, GetAddOnMetadata('Sage', 'title'))
 	local group = 'player'
-
+--[[
+	local textMode = panel:NewTextModeSelector(group)
+	textMode:SetPoint('TOPLEFT', 12, -72)
+--]]
 	--sliders
 	local scale = panel:NewScaleSlider(group)
 	scale:SetPoint('BOTTOMLEFT', 10, 10)

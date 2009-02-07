@@ -66,6 +66,8 @@ function TargetFrame:OnCreate()
 	debuff:SetPoint('TOPLEFT', npc, 'BOTTOMLEFT')
 	debuff:SetPoint('TOPRIGHT', npc, 'BOTTOMRIGHT')
 	debuff:SetHeight(BUFF_SIZE * 2)
+	debuff.showOnlyMyDebuffs_Change = debuff.SetFilter
+	debuff.showOnlyMyBuffs_Change = debuff.SetFriendFilter
 	self.debuff = debuff
 
 	local buff = Sage.AuraContainer:New('Buffs', self, 'HELPFUL', 'HARMFUL')
@@ -128,6 +130,16 @@ end
 function module:LoadOptions()
 	local panel = Sage.Options:New('SageTargetOptions', 'Target', 'Configuration settings for the Sage target frame', nil, GetAddOnMetadata('Sage', 'title'))
 	local group = 'target'
+	
+	--buttons
+	local numericCombo = panel:NewSettingCheckButton('Display Combo Points as a Number', group, 'numericComboPoints')
+	numericCombo:SetPoint('TOPLEFT', 12, -72)
+	
+	local showOnlyMyBuffs = panel:NewSettingCheckButton("Show Only Buffs I've Cast", group, 'showOnlyMyBuffs', 'HELPFUL|PLAYER', 'HELPFUL')
+	showOnlyMyBuffs:SetPoint('TOP', numericCombo, 'BOTTOM', 0, -2)
+	
+	local showOnlyMyDebuffs = panel:NewSettingCheckButton("Show Only Debuffs I've Cast", group, 'showOnlyMyDebuffs', 'HARMFUL|PLAYER', 'HARMFUL')
+	showOnlyMyDebuffs:SetPoint('TOP', showOnlyMyBuffs, 'BOTTOM', 0, -2)
 
 	--sliders
 	local scale = panel:NewScaleSlider(group)
