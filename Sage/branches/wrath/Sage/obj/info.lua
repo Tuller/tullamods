@@ -116,6 +116,7 @@ end
 function InfoBar:UNIT_FACTION(unit)
 	if self.unit == unit then
 		self:UpdatePvP()
+		self:UpdateNameColor() --done because faction changes when you tap an enemy, or something
 	end
 end
 
