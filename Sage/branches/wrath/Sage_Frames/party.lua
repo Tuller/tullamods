@@ -117,6 +117,14 @@ function PartyFrame:OnCreate()
 	self.drag = Sage.DragFrame:New(self)
 end
 
+function PartyFrame:showInRaid_Change(enable)
+	if enable then
+		self.sets.visibilityStates = nil
+	else
+		self.sets.visibilityStates = '[target=player,raid]hide'
+	end
+end
+
 function PartyFrame:GetDefaults()
 	return {
 		point = 'TOPLEFT',
@@ -126,6 +134,7 @@ function PartyFrame:GetDefaults()
 		extraWidth = BUFF_SIZE * 4 + 1,
 		oorAlpha = 0.6,
 		height = (BORDER_SIZE*2) + INFO_HEIGHT + HEALTH_HEIGHT + POWER_HEIGHT + BUFF_SIZE*2 + POWER_HEIGHT,
+		showInRaid = false,
 		visibilityStates = '[target=player,raid]hide'
 	}
 end
@@ -158,7 +167,7 @@ function module:LoadOptions()
 	local group = 'party'
 	
 	--buttons
-	local showInRaid = panel:NewSettingCheckButton('Display Party Frames When in a Raid', group, 'visibilityStates', nil, '[target=player,raid]hide')
+	local showInRaid = panel:NewSettingCheckButton('Display Party Frames When in a Raid', group, 'showInRaid')
 	showInRaid:SetPoint('TOPLEFT', 12, -72)
 	
 	local showOnlyMyBuffs = panel:NewSettingCheckButton("Show Only Buffs I've Cast", group, 'showOnlyMyBuffs', 'HELPFUL|PLAYER', 'HELPFUL')
