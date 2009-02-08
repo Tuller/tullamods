@@ -4,8 +4,5 @@
 ## Author: Tuller
 ## Dependencies: OmniCC
 ## LoadOnDemand: 1
-localization.lua
-localization.ru.lua
-localization.ko.lua
-localization.tw.lua
+localization.xml
 menu.lua
