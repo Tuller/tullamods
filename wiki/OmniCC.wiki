@@ -8,13 +8,13 @@ A configuration GUI is included, and can be shown via /omnicc or /occ
 -----
 ==FAQ==
 
-====OmniCC is displaying text on "Addon" and I don't want it to.  How do I make OmniCC not show up?====
+====OmniCC is displaying text on _Addon_ and I don't want it to.  How do I make OmniCC not show up?====
 
 OmniCC has three different settings that control whether or not text shows up on a given bar or not.  The first setting is *Minimum Duration*.  This is the duration, in seconds, that a cooldown must be for OmniCC to display text or not.  The second setting is *Minimum Scale*.  This setting controls how big an object must be for OmniCC to display text or not.  The larger the value, the bigger an object must be.  The setting is normalized at 100 meaning "about the size of an action button in the stock interface"
 
 The third setting is an internal one CooldownModel.noCooldownCount.  If set to true, then OmniCC will not display text.  If the addon you're running uses its own method for displaying text on objects with cooldown, then I encourage you to bug the other to implement the noCooldownCount flag.
 
-====OmniCC isn't displaying text on Addon <X> and I want it to.  How do I make OmniCC show up?====
+====OmniCC isn't displaying text on _Addon_ and I want it to.  How do I make OmniCC show up?====
 See above, but in reverse :)
 
 ====OmniCC is still showing up after I've adjusted the settings you've mentioned!====
