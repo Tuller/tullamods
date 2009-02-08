@@ -1,5 +1,7 @@
-#summary Cooldown count for everything.
 #labels OmniCC
+<wiki:toc max_depth="2" />
+
+== General ==
 
 OmniCC is an addon that adds text to items/spells/abilities that are on cooldown to indicate when they'll be ready for use. OmniCC should be compatible with any addon that uses a cooldown model.
 
