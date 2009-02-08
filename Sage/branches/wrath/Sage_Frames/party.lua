@@ -23,7 +23,7 @@ function PartyFrame:NewPartyPet()
 	local unit = 'partypet' .. self:GetAttribute('unit'):match('%d')
 
 	local f = Sage.Frame:Bind(CreateFrame('Frame', format('Sage%sFrame', unit), self, 'SecureHandlerStateTemplate'))
-	f._sets = setmetatable({}, {__index = self.sets})
+	f._sets = {}
 	f:LoadUnitController()
 	f:LoadVisibilityController()
 	f:SetUnit(unit)
