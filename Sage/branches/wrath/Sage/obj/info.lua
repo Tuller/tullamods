@@ -432,5 +432,6 @@ do
 	f:RegisterEvent('PARTY_MEMBERS_CHANGED')
 	f:RegisterEvent('PARTY_LOOT_METHOD_CHANGED')
 	f:RegisterEvent('UNIT_HEALTH')
-	f:RegisterEvent('UNIT_HEALTH_MAX');
+	f:RegisterEvent('UNIT_HEALTH_MAX')
+	f:RegisterEvent('RAID_ROSTER_UPDATE')
 end
