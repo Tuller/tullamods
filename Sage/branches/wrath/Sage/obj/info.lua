@@ -148,6 +148,12 @@ function InfoBar:PARTY_LEADER_CHANGED()
 	end
 end
 
+function InfoBar:RAID_ROSTER_UPDATE()
+	if self.hasPartyInfo and UnitIsUnit(self.unit, 'player') then
+		self:UpdateLevel()
+	end
+end
+
 function InfoBar:PARTY_MEMBERS_CHANGED()
 	if self.hasPartyInfo then
 		self:UpdatePartyLeader()
@@ -305,11 +311,26 @@ function InfoBar:UpdatePvP()
 end
 
 --updates the level display for the unit, colors depending on relative level to the player
+function InfoBar:GetRaidGroup()
+	local unitName = UnitName(self.unit)
+	for i = 1, _G['MAX_RAID_MEMBERS'] do
+		if i <= GetNumRaidMembers() then
+			local name, rank, group = GetRaidRosterInfo(i)
+			if name == unitName then
+				return group
+			end
+		end
+	end
+end
+
 function InfoBar:UpdateLevel()
 	local levelText = self.level
 	local level = UnitLevel(self.unit)
-
-	if level and level > 0 then
+	
+	if UnitInRaid(self.unit) and UnitIsUnit(self.unit, 'player') then
+		levelText:SetVertexColor(1, 1, 1)
+		levelText:SetText('G' .. self:GetRaidGroup())
+	elseif level and level > 0 then
 		local color = GetDifficultyColor(level)
 		levelText:SetVertexColor(color.r, color.g, color.b)
 		levelText:SetText(level)

@@ -309,7 +309,7 @@ function Frame:LoadVisibilityController()
 end
 
 function Frame:visibilityStates_Change(newStates)
---	self:UpdateVisibilityStates()
+	self:UpdateVisibilityStates()
 end
 
 function Frame:UpdateVisibilityStates()
