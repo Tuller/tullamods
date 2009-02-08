@@ -3,4 +3,5 @@
 ## Notes: Causes icons to pulse on cooldown completion
 ## Author: Tuller
 ## Dependencies: OmniCC
+## Version: 1.0.0
 pulse.lua
