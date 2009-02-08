@@ -8,6 +8,7 @@ Bagnon:
   * Show token information in the money tooltip for whatever currency we've opted to track
   * Clean up conditional display event code
   * Clean up spot code.  Add ability to search by quality.
+  * Write up wiki
 
 Bagnon_Forever:
   * Store token information
