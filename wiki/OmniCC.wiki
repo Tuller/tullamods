@@ -1,5 +1,6 @@
 #labels OmniCC
 <wiki:toc max_depth="3" />
+-----
 
 == General ==
 
@@ -7,7 +8,7 @@ OmniCC is an addon that adds text to items/spells/abilities that are on cooldown
 
 A configuration GUI is included, and can be shown via /omnicc or /occ
 
------
+
 ==FAQ==
 
 ===OmniCC is displaying text on _Addon_ and I don't want it to.  How do I make OmniCC not show up?===
