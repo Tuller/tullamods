@@ -173,8 +173,7 @@ function OmniCC:StartTimer(cooldown, start, duration)
 		timer.start = start
 		timer.duration = duration
 		
-		timer.shouldPulse = true
---		timer.shouldPulse = duration > (self.sets.minFinishEffectDuration or 30)
+		timer.shouldPulse = duration > (self.sets.minFinishEffectDuration or 30)
 		timer.nextUpdate = 0
 		timer:Show()
 	end
