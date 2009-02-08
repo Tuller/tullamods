@@ -48,6 +48,7 @@ SellFish:
 Tipachu:
   * Fix if it breaks
 
+-----
 Crazy Town - These are ideas I have that may either be entirely new things, impossible, or some combination of both:
   * Build a unit frame designer & runner pair of addons.  Suck at making unitframes? Just download ones someone else has used the designer to make.
   * Create an action bar addon based on a modal layout system.  Instead of telling Dominos: "switch to this bar when in form x" you instead specify a state ([form1]), then draw your bars, and attach spells.  Basically, in this system, you have a completely different UI based on what state you're in.  Blizzard implemented such a system with the vehicle and non vehicle UIs.
