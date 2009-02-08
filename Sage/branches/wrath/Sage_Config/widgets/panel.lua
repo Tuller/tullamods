@@ -168,7 +168,7 @@ end
 
 --width
 function Panel:NewWidthSlider(unitGroup)
-	local f = self:NewSettingSlider(L.Width, unitGroup, setting, 100, 300, 5)
+	local f = self:NewSettingSlider(L.Width, unitGroup, 'width', 100, 300, 5)
 	f.defaultValue = 150
 	return f
 end
