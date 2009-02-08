@@ -1,6 +1,0 @@
-﻿## Interface: 20400
-## Title: Mangos Buff Highlight
-## Notes: Adds borders around action buttons when a buff or debuff is cast on your target or yourself
-## Author: Tuller
-## Dependencies: Mangos
-main.lua
