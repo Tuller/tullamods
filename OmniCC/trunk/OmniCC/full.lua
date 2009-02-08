@@ -61,7 +61,7 @@ function OmniCC:InitDB()
 	local db = _G['OmniCCDB']
 	
 	--no settings, load defaults
-	if not db and db.version then
+	if not(db and db.version) then
 		db = {
 			font = SML:GetDefault('font'), --what font to use
 			fontOutline = 'OUTLINE', --what outline to use on fonts
