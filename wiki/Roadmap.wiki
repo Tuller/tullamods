@@ -2,18 +2,21 @@
 #labels Featured
 
 Bagnon:
-  * Modernize codebase.
+  * Write a 2.0 version
+  * Make the item button and utility libraries generic enough that they can be used for Combuctor and Bagnon (bagnon_core)
+  * Separate addons for bags, bank, and keys.  If a given module is enabled, completely replace the blizzard version.
+  * Show token information in the money tooltip for whatever currency we've opted to track
+  * Clean up conditional display event code
+  * Clean up spot code.  Add ability to search by quality.
 
 Bagnon_Forever:
-  * Need to deal with links that include player levels (maybe)
   * Store token information
-  * Crazy town: Implement guild bank support
 
 Combuctor:
   * Switch to using bag sounds instead of merchant frame sounds
   * Implement better set API
   * Add in event-> tab event system (ex, show bank frame, normal tab when showing the bank, keyring when I click the keyring, trade bags...)
-  * Add in a few configuration options
+  * Add in a few configuration options (scale, etc)
 
 [Dominos]:
   * Revise wiki, add FAQ
@@ -28,18 +31,18 @@ Ludwig:
   * Add in spell and talent link support
 
 OmniCC:
-  * Return of the shine option?
+  * Add a minimum duration option for end effects
+  * Transform shine/flash into a plugin architecture
+  * Write a brief wiki
 
 Sage:
-  * Rewrite for 3.0
-  * Make buff display better (fix icons, show all debuffs, but give mine a bigger icon)
-  * Implement forced visibility state code (so that I can make party frames not show wheen in a raid, etc)
-  * Use a template system of some sort to make it easier to create new jambers
-  * Refactor code.  Events -> processor -> unit widgets
+  * Separate frame folders (core, party, target_target, focus_target, party_targets)
+  * Write wiki on completion of the thing
+  * Add "always show these buffs" and "always show these debuffs" lists
 
 SellFish:
-  * Update whenever there's an itemprice update
-  * Write an armory scraper if itemprice updates stop again
+  * Update whenever there's an libitemprice update
+  * Write an armory scraper if libitemprice updates stop again (a good reason to learn another language)
 
 Tipachu:
   * Fix if it breaks
