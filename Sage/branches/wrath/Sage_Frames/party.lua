@@ -125,6 +125,10 @@ function PartyFrame:showInRaid_Change(enable)
 	end
 end
 
+function PartyFrame:textMode_Change(mode)
+	self.pet.health:textMode_Change(mode)
+end
+
 function PartyFrame:GetDefaults()
 	return {
 		point = 'TOPLEFT',
