@@ -20,46 +20,32 @@ local activePulses = {}
 local WOW_EPOCH = time{year = 2008, month = 11, day = 23, hour = 2, min = 0, sec = 0}
 
 --omg speed constants
+local _G = _G
 local floor = math.floor
 local format = string.format
-local _G = _G
+local time = time
 
 --[[
 	Addon Loading
 --]]
 
 OmniCC = CreateFrame('Frame')
-OmniCC:Hide()
 OmniCC:SetScript('OnEvent', function(self) self:Enable() end)
-OmniCC:SetScript('OnUpdate', function(self, elapsed) self:UpdateAllPulses(elapsed) end)
 OmniCC:RegisterEvent('PLAYER_LOGIN')
 
 function OmniCC:Enable()
-	if not(OmniCCDB and OmniCCDB.version) then
-		self:LoadDefaults()
-	else
-		local cMajor, cMinor = CURRENT_VERSION:match('(%d+)%.(%d+)')
-		local major, minor = OmniCCDB.version:match('(%d+)%.(%d+)')
+	self.sets = self:InitDB()
+	
+	self:CheckVersion()
 
-		if major ~= cMajor then
-			self:LoadDefaults()
-		elseif minor ~= cMinor then
-			self:UpdateSettings()
-		end
-
-		if OmniCCDB.version ~= CURRENT_VERSION then
-			self:UpdateVersion()
-		end
-	end
-
-	self.sets = OmniCCDB
-
-	--enable the addon
 	self:HookCooldown()
 	
 	--setup the options menu hook
 	local f = CreateFrame('Frame', nil, InterfaceOptionsFrame)
-	f:SetScript('OnShow', function(self) LoadAddOn('OmniCC_Options') self:SetScript('OnShow', nil) end)
+	f:SetScript('OnShow', function(self) 
+		LoadAddOn('OmniCC_Options') 
+		self:SetScript('OnShow', nil) 
+	end)
 
 	--load slash commands
 	SlashCmdList['OmniCCCOMMAND'] = function()
@@ -71,38 +57,64 @@ function OmniCC:Enable()
 	SLASH_OmniCCCOMMAND2 = '/occ'
 end
 
-function OmniCC:LoadDefaults()
-	OmniCCDB = {
-		font = SML:GetDefault('font'), --what font to use
-		fontOutline = 'OUTLINE', --what outline to use on fonts
-		fontSize = 18, --the base font size to use at a scale of 1
+function OmniCC:InitDB()
+	local db = _G['OmniCCDB']
+	
+	--no settings, load defaults
+	if not db and db.version then
+		db = {
+			font = SML:GetDefault('font'), --what font to use
+			fontOutline = 'OUTLINE', --what outline to use on fonts
+			fontSize = 18, --the base font size to use at a scale of 1
 
-		showModel = true, --show the cooldown model or not
-		useMMSS = false, --use MM:SS format for cooldowns under 3 minutes
-		usePulse = false, --pulse at end of cooldown
+			showModel = true, --show the cooldown model or not
+			useMMSS = false, --use MM:SS format for cooldowns under 3 minutes
 
-		minScale = 0.5, --the minimum scale we want to show cooldown counts at, anything below will be hidden
-		minDuration = 3, --the minimum duration we want to show cooldowns for, anything below will not show a timer
+			minScale = 0.5, --the minimum scale we want to show cooldown counts at, anything below will be hidden
+			minDuration = 3, --the minimum duration we want to show cooldowns for, anything below will not show a timer
+			minFinishEffectDuration = 30, --the minimum duration a cooldown should have for completion effects
 
-		style = {
-			short = {r = 1, g = 0, b = 0, s = 1.25}, -- <= 5 seconds
-			secs = {r = 1, g = 1, b = 0.4, s = 1}, -- < 1 minute
-			mins = {r = 0.8, g = 0.8, b = 0.9, s = 0.9}, -- >= 1 minute
-			hrs = {r = 0.8, g = 0.8, b = 0.9, s = 0.8}, -- >= 1 hr
-			days = {r = 0.8, g = 0.8, b = 0.9, s = 0.65}, -- >= 1 day
-		},
+			style = {
+				short = {r = 1, g = 0, b = 0, s = 1.25}, -- <= 5 seconds
+				secs = {r = 1, g = 1, b = 0.4, s = 1}, -- < 1 minute
+				mins = {r = 0.8, g = 0.8, b = 0.9, s = 0.9}, -- >= 1 minute
+				hrs = {r = 0.8, g = 0.8, b = 0.9, s = 0.8}, -- >= 1 hr
+				days = {r = 0.8, g = 0.8, b = 0.9, s = 0.65}, -- >= 1 day
+			},
 
-		version = CURRENT_VERSION,
-	}
+			version = CURRENT_VERSION,
+		}
+
+		_G['OmniCCDB'] = db
+	end
+
+	return db
+end
+
+function OmniCC:CheckVersion()
+	local cMajor, cMinor, cBugfix = CURRENT_VERSION:match('(%w+)%.(%w+)%.(%w+)')
+	local major, minor, bugfix = self.sets.version:match('(%w+)%.(%w+)%.(%w+)')
+
+	if major ~= cMajor then
+		self:LoadDefaults()
+	elseif minor ~= cMinor then
+		self:UpdateSettings()
+	end
+
+	if self.sets.version ~= CURRENT_VERSION then
+		self:UpdateVersion()
+	end
 end
 
 function OmniCC:UpdateSettings()
-	OmniCCDB.font = SML:GetDefault('font')
+	self.sets.font = SML:GetDefault('font')
+	self.sets.usePulse = nil
+	self.sets.minFinishEffectDuration = 30
 end
 
 function OmniCC:UpdateVersion()
-	OmniCCDB.version = CURRENT_VERSION
-	self:Print(L.Updated:format(OmniCCDB.version), true)
+	self.sets.version = CURRENT_VERSION
+	self:Print(format(L.Updated, self.sets.version))
 end
 
 do
@@ -137,7 +149,6 @@ end
 	Timer Code
 --]]
 
-local datetbl
 function OmniCC:StartTimer(cooldown, start, duration)
 	local timer = timers[cooldown] or self:CreateTimer(cooldown)
 	
@@ -161,7 +172,9 @@ function OmniCC:StartTimer(cooldown, start, duration)
 
 		timer.start = start
 		timer.duration = duration
-		timer.shouldPulse = duration > 30
+		
+		timer.shouldPulse = true
+--		timer.shouldPulse = duration > (self.sets.minFinishEffectDuration or 30)
 		timer.nextUpdate = 0
 		timer:Show()
 	end
@@ -264,8 +277,8 @@ function OmniCC:UpdateTimer(timer)
 		else
 			timer:Hide()
 
-			if timer.shouldPulse and self:ShowingPulse() then
-				self:StartPulse(timer)
+			if timer.shouldPulse and self.OnFinishCooldown then
+				self:OnFinishCooldown(timer)
 			end
 		end
 	end
@@ -276,6 +289,9 @@ function OmniCC:UpdateAllTimers()
 		timer.nextUpdate = 0
 	end
 end
+
+
+--[[ Format Functions ]]--
 
 function OmniCC:GetFormattedTime(s)
   if s >= DAY then
@@ -312,79 +328,11 @@ end
 
 
 --[[
-	Pulse Code
---]]
-
-function OmniCC:CreatePulse(parent)
-	local frame = CreateFrame('Frame', nil, parent)
-	frame:SetAllPoints(parent)
-	frame:SetToplevel(true)
-
-	local icon = frame:CreateTexture(nil, 'OVERLAY')
-	icon:SetPoint('CENTER')
-	icon:SetBlendMode('ADD')
-	icon:SetHeight(frame:GetHeight())
-	icon:SetWidth(frame:GetWidth())
-	frame.icon = icon
-
-	pulses[parent] = frame
-
-	return frame
-end
-
-function OmniCC:StartPulse(timer)
-	local icon = timer.icon
-	local parent = timer:GetParent()
-
-	if icon and icon.GetTexture and parent:IsVisible() then
-		local pulse = pulses[parent] or self:CreatePulse(parent)
-		if pulse and not activePulses[pulse] then
-			pulse.scale = 1
-			pulse.icon:SetTexture(icon:GetTexture())
-
-			local r, g, b = icon:GetVertexColor()
-			pulse.icon:SetVertexColor(r, g, b, 0.7)
-			pulse:Show()
-
-			--enable the pulse updater
-			activePulses[pulse] = true
-			self:Show()
-		end
-	end
-end
-
-function OmniCC:UpdatePulse(pulse, elapsed)
-	if pulse.scale >= 2 then
-		pulse.dec = 1
-	end
-
-	pulse.scale = max(min(pulse.scale + (pulse.dec and -1 or 1) * pulse.scale * (elapsed/0.5), 2), 1)
-
-	if pulse.scale <= 1 then
-		activePulses[pulse] = nil
-		pulse:Hide()
-		pulse.dec = nil
-	else
-		pulse.icon:SetHeight(pulse:GetHeight() * pulse.scale)
-		pulse.icon:SetWidth(pulse:GetWidth() * pulse.scale)
-	end
-end
-
-function OmniCC:UpdateAllPulses(elapsed)
-	if next(activePulses) then
-		for pulse in pairs(activePulses) do
-			self:UpdatePulse(pulse, elapsed)
-		end
-	else
-		self:Hide()
-	end
-end
-
-
---[[
 	Configuration Functions
 --]]
 
+
+--font style selector
 function OmniCC:SetFont(font)
 	self.sets.font = font
 	self:UpdateAllTimers()
@@ -393,14 +341,16 @@ end
 --wrapper for shared media library
 --gets the path to the font we're using
 function OmniCC:GetFont()
-	return SML:Fetch(SML.MediaType.FONT, self.sets.font)
+	return SML:Fetch(SML.MediaType['FONT'], self.sets.font)
 end
 
---get the name of the font we're using
+--get the name of the font we're using (used for the options menu)
 function OmniCC:GetFontName()
 	return self.sets.font
 end
 
+
+--font size selector
 function OmniCC:SetFontSize(fontSize)
 	if fontSize then
 		self.sets.fontSize = fontSize
@@ -421,6 +371,8 @@ function OmniCC:GetFontOutline()
 	return self.sets.fontOutline
 end
 
+
+--text format settings
 function OmniCC:SetDurationColor(duration, r, g, b)
 	local style = self.sets.style
 	if duration and style[duration] then
@@ -447,6 +399,8 @@ function OmniCC:GetDurationFormat(duration)
 	end
 end
 
+
+--minum scale of icon to show text
 function OmniCC:SetMinScale(scale)
 	if scale then
 		self.sets.minScale = scale
@@ -458,6 +412,8 @@ function OmniCC:GetMinScale()
 	return self.sets.minScale
 end
 
+
+--minimum duration toggle
 function OmniCC:SetMinDuration(duration)
 	if duration then
 		self.sets.minDuration = duration
@@ -468,14 +424,8 @@ function OmniCC:GetMinDuration()
 	return self.sets.minDuration
 end
 
-function OmniCC:SetShowPulse(enable)
-	self.sets.usePulse = enable
-end
 
-function OmniCC:ShowingPulse()
-	return self.sets.usePulse
-end
-
+--show cooldown models toggle
 function OmniCC:SetShowModels(enable)
 	self.sets.showModel = enable
 end
@@ -484,6 +434,7 @@ function OmniCC:ShowingModels()
 	return self.sets.showModel
 end
 
+--mmss format thingy
 function OmniCC:SetUseMMSS(enable)
 	self.sets.useMMSS = enable
 	self:UpdateAllTimers()
@@ -493,14 +444,27 @@ function OmniCC:UsingMMSS()
 	return self.sets.useMMSS
 end
 
+
 --[[
 	Utility Functions
 --]]
 
-function OmniCC:Print(msg, showAddon)
-	if showAddon then
-		print(format('|cFF33FF99OmniCC|r: %s', tostring(msg)))
-	else
-		print(tostring(msg))
+function OmniCC:Print(...)
+	print('|cFF33FF99OmniCC|r', ...)
+end
+
+function OmniCC:CreateClass(type, parentClass)	
+	local class = CreateFrame(type)
+	class.mt = {__index = class}
+
+	if parentClass then
+		class = setmetatable(class, {__index = parentClass})
+		class.super = parentClass
 	end
+
+	function class:Bind(o)
+		return setmetatable(o, self.mt)
+	end
+
+	return class
 end
