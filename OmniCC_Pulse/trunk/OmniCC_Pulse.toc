@@ -1,0 +1,7 @@
+## Interface: 30000
+## Title: OmniCC_Pulse
+## Notes: Causes icons to pulse on cooldown completion
+## Author: Tuller
+## Dependencies: OmniCC
+## DefaultState: Disabled
+pulse.lua
