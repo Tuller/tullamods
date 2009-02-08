@@ -23,10 +23,9 @@ Combuctor:
 [Dominos]:
   * Revise wiki, add FAQ
   * Make a possess bar.  By a possess bar, I mean a bar that hijacks either the pet or action bar buttons (including stealing hotkeys while its up) when controlling a vehicle/possessing a dude.
-  * Implement cooldown displays for buffs/debuffs on buttons.
   * Make Dominos have a saner layout when switching between 1-120 bars.  This includes adding a slider for numbars/numbuttons
   * Clean up the auto fading and showstate interfaces.  
-  * Crazy town: custom state headers.
+  * Implement per spec action button layouts with 3.1.0/dual specs
 
 Ludwig:
   * Modernize codebase
