@@ -1,5 +1,5 @@
 #labels OmniCC
-<wiki:toc max_depth="2" />
+<wiki:toc max_depth="1" />
 
 == General ==
 
