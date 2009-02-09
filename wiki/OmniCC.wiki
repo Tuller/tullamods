@@ -27,3 +27,9 @@ This means that the addon you're using has implemented its own method for displa
 
 ===Why don't you implement a blacklist instead of using all of these crazy algorithms?===
 Bloat, basically.  If I were to implement a blacklist, and handle nameless frames properly, I would have to introduce addon specific code.  But introducing addon specific code, however, is completely against the design of OmniCC in the first place :)
+
+===I've downloaded a end effect plugin like _OmniCC Pulse_ but its not doing anything===
+To prevent overloading your CPU with too many end of cooldown effects in the case you're silenced, etc, OmniCC has a hidden setting to determine how long a cooldown must be to trigger an end effect.  The setting is set to 30 seconds by default.  To change it run this command:
+{{{
+/run OmniCC.sets.minFinishEffectDuration = <minimum duration of a cooldown to show an end of cooldown effect for in seconds>
+}}}
