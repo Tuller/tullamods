@@ -31,10 +31,8 @@ Ludwig:
   * Modernize codebase
   * Add in spell and talent link support
 
-OmniCC:
-  * Add a minimum duration option for end effects
-  * Transform shine/flash into a plugin architecture
-  * Write a brief wiki
+[OmniCC]:
+  * Fix bugs
 
 Sage:
   * Separate frame folders (core, party, target_target, focus_target, party_targets)
