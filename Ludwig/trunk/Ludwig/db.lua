@@ -3,16 +3,13 @@
 		The database portion Of Ludwig
 --]]
 
+Ludwig = {}
+
 local MAXID = 60000 --probably need to increase this to 40k by Wrath
 local lastSearch --this is a hack to allow for 3 variables when sorting.  Its used to give the name filter
-local filteredList = {}
-local searchList = {}
-local db, itemInfo
 
 
 --[[ Sorting Functions ]]--
-
-local GetItemInfo = GetItemInfo
 
 --returns the difference between two strings, where one is known to be within the other.
 local function GetDist(str1, str2)
@@ -34,12 +31,14 @@ end
 
 --sorts a list by rarity, either closeness to the searchString if there's been a search, then level, then name
 local function SortByEverything(id1, id2)
-	local name1 = db[id1]
-	local name2 = db[id2]
-	local rarity1 = itemInfo[3][id1]
-	local rarity2 = itemInfo[3][id2]
-	local level1 = itemInfo[4][id1]
-	local level2 = itemInfo[4][id2]
+	local item1 = Ludwig:GetItemInfo(id1)
+	local item2 = Ludwig:GetItemInfo(id2)
+	local name1 = item1.search
+	local name2 = item2.search
+	local rarity1 = item1[3]
+	local rarity2 = item2[3]
+	local level1 = item1[4]
+	local level2 = item2[4]
 
 	if rarity1 ~= rarity2 then
 		return rarity1 > rarity2
@@ -62,23 +61,8 @@ end
 
 --sort by distance to the searchTerm
 local function SortByDistance(id1, id2)
-	return GetDist(lastSearch, db[id1]) < GetDist(lastSearch, db[id2])
-end
-
-local function CreateItemCacheTable()
-	local info = {}
-	for i = 1, 10 do
-		info[i] = setmetatable({}, {
-			__index = function(t, k)
-				local stats = (select(i, GetItemInfo(k)))
-				if stats then
-					t[k] = stats
-				end
-				return stats
-			end
-		})
-	end
-	return info
+	local item1, item2 = Ludwig:GetItemInfo(id1), Ludwig:GetItemInfo(id2)
+	return GetDist(lastSearch, item1.search) < GetDist(lastSearch, item2.search)
 end
 
 local function ToSearch(name)
@@ -88,113 +72,122 @@ end
 
 --[[ Usable Functions ]]--
 
-Ludwig = {}
-
-function Ludwig:GetAllItems(refresh)
-	if not itemInfo then
-		itemInfo = CreateItemCacheTable()
-	end
-
-	if not db or refresh then
-		db = db or {}
-		for i = 1, MAXID do
-			local name = itemInfo[1][i]
-			if not db[i] and name then
-				db[i] = name:lower()
-			end
+do
+	--a cache of GetItemInfo
+	local GetItemInfo = _G['GetItemInfo']
+	local itemInfo = setmetatable({}, {__index = function(t, id)
+		local name, link, rarity, iLevel, reqLevel, type, subType, stackCount, equipLoc, texture = GetItemInfo(id)
+		if name then
+			t[id] = {
+				name, 
+				link, 
+				rarity, 
+				iLevel, 
+				reqLevel, 
+				type, 
+				subType, 
+				stackCount, 
+				equipLoc, 
+				texture, 
+				['search'] = name:lower()
+			}
+			return t[id]
+		end
+	end})
+	
+	function Ludwig:RefreshDB()
+		for id = 1, MAXID do
+			local k = itemInfo[id]
 		end
 	end
-	return db
+	
+	function Ludwig:GetAllItems()
+		return pairs(itemInfo)
+	end
+	
+	function Ludwig:GetItemInfo(id)
+		return itemInfo[id]
+	end
 end
 
-function Ludwig:GetItems(name, quality, type, subType, equipLoc, minLevel, maxLevel)
-	local db = self:GetAllItems()
-	local stats = itemInfo
-	local search
 
-	if name and name ~= '' then
-		name = name:lower()
-		search = ToSearch(name)
-		--this is a hack to obtain better performance, we're not filtering searches by closeness for short strings
-		if #name > 2 then
-			lastSearch = name
+--[[ Search Methods ]]--
+
+do
+	local results = {}
+	function Ludwig:GetItems(name, quality, type, subType, equipLoc, minLevel, maxLevel)
+		local search
+		if name and #name > 2 then
+			name = name:lower()
+			search = ToSearch(name)
 		else
-			lastSearch = nil
+			search = nil
 		end
-	else
-		lastSearch = nil
-		name = nil
-	end
+		lastSearch = name
 
-	for i in pairs(filteredList) do
-		filteredList[i] = nil
-	end
+		for k, v in pairs(results) do results[k] = nil end
+		for id, info in self:GetAllItems() do
+			local inSet = true
 
-	local count = 0
+			if quality and info[3] ~= quality then
+				inSet = nil
+			elseif minLevel and info[5] < minLevel then
+				inSet = nil
+			elseif maxLevel and info[5] > maxLevel then
+				inSet = nil
+			elseif type and info[6] ~= type then
+				inSet = nil
+			elseif subType and info[7] ~= subType then
+				inSet = nil
+			elseif equipLoc and info[9] ~= equipLoc then
+				inSet = nil
+			elseif search and not(info.search == name or info.search:match(search))then
+				inSet = nil
+			end
 
-	for id, itemName in pairs(db) do
-		local addItem = true
-		if quality and stats[3][id] ~= quality then
-			addItem = nil
-		elseif minLevel and stats[5][id] < minLevel then
-			addItem = nil
-		elseif maxLevel and stats[5][id] > maxLevel then
-			addItem = nil
-		elseif type and stats[6][id] ~= type then
-			addItem = nil
-		elseif subType and stats[7][id] ~= subType then
-			addItem = nil
-		elseif equipLoc and stats[9][id] ~= equipLoc then
-			addItem = nil
-		elseif name then
-			if not(name == itemName or itemName:find(search)) then
-				addItem = nil
+			if inSet then
+				table.insert(results, id)
 			end
 		end
 
-		if addItem then
-			count = count + 1
-			filteredList[count] = id
-		end
+		table.sort(results, SortByEverything)
+		return results
 	end
-
-	table.sort(filteredList, SortByEverything)
-
-	return filteredList
 end
 
-function Ludwig:GetItemsNamedLike(name)
-	if name == '' then return end
+do
+	local results = {}
+	function Ludwig:GetItemsNamedLike(name)
+		if (not name) or name == '' then return end
+		
+		local name = name:lower()
+		local search = '^' .. ToSearch(name)
+		lastSearch = name
 
-	local name = name:lower()
-	local search = '^' .. ToSearch(name)
-
-	for i in pairs(searchList) do
-		searchList[i] = nil
-	end
-
-	local db = self:GetAllItems()
-	for id, itemName in pairs(db) do
-		if itemName == name or itemName:find(search) then
-			table.insert(searchList, id)
-			if itemName == name then
-				break
+		for k, v in pairs(results) do results[k] = nil end
+		for id, info in self:GetAllItems() do
+			if info.search == name or info.search:find(search) then
+				table.insert(results, id)
+				if info.search == name then
+					break
+				end
 			end
 		end
-	end
 
-	lastSearch = search
-	if next(searchList) then
-		table.sort(searchList, SortByDistance)
+		table.sort(results, SortByDistance)
+		return results
 	end
-	return searchList
 end
+
+
+--[[ Item Info Utility Methods ]]--
 
 function Ludwig:GetItemName(id, inColor)
-	local stats = itemInfo
-	local name = stats[1][id]
+	local info = self:GetItemInfo(id)
+	local name = info and info[1]
+
 	if name and inColor then
-		local rarity = stats[3][id]
+		local rarity = info[3]
 		local hex = (select(4, GetItemQualityColor(rarity)))
 		return format('%s%s|r', hex, name)
 	end
@@ -202,13 +195,40 @@ function Ludwig:GetItemName(id, inColor)
 end
 
 function Ludwig:GetItemLink(id)
-	return (select(2, GetItemInfo(id)))
+	local info = self:GetItemInfo(id)
+	return info and info[2]
 end
 
 function Ludwig:GetItemTexture(id)
-	return itemInfo[10][id]
+	local info = self:GetItemInfo(id)
+	return info and info[10]
 end
 
-function Ludwig:ReloadDB()
-	self:GetAllItems(true)
+--queries the server for items from startID to endID.  don't run too many of these at once, or you WILL be disconnected
+function Ludwig:Scan(startID, endID)
+	local tip = self.spider or CreateFrame('GameTooltip', 'LudwigSpiderTooltip', UIParent, 'GameTooltipTemplate')
+	self.spider = tip
+
+	local nextUpdate = 0
+	local id = startID or 1
+	local endID = endID or MAXID
+
+	CreateFrame('Frame'):SetScript('OnUpdate', function(self, elapsed)
+		if nextUpdate < 0 then
+			nextUpdate = 1
+
+			--skip over any items we've seen already
+			while Ludwig:GetItemInfo(id) do id = id + 1 end
+
+			--we've reached an id that's not been 'seen', query the server for item info
+			tip:SetHyperlink(format('item:%d', id))
+
+			id = id + 1
+			if id > endID then
+				self:Hide()
+			end
+		else
+			nextUpdate = nextUpdate - elapsed
+		end
+	end)
 end

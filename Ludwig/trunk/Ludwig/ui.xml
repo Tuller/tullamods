@@ -309,7 +309,7 @@
 						LudwigUI_OnScrollFrameHide()
 					</OnHide>
 					<OnVerticalScroll>
-						FauxScrollFrame_OnVerticalScroll(self, arg1, LWUI_SHOWN, LudwigUI_UpdateList)
+						FauxScrollFrame_OnVerticalScroll(self, arg1, LWUI_SHOWN, function(self) LudwigUI_UpdateList() end)
 					</OnVerticalScroll>
 				</Scripts>
 			</ScrollFrame>
@@ -346,11 +346,11 @@
 				LudwigUI_OnLoad(self)
 			</OnLoad>
 			<OnShow>
-				LudwigUI_OnShow()
+				LudwigUI_OnShow(self)
 				PlaySound("igCharacterInfoOpen")
 			</OnShow>
 			<OnHide>
-				LudwigUI_OnHide()
+				LudwigUI_OnHide(self)
 				PlaySound("igCharacterInfoClose")
 			</OnHide>
 		</Scripts>

@@ -40,16 +40,17 @@ function LudwigUI_OnLoad(self)
 	uiFrame = self
 end
 
-function LudwigUI_OnShow()
+function LudwigUI_OnShow(self)
+	Ludwig:RefreshDB()
 	LudwigUI_UpdateList(true)
 end
 
-function LudwigUI_OnHide()
+function LudwigUI_OnHide(self)
 	display = nil
 end
 
 function LudwigUI_Refresh()
-	Ludwig:ReloadDB()
+	Ludwig:RefreshDB()
 	LudwigUI_UpdateList(true)
 end
 

@@ -7,7 +7,7 @@
 local function OnFullMatch(match)
 	local list = Ludwig:GetItemsNamedLike(match)
 	if list and list[1] then
-		return (select(2, GetItemInfo(list[1])))
+		return Ludwig:GetItemLink(list[1])
 	end
 	return match
 end
@@ -15,7 +15,7 @@ end
 local function OnPartialMatch(match)
 	local list = Ludwig:GetItemsNamedLike(match)
 	if list and list[1] then
-		return '[[' .. GetItemInfo(list[1])
+		return '[[' .. Ludwig:GetItemName(list[1])
 	end
 	return '[[' .. match
 end
