@@ -27,8 +27,8 @@ Combuctor:
   * Clean up the auto fading and showstate interfaces.  
   * Implement per spec action button layouts with 3.1.0/dual specs
 
-Ludwig:
-  * Modernize codebase
+[Ludwig]:
+  * Clean up GUI code
   * Add in spell and talent link support
 
 [OmniCC]:
