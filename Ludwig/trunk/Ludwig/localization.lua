@@ -26,8 +26,8 @@ L.TradeGoods = "Trade Goods"
 --Slash command responses
 L.DBRefreshed = "Database Refreshed"
 L.UnknownCommand = "\"%s\" is an unknown command"
-L.NoMatchingItems = "There are no items matching \"%s\""
-L.NumMatching = "There are %d items matching \"%s\":"
+L.NoMatchingItems = "There are no items matching '%s'"
+L.NumMatching = "There are %d items matching '%s':"
 L.GenTime = "Generated in %.3f seconds"
 
 -- Chinese translation (zhCN) by lostcup @ NGACN

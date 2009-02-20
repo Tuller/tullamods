@@ -2,68 +2,93 @@
 	slash.lua
 		Slash command handler for Ludwig
 
-	Commands:
+	ludwig slash commands:
 		/lw or /ludwig
-			start of a command, shows the UI if its enabled
-		/lw --refresh
-			resets the database
+			toggles the GUI
 		/lw <name>
 			prints a list of items matching <name>
+		/lw --q <itemID>
+			queries the game for and displays the link of <itemID>
+		/lw --r
+			forces a database refresh
 --]]
 
-local L = LUDWIG_LOCALS
-local MAX_DISPLAY = 9
+--constants!
+local L = _G['LUDWIG_LOCALS']
+local MAX_RESULTS = 10
 
-local function LMsg(...)
-	print('|cFF00EE00Ludwig|r:', ...)
-end
+--[[
+	Slash Command Actions
+--]]
 
-local function PrintList(name, list, startTime)
-	LMsg(format(L.NumMatching, #list, name))
+--display all items matching <name> in the chat window
+local function listItemsMatching(name)
+	local startTime = GetTime()
+	LudwigDB:Refresh()
 
-	for i = 1, min(#list, MAX_DISPLAY) do
-		print(Ludwig:GetItemLink(list[i]))
-	end
+	local results = LudwigDB:GetItems(name)
+	if #results > 0 then
+		--print title
+		print(format(L.NumMatching, #results, name))
 
-	print(format(L.GenTime, time() - startTime))
-end
-
-local function ListItemsOfName(name)
-	local startTime = time()
-
-	Ludwig:RefreshDB()
-	local list = Ludwig:GetItems(name)
-	if list then
-		PrintList(name, list, startTime)
-	else
-		LMsg(format(L.NoMatchingItems, name))
-	end
-end
-
-SlashCmdList["LudwigSlashCOMMAND"] = function(msg)
-	if not msg or msg == "" then
-		if(LudwigFrame and LudwigFrame:IsShown()) then
-			HideUIPanel(LudwigFrame)
-		elseif(LudwigFrame) then
-			ShowUIPanel(LudwigFrame)
+		--list result
+		for i = 1, math.min(#results, MAX_RESULTS) do
+			print(' - ' .. LudwigDB:GetItemLink(results[i]))
 		end
+
+		--print the time it took to generate the set
+		print(format(L.GenTime, GetTime() - startTime))
 	else
-		local cmd = msg:lower():match("%-%-(%w+)")
+		--print
+		print(format(L.NoMatchingItems, name))
+	end
+end
+
+--refresh the item database
+local function refreshDB()
+	LudwigDB:Refresh()
+	print(L.DBRefreshed)
+end
+
+--query and display an item that matches <id>
+local function queryItem(id)
+	SetItemRef(format('item:%d', tonumber(id)))
+end
+
+--toggle the ludwig frame
+local function toggleGUI()
+	local frame = _G['LudwigFrame']
+	if frame then
+		if frame:IsShown() then
+			HideUIPanel(frame)
+		else
+			ShowUIPanel(frame)
+		end
+	end
+end
+
+
+--[[
+	Slash Command Setup
+--]]
+
+SlashCmdList['LudwigSlashCOMMAND'] = function(msg)
+	if not msg or msg == '' then
+		toggleGUI()
+	else
+		local cmd = msg:lower():match('%-%-([%w%s]+)')
 		if cmd then
-			if cmd == "refresh" then
-				Ludwig:RefreshDB()
-				LMsg(L.DBRefreshed)
-			elseif cmd == "scan" then
-				Ludwig:Scan()
-			elseif tonumber(cmd) then
-				SetItemRef(format("item:%d", tonumber(cmd)))
+			if cmd == 'r' then
+				refreshDB()
+			elseif cmd:match('q %d+') then
+				queryItem(cmd:match('q (%d+)'))
 			else
-				LMsg(format(L.UnknownCommand, cmd))
+				print(format(L.UnknownCommand, cmd))
 			end
 		else
-			ListItemsOfName(msg)
+			listItemsMatching(msg)
 		end
 	end
 end
-SLASH_LudwigSlashCOMMAND1 = "/lw"
-SLASH_LudwigSlashCOMMAND2 = "/ludwig"
+SLASH_LudwigSlashCOMMAND1 = '/lw'
+SLASH_LudwigSlashCOMMAND2 = '/ludwig'

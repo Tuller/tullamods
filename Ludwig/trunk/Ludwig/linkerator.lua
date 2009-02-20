@@ -4,41 +4,32 @@
 		Thanks to N00bZXI for the autocomplete changes
 --]]
 
-local function OnFullMatch(match)
-	local list = Ludwig:GetItemsNamedLike(match)
+local function onFullMatch(match)
+	local list = LudwigDB:GetItemsNamedLike(match)
 	if list and list[1] then
-		return Ludwig:GetItemLink(list[1])
+		return LudwigDB:GetItemLink(list[1])
 	end
 	return match
 end
 
-local function OnPartialMatch(match)
-	local list = Ludwig:GetItemsNamedLike(match)
+local function onPartialMatch(match)
+	local list = LudwigDB:GetItemsNamedLike(match)
 	if list and list[1] then
-		return '[[' .. Ludwig:GetItemName(list[1])
+		return '[[' .. LudwigDB:GetItemName(list[1])
 	end
 	return '[[' .. match
 end
 
-local function Linkerator_OnChar(self, ...)
-	local obj = self
-	if WIM_EditBoxInFocus then
-		obj = WIM_EditBoxInFocus
-	end
+_G['ChatFrameEditBox']:HookScript('OnChar', function(self, ...)
+	local self = _G['WIM_EditBoxInFocus'] or self
 
-	local text = obj:GetText()
+	local text = self:GetText()
 	if text ~= '' then
 		if text:match('%[%[(.+)%]$') then
-			obj:SetText(text:gsub('%[%[(.+)%]$', OnFullMatch))
+			self:SetText(text:gsub('%[%[(.+)%]$', onFullMatch))
 		else
-			obj:SetText(text:gsub('%[%[(.+)$', OnPartialMatch))
-			obj:HighlightText(#text, -1)
+			self:SetText(text:gsub('%[%[(.+)$', onPartialMatch))
+			self:HighlightText(#text, -1)
 		end
 	end
-end
-
-if ChatFrameEditBox:GetScript('OnChar') then
-	ChatFrameEditBox:HookScript('OnChar', Linkerator_OnChar)
-else
-	ChatFrameEditBox:SetScript('OnChar', Linkerator_OnChar)
-end
+end)

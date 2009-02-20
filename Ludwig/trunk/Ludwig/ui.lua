@@ -41,7 +41,7 @@ function LudwigUI_OnLoad(self)
 end
 
 function LudwigUI_OnShow(self)
-	Ludwig:RefreshDB()
+	LudwigDB:Refresh()
 	LudwigUI_UpdateList(true)
 end
 
@@ -50,14 +50,14 @@ function LudwigUI_OnHide(self)
 end
 
 function LudwigUI_Refresh()
-	Ludwig:RefreshDB()
+	LudwigDB:Refresh()
 	LudwigUI_UpdateList(true)
 end
 
 function LudwigUI_Reset()
 	local changed
 	for i in pairs(filter) do
-		if(filter[i] ~= nil) then
+		if filter[i] ~= nil then
 			changed = true
 			filter[i] = nil
 		end
@@ -65,10 +65,10 @@ function LudwigUI_Reset()
 
 	--reset search text
 	local search = _G[uiFrame:GetName() .. 'Search']
-	if(search:HasFocus()) then
+	if search:HasFocus() then
 		search:SetText('')
 	else
-		search:SetText(SEARCH)
+		search:SetText(_G['SEARCH'])
 	end
 
 	_G[uiFrame:GetName() .. 'MinLevel']:SetText('')
@@ -97,17 +97,17 @@ end
 
 function LudwigUI_OnItemClick(self)
 	if IsShiftKeyDown() then
-		ChatFrameEditBox:Insert(Ludwig:GetItemLink(self:GetID()))
+		ChatFrameEditBox:Insert(LudwigDB:GetItemLink(self:GetID()))
 	elseif IsControlKeyDown() then
-		DressUpItemLink(Ludwig:GetItemLink(self:GetID()))
+		DressUpItemLink(LudwigDB:GetItemLink(self:GetID()))
 	else
-		SetItemRef(Ludwig:GetItemLink(self:GetID()))
+		SetItemRef(LudwigDB:GetItemLink(self:GetID()))
 	end
 end
 
 function LudwigUI_OnItemEnter(self)
 	GameTooltip:SetOwner(self, 'ANCHOR_BOTTOMRIGHT')
-	GameTooltip:SetHyperlink(Ludwig:GetItemLink(self:GetID()))
+	GameTooltip:SetHyperlink(LudwigDB:GetItemLink(self:GetID()))
 	GameTooltip:Show()
 end
 
@@ -121,7 +121,7 @@ end
 function LudwigUI_UpdateList(changed)
 	--update list only if there are changes
 	if not display or changed then
-		display = Ludwig:GetItems(filter.name, filter.quality, filter.type, filter.subType, filter.equipLoc, filter.minLevel, filter.maxLevel)
+		display = LudwigDB:GetItems(filter.name, filter.quality, filter.type, filter.subType, filter.equipLoc, filter.minLevel, filter.maxLevel)
 	end
 
 	local size = #display
@@ -136,8 +136,8 @@ function LudwigUI_UpdateList(changed)
 			button:Hide()
 		else
 			local id = display[index]
-			button.icon:SetTexture(Ludwig:GetItemTexture(id))
-			button:SetText(Ludwig:GetItemName(id, true))
+			button.icon:SetTexture(LudwigDB:GetItemTexture(id))
+			button:SetText(LudwigDB:GetItemName(id, true))
 			button:SetID(id)
 			button:Show()
 		end
@@ -205,9 +205,16 @@ end
 --[[ Quality ]]--
 
 local function Quality_GetText(index)
-	if tonumber(index) then
+	local index = tonumber(index)
+	if index then
 		local hex = select(4, GetItemQualityColor(index))
-		return hex .. _G['ITEM_QUALITY' .. index .. '_DESC'] .. '|r'
+		local desc
+		if index == 7 then
+			desc = 'Heirloom'
+		else
+			desc = _G['ITEM_QUALITY' .. index .. '_DESC']
+		end
+		return hex .. desc .. '|r'
 	end
 	return ALL
 end
@@ -225,7 +232,7 @@ end
 --add all buttons to the dropdown menu
 local function Quality_Initialize(self)
 	AddItem(ALL, ALL, Quality_OnClick)
-	for i = 6, 0, -1 do
+	for i = 7, 0, -1 do
 		AddItem(Quality_GetText(i), i, Quality_OnClick)
 	end
 end

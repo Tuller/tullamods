@@ -3,16 +3,19 @@
 		The database portion Of Ludwig
 --]]
 
-Ludwig = {}
-
-local MAXID = 60000 --probably need to increase this to 40k by Wrath
-local lastSearch --this is a hack to allow for 3 variables when sorting.  Its used to give the name filter
+local ItemDB = {}
+LudwigDB = ItemDB
 
 
---[[ Sorting Functions ]]--
+--[[ Constants! ]]--
+
+ItemDB.MAX_ID = 60000 --the maximum number of itemIDs to look through
+
+
+--[[ Utility Functions ]]--
 
 --returns the difference between two strings, where one is known to be within the other.
-local function GetDist(str1, str2)
+local function getDistance(str1, str2)
 	--a few optimizations for when we already know distance
 	if str1 == str2 then
 		return 0
@@ -29,10 +32,18 @@ local function GetDist(str1, str2)
 	return abs(#str1 - #str2)
 end
 
+--formats a string for use as a search pattern
+local function toSearchStr(name)
+	return name:gsub('%p', '%%%1')
+end
+
+
+--[[ Sorting Methods ]]--
+
 --sorts a list by rarity, either closeness to the searchString if there's been a search, then level, then name
-local function SortByEverything(id1, id2)
-	local item1 = Ludwig:GetItemInfo(id1)
-	local item2 = Ludwig:GetItemInfo(id2)
+local function sortByEverything(id1, id2)
+	local item1 = ItemDB:GetItemInfo(id1)
+	local item2 = ItemDB:GetItemInfo(id2)
 	local name1 = item1.search
 	local name2 = item2.search
 	local rarity1 = item1[3]
@@ -44,9 +55,10 @@ local function SortByEverything(id1, id2)
 		return rarity1 > rarity2
 	end
 
+	local lastSearch = ItemDB.lastSearchString
 	if lastSearch then
-		local dist1 = GetDist(lastSearch, name1)
-		local dist2 = GetDist(lastSearch, name2)
+		local dist1 = getDistance(lastSearch, name1)
+		local dist2 = getDistance(lastSearch, name2)
 		if dist1 ~= dist2 then
 			return dist1 < dist2
 		end
@@ -60,129 +72,182 @@ local function SortByEverything(id1, id2)
 end
 
 --sort by distance to the searchTerm
-local function SortByDistance(id1, id2)
-	local item1, item2 = Ludwig:GetItemInfo(id1), Ludwig:GetItemInfo(id2)
-	return GetDist(lastSearch, item1.search) < GetDist(lastSearch, item2.search)
+local function sortByDistance(id1, id2)
+	local lastSearch = ItemDB.lastSearchString
+	local item1 = ItemDB:GetItemInfo(id1)
+	local item2 = ItemDB:GetItemInfo(id2)
+
+	return getDistance(lastSearch, item1.search) < getDistance(lastSearch, item2.search)
 end
 
-local function ToSearch(name)
-	return name:gsub('%p', '%%%1')
-end
-
-
---[[ Usable Functions ]]--
+--[[
+	DB Setup/cleanup
+--]]
 
 do
-	--a cache of GetItemInfo
+	local itemInfo
 	local GetItemInfo = _G['GetItemInfo']
-	local itemInfo = setmetatable({}, {__index = function(t, id)
+
+	--get item information
+	--if we have a result, save in t[id] and return t[id]
+	local function getAndSaveItemInfo(t, id)
+		local result
 		local name, link, rarity, iLevel, reqLevel, type, subType, stackCount, equipLoc, texture = GetItemInfo(id)
 		if name then
-			t[id] = {
-				name, 
-				link, 
-				rarity, 
-				iLevel, 
-				reqLevel, 
-				type, 
-				subType, 
-				stackCount, 
-				equipLoc, 
-				texture, 
+			result = {
+				name,
+				link,
+				rarity,
+				iLevel,
+				reqLevel,
+				type,
+				subType,
+				stackCount,
+				equipLoc,
+				texture,
 				['search'] = name:lower()
 			}
-			return t[id]
 		end
-	end})
-	
-	function Ludwig:RefreshDB()
-		for id = 1, MAXID do
-			local k = itemInfo[id]
+
+		t[id] = result
+		return result
+	end
+
+	local function getItemInfoTable()
+		return setmetatable({}, {__index = getAndSaveItemInfo})
+	end
+
+	--refresh the database
+	--this is done via looking up each itemID in itemInfo to force a query
+	function ItemDB:Refresh()
+		if itemInfo then
+			for id = 1, self.MAX_ID do
+				local k = itemInfo[id]
+			end
 		end
 	end
-	
-	function Ludwig:GetAllItems()
+
+	--returns an iterator over all data in itemInfo
+	--creates and loads itemInfo if it does not exist yet
+	function ItemDB:GetAllItems()
+		if not itemInfo then
+			itemInfo = getItemInfoTable()
+			self:Refresh()
+		end
+
 		return pairs(itemInfo)
 	end
-	
-	function Ludwig:GetItemInfo(id)
+
+	--returns a table filled with the returns of GetItemInfo(id) if we have information about an item
+	--returns nil if we do not
+	--creates and loads itemInfo if it does not exist yet
+	function ItemDB:GetItemInfo(id)
+		if not itemInfo then
+			itemInfo = getItemInfoTable()
+			self:Refresh()
+		end
 		return itemInfo[id]
 	end
 end
 
 
---[[ Search Methods ]]--
+--[[
+	Query Methods
+--]]
 
+--get all items matching the given filter pattern
 do
 	local results = {}
-	function Ludwig:GetItems(name, quality, type, subType, equipLoc, minLevel, maxLevel)
+	function ItemDB:GetItems(name, quality, type, subType, equipLoc, minLevel, maxLevel)
+		for k, v in pairs(results) do results[k] = nil end
+
+		--get search string based on name
 		local search
 		if name and #name > 2 then
 			name = name:lower()
-			search = ToSearch(name)
+			search = toSearchStr(name)
 		else
 			search = nil
 		end
-		lastSearch = name
+		self.lastSearchStr = name
 
-		for k, v in pairs(results) do results[k] = nil end
-		for id, info in self:GetAllItems() do
-			local inSet = true
-
-			if quality and info[3] ~= quality then
-				inSet = nil
-			elseif minLevel and info[5] < minLevel then
-				inSet = nil
-			elseif maxLevel and info[5] > maxLevel then
-				inSet = nil
-			elseif type and info[6] ~= type then
-				inSet = nil
-			elseif subType and info[7] ~= subType then
-				inSet = nil
-			elseif equipLoc and info[9] ~= equipLoc then
-				inSet = nil
-			elseif search and not(info.search == name or info.search:match(search))then
-				inSet = nil
-			end
-
-			if inSet then
+		for id, item in self:GetAllItems() do
+			if self:ItemInSet(item, search, name, quality, type, subType, equipLoc, minLevel, maxLevel) then
 				table.insert(results, id)
 			end
 		end
-
-		table.sort(results, SortByEverything)
+		table.sort(results, sortByEverything)
 		return results
+	end
+
+	--returns true if the given item matches all defined filter rules, and false otherwise
+	function ItemDB:ItemInSet(item, search, name, quality, type, subType, equipLoc, minLevel, maxLevel)
+		if quality and item[3] ~= quality then
+			return false
+		end
+
+		if minLevel and item[5] < minLevel then
+			return false
+		end
+
+		if maxLevel and item[5] > maxLevel then
+			return false
+		end
+
+		if type and item[6] ~= type then
+			return false
+		end
+
+		if subType and item[7] ~= subType then
+			return false
+		end
+
+		if equipLoc and item[9] ~= equipLoc then
+			return false
+		end
+
+		if search and not(item.search == name or item.search:match(search))then
+			return false
+		end
+
+		return true
 	end
 end
 
+--returns all items that have names that start with <name>
+--used for linkerator support
 do
 	local results = {}
-	function Ludwig:GetItemsNamedLike(name)
-		if (not name) or name == '' then return end
-		
-		local name = name:lower()
-		local search = '^' .. ToSearch(name)
-		lastSearch = name
-
+	function ItemDB:GetItemsNamedLike(name, maxResults)
 		for k, v in pairs(results) do results[k] = nil end
-		for id, info in self:GetAllItems() do
-			if info.search == name or info.search:find(search) then
+
+		--no matches in the case of no name being passed/an empty string
+		if not(name) or name == '' then
+			self.lastSearch = nil
+			return results
+		end
+
+		local name = name:lower()
+		self.lastSearchStr = name
+
+		local search = '^' .. toSearchStr(name) --we're looking for items that have names that start with the search pattern
+		for id, item in self:GetAllItems() do
+			if item.search:match(search) then
 				table.insert(results, id)
-				if info.search == name then
-					break
-				end
 			end
 		end
 
-		table.sort(results, SortByDistance)
+		table.sort(results, sortByDistance)
 		return results
 	end
 end
 
 
---[[ Item Info Utility Methods ]]--
+--[[
+	Utility Accessors
+--]]
 
-function Ludwig:GetItemName(id, inColor)
+function ItemDB:GetItemName(id, inColor)
 	local info = self:GetItemInfo(id)
 	local name = info and info[1]
 
@@ -194,41 +259,12 @@ function Ludwig:GetItemName(id, inColor)
 	return name
 end
 
-function Ludwig:GetItemLink(id)
+function ItemDB:GetItemLink(id)
 	local info = self:GetItemInfo(id)
 	return info and info[2]
 end
 
-function Ludwig:GetItemTexture(id)
+function ItemDB:GetItemTexture(id)
 	local info = self:GetItemInfo(id)
 	return info and info[10]
-end
-
---queries the server for items from startID to endID.  don't run too many of these at once, or you WILL be disconnected
-function Ludwig:Scan(startID, endID)
-	local tip = self.spider or CreateFrame('GameTooltip', 'LudwigSpiderTooltip', UIParent, 'GameTooltipTemplate')
-	self.spider = tip
-
-	local nextUpdate = 0
-	local id = startID or 1
-	local endID = endID or MAXID
-
-	CreateFrame('Frame'):SetScript('OnUpdate', function(self, elapsed)
-		if nextUpdate < 0 then
-			nextUpdate = 1
-
-			--skip over any items we've seen already
-			while Ludwig:GetItemInfo(id) do id = id + 1 end
-
-			--we've reached an id that's not been 'seen', query the server for item info
-			tip:SetHyperlink(format('item:%d', id))
-
-			id = id + 1
-			if id > endID then
-				self:Hide()
-			end
-		else
-			nextUpdate = nextUpdate - elapsed
-		end
-	end)
 end

@@ -167,29 +167,31 @@
 
 				<Scripts>
 					<OnShow>
-						if (self:GetText() == "") then
-							self:SetText(SEARCH)
+						if self:GetText() == '' then
+							self:SetText(_G['SEARCH'])
 						end
 					</OnShow>
 					<OnEnterPressed>
 						self:ClearFocus()
 					</OnEnterPressed>
 					<OnTextChanged>
-						LudwigUI_OnSearchChanged(self,self:GetText())
+						LudwigUI_OnSearchChanged(self, self:GetText())
 					</OnTextChanged>
 					<OnTabPressed>
-						getglobal(self:GetParent():GetName() .. "MinLevel"):SetFocus()
+						getglobal(self:GetParent():GetName() .. 'MinLevel'):SetFocus()
 					</OnTabPressed>
 					<OnEditFocusLost>
 						self:HighlightText(0, 0)
-						if (self:GetText() == "") then
-							self:SetText(SEARCH)
+
+						if self:GetText() == '' then
+							self:SetText(_G['SEARCH'])
 						end
 					</OnEditFocusLost>
 					<OnEditFocusGained>
 						self:HighlightText()
-						if (self:GetText() == SEARCH) then
-							self:SetText("")
+
+						if self:GetText() == _G['SEARCH'] then
+							self:SetText('')
 						end
 					</OnEditFocusGained>
 				</Scripts>
@@ -215,13 +217,13 @@
 				</Layers>
 				<Scripts>
 					<OnTabPressed>
-						getglobal(self:GetParent():GetName() .. "MaxLevel"):SetFocus()
+						_G[self:GetParent():GetName() .. 'MaxLevel']:SetFocus()
 					</OnTabPressed>
 					<OnEnterPressed>
 						self:ClearFocus()
 					</OnEnterPressed>
 					<OnTextChanged>
-						LudwigUI_OnMinLevelChanged(self,self:GetText())
+						LudwigUI_OnMinLevelChanged(self, self:GetText())
 					</OnTextChanged>
 				</Scripts>
 			</EditBox>
@@ -235,13 +237,13 @@
 				</Anchors>
 				<Scripts>
 					<OnTabPressed>
-						getglobal(self:GetParent():GetName() .. "Search"):SetFocus()
+						_G[self:GetParent():GetName() .. 'Search']:SetFocus()
 					</OnTabPressed>
 					<OnEnterPressed>
 						self:ClearFocus()
 					</OnEnterPressed>
 					<OnTextChanged>
-						LudwigUI_OnMaxLevelChanged(self,self:GetText())
+						LudwigUI_OnMaxLevelChanged(self, self:GetText())
 					</OnTextChanged>
 				</Scripts>
 			</EditBox>
