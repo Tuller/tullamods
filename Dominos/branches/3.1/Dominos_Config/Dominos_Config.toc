@@ -6,11 +6,7 @@
 ## Author: Tuller
 ## Dependencies: Dominos
 ## LoadOnDemand: 1
-localization\localization.lua
-localization\localization.cn.lua
-localization\localization.tw.lua
-localization\localization.fr.lua
-localization\localization.ko.lua
+localization.xml
 menu.lua
 panel.lua
 general.lua
