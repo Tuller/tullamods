@@ -49,6 +49,13 @@ local Updater = CreateFrame('Frame')
 Updater.targetBuffs = {}
 Updater.targetDebuffs = {}
 Updater.playerBuffs = {}
+Updater.procs = {
+	[(GetSpellInfo(686))] = GetSpellInfo(17941)
+}
+Updater.missing = {
+	[(GetSpellInfo(5697))] = true,
+	[(GetSpellInfo(132))] = true
+}
 Updater.buttons = {}
 
 --buff and debuff caches
@@ -216,11 +223,30 @@ function Updater:PlayerHasBuff(buff)
 	return self.playerBuffs[buff]
 end
 
+function Updater:GetProc(spell)
+	return self.procs[spell]
+end
+
+function Updater:WatchMissing(spell)
+	return self.missing[spell]
+end
+
 
 --[[ Action Button Updating ]]--
 
 local function ActionButton_UpdateBorder(self, spell)
 	if spell then
+		if Updater:WatchMissing(spell) and not(Updater:PlayerHasBuff(spell)) then
+			self:GetCheckedTexture():SetVertexColor(1, 0, 0)
+			return true	
+		end
+	
+		local proc = Updater:GetProc(spell)
+		if proc and Updater:PlayerHasBuff(proc) then
+			self:GetCheckedTexture():SetVertexColor(0, 0, 1)
+			return true
+		end
+		
 		if UnitExists('target') then
 			if UnitIsFriend('player', 'target') then
 				if Updater:TargetHasBuff(spell) then
