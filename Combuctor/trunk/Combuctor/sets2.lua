@@ -173,6 +173,10 @@ function Set:AddChild(name, icon, rule)
 	return Set_New(id, self.id, name, icon, rule)
 end
 
+function Set:GetChild(id)
+	return Set_Get(id, self.id)
+end
+
 --iterator
 --usage: for i, subSet in set:GetChildren() do
 --	print(set:GetName(), set:GetIcon(), set:GetRule())
