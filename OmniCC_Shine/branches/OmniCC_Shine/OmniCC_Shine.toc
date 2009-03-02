@@ -1,0 +1,7 @@
+## Interface: 30000
+## Title: OmniCC Shine
+## Notes: Causes icons to shine on cooldown completion
+## Author: Tuller
+## Dependencies: OmniCC
+## Version: 1.0.1
+shine.lua
