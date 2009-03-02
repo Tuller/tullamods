@@ -1,0 +1,11 @@
+## Interface: 30000
+## Title: Sage Frames
+## Notes: A set of basic unitframes for Sage
+## Author: Tuller
+## RequiredDeps: Sage
+player.lua
+target.lua
+focus.lua
+pet.lua
+targetOfTarget.lua
+party.lua
