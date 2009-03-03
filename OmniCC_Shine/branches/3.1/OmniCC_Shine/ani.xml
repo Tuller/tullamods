@@ -1,0 +1,28 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<AnimationGroup name="OmniCCAnimationTemplate_Shine" looping="BOUNCE" virtual="true">
+		<Alpha change="-1" duration="0" order="0"/>
+		
+		<Alpha change="1" duration="0.5" order="1"/>
+		
+		<Scale scaleX="3" scaleY="3" duration="0.5" order="1">
+			<Origin point="CENTER"/>
+		</Scale>
+
+		<Scripts>
+			<OnUpdate>
+				self.elapsed = (self.elapsed or 0) + elapsed
+				if self.elapsed >= 1 then
+					self:Stop()
+				end
+			</OnUpdate>
+			<OnPlay>
+				self.elapsed = 0
+			</OnPlay>
+			<OnStop>
+				if self:GetParent():IsShown() then
+					self:GetParent():Hide()
+				end
+			</OnStop>
+		</Scripts>
+	</AnimationGroup>
+</Ui>
