@@ -11,64 +11,52 @@ assert(not OmniCC.OnFinishCooldown, 'Another finish effect is already loaded')
 
 local Pulse = OmniCC:CreateClass('Frame')
 
+local id = 0
 function Pulse:New(parent)
-	local f = self:Bind(CreateFrame('Frame', nil, parent))
+	local f = self:Bind(CreateFrame('Frame', nil, parent)) 
 	f:SetAllPoints(parent)
 	f:SetToplevel(true)
 	f:Hide()
-
+	
+	f.ani = f:CreateAnimationGroup('OmniCCPulse_Ani' .. id, 'OmniCCPulseAnimationTemplate')
 	f:SetScript('OnUpdate', f.OnUpdate)
 	f:SetScript('OnHide', f.OnHide)
 
 	local icon = f:CreateTexture(nil, 'OVERLAY')
 	icon:SetPoint('CENTER')
 	icon:SetBlendMode('ADD')
-	icon:SetHeight(f:GetHeight())
-	icon:SetWidth(f:GetWidth())
+	icon:SetAllPoints(f)
 	f.icon = icon
 
+	id = id + 1
 	return f
 end
 
 function Pulse:Start(texture)
-	if not self.active then
-		self.scale = 1
-		self.active = true
-
+	if not self.ani:IsPlaying() then
 		local icon = self.icon
 		local r, g, b = icon:GetVertexColor()
 		icon:SetVertexColor(r, g, b, 0.7)
 		icon:SetTexture(texture)
 
+		self.elapsed = 0
 		self:Show()
+		self.ani:Play()
 	end
 end
 
---omg speed
-local max = math.max
-local min = math.min
 function Pulse:OnUpdate(elapsed)
-	if self.scale >= 2 then
-		self.shrinking = true
-	end
-
-	local delta = (self.shrinking and -1 or 1) * self.scale * (elapsed/0.5)
-	self.scale = max(min(self.scale + delta, 2), 1)
-
-	if self.scale > 1 then
-		local icon = self.icon
-		icon:SetHeight(self:GetHeight() * self.scale)
-		icon:SetWidth(self:GetWidth() * self.scale)
-	else
+	self.elapsed = self.elapsed + elapsed
+	if self.elapsed >= 1 then
 		self:Hide()
 	end
 end
 
 --this may look stupid, but it handles the case of the pulse no longer being visible due to its parent hiding
 function Pulse:OnHide()
-	self.active = nil
-	self.shrinking = nil
-	self:Hide()
+	if self.ani:IsPlaying() then
+		self.ani:Stop()
+	end
 end
 
 
