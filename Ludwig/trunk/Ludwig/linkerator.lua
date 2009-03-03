@@ -21,7 +21,7 @@ local function onPartialMatch(match)
 end
 
 _G['ChatFrameEditBox']:HookScript('OnChar', function(self, ...)
-	local self = _G['WIM_EditBoxInFocus'] or self
+	local self = WIM and WIM.EditBoxInFocus or self 
 
 	local text = self:GetText()
 	if text ~= '' then
