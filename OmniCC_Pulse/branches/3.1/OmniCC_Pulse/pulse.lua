@@ -10,16 +10,15 @@ assert(not OmniCC.OnFinishCooldown, 'Another finish effect is already loaded')
 --[[ the pulse object ]]--
 
 local Pulse = OmniCC:CreateClass('Frame')
+local ANIMATION_TEMPLATE = 'OmniCCAnimationTemplate_Pulse'
 
-local id = 0
 function Pulse:New(parent)
 	local f = self:Bind(CreateFrame('Frame', nil, parent)) 
 	f:SetAllPoints(parent)
 	f:SetToplevel(true)
 	f:Hide()
 	
-	f.ani = f:CreateAnimationGroup('OmniCCPulse_Ani' .. id, 'OmniCCPulseAnimationTemplate')
-	f:SetScript('OnUpdate', f.OnUpdate)
+	f.ani = f:CreateAnimationGroup(nil, ANIMATION_TEMPLATE)
 	f:SetScript('OnHide', f.OnHide)
 
 	local icon = f:CreateTexture(nil, 'OVERLAY')
@@ -28,7 +27,6 @@ function Pulse:New(parent)
 	icon:SetAllPoints(f)
 	f.icon = icon
 
-	id = id + 1
 	return f
 end
 
@@ -39,24 +37,16 @@ function Pulse:Start(texture)
 		icon:SetVertexColor(r, g, b, 0.7)
 		icon:SetTexture(texture)
 
-		self.elapsed = 0
 		self:Show()
 		self.ani:Play()
 	end
 end
 
-function Pulse:OnUpdate(elapsed)
-	self.elapsed = self.elapsed + elapsed
-	if self.elapsed >= 1 then
-		self:Hide()
-	end
-end
-
---this may look stupid, but it handles the case of the pulse no longer being visible due to its parent hiding
 function Pulse:OnHide()
 	if self.ani:IsPlaying() then
 		self.ani:Stop()
 	end
+	self:Hide()
 end
 
 
