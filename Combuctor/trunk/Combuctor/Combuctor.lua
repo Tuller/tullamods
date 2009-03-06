@@ -30,7 +30,7 @@ function Combuctor:OnInitialize()
 	else
 		version = CURRENT_VERSION
 	end
-	
+
 	--create a loader for the options menu
 	local f = CreateFrame('Frame', nil, InterfaceOptionsFrame)
 	f:SetScript('OnShow', function(self)
@@ -73,7 +73,7 @@ local function addSet(sets, exclude, name, ...)
 	else
 		sets = {name}
 	end
-	
+
 	if select('#', ...) > 0 then
 		if exclude then
 			table.insert(exclude, {[name] = {...}})

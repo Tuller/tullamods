@@ -76,7 +76,7 @@ do
 			end
 		end
 	end
-	
+
 	function FrameEvents:UpdateSetConfig(msg, key, name)
 		for f in self:GetFrames() do
 			if f.key == key then
@@ -84,7 +84,7 @@ do
 			end
 		end
 	end
-	
+
 	function FrameEvents:UpdateSubSetConfig(msg, key, name, parent)
 		for f in self:GetFrames() do
 			if f.key == key and f:GetCategory() == parent then
@@ -151,7 +151,8 @@ function InventoryFrame:New(titleText, settings, isBank, key)
 
 	f.title = _G[f:GetName() .. 'Title']
 
-	f.sideFilter = Combuctor.SideFilter:New(f)
+	f.sideFilter = Combuctor.SideFilter:New(f, f:IsSideFilterOnLeft())
+
 	f.bottomFilter = Combuctor.BottomFilter:New(f)
 
 	f.nameFilter = _G[f:GetName() .. 'Search']
@@ -175,6 +176,7 @@ function InventoryFrame:New(titleText, settings, isBank, key)
 	--place the frame
 	f.sideFilter:UpdateFilters()
 	f:LoadPosition()
+	f:UpdateClampInsets()
 
 	lastID = lastID + 1
 
@@ -530,8 +532,13 @@ function InventoryFrame:UpdateClampInsets()
 	end
 
 	if self.sideFilter:IsShown() then
-		l = 15
-		r = 0
+		if self.sideFilter:Reversed() then
+			l = -20
+			r = -35
+		else
+			l = 15
+			r = 0
+		end
 	else
 		l = 15
 		r = -35
@@ -642,4 +649,17 @@ function InventoryFrame:HideFrame(auto)
 			self.autoShown = nil
 		end
 	end
+end
+
+--[[
+	Side Filter Positioning
+--]]
+
+function InventoryFrame:SetLeftSideFilter(enable)
+	self.sets.leftSideFilter = enable and true or nil
+	self.sideFilter:SetReversed(enable)
+end
+
+function InventoryFrame:IsSideFilterOnLeft()
+	return self.sets.leftSideFilter
 end

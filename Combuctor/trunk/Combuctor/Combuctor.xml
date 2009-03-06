@@ -4,6 +4,32 @@
 		Widget Templates
 	-->
 
+	<CheckButton name="CombuctorSideTabButtonTemplate" virtual="true" hidden="true">
+		<Size x="32" y="32"/>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentBorder" file="Interface\SpellBook\SpellBook-SkillLineTab">
+					<Size x="64" y="64"/>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset x="-3" y="11"/>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnEnter>
+				GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+				GameTooltip:SetText(self.tooltip);
+			</OnEnter>
+			<OnLeave function="GameTooltip_Hide"/>
+		</Scripts>
+		<NormalTexture/>
+		<HighlightTexture file="Interface\Buttons\ButtonHilight-Square" alphaMode="ADD"/>
+		<CheckedTexture file="Interface\Buttons\CheckButtonHilight" alphaMode="ADD"/>
+	</CheckButton>
+
 	<Button name="CombuctorFrameTabButtonTemplate" inherits="CharacterFrameTabButtonTemplate" virtual="true">
 		<Scripts>
 			<OnLoad>
@@ -199,6 +225,7 @@
 		<Scripts>
 			<OnLoad>
 				self:RegisterForClicks('anyUp')
+				self:RegisterForDrag('LeftButton')
 			</OnLoad>
 			<OnClick>
 				if IsAltKeyDown() then
@@ -208,12 +235,8 @@
 				end
 			</OnClick>
 			<OnMouseDown>
-				if IsAltKeyDown() then
-					if arg1 == 'LeftButton' then
-						self.isMoving = true
-						self:GetParent():StartMoving()
-					end
-				end
+				self.isMoving = true
+				self:GetParent():StartMoving()
 			</OnMouseDown>
 			<OnMouseUp>
 				if self.isMoving then
@@ -460,7 +483,7 @@
 					<Anchor point="LEFT" relativeTo="$parentReset" relativePoint="RIGHT"/>
 				</Anchors>
 			</Button>
-			
+
 			<Button name="$parentResize">
 				<Size x="16" y="16"/>
 
