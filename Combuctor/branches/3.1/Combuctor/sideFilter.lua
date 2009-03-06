@@ -7,17 +7,17 @@
 
 local SideFilterButton = Combuctor:NewClass('CheckButton')
 do
-	local nextID = 0
+	local id = 1
+	function SideFilterButton:New(parent, reversed)
+		local b = self:Bind(CreateFrame('CheckButton', 'CombuctorSideButton' .. id, parent, 'CombuctorSideTabButtonTemplate'))
+		b:GetNormalTexture():SetTexCoord(0.06, 0.94, 0.06, 0.94)
+		b:SetScript('OnClick', b.OnClick)
+		b:SetScript('OnEnter', b.OnEnter)
+		b:SetScript('OnLeave', b.OnLeave)
+		b:SetReversed(reversed)
 
-	function SideFilterButton:New(parent)
-		local button = self:Bind(CreateFrame('CheckButton', format('CombuctorItemFilter%d', nextID), parent, 'SpellBookSkillLineTabTemplate'))
-		button:GetNormalTexture():SetTexCoord(0.06, 0.94, 0.06, 0.94)
-		button:SetScript('OnClick', self.OnClick)
-		button:SetScript('OnEnter', self.OnEnter)
-		button:SetScript('OnLeave', self.OnLeave)
-
-		nextID = nextID + 1
-		return button
+		id = id + 1
+		return b
 	end
 end
 
@@ -44,6 +44,26 @@ function SideFilterButton:UpdateHighlight(setName)
 	self:SetChecked(self.set.name == setName)
 end
 
+function SideFilterButton:SetReversed(enable)
+	self.reversed = enable and true or nil
+
+	local border = _G[self:GetName() .. 'Border']
+
+	border:ClearAllPoints()
+	if self:Reversed() then
+		border:SetTexCoord(1, 0, 0, 1)
+		border:SetPoint('TOPRIGHT', 3, 11)
+	else
+		border:SetTexCoord(0, 1, 0, 1)
+		border:ClearAllPoints()
+		border:SetPoint('TOPLEFT', -3, 11)
+	end
+end
+
+function SideFilterButton:Reversed()
+	return self.reversed
+end
+
 
 --[[
 	Side Filter Object
@@ -51,26 +71,32 @@ end
 
 local SideFilter = Combuctor:NewClass('Frame')
 Combuctor.SideFilter = SideFilter
+
 local CombuctorSets = Combuctor:GetModule('Sets')
 
-
-function SideFilter:New(parent)
+function SideFilter:New(parent, reversed)
 	local f = self:Bind(CreateFrame('Frame', nil, parent))
 
 	--metatable magic for button creation on demand
 	f.buttons = setmetatable({}, {__index = function(t, k)
-		local button = SideFilterButton:New(f)
+		local b = SideFilterButton:New(f, f:Reversed())
 
+		--layout the last placed button
 		if k > 1 then
-			button:SetPoint('TOPLEFT', f.buttons[k-1], 'BOTTOMLEFT', 0, -17)
+			b:SetPoint('TOPLEFT', t[k-1], 'BOTTOMLEFT', 0, -17)
 		else
-			button:SetPoint('TOPLEFT', parent, 'TOPRIGHT', -32, -65)
+			if f:Reversed() then
+				b:SetPoint('TOPRIGHT', parent, 'TOPLEFT', 10, -80)
+			else
+				b:SetPoint('TOPLEFT', parent, 'TOPRIGHT', -32, -65)
+			end
 		end
 
-		t[k] = button
-
-		return button
+		t[k] = b
+		return b
 	end})
+
+	f:SetReversed(reversed)
 
 	return f
 end
@@ -102,8 +128,6 @@ function SideFilter:UpdateFilters()
 	else
 		self:Hide()
 	end
-
-	self:GetParent():UpdateClampInsets()
 end
 
 function SideFilter:UpdateHighlight()
@@ -114,4 +138,37 @@ function SideFilter:UpdateHighlight()
 			button:UpdateHighlight(category)
 		end
 	end
+end
+
+--layout all buttons
+function SideFilter:Layout()
+	if #self.buttons > 0 then
+		local first = self.buttons[1]
+		first:ClearAllPoints()
+
+		if self:Reversed() then
+			first:SetPoint('TOPRIGHT', self:GetParent(), 'TOPLEFT', 10, -80)
+		else
+			first:SetPoint('TOPLEFT', self:GetParent(), 'TOPRIGHT', -32, -65)
+		end
+
+		for i = 2, #self.buttons do
+			self.buttons[i]:SetPoint('TOPLEFT', self.buttons[i-1], 'BOTTOMLEFT', 0, -17)
+		end
+	end
+end
+
+--[[ Switch between tabs on the left/right ]]--
+function SideFilter:SetReversed(enable)
+	self.reversed = enable and true or nil
+
+	for i, button in pairs(self.buttons) do
+		button:SetReversed(enable)
+	end
+
+	self:Layout()
+end
+
+function SideFilter:Reversed()
+	return self.reversed
 end
