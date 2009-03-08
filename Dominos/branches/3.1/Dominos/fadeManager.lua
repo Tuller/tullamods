@@ -1,0 +1,135 @@
+--[[ Fade Manager ]]--
+
+local FadeManager = {}
+Dominos.FadeManager = FadeManager
+
+local FadeWatcher = CreateFrame('Frame')
+local Fader = CreateFrame('Frame')
+
+--[[ Registers Frames for Fading ]]--
+
+function FadeManager:Add(f)
+	FadeWatcher:Add(f)
+end
+
+function FadeManager:Remove(f)
+	FadeWatcher:Remove(f)
+end
+
+
+--[[ Watch Frames For Fade Changing ]]--
+
+do
+	local watchedFrames = {}
+
+	FadeWatcher:Hide()
+	FadeWatcher.nextUpdate = 0
+	FadeWatcher.DELAY = 0.1
+
+	FadeWatcher:SetScript('OnUpdate', function(self, elapsed)
+		if not next(watchedFrames) then
+			self:Hide()
+		end
+
+
+		self.nextUpdate = self.nextUpdate - elapsed
+		if self.nextUpdate < 0 then
+			self.nextUpdate = self.DELAY
+
+			for f in pairs(watchedFrames) do
+				--check for faded frames that are now in focus
+				if self:IsFocus(f) then
+					--the checking logic is a little weird because floating point values tend to not be exact
+					if abs(f:GetAlpha() - f:GetFadedAlpha()) < 0.01 then
+						Fader:Fade(f, 0.1, f:GetAlpha(), f:GetFrameAlpha())
+					end
+				--check for unfaded frames that are not in focus
+				else
+					if abs(f:GetAlpha() - f:GetFrameAlpha()) < 0.01 then
+						Fader:Fade(f, 0.1, f:GetAlpha(), f:GetFadedAlpha())
+					end
+				end
+			end
+		end
+	end)
+
+	FadeWatcher:SetScript('OnHide', function(self)
+		self.nextUpdate = 0
+	end)
+
+	function FadeWatcher:Add(f)
+		watchedFrames[f] = true
+		self:Show()
+	end
+
+	function FadeWatcher:Remove(f)
+		watchedFrames[f] = nil
+	end
+
+	--this code determins if the mouse is over either the frame itself, or any child frames
+	function FadeWatcher:IsFocus(f)
+		if MouseIsOver(f, 1, -1, -1, 1) then
+			return GetMouseFocus() == _G['WorldFrame'] or self:IsChildFocus(f:GetChildren())
+		end
+	end
+
+	function FadeWatcher:IsChildFocus(...)
+		for i = 1, select('#', ...) do
+			if GetMouseFocus() == select(i, ...) then
+				return true
+			end
+		end
+
+		for i = 1, select('#', ...) do
+			local f = select(i, ...)
+			if f:IsShown() and self:IsChildFocus(f:GetChildren()) then
+				return true
+			end
+		end
+	end
+end
+
+
+--[[ Handle Fading ]]--
+
+do
+	local fadingFrames = {}
+
+	Fader:Hide()
+
+	Fader:SetScript('OnUpdate', function(self, elapsed)
+		if not next(fadingFrames) then
+			self:Hide()
+		end
+
+		for frame, fadeInfo in pairs(fadingFrames) do
+			fadeInfo.fadeTimer = (fadeInfo.fadeTimer or 0) + elapsed
+
+			if fadeInfo.fadeTimer < fadeInfo.timeToFade then
+				local pct = fadeInfo.fadeTimer / fadeInfo.timeToFade
+				local delta = fadeInfo.endAlpha - fadeInfo.startAlpha
+
+				frame:SetAlpha(fadeInfo.startAlpha + pct*delta)
+			else
+				frame:SetAlpha(fadeInfo.endAlpha)
+				fadingFrames[frame] = nil
+			end
+		end
+	end)
+
+	function Fader:Fade(frame, timeToFade, startAlpha, endAlpha)
+		frame:SetAlpha(startAlpha)
+
+		if not fadingFrames[frame] then
+			local fadeInfo = frame.fadeInfo or {}
+			fadeInfo.timeToFade = timeToFade
+			fadeInfo.startAlpha = startAlpha
+			fadeInfo.endAlpha = endAlpha
+			fadeInfo.fadeTimer = 0
+			frame.fadeInfo = fadeInfo
+			
+			fadingFrames[frame] = fadeInfo
+			self:Show()
+		end
+	end
+end

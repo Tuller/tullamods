@@ -3,112 +3,10 @@
 		An action button frame thingy
 --]]
 
-local Dominos = Dominos
-
-
---[[ Fade Manager ]]--
-
-local Fader = CreateFrame('Frame')
-do
-	Fader.nextUpdate = 0
-	Fader.fs = {}
-
-	Fader:SetScript('OnUpdate', function(self, elapsed)
-		if self.nextUpdate < 0 then
-			self.nextUpdate = 0.1
-
-			for f in pairs(self.fs) do
-				if self:IsFocus(f) then
-					if abs(f:GetAlpha() - f:GetFadedAlpha()) < 0.01 then --the checking logic is a little weird because floating point values tend to not be exact
-						self:FadeIn(f, 0.1, f:GetAlpha(), f:GetFrameAlpha())
-					end
-				else
-					if abs(f:GetAlpha() - f:GetFrameAlpha()) < 0.01 then
-						self:FadeOut(f, 0.1, f:GetAlpha(), f:GetFadedAlpha())
-					end
-				end
-			end
-		else
-			self.nextUpdate = self.nextUpdate - elapsed
-		end
-	end)
-	Fader:Hide()
-
-	function Fader:Add(f)
-		self.fs[f] = true
-		if not self:IsShown() then
-			self:Show()
-		end
-	end
-
-	function Fader:Remove(f)
-		self.fs[f] = nil
-		if not next(self.fs) then
-			self:Hide()
-		end
-	end
-
-	-- Generic fade function, taken from UIFrameFade
-	--the following code exists only so that I can prevent some basic tainting issues caused by the UIFrameFade function attempting to show frames
-	local function Fade(frame, fadeInfo)
-		frame:SetAlpha(fadeInfo.startAlpha)
-		frame.fadeInfo = fadeInfo
-
-		for _,f in pairs(FADEFRAMES) do
-			if f == frame then
-				return
-			end
-		end
-		tinsert(FADEFRAMES, frame)
-	end
-
-	function Fader:FadeIn(frame, timeToFade, startAlpha, endAlpha)
-		local fadeInfo = {}
-		fadeInfo.mode = "IN"
-		fadeInfo.timeToFade = timeToFade
-		fadeInfo.startAlpha = startAlpha
-		fadeInfo.endAlpha = endAlpha
-		Fade(frame, fadeInfo)
-	end
-
-	function Fader:FadeOut(frame, timeToFade, startAlpha, endAlpha)
-		local fadeInfo = {}
-		fadeInfo.mode = "OUT"
-		fadeInfo.timeToFade = timeToFade
-		fadeInfo.startAlpha = startAlpha
-		fadeInfo.endAlpha = endAlpha
-		Fade(frame, fadeInfo)
-	end
-
-	--this code determins if the mouse is over either the frame itself, or any child frames
-	function Fader:IsFocus(f)
-		if MouseIsOver(f, 1, -1, -1, 1) then
-			return GetMouseFocus() == WorldFrame or self:IsChildFocus(f:GetChildren())
-		end
-	end
-
-	function Fader:IsChildFocus(...)
-		for i = 1, select('#', ...) do
-			if GetMouseFocus() == select(i, ...) then
-				return true
-			end
-		end
-
-		for i = 1, select('#', ...) do
-			local f = select(i, ...)
-			if f:IsShown() and self:IsChildFocus(f:GetChildren()) then
-				return true
-			end
-		end
-	end
-end
-
-
---[[ Mango Frame ]]--
-
 local Frame = Dominos:CreateClass('Frame')
 Dominos.Frame = Frame
 
+local FadeManager = Dominos.FadeManager
 local active = {}
 local unused = {}
 
@@ -150,7 +48,7 @@ function Frame:Free()
 	active[self.id] = nil
 
 	UnregisterStateDriver(self.header, 'visibility', 'show')
-	Fader:Remove(self)
+	FadeManager:Remove(self)
 
 	for i in pairs(self.buttons) do
 		self:RemoveButton(i)
@@ -623,12 +521,12 @@ end
 --run the fade onupdate checker if only if there are mouseover fs to check
 function Frame:UpdateFader()
 	if self.sets.hidden then
-		Fader:Remove(self)
+		FadeManager:Remove(self)
 	else
 		if select(2, self:GetFadedAlpha()) == 1 then
-			Fader:Remove(self)
+			FadeManager:Remove(self)
 		else
-			Fader:Add(self)
+			FadeManager:Add(self)
 		end
 	end
 end
