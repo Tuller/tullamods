@@ -209,8 +209,6 @@ end
 
 function Dominos:HideBlizzard()
 	local noop = Multibar_EmptyFunc
-
-	RANGE_INDICATOR = ''
 	MultiActionBar_Update = noop
 	MultiActionBar_UpdateGrid = noop
 	ShowBonusActionBar = noop

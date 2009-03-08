@@ -35,6 +35,12 @@ function ActionButton:New(id)
 		b:UpdateHotkey(b.buttonType)
 		b:UpdateMacro()
 
+		--hack #1billion, get rid of range indicator text
+		local hotkey = _G[b:GetName() .. 'HotKey']
+		if hotkey:GetText() == _G['RANGE_INDICATOR'] then
+			hotkey:SetText('')
+		end
+
 		self.active[id] = b
 
 		return b
@@ -132,7 +138,7 @@ function ActionButton:OnEnter()
 end
 
 --override the old update hotkeys function
-ActionButton_UpdateHotkeys = ActionButton.UpdateHotkey
+_G['ActionButton_UpdateHotkeys'] = ActionButton.UpdateHotkey
 
 --button visibility
 function ActionButton:UpdateGrid()
