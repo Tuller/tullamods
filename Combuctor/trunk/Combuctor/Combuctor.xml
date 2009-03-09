@@ -462,6 +462,15 @@
 						<Offset x="-29" y="-8"/>
 					</Anchor>
 				</Anchors>
+				
+				<Scripts>
+					<OnClick>
+						if self:GetParent():IsBank() then
+							CloseBankFrame()
+						end
+						HideUIPanel(self:GetParent())
+					</OnClick>
+				</Scripts>
 	        </Button>
 
 			<Button name="$parentIconButton" inherits="CombuctorIconButtonTemplate"/>
