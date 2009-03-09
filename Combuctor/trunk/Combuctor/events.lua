@@ -233,13 +233,13 @@ end
 
 function BagEvents:BANKFRAME_OPENED()
 	self.atBank = true
-	
+
 	if self.firstVisit then
 		self.firstVisit = nil
 		self:UpdateBagSize(BANK_CONTAINER)
 		self:UpdateBagSizesAndTypes()
 	end
-	
+
 	self:SendMessage('COMBUCTOR_BANK_OPENED')
 end
 

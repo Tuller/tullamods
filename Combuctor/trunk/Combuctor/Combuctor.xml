@@ -84,6 +84,14 @@
 					end
 				end
 			</OnClick>
+			<OnEnter>
+				if BagnonDB then
+					self:GetParent():OnPortraitEnter(self)
+				end
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide()
+			</OnLeave>
 		</Scripts>
 
 		<HighlightTexture alphaMode="ADD" file="Interface\Minimap\UI-Minimap-ZoomButton-Highlight">

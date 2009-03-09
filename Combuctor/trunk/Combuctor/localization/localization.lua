@@ -21,13 +21,13 @@ L.BankTitle = "%s's Bank"
 L.Inventory = 'Inventory'
 L.Bank = 'Bank'
 L.TotalOnRealm = 'Total on %s'
-L.ClickToPurchase = '<Click> to Purchase'
+L.ClickToPurchase = '<Click> to purchase'
 L.Bags = 'Bags'
-L.BagToggle = '<LeftClick> To Toggle Showing Bags'
-L.InventoryToggle = '<RightClick> To Toggle the Inventory Frame'
-L.BankToggle = '<RightClick> To Toggle the Bank Frame'
-L.MoveTip = '<Alt-LeftDrag> To Move'
-L.ResetPositionTip = '<RightClick> To Reset Position'
+L.BagToggle = '<LeftClick> to toggle the bag display'
+L.InventoryToggle = '<RightClick> to toggle displaying the inventory frame'
+L.BankToggle = '<RightClick> to toggle displaying the bank frame'
+L.MoveTip = '<LeftDrag> to move'
+L.ResetPositionTip = '<Alt-RightClick> to make the frame act as an interface panel'
 
 --default sets (need to be here because of a flaw in how I save things
 --these are automatically localized (aka, don't translate them :)

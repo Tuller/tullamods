@@ -223,12 +223,20 @@ end
 function InventoryFrame:OnBagToggleEnter(toggle)
 	GameTooltip:SetOwner(toggle, 'ANCHOR_LEFT')
 	GameTooltip:SetText(L.Bags, 1, 1, 1)
+	GameTooltip:AddLine(L.BagToggle)
 
 	if self.isBank then
 		GameTooltip:AddLine(L.InventoryToggle)
 	else
 		GameTooltip:AddLine(L.BankToggle)
 	end
+	GameTooltip:Show()
+end
+
+function InventoryFrame:OnPortraitEnter(portrait)
+	GameTooltip:SetOwner(portrait, 'ANCHOR_RIGHT')
+	GameTooltip:SetText(self:GetPlayer(), 1, 1, 1)
+	GameTooltip:AddLine('<Left Click> to switch characters')
 	GameTooltip:Show()
 end
 
