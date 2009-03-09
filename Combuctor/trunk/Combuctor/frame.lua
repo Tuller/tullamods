@@ -611,20 +611,17 @@ end
 --]]
 
 function InventoryFrame:OnShow()
-	PlaySound('igMainMenuOpen')
+	PlaySound('igBackPackOpen')
 	FrameEvents:Register(self)
 	self:UpdateSets(self:GetDefaultCategory())
 end
 
 function InventoryFrame:OnHide()
-	PlaySound('igMainMenuClose')
+	PlaySound('igBackPackClose')
 	FrameEvents:Unregister(self)
 
 	--return to showing the current player on close
 	self:SetPlayer(UnitName('player'))
-	if self.isBank then
-		CloseBankFrame()
-	end
 end
 
 function InventoryFrame:ToggleFrame(auto)
@@ -662,4 +659,13 @@ end
 
 function InventoryFrame:IsSideFilterOnLeft()
 	return self.sets.leftSideFilter
+end
+
+
+--[[
+	Accessors
+--]]
+
+function InventoryFrame:IsBank()
+	return self.isBank
 end
