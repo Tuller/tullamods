@@ -3,7 +3,6 @@
 		Adds item icons to tooltips
 --]]
 
-local _G = _G
 local DEFAULT_ICON_SIZE = 24
 
 local function AddIcon(self, icon)
@@ -20,16 +19,10 @@ end
 --]]
 
 local function hookItem(tip)
-	local set = tip:GetScript('OnTooltipSetItem')
-
-	tip:SetScript('OnTooltipSetItem', function(self, ...)
+	tip:HookScript('OnTooltipSetItem', function(self, ...)
 		local name, link = self:GetItem()
 		local icon = link and GetItemIcon(link)
 		AddIcon(self, icon)
-
-		if set then
-			return set(self, ...)
-		end
 	end)
 end
 hookItem(_G['GameTooltip'])
@@ -41,15 +34,9 @@ hookItem(_G['ItemRefTooltip'])
 --]]
 
 local function hookSpell(tip)
-	local set = tip:GetScript('OnTooltipSetSpell')
-
-	tip:SetScript('OnTooltipSetSpell', function(self, ...)
+	tip:HookScript('OnTooltipSetSpell', function(self, ...)
 		local name, rank, icon = GetSpellInfo(self:GetSpell())
 		AddIcon(self, icon)
-
-		if set then
-			return set(self, ...)
-		end
 	end)
 end
 hookSpell(_G['GameTooltip'])
