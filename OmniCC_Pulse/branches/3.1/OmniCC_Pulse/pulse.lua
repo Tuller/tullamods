@@ -43,9 +43,7 @@ function Pulse:Start(texture)
 end
 
 function Pulse:OnHide()
-	if self.ani:IsPlaying() then
-		self.ani:Stop()
-	end
+	self.ani:Finish()
 	self:Hide()
 end
 
