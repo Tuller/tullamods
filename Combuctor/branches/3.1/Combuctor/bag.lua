@@ -103,7 +103,7 @@ function Bag:Release()
 	self:SetParent(nil)
 	self:Hide()
 	self:UnregisterAllEvents()
-	getglobal(self:GetName() .. 'Count'):Hide()
+	_G[self:GetName() .. 'Count']:Hide()
 end
 
 
@@ -150,9 +150,9 @@ function Bag:UpdateLock()
 	local player = self:GetParent():GetPlayer()
 
 	if IsInventoryItemLocked(InvData:GetInvSlot(id)) and not InvData:IsCachedBag(id, player) then
-		getglobal(self:GetName() .. 'IconTexture'):SetDesaturated(true)
+		_G[self:GetName() .. 'IconTexture']:SetDesaturated(true)
 	else
-		getglobal(self:GetName() .. 'IconTexture'):SetDesaturated(false)
+		_G[self:GetName() .. 'IconTexture']:SetDesaturated(false)
 	end
 end
 
@@ -232,7 +232,7 @@ function Bag:UpdateTextureFromCache()
 end
 
 function Bag:SetCount(count)
-	local text = getglobal(self:GetName() .. 'Count')
+	local text = _G[self:GetName() .. 'Count']
 	local count = count or 0
 	if count > 1 then
 		if count > 999 then

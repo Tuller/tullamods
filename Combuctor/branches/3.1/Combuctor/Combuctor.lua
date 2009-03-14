@@ -125,6 +125,7 @@ function Combuctor:GetBaseProfile()
 			bags = {-2, 0, 1, 2, 3, 4},
 			position = {'RIGHT'},
 			showBags = false,
+			leftSideFilter = true,
 			w = 384,
 			h = 512,
 		},

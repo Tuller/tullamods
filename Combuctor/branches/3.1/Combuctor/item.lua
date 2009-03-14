@@ -3,13 +3,20 @@
 		An item button
 --]]
 
+--libs/other jambers
+local InvData = Combuctor:GetModule('InventoryData')
+
+--that's classy
 local Item = Combuctor:NewClass('Button')
+Item.SIZE = 37
 Combuctor.Item = Item
 
-local InvData = Combuctor:GetModule('InventoryData')
-Item.SIZE = 37
 
---create a dummy item slot for tooltips and modified clicks of cached items
+--[[
+	Dummy Slot
+		A hack, used to provide a tooltip for cached items without tainting other item code
+--]]
+
 do
 	local slot = CreateFrame('Button')
 	slot:RegisterForClicks('anyUp')
@@ -59,28 +66,25 @@ end
 	The item widget
 --]]
 
-local itemID = 1
-local unused = {}
-
+local id = 1
 function Item:New()
-	local item = self:GetBlizzard(itemID)
-	if not item then
-		item = CreateFrame('Button', format('CombuctorItem%d', itemID), nil, 'ContainerFrameItemButtonTemplate')
-	end
-	item = self:Bind(item) --apply item methods
-	item:ClearAllPoints() --hack, to fix reusing blizzard buttons
+	local item = self:Bind(self:GetBlizzard(id) or CreateFrame('Button', 'CombuctorItem' .. id, nil, 'ContainerFrameItemButtonTemplate'))
 
+	--add a quality border texture
 	local border = item:CreateTexture(nil, 'OVERLAY')
-	border:SetWidth(67); border:SetHeight(67)
+	border:SetWidth(67)
+	border:SetHeight(67)
 	border:SetPoint('CENTER', item)
 	border:SetTexture('Interface/Buttons/UI-ActionButton-Border')
 	border:SetBlendMode('ADD')
 	border:Hide()
 	item.border = border
 
-	item.cooldown = getglobal(item:GetName() .. 'Cooldown')
+	--hack, make sure the cooldown model stays visible
+	item.cooldown = _G[item:GetName() .. 'Cooldown']
 	item.cooldown:SetFrameLevel(4)
 
+	--get rid of any registered frame events, and use my own
 	item:UnregisterAllEvents()
 	item:SetScript('OnEvent', nil)
 	item:SetScript('OnEnter', self.OnEnter)
@@ -88,7 +92,7 @@ function Item:New()
 	item:SetScript('PostClick', self.PostClick)
 	item.UpdateTooltip = nil
 
-	itemID = itemID + 1
+	id = id + 1
 
 	return item
 end
@@ -96,63 +100,71 @@ end
 function Item:GetBlizzard(id)
 	local bag = ceil(id / MAX_CONTAINER_ITEMS)
 	local slot = (id-1) % MAX_CONTAINER_ITEMS + 1
-	local item = getglobal(format('ContainerFrame%dItem%d', bag, slot))
+	local item = _G[format('ContainerFrame%dItem%d', bag, slot)]
 
 	if item then
 		item:SetID(0)
+		item:ClearAllPoints()
 		return item
 	end
 end
 
-function Item:Get()
-	local item = next(unused)
-	if item then
-		unused[item] = nil
-		return item
+--item pool methods
+do
+	local unused = {}
+
+	function Item:Get()
+		local item = next(unused)
+		if item then
+			unused[item] = nil
+			return item
+		end
+		return self:New()
 	end
-	return self:New()
+
+	function Item:Release()
+		unused[self] = true
+
+		self.cached = nil
+		self.hasItem = nil
+		self:SetParent(nil)
+		self:Hide()
+	end
 end
+
+--dummy bag, a hack to enforce the internal blizzard rule that item:GetParent():GetID() == bagID
+function Item:GetDummyBag(parent, id)
+	local dummyBags = parent.dummyBags
+
+	--metatable magic to create a new frame on demand
+	if not dummyBags then
+		dummyBags = setmetatable({}, {
+			__index = function(t, k)
+				local f = CreateFrame('Frame', nil, parent)
+				f:SetID(k)
+				t[k] = f
+				return f
+			end
+		})
+		parent.dummyBags = dummyBags
+	end
+
+	return dummyBags[id]
+end
+
+
+--[[ Update Methods ]]--
 
 function Item:Set(parent, bag, slot)
 	self:SetParent(self:GetDummyBag(parent, bag))
 	self:SetID(slot)
 	self:Update()
-
 	return item
 end
 
-function Item:Release()
-	unused[self] = true
-
-	self.cached = nil
-	self.hasItem = nil
-	self:SetParent(nil)
-	self:Hide()
-end
-
-function Item:GetDummyBag(parent, id)
-	if not parent.dummyBags then
-		parent.dummyBags = {}
-	end
-
-	local frame = parent.dummyBags[id]
-	if not frame then
-		frame = CreateFrame('Frame', nil, parent)
-		frame:SetID(id)
-		parent.dummyBags[id] = frame
-	end
-
-	return frame
-end
-
-
---[[ Update Functions ]]--
-
 -- Update the texture, lock status, and other information about an item
 function Item:Update()
-	local slot = self:GetID()
-	local bag = self:GetBag()
-	local player = self:GetPlayer()
+	local player, bag, slot = self:GetSlotInfo()
 	local link, count, texture, quality, locked, readable, cached = InvData:GetItemInfo(bag, slot, player)
 
 	self.readable = readable
@@ -186,16 +198,27 @@ function Item:UpdateBorder(quality)
 end
 
 function Item:UpdateLock(locked)
-	local locked = select(3, GetContainerItemInfo(self:GetBag(), self:GetID()))
+	local player, bag, slot = self:GetSlotInfo()
+	local locked = select(3, GetContainerItemInfo(bag, slot))
 	SetItemButtonDesaturated(self, locked)
 end
 
 function Item:UpdateCooldown()
 	if (not self.cached) and self.hasItem then
-		local start, duration, enable = GetContainerItemCooldown(self:GetBag(), self:GetID())
+		local player, bag, slot = self:GetSlotInfo()
+		local start, duration, enable = GetContainerItemCooldown(bag, slot)
 		CooldownFrame_SetTimer(self.cooldown, start, duration, enable)
 	elseif self.cooldown:IsShown() then
 		CooldownFrame_SetTimer(self.cooldown, 0, 0, 0)
+	end
+end
+
+--fade out slots, if not true
+function Item:Highlight(enable)
+	if enable then		
+		self:LockHighlight()
+	else
+		self:UnlockHighlight()
 	end
 end
 
@@ -209,21 +232,22 @@ function Item:OnDragStart()
 end
 
 function Item:OnModifiedClick(button)
-	if self.cached then
-		if self.hasItem then
-			if button == 'LeftButton' then
-				if IsModifiedClick('DRESSUP') then
-					DressUpItemLink(InvData:GetItemLink(self:GetBag(), self:GetID(), self:GetPlayer()))
-				elseif IsModifiedClick('CHATLINK') then
-					ChatFrameEditBox:Insert(InvData:GetItemLink(self:GetBag(), self:GetID(), self:GetPlayer()))
-				end
-			end
-		end
+	if self.cached and self.hasItem then
+		local player, bag, slot = self:GetSlotInfo()
+		HandleModifiedItemClick(InvData:GetItemLink(bag, slot, player))
 	end
 end
 
+function Item:OnHide()
+	if self.hasStackSplit and self.hasStackSplit == 1 then
+		StackSplitFrame:Hide()
+	end
+end
+
+
+--[[ Tooltip Methods ]]--
+
 function Item:OnEnter()
-	local bag, slot = self:GetBag(), self:GetID()
 	if self.cached then
 		self.dummySlot:SetParent(self)
 		self.dummySlot:SetAllPoints(self)
@@ -232,6 +256,7 @@ function Item:OnEnter()
 		self.dummySlot:Hide()
 
 		--boo for special case bank code
+		local player, bag, slot = self:GetSlotInfo()
 		if bag == BANK_CONTAINER then
 			if self.hasItem then
 				self:AnchorTooltip()
@@ -243,21 +268,8 @@ function Item:OnEnter()
 		end
 	end
 end
+
 Item.UpdateTooltip = Item.OnEnter
-
-function Item:OnHide()
-	if self.hasStackSplit and self.hasStackSplit == 1 then
-		StackSplitFrame:Hide()
-	end
-end
-
-function Item:Highlight(enable)
-	if enable then
-		self:LockHighlight()
-	else
-		self:UnlockHighlight()
-	end
-end
 
 
 --[[ Convenience Functions ]]--
@@ -274,6 +286,10 @@ end
 function Item:GetBag()
 	local bag = self:GetParent()
 	return bag and bag:GetID()
+end
+
+function Item:GetSlotInfo()
+	return self:GetPlayer(), self:GetBag(), self:GetID()
 end
 
 function Item:AnchorTooltip()

@@ -223,12 +223,20 @@ end
 function InventoryFrame:OnBagToggleEnter(toggle)
 	GameTooltip:SetOwner(toggle, 'ANCHOR_LEFT')
 	GameTooltip:SetText(L.Bags, 1, 1, 1)
+	GameTooltip:AddLine(L.BagToggle)
 
 	if self.isBank then
 		GameTooltip:AddLine(L.InventoryToggle)
 	else
 		GameTooltip:AddLine(L.BankToggle)
 	end
+	GameTooltip:Show()
+end
+
+function InventoryFrame:OnPortraitEnter(portrait)
+	GameTooltip:SetOwner(portrait, 'ANCHOR_RIGHT')
+	GameTooltip:SetText(self:GetPlayer(), 1, 1, 1)
+	GameTooltip:AddLine('<Left Click> to switch characters')
 	GameTooltip:Show()
 end
 
@@ -611,20 +619,17 @@ end
 --]]
 
 function InventoryFrame:OnShow()
-	PlaySound('igMainMenuOpen')
+	PlaySound('igBackPackOpen')
 	FrameEvents:Register(self)
 	self:UpdateSets(self:GetDefaultCategory())
 end
 
 function InventoryFrame:OnHide()
-	PlaySound('igMainMenuClose')
+	PlaySound('igBackPackClose')
 	FrameEvents:Unregister(self)
 
 	--return to showing the current player on close
 	self:SetPlayer(UnitName('player'))
-	if self.isBank then
-		CloseBankFrame()
-	end
 end
 
 function InventoryFrame:ToggleFrame(auto)
@@ -662,4 +667,13 @@ end
 
 function InventoryFrame:IsSideFilterOnLeft()
 	return self.sets.leftSideFilter
+end
+
+
+--[[
+	Accessors
+--]]
+
+function InventoryFrame:IsBank()
+	return self.isBank
 end

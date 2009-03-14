@@ -38,9 +38,9 @@
 --]]
 
 local BagEvents = Combuctor:NewModule('Events', 'AceEvent-3.0')
-local atBank = false
-local loading = true
-local firstVisit = true
+BagEvents.atBank = false
+BagEvents.firstVisit = true
+
 local slots = {}
 local bagSubTypes = {}
 
@@ -186,7 +186,7 @@ function BagEvents:UpdateBagType(bag)
 end
 
 function BagEvents:UpdateBagSizesAndTypes()
-	if atBank then
+	if self:AtBank() then
 		for bag = 1, GetNumBankSlots() + 4 do
 			self:UpdateBagSize(bag)
 			self:UpdateBagType(bag)
@@ -232,22 +232,24 @@ function BagEvents:PLAYERBANKSLOTS_CHANGED()
 end
 
 function BagEvents:BANKFRAME_OPENED()
-	atBank = true
-	if firstVisit then
-		firstVisit = false
+	self.atBank = true
+
+	if self.firstVisit then
+		self.firstVisit = nil
 		self:UpdateBagSize(BANK_CONTAINER)
 		self:UpdateBagSizesAndTypes()
 	end
+
 	self:SendMessage('COMBUCTOR_BANK_OPENED')
 end
 
 function BagEvents:BANKFRAME_CLOSED()
-	atBank = false
+	self.atBank = false
 	self:SendMessage('COMBUCTOR_BANK_CLOSED')
 end
 
 function BagEvents:ITEM_LOCK_CHANGED()
-	if atBank then
+	if self:AtBank() then
 		for bag = -2, GetNumBankSlots() + 4 do
 			self:UpdateLocks(bag)
 		end
@@ -263,4 +265,10 @@ function BagEvents:BAG_UPDATE_COOLDOWN()
 	for bag = 0, 4 do
 		self:UpdateCooldowns(bag)
 	end
+end
+
+--[[ Accessor Methods ]]--
+
+function BagEvents:AtBank()
+	return self.atBank
 end
