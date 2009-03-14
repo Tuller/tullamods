@@ -40,7 +40,7 @@ end
 
 function Shine:OnHide()
 	if self.ani:IsPlaying() then
-		self.ani:Stop()
+		self.ani:Finish()
 	end
 	self:Hide()
 end
