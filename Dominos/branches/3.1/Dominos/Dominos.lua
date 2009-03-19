@@ -212,6 +212,11 @@ function Dominos:HideBlizzard()
 	MultiActionBar_Update = noop
 	MultiActionBar_UpdateGrid = noop
 	ShowBonusActionBar = noop
+	
+	--hack, to make sure the seat indicator is placed in the right spot
+	if not _G['VehicleSeatIndicator']:IsUserPlaced() then
+		_G['VehicleSeatIndicator']:SetPoint("TOPRIGHT", MinimapCluster, "BOTTOMRIGHT", 0, -13)
+	end
 
 	UIPARENT_MANAGED_FRAME_POSITIONS['MultiBarRight'] = nil
 	UIPARENT_MANAGED_FRAME_POSITIONS['MultiBarLeft'] = nil
