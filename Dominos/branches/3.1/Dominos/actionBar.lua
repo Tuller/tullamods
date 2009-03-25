@@ -214,8 +214,11 @@ ActionBar.mainbarOffsets = {
 			pages['[bonusbar:1]'] = 6
 			pages['[bonusbar:2]'] = 7
 			pages['[bonusbar:3]'] = 8
-		elseif i == 'PRIEST' or i == 'ROGUE' then
+		elseif i == 'PRIEST' then
 			pages['[bonusbar:1]'] = 6
+		elseif i == 'ROGUE' then
+			pages['[bonusbar:1]'] = 6
+			pages['[form:3]'] = 6 --shadowdance
 --[[
 		elseif i == 'WARLOCK' then
 			pages['[form:2]'] = 6 --demon form, need to watch this to make sure blizzard doesn't change the page
@@ -241,6 +244,7 @@ ActionBar.conditions = {
 	'[bar:6]',
 	'[bonusbar:1,stealth]',
 	'[form:2]',
+	'[form:3]',
 	'[bonusbar:1]',
 	'[bonusbar:2]',
 	'[bonusbar:3]',
@@ -562,6 +566,7 @@ do
 				ConditionSlider_New(p, '[bonusbar:1]', GetSpellInfo(15473))
 			elseif class == 'ROGUE' then
 				ConditionSlider_New(p, '[bonusbar:1]', GetSpellInfo(1784))
+				ConditionSlider_New(p, '[form:3]', GetSpellInfo(51713))
 			elseif class == 'WARLOCK' then
 				ConditionSlider_New(p, '[form:2]', GetSpellInfo(47241))
 			end
