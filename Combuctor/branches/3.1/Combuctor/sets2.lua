@@ -162,7 +162,7 @@ function Set:ContainsSlot(player, bagType, name, link, quality, reqLevel, iLvl, 
 end
 
 --forces a set update event
-function Set:Update()
+function Set:ForceUpdate()
 	CombuctorSet:SendMessage('COMBUCTOR_SET_UPDATE', self)
 end
 
