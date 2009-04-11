@@ -1,17 +1,14 @@
-## Interface: 30000
+## Interface: 30100
 ## Title: Dominos
 ## Notes: A main actionbar replacement
 ## Author: Tuller
-## Version: 1.8.3
+## Version: 1.9.3
 ## SavedVariables: DominosDB, DominosVersion
 ## OptionalDeps: Ace3, LibKeyBound-1.0, Dominos_Buff, ButtonFacade
 embeds.xml
-localization\localization.lua
-localization\localization.fr.lua
-localization\localization.cn.lua
-localization\localization.tw.lua
-localization\localization.ko.lua
+localization.xml
 Dominos.lua
+fadeManager.lua
 drag.lua
 frame.lua
 bindableButton.lua

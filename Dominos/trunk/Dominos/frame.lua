@@ -1,114 +1,41 @@
 --[[
-	Dominos Frame
-		An action button frame thingy
+	frame.lua
+		A dominos frame, a generic container object
 --]]
 
-local Dominos = Dominos
+--[[
+	Copyright (c) 2008-2009 Jason Greer
+	All rights reserved.
 
+	Redistribution and use in source and binary forms, with or without 
+	modification, are permitted provided that the following conditions are met:
 
---[[ Fade Manager ]]--
+		* Redistributions of source code must retain the above copyright notice, 
+		  this list of conditions and the following disclaimer.
+		* Redistributions in binary form must reproduce the above copyright
+		  notice, this list of conditions and the following disclaimer in the 
+		  documentation and/or other materials provided with the distribution.
+		* Neither the name of the author nor the names of its contributors may 
+		  be used to endorse or promote products derived from this software 
+		  without specific prior written permission.
 
-local Fader = CreateFrame('Frame')
-do
-	Fader.nextUpdate = 0
-	Fader.fs = {}
-
-	Fader:SetScript('OnUpdate', function(self, elapsed)
-		if self.nextUpdate < 0 then
-			self.nextUpdate = 0.1
-
-			for f in pairs(self.fs) do
-				if self:IsFocus(f) then
-					if abs(f:GetAlpha() - f:GetFadedAlpha()) < 0.01 then --the checking logic is a little weird because floating point values tend to not be exact
-						self:FadeIn(f, 0.1, f:GetAlpha(), f:GetFrameAlpha())
-					end
-				else
-					if abs(f:GetAlpha() - f:GetFrameAlpha()) < 0.01 then
-						self:FadeOut(f, 0.1, f:GetAlpha(), f:GetFadedAlpha())
-					end
-				end
-			end
-		else
-			self.nextUpdate = self.nextUpdate - elapsed
-		end
-	end)
-	Fader:Hide()
-
-	function Fader:Add(f)
-		self.fs[f] = true
-		if not self:IsShown() then
-			self:Show()
-		end
-	end
-
-	function Fader:Remove(f)
-		self.fs[f] = nil
-		if not next(self.fs) then
-			self:Hide()
-		end
-	end
-
-	-- Generic fade function, taken from UIFrameFade
-	--the following code exists only so that I can prevent some basic tainting issues caused by the UIFrameFade function attempting to show frames
-	local function Fade(frame, fadeInfo)
-		frame:SetAlpha(fadeInfo.startAlpha)
-		frame.fadeInfo = fadeInfo
-
-		for _,f in pairs(FADEFRAMES) do
-			if f == frame then
-				return
-			end
-		end
-		tinsert(FADEFRAMES, frame)
-	end
-
-	function Fader:FadeIn(frame, timeToFade, startAlpha, endAlpha)
-		local fadeInfo = {}
-		fadeInfo.mode = "IN"
-		fadeInfo.timeToFade = timeToFade
-		fadeInfo.startAlpha = startAlpha
-		fadeInfo.endAlpha = endAlpha
-		Fade(frame, fadeInfo)
-	end
-
-	function Fader:FadeOut(frame, timeToFade, startAlpha, endAlpha)
-		local fadeInfo = {}
-		fadeInfo.mode = "OUT"
-		fadeInfo.timeToFade = timeToFade
-		fadeInfo.startAlpha = startAlpha
-		fadeInfo.endAlpha = endAlpha
-		Fade(frame, fadeInfo)
-	end
-
-	--this code determins if the mouse is over either the frame itself, or any child frames
-	function Fader:IsFocus(f)
-		if MouseIsOver(f, 1, -1, -1, 1) then
-			return GetMouseFocus() == WorldFrame or self:IsChildFocus(f:GetChildren())
-		end
-	end
-
-	function Fader:IsChildFocus(...)
-		for i = 1, select('#', ...) do
-			if GetMouseFocus() == select(i, ...) then
-				return true
-			end
-		end
-
-		for i = 1, select('#', ...) do
-			local f = select(i, ...)
-			if f:IsShown() and self:IsChildFocus(f:GetChildren()) then
-				return true
-			end
-		end
-	end
-end
-
-
---[[ Mango Frame ]]--
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+	LIABLE FORANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+	POSSIBILITY OF SUCH DAMAGE.
+--]]
 
 local Frame = Dominos:CreateClass('Frame')
 Dominos.Frame = Frame
 
+local FadeManager = Dominos.FadeManager
 local active = {}
 local unused = {}
 
@@ -150,7 +77,7 @@ function Frame:Free()
 	active[self.id] = nil
 
 	UnregisterStateDriver(self.header, 'visibility', 'show')
-	Fader:Remove(self)
+	FadeManager:Remove(self)
 
 	for i in pairs(self.buttons) do
 		self:RemoveButton(i)
@@ -623,12 +550,12 @@ end
 --run the fade onupdate checker if only if there are mouseover fs to check
 function Frame:UpdateFader()
 	if self.sets.hidden then
-		Fader:Remove(self)
+		FadeManager:Remove(self)
 	else
 		if select(2, self:GetFadedAlpha()) == 1 then
-			Fader:Remove(self)
+			FadeManager:Remove(self)
 		else
-			Fader:Add(self)
+			FadeManager:Add(self)
 		end
 	end
 end

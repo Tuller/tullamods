@@ -1,6 +1,35 @@
 ﻿--[[
-	Dominos
-		Because sometimes I feel bad about doing to much
+	actionBar.lua
+		the code for Dominos action bars and buttons
+--]]
+
+--[[
+	Copyright (c) 2008-2009 Jason Greer
+	All rights reserved.
+
+	Redistribution and use in source and binary forms, with or without 
+	modification, are permitted provided that the following conditions are met:
+
+		* Redistributions of source code must retain the above copyright notice, 
+		  this list of conditions and the following disclaimer.
+		* Redistributions in binary form must reproduce the above copyright
+		  notice, this list of conditions and the following disclaimer in the 
+		  documentation and/or other materials provided with the distribution.
+		* Neither the name of the author nor the names of its contributors may 
+		  be used to endorse or promote products derived from this software 
+		  without specific prior written permission.
+
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+	LIABLE FORANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+	POSSIBILITY OF SUCH DAMAGE.
 --]]
 
 --libs and omgspeed
@@ -34,6 +63,12 @@ function ActionButton:New(id)
 		b:UpdateGrid()
 		b:UpdateHotkey(b.buttonType)
 		b:UpdateMacro()
+
+		--hack #1billion, get rid of range indicator text
+		local hotkey = _G[b:GetName() .. 'HotKey']
+		if hotkey:GetText() == _G['RANGE_INDICATOR'] then
+			hotkey:SetText('')
+		end
 
 		self.active[id] = b
 
@@ -132,7 +167,7 @@ function ActionButton:OnEnter()
 end
 
 --override the old update hotkeys function
-ActionButton_UpdateHotkeys = ActionButton.UpdateHotkey
+_G['ActionButton_UpdateHotkeys'] = ActionButton.UpdateHotkey
 
 --button visibility
 function ActionButton:UpdateGrid()
@@ -208,8 +243,11 @@ ActionBar.mainbarOffsets = {
 			pages['[bonusbar:1]'] = 6
 			pages['[bonusbar:2]'] = 7
 			pages['[bonusbar:3]'] = 8
-		elseif i == 'PRIEST' or i == 'ROGUE' then
+		elseif i == 'PRIEST' then
 			pages['[bonusbar:1]'] = 6
+		elseif i == 'ROGUE' then
+			pages['[bonusbar:1]'] = 6
+			pages['[form:3]'] = 6 --shadowdance
 --[[
 		elseif i == 'WARLOCK' then
 			pages['[form:2]'] = 6 --demon form, need to watch this to make sure blizzard doesn't change the page
@@ -235,6 +273,7 @@ ActionBar.conditions = {
 	'[bar:6]',
 	'[bonusbar:1,stealth]',
 	'[form:2]',
+	'[form:3]',
 	'[bonusbar:1]',
 	'[bonusbar:2]',
 	'[bonusbar:3]',
@@ -556,6 +595,7 @@ do
 				ConditionSlider_New(p, '[bonusbar:1]', GetSpellInfo(15473))
 			elseif class == 'ROGUE' then
 				ConditionSlider_New(p, '[bonusbar:1]', GetSpellInfo(1784))
+				ConditionSlider_New(p, '[form:3]', GetSpellInfo(51713))
 			elseif class == 'WARLOCK' then
 				ConditionSlider_New(p, '[form:2]', GetSpellInfo(47241))
 			end
