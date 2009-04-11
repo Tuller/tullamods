@@ -248,7 +248,7 @@ function InfoBar:GetPCColor(unit)
 	end
 
 	local threatLevel = UnitExists(unit) and UnitThreatSituation(unit)
-	if threatLevel > 0 then
+	if threatLevel and threatLevel > 0 then
 		return GetThreatStatusColor(threatLevel)
 	end
 
@@ -280,7 +280,7 @@ function InfoBar:GetNPCColor(unit)
 			threatLevel = UnitThreatSituation('player', unit)
 		end
 
-		if threatLevel > 0 then
+		if threatLevel and threatLevel > 0 then
 			return GetThreatStatusColor(threatLevel)
 		end
 	end

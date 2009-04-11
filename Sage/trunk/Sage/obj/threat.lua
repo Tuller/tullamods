@@ -54,7 +54,7 @@ function ThreatDisplay:Update()
 		end
 	end
 	
-	if state > 0 then
+	if state and state > 0 then
 		local r, g, b = GetThreatStatusColor(state)
 		self.bg:SetTexture(r, g, b, 0.5)
 	else

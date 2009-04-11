@@ -121,7 +121,7 @@ function PartyFrame:showInRaid_Change(enable)
 	if enable then
 		self.sets.visibilityStates = nil
 	else
-		self.sets.visibilityStates = '[target=player,raid]hide'
+		self.sets.visibilityStates = '[target=player,raid]hide;show'
 	end
 end
 
@@ -139,7 +139,7 @@ function PartyFrame:GetDefaults()
 		oorAlpha = 0.6,
 		height = (BORDER_SIZE*2) + INFO_HEIGHT + HEALTH_HEIGHT + POWER_HEIGHT + BUFF_SIZE*2 + POWER_HEIGHT,
 		showInRaid = false,
-		visibilityStates = '[target=player,raid]hide'
+		visibilityStates = '[target=player,raid]hide;show'
 	}
 end
 
