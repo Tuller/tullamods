@@ -1,9 +1,9 @@
-## Interface: 30000
+## Interface: 30100
 ## Title: SellFish
 ## Author: Tuller
 ## Notes: Lets you view sell value data about items from anywhere
 ## SavedVariables: SellFishDB
-## Version: 2.1.7
+## Version: 2.1.8
 ## OptionalDeps: LibStub, ItemPrice-1.1
 embeds.xml
 localization.lua
