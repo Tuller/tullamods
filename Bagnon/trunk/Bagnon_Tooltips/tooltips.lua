@@ -96,12 +96,7 @@ local function AddOwners(frame, link)
 end
 
 local function HookTip(tooltip)
-	local SetItem = tooltip:GetScript('OnTooltipSetItem')
-	tooltip:SetScript('OnTooltipSetItem', function(self, ...)
-		if SetItem then
-			SetItem(self, ...)
-		end
-
+	tooltip:HookScript('OnTooltipSetItem', function(self, ...)
 		local itemLink = select(2, self:GetItem())
 		if itemLink and GetItemInfo(itemLink) then --fix for blizzard doing craziness when doing getiteminfo
 			AddOwners(self, itemLink)
