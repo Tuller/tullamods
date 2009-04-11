@@ -2,7 +2,7 @@
 ## Title: Sage
 ## Notes: Minimalistic Unitframes
 ## Author: Tuller
-## Version: 3.2.4
+## Version: 3.2.5
 ## SavedVariables: SageDB, SageVersion
 ## OptionalDeps: Ace3, LibSharedMedia-3.0
 embeds.xml
