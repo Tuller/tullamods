@@ -27,7 +27,6 @@ Combuctor:
 
 [Ludwig]:
   * Clean up GUI code
-  * Add in spell and talent link support
 
 [OmniCC]:
   * Fix bugs
