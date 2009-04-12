@@ -4,8 +4,8 @@
 
 	Grammar:
 		<search> 			:=	<intersect search>
-		<intersect search> 	:=	<union search> | <union search> ; <union search>
-		<union search>		:=	<negatable search>  & <negatable search> ; <negatable search>
+		<intersect search> 	:=	<union search> & <union search> ; <union search>
+		<union search>		:=	<negatable search>  | <negatable search> ; <negatable search>
 		<negatable search> 	:=	!<primitive search> ; <primitive search>
 		<primitive search>	:=	<tooltip search> ; <quality search> ; <type search> ; <text search>
 		<tooltip search>	:=  bop ; boa ; bou ; boe ; quest
@@ -27,8 +27,8 @@ function ItemSearch:Find(itemLink, search)
 		return false
 	end
 
-	if search:match('\124') then
-		return self:FindIntersectSearch(itemLink, strsplit('\124', search))
+	if search:match('\038') then
+		return self:FindIntersectSearch(itemLink, strsplit('\038', search))
 	end
 	return self:FindIntersectSearch(itemLink, search)
 end
@@ -37,8 +37,8 @@ function ItemSearch:FindIntersectSearch(itemLink, ...)
 	for i = 1, select('#', ...) do
 		local search = select(i, ...)
 		if search and search ~= '' then
-			if search:match('\038') then
-				if not self:FindUnionSearch(itemLink, strsplit('\038', search)) then
+			if search:match('\124') then
+				if not self:FindUnionSearch(itemLink, strsplit('\124', search)) then
 					return false
 				end
 			else
@@ -70,23 +70,26 @@ function ItemSearch:FindNegatableSearch(itemLink, search)
 end
 
 function ItemSearch:FindPrimitiveSearch(itemLink, search)
-	if self:FindTooltipSearch(itemLink, search) then
-		return true
+	if not search then
+		return false
 	end
 
-	if self:FindQualitySearch(itemLink, search) then
-		return true
+	local tSearch = self:IsTooltipSearch(search)
+	if tSearch then
+		return self:FindTooltipSearch(itemLink, tSearch)
 	end
 
-	if self:FindTypeSearch(itemLink, search) then
-		return true
+	local qSearch = self:IsQualitySearch(search)
+	if qSearch then
+		return self:FindQualitySearch(itemLink, qSearch)
 	end
 
-	if self:FindTextSearch(itemLink, search) then
-		return true
+	local tSearch = self:IsTypeSearch(search)
+	if tSearch then
+		return self:FindTypeSearch(itemLink, tSearch)
 	end
 
-	return false
+	return self:FindTextSearch(itemLink, search)
 end
 
 
@@ -133,40 +136,53 @@ local function link_FindSearchInTooltip(itemLink, search)
 	return result
 end
 
-function ItemSearch:FindTooltipSearch(itemLink, search)
-	local tSearch = tooltipSearches[search]
+function ItemSearch:FindTooltipSearch(itemLink, tSearch)
 	return tSearch and link_FindSearchInTooltip(itemLink, tSearch)
 end
 
---quality q:(.+)
-function ItemSearch:FindQualitySearch(itemLink, search)
-	local qSearch = search:match('^q:(.+)$')
-	if not qSearch then
-		return false
-	end
+function ItemSearch:IsTooltipSearch(search)
+	return tooltipSearches[search]
+end
 
+
+--quality q:(.+)
+function ItemSearch:FindQualitySearch(itemLink, qSearch)
 	local name, link, quality = GetItemInfo(itemLink)
 	if not name then
 		return false
 	end
-
-	return tonumber(qSearch) == quality or search_IsInText(qSearch, _G['ITEM_QUALITY' .. quality .. '_DESC'])
+	
+	local qSearchNum = tonumber(qSearch)
+	if qSearchNum then
+		return qSearchNum == quality
+	end
+	
+	local qualityDesc = _G['ITEM_QUALITY' .. quality .. '_DESC']
+	if qualityDesc then
+		return qSearch == qualityDesc:lower()
+	end
+	
+	return false
 end
 
---typeSearch t:(.+)
-function ItemSearch:FindTypeSearch(itemLink, search)
-	local tSearch = search:match('^t:(.+)$')
-	if not tSearch then
-		return false
-	end
+function ItemSearch:IsQualitySearch(search)
+	return search and search:match('^q:(.+)$')
+end
 
+
+--typeSearch t:(.+)
+function ItemSearch:FindTypeSearch(itemLink, tSearch)
 	local name, link, quality, iLevel, reqLevel, type, subType, maxStack, equipSlot = GetItemInfo(itemLink)
 	if not name then
 		return false
 	end
-
 	return search_IsInText(tSearch, type, subType, _G[equipSlot])
 end
+
+function ItemSearch:IsTypeSearch(search)
+	return search and search:match('^t:(.+)$')
+end
+
 
 --basic text search
 function ItemSearch:FindTextSearch(itemLink, search)
