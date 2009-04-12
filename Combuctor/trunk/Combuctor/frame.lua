@@ -620,6 +620,7 @@ end
 
 function InventoryFrame:OnShow()
 	PlaySound('igBackPackOpen')
+	
 	FrameEvents:Register(self)
 	self:UpdateSets(self:GetDefaultCategory())
 end
@@ -627,6 +628,11 @@ end
 function InventoryFrame:OnHide()
 	PlaySound('igBackPackClose')
 	FrameEvents:Unregister(self)
+
+	--it may look stupid, but yes
+	if self:IsBank() and Combuctor:GetModule('InventoryData'):AtBank() then
+		CloseBankFrame()
+	end
 
 	--return to showing the current player on close
 	self:SetPlayer(UnitName('player'))
