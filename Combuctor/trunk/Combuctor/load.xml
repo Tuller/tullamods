@@ -6,6 +6,7 @@
 	<Script file="localization\localization.ruRU.lua"/>
 	<Script file="Combuctor.lua"/>
 	<Script file="inventoryData.lua"/>
+	<Script file="itemSearch.lua"/>
 	<Script file="events.lua"/>
 	<Script file="sets.lua"/>
 	<Script file="item.lua"/>
