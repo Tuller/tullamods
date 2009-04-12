@@ -27,38 +27,40 @@ function ItemSearch:Find(itemLink, search)
 		return false
 	end
 
-	if search:match('\038') then
-		return self:FindIntersectSearch(itemLink, strsplit('\038', search))
+	if search:match('\124') then
+		return self:FindUnionSearch(itemLink, strsplit('\124', search))
 	end
-	return self:FindIntersectSearch(itemLink, search)
-end
-
-function ItemSearch:FindIntersectSearch(itemLink, ...)
-	for i = 1, select('#', ...) do
-		local search = select(i, ...)
-		if search and search ~= '' then
-			if search:match('\124') then
-				if not self:FindUnionSearch(itemLink, strsplit('\124', search)) then
-					return false
-				end
-			else
-				if not self:FindUnionSearch(itemLink, search) then
-					return false
-				end
-			end
-		end
-	end
-	return true
+	return self:FindUnionSearch(itemLink, search)
 end
 
 function ItemSearch:FindUnionSearch(itemLink, ...)
 	for i = 1, select('#', ...) do
 		local search = select(i, ...)
-		if search and search ~= '' and self:FindNegatableSearch(itemLink, search) then
-			return true
+		if search and search ~= '' then
+			if search:match('\038') then
+				if self:FindIntersectSearch(itemLink, strsplit('\038', search)) then
+					return true
+				end
+			else
+				if self:FindIntersectSearch(itemLink, search) then
+					return true
+				end
+			end
 		end
 	end
 	return false
+end
+
+function ItemSearch:FindIntersectSearch(itemLink, ...)
+	for i = 1, select('#', ...) do
+		local search = select(i, ...)
+		if search and search ~= '' then 
+			if not self:FindNegatableSearch(itemLink, search) then
+				return false
+			end
+		end
+	end
+	return true
 end
 
 function ItemSearch:FindNegatableSearch(itemLink, search)
@@ -151,17 +153,17 @@ function ItemSearch:FindQualitySearch(itemLink, qSearch)
 	if not name then
 		return false
 	end
-	
+
 	local qSearchNum = tonumber(qSearch)
 	if qSearchNum then
 		return qSearchNum == quality
 	end
-	
+
 	local qualityDesc = _G['ITEM_QUALITY' .. quality .. '_DESC']
 	if qualityDesc then
 		return qSearch == qualityDesc:lower()
 	end
-	
+
 	return false
 end
 
