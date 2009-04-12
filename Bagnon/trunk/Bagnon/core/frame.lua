@@ -413,7 +413,7 @@ end
 
 function BagnonFrame:UpdateSearch()
 	for _,item in pairs(self.items) do
-		item:UpdateSearch()
+		item:UpdateFade()
 	end
 end
 

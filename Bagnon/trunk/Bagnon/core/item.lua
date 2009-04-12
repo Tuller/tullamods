@@ -151,9 +151,7 @@ function BagnonItem:Update()
 		self:UpdateTooltip()
 	end
 
-	if BagnonSpot:Searching() then
-		self:UpdateSearch()
-	end
+	self:UpdateFade()
 end
 
 --colors the item border based on the quality of the item.  hides it for common/poor items
@@ -207,48 +205,13 @@ end
 
 --[[ Spot Searching ]]--
 
-function BagnonItem:UpdateSearch()
-	local text, bag = BagnonSpot:GetSearch()
-
-	if text or bag then
-		if bag then
-			if self:GetBag() ~= bag then
-				self:Fade()
-				return
-			end
-		end
-
-		if text then
-			local link = self.hasItem
-			if link then
-				--smart text search: will attempt to match type, subtype, and equip locations in addition to names
-				local name, _, quality, itemLevel, minLevel, type, subType, _, equipLoc = GetItemInfo(link)
-				if name then
-					text = text:lower()
-					name = name:lower()
-
-					if not(text == name or name:find(text)) then
-						local type = type:lower()
-						if not(text == type or type:find(text)) then
-							local subType = subType:lower()
-							if not(text == subType or subType:find(text)) then
-								local equipLoc = _G[equipLoc] and _G[equipLoc]:lower()
-								if not(equipLoc and (text == equipLoc or equipLoc:find(text))) then
-									self:Fade()
-									return
-								end
-							end
-						end
-					end
-				end
-			else
-				self:Fade()
-				return
-			end
-		end
+function BagnonItem:UpdateFade()
+	if not BagnonSpot:Searching() then
+		self:Unfade()
+	elseif self:InBagSearch(BagnonSpot:GetBagSearch()) and self:InItemSearch(BagnonSpot:GetTextSearch()) then
 		self:Unfade(true)
 	else
-		self:Unfade()
+		self:Fade()
 	end
 end
 
@@ -266,6 +229,102 @@ function BagnonItem:Unfade(highlight)
 		self:LockHighlight()
 	else
 		self:UnlockHighlight()
+	end
+end
+
+
+--[[ Search Matching ]]--
+
+--intersect search
+function BagnonItem:InBagSearch(...)
+	local myBag = self:GetBag()
+	for i = 1, select('#', ...) do
+		local bag = select(i, ...)
+		if bag and myBag ~= bag then
+			return false
+		end
+	end
+	return true
+end
+
+--deal with intersect searches
+function BagnonItem:InItemSearch(...)
+	for i = 1, select('#', ...) do
+		local search = select(i, ...)
+		if not self:InSingleItemSearch(search) then
+			return false
+		end
+	end
+	return true
+end
+
+--utility function to do a lot of basic text searches at once
+local function searchIsInText(search, ...)
+	for i = 1, select('#', ...) do
+		local text = select(i, ...)
+		text = text and text:lower()
+		if text and (text == search or text:match(search)) then
+			return true
+		end
+	end
+	return false
+end
+
+local tooltipSearches = {
+	['boe'] = ITEM_BIND_ON_EQUIP,
+	['bop'] = ITEM_BIND_ON_PICKUP,
+	['bou'] = ITEM_BIND_ON_USE,
+	['quest'] = ITEM_BIND_QUEST,
+	['boa'] = ITEM_BIND_TO_ACCOUNT
+}
+
+function BagnonItem:InSingleItemSearch(search)
+	local link = self.hasItem
+	--no link == no item, so fail
+	if not link then
+		return false
+	end
+
+	local name, itemLink, quality, itemLevel, reqLevel, type, subType, stackCount, equipLoc = GetItemInfo(link)
+	--no name == no returns from getiteminfo, so fail
+	if not name then
+		return false
+	end
+
+	local tooltipSearch = tooltipSearches[search]
+	if tooltipSearch then
+		return self:IsSearchInTooltip(tooltipSearch)
+	end
+
+	--item info searches
+	if searchIsInText(search, name, type, subType, _G[equipLoc]) then
+		return true
+	end
+
+	--quality searches, look for either number or text (epic, etc)
+	if quality == tonumber(search) or searchIsInText(search, _G['ITEM_QUALITY' .. quality .. '_DESC']) then
+		return true
+	end
+
+	return false
+end
+
+do
+	local searchTooltip = CreateFrame('GameTooltip', 'BagnonItemSearchTooltip', UIParent, 'GameTooltipTemplate')
+	function BagnonItem:IsSearchInTooltip(search)
+		local result = false
+		
+		searchTooltip:SetOwner(UIParent, 'ANCHOR_NONE')
+		searchTooltip:SetHyperlink(self.hasItem)
+		
+		if searchTooltip:NumLines() > 1 and _G[searchTooltip:GetName() .. 'TextLeft2']:GetText() == search then
+			result = true 
+		elseif searchTooltip:NumLines() > 2 and _G[searchTooltip:GetName() .. 'TextLeft3']:GetText() == search then
+			result = true
+		end		
+		
+		searchTooltip:Hide()
+		return result
 	end
 end
 

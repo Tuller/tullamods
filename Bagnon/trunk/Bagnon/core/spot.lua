@@ -66,9 +66,21 @@ function BagnonSpot:SetTextSearch(text)
 	self:UpdateFrames()
 end
 
+function BagnonSpot:GetTextSearch()
+	local search = self.textSearch
+	if search and search:find('\124') then
+		return strsplit('\124', search)
+	end
+	return search
+end
+
 function BagnonSpot:SetBagSearch(bag)
 	self.bagSearch = bag
 	self:UpdateFrames()
+end
+
+function BagnonSpot:GetBagSearch()
+	return self.bagSearch
 end
 
 --clears all searches
