@@ -12,6 +12,13 @@
 			point - any non nil return value of FlyPaper.Stick
 --]]
 
+--[[
+		This work is in the Public Domain. To view a copy of the public domain certification, 
+		visit http://creativecommons.org/licenses/publicdomain/ or send a letter to Creative Commons, 
+		171 Second Street, Suite 300, San Francisco, California, 94105, USA.
+--]]
+
+
 
 --[[ library stuff ]]--
 
