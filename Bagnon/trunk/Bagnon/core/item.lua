@@ -251,7 +251,7 @@ end
 function BagnonItem:InItemSearch(...)
 	for i = 1, select('#', ...) do
 		local search = select(i, ...)
-		if not self:InSingleItemSearch(search) then
+		if search and not self:InSingleItemSearch(search) then
 			return false
 		end
 	end

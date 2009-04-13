@@ -5,7 +5,7 @@
 ## Notes-zhTW: 以單一視窗顯示背包和銀行
 ## Notes-zhCN: 在单一框架内显示背包或银行中的物品
 ## SavedVariablesPerCharacter: BagnonSets
-## Version: 1.7.0
+## Version: 1.7.1
 ## OptionalDeps: Ace3, Bagnon_Forever
 embeds.xml
 localization\localization.lua
