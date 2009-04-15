@@ -44,6 +44,7 @@ function BagnonSpot:Show(anchor)
 		self.frame:SetPoint("TOPLEFT", anchor.title, "TOPLEFT", -8, 6)
 		self.frame:SetPoint("BOTTOMRIGHT", anchor.title, "BOTTOMRIGHT", -4, -6)
 		self:SetTextSearch(self.frame:GetText())
+		self.frame:SetFocus()
 	end
 end
 
