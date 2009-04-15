@@ -3,7 +3,7 @@
 		An aura icon display
 --]]
 
-local AuraButton = Sage:CreateClass('Button')
+local AuraButton = Sage:CreateClass('Frame')
 
 local _G = _G
 local DebuffTypeColor = _G['DebuffTypeColor']
@@ -16,7 +16,7 @@ local ceil = math.ceil
 --needs to be XML based since blizzard forgot to make the brighter cooldown model attribute able to be set via lua
 function AuraButton:New(id, parent)
 	local name = parent:GetName() .. id
-	local f = self:Bind(CreateFrame('Button', name, parent, 'TargetDebuffButtonTemplate'))
+	local f = self:Bind(CreateFrame('Frame', name, parent, 'TargetDebuffFrameTemplate'))
 
 	f:SetID(id)
 	f.count = _G[name .. 'Count']
@@ -154,33 +154,33 @@ function AuraContainer:Update()
 
 
 	local id = 1
-	local name, rank, icon, applications, debuffType, duration, expirationTime, isMine, isStealable = UnitAura(unit, id, filter)
+	local name, rank, icon, applications, debuffType, duration, expirationTime, caster, isStealable = UnitAura(unit, id, filter)
 	while name do
-		if isMine then
+		if caster == 'player' then
 			count = count + 1
 
 			local b = self.buttons[count]
-			b:Update(name, rank, icon, applications, debuffType, duration, expirationTime, isMine, isStealable)
+			b:Update(name, rank, icon, applications, debuffType, duration, expirationTime, caster, isStealable)
 			b:Show()
 		end
 
 		id = id + 1
-		name, rank, icon, applications, debuffType, duration, expirationTime, isMine, isStealable = UnitAura(unit, id, filter)
+		name, rank, icon, applications, debuffType, duration, expirationTime, caster, isStealable = UnitAura(unit, id, filter)
 	end
 
 	local id = 1
-	local name, rank, icon, applications, debuffType, duration, expirationTime, isMine, isStealable = UnitAura(unit, id, filter)
+	local name, rank, icon, applications, debuffType, duration, expirationTime, caster, isStealable = UnitAura(unit, id, filter)
 	while name do
-		if not isMine then
+		if caster ~= 'player' then
 			count = count + 1
 
 			local b = self.buttons[count]
-			b:Update(name, rank, icon, applications, debuffType, duration, expirationTime, isMine, isStealable)
+			b:Update(name, rank, icon, applications, debuffType, duration, expirationTime, caster, isStealable)
 			b:Show()
 		end
 
 		id = id + 1
-		name, rank, icon, applications, debuffType, duration, expirationTime, isMine, isStealable = UnitAura(unit, id, filter)
+		name, rank, icon, applications, debuffType, duration, expirationTime, caster, isStealable = UnitAura(unit, id, filter)
 	end
 
 	for i = count + 1, #self.buttons do
