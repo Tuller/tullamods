@@ -21,8 +21,6 @@ My own addon, [http://www.wowinterface.com/downloads/info4836-OmniCC.html OmniCC
 
 ==== Buff and Debuff Highlighting ====
 
-This is actually included in the Dominos download as Dominos_Buff.  What this addon does is add a green border around buttons that contain buffs that you currently have on yourself, or a friendly target.  It also displays a purple border around debuffs you've cast on an enemy target.
-
-[http://wow.curse.com/downloads/wow-addons/details/inline-aura.aspx Inline Aura] also does the same thing, but includes some extra features, like durations and stack counts.
+[http://wow.curse.com/downloads/wow-addons/details/inline-aura.aspx Inline Aura]   What this addon does is add a green border around buttons that contain buffs that you currently have on yourself, or a friendly target.  It also displays a purple border around debuffs you've cast on an enemy target.  In addition, it can display aura durations, like cooldown count type addons do for timers.
 
 [http://www.wowinterface.com/downloads/fileinfo.php?id=12566 Proc Borders] allows you to highlight an action whenever you have a certain buff up.  Its great if you want, for example, to have Shadow Bolt to be highlighted when Shadow Trance is up.
