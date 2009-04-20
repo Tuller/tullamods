@@ -8,6 +8,8 @@
 
 You can change the looks of the action buttons in Dominos using an addon called [http://www.wowace.com/projects/buttonfacade/pages/main/ Button Facade].  A wide variety of [http://www.wowinterface.com/downloads/search.php?search=button+facade&title&author&page=1&so=asc&sb=title styles] are available for the addon.
 
+[http://www.wowinterface.com/downloads/info12024-rActionButtonStyler.html rActionButtonStyler] is a nice alternative to Button Facade.
+
 
 ==== Out of Range Coloring ====
 
