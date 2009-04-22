@@ -280,7 +280,7 @@ ActionBar.conditions = {
 	'[bonusbar:4]',
 	'[help]',
 	'[harm]',
-	'[none]'
+	'[noexists]'
 }
 
 ActionBar.class = select(2, UnitClass('player'))
@@ -619,7 +619,7 @@ do
 
 	local function AddTargeting(self)
 		local p = self:NewPanel(L.Targeting)
-		ConditionSlider_New(p, '[none]', NONE)
+		ConditionSlider_New(p, '[noexists]', NONE)
 		ConditionSlider_New(p, '[harm]', L.Harm)
 		ConditionSlider_New(p, '[help]', L.Help)
 	end
