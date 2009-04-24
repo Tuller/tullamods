@@ -5,6 +5,9 @@
 
 BagnonMoneyFrame = {}
 
+local L = LibStub('AceLocale-3.0'):GetLocale('Bagnon')
+
+
 local id = 0
 function BagnonMoneyFrame:Create(parent)
 	local frame = CreateFrame('Frame', format('BagnonMoney%s', id), parent, 'SmallMoneyFrameTemplate')
@@ -53,7 +56,7 @@ end
 function BagnonMoneyFrame:OnEnter()
 	if BagnonDB then
 		GameTooltip:SetOwner(self, 'ANCHOR_TOPRIGHT')
-		GameTooltip:SetText(format('Total on %s', GetRealmName()))
+		GameTooltip:SetText(format(L.TipGoldOnRealm, GetRealmName()))
 
 		local money = 0
 		for player in BagnonDB:GetPlayers() do
