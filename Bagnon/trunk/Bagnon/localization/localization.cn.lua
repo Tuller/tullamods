@@ -1,10 +1,10 @@
 --[[
 	THIS FILE IS ENCODED IN UTF-8
 
-	Bagnon Localization file: Chinese Simplified 
-		Credit: Diablohu, yleaf
+	Bagnon Localization file: Chinese Simplified
+		Credit: Diablohu, yleaf, 狂飙
 	
-	Last Update: Nov 16, 2008
+	Last Update: Apr 25, 2009
 --]]
 
 local L = LibStub('AceLocale-3.0'):NewLocale('Bagnon', 'zhCN')
@@ -21,7 +21,7 @@ L.UpdatedIncompatible = "从一个错误的版本更新，已载入默认设置�
 
 --errors
 L.ErrorNoSavedBank = "无法打开银行：无可用的存储信息。"
-L.vBagnonLoaded = format("vBagnon 和 Bagnon 不能同时开启. 点击 %s 禁用 vBagnon 并重载界面", TEXT(ACCEPT))
+L.vBagnonLoaded = format("vBagnon 和 Bagnon 不能同时开启。点击 %s 禁用 vBagnon 并重载界面", TEXT(ACCEPT))
 
 --slash commands
 L.Commands = "命令:"
@@ -40,6 +40,6 @@ L.TipShowMenu = "<右键点击>打开设置菜单"
 L.TipShowSearch = "<双击>进行搜索"
 L.TipShowBag = "<单击>显示"
 L.TipHideBag = "<单击>隐藏"
-L.TipGoldOnRealm = "%s服务器上的总资产"
+L.TipGoldOnRealm = "%s上的总资产"
 
 L.ConfirmReloadUI = '这个设置将在你下次登录时生效'
