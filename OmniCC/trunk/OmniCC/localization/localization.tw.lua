@@ -1,10 +1,24 @@
 ﻿--[[
-	OmniCC Localization File
+	OmniCC Options Localizion
 		T-Chinese by NightOwl
 --]]
 
 if GetLocale() == 'zhTW' then
 	local L = OMNICC_LOCALS
-	L.UpgradeIncompatible = "升級的版本不兼容. 載入預設設定"
-	L.Updated = "升級至 v%s"
+	L.Thin = '幼線'
+	L.Thick = '粗線'
+	L.ShowModels = '顯示冷卻模組'
+	L.ShowPulse = '使用閃爍模式'
+	L.UseMMSS = '使用 MM:SS 格式'
+	L.MinDuration = '最少時間的時值'
+	L.MinScale = '最少刻度'
+	L.Display = '顯示'
+	L.FontFace = '字形外觀'
+	L.FontOutline = '字形輪廓'
+	L.FontSize = '字形大小'
+	L.Font = '字形'
+	L.ColorsAndScaling = '顏色與刻度'
+	L.UnderFiveSeconds = '少於5秒'
+	L.OptionsTitle = 'OmniCC 設定'
+	L.MinEffectDuration = '效果完成的時值'
 end
