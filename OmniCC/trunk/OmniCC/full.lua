@@ -173,7 +173,7 @@ function OmniCC:StartTimer(cooldown, start, duration)
 		timer.start = start
 		timer.duration = duration
 		
-		timer.shouldPulse = duration > (self.sets.minFinishEffectDuration or 30)
+		timer.shouldPulse = duration > self:GetMinEffectDuration()
 		timer.nextUpdate = 0
 		timer:Show()
 	end
@@ -441,6 +441,15 @@ end
 
 function OmniCC:UsingMMSS()
 	return self.sets.useMMSS
+end
+
+--min effect duration
+function OmniCC:SetMinEffectDuration(duration)
+	self.sets.minFinishEffectDuration = duration
+end
+
+function OmniCC:GetMinEffectDuration()
+	return self.sets.minFinishEffectDuration or 30
 end
 
 
