@@ -13,9 +13,9 @@ A configuration GUI is included, and can be shown via /omnicc or /occ
 
 ===OmniCC is displaying text on _Addon_ and I don't want it to.  How do I make OmniCC not show up?===
 
-OmniCC has three different settings that control whether or not text shows up on a given bar or not.  The first setting is *Minimum Duration*.  This is the duration, in seconds, that a cooldown must be for OmniCC to display text or not.  
+OmniCC has three different settings that control whether or not text shows up on a given bar or not.  The first setting is *Duration Threshold*.  This is the duration, in seconds, that a cooldown must be for OmniCC to display text or not.  
 
-The second setting is *Minimum Scale*.  This setting controls how big an object must be for OmniCC to display text or not.  The larger the value, the bigger an object must be.  The setting is normalized at 100 meaning "about the size of an action button in the stock interface"
+The second setting is *Size Threshold*.  This setting controls how big an object must be for OmniCC to display text or not.  The larger the value, the bigger an object must be.  The setting is normalized at 100 meaning "about the size of an action button in the stock interface"
 
 The third setting is an internal one:  `CooldownModel.noCooldownCount`.  If set to true, then OmniCC will not display text.  If the addon you're running uses its own method for displaying text on objects with cooldown, then I encourage you to bug the other to implement the noCooldownCount flag.
 
@@ -29,7 +29,4 @@ This means that the addon you're using has implemented its own method for displa
 Bloat, basically.  If I were to implement a blacklist, and handle nameless frames properly, I would have to introduce addon specific code.  But introducing addon specific code, however, is completely against the design of OmniCC in the first place :)
 
 ===I've downloaded a end effect plugin like _OmniCC Pulse_ but its not doing anything===
-To prevent overloading your CPU with too many end of cooldown effects in the case you're silenced, etc, OmniCC has a hidden setting to determine how long a cooldown must be to trigger an end effect.  The setting is set to 30 seconds by default.  To change it run this command:
-{{{
-/run OmniCC.sets.minFinishEffectDuration = <minimum duration of a cooldown to show an end of cooldown effect for in seconds>
-}}}
+By default, OmniCC is setup to not show an end of cooldown effect for any timer with a duration less than 30 seconds.  To adjust this, mess around with the *Finish Effect Threshold* slider in the options menu.
