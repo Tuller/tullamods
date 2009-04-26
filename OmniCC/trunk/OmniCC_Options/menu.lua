@@ -65,12 +65,27 @@ function Options:AddDisplayPanel()
 		self.onShow = nil
 	end)
 	minDuration:SetScript('OnValueChanged', function(self, value)
-		self.valText:SetText(format('%.1f', value))
+		self.valText:SetText(format('%.1fs', value))
 		if not self.onShow then
 			OmniCC:SetMinDuration(value)
 		end
 	end)
 	minDuration:SetPoint('TOPLEFT', useMMSS, 'BOTTOMLEFT', 2, -24)
+	
+	--minimum pulse duration slider
+	local minEffectDuration = self:CreateSlider(L.MinEffectDuration, self, 0, 60, 0.5)
+	minEffectDuration:SetScript('OnShow', function(self)
+		self.onShow = true
+		self:SetValue(OmniCC:GetMinEffectDuration())
+		self.onShow = nil
+	end)
+	minEffectDuration:SetScript('OnValueChanged', function(self, value)
+		self.valText:SetText(format('%.1fs', value))
+		if not self.onShow then
+			OmniCC:SetMinEffectDuration(value)
+		end
+	end)
+	minEffectDuration:SetPoint('TOPLEFT', minDuration, 'BOTTOMLEFT', 0, -20)
 
 	--minimum scale slider
 	local minScale = self:CreateSlider(L.MinScale, self, 0, 2, 0.05)
@@ -85,7 +100,7 @@ function Options:AddDisplayPanel()
 			OmniCC:SetMinScale(value)
 		end
 	end)
-	minScale:SetPoint('TOPLEFT', minDuration, 'BOTTOMLEFT', 0, -20)
+	minScale:SetPoint('TOPLEFT', minEffectDuration, 'BOTTOMLEFT', 0, -20)
 end
 
 --font
