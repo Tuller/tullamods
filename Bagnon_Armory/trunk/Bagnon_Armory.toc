@@ -1,0 +1,8 @@
+﻿## Interface: 30100
+## Title: Bagnon Armory
+## Notes: A BagnonDB wrapper for the Armory addon
+## Author: Tuller, Warmexx
+## Version: 1.0.0
+## RequiredDeps: Armory
+ArmoryBagnon.lua
+ui.xml
