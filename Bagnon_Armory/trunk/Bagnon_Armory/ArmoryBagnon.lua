@@ -1,16 +1,17 @@
 --[[
 
+	ArmoryBagnon.lua
+		A BagnonDB wrapper for the Armory addon, by Warmexx 
+		
    Armory can be used as a source when Armory:HasInventory() returns true
    indicating that the user didn't turn off the inventory module.
 
    The code below is totally untested but should give you a good idea about
    how to proceed (and may even just work as expected).
-
 --]]
 
-assert(not BagnonDB, 'Another BagnonDB addon is already loaded')
-BagnonDB = CreateFrame('Frame')
-BagnonDB.addon = 'armory'
+assert(not BagnonDB, 'Unable to load Bagnon_Armory. Another BagnonDB wrapper is already loaded')
+BagnonDB = {addon = 'Armory'}
 
 --[[
     Helper functions
