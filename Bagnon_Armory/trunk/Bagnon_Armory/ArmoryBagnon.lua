@@ -122,7 +122,7 @@ function BagnonDB:GetBagData(bag, player)
 
     if ( profile ) then
         name, numSlots, isCollapsed, itemLink = Armory:GetInventoryContainerInfo(bag)
-		itemLink = bag > 0 and Armory:GetInventoryItemLink('player', ContainerIDToInventoryID(bag))
+		itemLink = bag > 0 and Armory:GetCharacterValue('InventoryItemLink' .. ContainerIDToInventoryID(bag))
 
         if ( numSlots and numSlots > 0 ) then
             countItems = 0;
