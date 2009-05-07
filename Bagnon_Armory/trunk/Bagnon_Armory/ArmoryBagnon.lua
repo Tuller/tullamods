@@ -121,8 +121,8 @@ function BagnonDB:GetBagData(bag, player)
     local name, numSlots, isCollapsed, countItems, itemLink
 
     if ( profile ) then
-        name, numSlots, isCollapsed = Armory:GetInventoryContainerInfo(bag)
-		itemLink = name and select(2, GetItemInfo(name))
+        name, numSlots, isCollapsed, itemLink = Armory:GetInventoryContainerInfo(bag)
+		itemLink = bag > 0 and Armory:GetInventoryItemLink('player', ContainerIDToInventoryID(bag))
 
         if ( numSlots and numSlots > 0 ) then
             countItems = 0;
@@ -136,7 +136,7 @@ function BagnonDB:GetBagData(bag, player)
 
     ArmoryRestore(profile);
 
-    return numSlots, itemLink, countItems, itemLink and GetItemIcon(name)
+    return numSlots, itemLink, countItems, itemLink and GetItemIcon(itemLink)
 end
 
 
