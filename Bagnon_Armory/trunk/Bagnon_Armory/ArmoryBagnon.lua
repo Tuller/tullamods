@@ -42,7 +42,7 @@ end
             for playerName, data in BagnonDB:GetPlayers()
 --]]
 function BagnonDB:GetPlayers()
-    return pairs(Armory:CharacterList(Armory.playerRealm))
+    return pairs(self:GetPlayerList())
 end
 
 function BagnonDB:GetPlayerList()
@@ -84,14 +84,10 @@ end
 --]]
 function BagnonDB:GetNumBankSlots(player)
     local profile = ArmorySelect(player);
-    local numSlots = 0;
+    local numSlots;
 
     if ( profile ) then
-        for bag = NUM_BAG_SLOTS + 1, NUM_BAG_SLOTS + NUM_BANKBAGSLOTS do
-            if ( Armory:GetInventoryContainerInfo(bag) ) then
-                numSlots = numSlots + 1;
-            end
-        end
+        numSlots = Armory:GetNumBankSlots();
     end
 
     ArmoryRestore(profile);
@@ -121,8 +117,12 @@ function BagnonDB:GetBagData(bag, player)
     local name, numSlots, isCollapsed, countItems, itemLink
 
     if ( profile ) then
-        name, numSlots, isCollapsed, itemLink = Armory:GetInventoryContainerInfo(bag)
-		itemLink = bag > 0 and Armory:GetCharacterValue('InventoryItemLink' .. ContainerIDToInventoryID(bag))
+        name, numSlots, isCollapsed = Armory:GetInventoryContainerInfo(bag);
+        if ( bag > 0 and bag <= NUM_BAG_SLOTS ) then
+            itemLink = Armory:GetInventoryItemLink("player", ContainerIDToInventoryID(bag));
+		elseif ( bag > NUM_BAG_SLOTS and bag <= NUM_BAG_SLOTS + NUM_BANKBAGSLOTS ) then
+            itemLink = Armory:GetContainerItemLink(BANK_CONTAINER, NUM_BANKGENERIC_SLOTS + bag - NUM_BAG_SLOTS);
+        end
 
         if ( numSlots and numSlots > 0 ) then
             countItems = 0;
