@@ -43,19 +43,18 @@ function Options:AddDisplayPanel()
 	showModels:SetScript('OnClick', function(self) OmniCC:SetShowModels(self:GetChecked()) end)
 	showModels:SetPoint('TOPLEFT', 10, -72)
 
-	--show cooldown pulse
---[[
-	local showPulse = self:CreateCheckButton(L.ShowPulse, self)
-	showPulse:SetScript('OnShow', function(self) self:SetChecked(OmniCC:ShowingPulse()) end)
-	showPulse:SetScript('OnClick', function(self) OmniCC:SetShowPulse(self:GetChecked()) end)
-	showPulse:SetPoint('TOP', showModels, 'BOTTOM', 0, -2)
---]]
+	--show cooldown puls
 
 	--use MM:SS format
 	local useMMSS = self:CreateCheckButton(L.UseMMSS, self)
 	useMMSS:SetScript('OnShow', function(self) self:SetChecked(OmniCC:UsingMMSS()) end)
 	useMMSS:SetScript('OnClick', function(self) OmniCC:SetUseMMSS(self:GetChecked()) end)
 	useMMSS:SetPoint('TOP', showModels, 'BOTTOM', 0, -2)
+	
+	local showTenthsOfSeconds = self:CreateCheckButton(L.ShowTenthsOfSeconds, self)
+	showTenthsOfSeconds:SetScript('OnShow', function(self) self:SetChecked(OmniCC:UseTenthsOfSeconds()) end)
+	showTenthsOfSeconds:SetScript('OnClick', function(self) OmniCC:SetUseTenthsOfSeconds(self:GetChecked()) end)
+	showTenthsOfSeconds:SetPoint('TOP', useMMSS, 'BOTTOM', 0, -2)
 
 	--minimum duration slider
 	local minDuration = self:CreateSlider(L.MinDuration, self, 0, 30, 0.5)
