@@ -56,7 +56,7 @@ function MoneyFrame:OnEnter()
 		GameTooltip:SetText(format(L.TotalOnRealm, GetRealmName()))
 
 		local money = 0
-		for player in BagnonDB:GetPlayers() do
+		for i, player in pairs(BagnonDB:GetPlayerList()) do
 			money = money + BagnonDB:GetMoney(player)
 		end
 
