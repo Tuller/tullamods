@@ -35,16 +35,16 @@ OmniCC:RegisterEvent('PLAYER_LOGIN')
 
 function OmniCC:Enable()
 	self.sets = self:InitDB()
-	
+
 	self:CheckVersion()
 
 	self:HookCooldown()
-	
+
 	--setup the options menu hook
 	local f = CreateFrame('Frame', nil, InterfaceOptionsFrame)
-	f:SetScript('OnShow', function(self) 
-		LoadAddOn('OmniCC_Options') 
-		self:SetScript('OnShow', nil) 
+	f:SetScript('OnShow', function(self)
+		LoadAddOn('OmniCC_Options')
+		self:SetScript('OnShow', nil)
 	end)
 
 	--load slash commands
@@ -59,7 +59,7 @@ end
 
 function OmniCC:InitDB()
 	local db = _G['OmniCCDB']
-	
+
 	--no settings, load defaults
 	if not(db and db.version) then
 		db = {
@@ -151,7 +151,7 @@ end
 
 function OmniCC:StartTimer(cooldown, start, duration)
 	local timer = timers[cooldown] or self:CreateTimer(cooldown)
-	
+
 	--[[
 		voodoo formula
 		basically: start is based on the time since you've booted your computer
@@ -172,7 +172,7 @@ function OmniCC:StartTimer(cooldown, start, duration)
 
 		timer.start = start
 		timer.duration = duration
-		
+
 		timer.shouldPulse = duration > self:GetMinEffectDuration()
 		timer.nextUpdate = 0
 		timer:Show()
@@ -258,7 +258,7 @@ function OmniCC:UpdateTimer(timer)
 		timer.text:Hide()
 	else
 		local remain = timer.duration - (GetTime() - timer.start)
-		if floor(remain + 0.5) > 0 then
+		if remain >= 0 then
 			local time, nextUpdate = self:GetFormattedTime(remain)
 			local font, size, r, g, b, outline = self:GetFormattedFont(remain)
 			local text = timer.text
@@ -293,17 +293,20 @@ end
 --[[ Format Functions ]]--
 
 function OmniCC:GetFormattedTime(s)
-  if s >= DAY then
-    return format('%dd', floor(s/DAY + 0.5)), s % DAY
-  elseif s >= HOUR then
-    return format('%dh', floor(s/HOUR + 0.5)), s % HOUR
-  elseif s >= MINUTE then
-    if s <= MINUTE*3 and self:UsingMMSS() then
-      return format('%d:%02d', floor(s/60), s % MINUTE), s - floor(s)
-    end
-    return format('%dm', floor(s/MINUTE + 0.5)), s % MINUTE
-  end
-  return floor(s + 0.5), s - floor(s)
+	if s >= DAY then
+		return format('%dd', floor(s/DAY + 0.5)), s % DAY
+	elseif s >= HOUR then
+		return format('%dh', floor(s/HOUR + 0.5)), s % HOUR
+	elseif s >= MINUTE then
+		if s <= MINUTE*3 and self:UsingMMSS() then
+			return format('%d:%02d', floor(s/60), s % MINUTE), s - floor(s)
+		end
+		return format('%dm', floor(s/MINUTE + 0.5)), s % MINUTE
+	end
+	if s < 3 and self:UseTenthsOfSeconds() then
+		return format('%.1f', s), (s * 100 - floor(s * 100))/100
+	end
+	return floor(s + 0.5), s - floor(s)
 end
 
 function OmniCC:GetFormattedFont(s)
@@ -452,6 +455,15 @@ function OmniCC:GetMinEffectDuration()
 	return self.sets.minFinishEffectDuration or 30
 end
 
+--tenths of seconds display
+function OmniCC:UseTenthsOfSeconds()
+	return self.sets.useTenthsOfSeconds
+end
+
+function OmniCC:SetUseTenthsOfSeconds(enable)
+	self.sets.useTenthsOfSeconds = enable or false
+end
+
 
 --[[
 	Utility Functions
@@ -461,7 +473,7 @@ function OmniCC:Print(...)
 	print('|cFF33FF99OmniCC|r', ...)
 end
 
-function OmniCC:CreateClass(type, parentClass)	
+function OmniCC:CreateClass(type, parentClass)
 	local class = CreateFrame(type)
 	class.mt = {__index = class}
 
