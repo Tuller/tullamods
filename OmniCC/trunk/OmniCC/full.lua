@@ -258,7 +258,15 @@ function OmniCC:UpdateTimer(timer)
 		timer.text:Hide()
 	else
 		local remain = timer.duration - (GetTime() - timer.start)
-		if remain >= 0 then
+		local shouldShowText = false
+
+		if self:UseTenthsOfSeconds() then
+			shouldShowText = remain >= 0
+		else
+			shouldShowText = floor(remain + 0.5) > 0
+		end
+
+		if shouldShowText then
 			local time, nextUpdate = self:GetFormattedTime(remain)
 			local font, size, r, g, b, outline = self:GetFormattedFont(remain)
 			local text = timer.text
