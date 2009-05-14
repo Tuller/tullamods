@@ -13,7 +13,9 @@ if GetLocale() == 'koKR' then
 	L.FontOutline = '글꼴 외각선'
 	L.FontSize = '글꼴 크기'
 	L.Font = '글꼴'
-	L.ColorsAndScaling = '색상 그리고 크기'
+	L.ColorsAndScaling = '색상 및 크기'
 	L.UnderFiveSeconds = '5초 미만'
 	L.OptionsTitle = 'OmniCC 옵션'
+	L.MinEffectDuration = '완료 효과 최소 표시 수치'
+	L.ShowTenthsOfSeconds = '완료 3초전 0.1초 단위 표시'
 end
