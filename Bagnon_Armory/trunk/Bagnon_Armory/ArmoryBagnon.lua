@@ -2,20 +2,24 @@
 
 	ArmoryBagnon.lua
 		A BagnonDB wrapper for the Armory addon, by Warmexx 
-		
-   Armory can be used as a source when Armory:HasInventory() returns true
-   indicating that the user didn't turn off the inventory module.
-
-   The code below is totally untested but should give you a good idea about
-   how to proceed (and may even just work as expected).
 --]]
 
-assert(not BagnonDB, 'Unable to load Bagnon_Armory. Another BagnonDB wrapper is already loaded')
-BagnonDB = {addon = 'Armory'}
+assert(not BagnonDB, 'Unable to load Bagnon_Armory. Another BagnonDB wrapper is already loaded');
+BagnonDB = {addon = 'Armory'};
 
 --[[
     Helper functions
 --]]
+
+local function CanUseArmory()
+	if ( Armory ) then
+	    local major, minor = strsplit(".", Armory.version);
+	    if ( major * 100 + minor >= 604 ) then
+		    return Armory:HasInventory();
+		end
+	end
+	return false;
+end
 
 local function ArmorySelect(player)
     local currentProfile = Armory:CurrentProfile();
@@ -46,7 +50,11 @@ function BagnonDB:GetPlayers()
 end
 
 function BagnonDB:GetPlayerList()
-	return Armory:CharacterList(Armory.playerRealm)
+    if ( CanUseArmory() ) then
+	    return Armory:CharacterList(Armory.playerRealm);
+	else
+	    return {};
+	end
 end
 
 
@@ -111,24 +119,29 @@ end
                 The hyperlink of the bag
             count (number)
                 How many items are in the bag.  This is used by ammo and soul shard bags
+            texture (string)
+                The filepath of the bag's texture
 --]]
 function BagnonDB:GetBagData(bag, player)
     local profile = ArmorySelect(player);
-    local name, numSlots, isCollapsed, countItems, itemLink
+    local numSlots, link, count, texture;
 
     if ( profile ) then
-        name, numSlots, isCollapsed = Armory:GetInventoryContainerInfo(bag);
-        if ( bag > 0 and bag <= NUM_BAG_SLOTS ) then
-            itemLink = Armory:GetInventoryItemLink("player", ContainerIDToInventoryID(bag));
-		elseif ( bag > NUM_BAG_SLOTS and bag <= NUM_BAG_SLOTS + NUM_BANKBAGSLOTS ) then
-            itemLink = Armory:GetContainerItemLink(BANK_CONTAINER, NUM_BANKGENERIC_SLOTS + bag - NUM_BAG_SLOTS);
-        end
-
+        _, numSlots = Armory:GetInventoryContainerInfo(bag);
         if ( numSlots and numSlots > 0 ) then
-            countItems = 0;
+            if ( bag > 0 and bag <= NUM_BAG_SLOTS ) then
+                link = Armory:GetInventoryItemLink("player", ContainerIDToInventoryID(bag));
+            elseif ( bag > NUM_BAG_SLOTS and bag <= NUM_BAG_SLOTS + NUM_BANKBAGSLOTS ) then
+                link = Armory:GetContainerItemLink(BANK_CONTAINER, NUM_BANKGENERIC_SLOTS + bag - NUM_BAG_SLOTS);
+            end
+            if ( link ) then
+                texture = GetItemIcon(link);
+            end
+
+            count = 0;
             for i = 1, numSlots do
                 if ( Armory:GetContainerItemInfo(bag, i) ) then
-                    countItems = countItems + 1;
+                    count = count + 1;
                 end
             end
         end
@@ -136,7 +149,7 @@ function BagnonDB:GetBagData(bag, player)
 
     ArmoryRestore(profile);
 
-    return numSlots, itemLink, countItems, itemLink and GetItemIcon(itemLink)
+    return numSlots, link, count, texture; 
 end
 
 
@@ -158,7 +171,7 @@ end
             texture (string)
                 The filepath of the item's texture
             quality (number)
-                The numeric representation of the item's quality: from 0 (poor) to 7 (artifcat)
+                The numeric representation of the item's quality: from 0 (poor) to 7 (artifact)
 
 --]]
 function BagnonDB:GetItemData(bag, slot, player)
