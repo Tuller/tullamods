@@ -311,7 +311,7 @@ function OmniCC:GetFormattedTime(s)
 		end
 		return format('%dm', floor(s/MINUTE + 0.5)), s % MINUTE
 	end
-	if s < 3 and self:UseTenthsOfSeconds() then
+	if s < 2 and self:UseTenthsOfSeconds() then
 		return format('%.1f', s), (s * 100 - floor(s * 100))/100
 	end
 	return floor(s + 0.5), s - floor(s)
