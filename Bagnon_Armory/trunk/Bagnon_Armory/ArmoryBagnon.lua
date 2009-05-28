@@ -1,7 +1,7 @@
 --[[
 
-	ArmoryBagnon.lua
-		A BagnonDB wrapper for the Armory addon, by Warmexx 
+    ArmoryBagnon.lua
+        A BagnonDB wrapper for the Armory addon, by Warmexx
 --]]
 
 assert(not BagnonDB, 'Unable to load Bagnon_Armory. Another BagnonDB wrapper is already loaded');
@@ -12,19 +12,25 @@ BagnonDB = {addon = 'Armory'};
 --]]
 
 local function CanUseArmory()
-	if ( Armory ) then
-	    local major, minor = strsplit(".", Armory.version);
-	    if ( major * 100 + minor >= 604 ) then
-		    return Armory:HasInventory();
-		end
-	end
-	return false;
+    if ( Armory ) then
+        local major, minor = strsplit(".", Armory.version);
+        if ( major * 100 + minor >= 604 ) then
+            return Armory:HasInventory();
+        end
+    end
+    return false;
 end
 
 local function ArmorySelect(player)
     local currentProfile = Armory:CurrentProfile();
     local currentRealm = Armory.playerRealm;
-    local profile = {realm=currentRealm, character=player, current=currentProfile};
+    local profile;
+
+    if ( type(player) == "number" ) then
+        player = Armory:CharacterList(currentRealm)[player];
+    end
+
+    profile = {realm=currentRealm, character=player, current=currentProfile};
 
     if ( Armory:ProfileExists(profile) ) then
         Armory:SelectProfile(profile);
@@ -51,10 +57,10 @@ end
 
 function BagnonDB:GetPlayerList()
     if ( CanUseArmory() ) then
-	    return Armory:CharacterList(Armory.playerRealm);
-	else
-	    return {};
-	end
+        return Armory:CharacterList(Armory.playerRealm);
+    else
+        return {};
+    end
 end
 
 
@@ -149,7 +155,7 @@ function BagnonDB:GetBagData(bag, player)
 
     ArmoryRestore(profile);
 
-    return numSlots, link, count, texture; 
+    return numSlots, link, count, texture;
 end
 
 
