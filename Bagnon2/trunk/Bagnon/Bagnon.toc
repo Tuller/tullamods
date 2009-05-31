@@ -1,0 +1,13 @@
+## Interface: 30100
+## Title: Bagnon
+## Author: Tuller
+## Notes: Single window displays for your inventory, bank, and keys
+## SavedVariablesPerCharacter: BagnonSets
+## Version: 2.0.0
+## OptionalDeps: Ace3, Bagnon_Forever, Bagnon_Armory
+embeds.xml
+localization.xml
+main.lua
+utility.xml
+components.xml
+## monkeys\bagBreak.lua
