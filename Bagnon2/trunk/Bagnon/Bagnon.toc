@@ -10,4 +10,3 @@ localization.xml
 main.lua
 utility.xml
 components.xml
-## monkeys\bagBreak.lua
