@@ -5,4 +5,7 @@
 	<Binding name="BANKNON_TOGGLE" description="BINDING_NAME_BANKNON_TOGGLE">
 		Bagnon.FrameSettings:Get('bank'):ToggleFrame()
 	</Binding>
+	<Binding name="BAGNON_KEYS_TOGGLE" description="BINDING_NAME_BAGNON_KEYS_TOGGLE">
+		Bagnon.FrameSettings:Get('keys'):ToggleFrame()
+	</Binding>
 </Bindings>

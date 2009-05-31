@@ -8,8 +8,9 @@ local L = LibStub('AceLocale-3.0'):GetLocale('Bagnon')
 
 --bindings
 BINDING_HEADER_BAGNON = 'Bagnon'
-BINDING_NAME_BAGNON_TOGGLE = L.BagnonToggle
-BINDING_NAME_BANKNON_TOGGLE = L.BanknonToggle
+BINDING_NAME_BAGNON_TOGGLE = L.ToggleBags
+BINDING_NAME_BANKNON_TOGGLE = L.ToggleBank
+BINDING_NAME_BAGNON_KEYS_TOGGLE = L.ToggleKeys
 
 --[[ Startup ]]--
 
