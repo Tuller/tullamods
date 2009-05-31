@@ -24,8 +24,6 @@ function Ears:SendMessage(msg, ...)
 	assert(type(msg) == 'string', 'String expected for <msg>, got: \'' .. type(msg) .. '\'')
 
 	local listeners = self.listeners[msg]
---	assert(listeners, 'Ears: No listeners registered for: ' .. msg)
-
 	if listeners then
 		for obj, action in pairs(listeners) do
 			action(obj, msg, ...)
