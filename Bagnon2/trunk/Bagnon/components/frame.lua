@@ -27,6 +27,7 @@ function Frame:New(frameID)
 
 	f:SetScript('OnShow', f.OnShow)
 	f:SetScript('OnHide', f.OnHide)
+	f:SetFrameStrata('HIGH')
 	f:SetFrameID(frameID)
 	f:UpdateEvents()
 

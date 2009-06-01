@@ -197,7 +197,7 @@ function FrameSettings:GetFramePosition()
 end
 
 function FrameSettings:GetFrameBackdropColor()
-	return random(), random(), random(), 0.5
+	return 0, 0, 0, 0.7
 end
 
 function FrameSettings:GetFrameBackdropBorderColor()
