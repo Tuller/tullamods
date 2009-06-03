@@ -187,6 +187,14 @@ function FrameSettings:GetFrameOpacity()
 	return Bagnon.SavedSettings:GetFrameOpacity(self:GetFrameID())
 end
 
+function FrameSettings:SetFramePosition(point, x, y)
+	local oPoint, oX, oY = self:GetFramePosition()
+	if not(point == oPoint and x == oX and y == oY) then
+		Bagnon.SavedSettings:SetFramePosition(self:GetFrameID(), point, x, y)
+		self:SendMessage('FRAME_POSITION_UPDATE', point, x, y)
+	end
+end
+
 function FrameSettings:GetFramePosition()
 	return Bagnon.SavedSettings:GetFramePosition(self:GetFrameID())
 end
@@ -268,7 +276,7 @@ end
 
 function FrameSettings:SetItemFrameSpacing(spacing)
 	if self:GetItemFrameSpacing() ~= spacing then
-		self.itemFrameSpacing = spacing
+		Bagnon.SavedSettings:SetItemFrameSpacing(self:GetFrameID(), spacing)
 		self:SendMessage('ITEM_FRAME_SPACING_UPDATE', self:GetItemFrameSpacing())
 	end
 end
@@ -279,7 +287,7 @@ end
 
 function FrameSettings:SetItemFrameColumns(columns)
 	if self:GetItemFrameColumns() ~= columns then
-		self.itemFrameColumns = columns
+		Bagnon.SavedSettings:SetItemFrameColumns(self:GetFrameID(), columns)
 		self:SendMessage('ITEM_FRAME_COLUMNS_UPDATE', self:GetItemFrameColumns())
 	end
 end
@@ -292,6 +300,7 @@ end
 --[[ Bag Slot Availability ]]--
 
 --sets the available bag slots for this frame
+--[[
 function FrameSettings:SetBagSlots(...)
 	local changed = false
 
@@ -313,6 +322,7 @@ function FrameSettings:SetBagSlots(...)
 	end
 	return changed
 end
+--]]
 
 --returns true if the slot is available to this frame, and false otherwise
 function FrameSettings:HasBagSlot(slot)
