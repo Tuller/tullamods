@@ -187,7 +187,7 @@ end
 function Frame:Layout()
 	if not self:IsVisible() then return end
 
-	local width, height = 200, 0
+	local width, height = 150, 0
 
 	--place the top left menu buttons
 	local tlMenuButtons = self.tlMenuButtons or {}

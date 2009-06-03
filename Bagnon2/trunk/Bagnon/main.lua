@@ -21,27 +21,15 @@ function Bagnon:OnEnable()
 end
 
 function Bagnon:CreateInventoryFrame()
-	local sets = self.FrameSettings:Get('inventory')
-	sets:SetBagSlots(BACKPACK_CONTAINER, 1, 2, 3, 4)
-
 	self.Frame:New('inventory')
-	sets:ShowFrame()
 end
 
 function Bagnon:CreateBankFrame()
-	local sets = self.FrameSettings:Get('bank')
-	sets:SetBagSlots(BANK_CONTAINER, 5, 6, 7, 8, 9, 10, 11)
-	
 	self.Frame:New('bank')
-	sets:ShowFrame()
 end
 
 function Bagnon:CreateKeyRing()
-	local sets = self.FrameSettings:Get('keys')
-	sets:SetBagSlots(KEYRING_CONTAINER)
-
 	self.Frame:New('keys')
-	sets:ShowFrame()
 end
 
 function Bagnon:SetPlayer(player)

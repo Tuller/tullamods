@@ -118,7 +118,14 @@ function BrokerDisplay:OnEnter()
 		GameTooltip:SetOwner(self, 'ANCHOR_TOPRIGHT')
 		GameTooltip:ClearLines()
 
-		self:GetObject().OnTooltipShow(GameTooltip)
+		dbo.OnTooltipShow(GameTooltip)
+
+		GameTooltip:Show()
+	else
+		GameTooltip:SetOwner(self, 'ANCHOR_TOPRIGHT')
+		GameTooltip:ClearLines()
+		GameTooltip:SetText(self:GetObjectName())
+		GameTooltip:Show()
 	end
 end
 

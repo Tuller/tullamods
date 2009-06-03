@@ -179,37 +179,32 @@ end
 
 --[[ Frame Layout ]]--
 
-function FrameSettings:GetFrameOpacity()
-	return 1
+function FrameSettings:GetFrameScale()
+	return Bagnon.SavedSettings:GetFrameScale(self:GetFrameID())
 end
 
-function FrameSettings:GetFrameScale()
-	return 1
+function FrameSettings:GetFrameOpacity()
+	return Bagnon.SavedSettings:GetFrameOpacity(self:GetFrameID())
 end
 
 function FrameSettings:GetFramePosition()
-	if self:GetFrameID() == 'bank' then
-		return 'LEFT', 0, 0
-	elseif self:GetFrameID() == 'inventory' then
-		return 'RIGHT', 0, 0
-	end
-	return 'CENTER', 0, 0
+	return Bagnon.SavedSettings:GetFramePosition(self:GetFrameID())
 end
 
 function FrameSettings:GetFrameBackdropColor()
-	return 0, 0, 0, 0.7
+	return Bagnon.SavedSettings:GetFrameBackgroundColor(self:GetFrameID())
 end
 
 function FrameSettings:GetFrameBackdropBorderColor()
-	return random(), random(), random(), 1
+	return Bagnon.SavedSettings:GetFrameBorderColor(self:GetFrameID())
 end
 
 function FrameSettings:FrameHasBagFrame()
-	return self:GetFrameID() ~= 'keys' 
+	return Bagnon.SavedSettings:DoesFrameHaveBagFrame(self:GetFrameID())
 end
 
 function FrameSettings:FrameHasMoneyFrame()
-	return self:GetFrameID() ~= 'keys' 
+	return Bagnon.SavedSettings:DoesFrameHaveMoneyFrame(self:GetFrameID())
 end
 
 
@@ -279,7 +274,7 @@ function FrameSettings:SetItemFrameSpacing(spacing)
 end
 
 function FrameSettings:GetItemFrameSpacing()
-	return self.itemFrameSpacing or 2
+	return Bagnon.SavedSettings:GetItemFrameSpacing(self:GetFrameID())
 end
 
 function FrameSettings:SetItemFrameColumns(columns)
@@ -290,7 +285,7 @@ function FrameSettings:SetItemFrameColumns(columns)
 end
 
 function FrameSettings:GetItemFrameColumns()
-	return self.itemFrameColumns or 10
+	return Bagnon.SavedSettings:GetItemFrameColumns(self:GetFrameID())
 end
 
 
@@ -331,7 +326,7 @@ end
 
 --returns an iterator for all bag slots available to this frame
 function FrameSettings:GetBagSlots()
-	return ipairs(self.bagSlots)
+	return ipairs(Bagnon.SavedSettings:GetFrameBags(self:GetFrameID()))
 end
 
 
@@ -375,8 +370,9 @@ end
 
 --returns an iterator for all bag slots that are available to this frame and marked as visible
 local function visibleSlotIterator(obj, i)
-	for j = i + 1, #obj.bagSlots do
-		local slot = obj.bagSlots[j]
+	local bagSlots = Bagnon.SavedSettings:GetFrameBags(obj:GetFrameID())
+	for j = i + 1, #bagSlots do
+		local slot = bagSlots[j]
 		local found = false
 
 		for _, hiddenSlot in pairs(obj.hiddenBagSlots) do

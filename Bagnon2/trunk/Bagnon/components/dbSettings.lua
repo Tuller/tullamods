@@ -1,174 +1,335 @@
-﻿
---[[
+﻿--[[
+	dbSettings.lua
+		Database access for Bagnon
+--]]
 
-function DBSettings:Initialize(currentVersion)
-	db = self:GetDB() or self:NewDB()
-	if not self:GetDB() then
-		db = {
-			['version'] = version
-		}
-		db = 
-	local db = _G['
-end
+local Bagnon = LibStub('AceAddon-3.0'):GetAddon('Bagnon')
+local SavedSettings = {}
+Bagnon.SavedSettings = SavedSettings
 
-function DBSettings:GetDB()
-	
 
-function DBSettings:GetDB()
-	return _G['BagnonSettings']
-end
+--[[ Database Settings ]]--
 
-function DBSettings
-
-function DBSettings:GetGlobalSettings()
-	local settings = self:GetDB().global
-	if not settings then
-		settings = self:GetDefaultGlobalSettings()
-		self:GetDB().global = settings
+function SavedSettings:GetDB()
+	if not self.db then
+		self.db = _G['BagnonSets']
+		if self.db then
+			self:UpgradeDB()
+		else
+			self.db = self:GetDefaultSettings()
+			_G['BagnonSets'] = self.db
+		end
 	end
-	return settings
+
+	return self.db
 end
 
+function SavedSettings:GetDefaultSettings()
+	local db = {
+		indexes = {
+		},
 
-function DBSettings:GetPlayerSettings(player, realm)
-	local dbIndex = player .. '|' .. realm
-	local settings = _G['BagnonSets'][dbIndex]
-	
-	if not settings then
-		settings = self:ConstructPlayerSettings()
-		_G['BagnonSets'][dbIndex] = settings
-	end
-	
-	return settings
-end
+		profiles = {
+		},
 
-function DBSettings:GetFrameSettings(player, realm, frameID)
-	local playerSettings = self:GetPlayerSettings()
-	local settings = playerSettings.frames[frameID]
-	
-	if not settings then
-		settings = self:ConstructFrameSettings()
-		playerSettings.frames[frameID] = settings
-	end
-	return 
-end
-
-function DBSettings:ConstructGlobalSettings()
-	return {
-		highlightSlotsByQuality = true,
-		highlightQuestItems = true,
+		version = self:GetAddOnVersion()
 	}
+
+	return db
 end
 
-function DBSettings:ConstructPlayerSettings()
-	return {
-		frames = {
-			inventory = {
-				point = 'RIGHT',
-				x = 0,
-				y = 0,
-				
-				bags = {BACKPACK_CONTAINER, 1, 2, 3, 4},
-				hiddenBags = {},
-				
-				locked = true,
-				hasBagFame = true,
-				hasMoneyFrame = true,
-				isBagFrameVisible = true,
-				
-				bgColor = {
-					r = 0,
-					g = 0,
-					b = 0.2,
-					a = 0.5
-				},
-				
-				columns = 8,
-				spacing = 2
-				scale = 1,
-				opacity = 1,
-			}
-			bank = {
-				point = 'LEFT',
-				x = 0,
-				y = 0,
-				
-				bags = {BANK_CONTAINER, 5, 6, 7, 8, 9, 10}
-				
-				hiddenBags = {},
-				
-				locked = true,
-				hasBagFrame = true,
-				hasMoneyFrame = true,
-				isBagFrameVisible = true,
-				
-				bgColor = {
-					r = 0,
-					g = 0,
-					b = 0.2,
-					a = 0.5
-				}
-				
-				columns = 10,
-				spacing = 2
-				scale = 1,
-				opacity = 1
-			}
-			keys = {
-				point = 'RIGHT',
-				x = 0,
-				y = 0,
-				
-				x = 0,
-				y = 300
-				
-				bags = {KEYRING_CONTAINER},
-				
-				hasBagFrame = false,
-				hasMoneyFrame = false,
-				isBagFrameVisible = false,
-				
-				bgColor = {
-					r = 0,
-					g = 0,
-					b = 0,
-					a = 0.5
-				}
-				
-				columns = 4,
-				spacing = 2
-				scale = 1,
-				opacity = 1
-			}
-		}
-	}
+function SavedSettings:UpgradeDB()
+	if not self:IsDBOutOfDate() then return end
+
+	self:GetDB().version = self:GetAddOnVersion()
 end
 
-function DBSettings:ConstructFrameSettings()
+function SavedSettings:IsDBOutOfDate()
+	return self:GetDBVersion() ~= self:GetAddOnVersion()
+end
+
+function SavedSettings:GetDBVersion()
+	return self:GetDB().version
+end
+
+function SavedSettings:GetAddOnVersion()
+	return GetAddOnMetadata('Bagnon', 'Version')
+end
+
+
+--[[ Global Settings ]]--
+
+
+--[[ Profile Settings ]]--
+
+function SavedSettings:GetCurrentProfile()
+	local db = self:GetDB()
+
+	local currentProfile = db.profiles[self:GetCurrentProfileName()]
+	if not currentProfile then
+		currentProfile = self:GetDefaultProfileSettings()
+		db.profiles[self:GetCurrentProfileName()] = currentProfile
+	end
+	return currentProfile
+end
+
+function SavedSettings:GetCurrentProfileName()
+	local db = self:GetDB()
+
+	local profileName = db.indexes[self:GetPlayerIndex()]
+	if not profileName then
+		profileName = 'Default'
+		db.indexes[self:GetPlayerIndex()] = profileName
+	end
+	return profileName
+end
+
+function SavedSettings:GetPlayerIndex()
+	return UnitName('player') .. ' - ' .. GetRealmName()
+end
+
+function SavedSettings:GetDefaultProfileSettings()
+	local profile = {frames = {}}
+	profile.frames.inventory = self:GetDefaultFrameSettings('inventory')
+	profile.frames.bank = self:GetDefaultFrameSettings('bank')
+	profile.frames.keys = self:GetDefaultFrameSettings('keys')
+	return profile
+end
+
+function SavedSettings:GetAvailableProfiles()
+	local profiles = {}
+	
+	for profileName in pairs(self:GetDB().profiles) do
+		table.insert(profiles, profileName)
+	end
+	
+	table.sort(profiles)
+	return ipairs(profiles)
+end
+
+
+
+--[[ 
+	Frame Settings
+--]]
+
+function SavedSettings:GetFrameSettings(frameID)
+	local frameSettings = self:GetCurrentProfile().frames[frameID]
+	if not frameSettings then
+		frameSettings = self:GetDefaultFrameSettings()
+		self:GetCurrentProfile().frames[frameID] = frameSettings
+	end
+	return frameSettings
+end
+
+
+--[[ Frame Color ]]--
+
+function SavedSettings:GetFrameBackgroundColor(frameID)
+	local r, g, b, a = unpack(self:GetFrameSettings(frameID).frameColor)
+	return r, g, b, a
+end
+
+
+function SavedSettings:SetFrameBackgroundColor(frameID, r, g, b, a)
+	local color = self:GetFrameSettings(frameID).frameColor
+	color[1] = r
+	color[2] = g
+	color[3] = b
+	color[4] = a
+end
+
+function SavedSettings:GetFrameBorderColor(frameID)
+	local r, g, b, a = unpack(self:GetFrameSettings(frameID).frameBorderColor)
+	return r, g, b, a
+end
+
+function SavedSettings:SetFrameBorderColor(frameID, r, g, b, a)
+	local color = self:GetFrameSettings(frameID).frameBorderColor
+	color[1] = r
+	color[2] = g
+	color[3] = b
+	color[4] = a
+end
+
+
+--[[ Frame Position ]]--
+
+function SavedSettings:GetFramePosition(frameID)
+	local sets = self:GetFrameSettings(frameID)
+	return sets.point, sets.x, sets.y
+end
+
+function SavedSettings:SetFramePosition(frameID, point, x, y)
+	local sets = self:GetFrameSettings(frameID)
+	sets.point = point
+	sets.x = x
+	sets.y = y
+end
+
+
+--[[ Frame Scale ]]--
+
+function SavedSettings:GetFrameScale(frameID)
+	return self:GetFrameSettings(frameID).scale
+end
+
+function SavedSettings:SetFrameScale(frameID, scale)
+	self:GetFrameSettings(frameID).scale = scale
+end
+
+
+--[[ Frame Opacity ]]--
+
+function SavedSettings:SetFrameOpacity(frameID, opacity)
+	self:GetFrameSettings(frameID).opacity = opacity
+end
+
+function SavedSettings:GetFrameOpacity(frameID)
+	return self:GetFrameSettings(frameID).opacity
+end
+
+
+--[[ Frame Components ]]--
+
+function SavedSettings:DoesFrameHaveBagFrame(frameID)
+	return self:GetFrameSettings(frameID).hasBagFrame
+end
+
+function SavedSettings:DoesFrameHaveMoneyFrame(frameID)
+	return self:GetFrameSettings(frameID).hasMoneyFrame
+end
+
+function SavedSettings:DoesFrameHaveDBOFrame(frameID)
+	return self:GetFrameSettings(frameID).hasDBOFrame
+end
+
+
+--[[ Frame Bags ]]--
+
+function SavedSettings:GetFrameBags(frameID)
+	return self:GetFrameSettings(frameID).availableBags
+end
+
+function SavedSettings:GetHiddenBags(frameID)
+	return self:GetFrameSettings(frameID).hiddenBags
+end
+
+
+--[[ Item Frame Layout ]]--
+
+function SavedSettings:SetItemFrameColumns(frameID, columns)
+	self:GetFrameSettings(frameID).itemFrameColumns = columns
+end
+
+function SavedSettings:GetItemFrameColumns(frameID)
+	return self:GetFrameSettings(frameID).itemFrameColumns
+end
+
+function SavedSettings:SetItemFrameSpacing(frameID, spacing)
+	self:GetFrameSettings(frameID).itemFrameSpacing = spacing
+end
+
+function SavedSettings:GetItemFrameSpacing(frameID)
+	return self:GetFrameSettings(frameID).itemFrameSpacing
+end
+
+
+--[[ Default Frame Settings ]]--
+
+function SavedSettings:GetDefaultFrameSettings(frameID)
+	if frameID == 'keys' then
+		return self:GetDefaultKeyRingSettings()
+	end
+	if frameID == 'bank' then
+		return self:GetDefaultBankSettings()
+	end
+	return self:GetDefaultInventorySettings()
+end	
+
+function SavedSettings:GetDefaultInventorySettings()
 	return {
-		point = 'CENTER',
+		--bag settings
+		availableBags = {BACKPACK_CONTAINER, 1, 2, 3, 4},
+		hiddenBags = {},
+
+		--frame
+		frameColor = {0, 0, 0, 0.5},
+		frameBorderColor = {random(), random(), random(), 1},
+		scale = 1,
+		opacity = 1,
+		point = 'RIGHT',
 		x = 0,
 		y = 0,
+
+		--itemFrame
+		itemFrameColumns = 8,
+		itemFrameSpacing = 2,
 		
-		bags = {BACKPACK_CONTAINER, 1, 2, 3, 4},
-		hiddenBags = {},
-		
-		locked = false,
-		hasBagFame = true,
+		--optional components
 		hasMoneyFrame = true,
-		isBagFrameVisible = true,
-		
-		bgColor = {
-			r = 0,
-			g = 0,
-			b = 0,
-			a = 0.5
-		},
-		
-		columns = 10,
-		spacing = 2
-		scale = 1,
-		opacity = 1
+		hasBagFrame = true,
+		hasDBOFrame = true,
+
+		--dbo display object
+		dataBrokerObject = nil,
 	}
 end
---]]
+
+function SavedSettings:GetDefaultBankSettings()
+	return {
+		--bag settings
+		availableBags = {BANK_CONTAINER, 5, 6, 7, 8, 9, 10, 11},
+		hiddenBags = {},
+
+		--frame
+		frameColor = {0, 0, 0, 0.5},
+		frameBorderColor = {random(), random(), random(), 1},
+		scale = 1,
+		opacity = 1,
+		point = 'LEFT',
+		x = 0,
+		y = 0,
+
+		--itemFrame
+		itemFrameColumns = 10,
+		itemFrameSpacing = 2,
+		
+		--optional components
+		hasMoneyFrame = true,
+		hasBagFrame = true,
+		hasDBOFrame = true,
+
+		--dbo display object
+		dataBrokerObject = nil,
+	}
+end
+
+function SavedSettings:GetDefaultKeyRingSettings()
+	return {
+		--bag settings
+		availableBags = {KEYRING_CONTAINER},
+		hiddenBags = {},
+
+		--frame
+		frameColor = {0, 0, 0, 0.5},
+		frameBorderColor = {random(), random(), random(), 1},
+		scale = 1,
+		opacity = 1,
+		point = 'RIGHT',
+		x = 0,
+		y = -400,
+
+		--itemFrame
+		itemFrameColumns = 4,
+		itemFrameSpacing = 2,
+		
+		--optional components
+		hasMoneyFrame = false,
+		hasBagFrame = false,
+		hasDBOFrame = false,
+
+		--dbo display object
+		dataBrokerObject = nil,
+	}
+end

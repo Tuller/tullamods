@@ -2,6 +2,7 @@
 	<Script file="components\bag.lua"/>
 	<Script file="components\bagFrame.lua"/>
 	<Script file="components\bagToggle.lua"/>
+	<Script file="components\dbSettings.lua"/>
 	<Script file="components\frame.lua"/>
 	<Script file="components\frameSettings.lua"/>
 	<Script file="components\item.lua"/>
