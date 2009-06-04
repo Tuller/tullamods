@@ -58,6 +58,7 @@ end
 function Frame:FRAME_MOVE_STOP(msg, frameID)
 	if self:GetFrameID() == frameID then
 		self:StopMovingOrSizing()
+		self:SavePosition()
 	end
 end
 
@@ -156,18 +157,59 @@ function Frame:UpdateLook()
 	self:Layout()
 end
 
+--scale
 function Frame:UpdateScale()
 	self:SetScale(self:GetFrameScale())
+	self:SavePosition()
 end
 
+--opacity
 function Frame:UpdateOpacity()
 	self:SetAlpha(self:GetFrameOpacity())
 end
 
+--position
+function Frame:SavePosition()
+	local point, x, y = self:GetRelativePosition()
+	if point then
+		self:GetSettings():SetFramePosition(point, x, y)
+	end
+end
+
+--get a frame's position relative to its parent
+function Frame:GetRelativePosition()
+	local parent = self:GetParent()
+	local w, h = parent:GetWidth(), parent:GetHeight()
+	local x, y = self:GetCenter()
+	local s = self:GetScale()
+	if not (x and y) then return end
+
+	w = w/s h = h/s
+
+	local dx, dy
+	local hHalf = (x > w/2) and 'RIGHT' or 'LEFT'
+	if hHalf == 'RIGHT' then
+		dx = self:GetRight() - w
+	else
+		dx = self:GetLeft()
+	end
+
+	local vHalf = (y > h/2) and 'TOP' or 'BOTTOM'
+	if vHalf == 'TOP' then
+		dy = self:GetTop() - h
+	else
+		dy = self:GetBottom()
+	end
+
+	return vHalf..hHalf, dx, dy
+end
+
 function Frame:UpdatePosition()
+	self:ClearAllPoints()
 	self:SetPoint(self:GetFramePosition())
 end
 
+--color
 function Frame:UpdateBackdrop()
 	self:SetBackdropColor(self:GetFrameBackdropColor())
 end
@@ -176,6 +218,7 @@ function Frame:UpdateBackdropBorder()
 	self:SetBackdropBorderColor(self:GetFrameBackdropBorderColor())
 end
 
+--visibility
 function Frame:UpdateShown()
 	if self:IsFrameShown() then
 		self:Show()
@@ -426,7 +469,7 @@ function Frame:CreateBrokerDisplay()
 end
 
 function Frame:HasBrokerDisplay()
-	return self:GetFrameID() ~= 'keys'
+	return self:GetSettings():FrameHasBrokerDisplay()
 end
 
 --[[ Frame Properties? ]]--
@@ -443,11 +486,7 @@ function Frame:GetFrameID()
 end
 
 
---[[ Frame Settings ]]--
-
-function Frame:HideFrame()
-	self:GetSettings():HideFrame()
-end
+--[[ Frame Settings Access ]]--
 
 function Frame:GetSettings()
 	return Bagnon.FrameSettings:Get(self:GetFrameID())
@@ -474,13 +513,17 @@ function Frame:IsBagFrameShown()
 end
 
 function Frame:GetFrameBackdropColor()
-	return self:GetSettings():GetFrameBackdropColor()
+	return self:GetSettings():GetFrameColor()
 end
 
 function Frame:GetFrameBackdropBorderColor()
-	return self:GetSettings():GetFrameBackdropBorderColor()
+	return self:GetSettings():GetFrameBorderColor()
 end
 
 function Frame:HasBagFrame()
 	return self:GetSettings():FrameHasBagFrame()
+end
+
+function Frame:HasBrokerDisplay()
+	return self:GetSettings():FrameHasDBOFrame()
 end

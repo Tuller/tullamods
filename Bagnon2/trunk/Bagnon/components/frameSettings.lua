@@ -20,7 +20,7 @@ FrameSettings.objects = setmetatable({}, {__index = function(tbl, id)
 	local obj = setmetatable({frameID = id}, FrameSettings.mt)
 	tbl[id] = obj
 	return obj
-end)
+end})
 
 function FrameSettings:Get(id)
 	return self.objects[id]
@@ -90,7 +90,7 @@ end
 
 --scale
 function FrameSettings:SetFrameScale(scale)
-	if self:GetScale() ~= scale then
+	if self:GetFrameScale() ~= scale then
 		self:GetDB():SetScale(scale)
 		self:SendMessage('FRAME_SCALE_UPDATE', scale)
 	end
@@ -102,7 +102,7 @@ end
 
 --opacity
 function FrameSettings:SetFrameOpacity(opacity)
-	if self:GetOpacity() ~= opacity then
+	if self:GetFrameOpacity() ~= opacity then
 		self:GetDB():SetOpacity(opacity)
 		self:SendMessage('FRAME_OPACITY_UPDATE', opacity)
 	end
@@ -292,7 +292,7 @@ local function visibleSlotIterator(obj, i)
 		local slot = bagSlots[j]
 		local found = false
 
-		for _, hiddenSlot in obj:GetHiddenBags() do
+		for _, hiddenSlot in obj:GetHiddenBagSlots() do
 			if hiddenSlot == slot then
 				found = true
 				break

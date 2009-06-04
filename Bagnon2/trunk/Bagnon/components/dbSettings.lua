@@ -14,12 +14,12 @@ Bagnon.SavedSettings = SavedSettings
 
 function SavedSettings:GetDB()
 	if not self.db then
-		self.db = _G['BagnonSets']
+		self.db = _G['BagnonSettings']
 		if self.db then
 			self:UpgradeDB()
 		else
 			self.db = self:GetDefaultSettings()
-			_G['BagnonSets'] = self.db
+			_G['BagnonSettings'] = self.db
 		end
 	end
 
@@ -73,12 +73,6 @@ function SavedSettings:SetProfile(profileName)
 	assert(profileName, 'Usage: SavedSettings:SetProfile(profileName)')
 
 	if profileName ~= self:GetCurrentProfileName() then
-		--hide all frames
-		for i, frameID in self:GetAvailableFrames() do
-			Bagnon.Callbacks:SendMessage('FRAME_HIDE', frameID)
-		end
-		
-		--set profile index
 		self:GetDB().indexes[self:GetPlayerIndex()] = profileName
 	end
 end
@@ -96,11 +90,19 @@ function SavedSettings:GetProfile(profileName)
 	return profile
 end
 
-function SavedSettings:DeleteProfile(profileName)
-	assert(profileName, 'Usage: SavedSettings:GetProfile(profileName)')
+function SavedSettings:DeleteProfile(profileToDelete)
+	assert(profileToDelete, 'Usage: SavedSettings:GetProfile(profileToDelete)')
 	
-	if self:GetProfileName() ~= profileName then
-		self:GetDB().profiles[profileName] = nil
+	if self:GetProfileName() ~= profileToDelete then
+		self:GetDB().profiles[profileToDelete] = nil
+		
+		--remove any player settings that reference this profile
+		local indexes = self:GetDB().indexes
+		for i, profileName in pairs(indexes) do
+			if profileName == profileToDelete then
+				indexes[i] = nil
+			end
+		end
 	end
 end
 	
@@ -137,11 +139,15 @@ function SavedSettings:GetCurrentProfileName()
 
 	local profileName = db.indexes[self:GetPlayerIndex()]
 	if not profileName then
-		profileName = 'Default'
+		profileName = self:GetDefaultProfileName()
 		db.indexes[self:GetPlayerIndex()] = profileName
 	end
 	
 	return profileName
+end
+
+function SavedSettings:GetDefaultProfileName()
+	return (UnitClass('player'))
 end
 
 function SavedSettings:GetPlayerIndex()
@@ -159,16 +165,4 @@ end
 
 function SavedSettings:GetFrameSettings(frameID)
 	return self:GetCurrentProfile().frames[frameID]
-end
-
---frames for current profile
-function SavedSettings:GetAvailableFrames(tbl)
-	local frames = tbl or {}
-
-	for frameID in pairs(self:GetCurrentProfile().frames) do
-		table.insert(frames, frameID)
-	end
-	
-	table.sort(frames)
-	return ipairs(frames)
 end

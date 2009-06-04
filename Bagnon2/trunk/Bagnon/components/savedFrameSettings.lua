@@ -17,10 +17,10 @@ SavedFrameSettings.mt = {
 }
 
 SavedFrameSettings.objects = setmetatable({}, {__index = function(tbl, id)
-	local obj = setmetatable({frameID = id}, FrameSettings.mt)
+	local obj = setmetatable({frameID = id}, SavedFrameSettings.mt)
 	tbl[id] = obj
 	return obj
-end)
+end})
 
 function SavedFrameSettings:Get(id)
 	return self.objects[id]
@@ -137,6 +137,18 @@ end
 --show a bag
 function SavedFrameSettings:ShowBag(bag)
 	local hiddenBags = self:GetDB().hiddenBags
+
+	for i, hiddenBag in pairs(hiddenBags) do
+		if bag == hiddenBag then
+			table.remove(hiddenBags, i)
+			return
+		end
+	end
+end
+
+--hide a bag
+function SavedFrameSettings:HideBag(bag)
+	local hiddenBags = self:GetDB().hiddenBags
 	local found = false
 	
 	for i, hiddenBag in pairs(hiddenBags) do
@@ -148,18 +160,6 @@ function SavedFrameSettings:ShowBag(bag)
 	
 	if not found then
 		table.insert(hiddenBags, bag)
-	end
-end
-
---hide a bag
-function SavedFrameSettings:HideBag(bag)
-	local hiddenBags = self:GetDB().hiddenBags
-
-	for i, hiddenBag in pairs(hiddenBags) do
-		if bag == hiddenBag then
-			table.remove(hiddenBags, bag)
-			return
-		end
 	end
 end
 
@@ -200,7 +200,7 @@ end
 --]]---------------------------------------------------------------------------
 
 --generic
-function SavedFrameSettings:GetDefaultFrameSettings()
+function SavedFrameSettings:GetDefaultSettings()
 	local frameID = self:GetFrameID()
 	
 	if frameID == 'keys' then
