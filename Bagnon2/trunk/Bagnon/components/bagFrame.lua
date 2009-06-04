@@ -12,8 +12,6 @@ Bagnon.BagFrame = BagFrame
 --[[ Constructor ]]--
 
 function BagFrame:New(frameID, parent)
-	--print('bagFrame', 'new', frameID, parent, parent:GetName())
-
 	local f = self:Bind(CreateFrame('Frame', nil, parent))
 	f:Hide()
 
@@ -53,31 +51,17 @@ function BagFrame:BAG_FRAME_HIDE(msg, frameID)
 	end
 end
 
-function BagFrame:BAG_FRAME_SPACING_UPDATE(msg, frameID, spacing)
-	if frameID == self:GetFrameID() then
-		self:Layout()
-		self:SendMessage('BAG_FRAME_UPDATE_LAYOUT', self:GetFrameID())
-	end
-end
-
-function BagFrame:BAG_FRAME_PADDING_UPDATE(msg, frameID, padding)
-	if frameID == self:GetFrameID() then
-		self:Layout()
-		self:SendMessage('BAG_FRAME_UPDATE_LAYOUT', self:GetFrameID())
-	end
-end
-
 
 --[[ Frame Events ]]--
 
 function BagFrame:OnShow()
-	self:UpdateEvents()
+--	self:UpdateEvents()
 	self:Layout()
 	self:SendMessage('BAG_FRAME_UPDATE_SHOWN', self:GetFrameID())
 end
 
 function BagFrame:OnHide()
-	self:UpdateEvents()
+--	self:UpdateEvents()
 	self:SendMessage('BAG_FRAME_UPDATE_SHOWN', self:GetFrameID())
 end
 
@@ -97,11 +81,6 @@ function BagFrame:UpdateEvents()
 
 	self:RegisterMessage('BAG_FRAME_SHOW')
 	self:RegisterMessage('BAG_FRAME_HIDE')
-
-	if self:IsVisible() then
-		self:RegisterMessage('BAG_FRAME_SPACING_UPDATE')
-		self:RegisterMessage('BAG_FRAME_PADDING_UPDATE')
-	end
 end
 
 function BagFrame:Layout()
@@ -160,11 +139,11 @@ function BagFrame:IsBagFrameShown()
 end
 
 function BagFrame:GetSpacing()
-	return self:GetSettings():GetBagFrameSpacing()
+	return 4
 end
 
 function BagFrame:GetPadding()
-	return self:GetSettings():GetBagFramePadding()
+	return 0
 end
 
 function BagFrame:GetBagSlots()
