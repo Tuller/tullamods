@@ -157,10 +157,15 @@ function Frame:UpdateLook()
 	self:Layout()
 end
 
---scale
+--set the frame's scale, while maintaining the same frame position
 function Frame:UpdateScale()
-	self:SetScale(self:GetFrameScale())
-	self:SavePosition()
+	local oldScale = self:GetScale()
+	local newScale = self:GetFrameScale()
+	local point, x, y = self:GetFramePosition()
+	local ratio = newScale / oldScale
+
+	self:SetScale(newScale)
+	self:GetSettings():SetFramePosition(point, x/ratio, y/ratio)
 end
 
 --opacity
@@ -238,7 +243,7 @@ function Frame:Layout()
 		button:Hide()
 		tlMenuButtons[i] = nil
 	end
-	
+
 	if self:HasPlayerSelector() then
 		table.insert(tlMenuButtons, self:GetPlayerSelector())
 	end
@@ -248,7 +253,7 @@ function Frame:Layout()
 	end
 
 	table.insert(tlMenuButtons, self:GetSearchToggle())
-	
+
 	for i, button in pairs(tlMenuButtons) do
 		if i == 1 then
 			button:SetPoint('TOPLEFT', self, 'TOPLEFT', 8, -8)
@@ -257,14 +262,14 @@ function Frame:Layout()
 		end
 		button:Show()
 	end
-	
+
 	self.tlMenuButtons = tlMenuButtons
 	height = height + tlMenuButtons[1]:GetHeight() + 16
-	
+
 	--place the top right menu buttons
 	local closeButton = self:GetCloseButton()
 	closeButton:SetPoint('TOPRIGHT', -2, -2)
-	
+
 	--place the title frame
 	local titleFrame = self:GetTitleFrame()
 	titleFrame:SetPoint('LEFT', tlMenuButtons[#tlMenuButtons], 'RIGHT', 4, 0)
@@ -276,7 +281,7 @@ function Frame:Layout()
 	searchFrame:SetPoint('LEFT', tlMenuButtons[#tlMenuButtons], 'RIGHT', 2, 0)
 	searchFrame:SetPoint('RIGHT', closeButton, 'LEFT', 4, 0)
 	searchFrame:SetHeight(28)
-	
+
 	--place the bag frame
 	local bagFrame = self:HasBagFrame() and self:GetBagFrame()
 	if bagFrame and self:IsBagFrameShown() then
@@ -285,7 +290,7 @@ function Frame:Layout()
 
 		bagFrame:SetPoint('TOPLEFT', tlMenuButtons[1], 'BOTTOMLEFT', 0, -4)
 	end
-	
+
 	--place the itemFrame
 	local itemFrame = self:GetItemFrame()
 	width = max(itemFrame:GetWidth() + 16, width)
@@ -296,7 +301,7 @@ function Frame:Layout()
 	else
 		itemFrame:SetPoint('TOPLEFT', tlMenuButtons[1], 'BOTTOMLEFT', 0, -4)
 	end
-	
+
 	--place the moneyFrame
 	local moneyFrame = self:HasMoneyFrame() and self:GetMoneyFrame()
 	if moneyFrame then
@@ -305,7 +310,7 @@ function Frame:Layout()
 
 		moneyFrame:SetPoint('BOTTOMRIGHT', self, 'BOTTOMRIGHT', 0, 10)
 	end
-	
+
 	--place the broker display frame
 	local brokerDisplay = self:HasBrokerDisplay() and self:GetBrokerDisplay()
 	if brokerDisplay then
@@ -321,6 +326,7 @@ function Frame:Layout()
 	--adjust size
 	self:SetWidth(width)
 	self:SetHeight(height)
+	self:SavePosition()
 end
 
 
