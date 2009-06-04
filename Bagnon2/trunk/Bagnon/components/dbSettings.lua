@@ -8,7 +8,9 @@ local SavedSettings = {}
 Bagnon.SavedSettings = SavedSettings
 
 
---[[ Database Settings ]]--
+--[[ 
+	Database Settings
+--]]
 
 function SavedSettings:GetDB()
 	if not self.db then
@@ -57,20 +59,12 @@ function SavedSettings:GetAddOnVersion()
 end
 
 
---[[ Global Settings ]]--
-
-
---[[ Profile Settings ]]--
+--[[ 
+	Profile Settings
+--]]
 
 function SavedSettings:GetCurrentProfile()
-	local db = self:GetDB()
-
-	local currentProfile = db.profiles[self:GetCurrentProfileName()]
-	if not currentProfile then
-		currentProfile = self:GetDefaultProfileSettings()
-		db.profiles[self:GetCurrentProfileName()] = currentProfile
-	end
-	return currentProfile
+	return self:GetProfile(self:GetCurrentProfileName())
 end
 
 function SavedSettings:GetCurrentProfileName()
@@ -81,6 +75,7 @@ function SavedSettings:GetCurrentProfileName()
 		profileName = 'Default'
 		db.indexes[self:GetPlayerIndex()] = profileName
 	end
+	
 	return profileName
 end
 
@@ -88,16 +83,51 @@ function SavedSettings:GetPlayerIndex()
 	return UnitName('player') .. ' - ' .. GetRealmName()
 end
 
-function SavedSettings:GetDefaultProfileSettings()
-	local profile = {frames = {}}
-	profile.frames.inventory = self:GetDefaultFrameSettings('inventory')
-	profile.frames.bank = self:GetDefaultFrameSettings('bank')
-	profile.frames.keys = self:GetDefaultFrameSettings('keys')
+function SavedSettings:SetProfile(profileName)
+	assert(profileName, 'Usage: SavedSettings:SetProfile(profileName)')
+
+	if profileName ~= self:GetCurrentProfileName() then
+		--hide all frames
+		for i, frameID in self:GetAvailableFrames() do
+			Bagnon.Callbacks:SendMessage('FRAME_HIDE', frameID)
+		end
+		
+		--set profile index
+		self:GetDB().indexes[self:GetPlayerIndex()] = profileName
+	end
+end
+
+function SavedSettings:GetProfile(profileName)
+	assert(profileName, 'Usage: SavedSettings:GetProfile(profileName)')
+	
+	local db = self:GetDB()
+	local profile = db.profiles[profileName]
+	if not profile then
+		profile = self:GetDefaultProfileSettings()
+		db.profiles[profileName] = profile
+	end
+	
 	return profile
 end
 
-function SavedSettings:GetAvailableProfiles()
-	local profiles = {}
+function SavedSettings:GetDefaultProfileSettings()
+	local profile = {
+		frames = {
+			inventory = self:GetDefaultFrameSettings('inventory'),
+			bank = self:GetDefaultFrameSettings('bank'),
+			keys = self:GetDefaultFrameSettings('keys'),
+		},
+	}
+	
+	return profile
+end
+
+
+--[[ Iterators ]]--
+
+--profiles
+function SavedSettings:GetAvailableProfiles(tbl)
+	local profiles = tbl or {}
 	
 	for profileName in pairs(self:GetDB().profiles) do
 		table.insert(profiles, profileName)
@@ -107,6 +137,17 @@ function SavedSettings:GetAvailableProfiles()
 	return ipairs(profiles)
 end
 
+--frames for current profile
+function SavedSettings:GetAvailableFrames(tbl)
+	local frames = tbl or {}
+
+	for frameID in pairs(self:GetCurrentProfile().frames) do
+		table.insert(frames, frameID)
+	end
+	
+	table.sort(frames)
+	return ipairs(frames)
+end
 
 
 --[[ 
@@ -125,14 +166,23 @@ end
 
 --[[ Frame Color ]]--
 
-function SavedSettings:GetFrameBackgroundColor(frameID)
+--background
+function SavedSettings:SetFrameColor(frameID, r, g, b, a)
+	local color = self:GetFrameSettings(frameID).frameColor
+	color[1] = r
+	color[2] = g
+	color[3] = b
+	color[4] = a
+end
+
+function SavedSettings:GetFrameColor(frameID)
 	local r, g, b, a = unpack(self:GetFrameSettings(frameID).frameColor)
 	return r, g, b, a
 end
 
-
-function SavedSettings:SetFrameBackgroundColor(frameID, r, g, b, a)
-	local color = self:GetFrameSettings(frameID).frameColor
+--border
+function SavedSettings:SetFrameBorderColor(frameID, r, g, b, a)
+	local color = self:GetFrameSettings(frameID).frameBorderColor
 	color[1] = r
 	color[2] = g
 	color[3] = b
@@ -144,21 +194,8 @@ function SavedSettings:GetFrameBorderColor(frameID)
 	return r, g, b, a
 end
 
-function SavedSettings:SetFrameBorderColor(frameID, r, g, b, a)
-	local color = self:GetFrameSettings(frameID).frameBorderColor
-	color[1] = r
-	color[2] = g
-	color[3] = b
-	color[4] = a
-end
-
 
 --[[ Frame Position ]]--
-
-function SavedSettings:GetFramePosition(frameID)
-	local sets = self:GetFrameSettings(frameID)
-	return sets.point, sets.x, sets.y
-end
 
 function SavedSettings:SetFramePosition(frameID, point, x, y)
 	local sets = self:GetFrameSettings(frameID)
@@ -167,15 +204,20 @@ function SavedSettings:SetFramePosition(frameID, point, x, y)
 	sets.y = y
 end
 
+function SavedSettings:GetFramePosition(frameID)
+	local sets = self:GetFrameSettings(frameID)
+	return sets.point, sets.x, sets.y
+end
+
 
 --[[ Frame Scale ]]--
 
-function SavedSettings:GetFrameScale(frameID)
-	return self:GetFrameSettings(frameID).scale
-end
-
 function SavedSettings:SetFrameScale(frameID, scale)
 	self:GetFrameSettings(frameID).scale = scale
+end
+
+function SavedSettings:GetFrameScale(frameID)
+	return self:GetFrameSettings(frameID).scale
 end
 
 
@@ -207,17 +249,49 @@ end
 
 --[[ Frame Bags ]]--
 
+--show a bag
+function SavedSettings:ShowFrameBag(frameID, bag)
+	local hiddenBags = self:GetFrameSettings(frameID).hiddenBags
+	local found = false
+	
+	for k, hiddenBag in pairs(hiddenBags) do
+		if bag == hiddenBag then
+			found = true
+			break
+		end
+	end
+	
+	if not found then
+		table.insert(hiddenBags, bag)
+	end
+end
+
+--hide a bag
+function SavedSettings:HideFrameBag(frameID, bag)
+	local hiddenBags = self:GetFrameSettings(frameID).hiddenBags
+
+	for k, hiddenBag in pairs(hiddenBags) do
+		if bag == hiddenBag then
+			table.remove(hiddenBags, bag)
+			return
+		end
+	end
+end
+
+--get all available bags
 function SavedSettings:GetFrameBags(frameID)
 	return self:GetFrameSettings(frameID).availableBags
 end
 
-function SavedSettings:GetHiddenBags(frameID)
+--get all hidden bags
+function SavedSettings:GetFrameHiddenBags(frameID)
 	return self:GetFrameSettings(frameID).hiddenBags
 end
 
 
 --[[ Item Frame Layout ]]--
 
+--columns
 function SavedSettings:SetItemFrameColumns(frameID, columns)
 	self:GetFrameSettings(frameID).itemFrameColumns = columns
 end
@@ -226,6 +300,7 @@ function SavedSettings:GetItemFrameColumns(frameID)
 	return self:GetFrameSettings(frameID).itemFrameColumns
 end
 
+--spacing
 function SavedSettings:SetItemFrameSpacing(frameID, spacing)
 	self:GetFrameSettings(frameID).itemFrameSpacing = spacing
 end
@@ -235,8 +310,9 @@ function SavedSettings:GetItemFrameSpacing(frameID)
 end
 
 
---[[ Default Frame Settings ]]--
+--[[ Frame Setting Defaults ]]--
 
+--generic
 function SavedSettings:GetDefaultFrameSettings(frameID)
 	if frameID == 'keys' then
 		return self:GetDefaultKeyRingSettings()
@@ -247,6 +323,7 @@ function SavedSettings:GetDefaultFrameSettings(frameID)
 	return self:GetDefaultInventorySettings()
 end	
 
+--inventory
 function SavedSettings:GetDefaultInventorySettings()
 	return {
 		--bag settings
@@ -276,6 +353,7 @@ function SavedSettings:GetDefaultInventorySettings()
 	}
 end
 
+--bank
 function SavedSettings:GetDefaultBankSettings()
 	return {
 		--bag settings
@@ -305,13 +383,14 @@ function SavedSettings:GetDefaultBankSettings()
 	}
 end
 
+--keys
 function SavedSettings:GetDefaultKeyRingSettings()
 	return {
 		--bag settings
 		availableBags = {KEYRING_CONTAINER},
 		hiddenBags = {},
 
-		--frame
+		--frame,
 		frameColor = {0, 0, 0, 0.5},
 		frameBorderColor = {random(), random(), random(), 1},
 		scale = 1,

@@ -91,7 +91,6 @@ function FrameSettings:FRAME_HIDE()
 	self:HideFrame()
 end
 
-
 --bag frame display
 function FrameSettings:BAG_FRAME_SHOW()
 	self:ShowBagFrame()
@@ -100,7 +99,6 @@ end
 function FrameSettings:BAG_FRAME_HIDE()
 	self:HideBagFrame()
 end
-
 
 --individual bag display
 function FrameSettings:BAG_SLOT_SHOW(slot)
@@ -114,7 +112,6 @@ function FrameSettings:BAG_SLOT_HIDE(slot)
 		self:HideBagSlot(slot)
 	end
 end
-
 
 --searching
 function FrameSettings:TEXT_SEARCH_ENABLE()
@@ -131,16 +128,17 @@ function FrameSettings:TEXT_SEARCH_UPDATE(search)
 	end
 end
 
-
 --player filtering
 function FrameSettings:PLAYER_UPDATE(player)
 	self:SetPlayerFilter(player)
 end
 
 --bag filtering
+--[[
 function FrameSettings:BAGS_UPDATE(...)
 	self:SetBagSlots(...)
 end
+--]]
 
 
 --[[---------------------------------------------------------------------------
@@ -173,20 +171,37 @@ function FrameSettings:ToggleFrame()
 end
 
 function FrameSettings:IsFrameShown()
-	return self.showFrame
+	return self.showFrame or false
 end
 
 
 --[[ Frame Layout ]]--
 
+--scale
+function FrameSettings:SetFrameScale(scale)
+	if self:GetScale() ~= scale then
+		Bagnon.SavedSettings:SetFrameScale(self:GetFrameID(), scale)
+		self:SendMessage('FRAME_SCALE_UPDATE', scale)
+	end
+end
+
 function FrameSettings:GetFrameScale()
 	return Bagnon.SavedSettings:GetFrameScale(self:GetFrameID())
+end
+
+--opacity
+function FrameSettings:SetFrameOpacity(opacity)
+	if self:GetOpacity() ~= opacity then
+		Bagnon.SavedSettings:SetFrameOpacity(self:GetFrameID(), opacity)
+		self:SendMessage('FRAME_OPACITY_UPDATE', opacity)
+	end
 end
 
 function FrameSettings:GetFrameOpacity()
 	return Bagnon.SavedSettings:GetFrameOpacity(self:GetFrameID())
 end
 
+--position
 function FrameSettings:SetFramePosition(point, x, y)
 	local oPoint, oX, oY = self:GetFramePosition()
 	if not(point == oPoint and x == oX and y == oY) then
@@ -199,20 +214,50 @@ function FrameSettings:GetFramePosition()
 	return Bagnon.SavedSettings:GetFramePosition(self:GetFrameID())
 end
 
-function FrameSettings:GetFrameBackdropColor()
-	return Bagnon.SavedSettings:GetFrameBackgroundColor(self:GetFrameID())
+--frame color
+function FrameSettings:SetFrameColor(r, g, b, a)
+	local pR, pG, pB, pA = self:GetFrameColor()
+
+	if not(pR == r and pG == g and pB == b and pA == a) then
+		Bagnon.SavedSettings:SetFrameColor(self:GetFrameID(), r, g, b, a)
+		self:SendMessage('FRAME_COLOR_UPDATE', r, g, b, a)
+	end
 end
 
-function FrameSettings:GetFrameBackdropBorderColor()
+function FrameSettings:GetFrameColor()
+	return Bagnon.SavedSettings:GetFrameColor(self:GetFrameID())
+end
+
+--border color
+function FrameSettings:SetFrameBorderColor(r, g, b, a)
+	local pR, pG, pB, pA = self:GetFrameBorderColor()
+
+	if not(pR == r and pG == g and pB == b and pA == a) then
+		Bagnon.SavedSettings:SetFrameBorderColor(self:GetFrameID(), r, g, b, a)
+		self:SendMessage('FRAME_BORDER_COLOR_UPDATE', r, g, b, a)
+	end
+end
+
+function FrameSettings:GetFrameBorderColor()
 	return Bagnon.SavedSettings:GetFrameBorderColor(self:GetFrameID())
 end
 
+
+--[[ Frame Components ]]--
+
+--returns true if the frame has a bag frame, and false otherwise
 function FrameSettings:FrameHasBagFrame()
 	return Bagnon.SavedSettings:DoesFrameHaveBagFrame(self:GetFrameID())
 end
 
+--returns true if the frame has a money frame, and false otherwise
 function FrameSettings:FrameHasMoneyFrame()
 	return Bagnon.SavedSettings:DoesFrameHaveMoneyFrame(self:GetFrameID())
+end
+
+--returns true if the frame has a databroker object frame, and false otherwise
+function FrameSettings:FrameHasDBOFrame()
+	return Bagnon.SavedSettings:DoesFrameHaveDBOFrame(self:GetFrameID())
 end
 
 
@@ -299,31 +344,6 @@ end
 
 --[[ Bag Slot Availability ]]--
 
---sets the available bag slots for this frame
---[[
-function FrameSettings:SetBagSlots(...)
-	local changed = false
-
-	if select('#', ...) ~= #self.bagSlots then
-		changed = true
-	else
-		for i, slot in self:GetBagSlots() do
-			local newSlot = select(i, ...)
-			if newSlot ~= slot then
-				changed = true
-				break
-			end
-		end
-	end
-
-	if changed then
-		self.bagSlots = {...}
-		self:SendMessage('BAGS_UPDATE', ...)
-	end
-	return changed
-end
---]]
-
 --returns true if the slot is available to this frame, and false otherwise
 function FrameSettings:HasBagSlot(slot)
 	for i, bagSlot in self:GetBagSlots() do
@@ -344,19 +364,14 @@ end
 
 function FrameSettings:ShowBagSlot(slotToShow)
 	if not self:IsBagSlotShown(slotToShow) then
-		for i, bagSlot in pairs(self.hiddenBagSlots) do
-			if bagSlot == slotToShow then
-				table.remove(self.hiddenBagSlots, i)
-			end
-		end
-
+		Bagnon.SavedSettings:ShowFrameBag(self:GetFrameID(), slotToShow)
 		self:SendMessage('BAG_SLOT_SHOW', slotToShow)
 	end
 end
 
 function FrameSettings:HideBagSlot(slotToHide)
 	if self:IsBagSlotShown(slotToHide) then
-		table.insert(self.hiddenBagSlots, slotToHide)
+		Bagnon.SavedSettings:HideFrameBag(self:GetFrameID(), slotToHide)
 		self:SendMessage('BAG_SLOT_HIDE', slotToHide)
 	end
 end
@@ -378,6 +393,11 @@ function FrameSettings:IsBagSlotShown(slot)
 	return false
 end
 
+--returns an iteratior for all bag slots marked as hidden for this frame
+function FrameSettings:GetHiddenBagSlots()
+	return ipairs(Bagnon.SavedSettings:GetHiddenBags(self:GetFrameID()))
+end
+
 --returns an iterator for all bag slots that are available to this frame and marked as visible
 local function visibleSlotIterator(obj, i)
 	local bagSlots = Bagnon.SavedSettings:GetFrameBags(obj:GetFrameID())
@@ -385,7 +405,7 @@ local function visibleSlotIterator(obj, i)
 		local slot = bagSlots[j]
 		local found = false
 
-		for _, hiddenSlot in pairs(obj.hiddenBagSlots) do
+		for _, hiddenSlot in obj:GetHiddenBags() do
 			if hiddenSlot == slot then
 				found = true
 				break
