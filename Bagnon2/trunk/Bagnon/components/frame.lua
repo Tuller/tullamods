@@ -114,11 +114,19 @@ end
 --[[ Frame Events ]]--
 
 function Frame:OnShow()
+	PlaySound('igBackPackOpen')
+	
 	self:UpdateEvents()
 	self:UpdateLook()
 end
 
 function Frame:OnHide()
+	PlaySound('igBackPackClose')
+	
+	if self:IsBankFrame() then
+		self:CloseBankFrame()
+	end
+	
 	self:UpdateEvents()
 end
 
@@ -327,6 +335,19 @@ function Frame:Layout()
 	self:SetWidth(width)
 	self:SetHeight(height)
 	self:SavePosition()
+end
+
+
+--[[ Special Bank Events ]]--
+
+function Frame:IsBankFrame()
+	return self:GetFrameID() == 'bank'
+end
+
+function Frame:CloseBankFrame()
+	if Bagnon.PlayerInfo:AtBank() then
+		CloseBankFrame()
+	end
 end
 
 

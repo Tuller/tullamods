@@ -151,7 +151,7 @@ end
 
 function BrokerDisplay:OnClick(...)
 	local dbo = self:GetObject()
-	if dbo then
+	if dbo and dbo.OnClick then
 		dbo.OnClick(self, ...)
 	end
 end

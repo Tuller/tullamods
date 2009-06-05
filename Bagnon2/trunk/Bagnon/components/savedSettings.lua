@@ -4,6 +4,7 @@
 --]]
 
 local Bagnon = LibStub('AceAddon-3.0'):GetAddon('Bagnon')
+local L = LibStub('AceLocale-3.0'):GetLocale('Bagnon')
 local SavedSettings = {}
 Bagnon.SavedSettings = SavedSettings
 
@@ -20,6 +21,7 @@ function SavedSettings:GetDB()
 		else
 			self.db = self:GetDefaultSettings()
 			_G['BagnonSettings'] = self.db
+			Bagnon:Print(L.NewUser)
 		end
 	end
 
@@ -50,6 +52,7 @@ function SavedSettings:UpgradeDB()
 	if not self:IsDBOutOfDate() then return end
 
 	self:GetDB().version = self:GetAddOnVersion()
+	Bagnon:Print(string.format(L.Updated, self:GetDBVersion()))
 end
 
 function SavedSettings:IsDBOutOfDate()

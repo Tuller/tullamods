@@ -55,6 +55,17 @@ function Bagnon:ToggleFrame(frameID)
 end
 
 function Bagnon:HookBagEvents()
+--[[
+	IsBagOpen = function(bag)
+		if self.BagSlotInfo:IsKeyRing(bag) then
+			return self.FrameSettings:Get('keys'):IsFrameShown()
+		elseif self.BagSlotInfo:IsBankBag(bag) then
+			return self.FrameSettings:Get('bank'):IsFrameShown()
+		end
+		return self.FrameSettings:Get('inventory'):IsFrameShown()
+	end
+--]]
+		
 	--backpack
 	hooksecurefunc('CloseBackpack', function()
 		self:HideFrame('inventory')
@@ -83,7 +94,7 @@ function Bagnon:HookBagEvents()
 	end
 
 	--all bags
-	--closing the game menu triggers this function, and can be done in combat,
+	--closing the game menu triggers this function, and can be done in combat
 	hooksecurefunc('CloseAllBags', function()
 		self:HideFrame('inventory')
 	end)

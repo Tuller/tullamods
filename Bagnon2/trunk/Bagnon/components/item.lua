@@ -237,7 +237,7 @@ function ItemSlot:OnEnter()
 		if self:IsBankSlot() then
 			if self:GetItem() then
 				self:AnchorTooltip()
-				GameTooltip:SetInventoryItemSlot('player', BankButtonIDToInvSlotID(self:GetID()))
+				GameTooltip:SetInventoryItem('player', BankButtonIDToInvSlotID(self:GetID()))
 				GameTooltip:Show()
 				CursorUpdate(self)
 			end
