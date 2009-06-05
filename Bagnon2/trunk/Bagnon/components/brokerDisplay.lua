@@ -90,8 +90,7 @@ end
 
 function BrokerDisplay:LibDataBroker_DataObjectCreated(msg, name, dataobj)
 	if self:GetObjectName() == name then
-		self:UpdateIcon()
-		self:UpdateText()
+		self:UpdateDisplay()
 	end
 end
 
@@ -102,6 +101,12 @@ function BrokerDisplay:LibDataBroker_AttributeChanged(msg, name, attr, value, da
 		elseif attr == 'text' then
 			self:UpdateText()
 		end
+	end
+end
+
+function BrokerDisplay:DATABROKER_OBJECT_UPDATE(msg, frameID, objectName)
+	if self:GetFrameID() == frameID then
+		self:UpdateDisplay()
 	end
 end
 
@@ -162,11 +167,7 @@ end
 
 function BrokerDisplay:UpdateEverything()
 	self:UpdateEvents()
-
-	if self:IsVisible() then
-		self:UpdateIcon()
-		self:UpdateText()
-	end
+	self:UpdateDisplay()
 end
 
 function BrokerDisplay:UpdateEvents()
@@ -177,6 +178,18 @@ function BrokerDisplay:UpdateEvents()
 			LDB.RegisterCallback(self, "LibDataBroker_DataObjectCreated")
 			LDB.RegisterCallback(self, "LibDataBroker_AttributeChanged")
 		end
+	end
+	
+	self:UnregisterAllMessages()
+	if self:IsVisible() then
+		self:RegisterMessage('DATABROKER_OBJECT_UPDATE')
+	end
+end
+
+function BrokerDisplay:UpdateDisplay()
+	if self:IsVisible() then
+		self:UpdateIcon()
+		self:UpdateText()
 	end
 end
 
@@ -227,17 +240,11 @@ function BrokerDisplay:Layout()
 --	self:SetWidth(width)
 end
 
---[[ Object Access ]]--
+
+--[[ Display Object Updating ]]--
 
 function BrokerDisplay:SetObject(objectName)
-	if self:GetObjectName() ~= objectName then
-		self.objectName = objectName
-
-		if self:IsVisible() then
-			self:UpdateIcon()
-			self:UpdateText()
-		end
-	end
+	self:GetSettings():SetBrokerDisplayObject(objectName)
 end
 
 function BrokerDisplay:GetObject()
@@ -249,7 +256,7 @@ function BrokerDisplay:GetObject()
 end
 
 function BrokerDisplay:GetObjectName()
-	return self.objectName
+	return self:GetSettings():GetBrokerDisplayObject()
 end
 
 function BrokerDisplay:SetNextObject()
@@ -333,4 +340,8 @@ end
 
 function BrokerDisplay:GetFrameID()
 	return self.frameID
+end
+
+function BrokerDisplay:GetSettings()
+	return Bagnon.FrameSettings:Get(self:GetFrameID())
 end

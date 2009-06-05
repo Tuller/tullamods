@@ -173,6 +173,19 @@ function FrameSettings:FrameHasDBOFrame()
 end
 
 
+--[[ Broker Display Object ]]--
+
+function FrameSettings:SetBrokerDisplayObject(objectName)
+	if self:GetBrokerDisplayObject() ~= objectName then
+		self:GetDB():SetBrokerDisplayObject(objectName)
+		self:SendMessage('DATABROKER_OBJECT_UPDATE', self:GetBrokerDisplayObject())
+	end
+end
+
+function FrameSettings:GetBrokerDisplayObject()
+	return self:GetDB():GetBrokerDisplayObject()
+end
+
 --[[ Bag Frame Visibility ]]--
 
 function FrameSettings:ShowBagFrame()

@@ -195,6 +195,17 @@ function SavedFrameSettings:GetItemFrameSpacing()
 end
 
 
+--[[ Databroker Display Object ]]--
+
+function SavedFrameSettings:SetBrokerDisplayObject(objectName)
+	self:GetDB().dataBrokerObject = objectName
+end
+
+function SavedFrameSettings:GetBrokerDisplayObject()
+	return self:GetDB().dataBrokerObject
+end
+
+
 --[[---------------------------------------------------------------------------
 	Frame Defaults
 --]]---------------------------------------------------------------------------

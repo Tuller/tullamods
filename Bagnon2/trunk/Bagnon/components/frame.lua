@@ -80,13 +80,13 @@ function Frame:FRAME_OPACITY_UPDATE(msg, frameID, opacity)
 	end
 end
 
-function Frame:FRAME_BACKDROP_UPDATE(msg, frameID, r, g, b, a)
+function Frame:FRAME_COLOR_UPDATE(msg, frameID, r, g, b, a)
 	if self:GetFrameID() == frameID then
 		self:UpdateBackdrop()
 	end
 end
 
-function Frame:FRAME_BACKDROP_BORDER_UPDATE(msg, frameID, r, g, b, a)
+function Frame:FRAME_BORDER_COLOR_UPDATE(msg, frameID, r, g, b, a)
 	if self:GetFrameID() == frameID then
 		self:UpdateBackdropBorder()
 	end
@@ -136,8 +136,8 @@ function Frame:UpdateEvents()
 		self:RegisterMessage('FRAME_POSITION_UPDATE')
 		self:RegisterMessage('FRAME_SCALE_UPDATE')
 		self:RegisterMessage('FRAME_OPACITY_UPDATE')
-		self:RegisterMessage('FRAME_BACKDROP_UPDATE')
-		self:RegisterMessage('FRAME_BACKDROP_BORDER_UPDATE')
+		self:RegisterMessage('FRAME_COLOR_UPDATE')
+		self:RegisterMessage('FRAME_BORDER_COLOR_UPDATE')
 
 		self:RegisterMessage('BAG_FRAME_UPDATE_SHOWN')
 		self:RegisterMessage('BAG_FRAME_UPDATE_LAYOUT')
@@ -342,11 +342,10 @@ end
 
 function Frame:CreateCloseButton()
 	local b = CreateFrame('Button', self:GetName() .. 'CloseButton', self, 'UIPanelCloseButton')
-	b:SetScript('OnClick', function() self:HideFrame() end)
+	b:SetScript('OnClick', function(self) self:GetParent():GetSettings():HideFrame() end)
 
 	return b
 end
-
 
 --search frame
 function Frame:GetSearchFrame()
@@ -360,7 +359,6 @@ function Frame:CreateSearchFrame()
 	return Bagnon.SearchFrame:New(self:GetFrameID(), self)
 end
 
-
 --search toggle
 function Frame:GetSearchToggle()
 	if not self.searchToggle then
@@ -372,7 +370,6 @@ end
 function Frame:CreateSearchToggle()
 	return Bagnon.SearchToggle:New(self:GetFrameID(), self)
 end
-
 
 --bag frame
 function Frame:GetBagFrame()
@@ -386,7 +383,6 @@ function Frame:CreateBagFrame()
 	return Bagnon.BagFrame:New(self:GetFrameID(), self)
 end
 
-
 --bag toggle
 function Frame:GetBagToggle()
 	if not self.bagToggle then
@@ -399,7 +395,6 @@ function Frame:CreateBagToggle()
 	return Bagnon.BagToggle:New(self:GetFrameID(), self)
 end
 
-
 --title frame
 function Frame:GetTitleFrame()
 	if not self.titleFrame then
@@ -409,6 +404,7 @@ function Frame:GetTitleFrame()
 end
 
 function Frame:CreateTitleFrame()
+	--icky hardcoding
 	if self:GetFrameID() == 'bank' then
 		return Bagnon.TitleFrame:New(L.TitleBank, self:GetFrameID(), self)
 	end
@@ -478,7 +474,8 @@ function Frame:HasBrokerDisplay()
 	return self:GetSettings():FrameHasBrokerDisplay()
 end
 
---[[ Frame Properties? ]]--
+
+--[[ Frame Settings Access ]]--
 
 function Frame:SetFrameID(frameID)
 	if self:GetFrameID() ~= frameID then
@@ -490,9 +487,6 @@ end
 function Frame:GetFrameID()
 	return self.frameID
 end
-
-
---[[ Frame Settings Access ]]--
 
 function Frame:GetSettings()
 	return Bagnon.FrameSettings:Get(self:GetFrameID())
