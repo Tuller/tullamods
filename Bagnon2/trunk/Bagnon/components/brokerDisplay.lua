@@ -36,6 +36,7 @@ function BrokerDisplay:New(id, frameID, parent)
 	obj:SetScript('OnClick', obj.OnClick)
 
 	obj:SetFrameID(frameID)
+	obj:SetHeight(13)
 
 	return obj
 end
@@ -51,6 +52,7 @@ end
 function BrokerDisplay:AddText()
 	local text = self:CreateFontString()
 	text:SetFontObject('NumberFontNormalRight')
+	text:SetJustifyH('LEFT')
 
 	return text
 end
@@ -221,23 +223,13 @@ function BrokerDisplay:UpdateIcon()
 end
 
 function BrokerDisplay:Layout()
-	local height = 13
-	local width = self.left:GetWidth() + self.right:GetWidth()
-
 	if self.icon:IsShown() then
 		self.text:SetPoint('LEFT', self.icon, 'RIGHT', 2, 0)
-		if self.text:GetText() == '' then
-			width = width + self.icon:GetWidth()
-		else
-			width = width + self.icon:GetWidth() + self.text:GetStringWidth() + 2
-		end
+		self.text:SetPoint('RIGHT', self.right, 'LEFT', -2, 0)
 	else
 		self.text:SetPoint('LEFT', self.left, 'RIGHT', 2, 0)
-		width = width + self.text:GetStringWidth()
+		self.text:SetPoint('RIGHT', self.right, 'LEFT', -2, 0)
 	end
-
-	self:SetHeight(13)
---	self:SetWidth(width)
 end
 
 
