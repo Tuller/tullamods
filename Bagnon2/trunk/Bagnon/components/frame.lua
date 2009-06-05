@@ -342,7 +342,7 @@ end
 
 function Frame:CreateCloseButton()
 	local b = CreateFrame('Button', self:GetName() .. 'CloseButton', self, 'UIPanelCloseButton')
-	b:SetScript('OnClick', function(self) self:GetParent():GetSettings():HideFrame() end)
+	b:SetScript('OnClick', function(self) self:GetParent():GetSettings():HideFrame(true) end) --force hide the frame
 
 	return b
 end

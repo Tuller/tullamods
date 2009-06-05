@@ -17,7 +17,7 @@ FrameSettings.mt = {
 }
 
 FrameSettings.objects = setmetatable({}, {__index = function(tbl, id)
-	local obj = setmetatable({frameID = id}, FrameSettings.mt)
+	local obj = setmetatable({frameID = id, frameShown = 0}, FrameSettings.mt)
 	tbl[id] = obj
 	return obj
 end})
@@ -59,30 +59,37 @@ end
 
 --[[ Frame Visibility ]]--
 
+--the logic here is a little wacky, since we deal with auto open/close events
+--if a frame was manually opened, then it should only be closable manually
 function FrameSettings:ShowFrame()
-	if not self:IsFrameShown() then
-		self.showFrame = true
+	local wasShown = self:IsFrameShown()
+	
+	self.frameShown = (self.frameShown or 0) + 1
+
+	if not wasShown then
 		self:SendMessage('FRAME_SHOW')
 	end
 end
 
-function FrameSettings:HideFrame()
-	if self:IsFrameShown() then
-		self.showFrame = false
+function FrameSettings:HideFrame(forceHide)
+	self.frameShown = (self.frameShown or 1) - 1
+
+	if forceHide or self.frameShown <= 0 then
+		self.frameShown = 0
 		self:SendMessage('FRAME_HIDE')
 	end
 end
 
 function FrameSettings:ToggleFrame()
 	if self:IsFrameShown() then
-		self:HideFrame()
+		self:HideFrame(true)
 	else
 		self:ShowFrame()
 	end
 end
 
 function FrameSettings:IsFrameShown()
-	return self.showFrame
+	return (self.frameShown or 0) > 0
 end
 
 

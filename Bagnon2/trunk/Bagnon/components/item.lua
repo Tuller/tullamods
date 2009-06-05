@@ -35,8 +35,8 @@ end
 --constructs a brand new item slot
 function ItemSlot:Create()
 	local id = self:GetNextItemSlotID()
-	local item = self:Bind(self:ConstructNewItemSlot(id))
---	local item = self:Bind(self:GetBlizzardItemSlot(id) or self:ConstructNewItemSlot(id))
+--	local item = self:Bind(self:ConstructNewItemSlot(id))
+	local item = self:Bind(self:GetBlizzardItemSlot(id) or self:ConstructNewItemSlot(id))
 
 	--add a quality border texture
 	local border = item:CreateTexture(nil, 'OVERLAY')
