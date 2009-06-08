@@ -234,7 +234,7 @@ function ItemSlot:OnEnter()
 	else
 		dummySlot:Hide()
 
-		if self:IsBankSlot() then
+		if self:IsBank() then
 			if self:GetItem() then
 				self:AnchorTooltip()
 				GameTooltip:SetInventoryItem('player', BankButtonIDToInvSlotID(self:GetID()))
@@ -464,6 +464,10 @@ end
 
 function ItemSlot:IsCached()
 	return Bagnon.BagSlotInfo:IsCached(self:GetPlayer(), self:GetBag())
+end
+
+function ItemSlot:IsBank()
+	return Bagnon.BagSlotInfo:IsBank(self:GetBag())
 end
 
 function ItemSlot:IsBankSlot()
