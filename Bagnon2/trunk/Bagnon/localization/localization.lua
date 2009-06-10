@@ -19,10 +19,10 @@ L.UpdatedIncompatible = 'Updating from an incompatible version, defaults loaded'
 
 --slash commands
 L.Commands = 'Commands:'
-L.ShowBagsDesc = 'Toggles the inventory frame'
-L.ShowBankDesc = 'Toggles the bank frame'
-L.ShowKeysDesc = 'Toggles the keyring'
-L.ShowVersionDesc = 'Prints the current verison'
+L.CmdShowInventory = 'Toggles the inventory frame'
+L.CmdShowBank = 'Toggles the bank frame'
+L.CmdShowKeyring = 'Toggles the keyring'
+L.CmdShowVersion = 'Prints the current verison'
 
 
 --frame text

@@ -6,22 +6,31 @@
 Bagnon = LibStub('AceAddon-3.0'):NewAddon('Bagnon', 'AceEvent-3.0', 'AceConsole-3.0')
 local L = LibStub('AceLocale-3.0'):GetLocale('Bagnon')
 
---bindings
+
+--[[ 
+	Binding Setup
+--]]
+
 BINDING_HEADER_BAGNON = 'Bagnon'
 BINDING_NAME_BAGNON_TOGGLE = L.ToggleBags
 BINDING_NAME_BANKNON_TOGGLE = L.ToggleBank
 BINDING_NAME_BAGNON_KEYS_TOGGLE = L.ToggleKeys
 
 
---[[ Startup ]]--
+--[[ 
+	Startup
+--]]
 
 function Bagnon:OnEnable()
 	self.frames = {}
 	self:HookBagEvents()
+	self:AddSlashCommands()
 end
 
 
---[[ Frame Visibility ]]--
+--[[
+	Frame Display
+--]]
 
 function Bagnon:GetFrame(frameID)
 	for i, frame in pairs(self.frames) do
@@ -47,25 +56,18 @@ function Bagnon:HideFrame(frameID)
 end
 
 function Bagnon:ToggleFrame(frameID)
-	if self.FrameSettings:Get(frameID):IsFrameShown() then
-		self:HideFrame(frameID)
-	else
-		self:ShowFrame(frameID)
+	if not self:GetFrame(frameID) then
+		self:CreateFrame(frameID)
 	end
+	self.FrameSettings:Get(frameID):ToggleFrame()
 end
 
-function Bagnon:HookBagEvents()
+
 --[[
-	IsBagOpen = function(bag)
-		if self.BagSlotInfo:IsKeyRing(bag) then
-			return self.FrameSettings:Get('keys'):IsFrameShown()
-		elseif self.BagSlotInfo:IsBankBag(bag) then
-			return self.FrameSettings:Get('bank'):IsFrameShown()
-		end
-		return self.FrameSettings:Get('inventory'):IsFrameShown()
-	end
+	Automatic Bag Display
 --]]
-		
+
+function Bagnon:HookBagEvents()
 	--backpack
 	hooksecurefunc('CloseBackpack', function()
 		self:HideFrame('inventory')
@@ -122,4 +124,45 @@ function Bagnon:HookBagEvents()
 
 	--mailbox auto open/close evnet
 	self:RegisterEvent('MAIL_CLOSED', function() self:HideFrame('inventory') end)
+end
+
+
+--[[ 
+	Slash Commands
+--]]
+
+function Bagnon:AddSlashCommands()
+	self:RegisterChatCommand('bagnon', 'HandleSlashCommand')
+	self:RegisterChatCommand('bgn', 'HandleSlashCommand')
+end
+
+function Bagnon:HandleSlashCommand(cmd)
+	cmd = cmd and cmd:lower() or ''
+	if cmd == 'bank' then
+		self:ToggleFrame('bank')
+	elseif cmd == 'bags' then
+		self:ToggleFrame('inventory')
+	elseif cmd == 'keys' then
+		self:ToggleFrame('keys')
+	elseif cmd == 'version' then
+		self:PrintVersion()
+	else
+		self:PrintHelp()
+	end
+end
+
+function Bagnon:PrintVersion()
+	self:Print(self.SavedSettings:GetDBVersion())
+end
+
+function Bagnon:PrintHelp(cmd)
+	local function PrintCmd(cmd, desc)
+		print(format(' - |cFF33FF99%s|r: %s', cmd, desc))
+	end
+
+	self:Print(L.Commands)
+	PrintCmd('bags', L.CmdShowInventory)
+	PrintCmd('bank', L.CmdShowBank)
+	PrintCmd('keys', L.CmdShowKeyring)
+	PrintCmd('version', L.CmdShowVersion)
 end

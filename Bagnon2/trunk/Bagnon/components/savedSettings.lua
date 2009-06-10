@@ -50,6 +50,9 @@ end
 
 function SavedSettings:UpgradeDB()
 	if not self:IsDBOutOfDate() then return end
+	
+	local major, minor, bugfix = self:GetDBVersion():match('(%w+)%.(%w+)%.(%w+)')
+	--do upgrade stuff
 
 	self:GetDB().version = self:GetAddOnVersion()
 	Bagnon:Print(string.format(L.Updated, self:GetDBVersion()))
