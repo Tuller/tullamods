@@ -34,9 +34,11 @@ function BrokerDisplay:New(id, frameID, parent)
 	obj:SetScript('OnEnter', obj.OnEnter)
 	obj:SetScript('OnLeave', obj.OnLeave)
 	obj:SetScript('OnClick', obj.OnClick)
+	obj:SetScript('OnMouseWheel', obj.OnMouseWheel)
 
 	obj:SetFrameID(frameID)
 	obj:SetHeight(13)
+	obj:EnableMouseWheel(true)
 
 	return obj
 end
@@ -162,6 +164,14 @@ end
 
 function BrokerDisplay:OnHide()
 	self:UpdateEvents()
+end
+
+function BrokerDisplay:OnMouseWheel(direction)
+	if direction > 0 then
+		self:SetNextObject()
+	else
+		self:SetPreviousObject()
+	end
 end
 
 
