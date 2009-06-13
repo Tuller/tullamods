@@ -1,4 +1,10 @@
-﻿local ItemFrame = Bagnon.ItemFrame
+﻿--[[
+	bagBreak.lua
+		A replacement for the default Bagnon layout function that keeps bags on separate lines
+--]]
+
+local Bagnon = LibStub('AceAddon-3.0'):GetAddon('Bagnon')
+local ItemFrame = Bagnon.ItemFrame
 
 function ItemFrame:Layout()
 	self.needsLayout = nil
