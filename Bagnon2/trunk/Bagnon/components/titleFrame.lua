@@ -30,7 +30,7 @@ function TitleFrame:New(text, frameID, parent)
 	b:SetFrameID(frameID)
 	b:SetTitleText(text)
 	b:UpdateEvents()
-	
+
 	return b
 end
 

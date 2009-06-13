@@ -25,6 +25,16 @@ function Bagnon:OnEnable()
 	self.frames = {}
 	self:HookBagEvents()
 	self:AddSlashCommands()
+	self:CreateOptionsLoader()
+end
+
+--create a loader for the options menu
+function Bagnon:CreateOptionsLoader()
+	local f = CreateFrame('Frame', nil, InterfaceOptionsFrame)
+	f:SetScript('OnShow', function(self)
+		self:SetScript('OnShow', nil)
+		LoadAddOn('Bagnon_Config')
+	end)
 end
 
 
@@ -146,8 +156,14 @@ function Bagnon:HandleSlashCommand(cmd)
 		self:ToggleFrame('keys')
 	elseif cmd == 'version' then
 		self:PrintVersion()
-	else
+	elseif cmd == 'config' then
+		self:ShowOptions()
+	elseif cmd == '?' or cmd == 'help' then
 		self:PrintHelp()
+	else
+		if not self:ShowOptions() then
+			self:PrintHelp()
+		end
 	end
 end
 
@@ -155,7 +171,7 @@ function Bagnon:PrintVersion()
 	self:Print(self.SavedSettings:GetDBVersion())
 end
 
-function Bagnon:PrintHelp(cmd)
+function Bagnon:PrintHelp()
 	local function PrintCmd(cmd, desc)
 		print(format(' - |cFF33FF99%s|r: %s', cmd, desc))
 	end
@@ -165,4 +181,12 @@ function Bagnon:PrintHelp(cmd)
 	PrintCmd('bank', L.CmdShowBank)
 	PrintCmd('keys', L.CmdShowKeyring)
 	PrintCmd('version', L.CmdShowVersion)
+end
+
+function Bagnon:ShowOptions()
+	if LoadAddOn('Bagnon_Config') then
+		InterfaceOptionsFrame_OpenToCategory(self.GeneralOptions)
+		return true
+	end
+	return false
 end

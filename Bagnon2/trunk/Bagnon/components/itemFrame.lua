@@ -245,8 +245,8 @@ function ItemFrame:Layout()
 		end
 	end
 
-	local width = effItemSize * math.min(columns, i) - spacing*2
-	local height = effItemSize * ceil(i / columns) - spacing*2
+	local width = effItemSize * math.min(columns, i) - spacing
+	local height = effItemSize * ceil(i / columns) - spacing
 	self:SetWidth(width)
 	self:SetHeight(height)
 end

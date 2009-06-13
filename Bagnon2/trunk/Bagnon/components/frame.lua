@@ -243,10 +243,12 @@ end
 function Frame:Layout()
 	if not self:IsVisible() then return end
 
-	local width, height = 150, 0
+	local width, height = 0, 0
 
 	--place the top left menu buttons
 	local tlMenuButtons = self.tlMenuButtons or {}
+	self.tlMenuButtons = tlMenuButtons
+
 	for i, button in pairs(tlMenuButtons) do
 		button:Hide()
 		tlMenuButtons[i] = nil
@@ -260,35 +262,59 @@ function Frame:Layout()
 		table.insert(tlMenuButtons, self:GetBagToggle())
 	end
 
-	table.insert(tlMenuButtons, self:GetSearchToggle())
+	if self:HasSearchFrame() then
+		table.insert(tlMenuButtons, self:GetSearchToggle())
+	end
 
-	for i, button in pairs(tlMenuButtons) do
+	for i, button in ipairs(tlMenuButtons) do
+		 button:ClearAllPoints()
 		if i == 1 then
 			button:SetPoint('TOPLEFT', self, 'TOPLEFT', 8, -8)
 		else
-			button:SetPoint('TOPLEFT', tlMenuButtons[i - 1], 'TOPRIGHT', 4, 0)
+			button:SetPoint('TOPLEFT', tlMenuButtons[i-1], 'TOPRIGHT', 4, 0)
 		end
 		button:Show()
 	end
 
-	self.tlMenuButtons = tlMenuButtons
-	height = height + tlMenuButtons[1]:GetHeight() + 16
-
 	--place the top right menu buttons
 	local closeButton = self:GetCloseButton()
 	closeButton:SetPoint('TOPRIGHT', -2, -2)
+	
+	local optionsToggle = self:GetOptionsToggle()
+	optionsToggle:ClearAllPoints()
+	optionsToggle:SetPoint('TOPRIGHT', self, 'TOPRIGHT', -32, -8)
+	height = height + optionsToggle:GetHeight() + 16
 
 	--place the title frame
 	local titleFrame = self:GetTitleFrame()
-	titleFrame:SetPoint('LEFT', tlMenuButtons[#tlMenuButtons], 'RIGHT', 4, 0)
-	titleFrame:SetPoint('RIGHT', closeButton, 'LEFT', 0, 0)
+	titleFrame:ClearAllPoints()
+	
+	if #tlMenuButtons > 0 then
+		titleFrame:SetPoint('LEFT', tlMenuButtons[#tlMenuButtons], 'RIGHT', 4, 0)
+	else
+		titleFrame:SetPoint('TOPLEFT', self, 'TOPLEFT', 8, -8)
+	end
+	
+	titleFrame:SetPoint('RIGHT', optionsToggle, 'LEFT', -4, 0)
 	titleFrame:SetHeight(20)
+	
+	--hurray magic numbers
+	width = max(width, titleFrame:GetTextWidth() + 24 * #tlMenuButtons + 48 + 16)
 
 	--place the search frame
-	local searchFrame = self:GetSearchFrame()
-	searchFrame:SetPoint('LEFT', tlMenuButtons[#tlMenuButtons], 'RIGHT', 2, 0)
-	searchFrame:SetPoint('RIGHT', closeButton, 'LEFT', 4, 0)
-	searchFrame:SetHeight(28)
+	local searchFrame = self:HasSearchFrame() and self:GetSearchFrame()
+	if searchFrame then
+		searchFrame:ClearAllPoints()
+		
+		if #tlMenuButtons > 0 then
+			searchFrame:SetPoint('LEFT', tlMenuButtons[#tlMenuButtons], 'RIGHT', 2, 0)
+		else
+			searchFrame:SetPoint('TOPLEFT', self, 'TOPLEFT', 8, -8)
+		end
+		
+		searchFrame:SetPoint('RIGHT', optionsToggle, 'LEFT', -2, 0)
+		searchFrame:SetHeight(28)
+	end
 
 	--place the bag frame
 	local bagFrame = self:HasBagFrame() and self:GetBagFrame()
@@ -296,6 +322,7 @@ function Frame:Layout()
 		width = max(bagFrame:GetWidth() + 16, width)
 		height = height + bagFrame:GetHeight() + 4
 
+		bagFrame:ClearAllPoints()
 		bagFrame:SetPoint('TOPLEFT', tlMenuButtons[1], 'BOTTOMLEFT', 0, -4)
 	end
 
@@ -304,10 +331,15 @@ function Frame:Layout()
 	width = max(itemFrame:GetWidth() + 16, width)
 	height = height + itemFrame:GetHeight() + 4
 
+	itemFrame:ClearAllPoints()
 	if bagFrame and self:IsBagFrameShown() then
 		itemFrame:SetPoint('TOPLEFT', bagFrame, 'BOTTOMLEFT', 0, -4)
 	else
-		itemFrame:SetPoint('TOPLEFT', tlMenuButtons[1], 'BOTTOMLEFT', 0, -4)
+		if #tlMenuButtons > 0 then
+			itemFrame:SetPoint('TOPLEFT', tlMenuButtons[1], 'BOTTOMLEFT', 0, -4)
+		else
+			itemFrame:SetPoint('TOPLEFT', titleFrame, 'BOTTOMLEFT', 2, -4)
+		end
 	end
 
 	--place the moneyFrame
@@ -316,12 +348,14 @@ function Frame:Layout()
 		width = max(moneyFrame:GetWidth() + 16, width)
 		height = height + 22
 
+		moneyFrame:ClearAllPoints()
 		moneyFrame:SetPoint('BOTTOMRIGHT', self, 'BOTTOMRIGHT', 0, 10)
 	end
 
 	--place the broker display frame
 	local brokerDisplay = self:HasBrokerDisplay() and self:GetBrokerDisplay()
 	if brokerDisplay then
+		brokerDisplay:ClearAllPoints()
 		brokerDisplay:SetPoint('BOTTOMLEFT', self, 'BOTTOMLEFT', 8, 10)
 
 		if moneyFrame then
@@ -378,6 +412,10 @@ end
 
 function Frame:CreateSearchFrame()
 	return Bagnon.SearchFrame:New(self:GetFrameID(), self)
+end
+
+function Frame:HasSearchFrame()
+	return self:GetFrameID() ~= 'keys'
 end
 
 --search toggle
@@ -493,6 +531,18 @@ end
 
 function Frame:HasBrokerDisplay()
 	return self:GetSettings():FrameHasBrokerDisplay()
+end
+
+--options toggle
+function Frame:GetOptionsToggle()
+	if not self.optionsToggle then
+		self.optionsToggle = self:CreateOptionsToggle()
+	end
+	return self.optionsToggle
+end
+
+function Frame:CreateOptionsToggle()
+	return Bagnon.OptionsToggle:New(self:GetFrameID(), self)
 end
 
 
