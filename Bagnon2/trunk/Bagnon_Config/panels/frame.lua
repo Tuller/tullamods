@@ -33,7 +33,12 @@ function FrameOptions:AddWidgets()
 	--[[ Colors ]]--
 	
 	--add color selector
+	local frameColor = self:CreateColorSelector()
+	frameColor:SetPoint('TOPLEFT', frameSelector, 'BOTTOMLEFT', 16, -8)
+		
 	--add border colors selector
+	local frameBorderColor = self:CreateBorderColorSelector()
+	frameBorderColor:SetPoint('TOPLEFT', frameColor, 'BOTTOMLEFT', 0, -4)
 
 	--[[ checkboxes ]]--
 	
@@ -42,7 +47,7 @@ function FrameOptions:AddWidgets()
 	
 	--[[ Sliders ]]--
 	
-	--add frame strata slider
+	--add frame strata slider?
 	
 	--add opacity slider
 	local opacity = self:CreateOpacitySlider()
@@ -146,6 +151,18 @@ function FrameOptions:GetFrameSelector()
 end
 
 function FrameOptions:CreateColorSelector()
+	local selector = Bagnon.OptionsColorSelector:New(L.FrameColor, self, true)
+	
+	selector.OnSetColor = function(self, r, g, b, a)
+		self:GetParent():GetSettings():SetFrameColor(r, g, b, a)
+	end
+	
+	selector.GetColor = function(self)
+		return self:GetParent():GetSettings():GetFrameColor()
+	end
+	
+	self.colorSelector = selector
+	return selector
 end
 
 function FrameOptions:GetColorSelector()
@@ -153,6 +170,18 @@ function FrameOptions:GetColorSelector()
 end
 
 function FrameOptions:CreateBorderColorSelector()
+	local selector = Bagnon.OptionsColorSelector:New(L.FrameBorderColor, self, true)
+	
+	selector.OnSetColor = function(self, r, g, b, a)
+		self:GetParent():GetSettings():SetFrameBorderColor(r, g, b, a)
+	end
+	
+	selector.GetColor = function(self)
+		return self:GetParent():GetSettings():GetFrameBorderColor()
+	end
+	
+	self.borderColorSelector = selector
+	return selector
 end
 
 function FrameOptions:GetBorderColorSelector()
@@ -258,8 +287,8 @@ function FrameOptions:UpdateMessages()
 
 	self:RegisterMessage('FRAME_SCALE_UPDATE')
 	self:RegisterMessage('FRAME_OPACITY_UPDATE')
---	self:RegisterMessage('FRAME_COLOR_UPDATE')
---	self:RegisterMessage('FRAME_BORDER_COLOR_UPDATE')
+	self:RegisterMessage('FRAME_COLOR_UPDATE')
+	self:RegisterMessage('FRAME_BORDER_COLOR_UPDATE')
 	self:RegisterMessage('ITEM_FRAME_SPACING_UPDATE')
 	self:RegisterMessage('ITEM_FRAME_COLUMNS_UPDATE')
 end
@@ -271,8 +300,8 @@ function FrameOptions:UpdateWidgets()
 
 	local settings = self:GetSettings()
 
---	self:GetColorSelector():SetColor(settings:GetFrameColor())
---	self:GetBorderColorSelector():SetColor(settings:GetFrameBorderColor())
+	self:GetColorSelector():SetColor(settings:GetFrameColor())
+	self:GetBorderColorSelector():SetColor(settings:GetFrameBorderColor())
 
 	self:GetColumnsSlider():SetValue(settings:GetItemFrameColumns())
 	self:GetSpacingSlider():SetValue(settings:GetItemFrameSpacing())
