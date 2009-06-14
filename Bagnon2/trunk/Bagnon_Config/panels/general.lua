@@ -42,9 +42,10 @@ function GeneralOptions:UpdateMessages()
 		return
 	end
 
-	self:RegisterMessage('EMPTY_ITEM_SLOT_TEXTURE_UPDATE')
+	self:RegisterMessage('SHOW_EMPTY_ITEM_SLOT_TEXTURE_UPDATE')
 	self:RegisterMessage('ITEM_HIGHLIGHT_QUALITY_UPDATE')
 	self:RegisterMessage('ITEM_HIGHLIGHT_QUEST_UPDATE')
+	self:RegisterMessage('LOCK_FRAME_POSITIONS_UPDATE')
 end
 
 function GeneralOptions:ITEM_HIGHLIGHT_QUALITY_UPDATE(msg, enable)
@@ -55,8 +56,12 @@ function GeneralOptions:ITEM_HIGHLIGHT_QUEST_UPDATE(msg, enable)
 	self:GetHighlightQuestItemsCheckbox():UpdateChecked()
 end
 
-function GeneralOptions:EMPTY_ITEM_SLOT_TEXTURE_UPDATE(msg, enable)
+function GeneralOptions:SHOW_EMPTY_ITEM_SLOT_TEXTURE_UPDATE(msg, enable)
 	self:GetEmptyItemSlotTextureCheckbox():UpdateChecked()
+end
+
+function GeneralOptions:LOCK_FRAME_POSITIONS_UPDATE(msg, enable)
+	self:GetLockFramePositionsCheckbox():UpdateChecked()
 end
 
 
@@ -73,6 +78,9 @@ function GeneralOptions:AddWidgets()
 
 	local highightQuestItems = self:CreateHighlightQuestItemsCheckbox()
 	highightQuestItems:SetPoint('TOPLEFT', highlightItemsByQuality, 'BOTTOMLEFT', 0, 0)
+
+	local lockFramePositions = self:CreateLockFramePositionsCheckbox()
+	lockFramePositions:SetPoint('TOPLEFT', highightQuestItems, 'BOTTOMLEFT', 0, 0)
 end
 
 function GeneralOptions:UpdateWidgets()
@@ -148,6 +156,27 @@ end
 
 function GeneralOptions:GetHighlightQuestItemsCheckbox()
 	return self.highlightQuestItemsCheckbox
+end
+
+
+--lock frame positions
+function GeneralOptions:CreateLockFramePositionsCheckbox()
+	local button = Bagnon.OptionsCheckButton:New(L.LockFramePositions, self)
+
+	button.OnEnableSetting = function(self, enable)
+		Bagnon.Settings:SetLockFramePositions(enable)
+	end
+
+	button.IsSettingEnabled = function(self)
+		return Bagnon.Settings:AreFramePositionsLocked()
+	end
+
+	self.lockFramePositionsCheckbox = button
+	return button
+end
+
+function GeneralOptions:GetLockFramePositionsCheckbox()
+	return self.lockFramePositionsCheckbox
 end
 
 

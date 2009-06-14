@@ -27,58 +27,24 @@ function FrameOptions:ShowFrame(frameID)
 	InterfaceOptionsFrame_OpenToCategory(self)
 end
 
-function FrameOptions:AddWidgets()
-	--add frame selector
-	local frameSelector = self:CreateFrameSelector()
-	frameSelector:SetPoint('TOPLEFT', self, 'TOPLEFT', -4, -64)
-
-	--[[ Colors ]]--
-	
-	--add color selector
-	local frameColor = self:CreateColorSelector()
-	frameColor:SetPoint('TOPLEFT', frameSelector, 'BOTTOMLEFT', 16, -8)
-		
-	--add border colors selector
-	local frameBorderColor = self:CreateBorderColorSelector()
-	frameBorderColor:SetPoint('TOPLEFT', frameColor, 'BOTTOMLEFT', 0, -4)
-
-	--[[ checkboxes ]]--
-	
-	--lock position
-	local lockPosition = self:CreateLockPositionCheckbox()
-	lockPosition:SetPoint('TOPLEFT', frameBorderColor, 'BOTTOMLEFT', -4, -2)
-	
-	--toplevel
-	
-	--[[ Sliders ]]--
-	
-	--add frame strata slider?
-	
-	--add opacity slider
-	local opacity = self:CreateOpacitySlider()
-	opacity:SetPoint('BOTTOMLEFT', self, 'BOTTOMLEFT', 12, 16)
-	opacity:SetPoint('BOTTOMRIGHT', self, 'BOTTOMRIGHT', -48, 16)
-	
-	--add scale slider
-	local scale = self:CreateScaleSlider()
-	scale:SetPoint('BOTTOMLEFT', opacity, 'TOPLEFT', 0, 20)
-	scale:SetPoint('BOTTOMRIGHT', opacity, 'TOPRIGHT', 0, 20)
-	
-	--add scale slider
-	local spacing = self:CreateSpacingSlider()
-	spacing:SetPoint('BOTTOMLEFT', scale, 'TOPLEFT', 0, 20)
-	spacing:SetPoint('BOTTOMRIGHT', scale, 'TOPRIGHT', 0, 20)
-	
-	--add scale slider
-	local cols = self:CreateColumnsSlider()
-	cols:SetPoint('BOTTOMLEFT', spacing, 'TOPLEFT', 0, 20)
-	cols:SetPoint('BOTTOMRIGHT', spacing, 'TOPRIGHT', 0, 20)
-end
-
 
 --[[
 	Messages
 --]]
+
+function FrameOptions:UpdateMessages()
+	if not self:IsVisible() then
+		self:UnregisterAllMessages()
+		return
+	end
+
+	self:RegisterMessage('FRAME_SCALE_UPDATE')
+	self:RegisterMessage('FRAME_OPACITY_UPDATE')
+	self:RegisterMessage('FRAME_COLOR_UPDATE')
+	self:RegisterMessage('FRAME_BORDER_COLOR_UPDATE')
+	self:RegisterMessage('ITEM_FRAME_SPACING_UPDATE')
+	self:RegisterMessage('ITEM_FRAME_COLUMNS_UPDATE')
+end
 
 function FrameOptions:FRAME_SCALE_UPDATE(msg, frameID, scale)
 	if self:GetFrameID() == frameID then
@@ -116,12 +82,6 @@ function FrameOptions:ITEM_FRAME_COLUMNS_UPDATE(msg, frameID, columns)
 	end
 end
 
-function FrameOptions:FRAME_MOVABLE_UPDATE(msg, frameID, canMoveFrame)
-	if self:GetFrameID() == frameID then
-		self:GetLockPositionCheckBox():EnableSetting(not canMoveFrame)
-	end
-end
-
 
 --[[
 	Frame Events
@@ -129,7 +89,6 @@ end
 
 function FrameOptions:OnShow()
 	self:UpdateMessages()
---	self:UpdateWidgets()
 end
 
 function FrameOptions:OnHide()
@@ -140,6 +99,64 @@ end
 --[[ 
 	Components
 --]]
+
+function FrameOptions:AddWidgets()
+	--[[ Dropdowns ]]--
+
+	--add frame selector
+	local frameSelector = self:CreateFrameSelector()
+	frameSelector:SetPoint('TOPLEFT', self, 'TOPLEFT', -4, -64)
+
+	--[[ Colors ]]--
+	
+	--add color selector
+	local frameColor = self:CreateColorSelector()
+	frameColor:SetPoint('TOPLEFT', frameSelector, 'BOTTOMLEFT', 16, -8)
+		
+	--add border colors selector
+	local frameBorderColor = self:CreateBorderColorSelector()
+	frameBorderColor:SetPoint('TOPLEFT', frameColor, 'BOTTOMLEFT', 0, -4)
+
+	
+	--[[ Sliders ]]--
+	
+	--add opacity slider
+	local opacity = self:CreateOpacitySlider()
+	opacity:SetPoint('BOTTOMLEFT', self, 'BOTTOMLEFT', 12, 16)
+	opacity:SetPoint('BOTTOMRIGHT', self, 'BOTTOMRIGHT', -48, 16)
+	
+	--add scale slider
+	local scale = self:CreateScaleSlider()
+	scale:SetPoint('BOTTOMLEFT', opacity, 'TOPLEFT', 0, 20)
+	scale:SetPoint('BOTTOMRIGHT', opacity, 'TOPRIGHT', 0, 20)
+	
+	--add scale slider
+	local spacing = self:CreateSpacingSlider()
+	spacing:SetPoint('BOTTOMLEFT', scale, 'TOPLEFT', 0, 20)
+	spacing:SetPoint('BOTTOMRIGHT', scale, 'TOPRIGHT', 0, 20)
+	
+	--add scale slider
+	local cols = self:CreateColumnsSlider()
+	cols:SetPoint('BOTTOMLEFT', spacing, 'TOPLEFT', 0, 20)
+	cols:SetPoint('BOTTOMRIGHT', spacing, 'TOPRIGHT', 0, 20)
+end
+
+function FrameOptions:UpdateWidgets()
+	if not self:IsVisible() then 
+		return 
+	end
+
+	local settings = self:GetSettings()
+
+	self:GetColorSelector():SetColor(settings:GetFrameColor())
+	self:GetBorderColorSelector():SetColor(settings:GetFrameBorderColor())
+
+	self:GetColumnsSlider():SetValue(settings:GetItemFrameColumns())
+	self:GetSpacingSlider():SetValue(settings:GetItemFrameSpacing())
+
+	self:GetScaleSlider():SetValue(settings:GetFrameScale() * 100)
+	self:GetOpacitySlider():SetValue(settings:GetFrameOpacity() * 100)
+end
 
 
 --[[ Dropdowns ]]--
@@ -331,40 +348,6 @@ end
 --[[ 
 	Update Methods
 --]]
-
-function FrameOptions:UpdateMessages()
-	if not self:IsVisible() then
-		self:UnregisterAllMessages()
-		return
-	end
-
-	self:RegisterMessage('FRAME_SCALE_UPDATE')
-	self:RegisterMessage('FRAME_OPACITY_UPDATE')
-	self:RegisterMessage('FRAME_COLOR_UPDATE')
-	self:RegisterMessage('FRAME_BORDER_COLOR_UPDATE')
-	self:RegisterMessage('ITEM_FRAME_SPACING_UPDATE')
-	self:RegisterMessage('ITEM_FRAME_COLUMNS_UPDATE')
-	self:RegisterMessage('FRAME_MOVABLE_UPDATE')
-end
-
-function FrameOptions:UpdateWidgets()
-	if not self:IsVisible() then 
-		return 
-	end
-
-	local settings = self:GetSettings()
-
-	self:GetColorSelector():SetColor(settings:GetFrameColor())
-	self:GetBorderColorSelector():SetColor(settings:GetFrameBorderColor())
-
-	self:GetColumnsSlider():SetValue(settings:GetItemFrameColumns())
-	self:GetSpacingSlider():SetValue(settings:GetItemFrameSpacing())
-
-	self:GetScaleSlider():SetValue(settings:GetFrameScale() * 100)
-	self:GetOpacitySlider():SetValue(settings:GetFrameOpacity() * 100)
-	
-	self:GetLockPositionCheckBox():EnableSetting(not settings:IsMovable())
-end
 
 function FrameOptions:SetFrameID(frameID)
 	if self:GetFrameID() ~= frameID then
