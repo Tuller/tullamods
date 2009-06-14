@@ -46,6 +46,7 @@ function GeneralOptions:UpdateMessages()
 	self:RegisterMessage('ITEM_HIGHLIGHT_QUALITY_UPDATE')
 	self:RegisterMessage('ITEM_HIGHLIGHT_QUEST_UPDATE')
 	self:RegisterMessage('LOCK_FRAME_POSITIONS_UPDATE')
+	self:RegisterMessage('SLOT_ORDER_UPDATE')
 end
 
 function GeneralOptions:ITEM_HIGHLIGHT_QUALITY_UPDATE(msg, enable)
@@ -62,6 +63,10 @@ end
 
 function GeneralOptions:LOCK_FRAME_POSITIONS_UPDATE(msg, enable)
 	self:GetLockFramePositionsCheckbox():UpdateChecked()
+end
+
+function GeneralOptions:SLOT_ORDER_UPDATE(msg, enable)
+	self:GetReverseSlotOrderCheckbox():UpdateChecked()
 end
 
 
@@ -81,6 +86,9 @@ function GeneralOptions:AddWidgets()
 
 	local lockFramePositions = self:CreateLockFramePositionsCheckbox()
 	lockFramePositions:SetPoint('TOPLEFT', highightQuestItems, 'BOTTOMLEFT', 0, 0)
+	
+	local reverseSlotOrdering = self:CreateReverseSlotOrderCheckbox()
+	reverseSlotOrdering:SetPoint('TOPLEFT', lockFramePositions, 'BOTTOMLEFT', 0, 0)
 end
 
 function GeneralOptions:UpdateWidgets()
@@ -91,6 +99,7 @@ function GeneralOptions:UpdateWidgets()
 	self:GetEmptyItemSlotTextureCheckbox():UpdateChecked()
 	self:GetHighlightItemsByQualityCheckbox():UpdateChecked()
 	self:GetHighlightQuestItemsCheckbox():UpdateChecked()
+	self:GetReverseSlotOrderCheckbox():UpdateChecked()
 end
 
 
@@ -177,6 +186,26 @@ end
 
 function GeneralOptions:GetLockFramePositionsCheckbox()
 	return self.lockFramePositionsCheckbox
+end
+
+--reverse slot ordering
+function GeneralOptions:CreateReverseSlotOrderCheckbox()
+	local button = Bagnon.OptionsCheckButton:New(L.ReverseSlotOrdering, self)
+
+	button.OnEnableSetting = function(self, enable)
+		Bagnon.Settings:SetReverseSlotOrder(enable)
+	end
+
+	button.IsSettingEnabled = function(self)
+		return Bagnon.Settings:IsSlotOrderReversed()
+	end
+
+	self.reverseSlotOrderCheckbox = button
+	return button
+end
+
+function GeneralOptions:GetReverseSlotOrderCheckbox()
+	return self.reverseSlotOrderCheckbox
 end
 
 
