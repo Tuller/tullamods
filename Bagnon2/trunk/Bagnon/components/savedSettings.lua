@@ -132,7 +132,7 @@ function SavedSettings:GetDefaultProfileSettings(profileName)
 		highlightQuestItems = true,
 		showEmptyItemSlotTexture = true,
 		lockFramePositions = true,
-		reverseSlotOrder false,
+		reverseSlotOrder = false,
 	}
 end
 
