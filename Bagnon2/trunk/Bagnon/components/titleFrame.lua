@@ -56,7 +56,7 @@ function TitleFrame:OnHide()
 end
 
 function TitleFrame:OnMouseDown()
-	if self:IsFrameMovable() then
+	if self:IsFrameMovable() or IsAltKeyDown() then
 		self:StartMovingFrame()
 	end
 end
