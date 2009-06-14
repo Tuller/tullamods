@@ -127,7 +127,12 @@ end
 
 function SavedSettings:GetDefaultProfileSettings(profileName)
 	return {
-		frames = {}
+		frames = {},
+		highlightItemsByQuality = true,
+		highlightQuestItems = true,
+		showEmptyItemSlotTexture = true,
+		lockFramePositions = true,
+		reverseSlotOrder false,
 	}
 end
 
