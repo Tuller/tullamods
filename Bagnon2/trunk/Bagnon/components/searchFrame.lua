@@ -54,13 +54,13 @@ end
 
 function SearchFrame:TEXT_SEARCH_ENABLE(msg, frameID)
 	if self:GetFrameID() == frameID then
-		self:Show()
+		self:UpdateShown()
 	end
 end
 
 function SearchFrame:TEXT_SEARCH_DISABLE(msg, frameID)
 	if self:GetFrameID() == frameID then
-		self:Hide()
+		self:UpdateShown()
 	end
 end
 
@@ -110,7 +110,9 @@ end
 
 function SearchFrame:UpdateShown()
 	if self:IsSearchEnabled() then
-		self:Show()
+		if not self:IsShown() then
+			UIFrameFadeIn(self, 0.1)
+		end
 	else
 		self:Hide()
 	end

@@ -41,13 +41,13 @@ end
 
 function BagFrame:BAG_FRAME_SHOW(msg, frameID)
 	if frameID == self:GetFrameID() then
-		self:Show()
+		self:UpdateShown()
 	end
 end
 
 function BagFrame:BAG_FRAME_HIDE(msg, frameID)
 	if frameID == self:GetFrameID() then
-		self:Hide()
+		self:UpdateShown()
 	end
 end
 
@@ -70,7 +70,9 @@ end
 
 function BagFrame:UpdateShown()
 	if self:IsBagFrameShown() then
-		self:Show()
+		if not self:IsShown() then
+			UIFrameFadeIn(self, 0.1)
+		end
 	else
 		self:Hide()
 	end
