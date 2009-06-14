@@ -1,9 +1,6 @@
 general settings:
 * Hide frames when entering combat
 * Hide empty item slot background
-* Highlight items by quality
-* Highlight quest items
-* Reverse item slot ordering
 * Enable bank frame 		(requires restart)
 * Enable inventory frame 	(requires restart)
 * Enable keyring 		(requires restart)

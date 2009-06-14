@@ -65,10 +65,10 @@ function Bagnon:CreateLDBLauncher()
 			if not tooltip or not tooltip.AddLine then return end
 
 			tooltip:AddLine('Bagnon')
-			tooltip:AddLine('Left Click to toggle your inventory.', 1, 1, 1)
-			tooltip:AddLine('Shift-Left Click to toggle your bank.', 1, 1, 1)
-			tooltip:AddLine('Alt-Left Click to toggle your keyring.', 1, 1, 1)
-			tooltip:AddLine('Right Click to open the options menu.', 1, 1, 1)
+			tooltip:AddLine(L.TipShowInventory, 1, 1, 1)
+			tooltip:AddLine(L.TipShowBank, 1, 1, 1)
+			tooltip:AddLine(L.TipShowKeyring, 1, 1, 1)
+			tooltip:AddLine(L.TipShowOptions, 1, 1, 1)
 		end,
 	})
 end

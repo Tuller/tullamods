@@ -3,7 +3,7 @@
 ## Author: Tuller
 ## Notes: Single window displays for your inventory, bank, and keys
 ## SavedVariables: BagnonSettings
-## Version: 2.1.0
+## Version: 2.2.0
 ## OptionalDeps: Ace3, Bagnon_Forever, Bagnon_Armory
 embeds.xml
 localization.xml

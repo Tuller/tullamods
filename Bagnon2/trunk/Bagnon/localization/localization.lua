@@ -46,3 +46,9 @@ L.TipShowSearch = 'Click to show the search frame.'
 L.TipShowSearch = 'Click to search.'
 L.TipShowFrameConfig = 'Click to configure this frame.'
 L.Total = 'Total'
+
+--databroker tooltips
+L.TipShowBank = 'Shift-Left Click to toggle your bank.'
+L.TipShowInventory = 'Left Click to toggle your inventory.'
+L.TipShowKeyring = 'Alt-Left Click to toggle your keyring.'
+L.TipShowOptions = 'Right Click to open the options menu.'

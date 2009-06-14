@@ -15,6 +15,7 @@ local ICON_SIZE = 18
 
 function BrokerDisplay:New(id, frameID, parent)
 	local obj = self:Bind(CreateFrame('Button', nil, parent))
+	obj:RegisterForClicks('anyUp')
 	obj:SetID(id)
 
 	obj.left = obj:CreateLeftButton()
