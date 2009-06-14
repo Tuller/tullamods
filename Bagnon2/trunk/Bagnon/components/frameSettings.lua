@@ -308,33 +308,59 @@ function FrameSettings:IsBagSlotShown(slot)
 	return false
 end
 
+function FrameSettings:IsBagSlotHidden(slot)
+	for i, bagSlot in self:GetHiddenBagSlots() do
+		if bagSlot == slot then
+			return true
+		end
+	end
+	return false
+end
+
 --returns an iteratior for all bag slots marked as hidden for this frame
 function FrameSettings:GetHiddenBagSlots()
 	return ipairs(self:GetDB():GetHiddenBags())
 end
 
+
+--[[ Bag Slot Iterators ]]--
+
 --returns an iterator for all bag slots that are available to this frame and marked as visible
+local function reverseVisibleSlotIterator(obj, i)
+	local bagSlots = obj:GetDB():GetBags()
+	local nextSlot = i - 1
+
+	for j = nextSlot, 1, -1 do
+		local slot = bagSlots[j]
+		if not obj:IsBagSlotHidden(slot) then
+			return j, slot
+		end
+	end
+end
+
 local function visibleSlotIterator(obj, i)
 	local bagSlots = obj:GetDB():GetBags()
-	for j = i + 1, #bagSlots do
+	local nextSlot = i + 1
+
+	for j = nextSlot, #bagSlots do
 		local slot = bagSlots[j]
-		local found = false
-
-		for _, hiddenSlot in obj:GetHiddenBagSlots() do
-			if hiddenSlot == slot then
-				found = true
-				break
-			end
-		end
-
-		if slot and not found then
+		if not obj:IsBagSlotHidden(slot) then
 			return j, slot
 		end
 	end
 end
 
 function FrameSettings:GetVisibleBagSlots()
+	if self:IsSlotOrderReversed() then
+		local bagSlots = self:GetDB():GetBags()
+		return reverseVisibleSlotIterator, self, #bagSlots + 1
+	end
 	return visibleSlotIterator, self, 0
+end
+
+
+function FrameSettings:IsSlotOrderReversed()
+	return Bagnon.Settings:IsSlotOrderReversed()
 end
 
 

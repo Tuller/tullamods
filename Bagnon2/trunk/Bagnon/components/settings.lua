@@ -80,3 +80,16 @@ end
 function Settings:AreFramePositionsLocked()
 	return self:GetDB().lockFramePositions
 end
+
+
+--item slot ordering
+function Settings:SetReverseSlotOrder(enable)
+	if self:IsSlotOrderReversed() ~= enable then
+		self:GetDB().reverseSlotOrder = enable
+		self:SendMessage('SLOT_ORDER_UPDATE', enable)
+	end
+end
+
+function Settings:IsSlotOrderReversed()
+	return self:GetDB().reverseSlotOrder
+end

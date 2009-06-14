@@ -91,6 +91,10 @@ function ItemFrame:ITEM_FRAME_COLUMNS_UPDATE(msg, frameID, columns)
 	end
 end
 
+function ItemFrame:SLOT_ORDER_UPDATE(msg, enable)
+	self:RequestLayout()
+end
+
 function ItemFrame:RegisterItemEvent(...)
 	Bagnon.BagEvents:Listen(self, ...)
 end
@@ -149,6 +153,7 @@ function ItemFrame:UpdateEvents()
 		self:RegisterMessage('PLAYER_UPDATE')
 		self:RegisterMessage('ITEM_FRAME_SPACING_UPDATE')
 		self:RegisterMessage('ITEM_FRAME_COLUMNS_UPDATE')
+		self:RegisterMessage('SLOT_ORDER_UPDATE')
 	end
 end
 
