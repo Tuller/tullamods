@@ -73,6 +73,7 @@ function OmniCC:InitDB()
 			minScale = 0.5, --the minimum scale we want to show cooldown counts at, anything below will be hidden
 			minDuration = 3, --the minimum duration we want to show cooldowns for, anything below will not show a timer
 			minFinishEffectDuration = 30, --the minimum duration a cooldown should have for completion effects
+			tenthsOfSecondsThreshold = 2,
 
 			style = {
 				short = {r = 1, g = 0, b = 0, s = 1.25}, -- <= 5 seconds
@@ -98,7 +99,7 @@ function OmniCC:CheckVersion()
 	if major ~= cMajor then
 		self:LoadDefaults()
 	elseif minor ~= cMinor then
-		self:UpdateSettings()
+		self:UpdateSettings(minor, bugfix)
 	end
 
 	if self.sets.version ~= CURRENT_VERSION then
@@ -106,10 +107,8 @@ function OmniCC:CheckVersion()
 	end
 end
 
-function OmniCC:UpdateSettings()
-	self.sets.font = SML:GetDefault('font')
-	self.sets.usePulse = nil
-	self.sets.minFinishEffectDuration = 30
+function OmniCC:UpdateSettings(minor, bugfix)
+	self.sets.tenthsOfSecondsThreshold = 2
 end
 
 function OmniCC:UpdateVersion()
@@ -300,6 +299,11 @@ end
 
 --[[ Format Functions ]]--
 
+--the cooldown duration necessary to display tenths of seconds
+function OmniCC:GetTenthsOfSecondsThreshold()
+	return self.sets.tenthsOfSecondsThreshold or 2
+end
+
 function OmniCC:GetFormattedTime(s)
 	if s >= DAY then
 		return format('%dd', floor(s/DAY + 0.5)), s % DAY
@@ -311,7 +315,7 @@ function OmniCC:GetFormattedTime(s)
 		end
 		return format('%dm', floor(s/MINUTE + 0.5)), s % MINUTE
 	end
-	if s < 2 and self:UseTenthsOfSeconds() then
+	if self:UseTenthsOfSeconds() and s < self:GetTenthsOfSecondsThreshold() then
 		return format('%.1f', s), (s * 100 - floor(s * 100))/100
 	end
 	return floor(s + 0.5), s - floor(s)
