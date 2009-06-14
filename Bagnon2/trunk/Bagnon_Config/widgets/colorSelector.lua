@@ -13,8 +13,8 @@ Bagnon.OptionsColorSelector = ColorSelector
 function ColorSelector:New(name, parent, hasOpacity)
 	local f = self:Bind(CreateFrame('Button', parent:GetName() .. name, parent))
 	f.hasOpacity = hasOpacity
-	f:SetWidth(20)
-	f:SetHeight(20)
+	f:SetWidth(18)
+	f:SetHeight(18)
 
 	if hasOpacity then
 		f.swatchFunc = function()
@@ -44,14 +44,14 @@ function ColorSelector:New(name, parent, hasOpacity)
 	f:SetNormalTexture(nt)
 
 	local bg = f:CreateTexture(nil, 'BACKGROUND')
-	bg:SetWidth(18)
-	bg:SetHeight(18)
+	bg:SetWidth(16)
+	bg:SetHeight(16)
 	bg:SetTexture(1, 1, 1)
 	bg:SetPoint('CENTER')
 	f.bg = bg
 
 	local text = f:CreateFontString(nil, 'ARTWORK', 'GameFontHighlight')
-	text:SetPoint('LEFT', f, 'RIGHT', 2, 0)
+	text:SetPoint('LEFT', f, 'RIGHT', 4, 0)
 	text:SetText(name)
 	f.text = text
 

@@ -24,6 +24,7 @@ function OptionsSlider:New(name, parent, low, high, step)
 	text:SetPoint('LEFT', f, 'RIGHT', 7, 0)
 	f.valText = text
 
+	f:SetScript('OnShow', f.OnShow)
 	f:SetScript('OnMouseWheel', f.OnMouseWheel)
 	f:SetScript('OnValueChanged', f.OnValueChanged)
 	f:SetScript('OnMouseWheel', f.OnMouseWheel)

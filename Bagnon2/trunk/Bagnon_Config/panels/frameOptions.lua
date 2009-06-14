@@ -11,7 +11,9 @@ FrameOptions:Hide()
 Bagnon.FrameOptions = FrameOptions
 
 
---[[ Startup ]]--
+--[[ 
+	Startup
+--]]
 
 function FrameOptions:Load()
 	self:SetFrameID('inventory')
@@ -43,6 +45,9 @@ function FrameOptions:AddWidgets()
 	--[[ checkboxes ]]--
 	
 	--lock position
+	local lockPosition = self:CreateLockPositionCheckbox()
+	lockPosition:SetPoint('TOPLEFT', frameBorderColor, 'BOTTOMLEFT', -4, -2)
+	
 	--toplevel
 	
 	--[[ Sliders ]]--
@@ -71,7 +76,9 @@ function FrameOptions:AddWidgets()
 end
 
 
---[[ Messages ]]--
+--[[
+	Messages
+--]]
 
 function FrameOptions:FRAME_SCALE_UPDATE(msg, frameID, scale)
 	if self:GetFrameID() == frameID then
@@ -109,12 +116,20 @@ function FrameOptions:ITEM_FRAME_COLUMNS_UPDATE(msg, frameID, columns)
 	end
 end
 
+function FrameOptions:FRAME_MOVABLE_UPDATE(msg, frameID, canMoveFrame)
+	if self:GetFrameID() == frameID then
+		self:GetLockPositionCheckBox():EnableSetting(not canMoveFrame)
+	end
+end
 
---[[ Frame Events ]]--
+
+--[[
+	Frame Events
+--]]
 
 function FrameOptions:OnShow()
 	self:UpdateMessages()
-	self:UpdateWidgets()
+--	self:UpdateWidgets()
 end
 
 function FrameOptions:OnHide()
@@ -122,8 +137,14 @@ function FrameOptions:OnHide()
 end
 
 
---[[ Components ]]--
+--[[ 
+	Components
+--]]
 
+
+--[[ Dropdowns ]]--
+
+--frame selector
 function FrameOptions:CreateFrameSelector()
 	local dropdown = Bagnon.OptionsDropdown:New(L.Frame, self, 200)
 	dropdown.titleText:Hide()
@@ -150,6 +171,10 @@ function FrameOptions:GetFrameSelector()
 	return self.frameSelector
 end
 
+
+--[[ Color Pickers ]]--
+
+--frame color
 function FrameOptions:CreateColorSelector()
 	local selector = Bagnon.OptionsColorSelector:New(L.FrameColor, self, true)
 	
@@ -169,6 +194,7 @@ function FrameOptions:GetColorSelector()
 	return self.colorSelector
 end
 
+--background color
 function FrameOptions:CreateBorderColorSelector()
 	local selector = Bagnon.OptionsColorSelector:New(L.FrameBorderColor, self, true)
 	
@@ -187,6 +213,9 @@ end
 function FrameOptions:GetBorderColorSelector()
 	return self.borderColorSelector
 end
+
+
+--[[ Sliders ]]--
 
 --columns
 function FrameOptions:CreateColumnsSlider()
@@ -277,7 +306,31 @@ function FrameOptions:GetOpacitySlider()
 end
 
 
---[[ Update Methods ]]--
+--[[ Check Boxes ]]--
+
+function FrameOptions:CreateLockPositionCheckbox()
+	local button = Bagnon.OptionsCheckButton:New(L.LockFramePosition, self)
+	
+	button.OnEnableSetting = function(self, enable)
+		self:GetParent():GetSettings():SetMovable(not enable)
+	end
+	
+	button.IsSettingEnabled = function(self, enable)
+		return not self:GetParent():GetSettings():IsMovable()
+	end
+	
+	self.lockPositionCheckbox = button
+	return button
+end
+
+function FrameOptions:GetLockPositionCheckBox()
+	return self.lockPositionCheckbox
+end
+
+
+--[[ 
+	Update Methods
+--]]
 
 function FrameOptions:UpdateMessages()
 	if not self:IsVisible() then
@@ -291,12 +344,13 @@ function FrameOptions:UpdateMessages()
 	self:RegisterMessage('FRAME_BORDER_COLOR_UPDATE')
 	self:RegisterMessage('ITEM_FRAME_SPACING_UPDATE')
 	self:RegisterMessage('ITEM_FRAME_COLUMNS_UPDATE')
+	self:RegisterMessage('FRAME_MOVABLE_UPDATE')
 end
 
 function FrameOptions:UpdateWidgets()
-	--print('UpdateWidgets')
-
-	if not self:IsVisible() then return end
+	if not self:IsVisible() then 
+		return 
+	end
 
 	local settings = self:GetSettings()
 
@@ -308,6 +362,8 @@ function FrameOptions:UpdateWidgets()
 
 	self:GetScaleSlider():SetValue(settings:GetFrameScale() * 100)
 	self:GetOpacitySlider():SetValue(settings:GetFrameOpacity() * 100)
+	
+	self:GetLockPositionCheckBox():EnableSetting(not settings:IsMovable())
 end
 
 function FrameOptions:SetFrameID(frameID)
