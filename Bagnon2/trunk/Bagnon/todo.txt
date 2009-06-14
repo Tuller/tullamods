@@ -1,4 +1,5 @@
 general settings:
+* Item slot coloring
 * Hide frames when entering combat
 * Enable bank frame 		(requires restart)
 * Enable inventory frame 	(requires restart)
