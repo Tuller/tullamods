@@ -1,0 +1,23 @@
+general settings:
+* Hide frames when entering combat
+* Hide empty item slot background
+* Highlight items by quality
+* Highlight quest items
+* Reverse item slot ordering
+* Enable bank frame 		(requires restart)
+* Enable inventory frame 	(requires restart)
+* Enable keyring 		(requires restart)
+
+frame settings:
+* Frame level (low, medium, high, always on top)
+
+
+automatic display settings:
+									Show Bank	Show Inventory	Show Keyring
+* When visiting the bank			x			x				x
+* When visiting the guild bank		x			x				x
+* When trading						x			x				x
+* When visiting the auction house	x			x				x
+* When crafting						x			x				x
+* When checking mail				x			x				x
+* When visiting a vendor			x			x				x

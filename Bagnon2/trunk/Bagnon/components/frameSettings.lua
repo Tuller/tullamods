@@ -110,15 +110,8 @@ function FrameSettings:GetFramePosition()
 	return point, x, y
 end
 
-function FrameSettings:SetMovable(enable)
-	if self:IsMovable() ~= enable then
-		self:GetDB():SetMovable(enable)
-		self:SendMessage('FRAME_MOVABLE_UPDATE', self:IsMovable())
-	end
-end
-
 function FrameSettings:IsMovable()
-	return self:GetDB():IsMovable()
+	return not Bagnon.Settings:AreFramePositionsLocked()
 end
 
 

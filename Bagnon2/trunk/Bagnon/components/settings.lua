@@ -60,10 +60,23 @@ end
 function Settings:SetShowEmptyItemSlotTexture(enable)
 	if self:ShowingEmptyItemSlotTextures() ~= enable then
 		self:GetDB().showEmptyItemSlotTexture = enable
-		self:SendMessage('EMPTY_ITEM_SLOT_TEXTURE_UPDATE', enable)
+		self:SendMessage('SHOW_EMPTY_ITEM_SLOT_TEXTURE_UPDATE', enable)
 	end
 end
 
 function Settings:ShowingEmptyItemSlotTextures()
 	return self:GetDB().showEmptyItemSlotTexture
+end
+
+
+--lock frame positions
+function Settings:SetLockFramePositions(enable)
+	if self:AreFramePositionsLocked() ~= enable then
+		self:GetDB().lockFramePositions = enable
+		self:SendMessage('LOCK_FRAME_POSITIONS_UPDATE', enable)
+	end
+end
+
+function Settings:AreFramePositionsLocked()
+	return self:GetDB().lockFramePositions
 end

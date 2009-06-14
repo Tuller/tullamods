@@ -188,7 +188,7 @@ function ItemSlot:ITEM_HIGHLIGHT_QUEST_UPDATE(msg, enable)
 	self:UpdateBorder()
 end
 
-function ItemSlot:EMPTY_ITEM_SLOT_TEXTURE_UPDATE(msg, enable)
+function ItemSlot:SHOW_EMPTY_ITEM_SLOT_TEXTURE_UPDATE(msg, enable)
 	self:Update()
 end
 
@@ -287,6 +287,7 @@ function ItemSlot:UpdateEvents()
 		self:RegisterMessage('BAG_SEARCH_UPDATE')
 		self:RegisterMessage('ITEM_HIGHLIGHT_QUEST_UPDATE')
 		self:RegisterMessage('ITEM_HIGHLIGHT_QUALITY_UPDATE')
+		self:RegisterMessage('SHOW_EMPTY_ITEM_SLOT_TEXTURE_UPDATE')
 
 		if self:IsBankSlot() then
 			self:RegisterItemSlotEvent('BANK_OPENED')
