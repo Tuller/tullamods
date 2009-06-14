@@ -94,6 +94,15 @@ function SavedFrameSettings:GetPosition()
 	return db.point, db.x, db.y
 end
 
+function SavedFrameSettings:SetMovable(enable)
+	local db = self:GetDB()
+	db.movable = enable or false
+end
+
+function SavedFrameSettings:IsMovable()
+	return self:GetDB().movable
+end
+
 
 --[[ Frame Scale ]]--
 

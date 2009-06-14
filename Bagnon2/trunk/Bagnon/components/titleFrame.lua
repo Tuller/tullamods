@@ -56,7 +56,9 @@ function TitleFrame:OnHide()
 end
 
 function TitleFrame:OnMouseDown()
-	self:StartMovingFrame()
+	if self:IsFrameMovable() then
+		self:StartMovingFrame()
+	end
 end
 
 function TitleFrame:OnMouseUp()
@@ -143,4 +145,8 @@ end
 
 function TitleFrame:GetPlayer()
 	return self:GetSettings():GetPlayerFilter()
+end
+
+function TitleFrame:IsFrameMovable()
+	return self:GetSettings():IsMovable()
 end

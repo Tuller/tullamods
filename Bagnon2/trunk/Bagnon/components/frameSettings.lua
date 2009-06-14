@@ -93,13 +93,42 @@ function FrameSettings:IsFrameShown()
 end
 
 
+--[[ Frame Position ]]--
+
+--position
+function FrameSettings:SetFramePosition(point, x, y)
+	local oPoint, oX, oY = self:GetFramePosition()
+	
+	if not(point == oPoint and x == oX and y == oY) then
+		self:GetDB():SetPosition(point, x, y)
+		self:SendMessage('FRAME_POSITION_UPDATE', self:GetFramePosition())
+	end
+end
+
+function FrameSettings:GetFramePosition()
+	local point, x, y = self:GetDB():GetPosition()
+	return point, x, y
+end
+
+function FrameSettings:SetMovable(enable)
+	if self:IsMovable() ~= enable then
+		self:GetDB():SetMovable(enable)
+		self:SendMessage('FRAME_MOVABLE_UPDATE', self:IsMovable())
+	end
+end
+
+function FrameSettings:IsMovable()
+	return self:GetDB():IsMovable()
+end
+
+
 --[[ Frame Layout ]]--
 
 --scale
 function FrameSettings:SetFrameScale(scale)
 	if self:GetFrameScale() ~= scale then
 		self:GetDB():SetScale(scale)
-		self:SendMessage('FRAME_SCALE_UPDATE', scale)
+		self:SendMessage('FRAME_SCALE_UPDATE', self:GetFrameScale())
 	end
 end
 
@@ -111,26 +140,12 @@ end
 function FrameSettings:SetFrameOpacity(opacity)
 	if self:GetFrameOpacity() ~= opacity then
 		self:GetDB():SetOpacity(opacity)
-		self:SendMessage('FRAME_OPACITY_UPDATE', opacity)
+		self:SendMessage('FRAME_OPACITY_UPDATE', self:GetFrameOpacity())
 	end
 end
 
 function FrameSettings:GetFrameOpacity()
 	return self:GetDB():GetOpacity()
-end
-
---position
-function FrameSettings:SetFramePosition(point, x, y)
-	local oPoint, oX, oY = self:GetFramePosition()
-	
-	if not(point == oPoint and x == oX and y == oY) then
-		self:GetDB():SetPosition(point, x, y)
-		self:SendMessage('FRAME_POSITION_UPDATE', point, x, y)
-	end
-end
-
-function FrameSettings:GetFramePosition()
-	return self:GetDB():GetPosition()
 end
 
 --frame color
@@ -139,7 +154,7 @@ function FrameSettings:SetFrameColor(r, g, b, a)
 
 	if not(pR == r and pG == g and pB == b and pA == a) then
 		self:GetDB():SetColor(r, g, b, a)
-		self:SendMessage('FRAME_COLOR_UPDATE', r, g, b, a)
+		self:SendMessage('FRAME_COLOR_UPDATE', self:GetFrameColor())
 	end
 end
 
@@ -153,7 +168,7 @@ function FrameSettings:SetFrameBorderColor(r, g, b, a)
 
 	if not(pR == r and pG == g and pB == b and pA == a) then
 		self:GetDB():SetBorderColor(r, g, b, a)
-		self:SendMessage('FRAME_BORDER_COLOR_UPDATE', r, g, b, a)
+		self:SendMessage('FRAME_BORDER_COLOR_UPDATE', self:GetFrameBorderColor())
 	end
 end
 

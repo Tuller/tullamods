@@ -180,6 +180,18 @@ function ItemSlot:BAG_SEARCH_UPDATE(msg, frameID, search)
 	end
 end
 
+function ItemSlot:ITEM_HIGHLIGHT_QUALITY_UPDATE(msg, enable)
+	self:UpdateBorder()
+end
+
+function ItemSlot:ITEM_HIGHLIGHT_QUEST_UPDATE(msg, enable)
+	self:UpdateBorder()
+end
+
+function ItemSlot:EMPTY_ITEM_SLOT_TEXTURE_UPDATE(msg, enable)
+	self:Update()
+end
+
 --event registration
 function ItemSlot:RegisterItemSlotEvent(...)
 	Bagnon.BagEvents:Listen(self, ...)
@@ -273,7 +285,9 @@ function ItemSlot:UpdateEvents()
 		self:RegisterMessage('TEXT_SEARCH_ENABLE')
 		self:RegisterMessage('TEXT_SEARCH_DISABLE')
 		self:RegisterMessage('BAG_SEARCH_UPDATE')
-		
+		self:RegisterMessage('ITEM_HIGHLIGHT_QUEST_UPDATE')
+		self:RegisterMessage('ITEM_HIGHLIGHT_QUALITY_UPDATE')
+
 		if self:IsBankSlot() then
 			self:RegisterItemSlotEvent('BANK_OPENED')
 			self:RegisterItemSlotEvent('BANK_CLOSED')
@@ -325,7 +339,10 @@ function ItemSlot:SetTexture(texture)
 end
 
 function ItemSlot:GetEmptyItemTexture()
---	return [[Interface\PaperDoll\UI-Backpack-EmptySlot]]
+	if self:ShowingEmptyItemSlotTexture() then
+		return [[Interface\PaperDoll\UI-Backpack-EmptySlot]]
+	end
+	return nil
 end
 
 --item count
@@ -356,13 +373,24 @@ end
 function ItemSlot:SetBorderQuality(quality)
 	local border = self.border
 
-	if self:GetItem() and quality and quality > 1 then
-		local r, g, b = GetItemQualityColor(quality)
-		border:SetVertexColor(r, g, b, 0.5)
-		border:Show()
-	else
-		border:Hide()
+	if self:HighlightingQuestItems() then
+		if self:IsQuestItem() then
+			border:SetVertexColor(1, 1, 0, 0.5)
+			border:Show()
+			return
+		end
 	end
+
+	if self:HighlightingItemsByQuality() then
+		if self:GetItem() and quality and quality > 1 then
+			local r, g, b = GetItemQualityColor(quality)
+			border:SetVertexColor(r, g, b, 0.5)
+			border:Show()
+			return
+		end
+	end
+
+	border:Hide()
 end
 
 function ItemSlot:UpdateBorder()
@@ -486,6 +514,26 @@ end
 function ItemSlot:GetItemSlotInfo()
 	local texture, count, locked, quality, readable, lootable, link = Bagnon.ItemSlotInfo:GetItemInfo(self:GetPlayer(), self:GetBag(), self:GetID())
 	return texture, count, locked, quality, readable, lootable, link
+end
+
+function ItemSlot:HighlightingItemsByQuality()
+	return Bagnon.Settings:HighlightingItemsByQuality()
+end
+
+function ItemSlot:HighlightingQuestItems()
+	return Bagnon.Settings:HighlightingQuestItems()
+end
+
+function ItemSlot:IsQuestItem()
+	local itemLink = self:GetItem()
+	if not itemLink then
+		return false
+	end
+	return Bagnon.ItemSearch:Find(itemLink, 't:quest|quest')
+end
+
+function ItemSlot:ShowingEmptyItemSlotTexture()
+	return Bagnon.Settings:ShowingEmptyItemSlotTextures()
 end
 
 
