@@ -321,7 +321,11 @@ end
 
 --item texture
 function ItemSlot:SetTexture(texture)
-	SetItemButtonTexture(self, texture or [[Interface\PaperDoll\UI-Backpack-EmptySlot]])
+	SetItemButtonTexture(self, texture or self:GetEmptyItemTexture())
+end
+
+function ItemSlot:GetEmptyItemTexture()
+--	return [[Interface\PaperDoll\UI-Backpack-EmptySlot]]
 end
 
 --item count

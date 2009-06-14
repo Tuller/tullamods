@@ -249,7 +249,7 @@ function SavedFrameSettings:GetDefaultInventorySettings()
 		hasDBOFrame = true,
 
 		--dbo display object
-		dataBrokerObject = nil,
+		dataBrokerObject = 'BagnonLauncher',
 	}
 end
 
@@ -279,7 +279,7 @@ function SavedFrameSettings:GetDefaultBankSettings()
 		hasDBOFrame = true,
 
 		--dbo display object
-		dataBrokerObject = nil,
+		dataBrokerObject = 'BagnonLauncher',
 	}
 end
 
@@ -309,6 +309,6 @@ function SavedFrameSettings:GetDefaultKeyRingSettings()
 		hasDBOFrame = false,
 
 		--dbo display object
-		dataBrokerObject = nil,
+		dataBrokerObject = 'BagnonLauncher',
 	}
 end

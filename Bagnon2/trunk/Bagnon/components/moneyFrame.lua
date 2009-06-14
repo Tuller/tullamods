@@ -98,7 +98,7 @@ function MoneyFrame:OnEnter()
 
 	local totalMoney = 0
 	for i, player in pairs(BagnonDB:GetPlayerList()) do
-		local money = BagnonDB:GetMoney(player) or 0
+		local money = Bagnon.PlayerInfo:GetMoney(player)
 		if money > 0 then
 			totalMoney = totalMoney + money
 			self:AddPlayerTotalToTooltip(player, money, GameTooltip)
@@ -147,10 +147,6 @@ function MoneyFrame:GetPlayer()
 	return self:GetSettings():GetPlayerFilter()
 end
 
-function MoneyFrame:IsCached()
-	return Bagnon.PlayerInfo:IsCached(self:GetPlayer())
-end
-
 function MoneyFrame:SetFrameID(frameID)
 	if self:GetFrameID() ~= frameID then
 		self.frameID = frameID
@@ -163,15 +159,7 @@ function MoneyFrame:GetFrameID()
 end
 
 function MoneyFrame:GetMoney()
-	local money
-	if self:IsCached() then
-		if BagnonDB then
-			money = BagnonDB:GetMoney(self:GetPlayer())
-		end
-	else
-		money = GetMoney()
-	end
-	return money or 0
+	return Bagnon.PlayerInfo:GetMoney(self:GetPlayer())
 end
 
 function MoneyFrame:GetGoldSilverCopper(money)

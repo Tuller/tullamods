@@ -26,6 +26,7 @@ function Bagnon:OnEnable()
 	self:HookBagEvents()
 	self:AddSlashCommands()
 	self:CreateOptionsLoader()
+	self:CreateLDBLauncher()
 end
 
 --create a loader for the options menu
@@ -35,6 +36,41 @@ function Bagnon:CreateOptionsLoader()
 		self:SetScript('OnShow', nil)
 		LoadAddOn('Bagnon_Config')
 	end)
+end
+
+function Bagnon:CreateLDBLauncher()
+	local LDB = LibStub:GetLibrary('LibDataBroker-1.1', true)
+	if not LDB then return end
+	
+	LDB:NewDataObject('BagnonLauncher', {
+		type = 'launcher',
+
+		icon = [[Interface\Icons\INV_Misc_Bag_07]],
+
+		OnClick = function(_, button)
+			if button == 'LeftButton' then
+				if IsShiftKeyDown() then
+					Bagnon:ToggleFrame('bank')
+				elseif IsAltKeyDown() then
+					Bagnon:ToggleFrame('keys')
+				else
+					Bagnon:ToggleFrame('inventory')
+				end
+			elseif button == 'RightButton' then
+				Bagnon:ShowOptions()
+			end
+		end,
+
+		OnTooltipShow = function(tooltip)
+			if not tooltip or not tooltip.AddLine then return end
+
+			tooltip:AddLine('Bagnon')
+			tooltip:AddLine('Left Click to toggle your inventory.', 1, 1, 1)
+			tooltip:AddLine('Shift-Left Click to toggle your bank.', 1, 1, 1)
+			tooltip:AddLine('Alt-Left Click to toggle your keyring.', 1, 1, 1)
+			tooltip:AddLine('Right Click to open the options menu.', 1, 1, 1)
+		end,
+	})
 end
 
 

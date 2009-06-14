@@ -65,7 +65,7 @@ function BrokerDisplay:CreateLeftButton()
 	b:SetNormalFontObject('GameFontNormal')
 	b:SetHighlightFontObject('GameFontHighlight')
 	b:SetText('<')
-	b:SetWidth(b:GetTextWidth() + 2)
+	b:SetWidth(b:GetTextWidth() + 4)
 	b:SetHeight(b:GetTextHeight())
 	b:SetScript('OnClick', function(self) self:GetParent():SetPreviousObject() end)
 	b:SetToplevel(true)
@@ -183,12 +183,12 @@ function BrokerDisplay:UpdateEverything()
 end
 
 function BrokerDisplay:UpdateEvents()
-	local LDB = LibStub:GetLibrary("LibDataBroker-1.1", true)
+	local LDB = LibStub:GetLibrary('LibDataBroker-1.1', true)
 	if LDB then
 		LDB.UnregisterAllCallbacks(self)
 		if self:IsVisible() then
-			LDB.RegisterCallback(self, "LibDataBroker_DataObjectCreated")
-			LDB.RegisterCallback(self, "LibDataBroker_AttributeChanged")
+			LDB.RegisterCallback(self, 'LibDataBroker_DataObjectCreated')
+			LDB.RegisterCallback(self, 'LibDataBroker_AttributeChanged')
 		end
 	end
 	
@@ -250,7 +250,7 @@ function BrokerDisplay:SetObject(objectName)
 end
 
 function BrokerDisplay:GetObject()
-	local LDB = LibStub:GetLibrary("LibDataBroker-1.1", true)
+	local LDB = LibStub:GetLibrary('LibDataBroker-1.1', true)
 	if LDB then
 		return LDB:GetDataObjectByName(self:GetObjectName())
 	end
@@ -262,7 +262,7 @@ function BrokerDisplay:GetObjectName()
 end
 
 function BrokerDisplay:SetNextObject()
-	local LDB = LibStub:GetLibrary("LibDataBroker-1.1", true)
+	local LDB = LibStub:GetLibrary('LibDataBroker-1.1', true)
 	if not LDB then return end
 
 	local currObjName = self:GetObjectName()
@@ -283,10 +283,12 @@ function BrokerDisplay:SetNextObject()
 		end
 		prevObjName = nextObjName
 	end
+	
+	self:SetObject(prevObjName)
 end
 
 function BrokerDisplay:SetPreviousObject()
-	local LDB = LibStub:GetLibrary("LibDataBroker-1.1", true)
+	local LDB = LibStub:GetLibrary('LibDataBroker-1.1', true)
 	if not LDB then return end
 
 	local currObjName = self:GetObjectName()
@@ -307,6 +309,8 @@ function BrokerDisplay:SetPreviousObject()
 		end
 		prevObjName = nextObjName
 	end
+	
+	self:SetObject(prevObjName)
 end
 
 do
@@ -318,7 +322,7 @@ do
 			end
 		end
 
-		local LDB = LibStub:GetLibrary("LibDataBroker-1.1", true)
+		local LDB = LibStub:GetLibrary('LibDataBroker-1.1', true)
 		if LDB then
 			for name, obj in LDB:DataObjectIterator() do
 				table.insert(objects, name)
