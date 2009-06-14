@@ -7,11 +7,11 @@
 		<intersect search> 	:=	<union search> & <union search> ; <union search>
 		<union search>		:=	<negatable search>  | <negatable search> ; <negatable search>
 		<negatable search> 	:=	!<primitive search> ; <primitive search>
-		<primitive search>	:=	<tooltip search> ; <quality search> ; <type search> ; <text search>
-		<tooltip search>	:=  bop ; boa ; bou ; boe ; quest
-		<quality search>	:=	q:<text> ; q:<digit>
-		<type search>		:=	t:<text>
-		<text search>		:=	<text>
+		<primitive search>		:=	<tooltip search> ; <quality search> ; <type search> ; <text search>
+		<tooltip search>		:=  bop ; boa ; bou ; boe ; quest
+		<quality search>		:=	q:<text> ; q:<digit>
+		<type search>			:=	t:<text>
+		<text search>			:=	<text>
 --]]
 
 

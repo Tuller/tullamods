@@ -30,6 +30,7 @@ function Frame:New(frameID)
 	f:SetFrameStrata('HIGH')
 	f:SetFrameID(frameID)
 	f:UpdateEvents()
+	table.insert(UISpecialFrames, f:GetName())
 
 	return f
 end
