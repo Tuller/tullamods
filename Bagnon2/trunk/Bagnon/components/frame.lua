@@ -353,8 +353,7 @@ function Frame:SetFrameLayer(layer)
 end
 
 function Frame:GetFrameLayer()
-	return 'TOPLEVEL'
---	return self:GetSettings():GetFrameLayer()
+	return self:GetSettings():GetFrameLayer()
 end
 
 
@@ -575,6 +574,7 @@ end
 
 function Frame:PlaceBagFrame()
 	if self:HasBagFrame() then
+		--the bag frame has to be created here to respond to events
 		local frame = self:GetBagFrame() or self:CreateBagFrame()
 		if self:IsBagFrameShown() then
 			local menuButtons = self:GetMenuButtons()
@@ -584,6 +584,9 @@ function Frame:PlaceBagFrame()
 			frame:Show()
 
 			return frame:GetWidth(), frame:GetHeight()
+		else
+			frame:Hide()
+			return 0, 0
 		end
 	end
 
