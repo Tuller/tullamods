@@ -187,6 +187,10 @@ function FrameSettings:FrameHasDBOFrame()
 	return self:GetDB():HasDBOFrame()
 end
 
+function FrameSettings:HasSearchFrame()
+	return self:GetFrameID() ~= 'keys'
+end
+
 
 --[[ Broker Display Object ]]--
 

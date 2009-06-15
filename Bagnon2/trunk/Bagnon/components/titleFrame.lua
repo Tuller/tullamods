@@ -14,7 +14,7 @@ Bagnon.TitleFrame = TitleFrame
 
 --[[ Constructor ]]--
 
-function TitleFrame:New(text, frameID, parent)
+function TitleFrame:New(frameID, parent)
 	local b = self:Bind(CreateFrame('Button', nil, parent))	
 	b:SetToplevel(true)
 
@@ -26,9 +26,11 @@ function TitleFrame:New(text, frameID, parent)
 	b:SetScript('OnHide', b.OnHide)
 	b:SetScript('OnMouseDown', b.OnMouseDown)
 	b:SetScript('OnMouseUp', b.OnMouseUp)
+	b:SetScript('OnEnter', b.OnEnter)
+	b:SetScript('OnLeave', b.OnLeave)
+	b:SetScript('OnSizeChanged', b.OnSizeChanged)
 
 	b:SetFrameID(frameID)
-	b:SetTitleText(text)
 	b:UpdateEvents()
 
 	return b
@@ -81,11 +83,15 @@ function TitleFrame:OnLeave()
 	end
 end
 
+function TitleFrame:OnSizeChanged()
+	self:GetFontString():SetWidth(self:GetWidth())
+end
+
 
 --[[ Update Methods ]]--
 
 function TitleFrame:UpdateText()
-	self:SetText(self:GetTitleText():format(self:GetPlayer()))
+	self:SetFormattedText(self:GetTitleText():format(self:GetPlayer()))
 end
 
 function TitleFrame:UpdateTooltip()
@@ -125,15 +131,16 @@ function TitleFrame:GetFrameID()
 	return self.frameID
 end
 
-function TitleFrame:SetTitleText(text)
-	if self:GetTitleText() ~= text then
-		self.titleText = text
-		self:UpdateText()
-	end
-end
-
 function TitleFrame:GetTitleText()
-	return self.titleText or ''
+	if self:GetFrameID() == 'bank' then
+		return L.TitleBank
+	end
+	
+	if self:GetFrameID() == 'keys' then
+		return L.TitleKeys
+	end
+	
+	return L.TitleBags
 end
 
 
