@@ -47,6 +47,7 @@ function GeneralOptions:UpdateMessages()
 	self:RegisterMessage('ITEM_HIGHLIGHT_QUEST_UPDATE')
 	self:RegisterMessage('LOCK_FRAME_POSITIONS_UPDATE')
 	self:RegisterMessage('SLOT_ORDER_UPDATE')
+	self:RegisterMessage('ITEM_SLOT_COLOR_UPDATE')
 end
 
 function GeneralOptions:ITEM_HIGHLIGHT_QUALITY_UPDATE(msg, enable)
@@ -69,26 +70,33 @@ function GeneralOptions:SLOT_ORDER_UPDATE(msg, enable)
 	self:GetReverseSlotOrderCheckbox():UpdateChecked()
 end
 
+function GeneralOptions:ITEM_SLOT_COLOR_UPDATE(msg, enable)
+	self:GetColorItemSlotsCheckbox():UpdateChecked()
+end
+
 
 --[[
 	Widgets
 --]]
 
 function GeneralOptions:AddWidgets()
+	local lockFramePositions = self:CreateLockFramePositionsCheckbox()
+	lockFramePositions:SetPoint('TOPLEFT', self, 'TOPLEFT', 14, -72)
+	
 	local showEmptyItemSlotTextures = self:CreateEmptyItemSlotTextureCheckbox()
-	showEmptyItemSlotTextures:SetPoint('TOPLEFT', self, 'TOPLEFT', 14, -72)
+	showEmptyItemSlotTextures:SetPoint('TOPLEFT', lockFramePositions, 'BOTTOMLEFT', 0, 0)
+	
+	local colorItemSlots = self:CreateColorItemSlotsCheckbox()
+	colorItemSlots:SetPoint('TOPLEFT', showEmptyItemSlotTextures, 'BOTTOMLEFT', 0, 0)
 
 	local highlightItemsByQuality = self:CreateHighlightItemsByQualityCheckbox()
-	highlightItemsByQuality:SetPoint('TOPLEFT', showEmptyItemSlotTextures, 'BOTTOMLEFT', 0, 0)
+	highlightItemsByQuality:SetPoint('TOPLEFT', colorItemSlots, 'BOTTOMLEFT', 0, 0)
 
 	local highightQuestItems = self:CreateHighlightQuestItemsCheckbox()
 	highightQuestItems:SetPoint('TOPLEFT', highlightItemsByQuality, 'BOTTOMLEFT', 0, 0)
-
-	local lockFramePositions = self:CreateLockFramePositionsCheckbox()
-	lockFramePositions:SetPoint('TOPLEFT', highightQuestItems, 'BOTTOMLEFT', 0, 0)
 	
 	local reverseSlotOrdering = self:CreateReverseSlotOrderCheckbox()
-	reverseSlotOrdering:SetPoint('TOPLEFT', lockFramePositions, 'BOTTOMLEFT', 0, 0)
+	reverseSlotOrdering:SetPoint('TOPLEFT', highightQuestItems, 'BOTTOMLEFT', 0, 0)
 end
 
 function GeneralOptions:UpdateWidgets()
@@ -100,6 +108,7 @@ function GeneralOptions:UpdateWidgets()
 	self:GetHighlightItemsByQualityCheckbox():UpdateChecked()
 	self:GetHighlightQuestItemsCheckbox():UpdateChecked()
 	self:GetReverseSlotOrderCheckbox():UpdateChecked()
+	self:GetColorItemSlotsCheckbox():UpdateChecked()
 end
 
 
@@ -206,6 +215,26 @@ end
 
 function GeneralOptions:GetReverseSlotOrderCheckbox()
 	return self.reverseSlotOrderCheckbox
+end
+
+--color item slots
+function GeneralOptions:CreateColorItemSlotsCheckbox()
+	local button = Bagnon.OptionsCheckButton:New(L.ColorItemSlotsByBagType, self)
+
+	button.OnEnableSetting = function(self, enable)
+		Bagnon.Settings:SetColorBagSlots(enable)
+	end
+
+	button.IsSettingEnabled = function(self)
+		return Bagnon.Settings:ColoringBagSlots()
+	end
+
+	self.colorItemSlotsCheckbox = button
+	return button
+end
+
+function GeneralOptions:GetColorItemSlotsCheckbox()
+	return self.colorItemSlotsCheckbox
 end
 
 
