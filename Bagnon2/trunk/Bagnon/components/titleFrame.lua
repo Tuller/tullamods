@@ -26,9 +26,6 @@ function TitleFrame:New(frameID, parent)
 	b:SetScript('OnHide', b.OnHide)
 	b:SetScript('OnMouseDown', b.OnMouseDown)
 	b:SetScript('OnMouseUp', b.OnMouseUp)
-	b:SetScript('OnEnter', b.OnEnter)
-	b:SetScript('OnLeave', b.OnLeave)
-	b:SetScript('OnSizeChanged', b.OnSizeChanged)
 
 	b:SetFrameID(frameID)
 	b:UpdateEvents()
@@ -65,26 +62,6 @@ end
 
 function TitleFrame:OnMouseUp()
 	self:StopMovingFrame()
-end
-
-function TitleFrame:OnEnter()
-	if self:GetRight() > (GetScreenWidth() / 2) then
-		GameTooltip:SetOwner(self, 'ANCHOR_LEFT')
-	else
-		GameTooltip:SetOwner(self, 'ANCHOR_RIGHT')
-	end
-	
-	self:UpdateTooltip()
-end
-
-function TitleFrame:OnLeave()
-	if GameTooltip:IsOwned(self) then
-		GameTooltip:Hide()
-	end
-end
-
-function TitleFrame:OnSizeChanged()
-	self:GetFontString():SetWidth(self:GetWidth())
 end
 
 
@@ -131,6 +108,7 @@ function TitleFrame:GetFrameID()
 	return self.frameID
 end
 
+--yeah, still hardcoded
 function TitleFrame:GetTitleText()
 	if self:GetFrameID() == 'bank' then
 		return L.TitleBank

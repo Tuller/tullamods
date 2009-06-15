@@ -55,13 +55,11 @@ end
 --[[ Frame Events ]]--
 
 function BagFrame:OnShow()
---	self:UpdateEvents()
 	self:Layout()
 	self:SendMessage('BAG_FRAME_UPDATE_SHOWN', self:GetFrameID())
 end
 
 function BagFrame:OnHide()
---	self:UpdateEvents()
 	self:SendMessage('BAG_FRAME_UPDATE_SHOWN', self:GetFrameID())
 end
 

@@ -52,6 +52,28 @@ end
 	Frame Messages
 --]]
 
+function Frame:UpdateEvents()
+	self:UnregisterAllMessages()
+
+	self:RegisterMessage('FRAME_SHOW')
+
+	if self:IsVisible() then
+		self:RegisterMessage('FRAME_HIDE')
+		self:RegisterMessage('FRAME_LAYER_UPDATE')
+		self:RegisterMessage('FRAME_MOVE_START')
+		self:RegisterMessage('FRAME_MOVE_STOP')
+		self:RegisterMessage('FRAME_POSITION_UPDATE')
+		self:RegisterMessage('FRAME_SCALE_UPDATE')
+		self:RegisterMessage('FRAME_OPACITY_UPDATE')
+		self:RegisterMessage('FRAME_COLOR_UPDATE')
+		self:RegisterMessage('FRAME_BORDER_COLOR_UPDATE')
+
+		self:RegisterMessage('BAG_FRAME_UPDATE_SHOWN')
+		self:RegisterMessage('BAG_FRAME_UPDATE_LAYOUT')
+		self:RegisterMessage('ITEM_FRAME_SIZE_CHANGE')
+	end
+end
+
 function Frame:FRAME_SHOW(msg, frameID)
 	if self:GetFrameID() == frameID then
 		self:Show()
@@ -171,28 +193,6 @@ end
 function Frame:UpdateEverything()
 	self:UpdateEvents()
 	self:UpdateLook()
-end
-
-function Frame:UpdateEvents()
-	self:UnregisterAllMessages()
-
-	self:RegisterMessage('FRAME_SHOW')
-
-	if self:IsVisible() then
-		self:RegisterMessage('FRAME_HIDE')
-		self:RegisterMessage('FRAME_LAYER_UPDATE')
-		self:RegisterMessage('FRAME_MOVE_START')
-		self:RegisterMessage('FRAME_MOVE_STOP')
-		self:RegisterMessage('FRAME_POSITION_UPDATE')
-		self:RegisterMessage('FRAME_SCALE_UPDATE')
-		self:RegisterMessage('FRAME_OPACITY_UPDATE')
-		self:RegisterMessage('FRAME_COLOR_UPDATE')
-		self:RegisterMessage('FRAME_BORDER_COLOR_UPDATE')
-
-		self:RegisterMessage('BAG_FRAME_UPDATE_SHOWN')
-		self:RegisterMessage('BAG_FRAME_UPDATE_LAYOUT')
-		self:RegisterMessage('ITEM_FRAME_SIZE_CHANGE')
-	end
 end
 
 function Frame:UpdateLook()
@@ -380,7 +380,7 @@ function Frame:Layout()
 	width = width + w
 
 	local w, h = self:PlaceOptionsToggle()
-	width = width + w
+	width = width + w + 24 --append spacing between close button and this
 	height = height + h
 
 	local w, h = self:PlaceTitleFrame()
@@ -494,7 +494,7 @@ function Frame:PlaceCloseButton()
 	b:SetPoint('TOPRIGHT', -2, -2)
 	b:Show()
 
-	return b:GetWidth(), b:GetHeight()
+	return 20, 20 --make the same size as the other menu buttons
 end
 
 
@@ -574,15 +574,17 @@ function Frame:IsBagFrameShown()
 end
 
 function Frame:PlaceBagFrame()
-	if self:HasBagFrame() and self:IsBagFrameShown() then
+	if self:HasBagFrame() then
 		local frame = self:GetBagFrame() or self:CreateBagFrame()
-		local menuButtons = self:GetMenuButtons()
+		if self:IsBagFrameShown() then
+			local menuButtons = self:GetMenuButtons()
 
-		frame:ClearAllPoints()
-		frame:SetPoint('TOPLEFT', menuButtons[1], 'BOTTOMLEFT', 0, -4)
-		frame:Show()
+			frame:ClearAllPoints()
+			frame:SetPoint('TOPLEFT', menuButtons[1], 'BOTTOMLEFT', 0, -4)
+			frame:Show()
 
-		return frame:GetWidth(), frame:GetHeight()
+			return frame:GetWidth(), frame:GetHeight()
+		end
 	end
 
 	local frame = self:GetBagFrame()
@@ -631,7 +633,7 @@ function Frame:PlaceTitleFrame()
 	frame:SetPoint('RIGHT', self:GetOptionsToggle(), 'LEFT', -4, 0)
 	frame:SetHeight(20)
 
-	return frame:GetWidth(), frame:GetHeight()
+	return frame:GetTextWidth() + 8, frame:GetHeight()
 end
 
 
@@ -658,12 +660,12 @@ function Frame:PlaceItemFrame()
 		if #menuButtons > 0 then
 			frame:SetPoint('TOPLEFT', menuButtons[1], 'BOTTOMLEFT', 0, -4)
 		else
-			frame:SetPoint('TOPLEFT', self:GetTitleFrame(), 'BOTTOMLEFT', 2, -4)
+			frame:SetPoint('TOPLEFT', self:GetTitleFrame(), 'BOTTOMLEFT', 0, -4)
 		end
 	end
 
 	frame:Show()
-	return frame:GetWidth(), frame:GetHeight()
+	return frame:GetWidth() - 2, frame:GetHeight()
 end
 
 
