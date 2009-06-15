@@ -26,6 +26,7 @@ function TitleFrame:New(frameID, parent)
 	b:SetScript('OnHide', b.OnHide)
 	b:SetScript('OnMouseDown', b.OnMouseDown)
 	b:SetScript('OnMouseUp', b.OnMouseUp)
+	b:SetScript('OnDoubleClick', b.OnDoubleClick)
 
 	b:SetFrameID(frameID)
 	b:UpdateEvents()
@@ -62,6 +63,10 @@ end
 
 function TitleFrame:OnMouseUp()
 	self:StopMovingFrame()
+end
+
+function TitleFrame:OnDoubleClick()
+	self:GetSettings():ToggleTextSearch()
 end
 
 

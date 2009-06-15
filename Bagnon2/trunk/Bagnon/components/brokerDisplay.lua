@@ -40,6 +40,7 @@ function BrokerDisplay:New(id, frameID, parent)
 	obj:SetFrameID(frameID)
 	obj:SetHeight(13)
 	obj:EnableMouseWheel(true)
+	obj:UpdateInsets()
 
 	return obj
 end
@@ -204,10 +205,8 @@ function BrokerDisplay:UpdateEvents()
 end
 
 function BrokerDisplay:UpdateDisplay()
-	if self:IsVisible() then
-		self:UpdateIcon()
-		self:UpdateText()
-	end
+	self:UpdateIcon()
+	self:UpdateText()
 end
 
 function BrokerDisplay:UpdateText()
@@ -234,6 +233,7 @@ function BrokerDisplay:UpdateIcon()
 	else
 		self.icon:Hide()
 	end
+
 	self:Layout()
 end
 
@@ -245,6 +245,14 @@ function BrokerDisplay:Layout()
 		self.text:SetPoint('LEFT', self.left, 'RIGHT', 2, 0)
 		self.text:SetPoint('RIGHT', self.right, 'LEFT', -2, 0)
 	end
+	
+	self:UpdateInsets()
+end
+
+--calculate the clickable portion of the frame
+function BrokerDisplay:UpdateInsets()
+	local realWidth = self.left:GetWidth() + (self.text:IsShown() and self.text:GetStringWidth() or 0) + (self.icon:IsShown() and self.icon:GetWidth() or 0)
+	self:SetHitRectInsets(0, self:GetWidth() - realWidth, 0, 0)
 end
 
 

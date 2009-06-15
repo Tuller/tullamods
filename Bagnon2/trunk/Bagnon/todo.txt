@@ -1,12 +1,18 @@
+general:
+* Fix frame hide/show bug
+* Fix databroker hit rect
+* Redo saved variables: 
+	general settings -> global; 
+	frame settings -> per character; 
+	display settings -> global
+
+	
 general settings:
 * Item slot coloring
 * Hide frames when entering combat
 * Enable bank frame 		(requires restart)
 * Enable inventory frame 	(requires restart)
-* Enable keyring 		(requires restart)
-
-frame settings:
-* Frame level (low, medium, high, always on top)
+* Enable keyring 			(requires restart)
 
 
 automatic display settings:
@@ -18,3 +24,8 @@ automatic display settings:
 * When crafting						x			x				x
 * When checking mail				x			x				x
 * When visiting a vendor			x			x				x
+
+
+frame settings:
+* Make bag ordering a per frame setting
+* Frame level (low, medium, high, always on top)
