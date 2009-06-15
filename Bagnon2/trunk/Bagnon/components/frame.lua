@@ -353,7 +353,8 @@ function Frame:SetFrameLayer(layer)
 end
 
 function Frame:GetFrameLayer()
-	return self:GetSettings():GetFrameLayer()
+	return 'HIGH'
+--	return self:GetSettings():GetFrameLayer()
 end
 
 

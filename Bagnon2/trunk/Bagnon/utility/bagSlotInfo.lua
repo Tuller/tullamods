@@ -12,43 +12,31 @@ Bagnon.BagSlotInfo = BagSlotInfo
 
 --returns true if the given bagSlot is a purchasable bank slot
 function BagSlotInfo:IsBankBag(bagSlot)
-	--assert(tonumber(bagSlot), 'Usage: BagSlotInfo:IsBankBag(bagSlot)')
-
 	return bagSlot > NUM_BAG_SLOTS and bagSlot < (NUM_BAG_SLOTS + NUM_BANKBAGSLOTS + 1)
 end
 
 --returns true if the given bagSlot is the bank container slot
 function BagSlotInfo:IsBank(bagSlot)
-	--assert(tonumber(bagSlot), 'Usage: BagSlotInfo:IsBank(bagSlot)')
-
 	return bagSlot == BANK_CONTAINER
 end
 
 --returns true if the given bagSlot is the backpack
 function BagSlotInfo:IsBackpack(bagSlot)
-	--assert(tonumber(bagSlot), 'Usage: BagSlotInfo:IsBackpack(bagSlot)')
-
 	return bagSlot == BACKPACK_CONTAINER
 end
 
 --returns true if the given bagSlot is an optional inventory bag slot
 function BagSlotInfo:IsBackpackBag(bagSlot)
-	--assert(tonumber(bagSlot), 'Usage: BagSlotInfo:IsBackpackBag(bagSlot)')
-
 	return bagSlot > 0 and bagSlot < (NUM_BAG_SLOTS + 1)
 end
 
 --returns true if the given bagSlot is the keyring
 function BagSlotInfo:IsKeyRing(bagSlot)
-	--assert(tonumber(bagSlot), 'Usage: BagSlotInfo:IsKeyRing(bagSlot)')
-
 	return bagSlot == KEYRING_CONTAINER
 end
 
 --returns true if the given bagSlot for the given player is cached
 function BagSlotInfo:IsCached(player, bagSlot)
-	--assert(player and tonumber(bagSlot), 'Usage: BagSlotInfo:IsCached(player, bagSlot)')
-
 	if Bagnon.PlayerInfo:IsCached(player) then
 		return true
 	end
@@ -62,8 +50,6 @@ end
 
 --returns true if the given bagSlot is purchasable for the given player and false otherwise
 function BagSlotInfo:IsPurchasable(player, bagSlot)
-	--assert(player and tonumber(bagSlot), 'Usage: BagSlotInfo:IsPurchasable(player, bagSlot)')
-
 	local purchasedSlots
 	if self:IsCached(player, bagSlot) then
 		if BagnonDB then
@@ -78,8 +64,6 @@ function BagSlotInfo:IsPurchasable(player, bagSlot)
 end
 
 function BagSlotInfo:IsLocked(player, bagSlot)
-	--assert(player and tonumber(bagSlot), 'Usage: BagSlotInfo:IsLocked(player, bagSlot)')
-
 	if self:IsBackpack(bagSlot) or self:IsKeyRing(bagSlot) or self:IsBank(bagSlot) or self:IsCached(player, bagSlot) then
 		return false
 	end
@@ -91,12 +75,10 @@ end
 
 --returns how many items can fit in the given bag
 function BagSlotInfo:GetSize(player, bagSlot)
-	--assert(player and tonumber(bagSlot), 'Usage: BagSlotInfo:GetSize(player, bagSlot)')
-
 	local size = 0
 	if self:IsCached(player, bagSlot) then
 		if BagnonDB then
-			size = (BagnonDB:GetBagData(bagSlot, player)) or 0
+			size = (BagnonDB:GetBagData(bagSlot, player))
 		end
 	elseif self:IsBank(bagSlot) then
 		size = NUM_BANKGENERIC_SLOTS
@@ -110,8 +92,6 @@ end
 
 --returns the itemLink, number of items in, and item icon texture of the given bagSlot
 function BagSlotInfo:GetItemInfo(player, bagSlot)
-	--assert(player and tonumber(bagSlot), 'Usage: BagSlotInfo:GetItemInfo(player, bagSlot)')
-
 	local link, texture, count, size
 	if self:IsCached(player, bagSlot) then
 		if BagnonDB then
@@ -127,12 +107,52 @@ function BagSlotInfo:GetItemInfo(player, bagSlot)
 end
 
 
+--[[ Slot Type Info ]]--
+
+function BagSlotInfo:GetBagType(player, bagSlot)
+	if self:IsKeyRing(bagSlot) then
+		return 256
+	end
+
+	if self:IsBank(bagSlot) or self:IsBackpack(bagSlot) then
+		return 0
+	end
+	
+	local itemLink = (self:GetItemInfo(player, bagSlot))
+	if itemLink then
+		return GetItemFamily(itemLink)
+	end
+	
+	return 0
+end
+
+-- Stolen from OneBag, since my bitflag knowledge could be better
+-- BAGTYPE_QUIVER = Quiver + Ammo
+local BAGTYPE_QUIVER = 0x0001 + 0x0002 
+
+function BagSlotInfo:IsAmmoBag(player, bagSlot)
+	return bit.band(self:GetBagType(player, bagSlot), BAGTYPE_QUIVER) > 0
+end
+
+-- BAGTYPE_SOUL = Soul Bags
+local BAGTYPE_SOUL = 0x004
+
+function BagSlotInfo:IsShardBag(player, bagSlot)
+	return bit.band(self:GetBagType(player, bagSlot), BAGTYPE_SOUL) > 0
+end
+
+-- BAGTYPE_PROFESSION = Leather + Inscription + Herb + Enchanting + Engineering + Gem + Mining
+local BAGTYPE_PROFESSION = 0x0008 + 0x0010 + 0x0020 + 0x0040 + 0x0080 + 0x0200 + 0x0400 
+
+function BagSlotInfo:IsTradeBag(player, bagSlot)
+	return bit.band(self:GetBagType(player, bagSlot), BAGTYPE_PROFESSION) > 0
+end
+
+
 --[[ Conversion Methods ]]--
 
 --converts the given bag slot into an applicable inventory slot
 function BagSlotInfo:ToInventorySlot(bagSlot)
-	--assert(tonumber(bagSlot), 'Usage: BagSlotInfo:ToInventorySlot(bagSlot)')
-
 	if self:IsBackpackBag(bagSlot) then
 		return ContainerIDToInventoryID(bagSlot)
 	end

@@ -317,6 +317,7 @@ function ItemSlot:Update()
 	self:SetReadable(readable)
 	self:SetBorderQuality(quality)
 	self:UpdateCooldown()
+	self:UpdateSlotColor()
 	self:UpdateSearch()
 	self:UpdateBagSearch()
 
@@ -327,11 +328,11 @@ end
 
 --item link
 function ItemSlot:SetItem(itemLink)
-	self.hasItemSlot = itemLink or nil
+	self.hasItem = itemLink or nil
 end
 
 function ItemSlot:GetItem()
-	return self.hasItemSlot
+	return self.hasItem
 end
 
 --item texture
@@ -344,6 +345,31 @@ function ItemSlot:GetEmptyItemTexture()
 		return [[Interface\PaperDoll\UI-Backpack-EmptySlot]]
 	end
 	return nil
+end
+
+function ItemSlot:UpdateSlotColor()
+	if not self:GetItem() then
+		if Bagnon.BagSlotInfo:IsAmmoBag(self:GetPlayer(), self:GetBag()) then
+			SetItemButtonTextureVertexColor(self, 1, 1, 0.5)
+			self:GetNormalTexture():SetVertexColor(1, 1, 0.5)
+			return
+		end
+		
+		if Bagnon.BagSlotInfo:IsTradeBag(self:GetPlayer(), self:GetBag()) then
+			SetItemButtonTextureVertexColor(self, 0.5, 1, 0.5)
+			self:GetNormalTexture():SetVertexColor(0.5, 1, 0.5)
+			return
+		end
+		
+		if Bagnon.BagSlotInfo:IsShardBag(self:GetPlayer(), self:GetBag()) then
+			SetItemButtonTextureVertexColor(self, 0.5, 0.5, 1)
+			self:GetNormalTexture():SetVertexColor(0.5, 0.5, 1)
+			return
+		end
+	end
+		
+	SetItemButtonTextureVertexColor(self, 1, 1, 1)
+	self:GetNormalTexture():SetVertexColor(1, 1, 1)
 end
 
 --item count
@@ -443,6 +469,7 @@ function ItemSlot:UpdateSearch()
 		self:SetAlpha(1)
 		self:UpdateLocked()
 		self:UpdateBorder()
+		self:UpdateSlotColor()
 	end
 end
 
