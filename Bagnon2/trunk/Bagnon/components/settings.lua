@@ -93,3 +93,16 @@ end
 function Settings:IsSlotOrderReversed()
 	return self:GetDB().reverseSlotOrder
 end
+
+
+--item slot coloring
+function Settings:SetColorBagSlots(enable)
+	if self:ColoringBagSlots() ~= enable then
+		self:GetDB().colorBagSlots = enable
+		self:SendMessage('ITEM_SLOT_COLOR_UPDATE', enable)
+	end
+end
+
+function Settings:ColoringBagSlots()
+	return self:GetDB().colorBagSlots
+end

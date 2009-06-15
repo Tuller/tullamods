@@ -131,8 +131,9 @@ function SavedSettings:GetDefaultProfileSettings(profileName)
 		highlightItemsByQuality = true,
 		highlightQuestItems = true,
 		showEmptyItemSlotTexture = true,
-		lockFramePositions = true,
+		lockFramePositions = false,
 		reverseSlotOrder = false,
+		colorBagSlots = true
 	}
 end
 

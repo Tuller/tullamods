@@ -192,6 +192,10 @@ function ItemSlot:SHOW_EMPTY_ITEM_SLOT_TEXTURE_UPDATE(msg, enable)
 	self:Update()
 end
 
+function ItemSlot:ITEM_SLOT_COLOR_UPDATE(msg, enable)
+	self:Update()
+end
+
 --event registration
 function ItemSlot:RegisterItemSlotEvent(...)
 	Bagnon.BagEvents:Listen(self, ...)
@@ -288,6 +292,7 @@ function ItemSlot:UpdateEvents()
 		self:RegisterMessage('ITEM_HIGHLIGHT_QUEST_UPDATE')
 		self:RegisterMessage('ITEM_HIGHLIGHT_QUALITY_UPDATE')
 		self:RegisterMessage('SHOW_EMPTY_ITEM_SLOT_TEXTURE_UPDATE')
+		self:RegisterMessage('ITEM_SLOT_COLOR_UPDATE')
 
 		if self:IsBankSlot() then
 			self:RegisterItemSlotEvent('BANK_OPENED')
@@ -349,20 +354,20 @@ end
 
 --item slot color
 function ItemSlot:UpdateSlotColor()
-	if not self:GetItem() then
-		if Bagnon.BagSlotInfo:IsAmmoBag(self:GetPlayer(), self:GetBag()) then
+	if (not self:GetItem()) and self:ColoringBagSlots() then
+		if self:IsAmmoBagSlot() then
 			SetItemButtonTextureVertexColor(self, 1, 1, 0.8)
 			self:GetNormalTexture():SetVertexColor(1, 1, 0.8)
 			return
 		end
 		
-		if Bagnon.BagSlotInfo:IsTradeBag(self:GetPlayer(), self:GetBag()) then
+		if self:IsTradeBagSlot() then
 			SetItemButtonTextureVertexColor(self, 0.5, 1, 0.5)
 			self:GetNormalTexture():SetVertexColor(0.5, 1, 0.5)
 			return
 		end
 		
-		if Bagnon.BagSlotInfo:IsShardBag(self:GetPlayer(), self:GetBag()) then
+		if self:IsShardBagSlot() then
 			SetItemButtonTextureVertexColor(self, 0.9, 0.7, 1)
 			self:GetNormalTexture():SetVertexColor(0.9, 0.7, 1)
 			return
@@ -545,6 +550,9 @@ function ItemSlot:GetItemSlotInfo()
 	return texture, count, locked, quality, readable, lootable, link
 end
 
+
+--[[ Item Type Highlighting ]]--
+
 function ItemSlot:HighlightingItemsByQuality()
 	return Bagnon.Settings:HighlightingItemsByQuality()
 end
@@ -563,6 +571,25 @@ end
 
 function ItemSlot:ShowingEmptyItemSlotTexture()
 	return Bagnon.Settings:ShowingEmptyItemSlotTextures()
+end
+
+
+--[[ Item Slot Coloring ]]--
+
+function ItemSlot:IsAmmoBagSlot()
+	return Bagnon.BagSlotInfo:IsAmmoBag(self:GetPlayer(), self:GetBag())
+end
+
+function ItemSlot:IsTradeBagSlot()
+	return Bagnon.BagSlotInfo:IsTradeBag(self:GetPlayer(), self:GetBag())
+end
+
+function ItemSlot:IsShardBagSlot()
+	return Bagnon.BagSlotInfo:IsShardBag(self:GetPlayer(), self:GetBag())
+end
+
+function ItemSlot:ColoringBagSlots()
+	return Bagnon.Settings:ColoringBagSlots()
 end
 
 
