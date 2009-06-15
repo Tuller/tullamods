@@ -173,6 +173,11 @@ function Frame:OnHide()
 	end
 
 	self:UpdateEvents()
+	
+	--fix issue where a frame is hidden, but not via bagnon controlled methods (ie, close on escape)
+	if self:IsFrameShown() then
+		self:HideFrame()
+	end
 end
 
 function Frame:CloseBankFrame()
@@ -331,6 +336,10 @@ end
 
 function Frame:IsFrameShown()
 	return self:GetSettings():IsFrameShown()
+end
+
+function Frame:HideFrame()
+	self:GetSettings():HideFrame()
 end
 
 
