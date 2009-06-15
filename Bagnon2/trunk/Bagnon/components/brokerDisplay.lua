@@ -112,6 +112,10 @@ end
 function BrokerDisplay:DATABROKER_OBJECT_UPDATE(msg, frameID, objectName)
 	if self:GetFrameID() == frameID then
 		self:UpdateDisplay()
+		
+		if GameTooltip:IsOwned(self) then
+			self:OneEnter()
+		end
 	end
 end
 

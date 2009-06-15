@@ -347,6 +347,7 @@ function ItemSlot:GetEmptyItemTexture()
 	return nil
 end
 
+--item slot color
 function ItemSlot:UpdateSlotColor()
 	if not self:GetItem() then
 		if Bagnon.BagSlotInfo:IsAmmoBag(self:GetPlayer(), self:GetBag()) then
