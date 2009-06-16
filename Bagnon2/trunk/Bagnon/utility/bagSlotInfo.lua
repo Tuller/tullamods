@@ -87,7 +87,7 @@ function BagSlotInfo:GetSize(player, bagSlot)
 	else
 		size = GetContainerNumSlots(bagSlot)
 	end
-	return size
+	return size or 0
 end
 
 --returns the itemLink, number of items in, and item icon texture of the given bagSlot

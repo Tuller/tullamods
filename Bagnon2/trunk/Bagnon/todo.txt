@@ -1,9 +1,14 @@
 general settings:
-* Hide frames when entering combat
 * Enable bank frame 		(requires restart)
 * Enable inventory frame 	(requires restart)
-* Enable keyring 			(requires restart)
+* Enable keyring 		(requires restart)
 
+Colors: (maybe)
+* Quest item color
+* Trade bag slot color
+* Ammo bag slot color
+* Soul shard slot color
+* Item quality color
 
 automatic display settings:
 									Show Bank	Show Inventory	Show Keyring
@@ -14,7 +19,15 @@ automatic display settings:
 * When crafting						x			x				x
 * When checking mail				x			x				x
 * When visiting a vendor			x			x				x
-
+* Hide frames when entering combat (maybe)
 
 frame settings:
 * Make bag ordering a per frame setting
+* Enable text search on this frame
+* Enable bag frame display
+* Enable money frame display
+* Enable databroker display
+
+other:
+* Add tooltips to most options to describe what they do in more detail
+* Minimize event registering/unregistering
