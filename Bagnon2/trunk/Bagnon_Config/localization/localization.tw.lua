@@ -4,7 +4,7 @@
 	Bagnon Config Localization Information: Chinese Traditional
 		Credits: yleaf@cwdg(yaroot@gmail.com), 狂飆@cwdg(networm@qq.com)
 
-	Last Update: 2009/06/15 by 狂飆@cwdg(networm@qq.com)
+	Last Update: 2009/06/16 by 狂飆@cwdg(networm@qq.com)
 
 --]]
 
@@ -26,3 +26,4 @@ L.ShowEmptyItemSlotBackground = '顯示空格背景材質'
 L.HighlightItemsByQuality = '按物品品質高亮物品'
 L.HighlightQuestItems = '高亮任務物品'
 L.ReverseSlotOrdering = '反向排列'
+L.ColorItemSlotsByBagType = '按背包類型對空格染色'
