@@ -38,6 +38,7 @@ function FrameOptions:UpdateMessages()
 		return
 	end
 
+	self:RegisterMessage('FRAME_LAYER_UPDATE')
 	self:RegisterMessage('FRAME_SCALE_UPDATE')
 	self:RegisterMessage('FRAME_OPACITY_UPDATE')
 	self:RegisterMessage('FRAME_COLOR_UPDATE')
@@ -46,15 +47,21 @@ function FrameOptions:UpdateMessages()
 	self:RegisterMessage('ITEM_FRAME_COLUMNS_UPDATE')
 end
 
+function FrameOptions:FRAME_LAYER_UPDATE(msg, frameID, layer)
+	if self:GetFrameID() == frameID then
+		self:GetLayerSlider():UpdateValue()
+	end
+end
+
 function FrameOptions:FRAME_SCALE_UPDATE(msg, frameID, scale)
 	if self:GetFrameID() == frameID then
-		self:GetScaleSlider():SetValue(scale * 100)
+		self:GetScaleSlider():UpdateValue()
 	end
 end
 
 function FrameOptions:FRAME_OPACITY_UPDATE(msg, frameID, opacity)
 	if self:GetFrameID() == frameID then
-		self:GetOpacitySlider():SetValue(opacity * 100)
+		self:GetOpacitySlider():UpdateValue()
 	end
 end
 
@@ -72,13 +79,13 @@ end
 
 function FrameOptions:ITEM_FRAME_SPACING_UPDATE(msg, frameID, spacing)
 	if self:GetFrameID() == frameID then
-		self:GetSpacingSlider():SetValue(spacing)
+		self:GetSpacingSlider():UpdateValue()
 	end
 end
 
 function FrameOptions:ITEM_FRAME_COLUMNS_UPDATE(msg, frameID, columns)
 	if self:GetFrameID() == frameID then
-		self:GetColumnsSlider():SetValue(columns)
+		self:GetColumnsSlider():UpdateValue()
 	end
 end
 
@@ -125,20 +132,21 @@ function FrameOptions:AddWidgets()
 	opacity:SetPoint('BOTTOMLEFT', self, 'BOTTOMLEFT', 12, 16)
 	opacity:SetPoint('BOTTOMRIGHT', self, 'BOTTOMRIGHT', -48, 16)
 	
-	--add scale slider
 	local scale = self:CreateScaleSlider()
 	scale:SetPoint('BOTTOMLEFT', opacity, 'TOPLEFT', 0, 20)
 	scale:SetPoint('BOTTOMRIGHT', opacity, 'TOPRIGHT', 0, 20)
 	
-	--add scale slider
 	local spacing = self:CreateSpacingSlider()
 	spacing:SetPoint('BOTTOMLEFT', scale, 'TOPLEFT', 0, 20)
 	spacing:SetPoint('BOTTOMRIGHT', scale, 'TOPRIGHT', 0, 20)
 	
-	--add scale slider
 	local cols = self:CreateColumnsSlider()
 	cols:SetPoint('BOTTOMLEFT', spacing, 'TOPLEFT', 0, 20)
 	cols:SetPoint('BOTTOMRIGHT', spacing, 'TOPRIGHT', 0, 20)
+	
+	local layer = self:CreateLayerSlider()
+	layer:SetPoint('BOTTOMLEFT', cols, 'TOPLEFT', 0, 20)
+	layer:SetPoint('BOTTOMRIGHT', cols, 'TOPRIGHT', 0, 20)
 end
 
 function FrameOptions:UpdateWidgets()
@@ -151,11 +159,12 @@ function FrameOptions:UpdateWidgets()
 	self:GetColorSelector():SetColor(settings:GetFrameColor())
 	self:GetBorderColorSelector():SetColor(settings:GetFrameBorderColor())
 
-	self:GetColumnsSlider():SetValue(settings:GetItemFrameColumns())
-	self:GetSpacingSlider():SetValue(settings:GetItemFrameSpacing())
+	self:GetColumnsSlider():UpdateValue()
+	self:GetSpacingSlider():UpdateValue()
 
-	self:GetScaleSlider():SetValue(settings:GetFrameScale() * 100)
-	self:GetOpacitySlider():SetValue(settings:GetFrameOpacity() * 100)
+	self:GetScaleSlider():UpdateValue()
+	self:GetOpacitySlider():UpdateValue()
+	self:GetLayerSlider():UpdateValue()
 end
 
 
@@ -321,6 +330,39 @@ end
 function FrameOptions:GetOpacitySlider()
 	return self.opacitySlider
 end
+
+--layer
+function FrameOptions:CreateLayerSlider()
+	local availableLayers = self:GetSettings():GetAvailableLayers()
+	local slider = Bagnon.OptionsSlider:New(L.FrameLayer, self, 1, #availableLayers, 1)
+	slider.layers = availableLayers
+
+	slider.SetSavedValue = function(self, value)
+		self:GetParent():GetSettings():SetFrameLayer(self.layers[value])
+	end
+
+	slider.GetSavedValue = function(self)
+		local layer = self:GetParent():GetSettings():GetFrameLayer()
+		for k, v in pairs(self.layers) do
+			if v == layer then
+				return k
+			end
+		end
+		return 1
+	end
+
+	slider.GetFormattedText = function(self, value)
+		return self.layers[value]
+	end
+
+	self.layerSlider = slider
+	return slider
+end
+
+function FrameOptions:GetLayerSlider()
+	return self.layerSlider
+end
+
 
 
 --[[ Check Boxes ]]--

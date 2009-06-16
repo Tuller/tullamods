@@ -36,13 +36,12 @@ end
 --[[ Frame Events ]]--
 
 function OptionsSlider:OnShow()
-	self:SetValue(self:GetSavedValue())
-	self:UpdateText(self:GetSavedValue())
+	self:UpdateValue()
 end
 
 function OptionsSlider:OnValueChanged(value)
 	self:SetSavedValue(value)
-	self:UpdateText(value)
+	self:UpdateText(self:GetSavedValue())
 end
 
 function OptionsSlider:OnMouseWheel(direction)
@@ -66,6 +65,11 @@ end
 
 function OptionsSlider:GetSavedValue()
 	assert(false, 'Hey, you forgot to set GetSavedValue for ' .. self:GetName())
+end
+
+function OptionsSlider:UpdateValue()
+	self:SetValue(self:GetSavedValue())
+	self:UpdateText(self:GetSavedValue())
 end
 
 function OptionsSlider:UpdateText(value)
