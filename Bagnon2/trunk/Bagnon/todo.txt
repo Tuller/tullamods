@@ -21,13 +21,6 @@ automatic display settings:
 * When visiting a vendor			x			x				x
 * Hide frames when entering combat (maybe)
 
-frame settings:
-* Make bag ordering a per frame setting
-* Enable text search on this frame
-* Enable bag frame display
-* Enable money frame display
-* Enable databroker display
-
 other:
 * Add tooltips to most options to describe what they do in more detail
 * Minimize event registering/unregistering
