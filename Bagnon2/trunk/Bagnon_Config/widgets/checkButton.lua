@@ -29,7 +29,7 @@ function OptionsCheckButton:UpdateChecked()
 end
 
 function OptionsCheckButton:EnableSetting(enable)
-	self:OnEnableSetting(enable)
+	self:OnEnableSetting(enable and true or false)
 	self:UpdateChecked()
 end
 
