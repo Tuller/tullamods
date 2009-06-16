@@ -37,12 +37,9 @@ function FrameSettings:GetFrameID()
 end
 
 function FrameSettings:GetDB()
-	return Bagnon.SavedFrameSettings:Get(self:GetFrameID())
---[[
 	local db = self.db or Bagnon.SavedFrameSettings:Get(self:GetFrameID())
 	self.db = db
 	return db
---]]
 end
 
 
@@ -170,6 +167,26 @@ end
 
 function FrameSettings:GetFrameBorderColor()
 	return self:GetDB():GetBorderColor()
+end
+
+--frame layer
+function FrameSettings:GetFrameLayer()
+	return self:GetDB():GetLayer()
+end
+
+function FrameSettings:SetFrameLayer(layer)
+	if self:GetFrameLayer() ~= layer then
+		self:GetDB():SetLayer(layer)
+		self:SendMessage('FRAME_LAYER_UPDATE', self:GetFrameLayer())
+	end
+end
+
+--returns a list of all possible frame layers
+function FrameSettings:GetAvailableLayers()
+	if not FrameSettings.availableFrameLayers then
+		FrameSettings.availableFrameLayers = {'LOW', 'MEDIUM', 'HIGH', 'TOPLEVEL'}
+	end
+	return FrameSettings.availableFrameLayers
 end
 
 

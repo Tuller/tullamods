@@ -18,4 +18,3 @@ automatic display settings:
 
 frame settings:
 * Make bag ordering a per frame setting
-* Frame level (low, medium, high, always on top)

@@ -234,6 +234,17 @@ function SavedFrameSettings:GetOpacity()
 end
 
 
+--[[ Frame Layer]]--
+
+function SavedFrameSettings:SetLayer(layer)
+	self:GetDB().frameLayer = layer
+end
+
+function SavedFrameSettings:GetLayer()
+	return self:GetDB().frameLayer
+end
+
+
 --[[ Frame Components ]]--
 
 function SavedFrameSettings:HasBagFrame()
@@ -355,6 +366,7 @@ function SavedFrameSettings:GetDefaultInventorySettings()
 		point = 'BOTTOMRIGHT',
 		x = 0,
 		y = 150,
+		frameLayer = 'HIGH',
 
 		--itemFrame
 		itemFrameColumns = 8,
@@ -388,6 +400,7 @@ function SavedFrameSettings:GetDefaultBankSettings()
 		point = 'BOTTOMLEFT',
 		x = 0,
 		y = 150,
+		frameLayer = 'HIGH',
 
 		--itemFrame
 		itemFrameColumns = 10,
@@ -420,6 +433,7 @@ function SavedFrameSettings:GetDefaultKeyRingSettings()
 		point = 'BOTTOMRIGHT',
 		x = -350,
 		y = 150,
+		frameLayer = 'HIGH',
 
 		--itemFrame
 		itemFrameColumns = 4,
