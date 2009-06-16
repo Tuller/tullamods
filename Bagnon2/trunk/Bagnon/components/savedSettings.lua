@@ -70,7 +70,6 @@ function SavedSettings:GetDefaultSettings()
 		highlightQuestItems = true,
 		showEmptyItemSlotTexture = true,
 		lockFramePositions = false,
-		reverseSlotOrder = false,
 		colorBagSlots = true
 	}
 	

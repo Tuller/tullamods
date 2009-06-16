@@ -180,7 +180,8 @@ function SavedFrameSettings:SetColor(r, g, b, a)
 end
 
 function SavedFrameSettings:GetColor()
-	return unpack(self:GetDB().frameColor)
+	local r, g, b, a = unpack(self:GetDB().frameColor)
+	return r, g, b, a
 end
 
 --border
@@ -193,7 +194,8 @@ function SavedFrameSettings:SetBorderColor(r, g, b, a)
 end
 
 function SavedFrameSettings:GetBorderColor()
-	return unpack(self:GetDB().frameBorderColor)
+	local r, g, b, a = unpack(self:GetDB().frameBorderColor)
+	return r, g, b, a
 end
 
 
@@ -247,16 +249,36 @@ end
 
 --[[ Frame Components ]]--
 
+function SavedFrameSettings:SetHasBagFrame(enable)
+	self:GetDB().hasBagFrame = enable or false
+end
+
 function SavedFrameSettings:HasBagFrame()
 	return self:GetDB().hasBagFrame
+end
+
+function SavedFrameSettings:SetHasMoneyFrame(enable)
+	self:GetDB().hasMoneyFrame = enable or false
 end
 
 function SavedFrameSettings:HasMoneyFrame()
 	return self:GetDB().hasMoneyFrame
 end
 
+function SavedFrameSettings:SetHasDBOFrame(enable)
+	self:GetDB().hasDBOFrame = enable or false
+end
+
 function SavedFrameSettings:HasDBOFrame()
 	return self:GetDB().hasDBOFrame
+end
+
+function SavedFrameSettings:SetHasSearchToggle(enable)
+	self:GetDB().hasSearchToggle = enable or false
+end
+
+function SavedFrameSettings:HasSearchToggle()
+	return self:GetDB().hasSearchToggle
 end
 
 
@@ -323,6 +345,17 @@ function SavedFrameSettings:GetItemFrameSpacing()
 end
 
 
+--[[ Item Frame Slot ORdering ]]--
+
+function SavedFrameSettings:SetReverseSlotOrder(enable)
+	self:GetDB().reverseSlotOrder = enable
+end
+
+function SavedFrameSettings:IsSlotOrderReversed()
+	return self:GetDB().reverseSlotOrder
+end
+
+
 --[[ Databroker Display Object ]]--
 
 function SavedFrameSettings:SetBrokerDisplayObject(objectName)
@@ -376,9 +409,13 @@ function SavedFrameSettings:GetDefaultInventorySettings()
 		hasMoneyFrame = true,
 		hasBagFrame = true,
 		hasDBOFrame = true,
+		hasSearchToggle = true,
 
 		--dbo display object
 		dataBrokerObject = 'BagnonLauncher',
+		
+		--slot ordering
+		reverseSlotOrder = false,
 	}
 
 	SavedFrameSettings.invDefaults = defaults
@@ -410,9 +447,13 @@ function SavedFrameSettings:GetDefaultBankSettings()
 		hasMoneyFrame = true,
 		hasBagFrame = true,
 		hasDBOFrame = true,
+		hasSearchToggle = true,
 
 		--dbo display object
 		dataBrokerObject = 'BagnonLauncher',
+		
+		--slot ordering
+		reverseSlotOrder = false,
 	}
 	SavedFrameSettings.bankDefaults = defaults
 	return defaults
@@ -443,9 +484,13 @@ function SavedFrameSettings:GetDefaultKeyRingSettings()
 		hasMoneyFrame = false,
 		hasBagFrame = false,
 		hasDBOFrame = false,
+		hasSearchToggle = false,
 
 		--dbo display object
 		dataBrokerObject = 'BagnonLauncher',
+		
+		--slot ordering
+		reverseSlotOrder = false,
 	}
 	SavedFrameSettings.keyDefaults = defaults
 	return defaults

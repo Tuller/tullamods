@@ -70,6 +70,11 @@ function Frame:UpdateEvents()
 		self:RegisterMessage('BAG_FRAME_UPDATE_SHOWN')
 		self:RegisterMessage('BAG_FRAME_UPDATE_LAYOUT')
 		self:RegisterMessage('ITEM_FRAME_SIZE_CHANGE')
+
+		self:RegisterMessage('BAG_FRAME_ENABLE_UPDATE')
+		self:RegisterMessage('MONEY_FRAME_ENABLE_UPDATE')
+		self:RegisterMessage('DATABROKER_FRAME_ENABLE_UPDATE')
+		self:RegisterMessage('SEARCH_TOGGLE_ENABLE_UPDATE')
 	end
 end
 
@@ -152,6 +157,30 @@ function Frame:FRAME_LAYER_UPDATE(msg, frameID, layer)
 	end
 end
 
+function Frame:BAG_FRAME_ENABLE_UPDATE(msg, frameID, enable)
+	if self:GetFrameID() == frameID then
+		self:Layout()
+	end
+end
+
+function Frame:MONEY_FRAME_ENABLE_UPDATE(msg, frameID, enable)
+	if self:GetFrameID() == frameID then
+		self:Layout()
+	end
+end
+
+function Frame:DATABROKER_FRAME_ENABLE_UPDATE(msg, frameID, enable)
+	if self:GetFrameID() == frameID then
+		self:Layout()
+	end
+end
+
+function Frame:SEARCH_TOGGLE_ENABLE_UPDATE(msg, frameID, enable)
+	if self:GetFrameID() == frameID then
+		self:Layout()
+	end
+end
+
 
 --[[
 	Frame Events
@@ -177,6 +206,9 @@ function Frame:OnHide()
 	if self:IsFrameShown() then
 		self:HideFrame()
 	end
+	
+	--reset player filter when the frame is closed
+	self:GetSettings():SetPlayerFilter(UnitName('player'))
 end
 
 function Frame:CloseBankFrame()
@@ -229,12 +261,12 @@ function Frame:UpdateScale()
 		local ratio = newScale / oldScale
 
 		self:SetScale(newScale)
-		self:GetSettings():SetFramePosition(point, x/ratio, y/ratio)
+		self:GetSettings():SetPosition(point, x/ratio, y/ratio)
 	end
 end
 
 function Frame:GetFrameScale()
-	return self:GetSettings():GetFrameScale()
+	return self:GetSettings():GetScale()
 end
 
 --rescale frame without altering position, needed when loading settins
@@ -252,7 +284,7 @@ function Frame:UpdateOpacity()
 end
 
 function Frame:GetFrameOpacity()
-	return self:GetSettings():GetFrameOpacity()
+	return self:GetSettings():GetOpacity()
 end
 
 
@@ -264,7 +296,7 @@ end
 function Frame:SavePosition()
 	local point, x, y = self:GetRelativePosition()
 	if point then
-		self:GetSettings():SetFramePosition(point, x, y)
+		self:GetSettings():SetPosition(point, x, y)
 	end
 end
 
@@ -302,7 +334,7 @@ function Frame:UpdatePosition()
 end
 
 function Frame:GetFramePosition()
-	return self:GetSettings():GetFramePosition()
+	return self:GetSettings():GetPosition()
 end
 
 
@@ -316,7 +348,7 @@ function Frame:UpdateBackdrop()
 end
 
 function Frame:GetFrameBackdropColor()
-	return self:GetSettings():GetFrameColor()
+	return self:GetSettings():GetColor()
 end
 
 --border
@@ -325,7 +357,7 @@ function Frame:UpdateBackdropBorder()
 end
 
 function Frame:GetFrameBackdropBorderColor()
-	return self:GetSettings():GetFrameBorderColor()
+	return self:GetSettings():GetBorderColor()
 end
 
 
@@ -342,11 +374,11 @@ function Frame:UpdateShown()
 end
 
 function Frame:IsFrameShown()
-	return self:GetSettings():IsFrameShown()
+	return self:GetSettings():IsShown()
 end
 
 function Frame:HideFrame()
-	self:GetSettings():HideFrame()
+	self:GetSettings():Hide()
 end
 
 
@@ -369,7 +401,7 @@ function Frame:SetFrameLayer(layer)
 end
 
 function Frame:GetFrameLayer()
-	return self:GetSettings():GetFrameLayer()
+	return self:GetSettings():GetLayer()
 end
 
 
@@ -451,7 +483,7 @@ function Frame:PlaceMenuButtons()
 		table.insert(menuButtons, toggle)
 	end
 
-	if self:HasSearchFrame() then
+	if self:HasSearchToggle() then
 		local toggle = self:GetSearchToggle() or self:CreateSearchToggle()
 		table.insert(menuButtons, toggle)
 	end
@@ -489,7 +521,7 @@ end
 --[[ close button ]]--
 
 local function CloseButton_OnClick(self)
-	self:GetParent():GetSettings():HideFrame(true) --force hide the frame
+	self:GetParent():GetSettings():Hide(true) --force hide the frame
 end
 
 function Frame:CreateCloseButton()
@@ -525,33 +557,21 @@ function Frame:GetSearchFrame()
 	return self.searchFrame
 end
 
-function Frame:HasSearchFrame()
-	return self:GetSettings():HasSearchFrame()
-end
-
 function Frame:PlaceSearchFrame()
-	if self:HasSearchFrame() then
-		local menuButtons = self:GetMenuButtons()
-		local frame = self:GetSearchFrame() or self:CreateSearchFrame()
-		frame:ClearAllPoints()
+	local menuButtons = self:GetMenuButtons()
+	local frame = self:GetSearchFrame() or self:CreateSearchFrame()
+	frame:ClearAllPoints()
 
-		if #menuButtons > 0 then
-			frame:SetPoint('LEFT', menuButtons[#menuButtons], 'RIGHT', 2, 0)
-		else
-			frame:SetPoint('TOPLEFT', self, 'TOPLEFT', 8, -8)
-		end
-
-		frame:SetPoint('RIGHT', self:GetOptionsToggle(), 'LEFT', -2, 0)
-		frame:SetHeight(28)
-
-		return frame:GetWidth(), frame:GetHeight()
+	if #menuButtons > 0 then
+		frame:SetPoint('LEFT', menuButtons[#menuButtons], 'RIGHT', 2, 0)
+	else
+		frame:SetPoint('TOPLEFT', self, 'TOPLEFT', 8, -8)
 	end
 
-	local frame = self:GetSearchFrame()
-	if frame then
-		frame:Hide()
-	end
-	return 0, 0
+	frame:SetPoint('RIGHT', self:GetOptionsToggle(), 'LEFT', -2, 0)
+	frame:SetHeight(28)
+
+	return frame:GetWidth(), frame:GetHeight()
 end
 
 
@@ -565,6 +585,10 @@ end
 
 function Frame:GetSearchToggle()
 	return self.searchToggle
+end
+
+function Frame:HasSearchToggle()
+	return self:GetSettings():HasSearchToggle()
 end
 
 
@@ -581,7 +605,7 @@ function Frame:GetBagFrame()
 end
 
 function Frame:HasBagFrame()
-	return self:GetSettings():FrameHasBagFrame()
+	return self:GetSettings():HasBagFrame()
 end
 
 function Frame:IsBagFrameShown()
@@ -718,7 +742,7 @@ function Frame:CreateMoneyFrame()
 end
 
 function Frame:HasMoneyFrame()
-	return self:GetSettings():FrameHasMoneyFrame()
+	return self:GetSettings():HasMoneyFrame()
 end
 
 function Frame:PlaceMoneyFrame()
@@ -752,7 +776,7 @@ function Frame:CreateBrokerDisplay()
 end
 
 function Frame:HasBrokerDisplay()
-	return self:GetSettings():FrameHasDBOFrame()
+	return self:GetSettings():HasDBOFrame()
 end
 
 function Frame:PlaceBrokerDisplayFrame()
@@ -768,7 +792,7 @@ function Frame:PlaceBrokerDisplayFrame()
 		end
 
 		frame:Show()
-		return frame:GetWidth(), frame:GetHeight()
+		return frame:GetWidth(), 24
 	end
 
 	local frame = self:GetBrokerDisplay()

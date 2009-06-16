@@ -91,8 +91,10 @@ function ItemFrame:ITEM_FRAME_COLUMNS_UPDATE(msg, frameID, columns)
 	end
 end
 
-function ItemFrame:SLOT_ORDER_UPDATE(msg, enable)
-	self:RequestLayout()
+function ItemFrame:SLOT_ORDER_UPDATE(msg, frameID, enable)
+	if self:GetFrameID() == frameID then
+		self:RequestLayout()
+	end
 end
 
 function ItemFrame:RegisterItemEvent(...)

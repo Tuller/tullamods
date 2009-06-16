@@ -32,12 +32,12 @@ end
 --]]---------------------------------------------------------------------------
 
 
-function FrameSettings:GetFrameID()
+function FrameSettings:GetID()
 	return self.frameID
 end
 
 function FrameSettings:GetDB()
-	local db = self.db or Bagnon.SavedFrameSettings:Get(self:GetFrameID())
+	local db = self.db or Bagnon.SavedFrameSettings:Get(self:GetID())
 	self.db = db
 	return db
 end
@@ -48,7 +48,7 @@ end
 --]]---------------------------------------------------------------------------
 
 function FrameSettings:SendMessage(msg, ...)
-	Bagnon.Callbacks:SendMessage(msg, self:GetFrameID(), ...)
+	Bagnon.Callbacks:SendMessage(msg, self:GetID(), ...)
 end
 
 
@@ -61,51 +61,51 @@ end
 
 --the logic here is a little wacky, since we deal with auto open/close events
 --if a frame was manually opened, then it should only be closable manually
-function FrameSettings:ShowFrame()
-	local wasShown = self:IsFrameShown()
+function FrameSettings:Show()
+	local wasShown = self:IsShown()
 	
-	self.frameShown = (self.frameShown or 0) + 1
+	self.shown = (self.shown or 0) + 1
 
-	if not wasShown then
+	if not shown then
 		self:SendMessage('FRAME_SHOW')
 	end
 end
 
-function FrameSettings:HideFrame(forceHide)
-	self.frameShown = (self.frameShown or 1) - 1
+function FrameSettings:Hide(forceHide)
+	self.shown = (self.shown or 1) - 1
 
-	if forceHide or self.frameShown <= 0 then
-		self.frameShown = 0
+	if forceHide or self.shown <= 0 then
+		self.shown = 0
 		self:SendMessage('FRAME_HIDE')
 	end
 end
 
-function FrameSettings:ToggleFrame()
-	if self:IsFrameShown() then
-		self:HideFrame(true)
+function FrameSettings:Toggle()
+	if self:IsShown() then
+		self:Hide(true)
 	else
-		self:ShowFrame()
+		self:Show()
 	end
 end
 
-function FrameSettings:IsFrameShown()
-	return (self.frameShown or 0) > 0
+function FrameSettings:IsShown()
+	return (self.shown or 0) > 0
 end
 
 
 --[[ Frame Position ]]--
 
 --position
-function FrameSettings:SetFramePosition(point, x, y)
-	local oPoint, oX, oY = self:GetFramePosition()
+function FrameSettings:SetPosition(point, x, y)
+	local oPoint, oX, oY = self:GetPosition()
 	
 	if not(point == oPoint and x == oX and y == oY) then
 		self:GetDB():SetPosition(point, x, y)
-		self:SendMessage('FRAME_POSITION_UPDATE', self:GetFramePosition())
+		self:SendMessage('FRAME_POSITION_UPDATE', self:GetPosition())
 	end
 end
 
-function FrameSettings:GetFramePosition()
+function FrameSettings:GetPosition()
 	local point, x, y = self:GetDB():GetPosition()
 	return point, x, y
 end
@@ -118,67 +118,67 @@ end
 --[[ Frame Layout ]]--
 
 --scale
-function FrameSettings:SetFrameScale(scale)
-	if self:GetFrameScale() ~= scale then
+function FrameSettings:SetScale(scale)
+	if self:GetScale() ~= scale then
 		self:GetDB():SetScale(scale)
-		self:SendMessage('FRAME_SCALE_UPDATE', self:GetFrameScale())
+		self:SendMessage('FRAME_SCALE_UPDATE', self:GetScale())
 	end
 end
 
-function FrameSettings:GetFrameScale()
+function FrameSettings:GetScale()
 	return self:GetDB():GetScale()
 end
 
 --opacity
-function FrameSettings:SetFrameOpacity(opacity)
-	if self:GetFrameOpacity() ~= opacity then
+function FrameSettings:SetOpacity(opacity)
+	if self:GetOpacity() ~= opacity then
 		self:GetDB():SetOpacity(opacity)
-		self:SendMessage('FRAME_OPACITY_UPDATE', self:GetFrameOpacity())
+		self:SendMessage('FRAME_OPACITY_UPDATE', self:GetOpacity())
 	end
 end
 
-function FrameSettings:GetFrameOpacity()
+function FrameSettings:GetOpacity()
 	return self:GetDB():GetOpacity()
 end
 
 --frame color
-function FrameSettings:SetFrameColor(r, g, b, a)
-	local pR, pG, pB, pA = self:GetFrameColor()
+function FrameSettings:SetColor(r, g, b, a)
+	local pR, pG, pB, pA = self:GetColor()
 
 	if not(pR == r and pG == g and pB == b and pA == a) then
 		self:GetDB():SetColor(r, g, b, a)
-		self:SendMessage('FRAME_COLOR_UPDATE', self:GetFrameColor())
+		self:SendMessage('FRAME_COLOR_UPDATE', self:GetColor())
 	end
 end
 
-function FrameSettings:GetFrameColor()
+function FrameSettings:GetColor()
 	return self:GetDB():GetColor()
 end
 
 --border color
-function FrameSettings:SetFrameBorderColor(r, g, b, a)
-	local pR, pG, pB, pA = self:GetFrameBorderColor()
+function FrameSettings:SetBorderColor(r, g, b, a)
+	local pR, pG, pB, pA = self:GetBorderColor()
 
 	if not(pR == r and pG == g and pB == b and pA == a) then
 		self:GetDB():SetBorderColor(r, g, b, a)
-		self:SendMessage('FRAME_BORDER_COLOR_UPDATE', self:GetFrameBorderColor())
+		self:SendMessage('FRAME_BORDER_COLOR_UPDATE', self:GetBorderColor())
 	end
 end
 
-function FrameSettings:GetFrameBorderColor()
+function FrameSettings:GetBorderColor()
 	return self:GetDB():GetBorderColor()
 end
 
 --frame layer
-function FrameSettings:GetFrameLayer()
-	return self:GetDB():GetLayer()
+function FrameSettings:SetLayer(layer)
+	if self:GetLayer() ~= layer then
+		self:GetDB():SetLayer(layer)
+		self:SendMessage('FRAME_LAYER_UPDATE', self:GetLayer())
+	end
 end
 
-function FrameSettings:SetFrameLayer(layer)
-	if self:GetFrameLayer() ~= layer then
-		self:GetDB():SetLayer(layer)
-		self:SendMessage('FRAME_LAYER_UPDATE', self:GetFrameLayer())
-	end
+function FrameSettings:GetLayer()
+	return self:GetDB():GetLayer()
 end
 
 --returns a list of all possible frame layers
@@ -193,22 +193,59 @@ end
 --[[ Frame Components ]]--
 
 --returns true if the frame has a bag frame, and false otherwise
-function FrameSettings:FrameHasBagFrame()
+function FrameSettings:SetHasBagFrame(enable)
+	local enable = enable and true or false --done to handle 1/nil cases
+
+	if self:HasBagFrame() ~= enable then
+		self:GetDB():SetHasBagFrame(enable)
+		self:SendMessage('BAG_FRAME_ENABLE_UPDATE', self:HasBagFrame())
+	end
+end
+
+function FrameSettings:HasBagFrame()
 	return self:GetDB():HasBagFrame()
 end
 
 --returns true if the frame has a money frame, and false otherwise
-function FrameSettings:FrameHasMoneyFrame()
+function FrameSettings:SetHasMoneyFrame(enable)
+	local enable = enable and true or false
+
+	if self:HasMoneyFrame() ~= enable then
+		self:GetDB():SetHasMoneyFrame(enable)
+		self:SendMessage('MONEY_FRAME_ENABLE_UPDATE', self:HasMoneyFrame())
+	end
+end
+
+function FrameSettings:HasMoneyFrame()
 	return self:GetDB():HasMoneyFrame()
 end
 
 --returns true if the frame has a databroker object frame, and false otherwise
-function FrameSettings:FrameHasDBOFrame()
+function FrameSettings:SetHasDBOFrame(enable)
+	local enable = enable and true or false
+
+	if self:HasDBOFrame() ~= enable then
+		self:GetDB():SetHasDBOFrame(enable)
+		self:SendMessage('DATABROKER_FRAME_ENABLE_UPDATE', self:HasDBOFrame())
+	end
+end
+
+function FrameSettings:HasDBOFrame()
 	return self:GetDB():HasDBOFrame()
 end
 
-function FrameSettings:HasSearchFrame()
-	return self:GetFrameID() ~= 'keys'
+--returns true if the search frame TOGGLE is shown, and false otherwise
+function FrameSettings:SetHasSearchToggle(enable)
+	local enable = enable and true or false
+
+	if self:HasSearchToggle() ~= enable then
+		self:GetDB():SetHasSearchToggle(enable)
+		self:SendMessage('SEARCH_TOGGLE_ENABLE_UPDATE', self:HasSearchToggle())
+	end
+end
+
+function FrameSettings:HasSearchToggle()
+	return self:GetDB():HasSearchToggle()
 end
 
 
@@ -224,6 +261,7 @@ end
 function FrameSettings:GetBrokerDisplayObject()
 	return self:GetDB():GetBrokerDisplayObject()
 end
+
 
 --[[ Bag Frame Visibility ]]--
 
@@ -383,8 +421,16 @@ function FrameSettings:GetVisibleBagSlots()
 end
 
 
+function FrameSettings:SetReverseSlotOrder(enable)
+	local enable = enable and true or false
+	if self:IsSlotOrderReversed() ~= enable then
+		self:GetDB():SetReverseSlotOrder(enable)
+		self:SendMessage('SLOT_ORDER_UPDATE', self:IsSlotOrderReversed())
+	end
+end
+
 function FrameSettings:IsSlotOrderReversed()
-	return Bagnon.Settings:IsSlotOrderReversed()
+	return self:GetDB():IsSlotOrderReversed()
 end
 
 

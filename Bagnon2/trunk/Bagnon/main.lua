@@ -94,18 +94,18 @@ function Bagnon:ShowFrame(frameID)
 	if not self:GetFrame(frameID) then
 		self:CreateFrame(frameID)
 	end
-	self.FrameSettings:Get(frameID):ShowFrame()
+	self.FrameSettings:Get(frameID):Show()
 end
 
 function Bagnon:HideFrame(frameID)
-	self.FrameSettings:Get(frameID):HideFrame()
+	self.FrameSettings:Get(frameID):Hide()
 end
 
 function Bagnon:ToggleFrame(frameID)
 	if not self:GetFrame(frameID) then
 		self:CreateFrame(frameID)
 	end
-	self.FrameSettings:Get(frameID):ToggleFrame()
+	self.FrameSettings:Get(frameID):Toggle()
 end
 
 
