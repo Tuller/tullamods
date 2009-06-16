@@ -76,6 +76,9 @@ function FrameSettings:Hide(forceHide)
 
 	if forceHide or self.shown <= 0 then
 		self.shown = 0
+		
+		--reset player filter on hide 
+		self:SetPlayerFilter(UnitName('player'))
 		self:SendMessage('FRAME_HIDE')
 	end
 end

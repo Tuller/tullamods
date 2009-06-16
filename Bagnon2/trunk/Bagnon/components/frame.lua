@@ -206,9 +206,6 @@ function Frame:OnHide()
 	if self:IsFrameShown() then
 		self:HideFrame()
 	end
-	
-	--reset player filter when the frame is closed
-	self:GetSettings():SetPlayerFilter(UnitName('player'))
 end
 
 function Frame:CloseBankFrame()
