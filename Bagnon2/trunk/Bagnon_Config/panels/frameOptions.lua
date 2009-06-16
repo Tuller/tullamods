@@ -45,6 +45,12 @@ function FrameOptions:UpdateMessages()
 	self:RegisterMessage('FRAME_BORDER_COLOR_UPDATE')
 	self:RegisterMessage('ITEM_FRAME_SPACING_UPDATE')
 	self:RegisterMessage('ITEM_FRAME_COLUMNS_UPDATE')
+	
+	self:RegisterMessage('BAG_FRAME_ENABLE_UPDATE')
+	self:RegisterMessage('MONEY_FRAME_ENABLE_UPDATE')
+	self:RegisterMessage('DATABROKER_FRAME_ENABLE_UPDATE')
+	self:RegisterMessage('SEARCH_TOGGLE_ENABLE_UPDATE')
+	self:RegisterMessage('SLOT_ORDER_UPDATE')
 end
 
 function FrameOptions:FRAME_LAYER_UPDATE(msg, frameID, layer)
@@ -89,6 +95,36 @@ function FrameOptions:ITEM_FRAME_COLUMNS_UPDATE(msg, frameID, columns)
 	end
 end
 
+function FrameOptions:BAG_FRAME_ENABLE_UPDATE(msg, frameID, enable)
+	if self:GetFrameID() == frameID then
+		self:GetToggleBagFrameCheckbox():UpdateChecked()
+	end
+end
+
+function FrameOptions:MONEY_FRAME_ENABLE_UPDATE(msg, frameID, enable)
+	if self:GetFrameID() == frameID then
+		self:GetToggleMoneyFrameCheckbox():UpdateChecked()
+	end
+end
+
+function FrameOptions:DATABROKER_FRAME_ENABLE_UPDATE(msg, frameID, enable)
+	if self:GetFrameID() == frameID then
+		self:GetToggleDBOFrameCheckbox():UpdateChecked()
+	end
+end
+
+function FrameOptions:SEARCH_TOGGLE_ENABLE_UPDATE(msg, frameID, enable)
+	if self:GetFrameID() == frameID then
+		self:GetToggleSearchFrameCheckbox():UpdateChecked()
+	end
+end
+
+function FrameOptions:SLOT_ORDER_UPDATE(msg, frameID, enable)
+	if self:GetFrameID() == frameID then
+		self:GetToggleSearchFrameCheckbox():UpdateChecked()
+	end
+end
+
 
 --[[
 	Frame Events
@@ -113,24 +149,43 @@ function FrameOptions:AddWidgets()
 	--add frame selector
 	local frameSelector = self:CreateFrameSelector()
 	frameSelector:SetPoint('TOPLEFT', self, 'TOPLEFT', -4, -64)
+	
+	
+	--[[ Checkboxes ]]--
+	
+	local toggleBagFrame = self:CreateToggleBagFrameCheckbox()
+	toggleBagFrame:SetPoint('TOPLEFT', frameSelector, 'BOTTOMLEFT', 16, -4)
+	
+	local toggleMoneyFrame = self:CreateToggleMoneyFrameCheckbox()
+	toggleMoneyFrame:SetPoint('TOPLEFT', toggleBagFrame, 'BOTTOMLEFT', 0, 0)
+	
+	local toggleDBOFrame = self:CreateToggleDBOFrameCheckbox()
+	toggleDBOFrame:SetPoint('TOPLEFT', toggleMoneyFrame, 'BOTTOMLEFT', 0, 0)
+	
+	local toggleSearchFrame = self:CreateToggleSearchFrameCheckbox()
+	toggleSearchFrame:SetPoint('TOPLEFT', toggleDBOFrame, 'BOTTOMLEFT', 0, 0)
+	
+	local reverseSlotOrdering = self:CreateReverseSlotOrderCheckbox()
+	reverseSlotOrdering:SetPoint('TOPLEFT', toggleSearchFrame, 'BOTTOMLEFT', 0, 0)
 
-	--[[ Colors ]]--
+	
+	--[[ Color Selectors ]]--
 	
 	--add color selector
 	local frameColor = self:CreateColorSelector()
-	frameColor:SetPoint('TOPLEFT', frameSelector, 'BOTTOMLEFT', 16, -8)
+	frameColor:SetPoint('TOPLEFT', frameSelector, 'BOTTOMRIGHT', -32, -6)
 		
 	--add border colors selector
 	local frameBorderColor = self:CreateBorderColorSelector()
-	frameBorderColor:SetPoint('TOPLEFT', frameColor, 'BOTTOMLEFT', 0, -4)
-
+	frameBorderColor:SetPoint('TOPLEFT', frameColor, 'BOTTOMLEFT', 0, -8)
 	
+
 	--[[ Sliders ]]--
 	
 	--add opacity slider
 	local opacity = self:CreateOpacitySlider()
-	opacity:SetPoint('BOTTOMLEFT', self, 'BOTTOMLEFT', 12, 16)
-	opacity:SetPoint('BOTTOMRIGHT', self, 'BOTTOMRIGHT', -48, 16)
+	opacity:SetPoint('BOTTOMLEFT', self, 'BOTTOMLEFT', 12, 10)
+	opacity:SetPoint('BOTTOMRIGHT', self, 'BOTTOMRIGHT', -48, 10)
 	
 	local scale = self:CreateScaleSlider()
 	scale:SetPoint('BOTTOMLEFT', opacity, 'TOPLEFT', 0, 20)
@@ -156,8 +211,8 @@ function FrameOptions:UpdateWidgets()
 
 	local settings = self:GetSettings()
 
-	self:GetColorSelector():SetColor(settings:GetFrameColor())
-	self:GetBorderColorSelector():SetColor(settings:GetFrameBorderColor())
+	self:GetColorSelector():SetColor(settings:GetColor())
+	self:GetBorderColorSelector():SetColor(settings:GetBorderColor())
 
 	self:GetColumnsSlider():UpdateValue()
 	self:GetSpacingSlider():UpdateValue()
@@ -165,6 +220,18 @@ function FrameOptions:UpdateWidgets()
 	self:GetScaleSlider():UpdateValue()
 	self:GetOpacitySlider():UpdateValue()
 	self:GetLayerSlider():UpdateValue()
+	
+	self:GetToggleBagFrameCheckbox():UpdateChecked()
+	if self:GetFrameID() == 'keys' then
+		self:GetToggleBagFrameCheckbox():Disable()
+	else
+		self:GetToggleBagFrameCheckbox():Enable()
+	end
+	
+	self:GetToggleMoneyFrameCheckbox():UpdateChecked()
+	self:GetToggleDBOFrameCheckbox():UpdateChecked()
+	self:GetToggleSearchFrameCheckbox():UpdateChecked()
+	self:GetReverseSlotOrderCheckbox():UpdateChecked()
 end
 
 
@@ -205,11 +272,11 @@ function FrameOptions:CreateColorSelector()
 	local selector = Bagnon.OptionsColorSelector:New(L.FrameColor, self, true)
 	
 	selector.OnSetColor = function(self, r, g, b, a)
-		self:GetParent():GetSettings():SetFrameColor(r, g, b, a)
+		self:GetParent():GetSettings():SetColor(r, g, b, a)
 	end
 	
 	selector.GetColor = function(self)
-		return self:GetParent():GetSettings():GetFrameColor()
+		return self:GetParent():GetSettings():GetColor()
 	end
 	
 	self.colorSelector = selector
@@ -225,11 +292,11 @@ function FrameOptions:CreateBorderColorSelector()
 	local selector = Bagnon.OptionsColorSelector:New(L.FrameBorderColor, self, true)
 	
 	selector.OnSetColor = function(self, r, g, b, a)
-		self:GetParent():GetSettings():SetFrameBorderColor(r, g, b, a)
+		self:GetParent():GetSettings():SetBorderColor(r, g, b, a)
 	end
 	
 	selector.GetColor = function(self)
-		return self:GetParent():GetSettings():GetFrameBorderColor()
+		return self:GetParent():GetSettings():GetBorderColor()
 	end
 	
 	self.borderColorSelector = selector
@@ -288,11 +355,11 @@ function FrameOptions:CreateScaleSlider()
 	local slider = Bagnon.OptionsSlider:New(L.Scale, self, 50, 200, 5)
 
 	slider.SetSavedValue = function(self, value)
-		self:GetParent():GetSettings():SetFrameScale(value / 100)
+		self:GetParent():GetSettings():SetScale(value / 100)
 	end
 
 	slider.GetSavedValue = function(self)
-		return self:GetParent():GetSettings():GetFrameScale() * 100
+		return self:GetParent():GetSettings():GetScale() * 100
 	end
 
 	slider.GetFormattedText = function(self, value)
@@ -312,11 +379,11 @@ function FrameOptions:CreateOpacitySlider()
 	local slider = Bagnon.OptionsSlider:New(L.Opacity, self, 10, 100, 1)
 
 	slider.SetSavedValue = function(self, value)
-		self:GetParent():GetSettings():SetFrameOpacity(value / 100)
+		self:GetParent():GetSettings():SetOpacity(value / 100)
 	end
 
 	slider.GetSavedValue = function(self)
-		return self:GetParent():GetSettings():GetFrameOpacity() * 100
+		return self:GetParent():GetSettings():GetOpacity() * 100
 	end
 
 	slider.GetFormattedText = function(self, value)
@@ -338,11 +405,11 @@ function FrameOptions:CreateLayerSlider()
 	slider.layers = availableLayers
 
 	slider.SetSavedValue = function(self, value)
-		self:GetParent():GetSettings():SetFrameLayer(self.layers[value])
+		self:GetParent():GetSettings():SetLayer(self.layers[value])
 	end
 
 	slider.GetSavedValue = function(self)
-		local layer = self:GetParent():GetSettings():GetFrameLayer()
+		local layer = self:GetParent():GetSettings():GetLayer()
 		for k, v in pairs(self.layers) do
 			if v == layer then
 				return k
@@ -367,23 +434,108 @@ end
 
 --[[ Check Boxes ]]--
 
-function FrameOptions:CreateLockPositionCheckbox()
-	local button = Bagnon.OptionsCheckButton:New(L.LockFramePosition, self)
+--bag frame
+function FrameOptions:CreateToggleBagFrameCheckbox()
+	local button = Bagnon.OptionsCheckButton:New(L.EnableBagFrame, self)
 	
 	button.OnEnableSetting = function(self, enable)
-		self:GetParent():GetSettings():SetMovable(not enable)
+		self:GetParent():GetSettings():SetHasBagFrame(enable)
 	end
 	
 	button.IsSettingEnabled = function(self, enable)
-		return not self:GetParent():GetSettings():IsMovable()
+		return self:GetParent():GetSettings():HasBagFrame()
 	end
 	
-	self.lockPositionCheckbox = button
+	self.toggleBagFrameCheckbox = button
 	return button
 end
 
-function FrameOptions:GetLockPositionCheckBox()
-	return self.lockPositionCheckbox
+function FrameOptions:GetToggleBagFrameCheckbox()
+	return self.toggleBagFrameCheckbox
+end
+
+
+--money frame
+function FrameOptions:CreateToggleMoneyFrameCheckbox()
+	local button = Bagnon.OptionsCheckButton:New(L.EnableMoneyFrame, self)
+	
+	button.OnEnableSetting = function(self, enable)
+		self:GetParent():GetSettings():SetHasMoneyFrame(enable)
+	end
+	
+	button.IsSettingEnabled = function(self, enable)
+		return self:GetParent():GetSettings():HasMoneyFrame()
+	end
+	
+	self.toggleMoneyFrameCheckbox = button
+	return button
+end
+
+function FrameOptions:GetToggleMoneyFrameCheckbox()
+	return self.toggleMoneyFrameCheckbox
+end
+
+
+--databroker frame
+function FrameOptions:CreateToggleDBOFrameCheckbox()
+	local button = Bagnon.OptionsCheckButton:New(L.EnableDBOFrame, self)
+	
+	button.OnEnableSetting = function(self, enable)
+		self:GetParent():GetSettings():SetHasDBOFrame(enable)
+	end
+	
+	button.IsSettingEnabled = function(self, enable)
+		return self:GetParent():GetSettings():HasDBOFrame()
+	end
+	
+	self.toggleDBOFrameCheckbox = button
+	return button
+end
+
+function FrameOptions:GetToggleDBOFrameCheckbox()
+	return self.toggleDBOFrameCheckbox
+end
+
+
+--search frame toggle
+function FrameOptions:CreateToggleSearchFrameCheckbox()
+	local button = Bagnon.OptionsCheckButton:New(L.EnableSearchToggle, self)
+	
+	button.OnEnableSetting = function(self, enable)
+		self:GetParent():GetSettings():SetHasSearchToggle(enable)
+	end
+	
+	button.IsSettingEnabled = function(self, enable)
+		return self:GetParent():GetSettings():HasSearchToggle()
+	end
+	
+	self.toggleSearchFrameCheckbox = button
+	return button
+end
+
+function FrameOptions:GetToggleSearchFrameCheckbox()
+	return self.toggleSearchFrameCheckbox
+end
+
+
+--reverse slot ordering
+function FrameOptions:CreateReverseSlotOrderCheckbox()
+	local button = Bagnon.OptionsCheckButton:New(L.ReverseSlotOrdering, self)
+
+	button.OnEnableSetting = function(self, enable)
+		self:GetParent():GetSettings():SetReverseSlotOrder(enable)
+	end
+
+	button.IsSettingEnabled = function(self)
+		return self:GetParent():GetSettings():IsSlotOrderReversed()
+	end
+
+	self.reverseSlotOrderCheckbox = button
+	return button
+end
+
+function FrameOptions:GetReverseSlotOrderCheckbox()
+	return self.reverseSlotOrderCheckbox
 end
 
 
