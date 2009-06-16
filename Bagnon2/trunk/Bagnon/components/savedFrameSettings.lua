@@ -9,6 +9,39 @@ Bagnon.SavedFrameSettings = SavedFrameSettings
 
 
 --[[---------------------------------------------------------------------------
+	Local Functions of Justice
+--]]---------------------------------------------------------------------------
+
+local function removeDefaults(tbl, defaults)
+	for k, v in pairs(defaults) do
+		if type(tbl[k]) == 'table' and type(v) == 'table' then
+			removeDefaults(tbl[k], v)
+
+			if not next(tbl[k]) then
+				tbl[k] = nil
+			end
+		elseif tbl[k] == v then
+			print('remove default', k, v)
+			tbl[k] = nil
+		end
+	end
+end
+
+local function copyDefaults(tbl, defaults)
+	for k, v in pairs(defaults) do
+		if not tbl[k] then
+			if type(v) == 'table' then
+				tbl[k] = copyDefaults({}, v)
+			else
+				tbl[k] = v
+			end
+		end
+	end
+	return tbl
+end
+
+
+--[[---------------------------------------------------------------------------
 	Constructorish
 --]]---------------------------------------------------------------------------
 
@@ -28,22 +61,106 @@ end
 
 
 --[[---------------------------------------------------------------------------
+	Events
+--]]---------------------------------------------------------------------------
+
+--create an event handler
+do
+	local f = CreateFrame('Frame')
+	f:SetScript('OnEvent', function(self, event, ...)
+		local action = SavedFrameSettings[event]
+		if action then
+			action(SavedFrameSettings, event, ...)
+		end
+	end)
+
+	f:RegisterEvent('PLAYER_LOGOUT')
+end
+
+--remove any settings that are set to defaults upon logout
+function SavedFrameSettings:PLAYER_LOGOUT()
+	self:ClearDefaults()
+end
+
+
+--[[---------------------------------------------------------------------------
 	Accessor Methods
 --]]---------------------------------------------------------------------------
+
+--get settings for all frames
+--only one instance of this for everything (hence the lack of self use)
+function SavedFrameSettings:GetGlobalDB()
+	if not SavedFrameSettings.db then
+		SavedFrameSettings.db = _G['BagnonFrameSettings']
+
+		if SavedFrameSettings.db then
+			if self:IsDBOutOfDate() then
+				self:UpgradeDB()
+			end
+		else
+			SavedFrameSettings.db = {
+				frames = {},
+				version = self:GetAddOnVersion()
+			}
+			_G['BagnonFrameSettings'] = SavedFrameSettings.db
+		end
+	end
+	return SavedFrameSettings.db
+end
+
+--get frame specific settings
+function SavedFrameSettings:GetDB()
+	if not self.frameDB then
+		self.frameDB = self:GetGlobalDB().frames[self:GetFrameID()]
+
+		if not self.frameDB then
+			self.frameDB = {}
+			self:GetGlobalDB().frames[self:GetFrameID()] = self.frameDB
+		end
+
+		copyDefaults(self.frameDB, self:GetDefaultSettings())
+	end
+	return self.frameDB
+end
 
 function SavedFrameSettings:GetFrameID()
 	return self.frameID
 end
 
-function SavedFrameSettings:GetDB()
-	local settings = Bagnon.SavedSettings:GetFrameSettings(self:GetFrameID())
-	
-	if not settings then
-		settings = self:GetDefaultSettings()
-		Bagnon.SavedSettings:SetFrameSettings(self:GetFrameID(), settings)
+
+--[[---------------------------------------------------------------------------
+	Upgrade Methods
+--]]---------------------------------------------------------------------------
+
+function SavedFrameSettings:UpgradeDB()
+	local major, minor, bugfix = self:GetDBVersion():match('(%w+)%.(%w+)%.(%w+)')
+	--do upgrade stuff
+
+	self:GetGlobalDB().version = self:GetAddOnVersion()
+end
+
+function SavedFrameSettings:IsDBOutOfDate()
+	return self:GetDBVersion() ~= self:GetAddOnVersion()
+end
+
+function SavedFrameSettings:GetDBVersion()
+	return self:GetGlobalDB().version
+end
+
+function SavedFrameSettings:GetAddOnVersion()
+	return GetAddOnMetadata('Bagnon', 'Version')
+end
+
+function SavedFrameSettings:ClearDefaults()
+	local db = self:GetGlobalDB()
+
+	for frameID, settings in pairs(db.frames) do
+		removeDefaults(settings, self:GetDefaultSettings(frameID))
+		
+		if not next(settings) then
+			db[frameID] = nil
+		end
 	end
-	
-	return settings
 end
 
 
@@ -92,15 +209,6 @@ end
 function SavedFrameSettings:GetPosition()
 	local db = self:GetDB()
 	return db.point, db.x, db.y
-end
-
-function SavedFrameSettings:SetMovable(enable)
-	local db = self:GetDB()
-	db.movable = enable or false
-end
-
-function SavedFrameSettings:IsMovable()
-	return self:GetDB().movable
 end
 
 
@@ -159,14 +267,14 @@ end
 function SavedFrameSettings:HideBag(bag)
 	local hiddenBags = self:GetDB().hiddenBags
 	local found = false
-	
+
 	for i, hiddenBag in pairs(hiddenBags) do
 		if bag == hiddenBag then
 			found = true
 			break
 		end
 	end
-	
+
 	if not found then
 		table.insert(hiddenBags, bag)
 	end
@@ -220,38 +328,38 @@ end
 --]]---------------------------------------------------------------------------
 
 --generic
-function SavedFrameSettings:GetDefaultSettings()
-	local frameID = self:GetFrameID()
-	
+function SavedFrameSettings:GetDefaultSettings(frameID)
+	local frameID = frameID or self:GetFrameID()
+
 	if frameID == 'keys' then
 		return self:GetDefaultKeyRingSettings()
 	elseif frameID == 'bank' then
 		return self:GetDefaultBankSettings()
 	end
-	
+
 	return self:GetDefaultInventorySettings()
-end	
+end
 
 --inventory
 function SavedFrameSettings:GetDefaultInventorySettings()
-	return {
+	local defaults = SavedFrameSettings.invDefaults or {
 		--bag settings
 		availableBags = {BACKPACK_CONTAINER, 1, 2, 3, 4},
 		hiddenBags = {},
 
 		--frame
 		frameColor = {0, 0, 0, 0.5},
-		frameBorderColor = {random(), random(), random(), 1},
+		frameBorderColor = {1, 1, 1, 1},
 		scale = 1,
 		opacity = 1,
-		point = 'RIGHT',
+		point = 'BOTTOMRIGHT',
 		x = 0,
-		y = 0,
+		y = 150,
 
 		--itemFrame
 		itemFrameColumns = 8,
 		itemFrameSpacing = 2,
-		
+
 		--optional components
 		hasMoneyFrame = true,
 		hasBagFrame = true,
@@ -260,28 +368,31 @@ function SavedFrameSettings:GetDefaultInventorySettings()
 		--dbo display object
 		dataBrokerObject = 'BagnonLauncher',
 	}
+
+	SavedFrameSettings.invDefaults = defaults
+	return defaults
 end
 
 --bank
 function SavedFrameSettings:GetDefaultBankSettings()
-	return {
+	local defaults = SavedFrameSettings.bankDefaults or {
 		--bag settings
 		availableBags = {BANK_CONTAINER, 5, 6, 7, 8, 9, 10, 11},
 		hiddenBags = {},
 
 		--frame
 		frameColor = {0, 0, 0, 0.5},
-		frameBorderColor = {random(), random(), random(), 1},
+		frameBorderColor = {1, 1, 0, 1},
 		scale = 1,
 		opacity = 1,
-		point = 'LEFT',
+		point = 'BOTTOMLEFT',
 		x = 0,
-		y = 0,
+		y = 150,
 
 		--itemFrame
 		itemFrameColumns = 10,
 		itemFrameSpacing = 2,
-		
+
 		--optional components
 		hasMoneyFrame = true,
 		hasBagFrame = true,
@@ -290,28 +401,30 @@ function SavedFrameSettings:GetDefaultBankSettings()
 		--dbo display object
 		dataBrokerObject = 'BagnonLauncher',
 	}
+	SavedFrameSettings.bankDefaults = defaults
+	return defaults
 end
 
 --keys
 function SavedFrameSettings:GetDefaultKeyRingSettings()
-	return {
+	local defaults = SavedFrameSettings.keyDefaults or {
 		--bag settings
 		availableBags = {KEYRING_CONTAINER},
 		hiddenBags = {},
 
 		--frame,
 		frameColor = {0, 0, 0, 0.5},
-		frameBorderColor = {random(), random(), random(), 1},
+		frameBorderColor = {0, 1, 1, 1},
 		scale = 1,
 		opacity = 1,
-		point = 'RIGHT',
-		x = 0,
-		y = -400,
+		point = 'BOTTOMRIGHT',
+		x = -350,
+		y = 150,
 
 		--itemFrame
 		itemFrameColumns = 4,
 		itemFrameSpacing = 2,
-		
+
 		--optional components
 		hasMoneyFrame = false,
 		hasBagFrame = false,
@@ -320,4 +433,6 @@ function SavedFrameSettings:GetDefaultKeyRingSettings()
 		--dbo display object
 		dataBrokerObject = 'BagnonLauncher',
 	}
+	SavedFrameSettings.keyDefaults = defaults
+	return defaults
 end

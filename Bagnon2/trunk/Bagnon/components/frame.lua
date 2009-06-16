@@ -205,11 +205,11 @@ function Frame:UpdateLook()
 		return
 	end
 
+	self:UpdatePosition()
 	self:UpdateScale()
 	self:UpdateOpacity()
 	self:UpdateBackdrop()
 	self:UpdateBackdropBorder()
-	self:UpdatePosition()
 	self:UpdateShown()
 	self:UpdateFrameLayer()
 	self:Layout()

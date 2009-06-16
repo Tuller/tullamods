@@ -2,7 +2,8 @@
 ## Title: Bagnon
 ## Author: Tuller
 ## Notes: Single window displays for your inventory, bank, and keys
-## SavedVariables: BagnonSettings
+## SavedVariables: BagnonGlobalSettings
+## SavedVariablesPerCharacter: BagnonFrameSettings
 ## Version: 2.2.1
 ## OptionalDeps: Ace3, Bagnon_Forever, Bagnon_Armory
 embeds.xml

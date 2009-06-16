@@ -37,9 +37,12 @@ function FrameSettings:GetFrameID()
 end
 
 function FrameSettings:GetDB()
+	return Bagnon.SavedFrameSettings:Get(self:GetFrameID())
+--[[
 	local db = self.db or Bagnon.SavedFrameSettings:Get(self:GetFrameID())
 	self.db = db
 	return db
+--]]
 end
 
 

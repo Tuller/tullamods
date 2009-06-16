@@ -14,7 +14,7 @@ Bagnon.Settings = Settings
 
 
 function Settings:GetDB()
-	return Bagnon.SavedSettings:GetCurrentProfile()
+	return Bagnon.SavedSettings:GetDB()
 end
 
 

@@ -1,6 +1,4 @@
 general:
-* Fix frame hide/show bug
-* Fix databroker hit rect
 * Redo saved variables: 
 	general settings -> global; 
 	frame settings -> per character; 
@@ -8,7 +6,6 @@ general:
 
 	
 general settings:
-* Item slot coloring
 * Hide frames when entering combat
 * Enable bank frame 		(requires restart)
 * Enable inventory frame 	(requires restart)

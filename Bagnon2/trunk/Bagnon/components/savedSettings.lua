@@ -9,48 +9,90 @@ local SavedSettings = {}
 Bagnon.SavedSettings = SavedSettings
 
 
---[[ 
-	Database
---]]
+--[[---------------------------------------------------------------------------
+	Local Functions of Justice
+--]]---------------------------------------------------------------------------
+
+local function removeDefaults(tbl, defaults)
+	for k, v in pairs(defaults) do
+		if type(tbl[k]) == 'table' and type(v) == 'table' then
+			removeDefaults(tbl[k], v)
+
+			if not next(tbl[k]) then
+				tbl[k] = nil
+			end
+		elseif tbl[k] == v then
+			print('remove default', k, v)
+			tbl[k] = nil
+		end
+	end
+end
+
+local function copyDefaults(tbl, defaults)
+	for k, v in pairs(defaults) do
+		if not tbl[k] then
+			if type(v) == 'table' then
+				tbl[k] = copyDefaults({}, v)
+			else
+				tbl[k] = v
+			end
+		end
+	end
+	return tbl
+end
+
+
+--[[---------------------------------------------------------------------------
+	Constructorish
+--]]---------------------------------------------------------------------------
 
 function SavedSettings:GetDB()
 	if not self.db then
-		self.db = _G['BagnonSettings']
+		self.db = _G['BagnonGlobalSettings']
+		
 		if self.db then
-			self:UpgradeDB()
+			if self:IsDBOutOfDate() then
+				self:UpgradeDB()
+			end
 		else
-			self.db = self:GetDefaultSettings()
-			_G['BagnonSettings'] = self.db
+			self.db = self:CreateNewDB()
 			Bagnon:Print(L.NewUser)
 		end
+		
+		setmetatable(self.db, {__index = self:GetDefaultSettings()})
 	end
-
 	return self.db
 end
 
-
---[[ Initialization ]]--
-
 function SavedSettings:GetDefaultSettings()
-	local db = {
-		indexes = {
-		},
-
-		profiles = {
-		},
-
-		version = self:GetAddOnVersion()
+	self.defaults = self.defaults or {
+		highlightItemsByQuality = true,
+		highlightQuestItems = true,
+		showEmptyItemSlotTexture = true,
+		lockFramePositions = false,
+		reverseSlotOrder = false,
+		colorBagSlots = true
 	}
-
-	return db
+	
+	return self.defaults
 end
 
 
---[[ Upgrading ]]--
+--[[---------------------------------------------------------------------------
+	Upgrade Methods
+--]]---------------------------------------------------------------------------
+
+
+function SavedSettings:CreateNewDB()
+	local db = {
+		version = self:GetAddOnVersion()
+	}
+	
+	_G['BagnonGlobalSettings'] = db
+	return db
+end
 
 function SavedSettings:UpgradeDB()
-	if not self:IsDBOutOfDate() then return end
-	
 	local major, minor, bugfix = self:GetDBVersion():match('(%w+)%.(%w+)%.(%w+)')
 	--do upgrade stuff
 
@@ -70,111 +112,33 @@ function SavedSettings:GetAddOnVersion()
 	return GetAddOnMetadata('Bagnon', 'Version')
 end
 
-
---[[ 
-	Profile
---]]
-
-function SavedSettings:SetProfile(profileName)
-	assert(profileName, 'Usage: SavedSettings:SetProfile(profileName)')
-
-	if profileName ~= self:GetCurrentProfileName() then
-		self:GetDB().indexes[self:GetPlayerIndex()] = profileName
+function SavedSettings:ClearDefaults()
+	local db = removeDefaults(self.db, self:GetDefaultSettings())
+	if not next(db) then
+		_G['BagnonGlobalSettings'] = nil
 	end
 end
 
-function SavedSettings:GetProfile(profileName)
-	assert(profileName, 'Usage: SavedSettings:GetProfile(profileName)')
-	
-	local db = self:GetDB()
-	local profile = db.profiles[profileName]
-	if not profile then
-		profile = self:GetDefaultProfileSettings(profileName)
-		db.profiles[profileName] = profile
-	end
-	
-	return profile
-end
 
-function SavedSettings:DeleteProfile(profileToDelete)
-	assert(profileToDelete, 'Usage: SavedSettings:GetProfile(profileToDelete)')
-	
-	if self:GetProfileName() ~= profileToDelete then
-		self:GetDB().profiles[profileToDelete] = nil
-		
-		--remove any player settings that reference this profile
-		local indexes = self:GetDB().indexes
-		for i, profileName in pairs(indexes) do
-			if profileName == profileToDelete then
-				indexes[i] = nil
-			end
+--[[---------------------------------------------------------------------------
+	Events
+--]]---------------------------------------------------------------------------
+
+
+--create an event handler
+do
+	local f = CreateFrame('Frame')
+	f:SetScript('OnEvent', function(self, event, ...)
+		local action = SavedSettings[event]
+		if action then
+			action(SavedSettings, event, ...)
 		end
-	end
-end
+	end)
 	
-
---profiles listing
-function SavedSettings:GetAvailableProfiles(tbl)
-	local profiles = tbl or {}
-	
-	for profileName in pairs(self:GetDB().profiles) do
-		table.insert(profiles, profileName)
-	end
-	
-	table.sort(profiles)
-	return ipairs(profiles)
+	f:RegisterEvent('PLAYER_LOGOUT')
 end
 
-function SavedSettings:GetDefaultProfileSettings(profileName)
-	return {
-		frames = {},
-		highlightItemsByQuality = true,
-		highlightQuestItems = true,
-		showEmptyItemSlotTexture = true,
-		lockFramePositions = false,
-		reverseSlotOrder = false,
-		colorBagSlots = true
-	}
-end
-
-
---[[
-	Player Profile Access
---]]
-
-function SavedSettings:GetCurrentProfile()
-	return self:GetProfile(self:GetCurrentProfileName())
-end
-
-function SavedSettings:GetCurrentProfileName()
-	local db = self:GetDB()
-
-	local profileName = db.indexes[self:GetPlayerIndex()]
-	if not profileName then
-		profileName = self:GetDefaultProfileName()
-		db.indexes[self:GetPlayerIndex()] = profileName
-	end
-	
-	return profileName
-end
-
-function SavedSettings:GetDefaultProfileName()
-	return (UnitClass('player'))
-end
-
-function SavedSettings:GetPlayerIndex()
-	return UnitName('player') .. ' - ' .. GetRealmName()
-end
-
-
---[[
-	Frames
---]]
-
-function SavedSettings:SetFrameSettings(frameID, settings)
-	self:GetCurrentProfile().frames[frameID] = settings
-end
-
-function SavedSettings:GetFrameSettings(frameID)
-	return self:GetCurrentProfile().frames[frameID]
+--remove any settings that are set to defaults upon logout
+function SavedSettings:PLAYER_LOGOUT()
+	self:ClearDefaults()
 end
