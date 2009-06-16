@@ -63,11 +63,10 @@ function Frame:UpdateEvents()
 		self:RegisterMessage('FRAME_MOVE_START')
 		self:RegisterMessage('FRAME_MOVE_STOP')
 		self:RegisterMessage('FRAME_POSITION_UPDATE')
-		self:RegisterMessage('FRAME_SCALE_UPDATE')
 		self:RegisterMessage('FRAME_OPACITY_UPDATE')
 		self:RegisterMessage('FRAME_COLOR_UPDATE')
 		self:RegisterMessage('FRAME_BORDER_COLOR_UPDATE')
-
+		self:RegisterMessage('FRAME_SCALE_UPDATE')
 		self:RegisterMessage('BAG_FRAME_UPDATE_SHOWN')
 		self:RegisterMessage('BAG_FRAME_UPDATE_LAYOUT')
 		self:RegisterMessage('ITEM_FRAME_SIZE_CHANGE')
@@ -224,15 +223,23 @@ end
 function Frame:UpdateScale()
 	local oldScale = self:GetScale()
 	local newScale = self:GetFrameScale()
-	local point, x, y = self:GetFramePosition()
-	local ratio = newScale / oldScale
 
-	self:SetScale(newScale)
-	self:GetSettings():SetFramePosition(point, x/ratio, y/ratio)
+	if oldScale ~= newScale then
+		local point, x, y = self:GetFramePosition()
+		local ratio = newScale / oldScale
+
+		self:SetScale(newScale)
+		self:GetSettings():SetFramePosition(point, x/ratio, y/ratio)
+	end
 end
 
 function Frame:GetFrameScale()
 	return self:GetSettings():GetFrameScale()
+end
+
+--rescale frame without altering position, needed when loading settins
+function Frame:Rescale()
+	self:SetScale(self:GetFrameScale())
 end
 
 
@@ -801,6 +808,7 @@ end
 function Frame:SetFrameID(frameID)
 	if self:GetFrameID() ~= frameID then
 		self.frameID = frameID
+		self:Rescale()
 		self:UpdateEverything()
 	end
 end
