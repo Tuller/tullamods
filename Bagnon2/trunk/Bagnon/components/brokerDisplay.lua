@@ -115,7 +115,7 @@ function BrokerDisplay:DATABROKER_OBJECT_UPDATE(msg, frameID, objectName)
 		self:UpdateDisplay()
 		
 		if GameTooltip:IsOwned(self) then
-			self:OneEnter()
+			self:OnEnter()
 		end
 	end
 end

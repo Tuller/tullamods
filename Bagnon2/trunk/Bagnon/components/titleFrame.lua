@@ -27,6 +27,8 @@ function TitleFrame:New(frameID, parent)
 	b:SetScript('OnMouseDown', b.OnMouseDown)
 	b:SetScript('OnMouseUp', b.OnMouseUp)
 	b:SetScript('OnDoubleClick', b.OnDoubleClick)
+	b:SetScript('OnEnter', b.OnEnter)
+	b:SetScript('OnLeave', b.OnLeave)
 
 	b:SetFrameID(frameID)
 	b:UpdateEvents()
@@ -69,6 +71,19 @@ function TitleFrame:OnDoubleClick()
 	self:GetSettings():ToggleTextSearch()
 end
 
+function TitleFrame:OnEnter()
+	if self:GetRight() > (GetScreenWidth() / 2) then
+		GameTooltip:SetOwner(self, 'ANCHOR_LEFT')
+	else
+		GameTooltip:SetOwner(self, 'ANCHOR_RIGHT')
+	end
+	self:UpdateTooltip()
+end
+
+function TitleFrame:OnLeave()
+	GameTooltip:Hide()
+end
+
 
 --[[ Update Methods ]]--
 
@@ -79,7 +94,7 @@ end
 function TitleFrame:UpdateTooltip()
 	if not GameTooltip:IsOwned(self) then return end
 	
-	GameTooltip:SetText(self:GetText(), 1, 1, 1)
+	GameTooltip:SetText(L.TipDoubleClickSearch)
 	GameTooltip:Show()
 end
 
