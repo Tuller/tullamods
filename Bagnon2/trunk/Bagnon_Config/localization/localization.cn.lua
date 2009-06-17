@@ -4,7 +4,7 @@
 	Bagnon Config Localization Information: Chinese Simplified
 		Credits: Diablohu, yleaf@cwdg(yaroot@gmail.com), 狂飙@cwdg(networm@qq.com)
 
-	Last Update: 2009/06/16 by 狂飙@cwdg(networm@qq.com)
+	Last Update: 2009/06/17 by 狂飙@cwdg(networm@qq.com)
 
 --]]
 
@@ -27,3 +27,8 @@ L.HighlightItemsByQuality = '按物品品质高亮物品'
 L.HighlightQuestItems = '高亮任务物品'
 L.ReverseSlotOrdering = '反向排列'
 L.ColorItemSlotsByBagType = '按背包类型对空格染色'
+L.FrameLayer = '窗口层级'
+L.EnableBagFrame = '启用背包窗口'
+L.EnableMoneyFrame = '启用货币窗口'
+L.EnableDBOFrame = '启用信息窗口'
+L.EnableSearchToggle = '启用搜索按钮'
