@@ -72,7 +72,6 @@ function ColorSelector:OnClick()
 	else
 		self.r, self.g, self.b, self.opacity = self:GetColor()
 		self.opacity = 1 - (self.opacity or 1) --correction, since the color menu is crazy
-		print(self.r, self.g, self.b, self.opacity)
 
 		OpenColorPicker(self)
 		ColorPickerFrame:SetFrameStrata('TOOLTIP')

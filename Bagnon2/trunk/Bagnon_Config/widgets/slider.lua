@@ -17,6 +17,7 @@ function OptionsSlider:New(name, parent, low, high, step)
 	f:EnableMouseWheel(true)
 
 	_G[f:GetName() .. 'Text']:SetText(name)
+	_G[f:GetName() .. 'Text']:SetFontObject('GameFontNormal')
 	_G[f:GetName() .. 'Low']:SetText('')
 	_G[f:GetName() .. 'High']:SetText('')
 
