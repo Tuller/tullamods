@@ -91,21 +91,39 @@ function Bagnon:CreateFrame(frameID)
 end
 
 function Bagnon:ShowFrame(frameID)
-	if not self:GetFrame(frameID) then
-		self:CreateFrame(frameID)
+	if self:IsFrameEnabled(frameID) then
+		if not self:GetFrame(frameID) then
+			self:CreateFrame(frameID)
+		end
+		
+		self.FrameSettings:Get(frameID):Show()
+		return true
 	end
-	self.FrameSettings:Get(frameID):Show()
+	return false
 end
 
 function Bagnon:HideFrame(frameID)
-	self.FrameSettings:Get(frameID):Hide()
+	if self:IsFrameEnabled(frameID) then
+		self.FrameSettings:Get(frameID):Hide()
+		return true
+	end
+	return false
 end
 
 function Bagnon:ToggleFrame(frameID)
-	if not self:GetFrame(frameID) then
-		self:CreateFrame(frameID)
+	if self:IsFrameEnabled(frameID) then
+		if not self:GetFrame(frameID) then
+			self:CreateFrame(frameID)
+		end
+		
+		self.FrameSettings:Get(frameID):Toggle()
+		return true
 	end
-	self.FrameSettings:Get(frameID):Toggle()
+	return false
+end
+
+function Bagnon:IsFrameEnabled(frameID)
+	return self.Settings:IsFrameEnabled(frameID)
 end
 
 
@@ -113,32 +131,54 @@ end
 	Automatic Bag Display
 --]]
 
+local function ShowBlizzardBankFrame()
+	BankFrame_OnEvent(_G['BankFrame'], 'BANKFRAME_OPENED')
+end
+
+local function HideBlizzardBankFrame()
+	BankFrame_OnEvent(_G['BankFrame'], 'BANKFRAME_CLOSED')
+end
+
 function Bagnon:HookBagEvents()
 	--backpack
 	hooksecurefunc('CloseBackpack', function()
 		self:HideFrame('inventory')
 	end)
 
-	OpenBackpack = function()
-		self:ShowFrame('inventory')
+	local oOpenBackpack = OpenBackpack
+	OpenBackpack = function(...)
+		if not self:ShowFrame('inventory') then
+			oOpenBackpack(...)
+		end
 	end
 
-	ToggleBackpack = function()
-		self:ToggleFrame('inventory')
+	local oToggleBackpack = ToggleBackpack
+	ToggleBackpack = function(...)
+		if not self:ToggleFrame('inventory') then
+			oToggleBackpack(...)
+		end
 	end
 
 	--single bag
+	local oToggleBag = ToggleBag
 	ToggleBag = function(bag)
+		local toggled = false
 		if self.BagSlotInfo:IsBankBag(bag) then
-			self:ToggleFrame('bank')
+			toggled = self:ToggleFrame('bank')
 		else
-			self:ToggleFrame('inventory')
+			toggled = self:ToggleFrame('inventory')
+		end
+		if not toggled then
+			oToggleBag(bag)
 		end
 	end
 
 	--keyring
+	local oToggleKeyRing = ToggleKeyRing
 	ToggleKeyRing = function()
-		self:ToggleFrame('keys')
+		if not self:ToggleFrame('keys') then
+			oToggleKeyRing()
+		end
 	end
 
 	--all bags
@@ -148,24 +188,36 @@ function Bagnon:HookBagEvents()
 	end)
 
 	OpenAllBags = function(force)
+		local opened = false
 		if force then
-			self:ShowFrame('inventory')
+			opened = self:ShowFrame('inventory')
 		else
-			self:ToggleFrame('inventory')
+			opened = self:ToggleFrame('inventory')
+		end
+		
+		if not opened then
+			oOpenAllBags(force)
 		end
 	end
 
 	--bank
-	BankFrame:UnregisterAllEvents()
+	BankFrame:UnregisterEvent('BANKFRAME_OPENED')
+	BankFrame:UnregisterEvent('BANKFRAME_CLOSED')
 
 	self.BagEvents:Listen(self, 'BANK_OPENED', function()
 		self:ShowFrame('inventory')
-		self:ShowFrame('bank')
+		
+		if not self:ShowFrame('bank') then
+			ShowBlizzardBankFrame()
+		end
 	end)
 
 	self.BagEvents:Listen(self, 'BANK_CLOSED', function()
 		self:HideFrame('inventory')
-		self:HideFrame('bank')
+		
+		if not self:HideFrame('bank') then
+			HideBlizzardBankFrame()
+		end
 	end)
 
 	--mailbox auto open/close evnet

@@ -191,6 +191,10 @@ function Frame:OnShow()
 
 	self:UpdateEvents()
 	self:UpdateLook()
+	
+	if self:GetFrameID() == 'inventory' then
+		self:CheckBagFrameBags(true)
+	end
 end
 
 function Frame:OnHide()
@@ -206,6 +210,10 @@ function Frame:OnHide()
 	if self:IsFrameShown() then
 		self:HideFrame()
 	end
+	
+	if self:GetFrameID() == 'inventory' then
+		self:CheckBagFrameBags(false)
+	end
 end
 
 function Frame:CloseBankFrame()
@@ -216,6 +224,15 @@ end
 
 function Frame:IsBankFrame()
 	return self:GetFrameID() == 'bank'
+end
+
+--check/uncheck the bag frames
+function Frame:CheckBagFrameBags(enable)
+	MainMenuBarBackpackButton:SetChecked(enable)
+	_G["CharacterBag0Slot"]:SetChecked(enable);
+	_G["CharacterBag1Slot"]:SetChecked(enable);
+	_G["CharacterBag2Slot"]:SetChecked(enable);
+	_G["CharacterBag3Slot"]:SetChecked(enable);
 end
 
 

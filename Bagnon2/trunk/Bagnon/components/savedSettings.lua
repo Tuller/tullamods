@@ -30,7 +30,7 @@ end
 
 local function copyDefaults(tbl, defaults)
 	for k, v in pairs(defaults) do
-		if not tbl[k] then
+		if tbl[k] == nil then
 			if type(v) == 'table' then
 				tbl[k] = copyDefaults({}, v)
 			else
