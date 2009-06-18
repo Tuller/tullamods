@@ -47,6 +47,7 @@ function GeneralOptions:UpdateMessages()
 	self:RegisterMessage('ITEM_HIGHLIGHT_QUEST_UPDATE')
 	self:RegisterMessage('LOCK_FRAME_POSITIONS_UPDATE')
 	self:RegisterMessage('ITEM_SLOT_COLOR_UPDATE')
+	self:RegisterMessage('ENABLE_FRAME_UPDATE')
 end
 
 function GeneralOptions:ITEM_HIGHLIGHT_QUALITY_UPDATE(msg, enable)
@@ -69,14 +70,27 @@ function GeneralOptions:ITEM_SLOT_COLOR_UPDATE(msg, enable)
 	self:GetColorItemSlotsCheckbox():UpdateChecked()
 end
 
+function GeneralOptions:ENABLE_FRAME_UPDATE(msg, frameID, enable)
+	self:GetEnableFrameCheckbox(frameID):UpdateChecked()
+end
+
 
 --[[
 	Widgets
 --]]
 
 function GeneralOptions:AddWidgets()
+	local enableInventory = self:CreateEnableFrameCheckbox('inventory')
+	enableInventory:SetPoint('TOPLEFT', self, 'TOPLEFT', 14, -72)
+	
+	local enableBank = self:CreateEnableFrameCheckbox('bank')
+	enableBank:SetPoint('TOPLEFT', enableInventory, 'BOTTOMLEFT', 0, 0)
+	
+	local enableKeyring = self:CreateEnableFrameCheckbox('keys')
+	enableKeyring:SetPoint('TOPLEFT', enableBank, 'BOTTOMLEFT', 0, 0)
+	
 	local lockFramePositions = self:CreateLockFramePositionsCheckbox()
-	lockFramePositions:SetPoint('TOPLEFT', self, 'TOPLEFT', 14, -72)
+	lockFramePositions:SetPoint('TOPLEFT', enableKeyring, 'BOTTOMLEFT', 0, 0)
 	
 	local showEmptyItemSlotTextures = self:CreateEmptyItemSlotTextureCheckbox()
 	showEmptyItemSlotTextures:SetPoint('TOPLEFT', lockFramePositions, 'BOTTOMLEFT', 0, 0)
@@ -96,6 +110,10 @@ function GeneralOptions:UpdateWidgets()
 		return
 	end
 
+	self:GetEnableFrameCheckbox('inventory'):UpdateChecked()
+	self:GetEnableFrameCheckbox('bank'):UpdateChecked()
+	self:GetEnableFrameCheckbox('keyring'):UpdateChecked()
+
 	self:GetEmptyItemSlotTextureCheckbox():UpdateChecked()
 	self:GetHighlightItemsByQualityCheckbox():UpdateChecked()
 	self:GetHighlightQuestItemsCheckbox():UpdateChecked()
@@ -104,6 +122,42 @@ end
 
 
 --[[ Checkboxes ]]--
+
+function GeneralOptions:CreateEnableFrameCheckbox(frameID)
+	local button = Bagnon.OptionsCheckButton:New(L['EnableFrame_' .. frameID], self)
+	button.frameID = frameID
+
+	button.OnEnableSetting = function(self, enable)
+		Bagnon.Settings:SetEnableFrame(self.frameID, enable)
+		GeneralOptions:DisplayRequiresRestartPopup()
+	end
+
+	button.IsSettingEnabled = function(self)
+		return Bagnon.Settings:WillFrameBeEnabled(self.frameID)
+	end
+
+	self['enableFrame_' .. frameID .. '_Checkbox'] = button
+	return button
+end
+
+function GeneralOptions:GetEnableFrameCheckbox(frameID)
+	return self['enableFrame_' .. frameID .. '_Checkbox']
+end
+
+function GeneralOptions:DisplayRequiresRestartPopup()
+	self:CreateRequiresRestartDialog()
+	StaticPopup_Show('BAGNON_CONFIRM_REQUIRES_RESTART')
+end
+
+function GeneralOptions:CreateRequiresRestartDialog()
+	if not StaticPopupDialogs['BAGNON_CONFIRM_REQUIRES_RESTART'] then
+		StaticPopupDialogs['BAGNON_CONFIRM_REQUIRES_RESTART'] = {
+			text = L.SettingRequiresRestart,
+			button1 = OKAY,
+			timeout = 0, exclusive = 1, hideOnEscape = 1
+		}
+	end
+end
 
 --show empty item slot textures
 function GeneralOptions:CreateEmptyItemSlotTextureCheckbox()
