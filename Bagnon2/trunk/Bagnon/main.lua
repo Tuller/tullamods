@@ -123,7 +123,8 @@ function Bagnon:ToggleFrame(frameID)
 end
 
 function Bagnon:IsFrameEnabled(frameID)
-	return self.Settings:IsFrameEnabled(frameID)
+	return true
+--	return self.Settings:IsFrameEnabled(frameID)
 end
 
 
