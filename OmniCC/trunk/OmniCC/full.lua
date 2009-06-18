@@ -318,7 +318,7 @@ function OmniCC:GetFormattedTime(s)
 	if self:UseTenthsOfSeconds() and s < self:GetTenthsOfSecondsThreshold() then
 		return format('%.1f', s), (s * 100 - floor(s * 100))/100
 	end
-	return floor(s + 0.5), s - floor(s)
+	return floor(s + 0.5), (s * 100 - floor(s * 100))/100
 end
 
 function OmniCC:GetFormattedFont(s)
