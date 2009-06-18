@@ -47,23 +47,32 @@ function ItemFrame:ITEM_SLOT_REMOVE(msg, bag, slot)
 	self:RemoveItemSlot(bag, slot)
 end
 
-function ItemFrame:BANK_SHOW(msg)
+function ItemFrame:BANK_OPENED(msg)
 	self:UpdateEverything()
+	self:HandleGlobalItemEvent(msg)
 end
 
-function ItemFrame:BANK_HIDE(msg)
+function ItemFrame:BANK_CLOSED(msg)
 	self:UpdateEverything()
+	self:HandleGlobalItemEvent(msg)
 end
 
 function ItemFrame:PLAYER_UPDATE(msg, frameID, player)
 	if self:GetFrameID() == frameID then
 		self:UpdateEverything()
+		self:HandleGlobalItemEvent(msg)
 	end
 end
 
 function ItemFrame:BAGS_UPDATE(msg, frameID)
 	if self:GetFrameID() == frameID then
 		self:UpdateEverything()
+	end
+end
+
+function ItemFrame:BAG_UPDATE_TYPE(msg, bag, type)
+	if self:IsBagShown(bag) and not self:IsBagSlotCached(bag) then
+		self:UpdateAllItemSlotsForBag(bag)
 	end
 end
 
@@ -94,6 +103,21 @@ end
 function ItemFrame:SLOT_ORDER_UPDATE(msg, frameID, enable)
 	if self:GetFrameID() == frameID then
 		self:RequestLayout()
+	end
+end
+
+function ItemFrame:HandleGlobalItemEvent(msg, ...)
+	for i, item in self:GetAllItemSlots() do
+		item:HandleEvent(msg, ...)
+	end
+end
+
+function ItemFrame:HandleSpecificItemEvent(msg, bag, slot, ...)
+	if self:HasBag(bag) and not self:IsBagSlotCached(bag) then	
+		local item = self:GetItem(bag, slot)
+		if item then
+			item:HandleEvent(msg, bag, slot, ...)
+		end
 	end
 end
 
@@ -138,6 +162,7 @@ function ItemFrame:UpdateEverything()
 end
 
 function ItemFrame:UpdateEvents()
+	self:UnregisterAllEvents()
 	self:UnregisterAllItemEvents()
 	self:UnregisterAllMessages()
 
@@ -146,9 +171,25 @@ function ItemFrame:UpdateEvents()
 			self:RegisterItemEvent('ITEM_SLOT_ADD')
 			self:RegisterItemEvent('ITEM_SLOT_REMOVE')
 			
-			self:RegisterItemEvent('BANK_SHOW')
-			self:RegisterItemEvent('BANK_HIDE')
+			self:RegisterItemEvent('BANK_OPENED')
+			self:RegisterItemEvent('BANK_CLOSED')
+			
+			self:RegisterItemEvent('BAG_UPDATE_TYPE')
+			
+			self:RegisterItemEvent('ITEM_SLOT_UPDATE', 'HandleSpecificItemEvent')
+			self:RegisterItemEvent('ITEM_SLOT_UPDATE_COOLDOWN', 'HandleSpecificItemEvent')
+			self:RegisterEvent('ITEM_LOCK_CHANGED', 'HandleSpecificItemEvent')
+			
+			self:RegisterMessage('TEXT_SEARCH_UPDATE', 'HandleGlobalItemEvent')
+			self:RegisterMessage('TEXT_SEARCH_ENABLE', 'HandleGlobalItemEvent')
+			self:RegisterMessage('TEXT_SEARCH_DISABLE', 'HandleGlobalItemEvent')
+			self:RegisterMessage('BAG_SEARCH_UPDATE', 'HandleGlobalItemEvent')
+			self:RegisterMessage('ITEM_HIGHLIGHT_QUEST_UPDATE', 'HandleGlobalItemEvent')
+			self:RegisterMessage('ITEM_HIGHLIGHT_QUALITY_UPDATE', 'HandleGlobalItemEvent')
+			self:RegisterMessage('SHOW_EMPTY_ITEM_SLOT_TEXTURE_UPDATE', 'HandleGlobalItemEvent')
+			self:RegisterMessage('ITEM_SLOT_COLOR_UPDATE', 'HandleGlobalItemEvent')
 		end
+
 		self:RegisterMessage('BAGS_UPDATE')
 		self:RegisterMessage('BAG_SLOT_SHOW')
 		self:RegisterMessage('BAG_SLOT_HIDE')
@@ -168,6 +209,8 @@ function ItemFrame:AddItemSlot(bag, slot)
 		local itemSlot = Bagnon.ItemSlot:New(bag, slot, self:GetFrameID(), self)
 		self.itemSlots[self:GetSlotIndex(bag, slot)] = itemSlot
 		self:RequestLayout()
+		
+		itemSlot:Update()
 	end
 end
 
@@ -181,9 +224,20 @@ function ItemFrame:RemoveItemSlot(bag, slot)
 	end
 end
 
+function ItemFrame:UpdateItemSlot(bag, slot)
+	local itemSlot = self:GetItemSlot(bag, slot)
+	if itemSlot then
+		itemSlot:Update()
+	end
+end
+
 --returns the item slot assigned to the given slotIndex
 function ItemFrame:GetItemSlot(bag, slot)
 	return self.itemSlots[self:GetSlotIndex(bag, slot)]
+end
+
+function ItemFrame:GetAllItemSlots()
+	return pairs(self.itemSlots)
 end
 
 --takes a bag and a slot, and returns an array index
@@ -204,6 +258,12 @@ end
 function ItemFrame:RemoveAllItemSlotsForBag(bag)
 	for slot = 1, self:GetBagSize(bag) do
 		self:RemoveItemSlot(bag, slot)
+	end
+end
+
+function ItemFrame:UpdateAllItemSlotsForBag(bag)
+	for slot = 1, self:GetBagSize(bag) do
+		self:UpdateItemSlot(bag, slot)
 	end
 end
 
@@ -309,6 +369,10 @@ end
 
 function ItemFrame:IsBagShown(bag)
 	return self:GetSettings():IsBagSlotShown(bag)
+end
+
+function ItemFrame:IsBagSlotCached(bag)
+	return Bagnon.BagSlotInfo:IsCached(self:GetPlayer(), bag)
 end
 
 function ItemFrame:GetVisibleBags()

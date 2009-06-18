@@ -17,11 +17,10 @@ local function removeDefaults(tbl, defaults)
 		if type(tbl[k]) == 'table' and type(v) == 'table' then
 			removeDefaults(tbl[k], v)
 
-			if not next(tbl[k]) then
+			if next(tbl[k]) == nil then
 				tbl[k] = nil
 			end
 		elseif tbl[k] == v then
-			print('remove default', k, v)
 			tbl[k] = nil
 		end
 	end
@@ -29,12 +28,10 @@ end
 
 local function copyDefaults(tbl, defaults)
 	for k, v in pairs(defaults) do
-		if tbl[k] == nil then
-			if type(v) == 'table' then
-				tbl[k] = copyDefaults({}, v)
-			else
-				tbl[k] = v
-			end
+		if type(v) == 'table' then
+			tbl[k] = copyDefaults(tbl[k] or {}, v)
+		elseif tbl[k] == nil then
+			tbl[k] = v
 		end
 	end
 	return tbl
@@ -157,9 +154,13 @@ function SavedFrameSettings:ClearDefaults()
 	for frameID, settings in pairs(db.frames) do
 		removeDefaults(settings, self:GetDefaultSettings(frameID))
 		
-		if not next(settings) then
+		if next(settings) == nil then
 			db[frameID] = nil
 		end
+	end
+	
+	if next(db) == nil then
+		_G['BagnonFrameSettings'] = nil
 	end
 end
 

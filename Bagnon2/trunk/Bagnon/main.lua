@@ -187,6 +187,7 @@ function Bagnon:HookBagEvents()
 		self:HideFrame('inventory')
 	end)
 
+	local oOpenAllBags = OpenAllBags
 	OpenAllBags = function(force)
 		local opened = false
 		if force then

@@ -96,8 +96,13 @@ end
 
 --enable frames
 function Settings:SetEnableFrame(frameID, enable)
-	Settings.framesToEnable = Settings.framesToEnable or setmetatable({}, {__index = self:GetDB().enabledFrames})
-	Settings.framesToEnable[frameID] = enable and true or false
+	local enable = enable and true or false
+	if self:WillFrameBeEnabled(frameID) ~= enable then
+		self.framesToEnable = self.framesToEnable or setmetatable({}, {__index = self:GetDB().enabledFrames})
+		self.framesToEnable[frameID] = enable and true or false
+
+		self:SendMessage('ENABLE_FRAME_UPDATE', frameID, self:WillFrameBeEnabled(frameID))
+	end
 end
 
 function Settings:IsFrameEnabled(frameID)
@@ -105,6 +110,15 @@ function Settings:IsFrameEnabled(frameID)
 end
 
 function Settings:WillFrameBeEnabled(frameID)
-	Settings.framesToEnable = Settings.framesToEnable or setmetatable({}, {__index = self:GetDB().enabledFrames})
-	return Settings.framesToEnable][frameID]
+	self.framesToEnable = self.framesToEnable or setmetatable({}, {__index = self:GetDB().enabledFrames})
+	return self.framesToEnable[frameID]
+end
+
+function Settings:AreAllFramesEnabled()
+	for frameID, isEnabled in pairs(self:GetDB().enabledFrames) do
+		if not isEnabled then
+			return false
+		end
+	end
+	return true
 end

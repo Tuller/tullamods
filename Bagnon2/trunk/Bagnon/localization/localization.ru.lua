@@ -1,40 +1,56 @@
 ﻿--[[
 	Bagnon Localization Information: Russian Localization by kutensky
+	Updated by StingerSoft
 		This file must be present to have partial translations
 --]]
 
 local L = LibStub('AceLocale-3.0'):NewLocale('Bagnon', 'ruRU')
 if not L then return end
 
-L.BagnonToggle = "Открыть инвентарь"
-L.BanknonToggle = "Открыть сейф банка"
+--keybinding text
+L.ToggleBags = 'Открыть/закрыть инвентарь'
+L.ToggleBank = 'Открыть/закрыть банк'
+L.ToggleKeys = 'Открыть/закрыть связку ключей'
+
 
 --system messages
-L.NewUser = "Обнаружен новый пользователь, загружены стандартные настройки"
-L.Updated = "Updated to v%s"
-L.UpdatedIncompatible = "Updating from an incompatible version, defaults loaded"
+L.NewUser = 'Обнаружен новый пользователь, загружены стандартные настройки'
+L.Updated = 'Обновлено до v%s'
+L.UpdatedIncompatible = 'Обновление от несовместимой версии, загружены стандартные настройки'
 
---errors
-L.ErrorNoSavedBank = "Невозможно открыть сейф, сохраненные данные не доступны"
-L.vBagnonLoaded = format("vBagnon and Bagnon are incompatible. Click %s to disable vBagnon and reload your UI", TEXT(ACCEPT))
 
 --slash commands
-L.Commands = "Команды:"
-L.ShowBagsDesc = "Открыть инвентарь"
-L.ShowBankDesc = "Открыть сейф банка"
-L.ShowVersionDesc = 'Сообщить версию программы'
+L.Commands = 'Команды:'
+L.CmdShowInventory = 'Открыть/закрыть инвентарь'
+L.CmdShowBank = 'Открыть/закрыть банк'
+L.CmdShowKeyring = 'Открыть/закрыть связку ключей'
+L.CmdShowVersion = 'Сообщить текущую версию модификации'
+
 
 --frame text
-L.TitleBank = "Сейф игрока %s"
-L.TitleBags = "Инвентарь игрока %s"
-L.ShowBags = "Показать сумки"
-L.HideBags = "Убрать сумки"
+L.TitleBags = 'Инвентарь |3-1(%s)'
+L.TitleBank = 'Банк |3-1(%s)'
+L.TitleKeys = 'Связка ключей |3-1(%s)'
+
 
 --tooltips
-L.TipShowMenu = "<ПКМ> Настройки"
-L.TipShowSearch = "<Двойной клик> Поиск"
-L.TipShowBag = "<Клик> отобразить сумку"
-L.TipHideBag = "<Клик> спрятать сумку"
-L.TipGoldOnRealm = "Всего денег на %s"
+L.TipBank = 'Банк'
+L.TipChangePlayer = '<Клик> - просмотр предметов другого персонажа.'
+L.TipGoldOnRealm = 'Всего денег на %s'
+L.TipHideBag = '<Клик> - скрыть сумку.'
+L.TipHideBags = '<Клик> - скрыть область сумок.'
+L.TipHideSearch = '<Клик> скрыть область поиска.'
+L.TipPurchaseBag = '<Клик> - купить ячейку в банке.'
+L.TipShowBag = '<Клик> - показать сумку.'
+L.TipShowBags = '<Клик> - показать область сумки.'
+L.TipShowMenu = '<Правый-клик> - настройки.'
+L.TipShowSearch = '<Клик> - показать окно поиска.'
+L.TipShowSearch = '<Клик> - поиск.'
+L.TipShowFrameConfig = '<Правый-клик> - настройки.'
+L.Total = 'Всего'
 
-L.ConfirmReloadUI = 'Изменение вступит в силу после перезагрузки игры'
+--databroker tooltips
+L.TipShowBank = '<Shift-Левый клик> - открыть/закрыть банк.'
+L.TipShowInventory = '<Левый клик> - открыть/закрыть инвентарь.'
+L.TipShowKeyring = '<Alt-левый клик> - открыть/закрыть связку ключей.'
+L.TipShowOptions = '<Правый-клик> - настройки.'

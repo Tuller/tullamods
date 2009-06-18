@@ -121,8 +121,14 @@ end
 
 function PlayerSelector:GetPlayerIcon()
 	local race, enRace = UnitRace('player')
+
+	--forsaken hack
+	if enRace == 'Scourge' then
+		enRace = 'Undead'
+	end
+
 	local sex = UnitSex('player')
-	if sex == 3 then 
+	if sex == 3 then
 		return string.format([[Interface\Icons\Achievement_Character_%s_%s]], enRace, 'Female')
 	end
 	return string.format([[Interface\Icons\Achievement_Character_%s_%s]], enRace, 'Male')

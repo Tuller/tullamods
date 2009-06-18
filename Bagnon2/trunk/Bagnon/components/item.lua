@@ -52,7 +52,7 @@ function ItemSlot:Create()
 	item.cooldown = _G[item:GetName() .. 'Cooldown']
 
 	--get rid of any registered frame events, and use my own
-	item:SetScript('OnEvent', item.OnEvent)
+	item:SetScript('OnEvent', nil)
 	item:SetScript('OnEnter', item.OnEnter)
 	item:SetScript('OnLeave', item.OnLeave)
 	item:SetScript('OnShow', item.OnShow)
@@ -70,6 +70,11 @@ end
 
 --returns an available blizzard item slot for <id>
 function ItemSlot:GetBlizzardItemSlot(id)
+	--only allow reuse of blizzard frames if all frames are enabled
+	if not Bagnon.Settings:AreAllFramesEnabled() then
+		return nil
+	end
+
 	local bag = math.ceil(id / MAX_CONTAINER_ITEMS)
 	local slot = (id-1) % MAX_CONTAINER_ITEMS + 1
 	local item = _G[format('ContainerFrame%dItem%d', bag, slot)]
@@ -108,7 +113,7 @@ function ItemSlot:Free()
 	self:Hide()
 	self:SetParent(nil)
 	self:UnregisterAllEvents()
-	self:UnregisterAllItemSlotEvents()
+--	self:UnregisterAllItemSlotEvents()
 	self:UnregisterAllMessages()
 
 	ItemSlot.unused = ItemSlot.unused or {}
@@ -130,24 +135,16 @@ function ItemSlot:ITEM_SLOT_UPDATE_COOLDOWN(msg, bag, slot)
 	end
 end
 
-function ItemSlot:ITEM_SLOT_ADD(msg, bag, slot)
-	if self:IsSlot(bag, slot) then
-		self:Update()
-	end
-end
-
-function ItemSlot:ITEM_SLOT_UPDATE(msg, bag, slot)
-	if self:IsSlot(bag, slot) then
-		self:Update()
-	end
-end
-
 function ItemSlot:BANK_OPENED(msg)
-	self:UpdateEverything()
+	if self:IsBankSlot() then
+		self:UpdateEverything()
+	end
 end
 
 function ItemSlot:BANK_CLOSED(msg)
-	self:UpdateEverything()
+	if self:IsBankSlot() then
+		self:UpdateEverything()
+	end
 end
 
 function ItemSlot:PLAYER_UPDATE(msg, frameID, player)
@@ -196,34 +193,21 @@ function ItemSlot:ITEM_SLOT_COLOR_UPDATE(msg, enable)
 	self:Update()
 end
 
---event registration
-function ItemSlot:RegisterItemSlotEvent(...)
-	Bagnon.BagEvents:Listen(self, ...)
-end
-
-function ItemSlot:UnregisterItemSlotEvent(...)
-	Bagnon.BagEvents:Ignore(self, ...)
-end
-
-function ItemSlot:UnregisterAllItemSlotEvents(...)
-	Bagnon.BagEvents:IgnoreAll(self, ...)
+function ItemSlot:HandleEvent(msg, ...)
+	local action = self[msg]
+	if action then
+		action(self, msg, ...)
+	end
 end
 
 
 --[[ Frame Events ]]--
-
-function ItemSlot:OnEvent(event, ...)
-	if self[event] then
-		self[event](self, event, ...)
-	end
-end
 
 function ItemSlot:OnShow()
 	self:UpdateEverything()
 end
 
 function ItemSlot:OnHide()
-	self:UpdateEvents()
 	self:HideStackSplitFrame()
 end
 
@@ -272,40 +256,7 @@ end
 --[[ Update Methods ]]--
 
 function ItemSlot:UpdateEverything()
-	self:UpdateEvents()
 	self:Update()
-end
-
-
---register/unregister events based on visibility
-function ItemSlot:UpdateEvents()
-	self:UnregisterAllEvents()
-	self:UnregisterAllItemSlotEvents()
-	self:UnregisterAllMessages()
-
-	if self:IsVisible() then
-		self:RegisterMessage('PLAYER_UPDATE')
-		self:RegisterMessage('TEXT_SEARCH_UPDATE')
-		self:RegisterMessage('TEXT_SEARCH_ENABLE')
-		self:RegisterMessage('TEXT_SEARCH_DISABLE')
-		self:RegisterMessage('BAG_SEARCH_UPDATE')
-		self:RegisterMessage('ITEM_HIGHLIGHT_QUEST_UPDATE')
-		self:RegisterMessage('ITEM_HIGHLIGHT_QUALITY_UPDATE')
-		self:RegisterMessage('SHOW_EMPTY_ITEM_SLOT_TEXTURE_UPDATE')
-		self:RegisterMessage('ITEM_SLOT_COLOR_UPDATE')
-
-		if self:IsBankSlot() then
-			self:RegisterItemSlotEvent('BANK_OPENED')
-			self:RegisterItemSlotEvent('BANK_CLOSED')
-		end
-
-		if not self:IsCached() then
-			self:RegisterEvent('ITEM_LOCK_CHANGED')
-			self:RegisterItemSlotEvent('ITEM_SLOT_ADD')
-			self:RegisterItemSlotEvent('ITEM_SLOT_UPDATE')
-			self:RegisterItemSlotEvent('ITEM_SLOT_UPDATE_COOLDOWN')
-		end
-	end
 end
 
 

@@ -27,6 +27,10 @@
 	BANK_CLOSED
 	args:		none
 		called when the bank is closed and all of the bagnon events have SendMessaged
+		
+	BAG_UPDATE_TYPE
+	args:	bag, type
+		called when the type of a bag changes (aka, what items you can put in it changes)
 --]]
 
 
@@ -38,6 +42,7 @@ Bagnon.BagEvents = BagEvents
 --[[ privates? ]]--
 
 local slots = {}
+local bagTypes = {}
 
 local function ToIndex(bag, slot)
 	return (bag < 0 and bag*100 - slot) or bag*100 + slot
@@ -172,6 +177,17 @@ function BagEvents:UpdateBagSize(bag)
 	end
 end
 
+function BagEvents:UpdateBagType(bag)
+	local _, newType = GetContainerNumFreeSlots(bag)
+	local prevType = bagTypes[bag]
+
+	if newType ~= prevType then
+		bagTypes[bag] = newType
+		self:SendMessage('BAG_UPDATE_TYPE', bag, newType)
+	end
+end
+
+
 function BagEvents:UpdateBagSizes()
 	if self:AtBank() then
 		for bag = 1, NUM_BAG_SLOTS + GetNumBankSlots() do
@@ -183,6 +199,18 @@ function BagEvents:UpdateBagSizes()
 		end
 	end
 	self:UpdateBagSize(KEYRING_CONTAINER)
+end
+
+function BagEvents:UpdateBagTypes()
+	if self:AtBank() then
+		for bag = 1, NUM_BAG_SLOTS + GetNumBankSlots() do
+			self:UpdateBagType(bag)
+		end
+	else
+		for bag = 1, NUM_BAG_SLOTS do
+			self:UpdateBagType(bag)
+		end
+	end
 end
 
 
@@ -204,11 +232,13 @@ function BagEvents:PLAYER_LOGIN(...)
 end
 
 function BagEvents:BAG_UPDATE(event, bag)
+	self:UpdateBagTypes()
 	self:UpdateBagSizes()
 	self:UpdateItems(bag)
 end
 
 function BagEvents:PLAYERBANKSLOTS_CHANGED(...)
+	self:UpdateBagTypes()
 	self:UpdateBagSizes()
 	self:UpdateItems(BANK_CONTAINER)
 end
@@ -220,6 +250,7 @@ function BagEvents:BANKFRAME_OPENED(...)
 		self.firstVisit = nil
 
 		self:UpdateBagSize(BANK_CONTAINER)
+		self:UpdateBagTypes()
 		self:UpdateBagSizes()
 	end
 
