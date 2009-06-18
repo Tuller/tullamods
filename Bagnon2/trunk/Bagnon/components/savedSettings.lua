@@ -70,7 +70,12 @@ function SavedSettings:GetDefaultSettings()
 		highlightQuestItems = true,
 		showEmptyItemSlotTexture = true,
 		lockFramePositions = false,
-		colorBagSlots = true
+		colorBagSlots = true,
+		enabledFrames = {
+			inventory = true,
+			bank = true,
+			keys = true,
+		}
 	}
 	
 	return self.defaults
@@ -139,5 +144,14 @@ end
 
 --remove any settings that are set to defaults upon logout
 function SavedSettings:PLAYER_LOGOUT()
+	--handle disabling frames
+	local framesToEnable = Bagnon.Settings.framesToEnable
+	if framesToEnable then
+		for frameID, enableStatus in pairs(framesToEnable) do
+			self:GetDB().framesToEnable[frameID] = enableStatus
+		end
+	end
+	
+	--clear defaults
 	self:ClearDefaults()
 end

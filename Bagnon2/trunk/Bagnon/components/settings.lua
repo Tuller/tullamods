@@ -93,3 +93,18 @@ end
 function Settings:ColoringBagSlots()
 	return self:GetDB().colorBagSlots
 end
+
+--enable frames
+function Settings:SetEnableFrame(frameID, enable)
+	Settings.framesToEnable = Settings.framesToEnable or setmetatable({}, {__index = self:GetDB().enabledFrames})
+	Settings.framesToEnable[frameID] = enable and true or false
+end
+
+function Settings:IsFrameEnabled(frameID)
+	return self:GetDB().enabledFrames[frameID] and true or false
+end
+
+function Settings:WillFrameBeEnabled(frameID)
+	Settings.framesToEnable = Settings.framesToEnable or setmetatable({}, {__index = self:GetDB().enabledFrames})
+	return Settings.framesToEnable][frameID]
+end
