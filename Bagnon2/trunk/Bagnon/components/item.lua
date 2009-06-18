@@ -122,18 +122,6 @@ end
 
 --[[ Events ]]--
 
-function ItemSlot:ITEM_LOCK_CHANGED(event, bag, slot)
-	if self:IsSlot(bag, slot) then
-		self:UpdateLocked()
-	end
-end
-
-function ItemSlot:ITEM_SLOT_UPDATE_COOLDOWN(msg, bag, slot)
-	if self:IsSlot(bag, slot) then
-		self:UpdateCooldown()
-	end
-end
-
 function ItemSlot:ITEM_SLOT_UPDATE(msg, bag, slot)
 	if self:IsSlot(bag, slot) then
 		self:Update()
