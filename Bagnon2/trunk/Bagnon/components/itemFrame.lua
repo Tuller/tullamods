@@ -32,6 +32,7 @@ function ItemFrame:New(frameID, parent)
 	f.throttledUpdater:SetScript('OnUpdate', throttledUpdater_OnUpdate)
 	f:SetFrameID(frameID)
 	f:SetScript('OnSizeChanged', f.OnSizeChanged)
+	f:SetScript('OnEvent', f.OnEvent)
 
 	return f
 end
@@ -39,12 +40,23 @@ end
 
 --[[ Messages ]]--
 
+function ItemFrame:OnEvent(event, ...)
+	local action = self[event]
+	if action then
+		action(self, event, ...)
+	end
+end
+
 function ItemFrame:ITEM_SLOT_ADD(msg, bag, slot)
 	self:AddItemSlot(bag, slot)
 end
 
 function ItemFrame:ITEM_SLOT_REMOVE(msg, bag, slot)
 	self:RemoveItemSlot(bag, slot)
+end
+
+function ItemFrame:ITEM_LOCK_CHANGED(msg, bag, slot, ...)
+	self:HandleSpecificItemEvent(msg, bag, slot, ...)
 end
 
 function ItemFrame:BANK_OPENED(msg)
@@ -113,8 +125,8 @@ function ItemFrame:HandleGlobalItemEvent(msg, ...)
 end
 
 function ItemFrame:HandleSpecificItemEvent(msg, bag, slot, ...)
-	if self:HasBag(bag) and not self:IsBagSlotCached(bag) then	
-		local item = self:GetItem(bag, slot)
+	if self:IsBagShown(bag) and (not self:IsBagSlotCached(bag)) then	
+		local item = self:GetItemSlot(bag, slot)
 		if item then
 			item:HandleEvent(msg, bag, slot, ...)
 		end
