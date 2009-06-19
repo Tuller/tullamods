@@ -148,8 +148,8 @@ function BrokerDisplay:OnLeave()
 	local dbo = self:GetObject()
 	if not dbo then return end
 
-	if dbo.OnHide then
-		dbo.OnHide(self)
+	if dbo.OnLeave then
+		dbo.OnLeave(self)
 	else
 		if GameTooltip:IsOwned(self) then
 			GameTooltip:Hide()
