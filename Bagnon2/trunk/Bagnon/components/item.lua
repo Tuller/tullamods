@@ -419,10 +419,12 @@ end
 function ItemSlot:UpdateSearch()
 	local shouldFade = false
 	local search = self:GetItemSearch()
+	
 	if search and search ~= '' then
 		local itemLink = self:GetItem()
 		shouldFade = not(itemLink and Bagnon.ItemSearch:Find(itemLink, search))
 	end
+	
 	if shouldFade then
 		self:SetAlpha(0.4)
 		SetItemButtonDesaturated(self, true)
