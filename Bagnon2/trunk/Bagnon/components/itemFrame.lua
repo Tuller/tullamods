@@ -48,15 +48,21 @@ function ItemFrame:OnEvent(event, ...)
 end
 
 function ItemFrame:ITEM_SLOT_ADD(msg, bag, slot)
-	self:AddItemSlot(bag, slot)
+	if self:IsBagShown(bag) and (not self:IsBagSlotCached(bag)) then
+		self:AddItemSlot(bag, slot)
+	end
 end
 
 function ItemFrame:ITEM_SLOT_REMOVE(msg, bag, slot)
-	self:RemoveItemSlot(bag, slot)
+	if self:IsBagShown(bag) and (not self:IsBagSlotCached(bag)) then
+		self:RemoveItemSlot(bag, slot)
+	end
 end
 
 function ItemFrame:ITEM_LOCK_CHANGED(msg, bag, slot, ...)
-	self:HandleSpecificItemEvent(msg, bag, slot, ...)
+	if slot and self:IsBagShown(bag) and (not self:IsBagSlotCached(bag)) then
+		self:HandleSpecificItemEvent(msg, bag, slot, ...)
+	end
 end
 
 function ItemFrame:BANK_OPENED(msg)
@@ -73,12 +79,6 @@ function ItemFrame:PLAYER_UPDATE(msg, frameID, player)
 	if self:GetFrameID() == frameID then
 		self:UpdateEverything()
 		self:HandleGlobalItemEvent(msg)
-	end
-end
-
-function ItemFrame:BAGS_UPDATE(msg, frameID)
-	if self:GetFrameID() == frameID then
-		self:UpdateEverything()
 	end
 end
 
@@ -125,7 +125,7 @@ function ItemFrame:HandleGlobalItemEvent(msg, ...)
 end
 
 function ItemFrame:HandleSpecificItemEvent(msg, bag, slot, ...)
-	if self:IsBagShown(bag) and (not self:IsBagSlotCached(bag)) then	
+	if self:IsBagShown(bag) and (not self:IsBagSlotCached(bag)) then
 		local item = self:GetItemSlot(bag, slot)
 		if item then
 			item:HandleEvent(msg, bag, slot, ...)
@@ -180,18 +180,17 @@ function ItemFrame:UpdateEvents()
 
 	if self:IsVisible() then
 		if not self:IsCached() then
+			self:RegisterEvent('ITEM_LOCK_CHANGED')
+
 			self:RegisterItemEvent('ITEM_SLOT_ADD')
 			self:RegisterItemEvent('ITEM_SLOT_REMOVE')
-			
-			self:RegisterItemEvent('BANK_OPENED')
-			self:RegisterItemEvent('BANK_CLOSED')
-			
-			self:RegisterItemEvent('BAG_UPDATE_TYPE')
-			
 			self:RegisterItemEvent('ITEM_SLOT_UPDATE', 'HandleSpecificItemEvent')
 			self:RegisterItemEvent('ITEM_SLOT_UPDATE_COOLDOWN', 'HandleSpecificItemEvent')
-			self:RegisterEvent('ITEM_LOCK_CHANGED', 'HandleSpecificItemEvent')
-			
+
+			self:RegisterItemEvent('BANK_OPENED')
+			self:RegisterItemEvent('BANK_CLOSED')
+			self:RegisterItemEvent('BAG_UPDATE_TYPE')
+
 			self:RegisterMessage('TEXT_SEARCH_UPDATE', 'HandleGlobalItemEvent')
 			self:RegisterMessage('TEXT_SEARCH_ENABLE', 'HandleGlobalItemEvent')
 			self:RegisterMessage('TEXT_SEARCH_DISABLE', 'HandleGlobalItemEvent')
@@ -202,7 +201,6 @@ function ItemFrame:UpdateEvents()
 			self:RegisterMessage('ITEM_SLOT_COLOR_UPDATE', 'HandleGlobalItemEvent')
 		end
 
-		self:RegisterMessage('BAGS_UPDATE')
 		self:RegisterMessage('BAG_SLOT_SHOW')
 		self:RegisterMessage('BAG_SLOT_HIDE')
 		self:RegisterMessage('PLAYER_UPDATE')
@@ -221,8 +219,6 @@ function ItemFrame:AddItemSlot(bag, slot)
 		local itemSlot = Bagnon.ItemSlot:New(bag, slot, self:GetFrameID(), self)
 		self.itemSlots[self:GetSlotIndex(bag, slot)] = itemSlot
 		self:RequestLayout()
-		
-		itemSlot:Update()
 	end
 end
 

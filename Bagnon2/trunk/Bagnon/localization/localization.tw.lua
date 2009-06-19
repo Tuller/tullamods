@@ -5,9 +5,9 @@
 	        2007/11/17 by matini< yiting.jheng <at> gmail <dot> com
 	        2008/12/01 by yleaf@cwdg(yaroot@gmail.com)
 	        2009/04/23 by youngway@水晶之刺
-		2009/06/15 by 狂飆@cwdg(networm@qq.com)
+		2009/06/19 by 狂飆@cwdg(networm@qq.com)
 
-	Last Update: 2009/06/15 by 狂飆@cwdg(networm@qq.com)
+	Last Update: 2009/06/19 by 狂飆@cwdg(networm@qq.com)
 
 --]]
 
@@ -54,9 +54,10 @@ L.TipShowMenu = '右擊打開設置菜單'
 L.TipShowSearch = '顯示搜索介面'
 L.TipShowSearch = '搜索'
 L.TipShowFrameConfig = '打開設置菜單'
+L.TipDoubleClickSearch = '按兩下打開搜索框'
 L.Total = '總共'
 
---databroker tooltips
+--databroker plugin tooltips
 L.TipShowBank = 'Shift-點擊 開關銀行'
 L.TipShowInventory = '點擊 開關背包'
 L.TipShowKeyring = 'Alt-點擊 開關鑰匙鏈'

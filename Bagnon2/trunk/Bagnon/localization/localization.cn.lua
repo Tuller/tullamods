@@ -4,7 +4,7 @@
 	Bagnon Localization Information: Chinese Simplified
 		Credits: Diablohu, yleaf@cwdg(yaroot@gmail.com), 狂飙@cwdg(networm@qq.com)
 
-	Last Update: 2009/06/15 by 狂飙@cwdg(networm@qq.com)
+	Last Update: 2009/06/19 by 狂飙@cwdg(networm@qq.com)
 
 --]]
 
@@ -51,9 +51,10 @@ L.TipShowMenu = '右击打开设置菜单'
 L.TipShowSearch = '显示搜索界面'
 L.TipShowSearch = '搜索'
 L.TipShowFrameConfig = '打开设置菜单'
+L.TipDoubleClickSearch = '双击打开搜索框'
 L.Total = '总共'
 
---databroker tooltips
+--databroker plugin tooltips
 L.TipShowBank = 'Shift-点击 开关银行'
 L.TipShowInventory = '点击 开关背包'
 L.TipShowKeyring = 'Alt-点击 开关钥匙链'
