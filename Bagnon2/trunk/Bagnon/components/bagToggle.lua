@@ -54,8 +54,6 @@ function BagToggle:New(frameID, parent)
 	b:SetScript('OnHide', b.OnHide)
 
 	b:SetFrameID(frameID)
---	b:UpdateEvents()
---	b:Update()
 
 	return b
 end

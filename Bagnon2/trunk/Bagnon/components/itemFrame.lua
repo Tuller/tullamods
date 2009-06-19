@@ -34,6 +34,7 @@ function ItemFrame:New(frameID, parent)
 	f:SetScript('OnSizeChanged', f.OnSizeChanged)
 	f:SetScript('OnEvent', f.OnEvent)
 	f:SetScript('OnShow', f.OnShow)
+	f:SetScript('OnHide', f.OnHide)
 
 	return f
 end

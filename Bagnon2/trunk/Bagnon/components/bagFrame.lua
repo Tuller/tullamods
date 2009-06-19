@@ -17,7 +17,6 @@ function BagFrame:New(frameID, parent)
 
 	f:SetScript('OnShow', f.OnShow)
 	f:SetScript('OnHide', f.OnHide)
-	f:SetScript('OnSizeChanged', f.OnSizeChanged)
 
 	f:SetFrameID(frameID)
 	f:CreateBagSlots()
