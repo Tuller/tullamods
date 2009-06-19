@@ -4,7 +4,7 @@
 	Bagnon Config Localization Information: Chinese Simplified
 		Credits: Diablohu, yleaf@cwdg(yaroot@gmail.com), 狂飙@cwdg(networm@qq.com)
 
-	Last Update: 2009/06/17 by 狂飙@cwdg(networm@qq.com)
+	Last Update: 2009/06/19 by 狂飙@cwdg(networm@qq.com)
 
 --]]
 
@@ -32,3 +32,7 @@ L.EnableBagFrame = '启用背包窗口'
 L.EnableMoneyFrame = '启用货币窗口'
 L.EnableDBOFrame = '启用信息窗口'
 L.EnableSearchToggle = '启用搜索按钮'
+L.EnableFrame_inventory = '启用背包框体'
+L.EnableFrame_bank = '启用银行框体'
+L.EnableFrame_keys = '启用钥匙链框体'
+L.SettingRequiresRestart = '这个设置将在你下次登录时生效'
