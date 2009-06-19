@@ -1,15 +1,3 @@
-general settings:
-* Enable bank frame 		(requires restart)
-* Enable inventory frame 	(requires restart)
-* Enable keyring 		(requires restart)
-
-Colors: (maybe)
-* Quest item color
-* Trade bag slot color
-* Ammo bag slot color
-* Soul shard slot color
-* Item quality color
-
 automatic display settings:
 									Show Bank	Show Inventory	Show Keyring
 * When visiting the bank			x			x				x
@@ -20,6 +8,13 @@ automatic display settings:
 * When checking mail				x			x				x
 * When visiting a vendor			x			x				x
 * Hide frames when entering combat (maybe)
+
+Colors: (maybe)
+* Quest item color
+* Trade bag slot color
+* Ammo bag slot color
+* Soul shard slot color
+* Item quality color
 
 other:
 * Add tooltips to most options to describe what they do in more detail
