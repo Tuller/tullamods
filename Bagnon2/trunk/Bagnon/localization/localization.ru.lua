@@ -44,12 +44,13 @@ L.TipPurchaseBag = '<Клик> - купить ячейку в банке.'
 L.TipShowBag = '<Клик> - показать сумку.'
 L.TipShowBags = '<Клик> - показать область сумки.'
 L.TipShowMenu = '<Правый-клик> - настройки.'
-L.TipShowSearch = '<Клик> - показать окно поиска.'
+L.TipShowSearch = '<Клик> - показать область поиска.'
 L.TipShowSearch = '<Клик> - поиск.'
 L.TipShowFrameConfig = '<Правый-клик> - настройки.'
+L.TipDoubleClickSearch = '<Двойной-клик> - показать область поиска.'
 L.Total = 'Всего'
 
---databroker tooltips
+--databroker plugin tooltips
 L.TipShowBank = '<Shift-Левый клик> - открыть/закрыть банк.'
 L.TipShowInventory = '<Левый клик> - открыть/закрыть инвентарь.'
 L.TipShowKeyring = '<Alt-левый клик> - открыть/закрыть связку ключей.'
