@@ -35,7 +35,6 @@ end
 --constructs a brand new item slot
 function ItemSlot:Create()
 	local id = self:GetNextItemSlotID()
---	local item = self:Bind(self:ConstructNewItemSlot(id))
 	local item = self:Bind(self:GetBlizzardItemSlot(id) or self:ConstructNewItemSlot(id))
 
 	--add a quality border texture
@@ -121,6 +120,14 @@ end
 
 
 --[[ Events ]]--
+
+--[[
+function ItemSlot:ITEM_SLOT_ADD(msg, bag, slot)
+	if self:IsSlot(bag, slot) then
+		self:Update()
+	end
+end
+--]]
 
 function ItemSlot:ITEM_SLOT_UPDATE(msg, bag, slot)
 	if self:IsSlot(bag, slot) then

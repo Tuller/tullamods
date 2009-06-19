@@ -33,6 +33,7 @@ function ItemFrame:New(frameID, parent)
 	f:SetFrameID(frameID)
 	f:SetScript('OnSizeChanged', f.OnSizeChanged)
 	f:SetScript('OnEvent', f.OnEvent)
+	f:SetScript('OnShow', f.OnShow)
 
 	return f
 end
@@ -125,6 +126,8 @@ function ItemFrame:HandleGlobalItemEvent(msg, ...)
 end
 
 function ItemFrame:HandleSpecificItemEvent(msg, bag, slot, ...)
+	assert(bag and slot, 'Invalid slot for ' .. msg)
+
 	if self:IsBagShown(bag) and (not self:IsBagSlotCached(bag)) then
 		local item = self:GetItemSlot(bag, slot)
 		if item then

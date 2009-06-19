@@ -52,7 +52,7 @@ function Ears:Listen(obj, msg, method)
 	listeners[obj] = action
 	self.listeners[msg] = listeners
 
-	assert(self.listeners[msg] and self.listeners[msg][obj], 'Ears: Failed to register ' .. msg)
+--	assert(self.listeners[msg] and self.listeners[msg][obj], 'Ears: Failed to register ' .. msg)
 end
 
 
@@ -69,7 +69,7 @@ function Ears:Ignore(obj, msg)
 		end
 	end
 
-	assert(not(self.listeners[msg] and self.listeners[msg][obj]), 'Ears: Failed to ignore ' .. msg)
+--	assert(not(self.listeners[msg] and self.listeners[msg][obj]), 'Ears: Failed to ignore ' .. msg)
 end
 
 
