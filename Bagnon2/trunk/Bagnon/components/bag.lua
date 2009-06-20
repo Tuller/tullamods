@@ -93,16 +93,9 @@ end
 --[[ Events ]]--
 
 function Bag:OnEvent(event, ...)
-	if event == 'ITEM_LOCK_UPDATED' then
-		self:UpdateLock()
-	elseif event == 'CURSOR_UPDATE' then
-		self:UpdateCursor()
-	elseif event == 'BAG_UPDATE' or event == 'PLAYERBANKSLOTS_UPDATED' then
-		self:UpdateLock()
-		self:UpdateSlotInfo()
-	elseif event == 'PLAYERBANKBAGSLOTS_UPDATED' then
-		self:UpdateLock()
-		self:UpdateSlotInfo()
+	local action = self[event]
+	if action then
+		action(self, event, ...)
 	end
 end
 
@@ -119,7 +112,7 @@ function Bag:UpdateEvents()
 			self:RegisterMessage('PLAYER_UPDATE')
 
 			if not self:IsCached() then
-				self:RegisterEvent('ITEM_LOCK_UPDATED')
+				self:RegisterEvent('ITEM_LOCK_CHANGED')
 				self:RegisterEvent('CURSOR_UPDATE')
 				self:RegisterEvent('BAG_UPDATE')
 				self:RegisterEvent('PLAYERBANKSLOTS_UPDATED')
@@ -145,6 +138,31 @@ end
 
 
 --[[ Messages ]]--
+
+function Bag:ITEM_LOCK_CHANGED(event, inventorySlot)
+	if self:GetInventorySlot() == inventorySlot then
+		self:UpdateLock()
+	end
+end
+
+function Bag:CURSOR_UPDATE()
+	self:UpdateCursor()
+end
+
+function Bag:BAG_UPDATE(event, bag)
+	self:UpdateLock()
+	self:UpdateSlotInfo()
+end
+
+function Bag:PLAYERBANKSLOTS_UPDATED(event)
+	self:UpdateLock()
+	self:UpdateSlotInfo()
+end
+
+function Bag:PLAYERBANKBAGSLOTS_UPDATED(event)
+	self:UpdateLock()
+	self:UpdateSlotInfo()
+end
 
 function Bag:BANK_OPENED(msg)
 	self:UpdateLock()
