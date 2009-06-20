@@ -222,11 +222,7 @@ function FrameOptions:UpdateWidgets()
 	self:GetLayerSlider():UpdateValue()
 	
 	self:GetToggleBagFrameCheckbox():UpdateChecked()
-	if self:GetFrameID() == 'keys' then
-		self:GetToggleBagFrameCheckbox():Disable()
-	else
-		self:GetToggleBagFrameCheckbox():Enable()
-	end
+	self:GetToggleBagFrameCheckbox():SetDisabled(self:GetFrameID() == 'keys')
 	
 	self:GetToggleMoneyFrameCheckbox():UpdateChecked()
 	self:GetToggleDBOFrameCheckbox():UpdateChecked()

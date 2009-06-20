@@ -16,6 +16,16 @@ function OptionsCheckButton:New(name, parent)
 	return b
 end
 
+function OptionsCheckButton:SetDisabled(disable)
+	if disable then
+		self:Disable()
+		_G[self:GetName() .. 'Text']:SetFontObject('GameFontDisable')
+	else
+		self:Enable()
+		_G[self:GetName() .. 'Text']:SetFontObject('GameFontHighlight')
+	end
+end
+
 function OptionsCheckButton:OnClick()
 	self:EnableSetting(self:GetChecked())
 end
