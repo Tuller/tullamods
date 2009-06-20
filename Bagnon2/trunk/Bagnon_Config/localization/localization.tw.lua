@@ -4,7 +4,7 @@
 	Bagnon Config Localization Information: Chinese Traditional
 		Credits: yleaf@cwdg(yaroot@gmail.com), 狂飆@cwdg(networm@qq.com)
 
-	Last Update: 2009/06/19 by 狂飆@cwdg(networm@qq.com)
+	Last Update: 2009/06/20 by 狂飆@cwdg(networm@qq.com)
 
 --]]
 
@@ -28,7 +28,7 @@ L.HighlightQuestItems = '高亮任務物品'
 L.ReverseSlotOrdering = '反向排列'
 L.ColorItemSlotsByBagType = '按背包類型對空格染色'
 L.FrameLayer = '窗口層級'
-L.EnableBagFrame = '啟用背包窗口'
+L.EnableBagFrame = '啟用背包按鈕'
 L.EnableMoneyFrame = '啟用貨幣窗口'
 L.EnableDBOFrame = '啟用資訊視窗'
 L.EnableSearchToggle = '啟用搜索按鈕'
@@ -36,3 +36,14 @@ L.EnableFrame_inventory = '啟用背包框體'
 L.EnableFrame_bank = '啟用銀行框體'
 L.EnableFrame_keys = '啟用鑰匙鏈框體'
 L.SettingRequiresRestart = '這個設置將在你下次登錄時生效'
+L.EnableAutoDisplay_bank = '打開銀行時'
+L.EnableAutoDisplay_ah = '打開拍賣行時'
+L.EnableAutoDisplay_vendor = '與商販對話時'
+L.EnableAutoDisplay_trade = '交易時'
+L.EnableAutoDisplay_craft = '製作物品時'
+L.EnableAutoDisplay_mail = '打開郵箱時'
+L.EnableAutoDisplay_guildbank = '打開公會銀行時'
+L.DisplaySettings = '事件設置'
+L.DisplaySettingsTitle = '何時自動打開背包'
+L.FrameSettings = '顯示設定'
+L.FrameSettingsTitle = '窗口顯示設定'
