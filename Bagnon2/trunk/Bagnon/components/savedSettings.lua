@@ -72,12 +72,21 @@ function SavedSettings:GetDefaultSettings()
 			inventory = true,
 			bank = true,
 			keys = true,
+		},
+		autoDisplayEvents = {
+			inventory = {
+				'ah',
+				'bank',
+				'vendor',
+				'mail',
+				'guildbank',
+				'trade',
+			},
 		}
 	}
 	
 	return self.defaults
 end
-
 
 --[[---------------------------------------------------------------------------
 	Upgrade Methods
@@ -155,4 +164,42 @@ function SavedSettings:ClearDefaults()
 	if next(db) == nil then
 		_G['BagnonGlobalSettings'] = nil
 	end
+end
+
+
+--[[---------------------------------------------------------------------------
+	Complex Settings
+--]]---------------------------------------------------------------------------
+
+--frame auto display events
+function SavedSettings:SetShowFrameAtEvent(frameID, event, enable)
+	if enable then
+		if not self:IsFrameShownAtEvent(frameID, event) then
+			local autoDisplayEvents = self:GetDB().autoDisplayEvents[frameID] or {}
+			table.insert(autoDisplayEvents, event)
+			self:GetDB().autoDisplayEvents[frameID] = autoDisplayEvents
+		end
+	else
+		if self:IsFrameShownAtEvent(frameID, event) then
+			local autoDisplayEvents = self:GetDB().autoDisplayEvents[frameID]
+			for i, displayEvent in pairs(autoDisplayEvents) do
+				if displayEvent == event then
+					table.remove(autoDisplayEvents, i)
+					return
+				end
+			end
+		end
+	end
+end
+
+function SavedSettings:IsFrameShownAtEvent(frameID, event)
+	local autoDisplayEvents = self:GetDB().autoDisplayEvents[frameID]
+	if autoDisplayEvents then
+		for i, displayEvent in pairs(autoDisplayEvents) do
+			if event == displayEvent then
+				return true
+			end
+		end
+	end
+	return false
 end

@@ -63,7 +63,7 @@ end
 --if a frame was manually opened, then it should only be closable manually
 function FrameSettings:Show()
 	local wasShown = self:IsShown()
-	
+
 	self.shown = (self.shown or 0) + 1
 
 	if not shown then
@@ -76,8 +76,8 @@ function FrameSettings:Hide(forceHide)
 
 	if forceHide or self.shown <= 0 then
 		self.shown = 0
-		
-		--reset player filter on hide 
+
+		--reset player filter on hide
 		self:SetPlayerFilter(UnitName('player'))
 		self:SendMessage('FRAME_HIDE')
 	end
@@ -101,7 +101,7 @@ end
 --position
 function FrameSettings:SetPosition(point, x, y)
 	local oPoint, oX, oY = self:GetPosition()
-	
+
 	if not(point == oPoint and x == oX and y == oY) then
 		self:GetDB():SetPosition(point, x, y)
 		self:SendMessage('FRAME_POSITION_UPDATE', self:GetPosition())

@@ -7,7 +7,7 @@ Bagnon = LibStub('AceAddon-3.0'):NewAddon('Bagnon', 'AceEvent-3.0', 'AceConsole-
 local L = LibStub('AceLocale-3.0'):GetLocale('Bagnon')
 
 
---[[ 
+--[[
 	Binding Setup
 --]]
 
@@ -17,13 +17,15 @@ BINDING_NAME_BANKNON_TOGGLE = L.ToggleBank
 BINDING_NAME_BAGNON_KEYS_TOGGLE = L.ToggleKeys
 
 
---[[ 
+--[[
 	Startup
 --]]
 
 function Bagnon:OnEnable()
 	self.frames = {}
-	self:HookBagEvents()
+
+	self:HookBagClickEvents()
+	self:RegisterAutoDisplayEvents()
 	self:AddSlashCommands()
 	self:CreateOptionsLoader()
 	self:CreateLDBLauncher()
@@ -41,7 +43,7 @@ end
 function Bagnon:CreateLDBLauncher()
 	local LDB = LibStub:GetLibrary('LibDataBroker-1.1', true)
 	if not LDB then return end
-	
+
 	LDB:NewDataObject('BagnonLauncher', {
 		type = 'launcher',
 
@@ -95,7 +97,7 @@ function Bagnon:ShowFrame(frameID)
 		if not self:GetFrame(frameID) then
 			self:CreateFrame(frameID)
 		end
-		
+
 		self.FrameSettings:Get(frameID):Show()
 		return true
 	end
@@ -115,7 +117,7 @@ function Bagnon:ToggleFrame(frameID)
 		if not self:GetFrame(frameID) then
 			self:CreateFrame(frameID)
 		end
-		
+
 		self.FrameSettings:Get(frameID):Toggle()
 		return true
 	end
@@ -128,18 +130,10 @@ end
 
 
 --[[
-	Automatic Bag Display
+	Bag Click Events
 --]]
 
-local function ShowBlizzardBankFrame()
-	BankFrame_OnEvent(_G['BankFrame'], 'BANKFRAME_OPENED')
-end
-
-local function HideBlizzardBankFrame()
-	BankFrame_OnEvent(_G['BankFrame'], 'BANKFRAME_CLOSED')
-end
-
-function Bagnon:HookBagEvents()
+function Bagnon:HookBagClickEvents()
 	--backpack
 	hooksecurefunc('CloseBackpack', function()
 		self:HideFrame('inventory')
@@ -195,38 +189,133 @@ function Bagnon:HookBagEvents()
 		else
 			opened = self:ToggleFrame('inventory')
 		end
-		
+
 		if not opened then
 			oOpenAllBags(force)
 		end
 	end
-
-	--bank
-	BankFrame:UnregisterEvent('BANKFRAME_OPENED')
-	BankFrame:UnregisterEvent('BANKFRAME_CLOSED')
-
-	self.BagEvents:Listen(self, 'BANK_OPENED', function()
-		self:ShowFrame('inventory')
-		
-		if not self:ShowFrame('bank') then
-			ShowBlizzardBankFrame()
-		end
-	end)
-
-	self.BagEvents:Listen(self, 'BANK_CLOSED', function()
-		self:HideFrame('inventory')
-		
-		if not self:HideFrame('bank') then
-			HideBlizzardBankFrame()
-		end
-	end)
-
-	--mailbox auto open/close evnet
-	self:RegisterEvent('MAIL_CLOSED', function() self:HideFrame('inventory') end)
 end
 
 
---[[ 
+--[[
+	Automatic Display
+--]]
+
+function Bagnon:RegisterAutoDisplayEvents()
+	self.BagEvents:Listen(self, 'BANK_OPENED')
+	self.BagEvents:Listen(self, 'BANK_CLOSED')
+	self:RegisterEvent('MAIL_CLOSED')
+	self:RegisterEvent('AUCTION_HOUSE_SHOW')
+	self:RegisterEvent('AUCTION_HOUSE_CLOSED')
+	self:RegisterEvent('MERCHANT_SHOW')
+	self:RegisterEvent('MERCHANT_CLOSED')
+	self:RegisterEvent('TRADE_SHOW')
+	self:RegisterEvent('TRADE_CLOSED')
+	self:RegisterEvent('TRADE_SKILL_SHOW')
+	self:RegisterEvent('TRADE_SKILL_CLOSE')
+	self:RegisterEvent('GUILDBANKFRAME_OPENED')
+	self:RegisterEvent('GUILDBANKFRAME_CLOSED')
+
+	--override normal bank display
+	BankFrame:UnregisterEvent('BANKFRAME_OPENED')
+	BankFrame:UnregisterEvent('BANKFRAME_CLOSED')
+end
+
+function Bagnon:ShowFrameAtEvent(frameID, event)
+	if self:AutoDisplayingFrameOnEvent(frameID, event) then
+		self:ShowFrame(frameID)
+	end
+end
+
+function Bagnon:HideFrameAtEvent(frameID, event)
+	if self:AutoDisplayingFrameOnEvent(frameID, event) then
+		self:HideFrame(frameID)
+	end
+end
+
+function Bagnon:AutoDisplayingFrameOnEvent(frameID, event)
+	return self.Settings:IsFrameShownAtEvent(frameID, event)
+end
+
+function Bagnon:ShowBlizzardBankFrame()
+	BankFrame_OnEvent(_G['BankFrame'], 'BANKFRAME_OPENED')
+end
+
+function Bagnon:HideBlizzardBankFrame()
+	BankFrame_OnEvent(_G['BankFrame'], 'BANKFRAME_CLOSED')
+end
+
+
+--[[ Events ]]--
+
+--visiting the bank
+function Bagnon:BANK_OPENED(event)
+	if not self:ShowFrame('bank') then
+		self:ShowBlizzardBankFrame()
+	end
+	self:ShowFrameAtEvent('inventory', 'bank')
+end
+
+function Bagnon:BANK_CLOSED(event)
+	if not self:HideFrame('bank') then
+		HideBlizzardBankFrame()
+	end
+	self:HideFrameAtEvent('inventory', 'bank')
+end
+
+--visiting the mailbox
+--mail frame is a special case, since its automatically handled by the stock interface
+function Bagnon:MAIL_CLOSED(event)
+	self:HideFrame('inventory')
+end
+
+--visiting the auction house
+function Bagnon:AUCTION_HOUSE_SHOW(event)
+	self:ShowFrameAtEvent('inventory', 'ah')
+end
+
+function Bagnon:AUCTION_HOUSE_CLOSED(event)
+	self:HideFrameAtEvent('inventory', 'ah')
+end
+
+--visitng a vendor
+function Bagnon:MERCHANT_SHOW(event)
+	self:ShowFrameAtEvent('inventory', 'vendor')
+end
+
+function Bagnon:MERCHANT_CLOSED(event)
+	self:HideFrameAtEvent('inventory', 'vendor')
+end
+
+--trading
+function Bagnon:TRADE_SHOW(event)
+	self:ShowFrameAtEvent('inventory', 'trade')
+end
+
+function Bagnon:TRADE_CLOSED(event)
+	self:HideFrameAtEvent('inventory', 'trade')
+end
+
+--visiting the guild bank
+function Bagnon:GUILDBANKFRAME_OPENED(event)
+	self:ShowFrameAtEvent('inventory', 'guildbank')
+end
+
+function Bagnon:GUILDBANKFRAME_CLOSED(event)
+	self:HideFrameAtEvent('inventory', 'guildbank')
+end
+
+--crafting
+function Bagnon:TRADE_SKILL_SHOW(event)
+	self:ShowFrameAtEvent('inventory', 'craft')
+end
+
+function Bagnon:TRADE_SKILL_CLOSE(event)
+	self:HideFrameAtEvent('inventory', 'craft')
+end
+
+
+--[[
 	Slash Commands
 --]]
 

@@ -229,10 +229,10 @@ end
 --check/uncheck the bag frames
 function Frame:CheckBagFrameBags(enable)
 	MainMenuBarBackpackButton:SetChecked(enable)
-	_G["CharacterBag0Slot"]:SetChecked(enable);
-	_G["CharacterBag1Slot"]:SetChecked(enable);
-	_G["CharacterBag2Slot"]:SetChecked(enable);
-	_G["CharacterBag3Slot"]:SetChecked(enable);
+	_G["CharacterBag0Slot"]:SetChecked(enable)
+	_G["CharacterBag1Slot"]:SetChecked(enable)
+	_G["CharacterBag2Slot"]:SetChecked(enable)
+	_G["CharacterBag3Slot"]:SetChecked(enable)
 end
 
 

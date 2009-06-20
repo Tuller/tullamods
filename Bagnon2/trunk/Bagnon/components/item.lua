@@ -24,7 +24,7 @@ function ItemSlot:New(bag, slot, frameID, parent)
 	item:SetFrameID(frameID)
 
 	if item:IsVisible() then
-		item:UpdateEverything()
+		item:Update()
 	else
 		item:Show()
 	end
@@ -121,48 +121,22 @@ end
 
 --[[ Events ]]--
 
---[[
-function ItemSlot:ITEM_SLOT_ADD(msg, bag, slot)
-	if self:IsSlot(bag, slot) then
-		self:Update()
-	end
-end
---]]
-
 function ItemSlot:ITEM_SLOT_UPDATE(msg, bag, slot)
-	if self:IsSlot(bag, slot) then
+--	if self:IsSlot(bag, slot) then
 		self:Update()
-	end
+--	end
 end
 
 function ItemSlot:ITEM_LOCK_CHANGED(event, bag, slot)
-	if self:IsSlot(bag, slot) then
+--	if self:IsSlot(bag, slot) then
 		self:UpdateLocked()
-	end
+--	end
 end
 
 function ItemSlot:ITEM_SLOT_UPDATE_COOLDOWN(msg, bag, slot)
-	if self:IsSlot(bag, slot) then
+--	if self:IsSlot(bag, slot) then
 		self:UpdateCooldown()
-	end
-end
-
-function ItemSlot:BANK_OPENED(msg)
-	if self:IsBankSlot() then
-		self:UpdateEverything()
-	end
-end
-
-function ItemSlot:BANK_CLOSED(msg)
-	if self:IsBankSlot() then
-		self:UpdateEverything()
-	end
-end
-
-function ItemSlot:PLAYER_UPDATE(msg, frameID, player)
-	if self:GetFrameID() == frameID then
-		self:UpdateEverything()
-	end
+--	end
 end
 
 function ItemSlot:TEXT_SEARCH_UPDATE(msg, frameID, search)
@@ -216,7 +190,7 @@ end
 --[[ Frame Events ]]--
 
 function ItemSlot:OnShow()
-	self:UpdateEverything()
+	self:Update()
 end
 
 function ItemSlot:OnHide()
@@ -266,10 +240,11 @@ end
 
 
 --[[ Update Methods ]]--
-
+--[[
 function ItemSlot:UpdateEverything()
 	self:Update()
 end
+--]]
 
 
 -- Update the texture, lock status, and other information about an item
@@ -469,7 +444,7 @@ end
 function ItemSlot:SetFrameID(frameID)
 	if self:GetFrameID() ~= frameID then
 		self.frameID = frameID
-		self:UpdateEverything()
+		self:Update()
 	end
 end
 

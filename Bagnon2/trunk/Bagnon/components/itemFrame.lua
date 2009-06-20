@@ -69,18 +69,15 @@ end
 
 function ItemFrame:BANK_OPENED(msg)
 	self:UpdateEverything()
-	self:HandleGlobalItemEvent(msg)
 end
 
 function ItemFrame:BANK_CLOSED(msg)
 	self:UpdateEverything()
-	self:HandleGlobalItemEvent(msg)
 end
 
 function ItemFrame:PLAYER_UPDATE(msg, frameID, player)
 	if self:GetFrameID() == frameID then
 		self:UpdateEverything()
-		self:HandleGlobalItemEvent(msg)
 	end
 end
 
@@ -190,9 +187,6 @@ function ItemFrame:UpdateEvents()
 			self:RegisterItemEvent('ITEM_SLOT_REMOVE')
 			self:RegisterItemEvent('ITEM_SLOT_UPDATE', 'HandleSpecificItemEvent')
 			self:RegisterItemEvent('ITEM_SLOT_UPDATE_COOLDOWN', 'HandleSpecificItemEvent')
-
-			self:RegisterItemEvent('BANK_OPENED')
-			self:RegisterItemEvent('BANK_CLOSED')
 			self:RegisterItemEvent('BAG_UPDATE_TYPE')
 
 			self:RegisterMessage('TEXT_SEARCH_UPDATE', 'HandleGlobalItemEvent')
@@ -203,6 +197,11 @@ function ItemFrame:UpdateEvents()
 			self:RegisterMessage('ITEM_HIGHLIGHT_QUALITY_UPDATE', 'HandleGlobalItemEvent')
 			self:RegisterMessage('SHOW_EMPTY_ITEM_SLOT_TEXTURE_UPDATE', 'HandleGlobalItemEvent')
 			self:RegisterMessage('ITEM_SLOT_COLOR_UPDATE', 'HandleGlobalItemEvent')
+			
+			if self:HasBankBags() then
+				self:RegisterItemEvent('BANK_OPENED')
+				self:RegisterItemEvent('BANK_CLOSED')
+			end
 		end
 
 		self:RegisterMessage('BAG_SLOT_SHOW')
@@ -288,14 +287,37 @@ function ItemFrame:RemoveAllItemSlots()
 	self:RequestLayout()
 end
 
---add all possible itemm slots ot the frame
+--remove all unused item slots from the frame
+--add all missing slots to the frame
+--update all existing slots on the frame
+--if slots have been added or removed, then request a layout update
 function ItemFrame:ReloadAllItemSlots()
-	self:RemoveAllItemSlots()
-
+	local changed = false
+	
+	local itemSlots = self.itemSlots
+	for i, itemSlot in pairs(itemSlots) do
+		local used = self:IsBagShown(itemSlot:GetBag()) and (itemSlot:GetID() <= self:GetBagSize(itemSlot:GetBag()))
+		if not used then
+			itemSlot:Free()
+			itemSlots[i] = nil
+			changed = true
+		end
+	end
+	
 	for _, bag in self:GetVisibleBags() do
 		for slot = 1, self:GetBagSize(bag) do
-			self:AddItemSlot(bag, slot)
+			local itemSlot = self:GetItemSlot(bag, slot)
+			if not itemSlot then
+				self:AddItemSlot(bag, slot)
+				changed = true
+			else
+				itemSlot:Update()
+			end
 		end
+	end
+	
+	if changed then
+		self:RequestLayout()
 	end
 end
 
@@ -389,6 +411,15 @@ end
 
 function ItemFrame:GetVisibleBags()
 	return self:GetSettings():GetVisibleBagSlots()
+end
+
+function ItemFrame:HasBankBags()
+	for _, bag in self:GetVisibleBags() do
+		if Bagnon.BagSlotInfo:IsBank(bag) or Bagnon.BagSlotInfo:IsBankBag(bag) then
+			return true
+		end
+	end
+	return false
 end
 
 --layout info

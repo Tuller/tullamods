@@ -121,21 +121,30 @@ local tooltipSearches = {
 	['boa'] = ITEM_BIND_TO_ACCOUNT
 }
 
-local tooltipScanner = _G['CombuctoTooltipScanner'] or CreateFrame('GameTooltip', 'CombuctoTooltipScanner', UIParent, 'GameTooltipTemplate')
+local tooltipSearchCache = setmetatable({}, {__index = function(t, k) local v = {} t[k] = v return v end})
+local tooltipScanner = _G['BagnonTooltipScanner'] or CreateFrame('GameTooltip', 'BagnonTooltipScanner', UIParent, 'GameTooltipTemplate')
 
 local function link_FindSearchInTooltip(itemLink, search)
-	local result = false
+	--look in the cache for the result
+	local itemID = itemLink:match('item:(%d+)')
+	local cachedResult = tooltipSearchCache[search][itemID]
+	if cachedResult ~= nil then
+		return cachedResult
+	end
 
+	--no match?, pull in the resut from tooltip parsing
 	tooltipScanner:SetOwner(UIParent, 'ANCHOR_NONE')
 	tooltipScanner:SetHyperlink(itemLink)
 
+	local result = false
 	if tooltipScanner:NumLines() > 1 and _G[tooltipScanner:GetName() .. 'TextLeft2']:GetText() == search then
 		result = true
 	elseif tooltipScanner:NumLines() > 2 and _G[tooltipScanner:GetName() .. 'TextLeft3']:GetText() == search then
 		result = true
 	end
-
 	tooltipScanner:Hide()
+
+	tooltipSearchCache[search][itemID] = result
 	return result
 end
 
