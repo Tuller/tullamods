@@ -5,7 +5,7 @@
 
 local Bagnon = LibStub('AceAddon-3.0'):GetAddon('Bagnon')
 local L = LibStub('AceLocale-3.0'):GetLocale('Bagnon-Config')
-local FrameOptions = Bagnon.OptionsPanel:New('BagnonOptions_Frame', 'Bagnon', 'Frame Settings', 'Configuration settings specific to a Bagnon frame')
+local FrameOptions = Bagnon.OptionsPanel:New('BagnonOptions_Frame', 'Bagnon', L.FrameSettings, L.FrameSettingsTitle)
 FrameOptions:Hide()
 
 Bagnon.FrameOptions = FrameOptions

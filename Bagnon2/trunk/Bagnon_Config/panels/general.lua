@@ -9,6 +9,8 @@ local name, desc = select(2, GetAddOnInfo('Bagnon'))
 local GeneralOptions = Bagnon.OptionsPanel:New('BagnonOptions_General', nil, name, desc, [[Interface\Icons\INV_Misc_Bag_07]])
 Bagnon.GeneralOptions = GeneralOptions
 
+local SPACING = 4
+
 
 --[[
 	Startup
@@ -84,25 +86,25 @@ function GeneralOptions:AddWidgets()
 	enableInventory:SetPoint('TOPLEFT', self, 'TOPLEFT', 14, -72)
 	
 	local enableBank = self:CreateEnableFrameCheckbox('bank')
-	enableBank:SetPoint('TOPLEFT', enableInventory, 'BOTTOMLEFT', 0, 0)
+	enableBank:SetPoint('TOPLEFT', enableInventory, 'BOTTOMLEFT', 0, -SPACING)
 	
 	local enableKeyring = self:CreateEnableFrameCheckbox('keys')
-	enableKeyring:SetPoint('TOPLEFT', enableBank, 'BOTTOMLEFT', 0, 0)
+	enableKeyring:SetPoint('TOPLEFT', enableBank, 'BOTTOMLEFT', 0, -SPACING)
 	
 	local lockFramePositions = self:CreateLockFramePositionsCheckbox()
-	lockFramePositions:SetPoint('TOPLEFT', enableKeyring, 'BOTTOMLEFT', 0, 0)
+	lockFramePositions:SetPoint('TOPLEFT', enableKeyring, 'BOTTOMLEFT', 0, -SPACING)
 	
 	local showEmptyItemSlotTextures = self:CreateEmptyItemSlotTextureCheckbox()
-	showEmptyItemSlotTextures:SetPoint('TOPLEFT', lockFramePositions, 'BOTTOMLEFT', 0, 0)
+	showEmptyItemSlotTextures:SetPoint('TOPLEFT', lockFramePositions, 'BOTTOMLEFT', 0, -SPACING)
 	
 	local colorItemSlots = self:CreateColorItemSlotsCheckbox()
-	colorItemSlots:SetPoint('TOPLEFT', showEmptyItemSlotTextures, 'BOTTOMLEFT', 0, 0)
+	colorItemSlots:SetPoint('TOPLEFT', showEmptyItemSlotTextures, 'BOTTOMLEFT', 0, -SPACING)
 
 	local highlightItemsByQuality = self:CreateHighlightItemsByQualityCheckbox()
-	highlightItemsByQuality:SetPoint('TOPLEFT', colorItemSlots, 'BOTTOMLEFT', 0, 0)
+	highlightItemsByQuality:SetPoint('TOPLEFT', colorItemSlots, 'BOTTOMLEFT', 0, -SPACING)
 
 	local highightQuestItems = self:CreateHighlightQuestItemsCheckbox()
-	highightQuestItems:SetPoint('TOPLEFT', highlightItemsByQuality, 'BOTTOMLEFT', 0, 0)
+	highightQuestItems:SetPoint('TOPLEFT', highlightItemsByQuality, 'BOTTOMLEFT', 0, -SPACING)
 end
 
 function GeneralOptions:UpdateWidgets()
