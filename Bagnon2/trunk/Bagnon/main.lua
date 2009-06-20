@@ -194,6 +194,15 @@ function Bagnon:HookBagClickEvents()
 			oOpenAllBags(force)
 		end
 	end
+	
+	local function bag_checkIfInventoryShown(self)
+		if Bagnon:IsFrameEnabled('inventory') then
+			self:SetChecked(Bagnon.FrameSettings:Get('inventory'):IsShown())
+		end
+	end
+	
+	hooksecurefunc('BagSlotButton_UpdateChecked', bag_checkIfInventoryShown)
+	hooksecurefunc('BackpackButton_UpdateChecked', bag_checkIfInventoryShown)
 end
 
 
@@ -249,14 +258,14 @@ end
 --[[ Events ]]--
 
 --visiting the bank
-function Bagnon:BANK_OPENED(event)
+function Bagnon:BANK_OPENED()
 	if not self:ShowFrame('bank') then
 		self:ShowBlizzardBankFrame()
 	end
 	self:ShowFrameAtEvent('inventory', 'bank')
 end
 
-function Bagnon:BANK_CLOSED(event)
+function Bagnon:BANK_CLOSED()
 	if not self:HideFrame('bank') then
 		HideBlizzardBankFrame()
 	end
@@ -265,52 +274,52 @@ end
 
 --visiting the mailbox
 --mail frame is a special case, since its automatically handled by the stock interface
-function Bagnon:MAIL_CLOSED(event)
+function Bagnon:MAIL_CLOSED()
 	self:HideFrame('inventory')
 end
 
 --visiting the auction house
-function Bagnon:AUCTION_HOUSE_SHOW(event)
+function Bagnon:AUCTION_HOUSE_SHOW()
 	self:ShowFrameAtEvent('inventory', 'ah')
 end
 
-function Bagnon:AUCTION_HOUSE_CLOSED(event)
+function Bagnon:AUCTION_HOUSE_CLOSED()
 	self:HideFrameAtEvent('inventory', 'ah')
 end
 
 --visitng a vendor
-function Bagnon:MERCHANT_SHOW(event)
+function Bagnon:MERCHANT_SHOW()
 	self:ShowFrameAtEvent('inventory', 'vendor')
 end
 
-function Bagnon:MERCHANT_CLOSED(event)
+function Bagnon:MERCHANT_CLOSED()
 	self:HideFrameAtEvent('inventory', 'vendor')
 end
 
 --trading
-function Bagnon:TRADE_SHOW(event)
+function Bagnon:TRADE_SHOW()
 	self:ShowFrameAtEvent('inventory', 'trade')
 end
 
-function Bagnon:TRADE_CLOSED(event)
+function Bagnon:TRADE_CLOSED()
 	self:HideFrameAtEvent('inventory', 'trade')
 end
 
 --visiting the guild bank
-function Bagnon:GUILDBANKFRAME_OPENED(event)
+function Bagnon:GUILDBANKFRAME_OPENED()
 	self:ShowFrameAtEvent('inventory', 'guildbank')
 end
 
-function Bagnon:GUILDBANKFRAME_CLOSED(event)
+function Bagnon:GUILDBANKFRAME_CLOSED()
 	self:HideFrameAtEvent('inventory', 'guildbank')
 end
 
 --crafting
-function Bagnon:TRADE_SKILL_SHOW(event)
+function Bagnon:TRADE_SKILL_SHOW()
 	self:ShowFrameAtEvent('inventory', 'craft')
 end
 
-function Bagnon:TRADE_SKILL_CLOSE(event)
+function Bagnon:TRADE_SKILL_CLOSE()
 	self:HideFrameAtEvent('inventory', 'craft')
 end
 
@@ -351,7 +360,7 @@ end
 
 function Bagnon:PrintHelp()
 	local function PrintCmd(cmd, desc)
-		print(format(' - |cFF33FF99%s|r: %s', cmd, desc))
+		print(string.format(' - |cFF33FF99%s|r: %s', cmd, desc))
 	end
 
 	self:Print(L.Commands)
