@@ -129,7 +129,7 @@ function Settings:SetShowFrameAtEvent(frameID, event, enable)
 	local enable = enable and true or false
 	if self:IsFrameShownAtEvent(frameID, event) ~= enable then
 		Bagnon.SavedSettings:SetShowFrameAtEvent(frameID, event, enable)
-		self:SendMessage('FRAME_DISPLAY_EVENT_UPDATE', frameID, self:IsFrameShownAtEvent(frameID, event))
+		self:SendMessage('FRAME_DISPLAY_EVENT_UPDATE', frameID, event, self:IsFrameShownAtEvent(frameID, event))
 	end
 end
 
