@@ -15,13 +15,13 @@ Bagnon.TitleFrame = TitleFrame
 --[[ Constructor ]]--
 
 function TitleFrame:New(frameID, parent)
-	local b = self:Bind(CreateFrame('Button', nil, parent))	
+	local b = self:Bind(CreateFrame('Button', nil, parent))
 	b:SetToplevel(true)
 
 	b:SetNormalFontObject('GameFontNormalLeft')
 	b:SetHighlightFontObject('GameFontHighlightLeft')
 	b:RegisterForClicks('anyUp')
-	
+
 	b:SetScript('OnShow', b.OnShow)
 	b:SetScript('OnHide', b.OnHide)
 	b:SetScript('OnMouseDown', b.OnMouseDown)
@@ -68,7 +68,7 @@ function TitleFrame:OnMouseUp()
 end
 
 function TitleFrame:OnDoubleClick()
-	self:GetSettings():ToggleTextSearch()
+	self:ToggleSearchFrame()
 end
 
 function TitleFrame:OnEnter()
@@ -81,26 +81,26 @@ function TitleFrame:OnEnter()
 end
 
 function TitleFrame:OnLeave()
-	GameTooltip:Hide()
+	if GameTooltip:IsOwned(self) then
+		GameTooltip:Hide()
+	end
 end
 
 
 --[[ Update Methods ]]--
 
 function TitleFrame:UpdateText()
-	self:SetFormattedText(self:GetTitleText():format(self:GetPlayer()))
+	self:SetFormattedText(self:GetTitleText(), self:GetPlayer())
 end
 
 function TitleFrame:UpdateTooltip()
-	if not GameTooltip:IsOwned(self) then return end
-	
 	GameTooltip:SetText(L.TipDoubleClickSearch)
 	GameTooltip:Show()
 end
 
 function TitleFrame:UpdateEvents()
 	self:UnregisterAllMessages()
-	
+
 	if self:IsVisible() then
 		self:RegisterMessage('PLAYER_UPDATE')
 	end
@@ -133,11 +133,11 @@ function TitleFrame:GetTitleText()
 	if self:GetFrameID() == 'bank' then
 		return L.TitleBank
 	end
-	
+
 	if self:GetFrameID() == 'keys' then
 		return L.TitleKeys
 	end
-	
+
 	return L.TitleBags
 end
 
@@ -154,4 +154,8 @@ end
 
 function TitleFrame:IsFrameMovable()
 	return self:GetSettings():IsMovable()
+end
+
+function TitleFrame:ToggleSearchFrame()
+	self:GetSettings():ToggleTextSearch()
 end

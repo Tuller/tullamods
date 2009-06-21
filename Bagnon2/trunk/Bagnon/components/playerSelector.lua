@@ -89,8 +89,6 @@ function PlayerSelector:ShowPlayerSelector()
 end
 
 function PlayerSelector:UpdateTooltip()
-	if not GameTooltip:IsOwned(self) then return end
-
 	GameTooltip:SetText(L.TipChangePlayer)
 end
 

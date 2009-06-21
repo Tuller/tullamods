@@ -61,6 +61,11 @@ function BrokerDisplay:AddText()
 	return text
 end
 
+
+--[[
+	Broker Selection Buttons
+--]]
+
 function BrokerDisplay:CreateLeftButton()
 	local b = CreateFrame('Button', nil, self)
 
@@ -113,7 +118,7 @@ end
 function BrokerDisplay:DATABROKER_OBJECT_UPDATE(msg, frameID, objectName)
 	if self:GetFrameID() == frameID then
 		self:UpdateDisplay()
-		
+
 		if GameTooltip:IsOwned(self) then
 			self:OnEnter()
 		end
@@ -197,7 +202,7 @@ function BrokerDisplay:UpdateEvents()
 			LDB.RegisterCallback(self, 'LibDataBroker_AttributeChanged')
 		end
 	end
-	
+
 	self:UnregisterAllMessages()
 	if self:IsVisible() then
 		self:RegisterMessage('DATABROKER_OBJECT_UPDATE')
@@ -245,13 +250,22 @@ function BrokerDisplay:Layout()
 		self.text:SetPoint('LEFT', self.left, 'RIGHT', 2, 0)
 		self.text:SetPoint('RIGHT', self.right, 'LEFT', -2, 0)
 	end
-	
+
 	self:UpdateInsets()
 end
 
 --calculate the clickable portion of the frame
 function BrokerDisplay:UpdateInsets()
-	local realWidth = self.left:GetWidth() + (self.text:IsShown() and self.text:GetStringWidth() or 0) + (self.icon:IsShown() and self.icon:GetWidth() or 0)
+	local realWidth = self.left:GetWidth()
+
+	if self.text:IsShown() then
+		realWidth = realWidth + (self.text:GetStringWidth() or 0)
+	end
+
+	if self.icon:IsShown() then
+		realWidth = realWidth + (self.icon:GetWidth() or 0)
+	end
+
 	self:SetHitRectInsets(0, self:GetWidth() - realWidth, 0, 0)
 end
 
@@ -296,7 +310,7 @@ function BrokerDisplay:SetNextObject()
 		end
 		prevObjName = nextObjName
 	end
-	
+
 	self:SetObject(prevObjName)
 end
 
@@ -322,14 +336,14 @@ function BrokerDisplay:SetPreviousObject()
 		end
 		prevObjName = nextObjName
 	end
-	
+
 	self:SetObject(prevObjName)
 end
 
 do
 	local objects = {}
 	function BrokerDisplay:GetAvailableObjects()
-		if next(objects) then
+		if next(objects) ~= nil then
 			for k, v in pairs(objects) do
 				objects[k] = nil
 			end

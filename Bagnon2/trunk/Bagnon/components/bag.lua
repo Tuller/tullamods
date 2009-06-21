@@ -246,8 +246,6 @@ end
 --[[ Tooltip Methods ]]--
 
 function Bag:UpdateTooltip()
-	if not GameTooltip:IsOwned(self) then return end
-
 	GameTooltip:ClearLines()
 
 	if self:IsBackpack() then
@@ -268,7 +266,8 @@ function Bag:UpdateTooltip()
 end
 
 function Bag:UpdateCachedBagTooltip()
-	local link = self:GetItemInfo()
+	local link = (self:GetItemInfo())
+
 	if link then
 		GameTooltip:SetHyperlink(link)
 	elseif self:IsPurchasable() then
@@ -390,7 +389,7 @@ function Bag:PurchaseSlot()
 		}
 	end
 
-	PlaySound('igMainMenuOption')
+--	PlaySound('igMainMenuOption')
 	StaticPopup_Show('CONFIRM_BUY_BANK_SLOT_BAGNON')
 end
 

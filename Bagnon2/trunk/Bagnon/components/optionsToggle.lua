@@ -12,6 +12,7 @@ Bagnon.OptionsToggle = OptionsToggle
 local SIZE = 20
 local NORMAL_TEXTURE_SIZE = 64 * (SIZE/36)
 
+
 --[[ Constructor ]]--
 
 function OptionsToggle:New(frameID, parent)
@@ -49,6 +50,7 @@ function OptionsToggle:New(frameID, parent)
 	return b
 end
 
+
 --[[ Frame Events ]]--
 
 function OptionsToggle:OnClick()
@@ -67,7 +69,9 @@ function OptionsToggle:OnEnter()
 end
 
 function OptionsToggle:OnLeave()
-	GameTooltip:Hide()
+	if GameTooltip:IsOwned(self) then
+		GameTooltip:Hide()
+	end
 end
 
 

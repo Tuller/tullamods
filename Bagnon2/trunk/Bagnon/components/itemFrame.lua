@@ -154,7 +154,6 @@ function ItemFrame:OnShow()
 end
 
 function ItemFrame:OnHide()
-	self:RemoveAllItemSlots()
 	self:UpdateEvents()
 end
 
@@ -219,10 +218,14 @@ end
 --if an item is not assigned to the given slotIndex, then add an item
 function ItemFrame:AddItemSlot(bag, slot)
 	if self:IsBagShown(bag) and not self:GetItemSlot(bag, slot) then
-		local itemSlot = Bagnon.ItemSlot:New(bag, slot, self:GetFrameID(), self)
+		local itemSlot = self:NewItemSlot(bag, slot)
 		self.itemSlots[self:GetSlotIndex(bag, slot)] = itemSlot
 		self:RequestLayout()
 	end
+end
+
+function ItemFrame:NewItemSlot(bag, slot)
+	return Bagnon.ItemSlot:New(bag, slot, self:GetFrameID(), self)
 end
 
 --removes any item slot associated with the given slotIndex
@@ -277,7 +280,7 @@ function ItemFrame:UpdateAllItemSlotsForBag(bag)
 		self:UpdateItemSlot(bag, slot)
 	end
 end
-
+--[[
 function ItemFrame:RemoveAllItemSlots()
 	local itemSlots = self.itemSlots
 	for i, itemSlot in pairs(itemSlots) do
@@ -286,6 +289,7 @@ function ItemFrame:RemoveAllItemSlots()
 	end
 	self:RequestLayout()
 end
+--]]
 
 --remove all unused item slots from the frame
 --add all missing slots to the frame
@@ -338,7 +342,7 @@ function ItemFrame:Layout()
 			local itemSlot = self:GetItemSlot(bag, slot)
 			if itemSlot then
 				i = i + 1
-				local row = mod(i - 1, columns)
+				local row = (i - 1) % columns
 				local col = math.ceil(i / columns) - 1
 				itemSlot:ClearAllPoints()
 				itemSlot:SetPoint('TOPLEFT', self, 'TOPLEFT', effItemSize * row, -effItemSize * col)

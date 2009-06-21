@@ -65,8 +65,7 @@ function FrameSettings:Show()
 	local wasShown = self:IsShown()
 
 	self.shown = (self.shown or 0) + 1
-
-	if not shown then
+	if not wasShown then
 		self:SendMessage('FRAME_SHOW')
 	end
 end

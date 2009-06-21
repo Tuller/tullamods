@@ -32,14 +32,26 @@ function MoneyFrame:New(frameID, parent)
 end
 
 --creates a clickable frame for tooltips/etc
+local function ClickFrame_OnClick(self, button)
+	self:GetParent():OnClick(button)
+end
+
+local function ClickFrame_OnEnter(self)
+	self:GetParent():OnEnter()
+end
+
+local function ClickFrame_OnLeave(self)
+	self:GetParent():OnLeave()
+end
+
 function MoneyFrame:AddClickFrame()
 	local f = CreateFrame('Button', self:GetName() .. 'Click', self)
 	f:SetFrameLevel(self:GetFrameLevel() + 3)
 	f:SetAllPoints(self)
 
-	f:SetScript('OnClick', function(self, ...) self:GetParent():OnClick(...) end)
-	f:SetScript('OnEnter', function(self, ...) self:GetParent():OnEnter(...) end)
-	f:SetScript('OnLeave', function(self, ...) self:GetParent():OnLeave(...) end)
+	f:SetScript('OnClick', ClickFrame_OnClick)
+	f:SetScript('OnEnter', ClickFrame_OnEnter)
+	f:SetScript('OnLeave', ClickFrame_OnLeave)
 
 	return f
 end
@@ -111,7 +123,9 @@ function MoneyFrame:OnEnter()
 end
 
 function MoneyFrame:OnLeave()
-	GameTooltip:Hide()
+	if GameTooltip:IsOwned(self) then
+		GameTooltip:Hide()
+	end
 end
 
 
