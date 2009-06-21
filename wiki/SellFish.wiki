@@ -4,3 +4,6 @@ Commands: (All start with /sf or /sellfish)
   * /sf ? - displays help messages
   * /sf reset - resets the item database
   * /sf style - cycles between graphical and text displays for sell value
+
+
+As of World of Warcraft Patch 3.2.0, this addon will no longer be necessary.
