@@ -160,9 +160,8 @@ function SavedSettings:UpdateEnableFrames()
 end
 
 function SavedSettings:ClearDefaults()
-	local db = removeDefaults(self.db, self:GetDefaultSettings())
-	if next(db) == nil then
-		_G['BagnonGlobalSettings'] = nil
+	if self.db then
+		removeDefaults(self.db, self:GetDefaultSettings())
 	end
 end
 

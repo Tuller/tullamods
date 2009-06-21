@@ -158,10 +158,6 @@ function SavedFrameSettings:ClearDefaults()
 			db[frameID] = nil
 		end
 	end
-	
-	if next(db) == nil then
-		_G['BagnonFrameSettings'] = nil
-	end
 end
 
 
