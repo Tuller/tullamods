@@ -21,4 +21,5 @@ if GetLocale() == 'ruRU' then
 	L.UnderFiveSeconds = 'Меньше 5с'
 	L.OptionsTitle = 'Опции OmniCC'
 	L.MinEffectDuration = 'Эффект готовности'
+	L.ShowTenthsOfSeconds = 'Показывать десятую часть секунд'
 end
