@@ -43,7 +43,6 @@ function DisplayOptions:UpdateMessages()
 end
 
 function DisplayOptions:FRAME_DISPLAY_EVENT_UPDATE(msg, frameID, event, enable)
-	print(msg, frameID, event, enable)
 	if self:GetFrameID() == frameID then
 		self:GetDisplayEventCheckbox(event):UpdateChecked()
 	end
