@@ -57,6 +57,7 @@ function GeneralOptions:UpdateMessages()
 	self:RegisterMessage('LOCK_FRAME_POSITIONS_UPDATE')
 	self:RegisterMessage('ITEM_SLOT_COLOR_UPDATE')
 	self:RegisterMessage('ENABLE_FRAME_UPDATE')
+	self:RegisterMessage('BLIZZARD_BAG_PASSTHROUGH_UPDATE')
 end
 
 function GeneralOptions:ITEM_HIGHLIGHT_QUALITY_UPDATE(msg, enable)
@@ -82,6 +83,11 @@ end
 function GeneralOptions:ENABLE_FRAME_UPDATE(msg, frameID, enable)
 	self:GetEnableFrameCheckbox(frameID):UpdateChecked()
 end
+
+function GeneralOptions:BLIZZARD_BAG_PASSTHROUGH_UPDATE(msg, enable)
+	self:GetBlizzardBagPassThroughCheckbox():UpdateChecked()
+end
+
 
 
 --[[
@@ -112,6 +118,9 @@ function GeneralOptions:AddWidgets()
 
 	local highightQuestItems = self:CreateHighlightQuestItemsCheckbox()
 	highightQuestItems:SetPoint('TOPLEFT', highlightItemsByQuality, 'BOTTOMLEFT', 0, -SPACING)
+	
+	local enableBlizzardBagPassThrough = self:CreateBlizzardBagPassThroughCheckbox()
+	enableBlizzardBagPassThrough:SetPoint('TOPLEFT', highightQuestItems, 'BOTTOMLEFT', 0, -SPACING)
 end
 
 function GeneralOptions:UpdateWidgets()
@@ -127,6 +136,7 @@ function GeneralOptions:UpdateWidgets()
 	self:GetHighlightItemsByQualityCheckbox():UpdateChecked()
 	self:GetHighlightQuestItemsCheckbox():UpdateChecked()
 	self:GetColorItemSlotsCheckbox():UpdateChecked()
+	self:GetBlizzardBagPassThroughCheckbox():UpdateChecked()
 end
 
 
@@ -271,6 +281,28 @@ end
 function GeneralOptions:GetColorItemSlotsCheckbox()
 	return self.colorItemSlotsCheckbox
 end
+
+
+--blizzard bag passthrough
+function GeneralOptions:CreateBlizzardBagPassThroughCheckbox()
+	local button = Bagnon.OptionsCheckButton:New(L.EnableBlizzardBagPassThrough, self)
+
+	button.OnEnableSetting = function(self, enable)
+		Bagnon.Settings:SetEnableBlizzardBagPassThrough(enable)
+		GeneralOptions:DisplayRequiresRestartPopup()
+	end
+
+	button.IsSettingEnabled = function(self)
+		return Bagnon.Settings:WillBlizzardBagPassThroughBeEnabled()
+	end
+
+	self.blizzardBagPassThroughCheckbox = button
+	return button
+end
+
+function GeneralOptions:GetBlizzardBagPassThroughCheckbox()
+	return self.blizzardBagPassThroughCheckbox
+end 
 
 
 --[[ Load the thing ]]--
