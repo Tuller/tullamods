@@ -298,7 +298,7 @@ end
 
 function Bagnon:BANK_CLOSED()
 	if not self:HideFrame('bank') then
-		HideBlizzardBankFrame()
+		self:HideBlizzardBankFrame()
 	end
 	self:HideFrameAtEvent('inventory', 'bank')
 end
