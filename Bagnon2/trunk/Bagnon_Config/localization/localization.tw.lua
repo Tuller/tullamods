@@ -4,7 +4,7 @@
 	Bagnon Config Localization Information: Chinese Traditional
 		Credits: yleaf@cwdg(yaroot@gmail.com), 狂飆@cwdg(networm@qq.com)
 
-	Last Update: 2009/06/20 by 狂飆@cwdg(networm@qq.com)
+	Last Update: 2009/06/26 by 狂飆@cwdg(networm@qq.com)
 
 --]]
 
@@ -23,8 +23,8 @@ L.Bank = '銀行'
 L.KeyRing = '鑰匙鏈'
 L.LockFramePositions = '鎖定位置'
 L.ShowEmptyItemSlotBackground = '顯示空格背景材質'
-L.HighlightItemsByQuality = '按物品品質高亮物品'
-L.HighlightQuestItems = '高亮任務物品'
+L.HighlightItemsByQuality = '按物品品質對物品染色'
+L.HighlightQuestItems = '對任務物品染色'
 L.ReverseSlotOrdering = '反向排列'
 L.ColorItemSlotsByBagType = '按背包類型對空格染色'
 L.FrameLayer = '窗口層級'
@@ -47,3 +47,5 @@ L.DisplaySettings = '事件設置'
 L.DisplaySettingsTitle = '何時自動打開背包'
 L.FrameSettings = '顯示設定'
 L.FrameSettingsTitle = '窗口顯示設定'
+L.GeneralSettings = '通用設置'
+L.GeneralSettingsTitle = 'Bagnon的通用設置'
