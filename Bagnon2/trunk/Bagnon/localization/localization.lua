@@ -45,7 +45,7 @@ L.TipShowMenu = 'Right-Click to configure this frame.'
 L.TipShowSearch = 'Click to show the search frame.'
 L.TipShowSearch = 'Click to search.'
 L.TipShowFrameConfig = 'Click to configure this frame.'
-L.TipDoubleClickSearch = 'Double-Click to show the search frame.'
+L.TipDoubleClickSearch = 'Alt-Drag to move.\nRight-Click to configure.\nDouble-Click to search.'
 L.Total = 'Total'
 
 --databroker plugin tooltips

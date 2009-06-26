@@ -29,6 +29,7 @@ function TitleFrame:New(frameID, parent)
 	b:SetScript('OnDoubleClick', b.OnDoubleClick)
 	b:SetScript('OnEnter', b.OnEnter)
 	b:SetScript('OnLeave', b.OnLeave)
+	b:SetScript('OnClick', b.OnClick)
 
 	b:SetFrameID(frameID)
 	b:UpdateEvents()
@@ -69,6 +70,14 @@ end
 
 function TitleFrame:OnDoubleClick()
 	self:ToggleSearchFrame()
+end
+
+function TitleFrame:OnClick(button)
+	if button == 'RightButton' then
+		if LoadAddOn('Bagnon_Config') then
+			Bagnon.FrameOptions:ShowFrame(self:GetFrameID())
+		end
+	end
 end
 
 function TitleFrame:OnEnter()

@@ -128,6 +128,14 @@ function Bagnon:IsFrameEnabled(frameID)
 	return self.Settings:IsFrameEnabled(frameID)
 end
 
+function Bagnon:FrameControlsBag(frameID, bagSlot)
+	return self.FrameSettings:Get(frameID):IsBagSlotShown(bagSlot) or (not self:IsBlizzardBagPassThroughEnabled())
+end
+
+function Bagnon:IsBlizzardBagPassThroughEnabled()
+	return self.Settings:IsBlizzardBagPassThroughEnabled()
+end
+
 
 --[[
 	Bag Click Events
@@ -141,36 +149,39 @@ function Bagnon:HookBagClickEvents()
 
 	local oOpenBackpack = OpenBackpack
 	OpenBackpack = function()
-		if not self:ShowFrame('inventory') then
+		local shown = self:FrameControlsBag('inventory', BACKPACK_CONTAINER) and self:ShowFrame('inventory')
+
+		if not shown then
 			oOpenBackpack()
 		end
 	end
 
 	local oToggleBackpack = ToggleBackpack
 	ToggleBackpack = function()
-		if not self:ToggleFrame('inventory') then
+		local toggled = self:FrameControlsBag('inventory', BACKPACK_CONTAINER) and self:ToggleFrame('inventory')
+
+		if not toggled then
 			oToggleBackpack()
 		end
 	end
 
 	--single bag
 	local oToggleBag = ToggleBag
-	ToggleBag = function(bag)
-		local toggled = false
-		if self.BagSlotInfo:IsBankBag(bag) then
-			toggled = self:ToggleFrame('bank')
-		else
-			toggled = self:ToggleFrame('inventory')
-		end
+	ToggleBag = function(bagSlot)
+		local frameID = self.BagSlotInfo:IsBankBag(bagSlot) and 'bank' or 'inventory'
+		local toggled = self:FrameControlsBag(frameID, bagSlot) and self:ToggleFrame(frameID)
+
 		if not toggled then
-			oToggleBag(bag)
+			oToggleBag(bagSlot)
 		end
 	end
 
 	--keyring
 	local oToggleKeyRing = ToggleKeyRing
 	ToggleKeyRing = function()
-		if not self:ToggleFrame('keys') then
+		local toggled = self:FrameControlsBag('keys', KEYRING_CONTAINER) and self:ToggleFrame('keys')
+
+		if not toggled then
 			oToggleKeyRing()
 		end
 	end
@@ -185,27 +196,32 @@ function Bagnon:HookBagClickEvents()
 	OpenAllBags = function(force)
 		local opened = false
 		if force then
-			opened = self:ShowFrame('inventory')
+			opened = self:FrameControlsBag('inventory', BACKPACK_CONTAINER) and self:ShowFrame('inventory')
 		else
-			opened = self:ToggleFrame('inventory')
+			opened = self:FrameControlsBag('inventory', BACKPACK_CONTAINER) and self:ToggleFrame('inventory')
 		end
 
 		if not opened then
 			oOpenAllBags(force)
 		end
 	end
-
-	local function bag_checkIfInventoryShown(self)
+--[[
+	local function checkIfInventoryShown(self)
 		if Bagnon:IsFrameEnabled('inventory') then
-			self:SetChecked(Bagnon.FrameSettings:Get('inventory'):IsShown())
+			self:SetChecked(Bagnon.FrameSettings:Get('inventory'):IsShown('inventory'))
 		end
 	end
 
+	_G['MainMenuBarBackpackButton']:HookScript('OnClick', checkIfInventoryShown)
+	for i = 0, 3 do
+		_G['CharacterBag' .. i .. 'Slot']:HookScript('OnClick', checkIfInventoryShown)
+	end
+
+
 	--handle checking/unchecking of the backpack buttons based on frame display
-	hooksecurefunc('BagSlotButton_UpdateChecked', bag_checkIfInventoryShown)
-	hooksecurefunc('BackpackButton_UpdateChecked', bag_checkIfInventoryShown)
 	self.Callbacks:Listen(self, 'FRAME_SHOW')
 	self.Callbacks:Listen(self, 'FRAME_HIDE')
+--]]
 end
 
 
