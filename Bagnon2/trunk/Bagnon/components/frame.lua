@@ -201,7 +201,7 @@ function Frame:OnHide()
 	end
 
 	self:UpdateEvents()
-	
+
 	--fix issue where a frame is hidden, but not via bagnon controlled methods (ie, close on escape)
 	if self:IsFrameShown() then
 		self:HideFrame()
@@ -388,13 +388,24 @@ function Frame:UpdateFrameLayer()
 end
 
 function Frame:SetFrameLayer(layer)
+	local strata, topLevel = nil, false
+
 	if layer == 'TOPLEVEL' then
-		self:SetFrameStrata('HIGH')
-		self:SetToplevel(true)
+		strata = 'HIGH'
+		topLevel = true
+	elseif layer == 'MEDIUMLOW' then
+		strata = 'LOW'
+		topLevel = true
+	elseif layer == 'MEDIUMHIGH' then
+		strata = 'MEDIUM'
+		topLevel = true
 	else
-		self:SetFrameStrata(layer)
-		self:SetToplevel(false)
+		strata = layer
+		topLevel = false
 	end
+
+	self:SetFrameStrata(strata)
+	self:SetToplevel(topLevel)
 end
 
 function Frame:GetFrameLayer()
@@ -750,7 +761,7 @@ function Frame:PlaceMoneyFrame()
 		frame:Show()
 		return frame:GetWidth(), 24
 	end
-	
+
 	local frame = self:GetMoneyFrame()
 	if frame then
 		frame:Hide()
