@@ -70,7 +70,7 @@ end
 --returns an available blizzard item slot for <id>
 function ItemSlot:GetBlizzardItemSlot(id)
 	--only allow reuse of blizzard frames if all frames are enabled
-	if not Bagnon.Settings:AreAllFramesEnabled() then
+	if not self:CanReuseBlizzardBagSlots() then
 		return nil
 	end
 
@@ -83,6 +83,10 @@ function ItemSlot:GetBlizzardItemSlot(id)
 		item:ClearAllPoints()
 		return item
 	end
+end
+
+function ItemSlot:CanReuseBlizzardBagSlots()
+	return Bagnon.Settings:AreAllFramesEnabled() and (not Bagnon.Settings:IsBlizzardBagPassThroughEnabled())
 end
 
 --returns the next available item slot

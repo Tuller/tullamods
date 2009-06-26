@@ -68,6 +68,7 @@ function SavedSettings:GetDefaultSettings()
 		showEmptyItemSlotTexture = true,
 		lockFramePositions = false,
 		colorBagSlots = true,
+		enableBlizzardBagPassThrough = false,
 		enabledFrames = {
 			inventory = true,
 			bank = true,
@@ -156,6 +157,7 @@ end
 --remove any settings that are set to defaults upon logout
 function SavedSettings:PLAYER_LOGOUT()
 	self:UpdateEnableFrames()
+	self:UpdateEnableBlizzardBagPassThrough()
 	self:ClearDefaults()
 end
 
@@ -168,6 +170,10 @@ function SavedSettings:UpdateEnableFrames()
 			self:GetDB().enabledFrames[frameID] = enableStatus
 		end
 	end
+end
+
+function SavedSettings:UpdateEnableBlizzardBagPassThrough()
+	self:GetDB().enableBlizzardBagPassThrough = Bagnon.Settings:WillBlizzardBagPassThroughBeEnabled()
 end
 
 function SavedSettings:ClearDefaults()

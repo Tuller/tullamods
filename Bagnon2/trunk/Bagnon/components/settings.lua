@@ -136,3 +136,24 @@ end
 function Settings:IsFrameShownAtEvent(frameID, event)
 	return Bagnon.SavedSettings:IsFrameShownAtEvent(frameID, event)
 end
+
+
+--blizzard bag passthrough
+function Settings:SetEnableBlizzardBagPassThrough(enable)
+	local enable = enable and true or false
+	if self:WillBlizzardBagPassThroughBeEnabled() ~= enable then
+		self.enableBlizzardBagPassThrough = enable
+		self:SendMessage('BLIZZARD_BAG_PASSTHROUGH_UPDATE', self:WillBlizzardBagPassThroughBeEnabled())
+	end
+end
+
+function Settings:IsBlizzardBagPassThroughEnabled()
+	return self:GetDB().enableBlizzardBagPassThrough
+end
+
+function Settings:WillBlizzardBagPassThroughBeEnabled()
+	if self.enableBlizzardBagPassThrough == nil then
+		self.enableBlizzardBagPassThrough = self:IsBlizzardBagPassThroughEnabled()
+	end
+	return self.enableBlizzardBagPassThrough
+end
