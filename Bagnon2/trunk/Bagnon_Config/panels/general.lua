@@ -5,8 +5,15 @@
 
 local Bagnon = LibStub('AceAddon-3.0'):GetAddon('Bagnon')
 local L = LibStub('AceLocale-3.0'):GetLocale('Bagnon-Config')
-local name, desc = select(2, GetAddOnInfo('Bagnon'))
-local GeneralOptions = Bagnon.OptionsPanel:New('BagnonOptions_General', nil, name, desc, [[Interface\Icons\INV_Misc_Bag_07]])
+
+--a hack panel, this is designed to force open to the general options panel when clicked
+local BagnonOptions = Bagnon.OptionsPanel:New('Bagnon', nil, 'Bagnon')
+BagnonOptions:SetScript('OnShow', function(self)
+	InterfaceOptionsFrame_OpenToCategory(Bagnon.GeneralOptions)
+	self:Hide()
+end)
+
+local GeneralOptions = Bagnon.OptionsPanel:New('BagnonOptions_General', 'Bagnon', L.GeneralSettings, L.GeneralSettingsTitle)
 Bagnon.GeneralOptions = GeneralOptions
 
 local SPACING = 4
