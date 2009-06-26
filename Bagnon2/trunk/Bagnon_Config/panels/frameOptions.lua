@@ -185,7 +185,7 @@ function FrameOptions:AddWidgets()
 	--add opacity slider
 	local opacity = self:CreateOpacitySlider()
 	opacity:SetPoint('BOTTOMLEFT', self, 'BOTTOMLEFT', 12, 10)
-	opacity:SetPoint('BOTTOMRIGHT', self, 'BOTTOMRIGHT', -48, 10)
+	opacity:SetPoint('BOTTOMRIGHT', self, 'BOTTOMRIGHT', -96, 10)
 	
 	local scale = self:CreateScaleSlider()
 	scale:SetPoint('BOTTOMLEFT', opacity, 'TOPLEFT', 0, 20)
