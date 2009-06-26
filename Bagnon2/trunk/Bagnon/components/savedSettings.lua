@@ -75,12 +75,13 @@ function SavedSettings:GetDefaultSettings()
 		},
 		autoDisplayEvents = {
 			inventory = {
-				'ah',
-				'bank',
-				'vendor',
-				'mail',
-				'guildbank',
-				'trade',
+				ah = true,
+				bank = true,
+				vendor = true,
+				mail = true,
+				guildbank = true,
+				trade = true,
+				craft = false
 			},
 		}
 	}
@@ -104,7 +105,17 @@ end
 
 function SavedSettings:UpgradeDB()
 	local major, minor, bugfix = self:GetDBVersion():match('(%w+)%.(%w+)%.(%w+)')
+	
 	--do upgrade stuff
+	if tonumber(minor) <= 6 and tonumber(bugfix) <= 2 then
+		local db = self.db
+		local autoDisplayEvents = self.db.autoDisplayEvents
+		if autoDisplayEvents then
+			for i = 1, #autoDisplayEvents do
+				autoDisplayEvents[i] = nil
+			end
+		end
+	end
 
 	self:GetDB().version = self:GetAddOnVersion()
 	Bagnon:Print(string.format(L.Updated, self:GetDBVersion()))
@@ -172,33 +183,9 @@ end
 
 --frame auto display events
 function SavedSettings:SetShowFrameAtEvent(frameID, event, enable)
-	if enable then
-		if not self:IsFrameShownAtEvent(frameID, event) then
-			local autoDisplayEvents = self:GetDB().autoDisplayEvents[frameID] or {}
-			table.insert(autoDisplayEvents, event)
-			self:GetDB().autoDisplayEvents[frameID] = autoDisplayEvents
-		end
-	else
-		if self:IsFrameShownAtEvent(frameID, event) then
-			local autoDisplayEvents = self:GetDB().autoDisplayEvents[frameID]
-			for i, displayEvent in pairs(autoDisplayEvents) do
-				if displayEvent == event then
-					table.remove(autoDisplayEvents, i)
-					return
-				end
-			end
-		end
-	end
+	self:GetDB().autoDisplayEvents[frameID][event] = enable and true or false
 end
 
 function SavedSettings:IsFrameShownAtEvent(frameID, event)
-	local autoDisplayEvents = self:GetDB().autoDisplayEvents[frameID]
-	if autoDisplayEvents then
-		for i, displayEvent in pairs(autoDisplayEvents) do
-			if event == displayEvent then
-				return true
-			end
-		end
-	end
-	return false
+	return self:GetDB().autoDisplayEvents[frameID][event]
 end

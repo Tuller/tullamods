@@ -17,7 +17,7 @@ FrameSettings.mt = {
 }
 
 FrameSettings.objects = setmetatable({}, {__index = function(tbl, id)
-	local obj = setmetatable({frameID = id, frameShown = 0}, FrameSettings.mt)
+	local obj = setmetatable({frameID = id, shown = 0}, FrameSettings.mt)
 	tbl[id] = obj
 	return obj
 end})

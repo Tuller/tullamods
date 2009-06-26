@@ -124,8 +124,6 @@ function ItemFrame:HandleGlobalItemEvent(msg, ...)
 end
 
 function ItemFrame:HandleSpecificItemEvent(msg, bag, slot, ...)
-	assert(bag and slot, 'Invalid slot for ' .. msg)
-
 	if self:IsBagShown(bag) and (not self:IsBagSlotCached(bag)) then
 		local item = self:GetItemSlot(bag, slot)
 		if item then
@@ -178,7 +176,8 @@ function ItemFrame:UpdateEvents()
 	self:UnregisterAllItemEvents()
 	self:UnregisterAllMessages()
 
-	if self:IsVisible() then
+	if self:IsVisible() then			
+		--live item events
 		if not self:IsCached() then
 			self:RegisterEvent('ITEM_LOCK_CHANGED')
 
@@ -187,15 +186,6 @@ function ItemFrame:UpdateEvents()
 			self:RegisterItemEvent('ITEM_SLOT_UPDATE', 'HandleSpecificItemEvent')
 			self:RegisterItemEvent('ITEM_SLOT_UPDATE_COOLDOWN', 'HandleSpecificItemEvent')
 			self:RegisterItemEvent('BAG_UPDATE_TYPE')
-
-			self:RegisterMessage('TEXT_SEARCH_UPDATE', 'HandleGlobalItemEvent')
-			self:RegisterMessage('TEXT_SEARCH_ENABLE', 'HandleGlobalItemEvent')
-			self:RegisterMessage('TEXT_SEARCH_DISABLE', 'HandleGlobalItemEvent')
-			self:RegisterMessage('BAG_SEARCH_UPDATE', 'HandleGlobalItemEvent')
-			self:RegisterMessage('ITEM_HIGHLIGHT_QUEST_UPDATE', 'HandleGlobalItemEvent')
-			self:RegisterMessage('ITEM_HIGHLIGHT_QUALITY_UPDATE', 'HandleGlobalItemEvent')
-			self:RegisterMessage('SHOW_EMPTY_ITEM_SLOT_TEXTURE_UPDATE', 'HandleGlobalItemEvent')
-			self:RegisterMessage('ITEM_SLOT_COLOR_UPDATE', 'HandleGlobalItemEvent')
 			
 			if self:HasBankBags() then
 				self:RegisterItemEvent('BANK_OPENED')
@@ -209,6 +199,15 @@ function ItemFrame:UpdateEvents()
 		self:RegisterMessage('ITEM_FRAME_SPACING_UPDATE')
 		self:RegisterMessage('ITEM_FRAME_COLUMNS_UPDATE')
 		self:RegisterMessage('SLOT_ORDER_UPDATE')
+		
+		self:RegisterMessage('TEXT_SEARCH_UPDATE', 'HandleGlobalItemEvent')
+		self:RegisterMessage('TEXT_SEARCH_ENABLE', 'HandleGlobalItemEvent')
+		self:RegisterMessage('TEXT_SEARCH_DISABLE', 'HandleGlobalItemEvent')
+		self:RegisterMessage('BAG_SEARCH_UPDATE', 'HandleGlobalItemEvent')
+		self:RegisterMessage('ITEM_HIGHLIGHT_QUEST_UPDATE', 'HandleGlobalItemEvent')
+		self:RegisterMessage('ITEM_HIGHLIGHT_QUALITY_UPDATE', 'HandleGlobalItemEvent')
+		self:RegisterMessage('SHOW_EMPTY_ITEM_SLOT_TEXTURE_UPDATE', 'HandleGlobalItemEvent')
+		self:RegisterMessage('ITEM_SLOT_COLOR_UPDATE', 'HandleGlobalItemEvent')
 	end
 end
 

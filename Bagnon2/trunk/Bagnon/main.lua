@@ -21,7 +21,7 @@ BINDING_NAME_BAGNON_KEYS_TOGGLE = L.ToggleKeys
 	Startup
 --]]
 
-function Bagnon:OnEnable()
+function Bagnon:OnInitialize()
 	self.frames = {}
 
 	self:HookBagClickEvents()

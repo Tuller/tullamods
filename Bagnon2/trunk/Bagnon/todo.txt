@@ -1,5 +1,8 @@
 automatic display settings:
 * Hide frames when entering combat (maybe)
+* Add icon to toggle the keyring
+* Add option to disable the options menu button
+* Make the general options menu a subpanel
 
 Colors: (maybe)
 * Quest item color
