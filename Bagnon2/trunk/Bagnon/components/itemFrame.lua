@@ -279,16 +279,6 @@ function ItemFrame:UpdateAllItemSlotsForBag(bag)
 		self:UpdateItemSlot(bag, slot)
 	end
 end
---[[
-function ItemFrame:RemoveAllItemSlots()
-	local itemSlots = self.itemSlots
-	for i, itemSlot in pairs(itemSlots) do
-		itemSlot:Free()
-		itemSlots[i] = nil
-	end
-	self:RequestLayout()
-end
---]]
 
 --remove all unused item slots from the frame
 --add all missing slots to the frame

@@ -44,5 +44,4 @@ function ItemFrame:Layout()
 	local height = effItemSize * (rows - 1) - spacing*2
 	self:SetWidth(width)
 	self:SetHeight(height)
-	self:SavePosition()
 end
