@@ -76,12 +76,12 @@ function SavedSettings:GetDefaultSettings()
 		},
 		autoDisplayEvents = {
 			inventory = {
-				ah = true,
+				ah = false,
 				bank = true,
 				vendor = true,
 				mail = true,
 				guildbank = true,
-				trade = true,
+				trade = false,
 				craft = false
 			},
 		}
