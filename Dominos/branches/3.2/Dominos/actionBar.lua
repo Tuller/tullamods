@@ -46,6 +46,7 @@ local LBF = LibStub('LibButtonFacade', true)
 --[[ Action Button ]]--
 
 local ActionButton = Dominos:CreateClass('CheckButton', Dominos.BindableButton)
+Dominos.ActionButton = ActionButton
 ActionButton.unused = {}
 ActionButton.active = {}
 
@@ -95,9 +96,8 @@ local function Create(id)
 		return _G['MultiBarBottomRightButton' .. (id-48)]
 	elseif id <= 72 then
 		return _G['MultiBarBottomLeftButton' .. (id-60)]
-	elseif id <= MAX_BUTTONS then
-		return CreateFrame('CheckButton', 'DominosActionButton' .. (id-72), nil, 'ActionBarButtonTemplate')
 	end
+	return CreateFrame('CheckButton', 'DominosActionButton' .. (id-72), nil, 'ActionBarButtonTemplate')
 end
 
 function ActionButton:Create(id)
