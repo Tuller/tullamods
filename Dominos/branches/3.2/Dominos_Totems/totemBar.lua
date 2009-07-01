@@ -16,8 +16,9 @@ local SpellButton
 --hurray for constants
 local NUM_TOTEM_BARS = 3 --fire, water, air
 local NUM_TOTEM_BAR_BUTTONS = 4 --fire, earth, water, air
-local TOTEM_CALLS = {}
-local CALL_OF_EARTH = 0
+local TOTEM_CALLS = {66842, 66843, 66844} --fire, water, air spellIDs
+local CALL_OF_EARTH = 36936
+local TOTEM_BAR_START_ID = 132 --actionID start of the totembar
 
 
 --[[ Module Stuff ]]--
@@ -63,22 +64,27 @@ function TotemBar:NumButtons()
 end
 
 function TotemBar:GetBaseID()
-	return 132 + (self:NumButtons() * (self.totemBarID - 1))
+	return TOTEM_BAR_START_ID + (NUM_TOTEM_BAR_BUTTONS * (self.totemBarID - 1))
 end
 
 
 --[[ button stuff]]--
 
 function TotemBar:LoadButtons()
-	for i = 1, self:NumButtons() - 2 do
+	self.buttons[1] = self:CreateSpellButton(TOTEM_CALLS[self.totemBarID])
+	
+	for i = 1, NUM_TOTEM_BAR_BUTTONS do
 		local b = Dominos.ActionButton:New(self:GetBaseID() + i)
 		if b then
 			b:SetParent(self.header)
-			self.buttons[i] = b
+			self.buttons[i + 1] = b
 		else
 			break
 		end
 	end
+	
+	self.buttons[self:NumButtons()] = self:CreateSpellButton(CALL_OF_EARTH)
+		
 	self.header:Execute([[ control:ChildUpdate('action', nil) ]])
 end
 
@@ -101,6 +107,10 @@ function TotemBar:RemoveButton(i)
 end
 
 function TotemBar:CreateSpellButton(spellID)
+	local b = Dominos.SpellButton:New(spellID)
+	b:SetParent(self.header)
+	
+	return b
 end
 
 function TotemBar:CreateActionButton(actionID)
