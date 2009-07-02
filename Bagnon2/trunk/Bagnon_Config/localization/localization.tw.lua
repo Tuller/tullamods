@@ -4,7 +4,7 @@
 	Bagnon Config Localization Information: Chinese Traditional
 		Credits: yleaf@cwdg(yaroot@gmail.com), 狂飆@cwdg(networm@qq.com)
 
-	Last Update: 2009/06/26 by 狂飆@cwdg(networm@qq.com)
+	Last Update: 2009/06/27 by 狂飆@cwdg(networm@qq.com)
 
 --]]
 
@@ -49,3 +49,4 @@ L.FrameSettings = '顯示設定'
 L.FrameSettingsTitle = '窗口顯示設定'
 L.GeneralSettings = '通用設置'
 L.GeneralSettingsTitle = 'Bagnon的通用設置'
+L.EnableBlizzardBagPassThrough = '禁用的背包使用暴雪默認框體'
