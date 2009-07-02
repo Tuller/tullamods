@@ -69,7 +69,7 @@ function RollBar:GetDefaults()
 end
 
 function RollBar:AddButton(i)
-	local b =  getglobal('GroupLootFrame' .. (5 - i))
+	local b =  _G['GroupLootFrame' .. (5 - i)]
 	b:SetParent(self.header)
 	self.buttons[i] = b
 end
