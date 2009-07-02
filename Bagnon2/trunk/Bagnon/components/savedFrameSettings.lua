@@ -278,6 +278,22 @@ function SavedFrameSettings:HasSearchToggle()
 	return self:GetDB().hasSearchToggle
 end
 
+function SavedFrameSettings:SetHasOptionsToggle(enable)
+	self:GetDB().hasOptionsToggle = enable or false
+end
+
+function SavedFrameSettings:HasOptionsToggle()
+	return self:GetDB().hasOptionsToggle
+end
+
+function SavedFrameSettings:SetHasKeyRingToggle(enable)
+	self:GetDB().hasKeyRingToggle = enable or false
+end
+
+function SavedFrameSettings:HasKeyRingToggle()
+	return self:GetDB().hasKeyRingToggle
+end
+
 
 --[[ Frame Bags ]]--
 
@@ -407,6 +423,8 @@ function SavedFrameSettings:GetDefaultInventorySettings()
 		hasBagFrame = true,
 		hasDBOFrame = true,
 		hasSearchToggle = true,
+		hasOptionsToggle = true,
+		hasKeyringToggle = true,
 
 		--dbo display object
 		dataBrokerObject = 'BagnonLauncher',
@@ -445,6 +463,8 @@ function SavedFrameSettings:GetDefaultBankSettings()
 		hasBagFrame = true,
 		hasDBOFrame = true,
 		hasSearchToggle = true,
+		hasOptionsToggle = true,
+		hasKeyringToggle = false,
 
 		--dbo display object
 		dataBrokerObject = 'BagnonLauncher',
@@ -482,6 +502,8 @@ function SavedFrameSettings:GetDefaultKeyRingSettings()
 		hasBagFrame = false,
 		hasDBOFrame = false,
 		hasSearchToggle = false,
+		hasOptionsToggle = true,
+		hasKeyringToggle = false,
 
 		--dbo display object
 		dataBrokerObject = 'BagnonLauncher',

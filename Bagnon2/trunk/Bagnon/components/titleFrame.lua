@@ -100,6 +100,7 @@ end
 
 function TitleFrame:UpdateText()
 	self:SetFormattedText(self:GetTitleText(), self:GetPlayer())
+	self:GetFontString():SetAllPoints(self)
 end
 
 function TitleFrame:UpdateTooltip()

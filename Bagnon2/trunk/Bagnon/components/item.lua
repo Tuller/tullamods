@@ -348,18 +348,18 @@ end
 function ItemSlot:SetBorderQuality(quality)
 	local border = self.border
 
-	if self:HighlightingQuestItems() then
-		if self:IsQuestItem() then
-			border:SetVertexColor(1, 1, 0, 0.5)
-			border:Show()
-			return
-		end
-	end
-
 	if self:HighlightingItemsByQuality() then
 		if self:GetItem() and quality and quality > 1 then
 			local r, g, b = GetItemQualityColor(quality)
 			border:SetVertexColor(r, g, b, 0.5)
+			border:Show()
+			return
+		end
+	end
+	
+	if self:HighlightingQuestItems() then
+		if self:IsQuestItem() then
+			border:SetVertexColor(1, 1, 0, 0.5)
 			border:Show()
 			return
 		end

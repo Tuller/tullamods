@@ -205,51 +205,6 @@ function Bagnon:HookBagClickEvents()
 			oOpenAllBags(force)
 		end
 	end
---[[
-	local function checkIfInventoryShown(self)
-		if Bagnon:IsFrameEnabled('inventory') then
-			self:SetChecked(Bagnon.FrameSettings:Get('inventory'):IsShown('inventory'))
-		end
-	end
-
-	_G['MainMenuBarBackpackButton']:HookScript('OnClick', checkIfInventoryShown)
-	for i = 0, 3 do
-		_G['CharacterBag' .. i .. 'Slot']:HookScript('OnClick', checkIfInventoryShown)
-	end
-
-
-	--handle checking/unchecking of the backpack buttons based on frame display
-	self.Callbacks:Listen(self, 'FRAME_SHOW')
-	self.Callbacks:Listen(self, 'FRAME_HIDE')
---]]
-end
-
-
---[[ Click Events ]]--
-
-function Bagnon:FRAME_SHOW(msg, frameID)
-	if frameID == 'inventory' then
-		if self:IsFrameEnabled('inventory') then
-			self:CheckBagFrameBags(true)
-		end
-	end
-end
-
-function Bagnon:FRAME_HIDE(msg, frameID)
-	if frameID == 'inventory' then
-		if self:IsFrameEnabled('inventory') then
-			self:CheckBagFrameBags(false)
-		end
-	end
-end
-
---check/uncheck the bag frames
-function Bagnon:CheckBagFrameBags(checked)
-	_G['MainMenuBarBackpackButton']:SetChecked(checked)
-	_G["CharacterBag0Slot"]:SetChecked(checked)
-	_G["CharacterBag1Slot"]:SetChecked(checked)
-	_G["CharacterBag2Slot"]:SetChecked(checked)
-	_G["CharacterBag3Slot"]:SetChecked(checked)
 end
 
 

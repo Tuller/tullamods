@@ -75,6 +75,7 @@ function Frame:UpdateEvents()
 		self:RegisterMessage('MONEY_FRAME_ENABLE_UPDATE')
 		self:RegisterMessage('DATABROKER_FRAME_ENABLE_UPDATE')
 		self:RegisterMessage('SEARCH_TOGGLE_ENABLE_UPDATE')
+		self:RegisterMessage('OPTIONS_TOGGLE_ENABLE_UPDATE')
 	end
 end
 
@@ -176,6 +177,12 @@ function Frame:DATABROKER_FRAME_ENABLE_UPDATE(msg, frameID, enable)
 end
 
 function Frame:SEARCH_TOGGLE_ENABLE_UPDATE(msg, frameID, enable)
+	if self:GetFrameID() == frameID then
+		self:Layout()
+	end
+end
+
+function Frame:OPTIONS_TOGGLE_ENABLE_UPDATE(msg, frameID, enable)
 	if self:GetFrameID() == frameID then
 		self:Layout()
 	end
@@ -436,7 +443,7 @@ function Frame:Layout()
 
 	local w, h = self:PlaceOptionsToggle()
 	width = width + w + 24 --append spacing between close button and this
-	height = height + h
+	height = height + 20
 
 	local w, h = self:PlaceTitleFrame()
 	width = width + w
@@ -463,7 +470,7 @@ function Frame:Layout()
 	end
 
 	--adjust size
-	self:SetWidth(width + padW)
+	self:SetWidth(math.max(width, 156) + padW)
 	self:SetHeight(height + padH)
 	self:SavePosition()
 end
@@ -535,7 +542,7 @@ end
 function Frame:CreateCloseButton()
 	local b = CreateFrame('Button', self:GetName() .. 'CloseButton', self, 'UIPanelCloseButton')
 	b:SetScript('OnClick', CloseButton_OnClick)
-	self.closeButton = closeButton
+	self.closeButton = b
 	return b
 end
 
@@ -576,7 +583,12 @@ function Frame:PlaceSearchFrame()
 		frame:SetPoint('TOPLEFT', self, 'TOPLEFT', 8, -8)
 	end
 
-	frame:SetPoint('RIGHT', self:GetOptionsToggle(), 'LEFT', -2, 0)
+	if self:HasOptionsToggle() then
+		frame:SetPoint('RIGHT', self:GetOptionsToggle(), 'LEFT', -2, 0)
+	else
+		frame:SetPoint('RIGHT', self:GetCloseButton(), 'LEFT', -2, 0)
+	end
+
 	frame:SetHeight(28)
 
 	return frame:GetWidth(), frame:GetHeight()
@@ -631,7 +643,7 @@ function Frame:PlaceBagFrame()
 			frame:SetPoint('TOPLEFT', menuButtons[1], 'BOTTOMLEFT', 0, -4)
 			frame:Show()
 
-			return frame:GetWidth(), frame:GetHeight()
+			return frame:GetWidth(), frame:GetHeight() + 4
 		else
 			frame:Hide()
 			return 0, 0
@@ -674,17 +686,27 @@ end
 function Frame:PlaceTitleFrame()
 	local menuButtons = self:GetMenuButtons()
 	local frame = self:GetTitleFrame() or self:CreateTitleFrame()
+	local w, h = 0, 0
 
+	frame:ClearAllPoints()
 	if #menuButtons > 0 then
 		frame:SetPoint('LEFT', menuButtons[#menuButtons], 'RIGHT', 4, 0)
+		w = frame:GetTextWidth() / 2 + 4
+		h = 20
 	else
 		frame:SetPoint('TOPLEFT', self, 'TOPLEFT', 8, -8)
+		w = frame:GetTextWidth() + 8
+		h = 20
 	end
 
-	frame:SetPoint('RIGHT', self:GetOptionsToggle(), 'LEFT', -4, 0)
+	if self:HasOptionsToggle() then
+		frame:SetPoint('RIGHT', self:GetOptionsToggle(), 'LEFT', -4, 0)
+	else
+		frame:SetPoint('RIGHT', self:GetCloseButton(), 'LEFT', -4, 0)
+	end
 	frame:SetHeight(20)
 
-	return frame:GetTextWidth() + 8, frame:GetHeight()
+	return w, h
 end
 
 
@@ -824,12 +846,25 @@ function Frame:CreateOptionsToggle()
 end
 
 function Frame:PlaceOptionsToggle()
-	local toggle = self:GetOptionsToggle() or self:CreateOptionsToggle()
-	toggle:ClearAllPoints()
-	toggle:SetPoint('TOPRIGHT', self, 'TOPRIGHT', -32, -8)
-	toggle:Show()
+	if self:HasOptionsToggle() then
+		local toggle = self:GetOptionsToggle() or self:CreateOptionsToggle()
+		toggle:ClearAllPoints()
+		toggle:SetPoint('TOPRIGHT', self, 'TOPRIGHT', -32, -8)
+		toggle:Show()
+		
+		return toggle:GetWidth(), toggle:GetHeight()
+	end
+	
+	local toggle = self:GetOptionsToggle()
+	if toggle then
+		toggle:Hide()
+	end
+	return 0, 0
+end
 
-	return toggle:GetWidth(), toggle:GetHeight()
+function Frame:HasOptionsToggle()
+	local name, title, notes, enabled = GetAddOnInfo('Bagnon_Config')
+	return enabled and self:GetSettings():HasOptionsToggle()
 end
 
 
