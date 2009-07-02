@@ -17,12 +17,17 @@ function OptionsSlider:New(name, parent, low, high, step)
 	f:EnableMouseWheel(true)
 
 	_G[f:GetName() .. 'Text']:SetText(name)
-	_G[f:GetName() .. 'Text']:SetFontObject('GameFontNormal')
+	_G[f:GetName() .. 'Text']:SetFontObject('GameFontNormalLeft')
+	_G[f:GetName() .. 'Text']:ClearAllPoints()
+	_G[f:GetName() .. 'Text']:SetPoint('BOTTOMLEFT', f, 'TOPLEFT')
+--	_G[f:GetName() .. 'Text']:SetJustifyH('LEFT')
 	_G[f:GetName() .. 'Low']:SetText('')
 	_G[f:GetName() .. 'High']:SetText('')
 
 	local text = f:CreateFontString(nil, 'BACKGROUND', 'GameFontHighlightSmall')
-	text:SetPoint('LEFT', f, 'RIGHT', 7, 0)
+	text:SetJustifyH('RIGHT')
+	text:SetPoint('BOTTOMRIGHT', f, 'TOPRIGHT')
+--	text:SetPoint('LEFT', f, 'RIGHT', 7, 0)
 	f.valText = text
 
 	f:SetScript('OnShow', f.OnShow)
