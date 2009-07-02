@@ -9,13 +9,13 @@ if enClass ~= 'SHAMAN' then
 	return
 end
 
-local DTB = Dominos:NewModule('totems')
+local DTB = Dominos:NewModule('totems', 'AceEvent-3.0')
 local TotemBar
 local SpellButton
 
 --hurray for constants
-local NUM_TOTEM_BARS = 3 --fire, water, air
-local NUM_TOTEM_BAR_BUTTONS = 4 --fire, earth, water, air
+local NUM_TOTEM_BARS = NUM_MULTI_CAST_PAGES --fire, water, air
+local NUM_TOTEM_BAR_BUTTONS = NUM_MULTI_CAST_BUTTONS_PER_PAGE --fire, earth, water, air
 local TOTEM_CALLS = {66842, 66843, 66844} --fire, water, air spellIDs
 local CALL_OF_EARTH = 36936
 local TOTEM_BAR_START_ID = 132 --actionID start of the totembar
@@ -24,16 +24,29 @@ local TOTEM_BAR_START_ID = 132 --actionID start of the totembar
 --[[ Module Stuff ]]--
 
 function DTB:Load()
-	for id = 1, NUM_TOTEM_BARS do
-		TotemBar:New(id)
-	end
+	self:LoadTotemBars()
+	self:RegisterEvent('UPDATE_MULTI_CAST_ACTIONBAR')
 end
 
 function DTB:Unload()
-	for id = 1, NUM_TOTEM_BARS do
-		local f = Dominos.Frame:Get('totem' .. id)
+	for i = 1, NUM_TOTEM_BARS do
+		local f = Dominos.Frame:Get('totem' .. i)
 		if f then
 			f:Free()
+		end
+	end
+	self:UnregisterEvent('UPDATE_MULTI_CAST_ACTIONBAR')
+end
+
+function DTB:UPDATE_MULTI_CAST_ACTIONBAR()
+	self:LoadTotemBars()
+end
+
+function DTB:LoadTotemBars()
+	for i = 1, NUM_TOTEM_BARS do
+		local f = Dominos.Frame:Get('totem' .. i)
+		if not f and IsSpellKnown(TOTEM_CALLS[i]) then
+			TotemBar:New(i)
 		end
 	end
 end
