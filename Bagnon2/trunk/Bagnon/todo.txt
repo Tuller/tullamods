@@ -1,6 +1,5 @@
 automatic display settings:
 * Add icon to toggle the keyring
-* Add option to disable the options menu button
 * Hide frames when entering combat (maybe)
 
 Colors: (maybe)
