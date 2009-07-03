@@ -4,7 +4,7 @@
 	Bagnon Config Localization Information: Chinese Traditional
 		Credits: yleaf@cwdg(yaroot@gmail.com), 狂飆@cwdg(networm@qq.com)
 
-	Last Update: 2009/06/27 by 狂飆@cwdg(networm@qq.com)
+	Last Update: 2009/07/03 by 狂飆@cwdg(networm@qq.com)
 
 --]]
 
@@ -32,6 +32,7 @@ L.EnableBagFrame = '啟用背包按鈕'
 L.EnableMoneyFrame = '啟用貨幣窗口'
 L.EnableDBOFrame = '啟用資訊視窗'
 L.EnableSearchToggle = '啟用搜索按鈕'
+L.EnableOptionsToggle = '啟用設置按鈕'
 L.EnableFrame_inventory = '啟用背包框體'
 L.EnableFrame_bank = '啟用銀行框體'
 L.EnableFrame_keys = '啟用鑰匙鏈框體'
