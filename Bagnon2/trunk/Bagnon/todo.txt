@@ -1,15 +1,4 @@
-automatic display settings:
 * Add icon to toggle the keyring
 * Hide frames when entering combat (maybe)
-
-Colors: (maybe)
-* Quest item color
-* Trade bag slot color
-* Ammo bag slot color
-* Soul shard slot color
-* Item quality color
-
-other:
-* Add tooltips to most options to describe what they do in more detail
-* Minimize event registering/unregistering
-* Review localization
+* Make search global
+* Make search close on enter
