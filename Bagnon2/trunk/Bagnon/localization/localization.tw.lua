@@ -1,51 +1,64 @@
 ﻿--[[
 	THIS FILE IS ENCODED IN UTF-8
 
-	Bagnon Config Localization Information: Chinese Traditional
-		Credits: yleaf@cwdg(yaroot@gmail.com), 狂飆@cwdg(networm@qq.com)
+	Bagnon Localization Information: Chinese Traditional
+	        2007/11/17 by matini< yiting.jheng <at> gmail <dot> com
+	        2008/12/01 by yleaf@cwdg(yaroot@gmail.com)
+	        2009/04/23 by youngway@水晶之刺
+		2009/06/19 by 狂飆@cwdg(networm@qq.com)
 
-	Last Update: 2009/06/26 by 狂飆@cwdg(networm@qq.com)
+	Last Update: 2009/06/19 by 狂飆@cwdg(networm@qq.com)
 
 --]]
 
-local L = LibStub('AceLocale-3.0'):NewLocale('Bagnon-Config', 'zhTW')
+local L = LibStub('AceLocale-3.0'):NewLocale('Bagnon', 'zhTW')
 if not L then return end
 
-L.Columns = '列數'
-L.Scale = '縮放'
-L.Spacing = '間距'
-L.Opacity = '透明度'
-L.FrameColor = '窗口顏色'
-L.FrameBorderColor = '窗口邊框顏色'
-L.Frame = '窗口'
-L.Inventory = '背包'
-L.Bank = '銀行'
-L.KeyRing = '鑰匙鏈'
-L.LockFramePositions = '鎖定位置'
-L.ShowEmptyItemSlotBackground = '顯示空格背景材質'
-L.HighlightItemsByQuality = '按物品品質對物品染色'
-L.HighlightQuestItems = '對任務物品染色'
-L.ReverseSlotOrdering = '反向排列'
-L.ColorItemSlotsByBagType = '按背包類型對空格染色'
-L.FrameLayer = '窗口層級'
-L.EnableBagFrame = '啟用背包按鈕'
-L.EnableMoneyFrame = '啟用貨幣窗口'
-L.EnableDBOFrame = '啟用資訊視窗'
-L.EnableSearchToggle = '啟用搜索按鈕'
-L.EnableFrame_inventory = '啟用背包框體'
-L.EnableFrame_bank = '啟用銀行框體'
-L.EnableFrame_keys = '啟用鑰匙鏈框體'
-L.SettingRequiresRestart = '這個設置將在你下次登錄時生效'
-L.EnableAutoDisplay_bank = '打開銀行時'
-L.EnableAutoDisplay_ah = '打開拍賣行時'
-L.EnableAutoDisplay_vendor = '與商販對話時'
-L.EnableAutoDisplay_trade = '交易時'
-L.EnableAutoDisplay_craft = '製作物品時'
-L.EnableAutoDisplay_mail = '打開郵箱時'
-L.EnableAutoDisplay_guildbank = '打開公會銀行時'
-L.DisplaySettings = '事件設置'
-L.DisplaySettingsTitle = '何時自動打開背包'
-L.FrameSettings = '顯示設定'
-L.FrameSettingsTitle = '窗口顯示設定'
-L.GeneralSettings = '通用設置'
-L.GeneralSettingsTitle = 'Bagnon的通用設置'
+--keybinding text
+L.ToggleBags = '開關 背包'
+L.ToggleBank = '開關 銀行'
+L.ToggleKeys = '開關 鑰匙鏈'
+
+
+--system messages
+L.NewUser = '這是該角色第一次使用 Bagnon，已載入默認設置。'
+L.Updated = '已更新到 Bagnon v%s'
+L.UpdatedIncompatible = '由一個不相容版本升級，已載入默認設置。'
+
+
+--slash commands
+L.Commands = '命令：'
+L.CmdShowInventory = '開關背包介面'
+L.CmdShowBank = '開關銀行介面'
+L.CmdShowKeyring = '開關鑰匙鏈介面'
+L.CmdShowVersion = '顯示當前版本'
+
+
+--frame text
+L.TitleBags = '%s的背包'
+L.TitleBank = '%s的銀行'
+L.TitleKeys = '%s的鑰匙鏈'
+
+
+--tooltips
+L.TipBank = '銀行'
+L.TipChangePlayer = '查看其他角色的物品'
+L.TipGoldOnRealm = '%s上的總資產'
+L.TipHideBag = '隱藏包裹'
+L.TipHideBags = '隱藏背包'
+L.TipHideSearch = '隱藏搜索介面'
+L.TipPurchaseBag = '購買銀行空位'
+L.TipShowBag = '顯示包裹'
+L.TipShowBags = '顯示背包'
+L.TipShowMenu = '右擊打開設置菜單'
+L.TipShowSearch = '顯示搜索介面'
+L.TipShowSearch = '搜索'
+L.TipShowFrameConfig = '打開設置菜單'
+L.TipDoubleClickSearch = '按兩下打開搜索框'
+L.Total = '總共'
+
+--databroker plugin tooltips
+L.TipShowBank = 'Shift-點擊 開關銀行'
+L.TipShowInventory = '點擊 開關背包'
+L.TipShowKeyring = 'Alt-點擊 開關鑰匙鏈'
+L.TipShowOptions = '右擊 打開設置菜單'
