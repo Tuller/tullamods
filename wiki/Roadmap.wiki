@@ -2,17 +2,11 @@
 #labels Featured
 
 Bagnon:
-  * Write a 2.0 version
-  * Make the item button and utility libraries generic enough that they can be used for Combuctor and Bagnon (bagnon_core)
-  * Separate addons for bags, bank, and keys.  If a given module is enabled, completely replace the blizzard version.
-  * Show token information in the money tooltip for whatever currency we've opted to track
-  * Clean up conditional display event code
-  * Clean up spot code.  Add ability to search by quality.
-  * Bag type checks should now use the new bitflag tech
+  * Do something with saved searches/bookmarks
   * Write up wiki
 
 Bagnon_Forever:
-  * Store token information
+  * Probably should store player race/sex info for Bagnon
 
 Combuctor:
   * Implement better set API
@@ -37,7 +31,7 @@ Sage:
   * Add "always show these buffs" and "always show these debuffs" lists
 
 SellFish:
-  * Write an armory scraper if libitemprice updates stop again (a good reason to learn another language)
+  * Obsolete with the release of WoW 3.2.0 
 
 Tipachu:
   * Fix if it breaks
