@@ -297,6 +297,12 @@ end
 --item slot color
 function ItemSlot:UpdateSlotColor()
 	if (not self:GetItem()) and self:ColoringBagSlots() then
+		if self:IsKeyRingSlot() then
+			SetItemButtonTextureVertexColor(self, 1, 0.8, 0)
+			self:GetNormalTexture():SetVertexColor(1, 0.8, 0)	
+			return
+		end
+		
 		if self:IsAmmoBagSlot() then
 			SetItemButtonTextureVertexColor(self, 1, 1, 0.8)
 			self:GetNormalTexture():SetVertexColor(1, 1, 0.8)
@@ -530,6 +536,10 @@ end
 
 function ItemSlot:IsShardBagSlot()
 	return Bagnon.BagSlotInfo:IsShardBag(self:GetPlayer(), self:GetBag())
+end
+
+function ItemSlot:IsKeyRingSlot()
+	return Bagnon.BagSlotInfo:IsKeyRing(self:GetBag())
 end
 
 function ItemSlot:ColoringBagSlots()

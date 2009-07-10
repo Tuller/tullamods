@@ -153,11 +153,17 @@ end
 
 --converts the given bag slot into an applicable inventory slot
 function BagSlotInfo:ToInventorySlot(bagSlot)
+	if self:IsKeyRing(bagSlot) then
+		return KeyRingButtonIDToInvSlotID(bagSlot)
+	end
+	
 	if self:IsBackpackBag(bagSlot) then
 		return ContainerIDToInventoryID(bagSlot)
 	end
+	
 	if self:IsBankBag(bagSlot) then
 		return BankButtonIDToInvSlotID(bagSlot, 1)
 	end
+	
 	return nil
 end

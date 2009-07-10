@@ -182,6 +182,10 @@ function Bagnon:HookBagClickEvents()
 		local toggled = self:FrameControlsBag('keys', KEYRING_CONTAINER) and self:ToggleFrame('keys')
 
 		if not toggled then
+			toggled = self:FrameControlsBag('inventory', KEYRING_CONTAINER) and self:ToggleFrame('inventory')
+		end
+
+		if not toggled then
 			oToggleKeyRing()
 		end
 	end
