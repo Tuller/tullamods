@@ -41,6 +41,7 @@ function SearchFrame:New(frameID, parent)
 	f:SetScript('OnHide', f.OnHide)
 	f:SetScript('OnTextChanged', f.OnTextChanged)
 	f:SetScript('OnEscapePressed', f.OnEscapePressed)
+	f:SetScript('OnEnterPressed', f.OnEnterPressed)
 
 	f:SetFrameID(frameID)
 	f:UpdateEvents()
@@ -64,26 +65,25 @@ function SearchFrame:TEXT_SEARCH_DISABLE(msg, frameID)
 	end
 end
 
-function SearchFrame:TEXT_SEARCH_UPDATE(msg, frameID, search)
-	if self:GetFrameID() == frameID then
-		self:UpdateText()
-	end
+function SearchFrame:TEXT_SEARCH_UPDATE(msg, search)
+	self:UpdateText()
 end
 
 
 --[[ Frame Events ]]--
 
 function SearchFrame:OnShow()
-	self:UpdateText()
 	self:UpdateEvents()
-
+	self:SetSearch(self:GetLastSearch())
 	self:HighlightText()
 	self:SetFocus()
 end
 
 function SearchFrame:OnHide()
 	self:UpdateEvents()
+	
 	self:ClearFocus()
+	self:SetSearch('')
 end
 
 function SearchFrame:OnTextChanged()
@@ -91,6 +91,10 @@ function SearchFrame:OnTextChanged()
 end
 
 function SearchFrame:OnEscapePressed()
+	self:DisableSearch()
+end
+
+function SearchFrame:OnEnterPressed()
 	self:DisableSearch()
 end
 
@@ -145,11 +149,15 @@ function SearchFrame:GetSettings()
 end
 
 function SearchFrame:SetSearch(search)
-	self:GetSettings():SetTextSearch(search)
+	Bagnon.Settings:SetTextSearch(search)
 end
 
 function SearchFrame:GetSearch()
-	return self:GetSettings():GetTextSearch()
+	return Bagnon.Settings:GetTextSearch()
+end
+
+function SearchFrame:GetLastSearch()
+	return Bagnon.Settings:GetLastTextSearch()
 end
 
 function SearchFrame:EnableSearch()

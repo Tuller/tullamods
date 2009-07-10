@@ -468,17 +468,6 @@ function FrameSettings:IsTextSearchEnabled()
 	return self.enableTextSearch
 end
 
-function FrameSettings:SetTextSearch(search)
-	if self:GetTextSearch() ~= search then
-		self.textSearch = search or ''
-		self:SendMessage('TEXT_SEARCH_UPDATE', self:GetTextSearch())
-	end
-end
-
-function FrameSettings:GetTextSearch()
-	return self.textSearch or ''
-end
-
 
 --[[ Bag Filtering ]]--
 

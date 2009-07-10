@@ -1,3 +1,1 @@
-* Make search global
-* Make search close on enter
 * Hide frames when entering combat (maybe)

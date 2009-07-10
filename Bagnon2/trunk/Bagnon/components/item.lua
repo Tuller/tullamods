@@ -126,39 +126,19 @@ end
 --[[ Events ]]--
 
 function ItemSlot:ITEM_SLOT_UPDATE(msg, bag, slot)
---	if self:IsSlot(bag, slot) then
-		self:Update()
---	end
+	self:Update()
 end
 
 function ItemSlot:ITEM_LOCK_CHANGED(event, bag, slot)
---	if self:IsSlot(bag, slot) then
-		self:UpdateLocked()
---	end
+	self:UpdateLocked()
 end
 
 function ItemSlot:ITEM_SLOT_UPDATE_COOLDOWN(msg, bag, slot)
---	if self:IsSlot(bag, slot) then
-		self:UpdateCooldown()
---	end
+	self:UpdateCooldown()
 end
 
 function ItemSlot:TEXT_SEARCH_UPDATE(msg, frameID, search)
-	if self:GetFrameID() == frameID then
-		self:UpdateSearch()
-	end
-end
-
-function ItemSlot:TEXT_SEARCH_ENABLE(msg, frameID, search)
-	if self:GetFrameID() == frameID then
-		self:UpdateSearch()
-	end
-end
-
-function ItemSlot:TEXT_SEARCH_DISABLE(msg, frameID, search)
-	if self:GetFrameID() == frameID then
-		self:UpdateSearch()
-	end
+	self:UpdateSearch()
 end
 
 function ItemSlot:BAG_SEARCH_UPDATE(msg, frameID, search)
@@ -244,11 +224,6 @@ end
 
 
 --[[ Update Methods ]]--
---[[
-function ItemSlot:UpdateEverything()
-	self:Update()
-end
---]]
 
 
 -- Update the texture, lock status, and other information about an item
@@ -304,8 +279,8 @@ function ItemSlot:UpdateSlotColor()
 		end
 		
 		if self:IsAmmoBagSlot() then
-			SetItemButtonTextureVertexColor(self, 0.8, 0.8, 1)
-			self:GetNormalTexture():SetVertexColor(0.8, 0.8, 1)
+			SetItemButtonTextureVertexColor(self, 0.7, 0.7, 1)
+			self:GetNormalTexture():SetVertexColor(0.7, 0.7, 1)
 			return
 		end
 		
@@ -430,7 +405,7 @@ function ItemSlot:UpdateSearch()
 end
 
 function ItemSlot:GetItemSearch()
-	return self:GetSettings():IsTextSearchEnabled() and self:GetSettings():GetTextSearch()
+	return Bagnon.Settings:GetTextSearch()
 end
 
 --bag search

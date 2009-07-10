@@ -201,8 +201,6 @@ function ItemFrame:UpdateEvents()
 		self:RegisterMessage('SLOT_ORDER_UPDATE')
 		
 		self:RegisterMessage('TEXT_SEARCH_UPDATE', 'HandleGlobalItemEvent')
-		self:RegisterMessage('TEXT_SEARCH_ENABLE', 'HandleGlobalItemEvent')
-		self:RegisterMessage('TEXT_SEARCH_DISABLE', 'HandleGlobalItemEvent')
 		self:RegisterMessage('BAG_SEARCH_UPDATE', 'HandleGlobalItemEvent')
 		self:RegisterMessage('ITEM_HIGHLIGHT_QUEST_UPDATE', 'HandleGlobalItemEvent')
 		self:RegisterMessage('ITEM_HIGHLIGHT_QUALITY_UPDATE', 'HandleGlobalItemEvent')

@@ -157,3 +157,27 @@ function Settings:WillBlizzardBagPassThroughBeEnabled()
 	end
 	return self.enableBlizzardBagPassThrough
 end
+
+--item searching
+function Settings:SetTextSearch(search)
+	local lastSearch = self:GetTextSearch()
+	if lastSearch ~= search then
+		self.textSearch = search
+		self:SetLastTextSearch(lastSearch)
+		self:SendMessage('TEXT_SEARCH_UPDATE', self:GetTextSearch())
+	end
+end
+
+function Settings:GetTextSearch()
+	return self.textSearch or ''
+end
+
+function Settings:SetLastTextSearch(search)
+	if search and search ~= '' then
+		self.lastTextSearch = search
+	end
+end
+
+function Settings:GetLastTextSearch()
+	return self.lastTextSearch or ''
+end
