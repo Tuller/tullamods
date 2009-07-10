@@ -387,17 +387,7 @@ function FrameSettings:IsBagSlotShown(slot)
 end
 
 function FrameSettings:IsBagSlotHidden(slot)
-	for i, bagSlot in self:GetHiddenBagSlots() do
-		if bagSlot == slot then
-			return true
-		end
-	end
-	return false
-end
-
---returns an iteratior for all bag slots marked as hidden for this frame
-function FrameSettings:GetHiddenBagSlots()
-	return ipairs(self:GetDB():GetHiddenBags())
+	return not self:GetDB():IsBagShown(slot)
 end
 
 

@@ -131,9 +131,22 @@ end
 
 function SavedFrameSettings:UpgradeDB()
 	local major, minor, bugfix = self:GetDBVersion():match('(%w+)%.(%w+)%.(%w+)')
-	--do upgrade stuff
+	local db = self:GetGlobalDB()
+	
+	--hidden bags upgrade
+	for frameID, settings in pairs(db.frames) do
+		local hiddenBags = settings.hiddenBags
+		if hiddenBags then
+			for k, v in pairs(hiddenBags) do
+				if tonumber(k) and tonumber(v) then
+					hiddenBags[v] = true
+					hiddenBags[k] = nil
+				end
+			end
+		end
+	end
 
-	self:GetGlobalDB().version = self:GetAddOnVersion()
+	db.version = self:GetAddOnVersion()
 end
 
 function SavedFrameSettings:IsDBOutOfDate()
@@ -291,31 +304,16 @@ end
 
 --show a bag
 function SavedFrameSettings:ShowBag(bag)
-	local hiddenBags = self:GetDB().hiddenBags
-
-	for i, hiddenBag in pairs(hiddenBags) do
-		if bag == hiddenBag then
-			table.remove(hiddenBags, i)
-			return
-		end
-	end
+	self:GetDB().hiddenBags[bag] = false
 end
 
 --hide a bag
 function SavedFrameSettings:HideBag(bag)
-	local hiddenBags = self:GetDB().hiddenBags
-	local found = false
+	self:GetDB().hiddenBags[bag] = true
+end
 
-	for i, hiddenBag in pairs(hiddenBags) do
-		if bag == hiddenBag then
-			found = true
-			break
-		end
-	end
-
-	if not found then
-		table.insert(hiddenBags, bag)
-	end
+function SavedFrameSettings:IsBagShown(bag)
+	return not self:GetDB().hiddenBags[bag]
 end
 
 --get all available bags
@@ -394,7 +392,15 @@ function SavedFrameSettings:GetDefaultInventorySettings()
 	local defaults = SavedFrameSettings.invDefaults or {
 		--bag settings
 		availableBags = {BACKPACK_CONTAINER, 1, 2, 3, 4, KEYRING_CONTAINER},
-		hiddenBags = {KEYRING_CONTAINER},
+	
+		hiddenBags = {			
+			[BACKPACK_CONTAINER] = false,
+			[1] = false,
+			[2] = false,
+			[3] = false,
+			[4] = false,
+			[KEYRING_CONTAINER] = true,
+		},
 
 		--frame
 		frameColor = {0, 0, 0, 0.5},
@@ -434,7 +440,16 @@ function SavedFrameSettings:GetDefaultBankSettings()
 	local defaults = SavedFrameSettings.bankDefaults or {
 		--bag settings
 		availableBags = {BANK_CONTAINER, 5, 6, 7, 8, 9, 10, 11},
-		hiddenBags = {},
+		hiddenBags = {
+			[BANK_CONTAINER] = false,
+			[5] = false,
+			[6] = false,
+			[7] = false,
+			[8] = false,
+			[9] = false,
+			[10] = false,
+			[11] = false
+		},
 
 		--frame
 		frameColor = {0, 0, 0, 0.5},
@@ -473,7 +488,9 @@ function SavedFrameSettings:GetDefaultKeyRingSettings()
 	local defaults = SavedFrameSettings.keyDefaults or {
 		--bag settings
 		availableBags = {KEYRING_CONTAINER},
-		hiddenBags = {},
+		hiddenBags = {
+			[KEYRING_CONTAINER] = false
+		},
 
 		--frame,
 		frameColor = {0, 0, 0, 0.5},
