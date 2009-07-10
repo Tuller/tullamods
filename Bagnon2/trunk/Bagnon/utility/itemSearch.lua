@@ -28,6 +28,7 @@ function ItemSearch:Find(itemLink, search)
 		return false
 	end
 
+	local search = search:lower()
 	if search:match('\124') then
 		return self:FindUnionSearch(itemLink, strsplit('\124', search))
 	end

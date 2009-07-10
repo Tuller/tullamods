@@ -264,20 +264,6 @@ function FrameSettings:HasOptionsToggle()
 	return self:GetDB():HasOptionsToggle()
 end
 
---keyring toggle
-function FrameSettings:SetHasKeyRingToggle(enable)
-	local enable = enable and true or false
-
-	if self:HasKeyRingToggle() ~= enable then
-		self:GetDB():SetHasKeyRingToggle(enable)
-		self:SendMessage('KEYRING_TOGGLE_ENABLE_UPDATE', self:HasKeyRingToggle())
-	end
-end
-
-function FrameSettings:HasKeyRingToggle()
-	return self:GetDB():HasKeyRingToggle()
-end
-
 
 --[[ Broker Display Object ]]--
 

@@ -286,14 +286,6 @@ function SavedFrameSettings:HasOptionsToggle()
 	return self:GetDB().hasOptionsToggle
 end
 
-function SavedFrameSettings:SetHasKeyRingToggle(enable)
-	self:GetDB().hasKeyRingToggle = enable or false
-end
-
-function SavedFrameSettings:HasKeyRingToggle()
-	return self:GetDB().hasKeyRingToggle
-end
-
 
 --[[ Frame Bags ]]--
 
