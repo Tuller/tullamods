@@ -304,8 +304,8 @@ function ItemSlot:UpdateSlotColor()
 		end
 		
 		if self:IsAmmoBagSlot() then
-			SetItemButtonTextureVertexColor(self, 1, 1, 0.8)
-			self:GetNormalTexture():SetVertexColor(1, 1, 0.8)
+			SetItemButtonTextureVertexColor(self, 0, 0, 1)
+			self:GetNormalTexture():SetVertexColor(0, 0, 1)
 			return
 		end
 		
