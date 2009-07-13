@@ -92,8 +92,13 @@ function ItemSearch:FindPrimitiveSearch(itemLink, search)
 	if tSearch then
 		return self:FindTypeSearch(itemLink, tSearch)
 	end
+	
+	local nSearch = self:IsNameSearch(search)
+	if nSearch then
+		return self:FindNameSearch(itemLink, nSearch)
+	end
 
-	return self:FindTextSearch(itemLink, search)
+	return self:FindTypeSearch(itemLink, search) or  self:FindNameSearch(itemLink, search)
 end
 
 
@@ -197,7 +202,11 @@ function ItemSearch:IsTypeSearch(search)
 end
 
 
---basic text search
-function ItemSearch:FindTextSearch(itemLink, search)
-	return search_IsInText(search, (GetItemInfo(itemLink)))
+--basic text search n:(.+)
+function ItemSearch:FindNameSearch(itemLink, nSearch)
+	return search_IsInText(nSearch, (GetItemInfo(itemLink)))
+end
+
+function ItemSearch:IsNameSearch(search)
+	return search and search:match('^n:(.+)$')
 end
