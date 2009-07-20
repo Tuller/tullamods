@@ -7,7 +7,7 @@ local OptionsPanel = Bagnon.Classy:New('Frame')
 Bagnon.OptionsPanel = OptionsPanel
 
 function OptionsPanel:New(name, parent, title, subtitle, icon)
-	local f = self:Bind(CreateFrame('Frame', name, UIParent))
+	local f = self:Bind(CreateFrame('Frame', name))
 	f.name = title
 	f.parent = parent
 	
