@@ -282,6 +282,10 @@ function Dominos:HideBlizzard()
 
 	PossessBarFrame:UnregisterAllEvents()
 	PossessBarFrame:Hide()
+	
+	hooksecurefunc('TalentFrame_LoadUI', function()
+		PlayerTalentFrame:UnregisterEvent('ACTIVE_TALENT_GROUP_CHANGED')
+	end)
 end
 
 
