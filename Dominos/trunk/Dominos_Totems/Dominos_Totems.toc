@@ -1,0 +1,7 @@
+﻿## Interface: 30200
+## Title: Dominos Totems
+## Notes: Totem bars for Shamans
+## Author: Tuller
+## Dependencies: Dominos
+spellButton.lua
+totemBar.lua
