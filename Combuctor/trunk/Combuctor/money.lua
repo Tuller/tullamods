@@ -50,16 +50,43 @@ function MoneyFrame:OnClick()
 	end
 end
 
+-- ChangeLog
+-- 07/03/2009 Serenity(SACW) modified this frame to show earmarked currencies in the money window when hovered over, probably should get it's own small square in the inventory frame
+--     but this works for now.
 function MoneyFrame:OnEnter()
 	if BagnonDB then
+		
 		GameTooltip:SetOwner(self, 'ANCHOR_TOPRIGHT')
-		GameTooltip:SetText(format(L.TotalOnRealm, GetRealmName()))
 
-		local money = 0
-		for i, player in pairs(BagnonDB:GetPlayerList()) do
-			money = money + BagnonDB:GetMoney(player)
+	-- Section added by Serenity of Silver Aerie Codeworks.
+		if ( GetNumWatchedTokens() > 0 ) then
+			local Num_Currs = GetNumWatchedTokens()
+
+			if ( Num_Currs > 3 ) then
+				Num_Currs = 3
+			end
+			
+			GameTooltip:AddLine(format("%s's Currencies", UnitName('player') ) )
+			
+			for CountVar = 1, Num_Currs, 1 do
+				local Curr_Name, Curr_Amt = GetBackpackCurrencyInfo(CountVar)
+				if ( Curr_Name == nil ) then
+				else
+					GameTooltip:AddDoubleLine(Curr_Name, Curr_Amt, 0, 170, 255, 255, 255, 255)
+				end
+			end			
+
+			GameTooltip:AddLine('\r')
 		end
 
+		local money = 0
+		for player in BagnonDB:GetPlayers() do
+			money = money + BagnonDB:GetMoney(player)
+		end
+	-- End Section
+	
+--		GameTooltip:SetText(format(L.TotalOnRealm, GetRealmName()))
+		GameTooltip:AddLine(format(L.TotalOnRealm, GetRealmName()))
 		SetTooltipMoney(GameTooltip, money)
 		GameTooltip:Show()
 	end
