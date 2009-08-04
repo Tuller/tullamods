@@ -139,6 +139,11 @@ function SavedSearchButton:OnLeave()
 	end
 end
 
+function SavedSearchButton:OnClick()
+	self:GetSettings():EnableTextSearch()
+	Bagnon.Settings:SetTextSearch(self:GetSearchRule())
+end
+
 
 --[[
 	update methods
