@@ -5,7 +5,7 @@
 
 local class, enClass = UnitClass('player')
 if enClass ~= 'SHAMAN' then
-	DisableAddOn('Dominos_Totems')
+--	DisableAddOn('Dominos_Totems')
 	return
 end
 
