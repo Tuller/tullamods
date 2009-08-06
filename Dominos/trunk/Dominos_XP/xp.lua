@@ -112,14 +112,50 @@ function XP:Load()
 	self.text = text
 
 	local click = CreateFrame('Button', nil, value)
-	click:SetScript('OnClick', function() self:OnClick() end)
-	click:SetScript('OnEnter', function() self:UpdateTextShown() end)
-	click:SetScript('OnLeave', function() self:UpdateTextShown() end)
+	click:SetScript('OnClick', function(_, ...) self:OnClick(...) end)
+	click:SetScript('OnEnter', function(_, ...) self:OnEnter(...) end)
+	click:SetScript('OnLeave', function(_, ...) self:OnLeave(...) end)
+	click:RegisterForClicks('anyUp')
 	click:SetAllPoints(self)
 end
 
-function XP:OnClick()
-	self:SetAlwaysShowXP(not self.sets.alwaysShowXP)
+function XP:OnClick(button)
+	if button == 'RightButton' and FFF_ReputationWatchBar_OnClick then
+		self:SetAlwaysShowXP(false)
+		FFF_ReputationWatchBar_OnClick(button)		
+	else
+		self:SetAlwaysShowXP(not self.sets.alwaysShowXP)
+		self:OnEnter()
+	end
+	self:UpdateRepWatcherTooltip()
+end
+
+function XP:OnEnter()
+	self:UpdateTextShown()
+
+	if (FFF_ReputationWatchBar_OnEnter and self:ShouldWatchFaction()) then
+		FFF_ReputationWatchBar_OnEnter(self)
+	end
+end
+
+function XP:OnLeave()
+	self:UpdateTextShown()
+	
+	if (FFF_ReputationWatchBar_OnLeave) then
+		FFF_ReputationWatchBar_OnLeave(self)
+	end
+end
+
+function XP:UpdateRepWatcherTooltip()
+	if GameTooltip:IsOwned(self) and self:ShouldWatchFaction() then
+		if FFF_ReputationWatchBar_OnEnter then
+			FFF_ReputationWatchBar_OnEnter(self)
+		end
+	else
+		if FFF_ReputationWatchBar_OnLeave then
+			FFF_ReputationWatchBar_OnLeave(self)
+		end
+	end
 end
 
 function XP:UpdateWatch()
