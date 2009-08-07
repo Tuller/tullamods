@@ -76,7 +76,8 @@ local function Timer_Start(self, start, duration)
 	end
 end
 
-local methods = getmetatable(ActionButton1Cooldown).__index
+--ActionButton1Cooldown here, is something we think will always exist
+local methods = getmetatable(_G['ActionButton1Cooldown']).__index
 hooksecurefunc(methods, 'SetCooldown', function(self, start, duration)
 	if start > 0 and duration > MIN_DURATION then
 		Timer_Start(self, start, duration)
