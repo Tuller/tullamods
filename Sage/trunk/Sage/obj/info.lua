@@ -331,7 +331,7 @@ function InfoBar:UpdateLevel()
 		levelText:SetVertexColor(1, 1, 1)
 		levelText:SetText('G' .. self:GetRaidGroup())
 	elseif level and level > 0 then
-		local color = GetDifficultyColor(level)
+		local color = GetQuestDifficultyColor(level)
 		levelText:SetVertexColor(color.r, color.g, color.b)
 		levelText:SetText(level)
 	else
