@@ -87,7 +87,11 @@ function AuraButton:GetUnit()
 end
 
 function AuraButton:GetFilter()
-	return UnitIsFriend('player', self:GetUnit()) and self:GetParent().friendFilter or self:GetParent().filter
+	return self.filter
+end
+
+function AuraButton:SetFilter(filter)
+	self.filter = filter
 end
 
 
@@ -161,6 +165,8 @@ function AuraContainer:Update()
 
 			local b = self.buttons[count]
 			b:Update(name, rank, icon, applications, debuffType, duration, expirationTime, caster, isStealable)
+			b:SetFilter(filter)
+			b:SetID(id)
 			b:Show()
 		end
 
@@ -176,6 +182,8 @@ function AuraContainer:Update()
 
 			local b = self.buttons[count]
 			b:Update(name, rank, icon, applications, debuffType, duration, expirationTime, caster, isStealable)
+			b:SetFilter(filter)
+			b:SetID(id)
 			b:Show()
 		end
 
