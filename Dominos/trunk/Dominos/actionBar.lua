@@ -167,7 +167,7 @@ function ActionButton:OnEnter()
 end
 
 --override the old update hotkeys function
-_G['ActionButton_UpdateHotkeys'] = ActionButton.UpdateHotkey
+hooksecurefunc('ActionButton_UpdateHotkeys', ActionButton.UpdateHotkey)
 
 --button visibility
 function ActionButton:UpdateGrid()

@@ -100,7 +100,7 @@ function PetButton:OnEnter()
 end
 
 --override keybinding display
-PetActionButton_SetHotkeys = PetButton.UpdateHotkey
+hooksecurefunc('PetActionButton_SetHotkeys', PetButton.UpdateHotkey)
 
 
 --[[ Pet Bar ]]--
