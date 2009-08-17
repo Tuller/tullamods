@@ -46,6 +46,7 @@ function BindableButton:UpdateHotkey(buttonType)
 		_G[self:GetName()..'HotKey']:SetText(key)
 		_G[self:GetName()..'HotKey']:Show()
 	else
+		_G[self:GetName()..'HotKey']:SetText('') --blank out non blank text, such as RANGE_INDICATOR
 		_G[self:GetName()..'HotKey']:Hide()
 	end
 end
