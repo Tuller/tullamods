@@ -45,6 +45,7 @@ function SearchFrame:New(frameID, parent)
 
 	f:SetFrameID(frameID)
 	f:UpdateEvents()
+	f:SetAutoFocus(false)
 --	f:UpdateShown()
 --	f:UpdateText()
 
