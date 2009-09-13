@@ -65,11 +65,14 @@ function ClassButton:Create(id)
 	b.icon:SetAllPoints(b)
 
 	b:SetNormalTexture('Interface\\Buttons\\UI-Quickslot2')
+	
 	local nt = b:GetNormalTexture()
 	nt:ClearAllPoints()
 	nt:SetPoint('CENTER', 0, -1)
 	nt:SetWidth(NT_SIZE)
 	nt:SetHeight(NT_SIZE)
+	_G[name .. 'NormalTexture'] = nt
+
 	b:SetPushedTexture('Interface\\Buttons\\UI-Quickslot-Depress')
 	b:SetHighlightTexture('Interface\\Buttons\\ButtonHilight-Square')
 	b:SetCheckedTexture('Interface\\Buttons\\CheckButtonHilight')
@@ -81,7 +84,7 @@ function ClassButton:Create(id)
 	b.hotkey:SetWidth(BUTTON_SIZE)
 	b.hotkey:SetHeight(10)
 
-	b.cooldown = CreateFrame('Cooldown', nil, b, 'CooldownFrameTemplate')
+	b.cooldown = CreateFrame('Cooldown', name .. 'Cooldown', b, 'CooldownFrameTemplate')
 	b.cooldown:SetAllPoints(b)
 
 	b:SetAttribute('type', 'spell')
