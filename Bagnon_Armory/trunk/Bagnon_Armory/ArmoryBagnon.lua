@@ -13,7 +13,7 @@ BagnonDB = {addon = 'Armory'};
 
 local function CanUseArmory()
     if ( Armory ) then
-        local major, minor = strsplit(".", Armory.version);
+		local major, minor = Armory.version:match('v?(%d+)\.(%d+)\.(%d+)')
         if ( major * 100 + minor >= 604 ) then
             return Armory:HasInventory();
         end
