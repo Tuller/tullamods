@@ -150,6 +150,17 @@ function Menu:AddLayoutPanel()
 	return panel
 end
 
+function Menu:AddAdvancedPanel()
+	local panel = self:NewPanel(L.Advanced)
+
+	panel:NewLeftToRightCheckbox()
+	panel:NewTopToBottomCheckbox()
+	
+	panel.width = 250
+	return panel
+end
+
+
 do
 	local info = {}
 	local function AddItem(text, value, func, checked)
@@ -415,5 +426,32 @@ do
 
 	function Panel:NewColumnsSlider()
 		return self:NewSlider(L.Columns, 1, 1, 1, Slider_OnShow, Slider_UpdateValue)
+	end
+end
+
+--right to left & left to right checkboxes
+do
+	function Panel:NewLeftToRightCheckbox()
+		local b = self:NewCheckButton(L.LeftToRight)
+		
+		b:SetScript('OnShow', function(self)
+			self:SetChecked(self:GetParent().owner:GetLeftToRight())
+		end)
+		b:SetScript('OnClick', function(self)
+			self:GetParent().owner:SetLeftToRight(self:GetChecked())
+		end)
+	end
+	
+	
+	function Panel:NewTopToBottomCheckbox()			
+		local b = self:NewCheckButton(L.TopToBottom)
+		
+		b:SetScript('OnShow', function(self)
+			self:SetChecked(self:GetParent().owner:GetTopToBottom())
+		end)
+		
+		b:SetScript('OnClick', function(self)
+			self:GetParent().owner:SetTopToBottom(self:GetChecked())
+		end)
 	end
 end
