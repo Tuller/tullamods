@@ -170,7 +170,7 @@ function Dominos:UpdateSettings(major, minor, bugfix)
 		local frames = sets.frames
 		if frames then
 			for frameID, frameSets in pairs(frames) do
-				frameSets.isRightToLeft = true
+				frameSets.isLeftToRight = true
 				frameSets.isTopToBottom = true
 			end
 		end
