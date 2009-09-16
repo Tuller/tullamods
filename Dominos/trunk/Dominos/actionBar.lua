@@ -316,6 +316,8 @@ function ActionBar:GetDefaults()
 	defaults.padW = 2
 	defaults.padH = 2
 	defaults.numButtons = self:MaxLength()
+	defaults.isRightToLeft = true
+	defaults.isTopToBottom = true
 
 	return defaults
 end
@@ -575,7 +577,11 @@ do
 			_G[self:GetParent():GetName() .. L.Columns]:OnShow()
 		end
 	end
-
+	
+	local function AddAdvancedLayout(self)
+		self:AddAdvancedPanel()
+	end
+	
 	--GetSpellInfo(spellID) is awesome for localization
 	local function AddClass(self)
 		local lClass, class = UnitClass('player')
@@ -664,6 +670,7 @@ do
 		AddModifier(menu)
 		AddTargeting(menu)
 		AddShowState(menu)
+		AddAdvancedLayout(menu)
 
 		ActionBar.menu = menu
 	end

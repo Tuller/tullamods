@@ -211,5 +211,7 @@ function BagBar:CreateMenu()
 		_G[panel:GetName() .. L.Columns]:OnShow()
 	end)
 	
+	
+	menu:AddAdvancedPanel()
 	self.menu = menu
 end

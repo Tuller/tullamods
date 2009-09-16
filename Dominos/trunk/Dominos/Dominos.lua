@@ -167,8 +167,12 @@ end
 
 function Dominos:UpdateSettings(major, minor, bugfix)
 	for profile,sets in pairs(self.db.sv.profiles) do
-		if sets.possessBar == 'pet' then
-			sets.possessBar = 1
+		local frames = sets.frames
+		if frames then
+			for frameID, frameSets in pairs(frames) do
+				frameSets.isRightToLeft = true
+				frameSets.isTopToBottom = true
+			end
 		end
 	end
 end

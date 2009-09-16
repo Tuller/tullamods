@@ -176,6 +176,24 @@ function Frame:GetPadding()
 	return self.sets.padW or 0, self.sets.padH or self.sets.padW or 0
 end
 
+function Frame:SetLeftToRight(isLeftToRight)
+	self.sets.isLeftToRight = isLeftToRight and true or nil
+	self:Layout()
+end
+
+function Frame:GetLeftToRight()
+	return self.sets.isLeftToRight
+end
+
+function Frame:SetTopToBottom(isTopToBottom)
+	self.sets.isTopToBottom = isTopToBottom and true or nil
+	self:Layout()
+end
+
+function Frame:GetTopToBottom()
+	return self.sets.isTopToBottom
+end
+
 function Frame:Layout()
 	local width, height
 	if #self.buttons > 0 then
@@ -183,14 +201,28 @@ function Frame:Layout()
 		local rows = ceil(#self.buttons / cols)
 		local pW, pH = self:GetPadding()
 		local spacing = self:GetSpacing()
+		local isLeftToRight = self:GetLeftToRight()
+		local isTopToBottom = self:GetTopToBottom()
 
 		local b = self.buttons[1]
 		local w = b:GetWidth() + spacing
 		local h = b:GetHeight() + spacing
 
 		for i,b in pairs(self.buttons) do
-			local col = (i-1) % cols
-			local row = ceil(i / cols) - 1
+			local col
+			local row
+			if isLeftToRight then
+				col = (i-1) % cols
+			else
+				col = (cols-1) - (i-1) % cols
+			end
+			
+			if isTopToBottom then
+				row = ceil(i / cols) - 1
+			else
+				row = rows - ceil(i / cols)
+			end
+			
 			b:ClearAllPoints()
 			b:SetPoint('TOPLEFT', w*col + pW, -(h*row + pH))
 		end
@@ -525,6 +557,7 @@ end
 function Frame:CreateMenu()
 	self.menu = Dominos:NewMenu(self.id)
 	self.menu:AddLayoutPanel()
+	self.menu:AddAdvancedPanel()
 end
 
 function Frame:ShowMenu()
