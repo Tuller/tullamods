@@ -176,22 +176,27 @@ function Frame:GetPadding()
 	return self.sets.padW or 0, self.sets.padH or self.sets.padW or 0
 end
 
+--the wackiness here is for backward compaitbility reasons, since I did not implement true defaults
 function Frame:SetLeftToRight(isLeftToRight)
-	self.sets.isLeftToRight = isLeftToRight and true or nil
+	local isRightToLeft = not isLeftToRight
+
+	self.sets.isRightToLeft = isRightToLeft and true or nil
 	self:Layout()
 end
 
 function Frame:GetLeftToRight()
-	return self.sets.isLeftToRight
+	return not self.sets.isRightToLeft
 end
 
 function Frame:SetTopToBottom(isTopToBottom)
-	self.sets.isTopToBottom = isTopToBottom and true or nil
+	local isBottomToTop = not isTopToBottom
+
+	self.sets.isBottomToTop = isBottomToTop and true or nil
 	self:Layout()
 end
 
 function Frame:GetTopToBottom()
-	return self.sets.isTopToBottom
+	return not self.sets.isBottomToTop
 end
 
 function Frame:Layout()

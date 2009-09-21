@@ -262,8 +262,12 @@ ActionBar.mainbarOffsets = {
 --this is the set of conditions used for paging, in order of evaluation
 ActionBar.conditions = {
 	'[mod:SELFCAST]',
-	'[mod:ctrl]',
+	'[mod:alt,mod:ctrl,mod:shift]',
+	'[mod:alt,mod:ctrl]',
+	'[mod:alt,mod:shift]',
+	'[mod:ctrl,mod:shift]',
 	'[mod:alt]',
+	'[mod:ctrl]',
 	'[mod:shift]',
 	'[bonusbar:5]',
 	'[bar:2]',
@@ -316,8 +320,6 @@ function ActionBar:GetDefaults()
 	defaults.padW = 2
 	defaults.padH = 2
 	defaults.numButtons = self:MaxLength()
-	defaults.isRightToLeft = true
-	defaults.isTopToBottom = true
 
 	return defaults
 end
@@ -618,6 +620,10 @@ do
 	local function AddModifier(self)
 		local p = self:NewPanel(L.Modifiers)
 		ConditionSlider_New(p, '[mod:SELFCAST]', AUTO_SELF_CAST_KEY_TEXT)
+		ConditionSlider_New(p, '[mod:alt,mod:ctrl,mod:shift]', L.CtrlAltShift)
+		ConditionSlider_New(p, '[mod:alt,mod:shift]', L.AltShift)
+		ConditionSlider_New(p, '[mod:ctrl,mod:shift]', L.CtrlShift)
+		ConditionSlider_New(p, '[mod:alt,mod:ctrl]', L.CtrlAlt)
 		ConditionSlider_New(p, '[mod:shift]', SHIFT_KEY)
 		ConditionSlider_New(p, '[mod:alt]', ALT_KEY)
 		ConditionSlider_New(p, '[mod:ctrl]', CTRL_KEY)

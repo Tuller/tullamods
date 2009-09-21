@@ -166,12 +166,16 @@ function Dominos:GetDefaults()
 end
 
 function Dominos:UpdateSettings(major, minor, bugfix)
-	for profile,sets in pairs(self.db.sv.profiles) do
-		local frames = sets.frames
-		if frames then
-			for frameID, frameSets in pairs(frames) do
-				frameSets.isLeftToRight = true
-				frameSets.isTopToBottom = true
+	if major == '1' and minor <= '12' then
+		for profile,sets in pairs(self.db.sv.profiles) do
+			local frames = sets.frames
+			if frames then
+				for frameID, frameSets in pairs(frames) do
+					frameSets.isLeftToRight = nil
+					frameSets.isRightToLeft = nil
+					frameSets.isTopToBottom = nil
+					frameSets.isBottomToTop = nil
+				end
 			end
 		end
 	end
