@@ -181,8 +181,9 @@ end
 --shower: a frame used to properly show and hide timer text without forcing the timer to be parented to the cooldown frame (needed for hiding the cooldown frame)
 do
 	local function Shower_OnShow(self)
-		local timer = timers[self:GetParent()]
-		if timer.wasShown then
+		local cooldown = self:GetParent()
+		local timer = timers[cooldown]
+		if timer.wasShown and not cooldown.noCooldownCount then
 			timer:Show()
 		end
 	end
