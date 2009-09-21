@@ -53,3 +53,9 @@ L.ShowMinimapButton = 'Show Minimap Button'
 L.Advanced = 'Advanced'
 L.LeftToRight = 'Layout Buttons From Left to Right'
 L.TopToBottom = 'Layout Buttons From Top to Bottom'
+
+L.ALT_KEY_TEXT = 'ALT'
+L.AltShift = 'ALT-' .. SHIFT_KEY_TEXT
+L.CtrlShift = CTRL_KEY_TEXT .. '-' .. SHIFT_KEY_TEXT
+L.CtrlAlt = CTRL_KEY_TEXT .. '-ALT'
+L.CtrlAltShift = CTRL_KEY_TEXT .. '-ALT-' .. SHIFT_KEY_TEXT
