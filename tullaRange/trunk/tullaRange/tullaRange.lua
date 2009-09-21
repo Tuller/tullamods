@@ -1,6 +1,7 @@
 --[[
 	tullaRange
-		Out of range coloring
+		Adds out of range coloring to action buttons
+		Derived from RedRange with negligable improvements to CPU usage
 --]]
 
 --[[ locals and speed ]]--
