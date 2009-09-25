@@ -264,3 +264,59 @@ ItemSearch:RegisterTypedSearch{
 		['boa'] = ITEM_BIND_TO_ACCOUNT
 	}
 }
+
+
+--[[ equipment set search ]]--
+
+local function findEquipmentSetByName(search)
+	local startsWithSearch = '^' .. search
+	local partialMatch = nil
+
+	for i = 1, GetNumEquipmentSets() do
+		local setName = (GetEquipmentSetInfo(i))
+		local lSetName = setName:lower()
+
+		if lSetName == search then
+			return setName
+		end
+
+		if lSetName:match(startsWithSearch) then
+			partialMatch = setName
+		end
+	end
+
+	return partialMatch
+end
+
+local function isItemInEquipmentSet(itemLink, setName)
+	if not setName then
+		return false
+	end
+
+	local itemIDs = GetEquipmentSetItemIDs(setName)
+	if not itemIDs then
+		return false
+	end
+
+	local itemID = tonumber(itemLink:match('item:(%d+)'))
+	for inventoryID, setItemID in pairs(itemIDs) do
+		if itemID == setItemID then
+			return true
+		end
+	end
+
+	return false
+end
+
+ItemSearch:RegisterTypedSearch{
+	id = 'equipmentSet',
+
+	isSearch = function(self, search)
+		return search and search:match('^s:(.+)$')
+	end,
+
+	findItem = function(self, itemLink, search)
+		local setName = findEquipmentSetByName(search)
+		return isItemInEquipmentSet(itemLink, setName)
+	end,
+}

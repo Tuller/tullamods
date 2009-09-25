@@ -274,29 +274,29 @@ function ItemSlot:UpdateSlotColor()
 	if (not self:GetItem()) and self:ColoringBagSlots() then
 		if self:IsKeyRingSlot() then
 			SetItemButtonTextureVertexColor(self, 1, 0.8, 0)
-			self:GetNormalTexture():SetVertexColor(1, 0.8, 0)	
+			self:GetNormalTexture():SetVertexColor(1, 0.8, 0)
 			return
 		end
-		
+
 		if self:IsAmmoBagSlot() then
 			SetItemButtonTextureVertexColor(self, 0.7, 0.7, 1)
 			self:GetNormalTexture():SetVertexColor(0.7, 0.7, 1)
 			return
 		end
-		
+
 		if self:IsTradeBagSlot() then
 			SetItemButtonTextureVertexColor(self, 0.5, 1, 0.5)
 			self:GetNormalTexture():SetVertexColor(0.5, 1, 0.5)
 			return
 		end
-		
+
 		if self:IsShardBagSlot() then
 			SetItemButtonTextureVertexColor(self, 0.9, 0.7, 1)
 			self:GetNormalTexture():SetVertexColor(0.9, 0.7, 1)
 			return
 		end
 	end
-		
+
 	SetItemButtonTextureVertexColor(self, 1, 1, 1)
 	self:GetNormalTexture():SetVertexColor(1, 1, 1)
 end
@@ -337,7 +337,7 @@ function ItemSlot:SetBorderQuality(quality)
 			return
 		end
 	end
-	
+
 	if self:HighlightingQuestItems() then
 		if self:IsQuestItem() then
 			border:SetVertexColor(1, 1, 0, 0.5)
@@ -386,12 +386,12 @@ end
 function ItemSlot:UpdateSearch()
 	local shouldFade = false
 	local search = self:GetItemSearch()
-	
+
 	if search and search ~= '' then
 		local itemLink = self:GetItem()
 		shouldFade = not(itemLink and Bagnon.ItemSearch:Find(itemLink, search))
 	end
-	
+
 	if shouldFade then
 		self:SetAlpha(0.4)
 		SetItemButtonDesaturated(self, true)
@@ -491,7 +491,9 @@ function ItemSlot:IsQuestItem()
 	if not itemLink then
 		return false
 	end
-	return Bagnon.ItemSearch:Find(itemLink, 't:quest|quest')
+
+	return Bagnon.ItemSearch:GetTypedSearch('itemTypeGeneric'):findItem(itemLink, 'quest')
+		or Bagnon.ItemSearch:GetTypedSearch('tooltip'):findItem(itemLink, 'quest')
 end
 
 function ItemSlot:ShowingEmptyItemSlotTexture()
