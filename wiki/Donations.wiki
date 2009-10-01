@@ -4,6 +4,7 @@
 
 Due to the significant time I invest in developing addons, and because I've been asked before, I have a paypal account setup for donations.  All money will be spent on the following:
   * _World of Warcraft_ subscription fees
+  * Ventrilo server hosting
   * Computer parts
   * Video games
   * Shiny things
