@@ -29,6 +29,7 @@ function Bagnon:OnInitialize()
 	self:AddSlashCommands()
 	self:CreateOptionsLoader()
 	self:CreateLDBLauncher()
+	self:CreateGuildBankLoader()
 end
 
 --create a loader for the options menu
@@ -38,6 +39,15 @@ function Bagnon:CreateOptionsLoader()
 		self:SetScript('OnShow', nil)
 		LoadAddOn('Bagnon_Config')
 	end)
+end
+
+function Bagnon:CreateGuildBankLoader()
+	local name, title, notes, enabled, loadable = GetAddOnInfo('Bagnon_GuildBank')
+	if enabled and loadable then
+		GuildBankFrame_LoadUI = function()
+			LoadAddOn('Bagnon_GuildBank') 
+		end
+	end
 end
 
 function Bagnon:CreateLDBLauncher()
