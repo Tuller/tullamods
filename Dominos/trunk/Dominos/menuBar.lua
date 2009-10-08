@@ -47,19 +47,20 @@ local menuButtons = {
 }
 --]]
 
-local menuButtons = {}
-local addButtons = function(...)
-	menuButtons = {}
-	
-	for i = 1, select('#', ...) do
-		local b = select(i, ...)
-		local name = b:GetName()
-		print('test', name)
-		if name and name:match('(%w+)MicroButton$') then
-			print('add', name)
-			table.insert(menuButtons, b)
+local menuButtons
+do
+	local loadButtons = function(...)
+		menuButtons = {}
+		
+		for i = 1, select('#', ...) do
+			local b = select(i, ...)
+			local name = b:GetName()
+			if name and name:match('(%w+)MicroButton$') then
+				table.insert(menuButtons, b)
+			end
 		end
 	end
+	loadButtons(_G['MainMenuBarArtFrame']:GetChildren())
 end
 
 do
@@ -88,8 +89,6 @@ local MenuBar = Dominos:CreateClass('Frame', Dominos.Frame)
 Dominos.MenuBar  = MenuBar
 
 function MenuBar:New()
-	addButtons(_G['MainMenuBarArtFrame']:GetChildren())
-	
 	local f = self.super.New(self, 'menu')
 	f:LoadButtons()
 	f:Layout()
