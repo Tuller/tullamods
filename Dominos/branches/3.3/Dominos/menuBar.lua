@@ -32,6 +32,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 --]]
 
+--[[
 local menuButtons = {
 	CharacterMicroButton,
 	SpellbookMicroButton,
@@ -40,10 +41,27 @@ local menuButtons = {
 	QuestLogMicroButton,
 	SocialsMicroButton,
 	PVPMicroButton,
-	LFGMicroButton,
+	LFDMicroButton,
 	MainMenuMicroButton,
 	HelpMicroButton
 }
+--]]
+
+local menuButtons
+do
+	local loadButtons = function(...)
+		menuButtons = {}
+		
+		for i = 1, select('#', ...) do
+			local b = select(i, ...)
+			local name = b:GetName()
+			if name and name:match('(%w+)MicroButton$') then
+				table.insert(menuButtons, b)
+			end
+		end
+	end
+	loadButtons(_G['MainMenuBarArtFrame']:GetChildren())
+end
 
 do
 	TalentMicroButton:SetScript('OnEvent', function(self, event)
@@ -92,18 +110,22 @@ end
 
 function MenuBar:AddButton(i)
 	local b = menuButtons[i]
-	b:SetParent(self.header)
-	b:Show()
+	if b then
+		b:SetParent(self.header)
+		b:Show()
 
-	self.buttons[i] = b
+		self.buttons[i] = b
+	end
 end
 
 function MenuBar:RemoveButton(i)
 	local b = self.buttons[i]
-	b:SetParent(nil)
-	b:Hide()
+	if b then
+		b:SetParent(nil)
+		b:Hide()
 
-	self.buttons[i] = nil
+		self.buttons[i] = nil
+	end
 end
 
 --override, because the menu bar has weird button sizes
