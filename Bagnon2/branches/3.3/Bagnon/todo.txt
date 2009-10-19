@@ -1,0 +1,1 @@
+* Hide frames when entering combat (maybe)
