@@ -32,8 +32,8 @@
 	POSSIBILITY OF SUCH DAMAGE.
 --]]
 
-local XP_FORMAT = '%s / %s'
-local REST_FORMAT = '%s / %s (+%s)'
+local XP_FORMAT = '%s / %s [%s%%]'
+local REST_FORMAT = '%s / %s (+%s) [%s%%]'
 local REP_FORMAT = '%s:  %s / %s (%s)'
 local L = LibStub('AceLocale-3.0'):GetLocale('Dominos-XP')
 local _G = getfenv(0)
@@ -202,19 +202,20 @@ end
 function XP:UpdateExperience()
 	local value = UnitXP('player')
 	local max = UnitXPMax('player')
+	local pct = math.floor((value / max) * 100 + 0.5)
 
 	self.value:SetMinMaxValues(0, max)
 	self.value:SetValue(value)
 
 	local rest = GetXPExhaustion()
 	self.rest:SetMinMaxValues(0, max)
-
+	
 	if rest then
 		self.rest:SetValue(value + rest)
-		self.text:SetFormattedText(REST_FORMAT, comma_value(value), comma_value(max), comma_value(rest))
+		self.text:SetFormattedText(REST_FORMAT, comma_value(value), comma_value(max), comma_value(rest), pct)
 	else
 		self.rest:SetValue(0)
-		self.text:SetFormattedText(XP_FORMAT, comma_value(value), comma_value(max))
+		self.text:SetFormattedText(XP_FORMAT, comma_value(value), comma_value(max), pct)
 	end
 end
 
