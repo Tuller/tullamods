@@ -211,7 +211,7 @@ function Dominos:Load()
 		bf:Group('Dominos', 'Action Bar'):Skin(unpack(self.db.profile.ab.style))
 		bf:Group('Dominos', 'Pet Bar'):Skin(unpack(self.db.profile.petStyle))
 		bf:Group('Dominos', 'Class Bar'):Skin(unpack(self.db.profile.classStyle))
-		-- bf:Group('Dominos', 'Bag Bar'):Skin(unpack(self.db.profile.bagStyle))
+		bf:Group('Dominos', 'Bag Bar'):Skin(unpack(self.db.profile.bagStyle))
 	end
 
 	--load in extra functionality
@@ -307,8 +307,8 @@ function Dominos:OnSkin(skin, glossAlpha, gloss, group, _, colors)
 		styleDB = self.db.profile.petStyle
 	elseif group == 'Class Bar' then
 		styleDB = self.db.profile.classStyle
-	-- elseif group == 'Bag Bar' then
-		-- styleDB = self.db.profile.bagStyle
+	elseif group == 'Bag Bar' then
+		styleDB = self.db.profile.bagStyle
 	end
 
 	if styleDB then

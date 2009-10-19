@@ -34,6 +34,7 @@
 
 local NT_RATIO = 64/37
 local _G = getfenv(0)
+local LBF = LibStub('LibButtonFacade', true)
 
 --load up the bag set...
 local bags = {}
@@ -44,12 +45,12 @@ do
 		b:GetNormalTexture():SetWidth(size * NT_RATIO)
 		b:GetNormalTexture():SetHeight(size * NT_RATIO)
 
-		local count = getglobal(b:GetName() .. 'Count')
+		local count = _G[b:GetName() .. 'Count']
 		count:SetFontObject('NumberFontNormalSmall')
 		count:SetPoint('BOTTOMRIGHT', 0, 2)
 
-		getglobal(b:GetName() .. 'Stock'):SetFontObject('NumberFontNormalSmall')
-		getglobal(b:GetName() .. 'Stock'):SetVertexColor(1, 1, 0)
+		_G[b:GetName() .. 'Stock']:SetFontObject('NumberFontNormalSmall')
+		_G[b:GetName() .. 'Stock']:SetVertexColor(1, 1, 0)
 	end
 
 	local function CreateKeyRing(name)
@@ -83,8 +84,8 @@ do
 			GameTooltip:Hide()
 		end)
 
-		getglobal(b:GetName() .. 'IconTexture'):SetTexture('Interface\\ContainerFrame\\KeyRing-Bag-Icon')
-		getglobal(b:GetName() .. 'IconTexture'):SetTexCoord(0, 0.9, 0.1, 1)
+		_G[b:GetName() .. 'IconTexture']:SetTexture('Interface\\ContainerFrame\\KeyRing-Bag-Icon')
+		_G[b:GetName() .. 'IconTexture']:SetTexCoord(0, 0.9, 0.1, 1)
 
 		ResizeItemButton(b, 30)
 	end
@@ -105,6 +106,16 @@ function BagBar:New()
 	f:Reload()
 
 	return f
+end
+
+function BagBar:SkinButton(b)
+	if b.skinned then return end
+
+	if LBF then
+		LBF:Group('Dominos', 'Bag Bar'):AddButton(b, {Icon = _G[b:GetName() .. 'IconTexture']})
+	end
+	
+	b.skinned = true
 end
 
 function BagBar:GetDefaults()
@@ -160,6 +171,7 @@ function BagBar:AddButton(i)
 	local b = self.bags[i]
 	b:SetParent(self.header)
 	b:Show()
+	self:SkinButton(b)
 
 	self.buttons[i] = b
 end
