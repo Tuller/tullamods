@@ -75,6 +75,7 @@ end
 --[[ Item Updating ]]--
 
 --returns true if the item matches the given filter, false othewise
+local ItemSearch = LibStub('ItemSearch-1.0')
 function ItemFrame:HasItem(bag, slot, link)
 	--check for the bag
 	local hasBag = false
@@ -108,7 +109,7 @@ function ItemFrame:HasItem(bag, slot, link)
 			return false
 		--text search
 		elseif f.name then
-			return Combuctor.ItemSearch:Find(link, f.name)
+			return ItemSearch:Find(link, f.name)
 		end
 	end
 	return true
