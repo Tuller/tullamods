@@ -91,6 +91,8 @@ function Drag:OnEnter()
 
 	GameTooltip:AddLine(format(L.SetAlpha, ceil(self.owner:GetFrameAlpha()*100)))
 	GameTooltip:Show()
+	
+	Dominos.HoverMenu:Set(self.owner)
 end
 
 function Drag:OnLeave()
@@ -104,6 +106,10 @@ function Drag:StartMoving(button)
 
 		if GameTooltip:IsOwned(self) then
 			GameTooltip:Hide()
+		end
+		
+		if Dominos.HoverMenu:IsOwned(self.owner) then
+			Dominos.HoverMenu:Free()
 		end
 	end
 end
