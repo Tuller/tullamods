@@ -52,6 +52,7 @@ function HoverMenu:Set(frame)
 	self.owner = frame
 	if frame then
 		self:Hide()
+		self:ClearAllPoints()
 		self:SetPoint('BOTTOMLEFT', frame, 'TOPLEFT')
 		frame.drag:LockHighlight()
 		self:Show()
@@ -151,7 +152,7 @@ function HoverMenu:CreateToggleVisibilityButton()
 		self:GetParent().owner:ToggleFrame()
 		self:UpdateIcon()
 	end)
-
+--[[
 	b:SetScript('OnEnter', function(self)
 		GameTooltip:SetOwner(self, 'ANCHOR_RIGHT')
 		self:UpdateTooltip()
@@ -160,7 +161,7 @@ function HoverMenu:CreateToggleVisibilityButton()
 	b:SetScript('OnLeave', function(self)
 		GameTooltip:Hide()
 	end)
-
+--]]
 	return b
 end
 
@@ -170,7 +171,7 @@ function HoverMenu:CreateToggleConfigMenuButton()
 	b:SetScript('OnClick', function(self)
 		self:GetParent().owner:ShowMenu()
 	end)
-
+--[[
 	b:SetScript('OnEnter', function(self)
 		GameTooltip:SetOwner(self, 'ANCHOR_RIGHT')
 		GameTooltip:SetText(L.ConfigureBarHelp)
@@ -179,6 +180,6 @@ function HoverMenu:CreateToggleConfigMenuButton()
 	b:SetScript('OnLeave', function(self)
 		GameTooltip:Hide()
 	end)
-
+--]]
 	return b
 end
