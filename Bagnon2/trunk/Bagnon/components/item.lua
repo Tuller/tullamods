@@ -8,6 +8,7 @@ local ItemSlot = Bagnon.Classy:New('Button')
 ItemSlot:Hide()
 Bagnon.ItemSlot = ItemSlot
 
+local ItemSearch = LibStub('LibItemSearch-1.0')
 
 --[[
 	The item widget
@@ -389,7 +390,7 @@ function ItemSlot:UpdateSearch()
 
 	if search and search ~= '' then
 		local itemLink = self:GetItem()
-		shouldFade = not(itemLink and Bagnon.ItemSearch:Find(itemLink, search))
+		shouldFade = not(itemLink and ItemSearch:Find(itemLink, search))
 	end
 
 	if shouldFade then
@@ -492,8 +493,7 @@ function ItemSlot:IsQuestItem()
 		return false
 	end
 
-	return Bagnon.ItemSearch:GetTypedSearch('itemTypeGeneric'):findItem(itemLink, 'quest')
-		or Bagnon.ItemSearch:GetTypedSearch('tooltip'):findItem(itemLink, 'quest')
+	return ItemSearch:GetTypedSearch('itemTypeGeneric'):findItem(itemLink, 'quest') or ItemSearch:GetTypedSearch('tooltip'):findItem(itemLink, 'quest')
 end
 
 function ItemSlot:ShowingEmptyItemSlotTexture()

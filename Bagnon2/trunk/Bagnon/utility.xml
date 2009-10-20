@@ -5,7 +5,6 @@
 	<Script file="utility\itemEvents.lua"/>
 
 	<Script file="utility\bagSlotInfo.lua"/>
-	<Script file="utility\itemSearch.lua"/>
 	<Script file="utility\itemSlotInfo.lua"/>
 	<Script file="utility\playerInfo.lua"/>
 </Ui>
