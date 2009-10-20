@@ -75,7 +75,7 @@ end
 --[[ Item Updating ]]--
 
 --returns true if the item matches the given filter, false othewise
-local ItemSearch = LibStub('ItemSearch-1.0')
+local ItemSearch = LibStub('LibItemSearch-1.0')
 function ItemFrame:HasItem(bag, slot, link)
 	--check for the bag
 	local hasBag = false
