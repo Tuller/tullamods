@@ -36,6 +36,7 @@
 --[[ Module Stuff ]]--
 
 local DRB = Dominos:NewModule('roll')
+local L = LibStub('AceLocale-3.0'):GetLocale('Dominos')
 local RollBar
 
 function DRB:Load()
@@ -52,7 +53,7 @@ end
 RollBar = Dominos:CreateClass('Frame', Dominos.Frame)
 
 function RollBar:New()
-	local f = self.super.New(self, 'roll')
+	local f = self.super.New(self, 'roll', L.TipRollBar)
 	f:LoadButtons()
 	f:Layout()
 
