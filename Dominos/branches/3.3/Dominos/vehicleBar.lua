@@ -38,10 +38,11 @@
 local VehicleBar = Dominos:CreateClass('Frame', Dominos.Frame)
 Dominos.VehicleBar  = VehicleBar
 
+local L = LibStub('AceLocale-3.0'):GetLocale('Dominos')
 local buttons = {VehicleMenuBarLeaveButton, VehicleMenuBarPitchUpButton, VehicleMenuBarPitchDownButton}
 
 function VehicleBar:New()
-	local f = self.super.New(self, 'vehicle')
+	local f = self.super.New(self, 'vehicle', L.TipVehicleBar)
 	f:SetShowStates('[target=vehicle,exists]')
 	f:SkinButtons()
 	f:LoadButtons()

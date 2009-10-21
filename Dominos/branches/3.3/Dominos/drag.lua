@@ -78,6 +78,11 @@ end
 function Drag:OnEnter()
 	GameTooltip:SetOwner(self, 'ANCHOR_BOTTOMLEFT')
 	GameTooltip:SetText(format('Bar: %s', self:GetText():gsub('^%l', string.upper)), 1, 1, 1)
+	
+	local tooltipText = self.owner:GetTooltipText()
+	if tooltipText then
+		GameTooltip:AddLine(tooltipText .. '\n', nil, nil, nil, nil, 1)
+	end
 
 	if self.owner.ShowMenu then
 		GameTooltip:AddLine(L.ShowConfig)
@@ -91,8 +96,6 @@ function Drag:OnEnter()
 
 	GameTooltip:AddLine(format(L.SetAlpha, ceil(self.owner:GetFrameAlpha()*100)))
 	GameTooltip:Show()
-	
-	Dominos.HoverMenu:Set(self.owner)
 end
 
 function Drag:OnLeave()
@@ -106,10 +109,6 @@ function Drag:StartMoving(button)
 
 		if GameTooltip:IsOwned(self) then
 			GameTooltip:Hide()
-		end
-		
-		if Dominos.HoverMenu:IsOwned(self.owner) then
-			Dominos.HoverMenu:Free()
 		end
 	end
 end

@@ -9,7 +9,6 @@ embeds.xml
 localization.xml
 Dominos.lua
 fadeManager.lua
-hoverMenu.lua
 drag.lua
 frame.lua
 bindableButton.lua
