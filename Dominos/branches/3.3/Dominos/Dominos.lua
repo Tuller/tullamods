@@ -141,6 +141,7 @@ function Dominos:GetDefaults()
 	return {
 		profile = {
 			possessBar = 1,
+			vehicleBar = 1,
 
 			sticky = true,
 			showMacroText = true,
@@ -829,6 +830,20 @@ end
 
 function Dominos:GetPossessBar()
 	return self.Frame:Get(self.db.profile.possessBar)
+end
+
+--vehicle bar settings
+function Dominos:SetVehicleBar(id)
+	local prevBar = self:GetVehicleBar()
+	self.db.profile.vehicleBar = id
+	local newBar = self:GetVehicleBar()
+
+	prevBar:UpdateStateDriver()
+	newBar:UpdateStateDriver()
+end
+
+function Dominos:GetVehicleBar()
+	return self.Frame:Get(self.db.profile.vehicleBar)
 end
 
 --action bar numbers

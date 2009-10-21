@@ -118,7 +118,7 @@ function PetBar:New()
 end
 
 function PetBar:UpdateStateDriver()
-	self:SetShowStates('[target=pet,exists,nobonusbar:5]')
+	self:SetShowStates('[@pet,exists,nobonusbar:5]')
 end
 
 function PetBar:GetDefaults()
