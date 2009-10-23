@@ -1,4 +1,5 @@
 #labels Featured,Bagnon
+#sidebar TullamodsSideBar
 <wiki:toc max_depth="3" />
 -----
 
