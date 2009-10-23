@@ -1,5 +1,8 @@
   * [Bagnon]
     * [Bagnon_Forever Bagnon Forever]
   * [Dominos]
+    * [DominosBasics Basics]
+    * [DominosAdvanced Advanced]
+    * [DominosPlugins Plugins]
   * [OmniCC]
   * [Donations]
