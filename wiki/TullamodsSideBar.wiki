@@ -1,4 +1,6 @@
   * [Bagnon]
+    * [Bagnon#General General Info]
+    * [Bagnon#FAQ FAQ]
     * [Bagnon_Forever Bagnon Forever]
   * [Dominos]
     * [DominosBasics Basics]
