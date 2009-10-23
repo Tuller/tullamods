@@ -1,6 +1,4 @@
-#summary Bagnon
 #labels Featured,Bagnon
-
 <wiki:toc max_depth="3" />
 -----
 
