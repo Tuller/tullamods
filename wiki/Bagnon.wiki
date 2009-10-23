@@ -1,4 +1,4 @@
-#summary Bagnon's frequently asked questions
+#summary Bagnon
 #labels Featured,Bagnon
 
 <wiki:toc max_depth="3" />
