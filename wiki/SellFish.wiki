@@ -1,4 +1,4 @@
-#sidebar TullamodsTableOfContents
+#sidebar TullamodsSideBar
 
 A lightweight addon for displaying sell value data for items, originally based on ColaLight. The addon includes sell values for the vast majority of items by default, and will automatically update prices whenever you visit a vendor.
 
