@@ -1,8 +1,6 @@
 #summary Advanced stuff and frequently asked questions
 #labels Dominos
-
-|| [DominosBasics Getting around the interface] || [DominosAdvanced Doing more advanced things] || [DominosPlugins Adding extra functionality] || [Donations] ||
-----
+#sidebar TullamodsSideBar
 
 ==== Hiding and Showing Bars ====
 
