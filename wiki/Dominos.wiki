@@ -1,8 +1,6 @@
 #summary The Dominos guide
 #labels Dominos,Featured
-
-|| [DominosBasics Getting around the interface] || [DominosAdvanced Doing more advanced things] || [DominosPlugins Adding extra functionality] || [Donations] ||
-----
+#sidebar TullamodsSideBar
 
 ==== So what the heck is Dominos? ====
 
