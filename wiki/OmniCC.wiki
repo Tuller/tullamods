@@ -1,4 +1,6 @@
+#summary Cooldown count for everything
 #labels OmniCC
+#sidebar TullamodsSideBar
 <wiki:toc max_depth="3" />
 -----
 
