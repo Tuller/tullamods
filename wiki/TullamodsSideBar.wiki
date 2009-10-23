@@ -6,5 +6,7 @@
     * [DominosBasics Basics]
     * [DominosAdvanced Advanced]
     * [DominosPlugins Plugins]
+  * [Ludwig]
   * [OmniCC]
+  * [SellFish]
   * [Donations]
