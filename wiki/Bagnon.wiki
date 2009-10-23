@@ -13,7 +13,7 @@ Bagnon is an addon that merges all of your bags into three frames: One for your 
 
 
 
-== Included Addons ==
+=== Included Addons ===
 Bagnon - Provides single window displays for your inventory, bank, and keyring
 
 !Bagnon_Config - Provides a means of configuring said frames :P
