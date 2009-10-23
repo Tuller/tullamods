@@ -1,0 +1,24 @@
+#summary Bagnon's frequently asked questions
+#labels Featured,Bagnon
+
+<wiki:toc max_depth="3" />
+-----
+
+== General ==
+Bagnon is an addon that merges all of your bags into three frames: One for your inventory, one for your bank, and one for your keyring. Beyond the basic all-in-one inventory functionality, Bagnon also provides the following features:
+  * Items can be colored based on quality
+  * Quest items can be highlighted
+  * Text searching
+  * Offline viewing of inventory information from your other characters (via Bagnon_Forever or Bagnon_Armory)
+  * [http://wiki.github.com/tekkub/libdatabroker-1-1 DataBroker] plugin support. Both the inventory and bank frames allow you to display a databroker plugin in the bottom left corner.
+
+
+
+== Included Addons ==
+Bagnon - Provides single window displays for your inventory, bank, and keyring
+
+Bagnon_Config - Provides a means of configuring said frames :P
+
+Bagnon_Forever - Enables the ability to view your character's bank, or items from any other character on the same server, from anywhere. (You need to log onto each character at least once for this to work).
+
+Bagnon_Tooltips - When hovering over an item, this tells you who has an item, and where.
