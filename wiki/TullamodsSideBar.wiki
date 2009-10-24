@@ -2,7 +2,7 @@
     * [Bagnon]
       * [Bagnon#General General Info]
       * [Bagnon#FAQ FAQ]
-      * [Bagnon_Forever Bagnon Forever]
+    * [Bagnon_Forever]
     * [Combuctor]
     * [Dominos]
       * [DominosBasics Basics]
