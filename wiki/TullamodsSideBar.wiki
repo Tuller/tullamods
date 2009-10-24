@@ -1,6 +1,5 @@
   * Active Addons
     * [Bagnon]
-      * [Bagnon#General General]
       * [Bagnon#Frequently_Asked_Questions FAQ]
     * [Bagnon_Forever]
     * [Combuctor]
