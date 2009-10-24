@@ -38,6 +38,8 @@ Odds are, they are not :)  Make sure that you have not accidentally hidden a bag
 
 Bagnon does not really know when you remove a character, so you need to delete that character's information manually.  To do so, Open up a Bagnon frame, and click the player selector button (the icon in the top left of the frame that looks like your character a bit).  From there, you can select and delete information about any character that you're not currently logged onto.
 
+[http://tullamods.googlecode.com/svn/images/bagnon_remove_character.png]
+
 === Is there guild bank support? ===
 
 Currently, no.  I'm potentially working on it.
