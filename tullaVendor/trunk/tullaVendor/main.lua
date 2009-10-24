@@ -39,7 +39,9 @@ do
 	MinimapZoomOut:Hide()
 	
 	MinimapZoneTextButton:Hide()
-	MinimapToggleButton:Hide()
+	if MinimapToggleButton then
+		MinimapToggleButton:Hide()
+	end
 	MinimapBorderTop:Hide()
 	
 	MinimapCluster:ClearAllPoints()
