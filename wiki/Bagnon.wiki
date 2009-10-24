@@ -28,7 +28,6 @@ Short answer: Install [http://www.wowinterface.com/downloads/info13001-CurrencyT
 Long answer, taken from a currency tracker comment:
 
 In Bagnon's options menu, you have to have the option "Enable databroker frame" ticked. If that is enabled, you should see a frame looking sorta like this "< >" when you open Bagnon, on the lower end of the bag frame, next to the money display. Those < > are arrows and you can click them to cycle through your Broker plugins, like CurrencyTracker. When you have no other plugins, CurrencyTracker should show right up, otherwise you'll have to click a few times until you see either your tracked currencies or just the text "CurrencyTracker". If the latter shows up, just click the text and mark your currencies you want to watch. 
-Hope this helps!
 
 === Items are disappearing when I put them in my Bank/Bags! ===
 
@@ -37,3 +36,11 @@ Odds are, they are not :)  Make sure that you have not accidentally hidden a bag
 === I deleted a character, but his or her items are still showing up in Bagnon's listing.  How do I get rid of him/her? ===
 
 Bagnon does not really know when you remove a character, so you need to delete that character's information manually.  To do so, Open up a Bagnon frame, and click the player selector button (the icon in the top left of the frame that looks like your character a bit).  From there, you can select and delete information about any character that you're not currently logged onto.
+
+=== Is there guild bank support? ===
+
+Currently, no.  I'm potentially working on it.
+
+=== Can you track items in my mailbox? ===
+
+Bagnon_Forever does not track mailbox items, and I have no plans on implementing support.  If you want that kind of information, you should probably check out an addon that stores more information about your characters, like the ArmoryAddon, or Altoholic.
