@@ -12,8 +12,8 @@
     * [OmniCC]
     * [Sage]
   * Discontinued Addons
-    * !Bongos
+    * Bongos
     * [Bongos2]
-    * !Bongos3
+    * Bongos3
     * [SellFish]
   * [Donations]
