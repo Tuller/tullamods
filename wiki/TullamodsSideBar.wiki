@@ -3,14 +3,15 @@
       * [Bagnon#General General Info]
       * [Bagnon#FAQ FAQ]
       * [Bagnon_Forever Bagnon Forever]
+    * [Combuctor]
     * [Dominos]
       * [DominosBasics Basics]
       * [DominosAdvanced Advanced]
       * [DominosPlugins Plugins]
     * [Ludwig]
     * [OmniCC]
-    * Sage
+    * [Sage]
   * Discontinued Addons
-    * Bongos
+    * [Bongos]
     * [SellFish]
   * [Donations]
