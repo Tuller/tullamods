@@ -1,16 +1,16 @@
-Active Addons
-  * [Bagnon]
-    * [Bagnon#General General Info]
-    * [Bagnon#FAQ FAQ]
-    * [Bagnon_Forever Bagnon Forever]
-  * [Dominos]
-    * [DominosBasics Basics]
-    * [DominosAdvanced Advanced]
-    * [DominosPlugins Plugins]
-  * [Ludwig]
-  * [OmniCC]
-  * Sage
-Discontinued Addons
-  * Bongos
-  * [SellFish]
-[Donations]
+  * Active Addons
+    * [Bagnon]
+      * [Bagnon#General General Info]
+      * [Bagnon#FAQ FAQ]
+      * [Bagnon_Forever Bagnon Forever]
+    * [Dominos]
+      * [DominosBasics Basics]
+      * [DominosAdvanced Advanced]
+      * [DominosPlugins Plugins]
+    * [Ludwig]
+    * [OmniCC]
+    * Sage
+  * Discontinued Addons
+    * Bongos
+    * [SellFish]
+  * [Donations]
