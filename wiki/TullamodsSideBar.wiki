@@ -1,3 +1,4 @@
+Active Addons
   * [Bagnon]
     * [Bagnon#General General Info]
     * [Bagnon#FAQ FAQ]
@@ -8,5 +9,8 @@
     * [DominosPlugins Plugins]
   * [Ludwig]
   * [OmniCC]
+  * Sage
+Discontinued Addons
+  * Bongos
   * [SellFish]
-  * [Donations]
+[Donations]
