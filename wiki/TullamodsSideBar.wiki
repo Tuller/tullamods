@@ -1,7 +1,7 @@
   * Active Addons
     * [Bagnon]
       * [Bagnon#General General Info]
-      * [Bagnon#FAQ FAQ]
+      * [Bagnon#FrequentlyAskedQuestions FAQ]
     * [Bagnon_Forever]
     * [Combuctor]
     * [Dominos]
