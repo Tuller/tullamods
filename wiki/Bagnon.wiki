@@ -1,8 +1,6 @@
 #summary All in one displays for your inventory, bank, and keyring
 #labels Featured,Bagnon
 #sidebar TullamodsSideBar
-<wiki:toc max_depth="3" />
------
 
 == General ==
 Bagnon is an addon that merges all of your bags into three frames: One for your inventory, one for your bank, and one for your keyring. Beyond the basic all-in-one inventory functionality, Bagnon also provides the following features:
