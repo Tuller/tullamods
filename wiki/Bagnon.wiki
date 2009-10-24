@@ -27,7 +27,7 @@ Short answer: Install [http://www.wowinterface.com/downloads/info13001-CurrencyT
 
 Long answer, taken from a currency tracker comment:
 
-In Bagnon's options menu, you have to have the option "Enable databroker frame" ticked. If that is enabled, you should see a frame looking sorta like this "< >" when you open Bagnon, on the lower end of the bag frame, next to the money display. Those < > are arrows and you can click them to cycle through your Broker plugins, like CurrencyTracker. When you have no other plugins, CurrencyTracker should show right up, otherwise you'll have to click a few times until you see either your tracked currencies or just the text "CurrencyTracker". If the latter shows up, just click the text and mark your currencies you want to watch. 
+ In Bagnon's options menu, you have to have the option "Enable databroker frame" ticked.    If that is enabled, you should see a frame looking sorta like this "< >" when you open Bagnon, on the lower end of the bag frame, next to the money display. Those < > are arrows and you can click them to cycle through your Broker plugins, like CurrencyTracker. When you have no other plugins, CurrencyTracker should show right up, otherwise you'll have to click a few times until you see either your tracked currencies or just the text "CurrencyTracker". If the latter shows up, just click the text and mark your currencies you want to watch. 
 
 === Items are disappearing when I put them in my Bank/Bags! ===
 
