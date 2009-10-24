@@ -13,10 +13,7 @@ Bagnon is an addon that merges all of your bags into three frames: One for your 
 
 
 === Included Addons ===
-Bagnon - Provides single window displays for your inventory, bank, and keyring
-
-!Bagnon_Config - Provides a means of configuring said frames :P
-
-Bagnon_Forever - Enables the ability to view your character's bank, or items from any other character on the same server, from anywhere. (You need to log onto each character at least once for this to work).
-
-!Bagnon_Tooltips - When hovering over an item, this tells you who has an item, and where.
+  * Bagnon - Provides single window displays for your inventory, bank, and keyring
+  * !Bagnon_Config - Provides a means of configuring said frames :P
+  * Bagnon_Forever - Enables the ability to view your character's bank, or items from any other character on the same server, from anywhere. (You need to log onto each character at least once for this to work).
+  * !Bagnon_Tooltips - When hovering over an item, this tells you who has an item, and where.
