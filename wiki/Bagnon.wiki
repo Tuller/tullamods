@@ -34,6 +34,8 @@ Long answer, taken from a currency tracker comment:
 
 Odds are, they are not :)  Make sure that you have not accidentally hidden a bag from within Bagnon's frames.
 
+[http://tullamods.googlecode.com/svn/images/bagnon_show_bags.png]
+
 === I deleted a character, but his or her items are still showing up in Bagnon's listing.  How do I get rid of him/her? ===
 
 Bagnon does not really know when you remove a character, so you need to delete that character's information manually.  To do so, Open up a Bagnon frame, and click the player selector button (the icon in the top left of the frame that looks like your character a bit).  From there, you can select and delete information about any character that you're not currently logged onto.
