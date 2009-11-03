@@ -128,6 +128,12 @@ function FrameOptions:SLOT_ORDER_UPDATE(msg, frameID, enable)
 	end
 end
 
+function FrameOptions:ITEM_FRAME_BAG_BREAK_UPDATE(msg, frameID, enable)
+	if self:GetFrameID() == frameID then
+		self:GetBagBreakCheckbox():UpdateChecked()
+	end
+end
+
 function FrameOptions:OPTIONS_TOGGLE_ENABLE_UPDATE(msg, frameID, enable)
 	if self:GetFrameID() == frameID then
 		self:GetToggleOptionsCheckbox():UpdateChecked()
@@ -179,6 +185,9 @@ function FrameOptions:AddWidgets()
 
 	local reverseSlotOrdering = self:CreateReverseSlotOrderCheckbox()
 	reverseSlotOrdering:SetPoint('TOPLEFT', toggleOptionsFrame, 'BOTTOMLEFT', 0, -CHECK_BUTTON_SPACING)
+	
+	local bagBreak = self:CreateBagBreakCheckbox()
+	bagBreak:SetPoint('TOPLEFT', reverseSlotOrdering, 'BOTTOMLEFT', 0, -CHECK_BUTTON_SPACING)
 
 
 	--[[ Color Selectors ]]--
@@ -196,7 +205,6 @@ function FrameOptions:AddWidgets()
 
 	--add opacity slider
 	local opacity = self:CreateOpacitySlider()
---	opacity:SetPoint('BOTTOMLEFT', self, 'BOTTOMLEFT', 12, 10)
 	opacity:SetWidth(180)
 	opacity:SetPoint('BOTTOMRIGHT', self, 'BOTTOMRIGHT', -16, 10)
 
@@ -567,6 +575,26 @@ end
 
 function FrameOptions:GetReverseSlotOrderCheckbox()
 	return self.reverseSlotOrderCheckbox
+end
+
+--bag break layout
+function FrameOptions:CreateBagBreakCheckbox()
+	local button = Bagnon.OptionsCheckButton:New(L.EnableBagBreak, self)
+
+	button.OnEnableSetting = function(self, enable)
+		self:GetParent():GetSettings():SetBagBreak(enable)
+	end
+
+	button.IsSettingEnabled = function(self)
+		return self:GetParent():GetSettings():IsBagBreakEnabled()
+	end
+
+	self.bagBreakCheckbox = button
+	return button
+end
+
+function FrameOptions:GetBagBreakCheckbox()
+	return self.bagBreakCheckbox
 end
 
 
