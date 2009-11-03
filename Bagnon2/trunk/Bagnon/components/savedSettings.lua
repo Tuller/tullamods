@@ -82,7 +82,8 @@ function SavedSettings:GetDefaultSettings()
 				mail = true,
 				guildbank = true,
 				trade = false,
-				craft = false
+				craft = false,
+				player = false
 			},
 		}
 	}

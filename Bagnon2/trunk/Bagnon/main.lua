@@ -244,6 +244,10 @@ function Bagnon:RegisterAutoDisplayEvents()
 	--override normal bank display
 	BankFrame:UnregisterEvent('BANKFRAME_OPENED')
 	BankFrame:UnregisterEvent('BANKFRAME_CLOSED')
+	
+	local f = CreateFrame('Frame', nil, CharacterFrame)
+	f:SetScript('OnShow', function() Bagnon:PLAYER_FRAME_SHOW() end)
+	f:SetScript('OnHide', function() Bagnon:PLAYER_FRAME_HIDE() end)
 end
 
 function Bagnon:ShowFrameAtEvent(frameID, event)
@@ -337,6 +341,15 @@ end
 
 function Bagnon:TRADE_SKILL_CLOSE()
 	self:HideFrameAtEvent('inventory', 'craft')
+end
+
+--player frame
+function Bagnon:PLAYER_FRAME_SHOW()
+	self:ShowFrameAtEvent('inventory', 'player')
+end
+
+function Bagnon:PLAYER_FRAME_HIDE()
+	self:HideFrameAtEvent('inventory', 'player')
 end
 
 
