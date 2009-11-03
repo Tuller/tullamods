@@ -117,6 +117,12 @@ function ItemFrame:SLOT_ORDER_UPDATE(msg, frameID, enable)
 	end
 end
 
+function ItemFrame:ITEM_FRAME_BAG_BREAK_UPDATE(msg, frameID, enable)
+	if self:GetFrameID() == frameID then
+		self:RequestLayout()
+	end
+end
+
 function ItemFrame:HandleGlobalItemEvent(msg, ...)
 	for i, item in self:GetAllItemSlots() do
 		item:HandleEvent(msg, ...)
@@ -199,6 +205,7 @@ function ItemFrame:UpdateEvents()
 		self:RegisterMessage('ITEM_FRAME_SPACING_UPDATE')
 		self:RegisterMessage('ITEM_FRAME_COLUMNS_UPDATE')
 		self:RegisterMessage('SLOT_ORDER_UPDATE')
+		self:RegisterMessage('ITEM_FRAME_BAG_BREAK_UPDATE')
 		
 		self:RegisterMessage('TEXT_SEARCH_UPDATE', 'HandleGlobalItemEvent')
 		self:RegisterMessage('BAG_SEARCH_UPDATE', 'HandleGlobalItemEvent')
@@ -315,8 +322,16 @@ end
 
 --[[ Layout Methods ]]--
 
---arranges itemSlots on the itemFrame, and adjusts size to fit
 function ItemFrame:Layout()
+	if self:IsBagBreakEnabled() then
+		self:Layout_BagBreak()
+	else
+		self:Layout_Default()
+	end
+end
+
+--arranges itemSlots on the itemFrame, and adjusts size to fit
+function ItemFrame:Layout_Default()
 	self.needsLayout = nil
 
 	local columns = self:NumColumns()
@@ -339,6 +354,47 @@ function ItemFrame:Layout()
 
 	local width = effItemSize * math.min(columns, i) - spacing
 	local height = effItemSize * ceil(i / columns) - spacing
+	self:SetWidth(width)
+	self:SetHeight(height)
+end
+
+
+function ItemFrame:Layout_BagBreak()
+	self.needsLayout = nil
+
+	local columns = self:NumColumns()
+	local spacing = self:GetSpacing()
+	local effItemSize = self.ITEM_SIZE + spacing
+
+	local rows = 1
+	local col = 1
+	local maxCols = 0
+
+	for _, bag in self:GetVisibleBags() do
+		local bagSize = self:GetBagSize(bag)
+		for slot = 1, bagSize do
+			local itemSlot = self:GetItemSlot(bag, slot)
+
+			itemSlot:ClearAllPoints()
+			itemSlot:SetPoint('TOPLEFT', self, 'TOPLEFT', effItemSize * (col - 1), -effItemSize * (rows - 1))
+
+			if col == columns then
+				col = 1
+				if slot < bagSize then
+					rows = rows + 1
+				end
+			else
+				col = col + 1
+				maxCols = math.max(maxCols, col)
+			end
+		end
+
+		rows = rows + 1
+		col = 1
+	end
+
+	local width = effItemSize * maxCols - spacing*2
+	local height = effItemSize * (rows - 1) - spacing*2
 	self:SetWidth(width)
 	self:SetHeight(height)
 end
@@ -420,4 +476,8 @@ end
 
 function ItemFrame:GetSpacing()
 	return self:GetSettings():GetItemFrameSpacing()
+end
+
+function ItemFrame:IsBagBreakEnabled()
+	return self:GetSettings():IsBagBreakEnabled()
 end

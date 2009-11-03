@@ -347,6 +347,15 @@ function SavedFrameSettings:GetItemFrameSpacing()
 	return self:GetDB().itemFrameSpacing
 end
 
+--bag break layout
+function SavedFrameSettings:SetBagBreak(enable)
+	self:GetDB().bagBreak = enable
+end
+
+function SavedFrameSettings:IsBagBreakEnabled()
+	return self:GetDB().bagBreak
+end
+
 
 --[[ Item Frame Slot ORdering ]]--
 
@@ -415,6 +424,7 @@ function SavedFrameSettings:GetDefaultInventorySettings()
 		--itemFrame
 		itemFrameColumns = 8,
 		itemFrameSpacing = 2,
+		bagBreak = false,
 
 		--optional components
 		hasMoneyFrame = true,
@@ -464,6 +474,7 @@ function SavedFrameSettings:GetDefaultBankSettings()
 		--itemFrame
 		itemFrameColumns = 10,
 		itemFrameSpacing = 2,
+		bagBreak = false,
 
 		--optional components
 		hasMoneyFrame = true,
@@ -505,6 +516,7 @@ function SavedFrameSettings:GetDefaultKeyRingSettings()
 		--itemFrame
 		itemFrameColumns = 4,
 		itemFrameSpacing = 2,
+		bagBreak = false,
 
 		--optional components
 		hasMoneyFrame = false,

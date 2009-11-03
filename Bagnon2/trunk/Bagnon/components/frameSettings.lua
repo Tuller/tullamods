@@ -334,6 +334,20 @@ function FrameSettings:GetItemFrameColumns()
 	return self:GetDB():GetItemFrameColumns()
 end
 
+--bag break layout
+function FrameSettings:SetBagBreak(enable)
+	local enable = enable and true or false
+
+	if self:IsBagBreakEnabled() ~= enable then
+		self:GetDB():SetBagBreak(enable)
+		self:SendMessage('ITEM_FRAME_BAG_BREAK_UPDATE', self:IsBagBreakEnabled())
+	end
+end
+
+function FrameSettings:IsBagBreakEnabled()
+	return self:GetDB():IsBagBreakEnabled()
+end
+
 
 --[[ Bag Slot Availability ]]--
 
