@@ -274,26 +274,30 @@ end
 function ItemSlot:UpdateSlotColor()
 	if (not self:GetItem()) and self:ColoringBagSlots() then
 		if self:IsKeyRingSlot() then
-			SetItemButtonTextureVertexColor(self, 1, 0.8, 0)
-			self:GetNormalTexture():SetVertexColor(1, 0.8, 0)
+			local r, g, b = self:GetKeyringSlotColor()
+			SetItemButtonTextureVertexColor(self, r, g, b)
+			self:GetNormalTexture():SetVertexColor(r, g, b)
 			return
 		end
 
 		if self:IsAmmoBagSlot() then
-			SetItemButtonTextureVertexColor(self, 0.7, 0.7, 1)
-			self:GetNormalTexture():SetVertexColor(0.7, 0.7, 1)
+			local r, g, b = self:GetAmmoSlotColor()
+			SetItemButtonTextureVertexColor(self, r, g, b)
+			self:GetNormalTexture():SetVertexColor(r, g, b)
 			return
 		end
 
 		if self:IsTradeBagSlot() then
-			SetItemButtonTextureVertexColor(self, 0.5, 1, 0.5)
-			self:GetNormalTexture():SetVertexColor(0.5, 1, 0.5)
+			local r, g, b = self:GetTradeSlotColor()
+			SetItemButtonTextureVertexColor(self, r, g, b)
+			self:GetNormalTexture():SetVertexColor(r, g, b)
 			return
 		end
 
 		if self:IsShardBagSlot() then
-			SetItemButtonTextureVertexColor(self, 0.9, 0.7, 1)
-			self:GetNormalTexture():SetVertexColor(0.9, 0.7, 1)
+			local r, g, b = self:GetShardSlotColor()
+			SetItemButtonTextureVertexColor(self, r, g, b)
+			self:GetNormalTexture():SetVertexColor(r, g, b)
 			return
 		end
 	end
@@ -333,7 +337,7 @@ function ItemSlot:SetBorderQuality(quality)
 	if self:HighlightingItemsByQuality() then
 		if self:GetItem() and quality and quality > 1 then
 			local r, g, b = GetItemQualityColor(quality)
-			border:SetVertexColor(r, g, b, 0.5)
+			border:SetVertexColor(r, g, b, self:GetHighlightAlpha())
 			border:Show()
 			return
 		end
@@ -341,7 +345,7 @@ function ItemSlot:SetBorderQuality(quality)
 
 	if self:HighlightingQuestItems() then
 		if self:IsQuestItem() then
-			border:SetVertexColor(1, 1, 0, 0.5)
+			border:SetVertexColor(1, 1, 0, self:GetHighlightAlpha())
 			border:Show()
 			return
 		end
@@ -487,6 +491,10 @@ function ItemSlot:HighlightingQuestItems()
 	return Bagnon.Settings:HighlightingQuestItems()
 end
 
+function ItemSlot:GetHighlightAlpha()
+	return 0.5
+end
+
 local QUEST_ITEM_SEARCH = string.format('t:%s|%s', select(12, GetAuctionItemClasses()), 'quest')
 function ItemSlot:IsQuestItem()
 	local itemLink = self:GetItem()
@@ -497,10 +505,6 @@ function ItemSlot:IsQuestItem()
 	return ItemSearch:Find(itemLink, QUEST_ITEM_SEARCH)
 end
 
-function ItemSlot:ShowingEmptyItemSlotTexture()
-	return Bagnon.Settings:ShowingEmptyItemSlotTextures()
-end
-
 
 --[[ Item Slot Coloring ]]--
 
@@ -508,20 +512,43 @@ function ItemSlot:IsAmmoBagSlot()
 	return Bagnon.BagSlotInfo:IsAmmoBag(self:GetPlayer(), self:GetBag())
 end
 
+function ItemSlot:GetAmmoSlotColor()
+	return 0.7, 0.7, 1
+end
+
 function ItemSlot:IsTradeBagSlot()
 	return Bagnon.BagSlotInfo:IsTradeBag(self:GetPlayer(), self:GetBag())
+end
+
+function ItemSlot:GetTradeSlotColor()	
+	return 0.5, 1, 0.5
 end
 
 function ItemSlot:IsShardBagSlot()
 	return Bagnon.BagSlotInfo:IsShardBag(self:GetPlayer(), self:GetBag())
 end
 
+function ItemSlot:GetShardSlotColor()
+	return 0.9, 0.7, 1
+end
+
 function ItemSlot:IsKeyRingSlot()
 	return Bagnon.BagSlotInfo:IsKeyRing(self:GetBag())
 end
 
+function ItemSlot:GetKeyringSlotColor()
+	return 1, 0.8, 0
+end
+
 function ItemSlot:ColoringBagSlots()
 	return Bagnon.Settings:ColoringBagSlots()
+end
+
+
+--[[ Empty Slot Visibility ]]--
+
+function ItemSlot:ShowingEmptyItemSlotTexture()
+	return Bagnon.Settings:ShowingEmptyItemSlotTextures()
 end
 
 
