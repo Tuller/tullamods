@@ -1,1 +1,2 @@
-* Hide frames when entering combat (maybe)
+* Saved searches
+* Guild bank
