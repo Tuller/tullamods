@@ -43,6 +43,7 @@ function ColorOptions:UpdateMessages()
 	self:RegisterMessage('ITEM_HIGHLIGHT_QUEST_UPDATE')
 	self:RegisterMessage('ITEM_SLOT_COLOR_ENABLED_UPDATE')
 	self:RegisterMessage('ITEM_SLOT_COLOR_UPDATE')
+	self:RegisterMessage('ITEM_HIGHLIGHT_OPACITY_UPDATE')
 end
 
 function ColorOptions:ITEM_HIGHLIGHT_QUALITY_UPDATE(msg, enable)
@@ -59,6 +60,10 @@ end
 
 function ColorOptions:ITEM_SLOT_COLOR_UPDATE(msg, type, r, g, b)
 	--update colorpicker
+end
+
+function ColorOptions:ITEM_HIGHLIGHT_OPACITY_UPDATE(msg, value)
+	self:GetHighlightOpacitySlider():UpdateValue()
 end
 
 
@@ -89,6 +94,10 @@ function ColorOptions:AddWidgets()
 
 	local highightQuestItems = self:CreateHighlightQuestItemsCheckbox()
 	highightQuestItems:SetPoint('TOPLEFT', highlightItemsByQuality, 'BOTTOMLEFT', 0, -SPACING)
+	
+	local opacity = self:CreateHighlightOpacitySlider()
+	opacity:SetPoint('BOTTOMLEFT', self, 'BOTTOMLEFT', 16, 10)
+	opacity:SetPoint('BOTTOMRIGHT', self, 'BOTTOMRIGHT', -16, 10)
 end
 
 function ColorOptions:UpdateWidgets()
@@ -99,6 +108,8 @@ function ColorOptions:UpdateWidgets()
 	self:GetHighlightItemsByQualityCheckbox():UpdateChecked()
 	self:GetHighlightQuestItemsCheckbox():UpdateChecked()
 	self:GetColorItemSlotsCheckbox():UpdateChecked()
+	
+	self:GetHighlightOpacitySlider():UpdateValue()
 end
 
 
@@ -165,6 +176,33 @@ end
 
 function ColorOptions:GetColorItemSlotsCheckbox()
 	return self.colorItemSlotsCheckbox
+end
+
+
+--[[ Sliders ]]--
+
+--border opacity
+function ColorOptions:CreateHighlightOpacitySlider()
+	local slider = Bagnon.OptionsSlider:New(L.ItemHighlightOpacity, self, 10, 100, 1)
+
+	slider.SetSavedValue = function(self, value)
+		Bagnon.Settings:SetHighlightOpacity(value / 100)
+	end
+
+	slider.GetSavedValue = function(self)
+		return Bagnon.Settings:GetHighlightOpacity() * 100
+	end
+
+	slider.GetFormattedText = function(self, value)
+		return value .. '%'
+	end
+
+	self.highlightOpacitySlider = slider
+	return slider
+end
+
+function ColorOptions:GetHighlightOpacitySlider()
+	return self.highlightOpacitySlider
 end
 
 
