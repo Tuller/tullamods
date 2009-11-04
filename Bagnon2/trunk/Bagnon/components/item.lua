@@ -487,13 +487,14 @@ function ItemSlot:HighlightingQuestItems()
 	return Bagnon.Settings:HighlightingQuestItems()
 end
 
+local QUEST_ITEM_SEARCH = string.format('t:%s|%s', select(12, GetAuctionItemClasses()), 'quest')
 function ItemSlot:IsQuestItem()
 	local itemLink = self:GetItem()
 	if not itemLink then
 		return false
 	end
 
-	return ItemSearch:GetTypedSearch('itemTypeGeneric'):findItem(itemLink, 'quest') or ItemSearch:GetTypedSearch('tooltip'):findItem(itemLink, 'quest')
+	return ItemSearch:Find(itemLink, QUEST_ITEM_SEARCH)
 end
 
 function ItemSlot:ShowingEmptyItemSlotTexture()
