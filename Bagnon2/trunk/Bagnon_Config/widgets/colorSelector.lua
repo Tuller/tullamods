@@ -109,3 +109,7 @@ end
 function ColorSelector:GetColor(r, g, b, a)
 	assert(false, 'Hey, you forgot to implement GetColor for ' .. self:GetName())
 end
+
+function ColorSelector:UpdateColor()
+	self:SetColor(self:GetColor())
+end

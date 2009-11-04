@@ -11,6 +11,7 @@ ColorOptions:Hide()
 Bagnon.ColorOptions = ColorOptions
 
 local SPACING = 4
+local ITEM_SLOT_COLOR_TYPES = {'ammo', 'trade', 'shard', 'keyring'}
 
 
 --[[
@@ -59,7 +60,7 @@ function ColorOptions:ITEM_SLOT_COLOR_ENABLED_UPDATE(msg, enable)
 end
 
 function ColorOptions:ITEM_SLOT_COLOR_UPDATE(msg, type, r, g, b)
-	--update colorpicker
+	self:GetItemSlotColorSelector(type):SetColor(r, g, b, a)
 end
 
 function ColorOptions:ITEM_HIGHLIGHT_OPACITY_UPDATE(msg, value)
@@ -98,6 +99,18 @@ function ColorOptions:AddWidgets()
 	local opacity = self:CreateHighlightOpacitySlider()
 	opacity:SetPoint('BOTTOMLEFT', self, 'BOTTOMLEFT', 16, 10)
 	opacity:SetPoint('BOTTOMRIGHT', self, 'BOTTOMRIGHT', -16, 10)
+	
+	local lastCheckbox = highightQuestItems
+	local lastSelector = nil
+	for i, type in self:GetColorTypes() do
+		local selector = self:CreateItemSlotColorSelector(type)
+		if i == 1 then
+			selector:SetPoint('TOPLEFT', lastCheckbox, 'BOTTOMLEFT', 4, -(SPACING + 4))
+		else
+			selector:SetPoint('TOPLEFT', lastSelector, 'BOTTOMLEFT', 0, -(SPACING + 6))
+		end
+		lastSelector = selector
+	end
 end
 
 function ColorOptions:UpdateWidgets()
@@ -110,6 +123,15 @@ function ColorOptions:UpdateWidgets()
 	self:GetColorItemSlotsCheckbox():UpdateChecked()
 	
 	self:GetHighlightOpacitySlider():UpdateValue()
+	
+	for i, type in self:GetColorTypes() do
+		local selector = self:GetItemSlotColorSelector(type)
+		selector:UpdateColor()
+	end
+end
+
+function ColorOptions:GetColorTypes()
+	return pairs(ITEM_SLOT_COLOR_TYPES)
 end
 
 
@@ -203,6 +225,33 @@ end
 
 function ColorOptions:GetHighlightOpacitySlider()
 	return self.highlightOpacitySlider
+end
+
+
+--[[ Color Pickers ]]--
+
+--frame color
+function ColorOptions:CreateItemSlotColorSelector(type)
+	local selector = Bagnon.OptionsColorSelector:New(L['ItemSlotColor_' .. type], self, false)
+	selector.itemSlotType = type
+
+	selector.OnSetColor = function(self, r, g, b)
+		Bagnon.Settings:SetItemSlotColor(self.itemSlotType, r, g, b)
+	end
+
+	selector.GetColor = function(self)
+		return Bagnon.Settings:GetItemSlotColor(self.itemSlotType)
+	end
+
+	local colorSelectors = self.colorSelectors or {}
+	colorSelectors[type] = selector
+	self.colorSelectors = colorSelectors
+
+	return selector
+end
+
+function ColorOptions:GetItemSlotColorSelector(type)
+	return self.colorSelectors and self.colorSelectors[type]
 end
 
 
