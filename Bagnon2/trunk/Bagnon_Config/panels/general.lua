@@ -16,7 +16,7 @@ end)
 local GeneralOptions = Bagnon.OptionsPanel:New('BagnonOptions_General', 'Bagnon', L.GeneralSettings, L.GeneralSettingsTitle)
 Bagnon.GeneralOptions = GeneralOptions
 
-local SPACING = 4
+local SPACING = 6
 
 
 --[[
@@ -52,20 +52,9 @@ function GeneralOptions:UpdateMessages()
 	end
 
 	self:RegisterMessage('SHOW_EMPTY_ITEM_SLOT_TEXTURE_UPDATE')
-	self:RegisterMessage('ITEM_HIGHLIGHT_QUALITY_UPDATE')
-	self:RegisterMessage('ITEM_HIGHLIGHT_QUEST_UPDATE')
 	self:RegisterMessage('LOCK_FRAME_POSITIONS_UPDATE')
-	self:RegisterMessage('ITEM_SLOT_COLOR_ENABLED_UPDATE')
 	self:RegisterMessage('ENABLE_FRAME_UPDATE')
 	self:RegisterMessage('BLIZZARD_BAG_PASSTHROUGH_UPDATE')
-end
-
-function GeneralOptions:ITEM_HIGHLIGHT_QUALITY_UPDATE(msg, enable)
-	self:GetHighlightItemsByQualityCheckbox():UpdateChecked()
-end
-
-function GeneralOptions:ITEM_HIGHLIGHT_QUEST_UPDATE(msg, enable)
-	self:GetHighlightQuestItemsCheckbox():UpdateChecked()
 end
 
 function GeneralOptions:SHOW_EMPTY_ITEM_SLOT_TEXTURE_UPDATE(msg, enable)
@@ -74,10 +63,6 @@ end
 
 function GeneralOptions:LOCK_FRAME_POSITIONS_UPDATE(msg, enable)
 	self:GetLockFramePositionsCheckbox():UpdateChecked()
-end
-
-function GeneralOptions:ITEM_SLOT_COLOR_ENABLED_UPDATE(msg, enable)
-	self:GetColorItemSlotsCheckbox():UpdateChecked()
 end
 
 function GeneralOptions:ENABLE_FRAME_UPDATE(msg, frameID, enable)
@@ -110,17 +95,8 @@ function GeneralOptions:AddWidgets()
 	local showEmptyItemSlotTextures = self:CreateEmptyItemSlotTextureCheckbox()
 	showEmptyItemSlotTextures:SetPoint('TOPLEFT', lockFramePositions, 'BOTTOMLEFT', 0, -SPACING)
 	
-	local colorItemSlots = self:CreateColorItemSlotsCheckbox()
-	colorItemSlots:SetPoint('TOPLEFT', showEmptyItemSlotTextures, 'BOTTOMLEFT', 0, -SPACING)
-
-	local highlightItemsByQuality = self:CreateHighlightItemsByQualityCheckbox()
-	highlightItemsByQuality:SetPoint('TOPLEFT', colorItemSlots, 'BOTTOMLEFT', 0, -SPACING)
-
-	local highightQuestItems = self:CreateHighlightQuestItemsCheckbox()
-	highightQuestItems:SetPoint('TOPLEFT', highlightItemsByQuality, 'BOTTOMLEFT', 0, -SPACING)
-	
 	local enableBlizzardBagPassThrough = self:CreateBlizzardBagPassThroughCheckbox()
-	enableBlizzardBagPassThrough:SetPoint('TOPLEFT', highightQuestItems, 'BOTTOMLEFT', 0, -SPACING)
+	enableBlizzardBagPassThrough:SetPoint('TOPLEFT', showEmptyItemSlotTextures, 'BOTTOMLEFT', 0, -SPACING)
 end
 
 function GeneralOptions:UpdateWidgets()
@@ -199,48 +175,6 @@ function GeneralOptions:GetEmptyItemSlotTextureCheckbox()
 end
 
 
---highlight items by quality
-function GeneralOptions:CreateHighlightItemsByQualityCheckbox()
-	local button = Bagnon.OptionsCheckButton:New(L.HighlightItemsByQuality, self)
-
-	button.OnEnableSetting = function(self, enable)
-		Bagnon.Settings:SetHighlightItemsByQuality(enable)
-	end
-
-	button.IsSettingEnabled = function(self)
-		return Bagnon.Settings:HighlightingItemsByQuality()
-	end
-
-	self.highlightItemsByQualityCheckbox = button
-	return button
-end
-
-function GeneralOptions:GetHighlightItemsByQualityCheckbox()
-	return self.highlightItemsByQualityCheckbox
-end
-
-
---highlight quest items
-function GeneralOptions:CreateHighlightQuestItemsCheckbox()
-	local button = Bagnon.OptionsCheckButton:New(L.HighlightQuestItems, self)
-
-	button.OnEnableSetting = function(self, enable)
-		Bagnon.Settings:SetHighlightQuestItems(enable)
-	end
-
-	button.IsSettingEnabled = function(self)
-		return Bagnon.Settings:HighlightingQuestItems()
-	end
-
-	self.highlightQuestItemsCheckbox = button
-	return button
-end
-
-function GeneralOptions:GetHighlightQuestItemsCheckbox()
-	return self.highlightQuestItemsCheckbox
-end
-
-
 --lock frame positions
 function GeneralOptions:CreateLockFramePositionsCheckbox()
 	local button = Bagnon.OptionsCheckButton:New(L.LockFramePositions, self)
@@ -259,27 +193,6 @@ end
 
 function GeneralOptions:GetLockFramePositionsCheckbox()
 	return self.lockFramePositionsCheckbox
-end
-
-
---color item slots
-function GeneralOptions:CreateColorItemSlotsCheckbox()
-	local button = Bagnon.OptionsCheckButton:New(L.ColorItemSlotsByBagType, self)
-
-	button.OnEnableSetting = function(self, enable)
-		Bagnon.Settings:SetColorBagSlots(enable)
-	end
-
-	button.IsSettingEnabled = function(self)
-		return Bagnon.Settings:ColoringBagSlots()
-	end
-
-	self.colorItemSlotsCheckbox = button
-	return button
-end
-
-function GeneralOptions:GetColorItemSlotsCheckbox()
-	return self.colorItemSlotsCheckbox
 end
 
 

@@ -2,4 +2,5 @@
 	<Script file="panels\general.lua"/>
 	<Script file="panels\frameOptions.lua"/>
 	<Script file="panels\displayOptions.lua"/>
+	<Script file="panels\colorOptions.lua"/>
 </Ui>
