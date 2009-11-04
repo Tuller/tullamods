@@ -55,7 +55,7 @@ function GeneralOptions:UpdateMessages()
 	self:RegisterMessage('ITEM_HIGHLIGHT_QUALITY_UPDATE')
 	self:RegisterMessage('ITEM_HIGHLIGHT_QUEST_UPDATE')
 	self:RegisterMessage('LOCK_FRAME_POSITIONS_UPDATE')
-	self:RegisterMessage('ITEM_SLOT_COLOR_UPDATE')
+	self:RegisterMessage('ITEM_SLOT_COLOR_ENABLED_UPDATE')
 	self:RegisterMessage('ENABLE_FRAME_UPDATE')
 	self:RegisterMessage('BLIZZARD_BAG_PASSTHROUGH_UPDATE')
 end
@@ -76,7 +76,7 @@ function GeneralOptions:LOCK_FRAME_POSITIONS_UPDATE(msg, enable)
 	self:GetLockFramePositionsCheckbox():UpdateChecked()
 end
 
-function GeneralOptions:ITEM_SLOT_COLOR_UPDATE(msg, enable)
+function GeneralOptions:ITEM_SLOT_COLOR_ENABLED_UPDATE(msg, enable)
 	self:GetColorItemSlotsCheckbox():UpdateChecked()
 end
 
