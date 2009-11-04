@@ -156,11 +156,19 @@ function ItemSlot:ITEM_HIGHLIGHT_QUEST_UPDATE(msg, enable)
 	self:UpdateBorder()
 end
 
+function ItemSlot:ITEM_HIGHLIGHT_OPACITY_UPDATE(msg, opacity)
+	self:UpdateBorder()
+end
+
 function ItemSlot:SHOW_EMPTY_ITEM_SLOT_TEXTURE_UPDATE(msg, enable)
 	self:Update()
 end
 
-function ItemSlot:ITEM_SLOT_COLOR_UPDATE(msg, enable)
+function ItemSlot:ITEM_SLOT_COLOR_ENABLED_UPDATE(msg, type, r, g, b)
+	self:Update()
+end
+
+function ItemSlot:ITEM_SLOT_COLOR_UPDATE(msg, type, r, g, b)
 	self:Update()
 end
 
@@ -492,7 +500,7 @@ function ItemSlot:HighlightingQuestItems()
 end
 
 function ItemSlot:GetHighlightAlpha()
-	return 0.5
+	return Bagnon.Settings:GetHighlightOpacity()
 end
 
 local QUEST_ITEM_SEARCH = string.format('t:%s|%s', select(12, GetAuctionItemClasses()), 'quest')
@@ -513,7 +521,7 @@ function ItemSlot:IsAmmoBagSlot()
 end
 
 function ItemSlot:GetAmmoSlotColor()
-	return 0.7, 0.7, 1
+	return Bagnon.Settings:GetItemSlotColor('ammo')
 end
 
 function ItemSlot:IsTradeBagSlot()
@@ -521,7 +529,7 @@ function ItemSlot:IsTradeBagSlot()
 end
 
 function ItemSlot:GetTradeSlotColor()	
-	return 0.5, 1, 0.5
+	return Bagnon.Settings:GetItemSlotColor('trade')
 end
 
 function ItemSlot:IsShardBagSlot()
@@ -529,7 +537,7 @@ function ItemSlot:IsShardBagSlot()
 end
 
 function ItemSlot:GetShardSlotColor()
-	return 0.9, 0.7, 1
+	return Bagnon.Settings:GetItemSlotColor('shard')
 end
 
 function ItemSlot:IsKeyRingSlot()
@@ -537,7 +545,7 @@ function ItemSlot:IsKeyRingSlot()
 end
 
 function ItemSlot:GetKeyringSlotColor()
-	return 1, 0.8, 0
+	return Bagnon.Settings:GetItemSlotColor('keyring')
 end
 
 function ItemSlot:ColoringBagSlots()

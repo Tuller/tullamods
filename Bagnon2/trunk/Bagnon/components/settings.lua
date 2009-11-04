@@ -55,6 +55,19 @@ function Settings:HighlightingQuestItems()
 	return self:GetDB().highlightQuestItems
 end
 
+--highlight opacity
+function Settings:SetHighlightOpacity(value)
+	local value = math.max(math.min(value, 1), 0)
+	if self:GetHighlightOpacity() ~= value then
+		self:GetDB().highlightOpacity = value
+		self:SendMessage('ITEM_HIGHLIGHT_OPACITY_UPDATE', value)
+	end
+end
+
+function Settings:GetHighlightOpacity()
+	return self:GetDB().highlightOpacity
+end
+
 
 --show empty item slots
 function Settings:SetShowEmptyItemSlotTexture(enable)
@@ -86,12 +99,30 @@ end
 function Settings:SetColorBagSlots(enable)
 	if self:ColoringBagSlots() ~= enable then
 		self:GetDB().colorBagSlots = enable
-		self:SendMessage('ITEM_SLOT_COLOR_UPDATE', enable)
+		self:SendMessage('ITEM_SLOT_COLOR_ENABLED_UPDATE', enable)
 	end
 end
 
 function Settings:ColoringBagSlots()
 	return self:GetDB().colorBagSlots
+end
+
+function Settings:SetItemSlotColor(type, r, g, b)
+	local oR, oG, oB = self:GetItemSlotColor(type)
+	if not(oR == r and oG == g and oB == b) then
+		local slotColor = self:GetDB().slotColors[type]
+
+		slotColor[1] = r
+		slotColor[2] = g
+		slotColor[3] = b
+
+		self:SendMessage('ITEM_SLOT_COLOR_UPDATE', type, self:GetItemSlotColor(type))
+	end
+end
+
+function Settings:GetItemSlotColor(type)
+	local slotColor = self:GetDB().slotColors[type]
+	return unpack(slotColor)
 end
 
 --enable frames

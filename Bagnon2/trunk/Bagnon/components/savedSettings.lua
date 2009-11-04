@@ -68,12 +68,15 @@ function SavedSettings:GetDefaultSettings()
 		showEmptyItemSlotTexture = true,
 		lockFramePositions = false,
 		colorBagSlots = true,
+		
 		enableBlizzardBagPassThrough = false,
+		
 		enabledFrames = {
 			inventory = true,
 			bank = true,
 			keys = true,
 		},
+		
 		autoDisplayEvents = {
 			inventory = {
 				ah = false,
@@ -85,7 +88,16 @@ function SavedSettings:GetDefaultSettings()
 				craft = false,
 				player = false
 			},
-		}
+		},
+		
+		slotColors = {
+			ammo = {0.7, 0.7, 1},
+			trade = {0.5, 1, 0.5},
+			shard = {0.9, 0.7, 1},
+			keyring = {1, 0.8, 0},
+		},
+		
+		highlightOpacity = 0.5,
 	}
 	
 	return self.defaults
