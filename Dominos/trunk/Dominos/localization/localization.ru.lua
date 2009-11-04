@@ -49,8 +49,8 @@ L.PrintVersionDesc = 'Сообщает текущую версию'
 
 --dragFrame tooltips
 L.ShowConfig = '<ПКМ> для конфигурирования'
-L.HideBar = '<СКМ or Shift-ПКМ> для скрытия'
-L.ShowBar = '<СКП or Shift-ПКМ> для показа'
+L.HideBar = '<СКМ или Shift-ПКМ> для скрытия'
+L.ShowBar = '<СКП или Shift-ПКМ> для показа'
 L.SetAlpha = '<КолесоМыши> для установки прозрачности (|cffffffff%d|r)'
 
 --minimap button stuff
