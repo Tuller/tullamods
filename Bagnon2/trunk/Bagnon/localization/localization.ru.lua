@@ -47,7 +47,7 @@ L.TipShowMenu = '<Правый-клик> - настройки.'
 L.TipShowSearch = '<Клик> - показать область поиска.'
 L.TipShowSearch = '<Клик> - поиск.'
 L.TipShowFrameConfig = '<Правый-клик> - настройки.'
-L.TipDoubleClickSearch = '<Двойной-клик> - показать область поиска.'
+L.TipDoubleClickSearch = '<Alt-тищить> - переместить.\n<Правый-клик> - настройка.\n<Двойной-клик> - поиск.'
 L.Total = 'Всего'
 
 --databroker plugin tooltips
