@@ -1,21 +1,26 @@
 #summary Stuff I want to do
 #labels Featured
 
-Bagnon:
+[Bagnon]:
   * Do something with saved searches/bookmarks
-  * Write up wiki
+  * Add in guild bank support
+  * If I don't continue Combuctor, then add in a Blizzard layout style.
 
-Bagnon_Forever:
-  * Probably should store player race/sex info for Bagnon
+[Bagnon_Forever]:
+  * Add command line searching using LibItemSearch
 
 Combuctor:
-  * Implement better set API
+  * Rewrite, like I did for Bagnon.
+  * Implement OO based set API, add in wrapper for LibItemSearch
   * Add in event-> tab event system (ex, show bank frame, normal tab when showing the bank, keyring when I click the keyring, trade bags...)
   * Add in a few configuration options (scale, etc)
 
 [Dominos]:
+  * Write a totem bar that more closely resembles the 
+  * Clean up the auto fading and show state interfaces.
   * Revise wiki, add FAQ
-  * Make a possess bar.  By a possess bar, I mean a bar that hijacks either the pet or action bar buttons (including stealing hotkeys while its up) when controlling a vehicle/possessing a dude.
+  * Make a dedicated possess bar.
+  * Make a dedicated vehicle bar.
   * Make Dominos have a saner layout when switching between 1-120 bars.  This includes adding a slider for numbars/numbuttons
   * Clean up the auto fading and showstate interfaces.
 
@@ -23,20 +28,14 @@ Combuctor:
   * Clean up GUI code
 
 [OmniCC]:
-  * Fix bugs
+  * Rewrite
 
 Sage:
   * Separate frame folders (core, party, target_target, focus_target, party_targets)
   * Write wiki on completion of the thing
   * Add "always show these buffs" and "always show these debuffs" lists
 
-SellFish:
-  * Obsolete with the release of WoW 3.2.0 
-
-Tipachu:
-  * Fix if it breaks
-
 -----
-Crazy Town - These are ideas I have that may either be entirely new things, impossible, or some combination of both:
-  * Build a unit frame designer & runner pair of addons.  Suck at making unitframes? Just download ones someone else has used the designer to make.
-  * Create an action bar addon based on a modal layout system.  Instead of telling Dominos: "switch to this bar when in form x" you instead specify a state ([form1]), then draw your bars, and attach spells.  Basically, in this system, you have a completely different UI based on what state you're in.  Blizzard implemented such a system with the vehicle and non vehicle UIs.
+Experiments/Random Ideas I Have:
+* Dominos + Perspectives: I want a system where I get to have multiple layouts based on what macro state I'm in.  Basically I only want to show a vehicle bar when in a vehicle, a possess bar when possessing something, and have key bindings setup for each form.
+* An infinite macro button addon:  I want to write an addon where I can draw as many macro bars as I want using the system I developed for Bongos3.  The scope of this addon should be heavily limited (ie, I expect you to use this addon with the stock interface, or with another actionbar addon).  Should also use the perspective system I intend on developing, for best effect.
