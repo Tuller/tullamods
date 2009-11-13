@@ -1,0 +1,22 @@
+#summary How to file bug reports/feature requests/etc
+
+For submitting bug reports and feature requests, I prefer you all to use [http://code.google.com/p/tullamods/issues/list Google code issue tracker].  If you absolutely refuse to use Google Code, I do read the issues on both !WoWInterface and !CurseForge.
+
+=== How To Submit a Bug Report ===
+
+The following information is absolutely necessary when submitting a bug report:
+ * Addon name
+ * Addon version
+ * What other addons you were running at the time.
+
+Its also really helpful for you to do the following, too:
+ * If you're not running the latest version of the addon for your game version, then grab the new version and try to reproduce the error.
+ * Try to reproduce the error with all other addons disabled.  This is necessary to determine if the issue is due to a conflict with another addon or not.
+ * Provide a step by step walkthrough on how to reproduce the error.
+
+=== How to Submit a Feature Request ===
+
+
+=== How To Submit a Patch ===
+
+The best way to have your feature request implemented is to write it yourself :)
