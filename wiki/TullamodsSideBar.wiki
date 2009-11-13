@@ -1,4 +1,4 @@
-  * Active Addons
+  * Active Projects
     * [Bagnon]
       * [Bagnon#Frequently_Asked_Questions FAQ]
     * [Bagnon_Forever]
@@ -10,10 +10,11 @@
     * [Ludwig]
     * [OmniCC]
     * [Sage]
-  * Discontinued Addons
+  * Discontinued Projects
     * Bongos
     * [Bongos2]
     * Bongos3
     * [SellFish]
   * [Roadmap Things I May Do]
+  * [SubmittingFeedback Contributing]
   * [Donations]
