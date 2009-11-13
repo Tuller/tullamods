@@ -1,6 +1,6 @@
 #summary How to file bug reports/feature requests/etc
 
-For submitting bug reports and feature requests, I prefer you all to use [http://code.google.com/p/tullamods/issues/list Google code issue tracker].  If you absolutely refuse to use Google Code, I do read the issues on both !WoWInterface and !CurseForge.
+For submitting bug reports and feature requests, I prefer you all to use [http://code.google.com/p/tullamods/issues/list Google code issue tracker].  If you absolutely refuse to use Google Code, I do read the issues on both WoWInterface and !CurseForge.
 
 === How To Submit a Bug Report ===
 
