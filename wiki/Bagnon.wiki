@@ -49,3 +49,7 @@ Currently, no.  I'm potentially working on it.
 === Can you track items in my mailbox? ===
 
 Bagnon_Forever does not track mailbox items, and I have no plans on implementing support.  If you want that kind of information, you should probably check out an addon that stores more information about your characters, like the [http://www.wowinterface.com/downloads/info7952-Armory.html Armory], or [http://www.wowinterface.com/downloads/info8533-Altoholic.html Altoholic].
+
+=== Can you add in sorting? ===
+
+I don't plan on implementing sorting in Bagnon, however, Bagnon works perfectly fine with things like [http://www.wowinterface.com/downloads/info7761-BankStack.html BankStack].
