@@ -451,6 +451,10 @@ function Frame:Layout()
 	local w, h = self:PlaceSearchFrame()
 
 	--place the middle frames
+	local w, h = self:PlaceSavedSearchBar()
+	width = math.max(w, width)
+	height = height + h
+
 	local w, h = self:PlaceBagFrame()
 	width = math.max(w, width)
 	height = height + h
@@ -726,7 +730,9 @@ function Frame:PlaceItemFrame()
 	local frame = self:GetItemFrame() or self:CreateItemFrame()
 	frame:ClearAllPoints()
 
-	if self:HasBagFrame() and self:IsBagFrameShown() then
+	if self:HasSavedSearchBar() then
+		frame:SetPoint('TOPLEFT', self:GetSavedSearchBar(), 'BOTTOMLEFT', 0, -4)
+	elseif self:HasBagFrame() and self:IsBagFrameShown() then
 		frame:SetPoint('TOPLEFT', self:GetBagFrame(), 'BOTTOMLEFT', 0, -4)
 	else
 		local menuButtons = self:GetMenuButtons()
@@ -865,6 +871,48 @@ end
 function Frame:HasOptionsToggle()
 	local name, title, notes, enabled = GetAddOnInfo('Bagnon_Config')
 	return enabled and self:GetSettings():HasOptionsToggle()
+end
+
+
+--[[ saved search frame ]]--
+
+function Frame:GetSavedSearchBar()
+	return self.savedSearchBar
+end
+
+function Frame:CreateSavedSearchBar()
+	local f = Bagnon.SavedSearchBar:New(self)
+	self.savedSearchBar = f
+	return f
+end
+
+function Frame:PlaceSavedSearchBar()
+	if self:HasSavedSearchBar() then
+		local f = self:GetSavedSearchBar() or self:CreateSavedSearchBar()
+		f:ClearAllPoints()
+		
+		if self:HasBagFrame() and self:IsBagFrameShown() then
+			f:SetPoint('TOPLEFT', self:GetBagFrame(), 'BOTTOMLEFT', 0, -4)
+		else
+			local menuButtons = self:GetMenuButtons()
+			if #menuButtons > 0 then
+				f:SetPoint('TOPLEFT', menuButtons[1], 'BOTTOMLEFT', 0, -4)
+			else
+				f:SetPoint('TOPLEFT', self:GetTitleFrame(), 'BOTTOMLEFT', 0, -4)
+			end
+		end
+		return f:GetWidth(), f:GetHeight()
+	end
+	
+	local f = self:GetSavedSearchBar()
+	if f then
+		f:Hide()
+	end
+	return 0, 0
+end
+
+function Frame:HasSavedSearchBar()
+	return self:GetFrameID() == 'inventory'
 end
 
 

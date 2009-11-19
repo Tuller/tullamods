@@ -16,4 +16,6 @@
 	<Script file="components\settings.lua"/>
 	<Script file="components\titleFrame.lua"/>
     <Script file="components\savedFrameSettings.lua"/>
+	<Script file="components\savedSearchButton.lua"/>
+	<Script file="components\savedSearchBar.lua"/>
 </Ui>

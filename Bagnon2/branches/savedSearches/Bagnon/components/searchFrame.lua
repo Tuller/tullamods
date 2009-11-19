@@ -30,7 +30,7 @@ function SearchFrame:New(frameID, parent)
 	f:Hide()
 
 	f:SetFrameStrata('DIALOG')
-	f:SetTextInsets(8, 8, 0, 0)
+	f:SetTextInsets(8, 32, 0, 0)
 	f:SetFontObject('ChatFontNormal')
 
 	f:SetBackdrop(f.backdrop)
@@ -46,8 +46,16 @@ function SearchFrame:New(frameID, parent)
 	f:SetFrameID(frameID)
 	f:UpdateEvents()
 	f:SetAutoFocus(false)
---	f:UpdateShown()
---	f:UpdateText()
+	
+	local b = CreateFrame('Button', nil, f)
+	b:SetWidth(16)
+	b:SetHeight(16)
+	b:SetPoint('RIGHT', f, 'RIGHT', -8, 0)
+	
+	local t = b:CreateTexture()
+	t:SetAllPoints(b)
+	t:SetTexture([[Interface\TargetingFrame\UI-RaidTargetingIcon_1]])
+	b:SetToplevel(true)
 
 	return f
 end
@@ -107,11 +115,10 @@ function SearchFrame:UpdateEvents()
 
 	self:RegisterMessage('TEXT_SEARCH_ENABLE')
 	self:RegisterMessage('TEXT_SEARCH_DISABLE')
---[[	
+
 	if self:IsVisible() then
 		self:RegisterMessage('TEXT_SEARCH_UPDATE')
 	end
---]]
 end
 
 function SearchFrame:UpdateShown()

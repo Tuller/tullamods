@@ -97,6 +97,7 @@ function SavedFrameSettings:GetGlobalDB()
 		else
 			SavedFrameSettings.db = {
 				frames = {},
+				searches = {},
 				version = self:GetAddOnVersion()
 			}
 			_G['BagnonFrameSettings'] = SavedFrameSettings.db
