@@ -362,6 +362,7 @@ function ActionBar:AddButton(i)
 		b:SetParent(self.header)
 		b:LoadAction()
 		self:UpdateAction(i)
+		self:UpdateGrid()
 	end
 end
 
