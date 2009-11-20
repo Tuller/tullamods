@@ -1,0 +1,5 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="components\item.lua"/>
+	<Script file="components\itemFrame.lua"/>
+	<Script file="components\frame.lua"/>
+</Ui>
