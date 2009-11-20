@@ -147,6 +147,7 @@ end
 
 function FrameOptions:OnShow()
 	self:UpdateMessages()
+	self:UpdateWidgets()
 end
 
 function FrameOptions:OnHide()
@@ -243,13 +244,18 @@ function FrameOptions:UpdateWidgets()
 	self:GetLayerSlider():UpdateValue()
 
 	self:GetToggleBagFrameCheckbox():UpdateChecked()
-	self:GetToggleBagFrameCheckbox():SetDisabled(self:GetFrameID() == 'keys')
+	self:GetToggleBagFrameCheckbox():SetDisabled(self:GetFrameID() == 'keys' or self:GetFrameID() == 'guildbank')
 
 	self:GetToggleMoneyFrameCheckbox():UpdateChecked()
 	self:GetToggleDBOFrameCheckbox():UpdateChecked()
 	self:GetToggleSearchFrameCheckbox():UpdateChecked()
 	self:GetToggleOptionsCheckbox():UpdateChecked()
+	
 	self:GetReverseSlotOrderCheckbox():UpdateChecked()
+	self:GetReverseSlotOrderCheckbox():SetDisabled(self:GetFrameID() == 'guildbank')
+	
+	self:GetBagBreakCheckbox():UpdateChecked()
+	self:GetBagBreakCheckbox():SetDisabled(self:GetFrameID() == 'keys' or self:GetFrameID() == 'guildbank')
 end
 
 
@@ -264,6 +270,10 @@ function FrameOptions:CreateFrameSelector()
 		self:AddItem(L.Inventory, 'inventory')
 		self:AddItem(L.Bank, 'bank')
 		self:AddItem(L.KeyRing, 'keys')
+		
+		if IsAddOnLoaded('Bagnon_GuildBank') then
+			self:AddItem(L.GuildBank, 'guildbank')
+		end
 	end
 
 	dropdown.SetSavedValue = function(self, value)
