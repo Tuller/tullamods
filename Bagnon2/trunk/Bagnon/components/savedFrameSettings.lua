@@ -391,6 +391,8 @@ function SavedFrameSettings:GetDefaultSettings(frameID)
 		return self:GetDefaultKeyRingSettings()
 	elseif frameID == 'bank' then
 		return self:GetDefaultBankSettings()
+	elseif frameID == 'guildbank' then
+		return self:GetDefaultGuildBankSettings()
 	end
 
 	return self:GetDefaultInventorySettings()
@@ -534,4 +536,8 @@ function SavedFrameSettings:GetDefaultKeyRingSettings()
 	}
 	SavedFrameSettings.keyDefaults = defaults
 	return defaults
+end
+
+function SavedFrameSettings:GetDefaultGuildBankSettings()
+	return GetDefaultInventorySettings()
 end
