@@ -2,4 +2,5 @@
 	<Script file="components\item.lua"/>
 	<Script file="components\itemFrame.lua"/>
 	<Script file="components\frame.lua"/>
+	<Script file="components\savedFrameSettings.lua"/>
 </Ui>

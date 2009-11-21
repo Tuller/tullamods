@@ -1,6 +1,6 @@
 --[[
-	ItemFrame.lua
-		An item slot container
+	itemFrame.lua
+		An guild bank item slot container
 --]]
 
 local Bagnon = LibStub('AceAddon-3.0'):GetAddon('Bagnon')
@@ -30,9 +30,9 @@ function ItemFrame:New(frameID, parent)
 	f.itemSlots = {}
 	f.throttledUpdater = CreateFrame('Frame', nil, f)
 	f.throttledUpdater:SetScript('OnUpdate', throttledUpdater_OnUpdate)
-	
+
 	f:SetFrameID(frameID)
-	
+
 	f:SetScript('OnSizeChanged', f.OnSizeChanged)
 	f:SetScript('OnEvent', f.OnEvent)
 	f:SetScript('OnShow', f.OnShow)
@@ -101,7 +101,7 @@ end
 function ItemFrame:UpdateEvents()
 	self:UnregisterAllMessages()
 
-	if self:IsVisible() then			
+	if self:IsVisible() then
 		self:RegisterMessage('GUILD_BANK_TAB_UPDATE')
 
 		self:RegisterMessage('ITEM_FRAME_SPACING_UPDATE')
@@ -140,7 +140,7 @@ function ItemFrame:GetItemSlot(slot)
 end
 
 function ItemFrame:GetAllItemSlots()
-	return pairs(self.itemSlots)
+	return ipairs(self.itemSlots)
 end
 
 
@@ -150,7 +150,7 @@ end
 --if slots have been added or removed, then request a layout update
 function ItemFrame:ReloadAllItemSlots()
 	local changed = false
-	
+
 	local currentTab = self:GetCurrentTab()
 	for slot = 1, self:GetCurrentTabSize() do
 		local itemSlot = self:GetItemSlot(slot)
@@ -161,7 +161,7 @@ function ItemFrame:ReloadAllItemSlots()
 			itemSlot:SetSlot(currentTab, slot)
 		end
 	end
-	
+
 	if changed then
 		self:RequestLayout()
 	end
@@ -171,21 +171,29 @@ end
 --[[ Layout Methods ]]--
 
 --arranges itemSlots on the ItemFrame, and adjusts size to fit
+--it should be noted that the guild bank is wacky in that items go down a column
 function ItemFrame:Layout()
 	self.needsLayout = nil
 
-	local numRows = math.ceil(self:GetCurrentTabSize() / self:NumColumns())
+	local numItems = self:GetCurrentTabSize()
+	local numColumns = math.min(self:NumColumns(), numItems)
+	local numRows = math.floor(numItems / numColumns + 0.5)
 	local spacing = self:GetSpacing()
 	local effItemSize = self.ITEM_SIZE + spacing
 
+	local row, col = 0, 1
 	for i, itemSlot in self:GetAllItemSlots() do
-		local row = (i - 1) % numRows
-		local col = math.ceil(i / numRows) - 1
+		row = row + 1
+		if row > numRows then
+			row = 1
+			col = col + 1
+		end
+		
 		itemSlot:ClearAllPoints()
-		itemSlot:SetPoint('TOPLEFT', self, 'TOPLEFT', effItemSize * col, -effItemSize * row)
+		itemSlot:SetPoint('TOPLEFT', self, 'TOPLEFT', effItemSize * (col - 1), -effItemSize * (row - 1))
 	end
 
-	local width = effItemSize * math.min(self:NumColumns(), self:GetCurrentTabSize()) - spacing
+	local width = effItemSize * col - spacing
 	local height = effItemSize * numRows - spacing
 	self:SetWidth(width)
 	self:SetHeight(height)
@@ -233,10 +241,9 @@ end
 
 --guild bank info
 function ItemFrame:GetCurrentTab()
-	return GetCurrentGuildBankTab() or 1
+	return GetCurrentGuildBankTab() or 0
 end
 
-local NUM_ITEMS_PER_TAB = 98
 function ItemFrame:GetCurrentTabSize()
-	return NUM_ITEMS_PER_TAB
+	return 98
 end
