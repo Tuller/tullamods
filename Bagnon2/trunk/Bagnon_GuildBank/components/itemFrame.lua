@@ -44,10 +44,20 @@ end
 
 --[[ Messages ]]--
 
-function ItemFrame:GUILD_BANK_TAB_UPDATE(msg, frameID, tab)
-	if self:GetFrameID() == frameID then
-		self:ReloadAllItemSlots()
+function ItemFrame:OnEvent(event, ...)
+	local action = self[event]
+	if action then
+		action(self, event, ...)
 	end
+end
+
+function ItemFrame:GUILDBANKBAGSLOTS_CHANGED(event, ...)
+	print(event, ...)
+	self:ReloadAllItemSlots()
+end
+
+function ItemFrame:GUILDBANK_UPDATE_TABS(event, ...)
+	print(event, ...)
 end
 
 function ItemFrame:ITEM_FRAME_SPACING_UPDATE(msg, frameID, spacing)
@@ -99,11 +109,13 @@ function ItemFrame:UpdateEverything()
 end
 
 function ItemFrame:UpdateEvents()
+	self:UnregisterAllEvents()
 	self:UnregisterAllMessages()
 
 	if self:IsVisible() then
-		self:RegisterMessage('GUILD_BANK_TAB_UPDATE')
-
+		self:RegisterEvent('GUILDBANKBAGSLOTS_CHANGED')
+		self:RegisterEvent('GUILDBANK_UPDATE_TABS')
+		
 		self:RegisterMessage('ITEM_FRAME_SPACING_UPDATE')
 		self:RegisterMessage('ITEM_FRAME_COLUMNS_UPDATE')
 

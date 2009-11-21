@@ -6,7 +6,7 @@
 local Bagnon = LibStub('AceAddon-3.0'):GetAddon('Bagnon')
 local L = LibStub('AceLocale-3.0'):GetLocale('Bagnon')
 local BagFrame = Bagnon.Classy:New('Frame')
-Bagnon.BagFrame = BagFrame
+Bagnon.GuildBagFrame = BagFrame
 
 
 --[[ Constructor ]]--
@@ -28,8 +28,8 @@ end
 function BagFrame:CreateBagSlots()
 	local bags = {}
 
-	for i, slotID in self:GetBagSlots() do
-		bags[i] = Bagnon.Bag:New(slotID, self:GetFrameID(), self)
+	for i, tab in self:GetBagSlots() do
+		bags[i] = Bagnon.GuildBag:New(tab, self:GetFrameID(), self)
 	end
 
 	self.bags = bags

@@ -6,7 +6,7 @@
 local Bagnon = LibStub('AceAddon-3.0'):GetAddon('Bagnon')
 local L = LibStub('AceLocale-3.0'):GetLocale('Bagnon')
 local Bag = Bagnon.Classy:New('CheckButton')
-Bagnon.Bag = Bag
+Bagnon.GuildBag = Bag
 
 --constants
 local SIZE = 32
@@ -15,8 +15,8 @@ local NORMAL_TEXTURE_SIZE = 64 * (SIZE/36)
 
 --[[ Constructor ]]--
 
-function Bag:New(slotID, frameID, parent)
-	local bag = Bag:CreateBag(slotID, parent)
+function Bag:New(tab, frameID, parent)
+	local bag = self:CreateBag(tab, parent)
 	bag:SetFrameID(frameID)
 
 	bag:SetScript('OnEnter', bag.OnEnter)
@@ -31,8 +31,8 @@ function Bag:New(slotID, frameID, parent)
 	return bag
 end
 
-function Bag:CreateBag(slotID, parent)
-	local bag = self:Bind(CreateFrame('CheckButton', 'BagnonBag' .. self:GetNextBagSlotID(), parent))
+function Bag:CreateBag(tab, parent)
+	local bag = self:Bind(CreateFrame('CheckButton', 'BagnonGuildBag' .. self:GetNextBagSlotID(), parent))
 	bag:SetWidth(SIZE)
 	bag:SetHeight(SIZE)
 	bag:SetID(slotID)

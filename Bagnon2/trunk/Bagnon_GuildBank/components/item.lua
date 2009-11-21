@@ -107,9 +107,6 @@ end
 
 --[[ Events ]]--
 
-function ItemSlot:GUILDBANKBAGSLOTS_CHANGED(event, tab, slot)
-	self:Update()
-end
 
 function ItemSlot:GUILDBANK_ITEM_LOCK_CHANGED(event, tab, slot)
 	self:UpdateLocked()
@@ -187,7 +184,6 @@ end
 
 function ItemSlot:OnShow()
 	self:Update()
-	self:RegisterEvent('GUILDBANKBAGSLOTS_CHANGED')
 	self:RegisterEvent('GUILDBANK_ITEM_LOCK_CHANGED')
 end
 

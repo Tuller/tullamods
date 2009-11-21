@@ -43,9 +43,9 @@
 	
 	tab:
 		SetCurrentGuildBankTab	Selects a tab in the guild bank
-		SetGuildBankTabInfo	Sets the name and icon for a guild bank tab
-		SetGuildBankTabPermissions	Changes guild bank tab permissions for the guild rank being edited
-		SetGuildBankText	Sets the info text for a guild bank tab
+		GetGuildBankTabInfo	Sets the name and icon for a guild bank tab
+		GetGuildBankTabPermissions	Changes guild bank tab permissions for the guild rank being edited
+		GetGuildBankText	Sets the info text for a guild bank tab
 		
 		BuyGuildBankTab	Purchases the next available guild bank tab
 		GetCurrentGuildBankTab	Returns the currently selected guild bank tab
