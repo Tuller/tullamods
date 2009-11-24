@@ -95,10 +95,25 @@ end
 
 function GuildTab:UpdateEvents()
 	--register necessary events
+	self:RegisterMessage('GUILD_BANK_TAB_CHANGE')
+	self:RegisterEvent('GUILDBANK_UPDATE_TABS')
+	self:RegisterEvent('GUILDBANKBAGSLOTS_CHANGED')
 end
 
 
 --[[ Messages ]]--
+
+function GuildTab:GUILDBANK_UPDATE_TABS()
+	self:Update()
+end
+
+function GuildTab:GUILD_BANK_TAB_CHANGE(msg, tabID)
+	self:SetChecked(self:GetID() == tabID)
+end
+
+function GuildTab:GUILDBANKBAGSLOTS_CHANGED()
+	self:UpdateCount()
+end
 
 
 --[[ Frame Events ]]--
@@ -112,7 +127,9 @@ function GuildTab:OnHide()
 end
 
 function GuildTab:OnClick()
-	--on click
+	SetCurrentGuildBankTab(self:GetID())
+	QueryGuildBankTab(self:GetID())
+	self:SendMessage('GUILD_BANK_TAB_CHANGE', self:GetID())
 end
 
 function GuildTab:OnDrag()
@@ -139,12 +156,71 @@ end
 --[[ Actions ]]--
 
 function GuildTab:UpdateEverything()
+	self:UpdateEvents()
+	self:Update()
+end
+
+function GuildTab:Update()
+	local name, icon, isViewable, canDeposit, numWithdrawals, remainingWithdrawals = GetGuildBankTabInfo(self:GetID())
+	
+	SetItemButtonTexture(self, icon or [[Interface\PaperDoll\UI-PaperDoll-Slot-Bag]])
+	self:SetCount(remainingWithdrawals)
+
+	--color red if the bag can be purchased
+	if not isViewable then
+		SetItemButtonTextureVertexColor(self, 1, 0.1, 0.1)
+	else
+		SetItemButtonTextureVertexColor(self, 1, 1, 1)
+	end
+end
+
+function GuildTab:UpdateCount()
+	local name, icon, isViewable, canDeposit, numWithdrawals, remainingWithdrawals = GetGuildBankTabInfo(self:GetID())
+	self:SetCount(remainingWithdrawals)
+end
+
+function GuildTab:SetCount(count)
+	local text = _G[self:GetName() .. 'Count']
+	local count = count or 0
+
+	if count > 1 then
+		if count > 999 then
+			text:SetFormattedText('%.1fk', count/1000)
+		else
+			text:SetText(count)
+		end
+		text:Show()
+	else
+		text:Hide()
+	end
 end
 
 
 --[[ Tooltip Methods ]]--
 
 function GuildTab:UpdateTooltip()
+	local name, icon, isViewable, canDeposit, numWithdrawals, remainingWithdrawals = GetGuildBankTabInfo(self:GetID())
+
+	if name then
+		GameTooltip:SetText(name)
+		
+		local access
+		if not canDeposit and numWithdrawals == 0 then
+			access = RED_FONT_COLOR_CODE .. "(" .. GUILDBANK_TAB_LOCKED .. ")" .. FONT_COLOR_CODE_CLOSE;
+		elseif not canDeposit then
+			access = RED_FONT_COLOR_CODE .."(" .. GUILDBANK_TAB_WITHDRAW_ONLY .. ")" .. FONT_COLOR_CODE_CLOSE;
+		elseif numWithdrawals == 0 then
+			access = RED_FONT_COLOR_CODE .."(" .. GUILDBANK_TAB_DEPOSIT_ONLY .. ")" .. FONT_COLOR_CODE_CLOSE;
+		else
+			access = GREEN_FONT_COLOR_CODE .. "(" .. GUILDBANK_TAB_FULL_ACCESS .. ")" .. FONT_COLOR_CODE_CLOSE;
+		end
+		
+		GameTooltip:AddLine(access)
+	else
+		GameTooltip:SetText('Unavailable Tab')
+	end
+	
+	GameTooltip:Show()
 end
 
 

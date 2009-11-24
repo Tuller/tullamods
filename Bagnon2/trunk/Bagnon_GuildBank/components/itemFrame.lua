@@ -52,12 +52,7 @@ function ItemFrame:OnEvent(event, ...)
 end
 
 function ItemFrame:GUILDBANKBAGSLOTS_CHANGED(event, ...)
-	print(event, ...)
 	self:ReloadAllItemSlots()
-end
-
-function ItemFrame:GUILDBANK_UPDATE_TABS(event, ...)
-	print(event, ...)
 end
 
 function ItemFrame:ITEM_FRAME_SPACING_UPDATE(msg, frameID, spacing)
@@ -114,7 +109,6 @@ function ItemFrame:UpdateEvents()
 
 	if self:IsVisible() then
 		self:RegisterEvent('GUILDBANKBAGSLOTS_CHANGED')
-		self:RegisterEvent('GUILDBANK_UPDATE_TABS')
 		
 		self:RegisterMessage('ITEM_FRAME_SPACING_UPDATE')
 		self:RegisterMessage('ITEM_FRAME_COLUMNS_UPDATE')
