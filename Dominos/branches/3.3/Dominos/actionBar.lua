@@ -39,7 +39,6 @@ local min = math.min
 local format = string.format
 local MAX_BUTTONS = 120
 local NUM_POSSESS_BAR_BUTTONS = 12
-local NUM_VEHICLE_BAR_BUTTONS = 12
 local KeyBound = LibStub('LibKeyBound-1.0')
 local LBF = LibStub('LibButtonFacade', true)
 
@@ -210,8 +209,7 @@ end
 local ActionBar = Dominos:CreateClass('Frame', Dominos.Frame)
 Dominos.ActionBar = ActionBar
 
-local VEHICLE_CONDITIONAL = '[vehicleui]'
-local POSSESSED_CONDITIONAL = '[bonusbar:5,novehicleui]'
+local POSSESSED_CONDITIONAL = '[bonusbar:5]'
 
 
 --[[ Constructor Code ]]--
@@ -273,7 +271,6 @@ ActionBar.conditions = {
 	'[mod:alt]',
 	'[mod:ctrl]',
 	'[mod:shift]',
-	VEHICLE_CONDITIONAL,
 	POSSESSED_CONDITIONAL,
 	'[bar:2]',
 	'[bar:3]',
@@ -395,11 +392,7 @@ function ActionBar:UpdateStateDriver()
 		if condition == POSSESSED_CONDITIONAL then
 			if self:IsPossessBar() then
 				header = header .. condition .. 'possess;'
-			end
-		elseif condition == VEHICLE_CONDITIONAL then
-			if self:IsVehicleBar() then
-				header = header .. condition .. 'vehicle;'
-			end		
+			end	
 		elseif self:GetPage(condition) then
 			header = header .. condition .. 'S' .. state .. ';'
 		end
@@ -434,12 +427,6 @@ function ActionBar:UpdateAction(i)
 	else
 		b:SetAttribute('action--possess', nil)
 	end
-	
-	if self:IsVehicleBar() and i <= NUM_VEHICLE_BAR_BUTTONS then
-		b:SetAttribute('action--vehicle', MAX_BUTTONS + i)
-	else
-		b:SetAttribute('action--vehicle', nil)
-	end
 end
 
 --updates the actionID of all buttons for all states
@@ -468,19 +455,6 @@ function ActionBar:UpdateActions()
 			b:SetAttribute('action--possess', nil)
 		end
 	end
-	
-	if self:IsVehicleBar() then
-		for i = 1, min(#self.buttons, NUM_VEHICLE_BAR_BUTTONS) do
-			self.buttons[i]:SetAttribute('action--vehicle', MAX_BUTTONS + i)
-		end
-		for i = NUM_VEHICLE_BAR_BUTTONS + 1, #self.buttons do
-			self.buttons[i]:SetAttribute('action--vehicle', nil)
-		end
-	else
-		for _,b in pairs(self.buttons) do
-			b:SetAttribute('action--vehicle', nil)
-		end
-	end
 end
 
 function ActionBar:LoadStateController()
@@ -499,10 +473,6 @@ end
 --returns true if the possess bar, false otherwise
 function ActionBar:IsPossessBar()
 	return self == Dominos:GetPossessBar()
-end
-
-function ActionBar:IsVehicleBar()
-	return self == Dominos:GetVehicleBar()
 end
 
 
