@@ -4,14 +4,13 @@
 --]]
 
 local Bagnon = LibStub('AceAddon-3.0'):GetAddon('Bagnon')
-local L = LibStub('AceLocale-3.0'):GetLocale('Bagnon')
-local BagFrame = Bagnon.Classy:New('Frame')
-Bagnon.GuildBagFrame = BagFrame
+local TabFrame = Bagnon.Classy:New('Frame')
+Bagnon.GuildTabFrame = TabFrame
 
 
 --[[ Constructor ]]--
 
-function BagFrame:New(frameID, parent)
+function TabFrame:New(frameID, parent)
 	local f = self:Bind(CreateFrame('Frame', nil, parent))
 	f:Hide()
 
@@ -25,11 +24,11 @@ function BagFrame:New(frameID, parent)
 	return f
 end
 
-function BagFrame:CreateBagSlots()
+function TabFrame:CreateBagSlots()
 	local bags = {}
 
-	for i, tab in self:GetBagSlots() do
-		bags[i] = Bagnon.GuildBag:New(tab, self:GetFrameID(), self)
+	for tab = 1, MAX_GUILDBANK_TABS do
+		table.insert(bags, Bagnon.GuildTab:New(tab, self:GetFrameID(), self))
 	end
 
 	self.bags = bags
@@ -38,13 +37,13 @@ end
 
 --[[ Messages ]]--
 
-function BagFrame:BAG_FRAME_SHOW(msg, frameID)
+function TabFrame:BAG_FRAME_SHOW(msg, frameID)
 	if frameID == self:GetFrameID() then
 		self:UpdateShown()
 	end
 end
 
-function BagFrame:BAG_FRAME_HIDE(msg, frameID)
+function TabFrame:BAG_FRAME_HIDE(msg, frameID)
 	if frameID == self:GetFrameID() then
 		self:UpdateShown()
 	end
@@ -53,19 +52,19 @@ end
 
 --[[ Frame Events ]]--
 
-function BagFrame:OnShow()
+function TabFrame:OnShow()
 	self:Layout()
 	self:SendMessage('BAG_FRAME_UPDATE_SHOWN', self:GetFrameID())
 end
 
-function BagFrame:OnHide()
+function TabFrame:OnHide()
 	self:SendMessage('BAG_FRAME_UPDATE_SHOWN', self:GetFrameID())
 end
 
 
 --[[ Update Methods ]]--
 
-function BagFrame:UpdateShown()
+function TabFrame:UpdateShown()
 	if self:IsBagFrameShown() then
 		if not self:IsShown() then
 			UIFrameFadeIn(self, 0.1)
@@ -75,14 +74,14 @@ function BagFrame:UpdateShown()
 	end
 end
 
-function BagFrame:UpdateEvents()
+function TabFrame:UpdateEvents()
 	self:UnregisterAllMessages()
 
 	self:RegisterMessage('BAG_FRAME_SHOW')
 	self:RegisterMessage('BAG_FRAME_HIDE')
 end
 
-function BagFrame:Layout()
+function TabFrame:Layout()
 	if not self:IsVisible() then return end
 
 	local width = 0
@@ -111,40 +110,36 @@ end
 
 --[[ Properties ]]--
 
-function BagFrame:SetFrameID(frameID)
+function TabFrame:SetFrameID(frameID)
 	if self:GetFrameID() ~= frameID then
 		self.frameID = frameID
 		self:UpdateShown()
 	end
 end
 
-function BagFrame:GetFrameID()
+function TabFrame:GetFrameID()
 	return self.frameID
 end
 
-function BagFrame:GetBags()
+function TabFrame:GetBags()
 	return ipairs(self.bags)
 end
 
 
 --[[ Frame Settings ]]--
 
-function BagFrame:GetSettings()
+function TabFrame:GetSettings()
 	return Bagnon.FrameSettings:Get(self:GetFrameID())
 end
 
-function BagFrame:IsBagFrameShown()
+function TabFrame:IsBagFrameShown()
 	return self:GetSettings():IsBagFrameShown()
 end
 
-function BagFrame:GetSpacing()
+function TabFrame:GetSpacing()
 	return 4
 end
 
-function BagFrame:GetPadding()
+function TabFrame:GetPadding()
 	return 0
-end
-
-function BagFrame:GetBagSlots()
-	return self:GetSettings():GetBagSlots()
 end

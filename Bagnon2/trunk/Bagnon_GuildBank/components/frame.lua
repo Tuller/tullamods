@@ -46,3 +46,9 @@ function Frame:CreateItemFrame()
 	self.itemFrame = f
 	return f
 end
+
+function Frame:CreateBagFrame()
+	local f = Bagnon.GuildTabFrame:New(self:GetFrameID(), self)
+	self.bagFrame = f
+	return f
+end

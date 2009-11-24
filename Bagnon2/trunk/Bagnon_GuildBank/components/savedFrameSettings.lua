@@ -24,7 +24,7 @@ function SavedFrameSettings:GetDefaultGuildBankSettings()
 
 		--optional components
 		hasMoneyFrame = false,
-		hasBagFrame = false,
+		hasBagFrame = true,
 		hasDBOFrame = true,
 		hasSearchToggle = true,
 		hasOptionsToggle = true,
