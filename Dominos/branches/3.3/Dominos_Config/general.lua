@@ -231,30 +231,6 @@ do
 		end
 		return dd
 	end
-	
-	local function AddVehicleBarSelector(self)
-		local dd = self:NewDropdown(L.VehicleBar)
-
-		dd:SetScript('OnShow', function(self)
-			UIDropDownMenu_SetWidth(self, 110)
-			UIDropDownMenu_Initialize(self, self.Initialize)
-			UIDropDownMenu_SetSelectedValue(self, Dominos:GetVehicleBar().id)
-		end)
-
-		local function Item_OnClick(self)
-			Dominos:SetVehicleBar(self.value)
-			UIDropDownMenu_SetSelectedValue(dd, self.value)
-		end
-
-		function dd:Initialize()
-			local selected = Dominos:GetVehicleBar().id
-
-			for i = 1, Dominos:NumBars() do
-				AddItem('Action Bar ' .. i, i, Item_OnClick, i == selected)
-			end
-		end
-		return dd
-	end
 
 	local quickMove = AddClickActionSelector(Options, L.QuickMoveKey, 'PICKUPACTION')
 	quickMove:SetPoint('TOPRIGHT', -10, -120)
@@ -264,7 +240,4 @@ do
 
 	local possess = AddPossessBarSelector(Options)
 	possess:SetPoint('TOP', rightClickUnit, 'BOTTOM', 0, -16)
-	
-	local vehicle = AddVehicleBarSelector(Options)
-	vehicle:SetPoint('TOP', possess, 'BOTTOM', 0, -16)
 end
