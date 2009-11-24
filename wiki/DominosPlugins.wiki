@@ -27,4 +27,4 @@ My own addon, [http://www.wowinterface.com/downloads/info4836-OmniCC.html OmniCC
 
 ==== Bindings ====
  
-[http://www.wowinterface.com/downloads/info15078-SnowfallKeyPress.html SnowFall KeyPress] allows you to execute actions when you press a key, instead of on release. 
+[http://www.wowinterface.com/downloads/info15078-SnowfallKeyPress.html SnowFall KeyPress] and [http://www.wowinterface.com/downloads/info15212-SpeedyActions.html Speedy Actions] allow you to execute actions when you press a key, instead of on release. 
