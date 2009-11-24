@@ -244,7 +244,7 @@ function FrameOptions:UpdateWidgets()
 	self:GetLayerSlider():UpdateValue()
 
 	self:GetToggleBagFrameCheckbox():UpdateChecked()
-	self:GetToggleBagFrameCheckbox():SetDisabled(self:GetFrameID() == 'keys' or self:GetFrameID() == 'guildbank')
+	self:GetToggleBagFrameCheckbox():SetDisabled(self:GetFrameID() == 'keys')
 
 	self:GetToggleMoneyFrameCheckbox():UpdateChecked()
 	self:GetToggleDBOFrameCheckbox():UpdateChecked()
