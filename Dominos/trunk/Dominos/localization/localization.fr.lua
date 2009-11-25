@@ -4,7 +4,7 @@
 
 	French
 --]]
--- French version (by Kubik) 2008-11-04
+-- French version (by Kubik of Vol'Jin) 2000-10-23
 -- à = \195\160
 -- â = \195\162
 -- ç = \195\167
@@ -75,3 +75,9 @@ L.ShowOptionsTip = '<Clic droit> afficher le menu d\'options'
 L.ConfigMode = 'Mode Configuration'
 L.ConfigModeExit = 'Sortir du Mode Config.'
 L.ConfigModeHelp = '<Clic-drag> d\195\169place la barre.  <Clic droit> configurer.  <Clic milieu> ou <Shift-Clic droit> visible/invisible'
+
+--bar tooltips
+L.TipRollBar = 'Affiche le cadre des objets tir\195\169s au sort, lorsqu\'on est en groupe.'
+L.TipVehicleBar = [[
+Affiche les contr\195\180les de vis\195\169e et de sortie du v\195\169hicule.
+Toutes les autres actions sont sur la barre de contr\195\180le du v\195\169hicule.]]

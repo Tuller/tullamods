@@ -209,6 +209,8 @@ end
 local ActionBar = Dominos:CreateClass('Frame', Dominos.Frame)
 Dominos.ActionBar = ActionBar
 
+local POSSESSED_CONDITIONAL = '[bonusbar:5]'
+
 
 --[[ Constructor Code ]]--
 
@@ -269,13 +271,13 @@ ActionBar.conditions = {
 	'[mod:alt]',
 	'[mod:ctrl]',
 	'[mod:shift]',
-	'[bonusbar:5]',
+	POSSESSED_CONDITIONAL,
 	'[bar:2]',
 	'[bar:3]',
 	'[bar:4]',
 	'[bar:5]',
 	'[bar:6]',
-	'[bonusbar:1,stealth]',
+	'[bonusbar:1,stealth]', --prowl
 	'[form:2]',
 	'[form:3]',
 	'[bonusbar:1]',
@@ -357,6 +359,7 @@ function ActionBar:AddButton(i)
 		b:SetParent(self.header)
 		b:LoadAction()
 		self:UpdateAction(i)
+		self:UpdateGrid()
 	end
 end
 
@@ -386,10 +389,10 @@ function ActionBar:UpdateStateDriver()
 	local header = ''
 	for state,condition in ipairs(self.conditions) do
 		--possess bar: special case
-		if condition == '[bonusbar:5]' then
+		if condition == POSSESSED_CONDITIONAL then
 			if self:IsPossessBar() then
 				header = header .. condition .. 'possess;'
-			end
+			end	
 		elseif self:GetPage(condition) then
 			header = header .. condition .. 'S' .. state .. ';'
 		end

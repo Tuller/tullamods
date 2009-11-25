@@ -40,11 +40,12 @@ local active = {}
 local unused = {}
 
 --constructor
-function Frame:New(id)
+function Frame:New(id, tooltipText)
 	local id = tonumber(id) or id
 	local f = self:Restore(id) or self:Create(id)
 	f:LoadSettings()
 	f.buttons = {}
+	f:SetTooltipText(tooltipText)
 
 	active[id] = f
 	return f
@@ -580,6 +581,16 @@ function Frame:ShowMenu()
 			menu:Show()
 		end
 	end
+end
+
+--[[ Tooltip Text ]]--
+
+function Frame:SetTooltipText(text)
+	self.tooltipText = text
+end
+
+function Frame:GetTooltipText()
+	return self.tooltipText
 end
 
 

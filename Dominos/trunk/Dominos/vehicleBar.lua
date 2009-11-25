@@ -38,11 +38,12 @@
 local VehicleBar = Dominos:CreateClass('Frame', Dominos.Frame)
 Dominos.VehicleBar  = VehicleBar
 
+local L = LibStub('AceLocale-3.0'):GetLocale('Dominos')
 local buttons = {VehicleMenuBarLeaveButton, VehicleMenuBarPitchUpButton, VehicleMenuBarPitchDownButton}
 
 function VehicleBar:New()
-	local f = self.super.New(self, 'vehicle')
-	f:SetShowStates('[target=vehicle,exists]')
+	local f = self.super.New(self, 'vehicle', L.TipVehicleBar)
+	f:UpdateStateDriver()
 	f:SkinButtons()
 	f:LoadButtons()
 	f:Layout()
@@ -52,6 +53,7 @@ function VehicleBar:New()
 
 	return f
 end
+
 
 function VehicleBar:OnEvent(event, arg1)
 	if event == 'UNIT_ENTERED_VEHICLE' then
@@ -170,4 +172,14 @@ function VehicleBar:RemoveButton(i)
 	b:Hide()
 
 	self.buttons[i] = nil
+end
+
+if GetBuildInfo() == '30200' then
+	function VehicleBar:UpdateStateDriver()
+		self:SetShowStates('[target=vehicle,exists]')
+	end
+else
+	function VehicleBar:UpdateStateDriver()
+		self:SetShowStates('[@vehicle,exists]')
+	end
 end

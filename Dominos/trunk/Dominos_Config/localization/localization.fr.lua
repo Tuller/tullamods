@@ -4,7 +4,7 @@
 
 	French
 --]]
--- French version (by Kubik) 2008-11-04
+-- French version (by Kubik of Vol'Jin) 2009-10-23
 -- à = \195\160
 -- â = \195\162
 -- ç = \195\167
@@ -44,7 +44,7 @@ L.RCUPlayer = 'Soi'
 L.RCUFocus = 'Focus'
 L.RCUToT = 'Cible de la cible'
 L.EnterName = 'Entrer Nom'
-L.PossessBar = 'Barre quand poss\195\169d\195\169'
+L.PossessBar = 'Barre de contr\195\180le'
 L.Profiles = 'Profils'
 L.ProfilesPanelDesc = 'Gestion des affichages Dominos enregistr\195\169s'
 L.SelfcastKey = 'Touche auto-ciblage'

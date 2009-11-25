@@ -78,6 +78,11 @@ end
 function Drag:OnEnter()
 	GameTooltip:SetOwner(self, 'ANCHOR_BOTTOMLEFT')
 	GameTooltip:SetText(format('Bar: %s', self:GetText():gsub('^%l', string.upper)), 1, 1, 1)
+	
+	local tooltipText = self.owner:GetTooltipText()
+	if tooltipText then
+		GameTooltip:AddLine(tooltipText .. '\n', nil, nil, nil, nil, 1)
+	end
 
 	if self.owner.ShowMenu then
 		GameTooltip:AddLine(L.ShowConfig)
