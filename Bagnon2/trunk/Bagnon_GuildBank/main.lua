@@ -83,6 +83,7 @@ end
 
 function GuildBank:GUILDBANKFRAME_OPENED()
 	Bagnon.FrameSettings:Get('guildbank'):Show()
+	QueryGuildBankTab(GetCurrentGuildBankTab())
 end
 
 function GuildBank:GUILDBANKFRAME_CLOSED()

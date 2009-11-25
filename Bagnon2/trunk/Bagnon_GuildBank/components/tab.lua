@@ -94,10 +94,14 @@ function GuildTab:OnEvent(event, ...)
 end
 
 function GuildTab:UpdateEvents()
-	--register necessary events
-	self:RegisterMessage('GUILD_BANK_TAB_CHANGE')
-	self:RegisterEvent('GUILDBANK_UPDATE_TABS')
-	self:RegisterEvent('GUILDBANKBAGSLOTS_CHANGED')
+	self:UnregisterAllEvents()
+	self:UnregisterAllMessages()
+
+	if self:IsVisible() then
+		self:RegisterMessage('GUILD_BANK_TAB_CHANGE')
+		self:RegisterEvent('GUILDBANK_UPDATE_TABS')
+		self:RegisterEvent('GUILDBANKBAGSLOTS_CHANGED')
+	end
 end
 
 
@@ -108,11 +112,13 @@ function GuildTab:GUILDBANK_UPDATE_TABS()
 end
 
 function GuildTab:GUILD_BANK_TAB_CHANGE(msg, tabID)
-	self:SetChecked(self:GetID() == tabID)
+	self:UpdateChecked()
 end
 
 function GuildTab:GUILDBANKBAGSLOTS_CHANGED()
-	self:UpdateCount()
+	if GetCurrentGuildBankTab() == self:GetID() then
+		self:UpdateCount()
+	end
 end
 
 
@@ -158,11 +164,13 @@ end
 function GuildTab:UpdateEverything()
 	self:UpdateEvents()
 	self:Update()
+	self:UpdateChecked()
 end
 
 function GuildTab:Update()
-	local name, icon, isViewable, canDeposit, numWithdrawals, remainingWithdrawals = GetGuildBankTabInfo(self:GetID())
+	QueryGuildBankTab(self:GetID())
 	
+	local name, icon, isViewable, canDeposit, numWithdrawals, remainingWithdrawals = GetGuildBankTabInfo(self:GetID())
 	SetItemButtonTexture(self, icon or [[Interface\PaperDoll\UI-PaperDoll-Slot-Bag]])
 	self:SetCount(remainingWithdrawals)
 
@@ -195,6 +203,10 @@ function GuildTab:SetCount(count)
 	end
 end
 
+function GuildTab:UpdateChecked()
+	self:SetChecked(self:GetID() == GetCurrentGuildBankTab())
+end
+
 
 --[[ Tooltip Methods ]]--
 
@@ -203,7 +215,7 @@ function GuildTab:UpdateTooltip()
 
 	if name then
 		GameTooltip:SetText(name)
-		
+
 		local access
 		if not canDeposit and numWithdrawals == 0 then
 			access = RED_FONT_COLOR_CODE .. "(" .. GUILDBANK_TAB_LOCKED .. ")" .. FONT_COLOR_CODE_CLOSE;
@@ -214,12 +226,12 @@ function GuildTab:UpdateTooltip()
 		else
 			access = GREEN_FONT_COLOR_CODE .. "(" .. GUILDBANK_TAB_FULL_ACCESS .. ")" .. FONT_COLOR_CODE_CLOSE;
 		end
-		
+
 		GameTooltip:AddLine(access)
 	else
-		GameTooltip:SetText('Unavailable Tab')
+		GameTooltip:SetText('Unavailable')
 	end
-	
+
 	GameTooltip:Show()
 end
 

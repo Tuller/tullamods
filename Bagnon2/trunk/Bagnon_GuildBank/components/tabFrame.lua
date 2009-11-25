@@ -27,8 +27,8 @@ end
 function TabFrame:CreateBagSlots()
 	local bags = {}
 
-	for tab = 1, MAX_GUILDBANK_TABS do
-		table.insert(bags, Bagnon.GuildTab:New(tab, self:GetFrameID(), self))
+	for id = 1, MAX_GUILDBANK_TABS do
+		table.insert(bags, Bagnon.GuildTab:New(id, self:GetFrameID(), self))
 	end
 
 	self.bags = bags
