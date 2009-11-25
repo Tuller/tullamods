@@ -117,8 +117,14 @@ function PetBar:New()
 	return f
 end
 
-function PetBar:UpdateStateDriver()
-	self:SetShowStates('[@pet,exists,nobonusbar:5]')
+if GetBuildInfo() == '30200' then
+	function PetBar:UpdateStateDriver()
+		self:SetShowStates('[target=pet,exists,nobonusbar:5]')
+	end
+else
+	function PetBar:UpdateStateDriver()
+		self:SetShowStates('[@pet,exists,nobonusbar:5]')
+	end
 end
 
 function PetBar:GetDefaults()
