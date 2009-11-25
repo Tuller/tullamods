@@ -3,6 +3,7 @@
 		Translations for Dominos
 	by ZealZany
 	Russian
+	Updated: StingerSoft
 --]]
 
 local L = LibStub('AceLocale-3.0'):NewLocale('Dominos-Config', 'ruRU')
@@ -51,3 +52,6 @@ L.OneBag = 'Одна сумка'
 L.ShowKeyring = 'Связка ключей'
 L.StickyBars = 'Липкие панели'
 L.ShowMinimapButton = 'Показать иконку на миникарте'
+L.Advanced = 'Дополнительно'
+L.LeftToRight = 'Расположение кнопок с лева на права'
+L.TopToBottom = 'Расположение кнопок с верху в низ'
