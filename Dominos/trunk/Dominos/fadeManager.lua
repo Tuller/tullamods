@@ -100,7 +100,7 @@ do
 	end
 
 	--this code determins if the mouse is over either the frame itself, or any child frames
-if GetBuildInfo() == '30200' then
+if select(4, GetBuildInfo()) == 30200 then
 	function FadeWatcher:IsFocus(f)
 		if MouseIsOver(f, 1, -1, -1, 1) then
 			return GetMouseFocus() == _G['WorldFrame'] or self:IsChildFocus(f:GetChildren())

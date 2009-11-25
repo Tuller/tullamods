@@ -117,7 +117,7 @@ function PetBar:New()
 	return f
 end
 
-if GetBuildInfo() == '30200' then
+if select(4, GetBuildInfo()) == 30200 then
 	function PetBar:UpdateStateDriver()
 		self:SetShowStates('[target=pet,exists,nobonusbar:5]')
 	end

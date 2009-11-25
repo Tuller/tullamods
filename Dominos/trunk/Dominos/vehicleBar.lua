@@ -174,7 +174,7 @@ function VehicleBar:RemoveButton(i)
 	self.buttons[i] = nil
 end
 
-if GetBuildInfo() == '30200' then
+if select(4, GetBuildInfo()) == 30200 then
 	function VehicleBar:UpdateStateDriver()
 		self:SetShowStates('[target=vehicle,exists]')
 	end
