@@ -9,14 +9,16 @@
 		<negatable search> 	:=	!<primitive search> ; <primitive search>
 		<primitive search>	:=	<tooltip search> ; <quality search> ; <type search> ; <text search>
 		<tooltip search>	:=  bop ; boa ; bou ; boe ; quest
-		<quality search>	:=	q:<text> ; q:<digit>
+		<quality search>	:=	q<op><text> ; q<op><digit>
+		<ilvl search>		:=	ilvl<op><number>
 		<type search>		:=	t:<text>
 		<text search>		:=	<text>
+		<op>				:=  : | = | == | != | ~= | < | > | <= | >=
 
 	I kindof half want to make a full parser for this
 --]]
 
-local MAJOR, MINOR = "LibItemSearch-1.0", 0
+local MAJOR, MINOR = "LibItemSearch-1.0", 1
 local ItemSearch = LibStub:NewLibrary(MAJOR, MINOR)
 if not ItemSearch then return end
 
@@ -123,9 +125,9 @@ function ItemSearch:FindTypedSearch(itemLink, search)
 	end
 
 	for id, searchInfo in self:GetTypedSearches() do
-		local capture = searchInfo:isSearch(search)
-		if capture then
-			return searchInfo:findItem(itemLink, capture)
+		local capture1, capture2, capture3 = searchInfo:isSearch(search)
+		if capture1 then
+			return searchInfo:findItem(itemLink, capture1, capture2, capture3)
 		end
 	end
 
@@ -136,6 +138,29 @@ end
 --[[
 	Basic typed searches
 --]]
+
+function ItemSearch:Compare(op, lhs, rhs)
+	--ugly, but it works
+	if op == ':' or op == '=' or op == '==' then
+		return lhs == rhs
+	end
+	if op == '!=' or op == '~=' then
+		return lhs ~= rhs
+	end
+	if op == '<=' then
+		return lhs <= rhs
+	end
+	if op == '<' then
+		return lhs < rhs
+	end
+	if op == '>' then
+		return lhs > rhs
+	end
+	if op == '>=' then
+		return lhs >= rhs
+	end
+	return false
+end
 
 
 --[[ basic text search n:(.+) ]]--
@@ -184,33 +209,62 @@ ItemSearch:RegisterTypedSearch{
 }
 
 
---[[ item quality search: q:(.+) ]]--
+--[[ item quality search: q(sign)(%d+) | q:(qualityName) ]]--
 
 ItemSearch:RegisterTypedSearch{
 	id = 'itemQuality',
 
 	isSearch = function(self, search)
-		return search and search:match('^q:(.+)$')
+		if search then
+			return search:match('^q([%~%:%<%>%=%!]+)(%w+)$')
+		end
 	end,
 
-	findItem = function(self, itemLink, search)
+	descToQuality = function(self, desc)
+		local q = 0
+
+		local quality = _G['ITEM_QUALITY' .. q .. '_DESC']
+		while quality and quality:lower() ~= desc do
+			q = q + 1
+			quality = _G['ITEM_QUALITY' .. q .. '_DESC']
+		end
+
+		if quality then
+			return q
+		end
+	end,
+
+	findItem = function(self, itemLink, op, search)
 		local name, link, quality = GetItemInfo(itemLink)
 		if not name then
 			return false
 		end
 
-		local qSearchNum = tonumber(search)
-		if qSearchNum then
-			return qSearchNum == quality
+		local num = tonumber(search) or self:descToQuality(search)
+		return num and ItemSearch:Compare(op, quality, num) or false
+	end,
+}
+
+--[[ item level search: lvl(sign)(%d+) ]]--
+
+ItemSearch:RegisterTypedSearch{
+	id = 'itemLevel',
+
+	isSearch = function(self, search)
+		if search then
+			return search:match('^ilvl([:<>=!]+)(%d+)$')
+		end
+	end,
+
+	findItem = function(self, itemLink, op, search)
+		local name, link, quality, iLvl = GetItemInfo(itemLink)
+		if not iLvl then
+			return false
 		end
 
-		local qualityDesc = _G['ITEM_QUALITY' .. quality .. '_DESC']
-		if qualityDesc then
-			return search == qualityDesc:lower()
-		end
-
-		return false
-	end
+		local num = tonumber(search)
+		return num and ItemSearch:Compare(op, iLvl, num) or false
+	end,
 }
 
 
