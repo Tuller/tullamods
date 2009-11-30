@@ -5,7 +5,7 @@
 ## SavedVariables: BagnonGlobalSettings
 ## SavedVariablesPerCharacter: BagnonFrameSettings
 ## Version: 2.12.0
-## OptionalDeps: Ace3, Bagnon_Forever, Bagnon_Armory
+## OptionalDeps: Ace3, Bagnon_Forever, Bagnon_Armory, LibItemSearch
 embeds.xml
 localization.xml
 main.lua
