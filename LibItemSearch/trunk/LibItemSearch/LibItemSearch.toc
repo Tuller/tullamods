@@ -3,4 +3,4 @@
 ## Notes: An item search library
 ## Author: Tuller
 LibStub.lua
-LibItemSearch\LibItemSearch-1.0
+LibItemSearch-1.0\LibItemSearch-1.0
