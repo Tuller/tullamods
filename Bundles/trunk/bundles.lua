@@ -17,12 +17,17 @@ local format = string.format
 --]]
 
 local function slotToIndex(bag, slot, link)
-	return format('%s,%s|%d', bag, slot, link)
+	return format('%d,%d|%s', bag, slot, link)
 end
 
 local function indexToSlot(index)
 	local bag, slot, link = index:match('^(%-?%d+)%,(%d+)%|(.+)')
 	return bag, slot, link
+end
+
+local function isSlotLocked(bag, slot)
+	local locked = select(3, GetContainerItemInfo(bag, slot))
+	return locked
 end
 
 
@@ -62,16 +67,15 @@ mover:SetScript('OnHide', function(self, elapsed)
 end)
 
 mover:SetScript('OnUpdate', function(self, elapsed)
-	if self.elapsed > 0 then
+	if (self.elapsed or 0) > 0 then
 		self.elapsed = self.elapsed - elapsed
 		return
 	end	
-	self.elapsed = 0.05
+	self.elapsed = 0.1
 
 	--if we're holding an item, then try and place it
 	if self.destBag and self.destSlot then
-		if CursorHasItem() then
-			print('put', self.destBag, self.destSlot)
+		if CursorHasItem() and not isSlotLocked(self.destBag, self.destSlot) then
 			PickupContainerItem(self.destBag, self.destSlot)
 			self.destBag = nil
 			self.destSlot = nil
@@ -89,12 +93,17 @@ mover:SetScript('OnUpdate', function(self, elapsed)
 	end
 	
 	--pickup the next item from the stack
-	local fromBag, fromSlot, fromLink = indexToSlot(tremove(items))
-	print('get', fromBag, fromSlot, fromLink)
+	local fromBag, fromSlot, fromLink = indexToSlot(items[#items])
+	if isSlotLocked(fromBag, fromSlot) then
+		return
+	end
+
+	tremove(items)
 	PickupContainerItem(fromBag, fromSlot)
 	
 	--determine where to put the item
 	local foundAHome = false
+	
 	
 	--if stackable
 	--try and place the item in the first unfilled stack we find for the item
