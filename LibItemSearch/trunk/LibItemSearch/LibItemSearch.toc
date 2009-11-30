@@ -1,0 +1,6 @@
+## Interface: 30200
+## Title: LibItemSearch
+## Notes: An item search library
+## Author: Tuller
+LibStub.lua
+LibItemSearch\LibItemSearch-1.0
