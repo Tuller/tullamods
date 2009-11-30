@@ -62,6 +62,12 @@ mover:SetScript('OnHide', function(self, elapsed)
 end)
 
 mover:SetScript('OnUpdate', function(self, elapsed)
+	if self.elapsed > 0 then
+		self.elapsed = self.elapsed - elapsed
+		return
+	end	
+	self.elapsed = 0.05
+
 	--if we're holding an item, then try and place it
 	if self.destBag and self.destSlot then
 		if CursorHasItem() then
