@@ -2,6 +2,6 @@
 ## Title: Bundles
 ## Notes: Command line item moving
 ## Author: Tuller
-LibStub.lua
-LibItemSearch-1.0.lua
+libs\LibStub\LibStub.lua
+libs\LibItemSearch-1.0\LibItemSearch-1.0.lua
 bundles.lua
