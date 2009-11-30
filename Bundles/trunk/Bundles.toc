@@ -1,0 +1,7 @@
+## Interface: 30200
+## Title: Bundles
+## Notes: Command line item moving
+## Author: Tuller
+LibStub.lua
+LibItemSearch-1.0.lua
+bundles.lua
