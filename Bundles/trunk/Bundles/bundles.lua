@@ -1,7 +1,7 @@
 --[[
 	bundles.lua
 		A thingy to mass move items from one inventory type to another
-		
+
 	I'm sure I've looked at both quicksort and bankstack for this
 --]]
 
@@ -17,12 +17,17 @@ local format = string.format
 --]]
 
 local function slotToIndex(bag, slot, link)
+	local link = link or ''
 	return format('%d,%d|%s', bag, slot, link)
 end
 
 local function indexToSlot(index)
-	local bag, slot, link = index:match('^(%-?%d+)%,(%d+)%|(.+)')
-	return bag, slot, link
+	if index then
+		local bag, slot, link = index:match('^(%-?%d+)%,(%d+)%|(.*)')
+		if link == '' then link = nil end
+		
+		return bag, slot, link
+	end
 end
 
 local function isSlotLocked(bag, slot)
@@ -35,124 +40,137 @@ end
 	item searching
 --]]
 
+local function pushItem(items, bag, slot, link)
+	tinsert(items, slotToIndex(bag, slot, link))
+end
+
+local function popItem(items)
+	return indexToSlot(tremove(items, 1))
+end
+
 local function getItemsInSearch(search, bags)
 	local items = {}
-	
+
 	for _, bag in ipairs(bags) do
 		for slot = 1, GetContainerNumSlots(bag) do
 			local link = GetContainerItemLink(bag, slot)
 			--i could implement basic caching for these searches at some point if speed becomes an issue
 			if link and LIS:Find(link, search) then
-				tinsert(items, slotToIndex(bag, slot, link))
+				pushItem(items, bag, slot, link)
 			end
-		end	
+		end
 	end
-	
-	return items	
+
+	return items
 end
 
+local function getItems(bags)
+	local items = {}
+
+	for _, bag in ipairs(bags) do
+		for slot = 1, GetContainerNumSlots(bag) do
+			pushItem(items, bag, slot, GetContainerItemLink(bag, slot))
+		end
+	end
+
+	return items
+end
 
 --[[
 	item movement functionality
 --]]
 
 local mover = CreateFrame('Frame')
+mover:Hide()
+mover.DELAY = 0.05
+mover.MAX_NO_MOVES = 50
+
+--remove lingering references on hide
+mover:SetScript('OnShow', function(self)
+	self.elapsed = -1
+	self.noMoveCount = 0
+end)
 
 mover:SetScript('OnHide', function(self, elapsed)
-	--remove lingering references on hide
-	self.destBag = nil
-	self.destSlot = nil
 	self.bags = nil
 	self.items = nil
+	collectgarbage()
 end)
 
 mover:SetScript('OnUpdate', function(self, elapsed)
-	if (self.elapsed or 0) > 0 then
+	if self.elapsed > 0 then
 		self.elapsed = self.elapsed - elapsed
 		return
-	end	
-	self.elapsed = 0.1
-
-	--if we're holding an item, then try and place it
-	if self.destBag and self.destSlot then
-		if CursorHasItem() and not isSlotLocked(self.destBag, self.destSlot) then
-			PickupContainerItem(self.destBag, self.destSlot)
-			self.destBag = nil
-			self.destSlot = nil
-		end
-		return
 	end
-	
-	local items = self.items
-	
-	--check to see if there are any remaining items to place
-	--if not, then quit
-	if not(items and #items > 0) then
+	self.elapsed = self.DELAY
+
+	--pickup the next item from the stack
+	local fromBag, fromSlot, fromLink = popItem(self.fromItems)
+	if not(fromBag and fromSlot) then
 		self:Hide()
 		return
 	end
-	
-	--pickup the next item from the stack
-	local fromBag, fromSlot, fromLink = indexToSlot(items[#items])
-	if isSlotLocked(fromBag, fromSlot) then
-		return
-	end
 
-	tremove(items)
-	PickupContainerItem(fromBag, fromSlot)
-	
-	--determine where to put the item
-	local foundAHome = false
-	
-	
-	--if stackable
-	--try and place the item in the first unfilled stack we find for the item
-	
 	--try and place the item in the first empty slot we find
-	for _, toBag in ipairs(self.bags) do
-		for toSlot = 1, GetContainerNumSlots(toBag) do
-			local toLink = GetContainerItemLink(toBag, toSlot)
-			if not toLink then
-				self.destBag = toBag
-				self.destSlot = toSlot
-				foundAHome = true
-				break
-			end
-		end
-		
-		if foundAHome then 
-			break
+	local itemPlaced = false
+	local toItems = self.toItems
+	local newItems = {}
+	
+	while next(toItems) do
+		local toBag, toSlot, toLink = popItem(toItems)
+
+		if not(itemPlaced or toLink or isSlotLocked(fromBag, fromSlot) or isSlotLocked(toBag, toSlot)) then
+			PickupContainerItem(fromBag, fromSlot)
+			PickupContainerItem(toBag, toSlot)
+			pushItem(newItems, toBag, toSlot, fromLink)
+			
+			itemPlaced = true
+		else
+			pushItem(newItems, toBag, toSlot, toLink)
 		end
 	end
+	self.toItems = newItems
 	
-	--we were unable to find a spot for the item
-	--so, stop trying to move things
-	if not foundAHome then
+	--we were not able to move the item, so 
+	if not itemPlaced then
+		pushItem(self.fromItems, fromBag, fromSlot, fromLink)
+		self.noMoveCount = self.noMoveCount + 1
+	end
+	
+	--infinite loop prevention
+	if self.noMoveCount > self.MAX_NO_MOVES then
 		self:Hide()
 	end
 end)
 
-local function moveItems(items, toBags)
-	mover.items = items
-	mover.bags = toBags
+local function moveItems(fromItems, toItems)
+	mover.fromItems = fromItems
+	mover.toItems = toItems
 	mover:Show()
 end
 
 
---[[ 
-	waffle town, usa 
+--[[
+	waffle town, usa
 --]]
 
 Bundles = {}
 
 local bagSets = {
-	KEYRING = {KEYRING_CONTAINER},
-	INVENTORY = {BACKPACK_CONTAINER, 1, 2, 3, 4},
-	BANK = {BANK_CONTAINER, 5, 6, 7, 8, 9, 10}
+	keyring = {KEYRING_CONTAINER},
+	inventory = {BACKPACK_CONTAINER, 1, 2, 3, 4},
+	bank = {BANK_CONTAINER, 5, 6, 7, 8, 9, 10}
 }
 
-function Bundles:GetBags(type)
-	return bagSets[type:upper()]
+--a few aliases
+bagSets.keys = bagSets.keyring
+bagSets.bags = bagSets.inventory
+
+
+function Bundles:GetBags(set)
+	if not set then return end
+
+	return bagSets[set:lower()]
 end
 
 function Bundles:Move(search, fromLoc, toLoc)
@@ -172,16 +190,45 @@ function Bundles:Move(search, fromLoc, toLoc)
 		self:Print(format("Invalid location '%s'", toLoc or 'nil'))
 		return
 	end
-	
-	local items = getItemsInSearch(search, fromBags)
-	if #items < 0 then
+
+	local fromItems = getItemsInSearch(search, fromBags)
+	if #fromItems < 0 then
 		self:Print(format('No items were found in %s for %s', search, fromLoc))
 		return
 	end
-	
-	moveItems(items, toBags)
+
+	moveItems(fromItems, getItems(toBags))
 end
 
 function Bundles:Print(...)
-	return print('Bundles', ...)
+	return print('|cff00ffffBundles|r:', ...)
+end
+
+
+--[[
+	slash commands
+--]]
+
+do
+	SlashCmdList['BundlesCOMMAND'] = function(msg)
+		if not msg then return end
+
+		local cmd, args = msg:match('^(%w+)%s(.+)$')
+		if not cmd then
+			Bundles:Print(format("Unknown command '%s'", msg))
+			return
+		end
+
+		cmd = cmd:lower()
+		if cmd == 'move' or cmd == 'mv' then
+			local search, from, to = args:match('^([%w%p%s]+)%s(%w+)%s(%w+)$')
+			if search and from and to then
+				Bundles:Move(search, from, to)
+			end
+		else
+			Bundles:Print(format("Unknown command '%s'", cmd))
+		end
+	end
+	SLASH_BundlesCOMMAND1 = '/bundle'
+	SLASH_BundlesCOMMAND2 = '/bnd'
 end
