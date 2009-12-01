@@ -25,7 +25,7 @@ local function indexToSlot(index)
 	if index then
 		local bag, slot, link = index:match('^(%-?%d+)%,(%d+)%|(.*)')
 		if link == '' then link = nil end
-		
+
 		return bag, slot, link
 	end
 end
@@ -115,7 +115,7 @@ mover:SetScript('OnUpdate', function(self, elapsed)
 	local itemPlaced = false
 	local toItems = self.toItems
 	local newItems = {}
-	
+
 	while next(toItems) do
 		local toBag, toSlot, toLink = popItem(toItems)
 
@@ -123,20 +123,20 @@ mover:SetScript('OnUpdate', function(self, elapsed)
 			PickupContainerItem(fromBag, fromSlot)
 			PickupContainerItem(toBag, toSlot)
 			pushItem(newItems, toBag, toSlot, fromLink)
-			
+
 			itemPlaced = true
 		else
 			pushItem(newItems, toBag, toSlot, toLink)
 		end
 	end
 	self.toItems = newItems
-	
-	--we were not able to move the item, so 
+
+	--we were not able to move the item, so
 	if not itemPlaced then
 		pushItem(self.fromItems, fromBag, fromSlot, fromLink)
 		self.noMoveCount = self.noMoveCount + 1
 	end
-	
+
 	--infinite loop prevention
 	if self.noMoveCount > self.MAX_NO_MOVES then
 		self:Hide()
@@ -151,12 +151,13 @@ end
 
 
 --[[
-	waffle town, usa
+	Bundles Core
 --]]
 
 Bundles = {}
 
 local bagSets = {
+	all = {KEYRING_CONTAINER, BACKPACK_CONTAINER, 1, 2, 3, 4, BANK_CONTAINER, 5, 6, 7, 8, 9, 10},
 	keyring = {KEYRING_CONTAINER},
 	inventory = {BACKPACK_CONTAINER, 1, 2, 3, 4},
 	bank = {BANK_CONTAINER, 5, 6, 7, 8, 9, 10}
@@ -167,10 +168,32 @@ bagSets.keys = bagSets.keyring
 bagSets.bags = bagSets.inventory
 
 
-function Bundles:GetBags(set)
+local function getBags(set)
 	if not set then return end
 
 	return bagSets[set:lower()]
+end
+
+function Bundles:Find(search, loc)
+	if not search then
+		self:Print('No search given')
+		return
+	end
+
+	local bags = getBags(loc)
+	if not bags then
+		self:Print(format("Invalid location '%s'", loc or 'nil'))
+		return
+	end
+	
+	local items = getItemsInSearch(search, bags)
+	if next(items) then
+		while next(items) do
+			self:Print(popItem(items))
+		end
+	else
+		self:Print(format('No items were found in %s for %s', search, loc))
+	end
 end
 
 function Bundles:Move(search, fromLoc, toLoc)
@@ -179,13 +202,13 @@ function Bundles:Move(search, fromLoc, toLoc)
 		return
 	end
 
-	local fromBags = self:GetBags(fromLoc)
+	local fromBags = getBags(fromLoc)
 	if not fromBags then
 		self:Print(format("Invalid location '%s'", fromLoc or 'nil'))
 		return
 	end
 
-	local toBags = self:GetBags(toLoc)
+	local toBags = getBags(toLoc)
 	if not toBags then
 		self:Print(format("Invalid location '%s'", toLoc or 'nil'))
 		return
@@ -224,6 +247,18 @@ do
 			local search, from, to = args:match('^([%w%p%s]+)%s(%w+)%s(%w+)$')
 			if search and from and to then
 				Bundles:Move(search, from, to)
+			end
+		elseif cmd == 'find' then
+			local search, loc = args:match('^([%w%p%s]+)%s(%w+)$')
+			if search and loc then
+				Bundles:Find(search, loc)
+				return
+			end
+			
+			local search = args:match('^([%w%p%s]+)')
+			if search then
+				Bundles:Find(search, 'all')
+				return
 			end
 		else
 			Bundles:Print(format("Unknown command '%s'", cmd))
