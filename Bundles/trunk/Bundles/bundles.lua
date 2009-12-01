@@ -92,8 +92,8 @@ mover:SetScript('OnShow', function(self)
 end)
 
 mover:SetScript('OnHide', function(self, elapsed)
-	self.bags = nil
-	self.items = nil
+	self.fromItems = nil
+	self.toItems = nil
 	collectgarbage()
 end)
 
@@ -114,7 +114,7 @@ mover:SetScript('OnUpdate', function(self, elapsed)
 	--try and place the item in the first empty slot we find
 	local itemPlaced = false
 	local toItems = self.toItems
-	local newItems = {}
+	local newItems = {} --delicious garbage
 
 	while next(toItems) do
 		local toBag, toSlot, toLink = popItem(toItems)
@@ -122,7 +122,7 @@ mover:SetScript('OnUpdate', function(self, elapsed)
 		if not(itemPlaced or toLink or isSlotLocked(fromBag, fromSlot) or isSlotLocked(toBag, toSlot)) then
 			PickupContainerItem(fromBag, fromSlot)
 			PickupContainerItem(toBag, toSlot)
-			pushItem(newItems, toBag, toSlot, fromLink)
+			pushItem(newItems, toBag, toSlot, fromLink) --this was the thing I did not learn from the sorting addons: you need to account for server delays by recording your own moves
 
 			itemPlaced = true
 		else
@@ -185,7 +185,7 @@ function Bundles:Find(search, loc)
 		self:Print(format("Invalid location '%s'", loc or 'nil'))
 		return
 	end
-	
+
 	local items = getItemsInSearch(search, bags)
 	if next(items) then
 		while next(items) do
@@ -254,7 +254,7 @@ do
 				Bundles:Find(search, loc)
 				return
 			end
-			
+
 			local search = args:match('^([%w%p%s]+)')
 			if search then
 				Bundles:Find(search, 'all')
