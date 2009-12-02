@@ -3,6 +3,7 @@
 ## Notes: Command line item moving
 ## Author: Tuller
 ## OptionalDeps: LibItemSearch
+## Version: 1.0
 libs\LibStub\LibStub.lua
 libs\LibItemSearch-1.0\LibItemSearch-1.0.lua
 bundles.lua
