@@ -117,6 +117,7 @@ CastingBar = Dominos:CreateClass('StatusBar')
 
 --omg speed
 local BORDER_SCALE = 197/150 --its magic!
+local TEXT_PADDING = 18
 
 function CastingBar:New(parent)
 	local f = self:Bind(CreateFrame('StatusBar', 'DominosCastingBar', parent, 'DominosCastingBarTemplate'))
@@ -163,8 +164,8 @@ function CastingBar:OnUpdate(elapsed)
 end
 
 function CastingBar:AdjustWidth()
-	local textWidth = self.text:GetStringWidth()
-	local timeWidth = (self.time:IsShown() and (self.time:GetStringWidth() + 8) * 2) or 0
+	local textWidth = self.text:GetStringWidth() + TEXT_PADDING
+	local timeWidth = (self.time:IsShown() and (self.time:GetStringWidth() + 4) * 2) or 0
 	local width = textWidth + timeWidth
 
 	local diff = width - self.normalWidth
