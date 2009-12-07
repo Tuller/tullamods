@@ -166,6 +166,7 @@ function Dominos:GetDefaults()
 end
 
 function Dominos:UpdateSettings(major, minor, bugfix)
+	--handle new layout options for upgrading from versions older than 1.13
 	if major == '1' and minor <= '12' then
 		for profile,sets in pairs(self.db.sv.profiles) do
 			local frames = sets.frames
@@ -175,6 +176,21 @@ function Dominos:UpdateSettings(major, minor, bugfix)
 					frameSets.isRightToLeft = nil
 					frameSets.isTopToBottom = nil
 					frameSets.isBottomToTop = nil
+				end
+			end
+		end
+	end
+	
+	--handle totem bar update for upgrading from versions older than 1.15
+	if major == '1' and minor <= '14' then
+		for profile,sets in pairs(self.db.sv.profiles) do
+			local frames = sets.frames
+			if frames then
+				for frameID, frameSets in pairs(frames) do
+					if tostring(frameID):match('^totem(%d+)') then
+						frameSets.showRecall = true
+						frameSets.showTotems = true
+					end
 				end
 			end
 		end
