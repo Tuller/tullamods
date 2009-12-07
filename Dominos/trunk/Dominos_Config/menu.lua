@@ -140,12 +140,12 @@ end
 function Menu:AddLayoutPanel()
 	local panel = self:NewPanel(L.Layout)
 
-	panel:NewOpacitySlider()
-	panel:NewFadeSlider()
-	panel:NewScaleSlider()
-	panel:NewPaddingSlider()
-	panel:NewSpacingSlider()
-	panel:NewColumnsSlider()
+	panel.opacitySlider = panel:NewOpacitySlider()
+	panel.fadeSlider = panel:NewFadeSlider()
+	panel.scaleSlider = panel:NewScaleSlider()
+	panel.paddingSlider = panel:NewPaddingSlider()
+	panel.spacingSlider = panel:NewSpacingSlider()
+	panel.colsSlider = panel:NewColumnsSlider()
 
 	return panel
 end

@@ -59,3 +59,7 @@ L.AltShift = 'ALT-' .. SHIFT_KEY_TEXT
 L.CtrlShift = CTRL_KEY_TEXT .. '-' .. SHIFT_KEY_TEXT
 L.CtrlAlt = CTRL_KEY_TEXT .. '-ALT'
 L.CtrlAltShift = CTRL_KEY_TEXT .. '-ALT-' .. SHIFT_KEY_TEXT
+
+--totems
+L.ShowTotems = 'Show Totems'
+L.ShowTotemRecall = 'Show Recall'
