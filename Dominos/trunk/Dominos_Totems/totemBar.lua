@@ -3,25 +3,24 @@
 		A dominos totem bar
 --]]
 
+--no reason to load if we're not playing a shaman...
 local class, enClass = UnitClass('player')
 if enClass ~= 'SHAMAN' then
---	DisableAddOn('Dominos_Totems')
 	return
 end
 
 local DTB = Dominos:NewModule('totems', 'AceEvent-3.0')
 local TotemBar
-local SpellButton
 
 --hurray for constants
 local NUM_TOTEM_BARS = NUM_MULTI_CAST_PAGES --fire, water, air
 local NUM_TOTEM_BAR_BUTTONS = NUM_MULTI_CAST_BUTTONS_PER_PAGE --fire, earth, water, air
 local TOTEM_CALLS = {66842, 66843, 66844} --fire, water, air spellIDs
-local CALL_OF_EARTH = 36936
+local TOTEMIC_RECALL = 36936
 local TOTEM_BAR_START_ID = 132 --actionID start of the totembar
 
 
---[[ Module Stuff ]]--
+--[[ Module ]]--
 
 function DTB:Load()
 	self:LoadTotemBars()
@@ -52,7 +51,7 @@ function DTB:LoadTotemBars()
 end
 
 
---[[ Totem Bar Object ]]--
+--[[ Totem Bar ]]--
 
 TotemBar = Dominos:CreateClass('Frame', Dominos.Frame)
 
@@ -68,61 +67,99 @@ end
 function TotemBar:GetDefaults()
 	return {
 		point = 'CENTER',
-		spacing = 2
+		spacing = 2,
+		showRecall = true,
+		showTotems = true
 	}
 end
 
 function TotemBar:NumButtons()
-	return NUM_TOTEM_BAR_BUTTONS + 2
+	local numButtons = 1 --we always show at least one button (the call of x spell)
+
+	if self:ShowingTotems() then
+		numButtons = numButtons + NUM_TOTEM_BAR_BUTTONS
+	end
+
+	if self:ShowingRecall() then
+		numButtons = numButtons + 1
+	end
+
+	return numButtons
 end
 
 function TotemBar:GetBaseID()
 	return TOTEM_BAR_START_ID + (NUM_TOTEM_BAR_BUTTONS * (self.totemBarID - 1))
 end
 
+--handle displaying the totemic recall button
+function TotemBar:SetShowRecall(show)
+	self.sets.showRecall = show and true or false
+	self:LoadButtons()
+	self:Layout()
+end
+
+function TotemBar:ShowingRecall()
+	return self.sets.showRecall
+end
+
+--handle displaying all of the totem buttons
+function TotemBar:SetShowTotems(show)
+	self.sets.showTotems = show and true or false
+	self:LoadButtons()
+	self:Layout()
+end
+
+function TotemBar:ShowingTotems()
+	return self.sets.showTotems
+end
+
 
 --[[ button stuff]]--
 
+local tinsert = table.insert
+
 function TotemBar:LoadButtons()
-	self.buttons[1] = self:CreateSpellButton(TOTEM_CALLS[self.totemBarID])
-	
-	for i = 1, NUM_TOTEM_BAR_BUTTONS do
-		local b = Dominos.ActionButton:New(self:GetBaseID() + i)
-		if b then
-			b:SetParent(self.header)
-			self.buttons[i + 1] = b
-		else
-			break
+	local buttons = self.buttons
+
+	--remove old buttons
+	for i, b in pairs(buttons) do
+		b:Free()
+		buttons[i] = nil 
+	end
+
+	--add call of X button
+	tinsert(buttons, self:GetCallButton())
+
+	--add totem actions
+	if self:ShowingTotems() then
+		for i = 1, NUM_TOTEM_BAR_BUTTONS do
+			tinsert(buttons, self:GetTotemButton(i))
 		end
 	end
-	
-	self.buttons[self:NumButtons()] = self:CreateSpellButton(CALL_OF_EARTH)
-		
+
+	--add recall button
+	if self:ShowingRecall() then
+		tinsert(buttons, self:GetRecallButton())
+	end
+
 	self.header:Execute([[ control:ChildUpdate('action', nil) ]])
 end
 
-function TotemBar:AddButton(i)
-	local b
-	if i == 1 then
-		b = self:CreateSpellButton(TOTEM_CALLS[self.totemBarID])
-	elseif i == self:NumButtons() then
-		b = self:CreateSpellButton(CALL_OF_EARTH)
-	else
-		b = self:CreateActionButton(self:GetBaseID() + 1)
-	end
-	self.buttons[i] = b
+function TotemBar:GetCallButton()
+	return self:CreateSpellButton(TOTEM_CALLS[self.totemBarID])
 end
 
-function TotemBar:RemoveButton(i)
-	local b = self.buttons[i]
-	self.buttons[i] = nil
-	b:Free()
+function TotemBar:GetRecallButton()
+	return self:CreateSpellButton(TOTEMIC_RECALL)
+end
+
+function TotemBar:GetTotemButton(id)
+	return self:CreateActionButton(self:GetBaseID() + id)
 end
 
 function TotemBar:CreateSpellButton(spellID)
 	local b = Dominos.SpellButton:New(spellID)
 	b:SetParent(self.header)
-	
 	return b
 end
 
@@ -130,6 +167,43 @@ function TotemBar:CreateActionButton(actionID)
 	local b = Dominos.ActionButton:New(actionID)
 	b:SetParent(self.header)
 	b:LoadAction()
-	
 	return b
+end
+
+
+--[[ right click menu ]]--
+
+function TotemBar:AddLayoutPanel(menu)
+	local L = LibStub('AceLocale-3.0'):GetLocale('Dominos-Config', 'enUS')
+	local panel = menu:AddLayoutPanel()
+	
+	--add show totemic recall toggle
+	local showRecall = panel:NewCheckButton(L.ShowTotemRecall)
+	
+	showRecall:SetScript('OnClick', function(b) 
+		self:SetShowRecall(b:GetChecked()); 
+		panel.colsSlider:OnShow() --force update the columns slider
+	end)
+	
+	showRecall:SetScript('OnShow', function(b)
+		b:SetChecked(self:ShowingRecall()) 
+	end)
+	
+	--add show totems toggle
+	local showTotems = panel:NewCheckButton(L.ShowTotems)
+	
+	showTotems:SetScript('OnClick', function(b) 
+		self:SetShowTotems(b:GetChecked());
+		panel.colsSlider:OnShow() 
+	end)
+	
+	showTotems:SetScript('OnShow', function(b) 
+		b:SetChecked(self:ShowingTotems()) 
+	end)
+end
+
+function TotemBar:CreateMenu()
+	self.menu = Dominos:NewMenu(self.id)
+	self:AddLayoutPanel(self.menu)
+	self.menu:AddAdvancedPanel()
 end
