@@ -1,4 +1,4 @@
-## Interface: 30200
+## Interface: 30300
 ## Title: Combuctor Config
 ## Author: Tuller
 ## Notes: An options menu for Combuctor

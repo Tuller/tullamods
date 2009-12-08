@@ -1,10 +1,10 @@
-## Interface: 30200
+## Interface: 30300
 ## Title: Bagnon
 ## Author: Tuller
 ## Notes: Single window displays for your inventory, bank, and keys
 ## SavedVariables: BagnonGlobalSettings
 ## SavedVariablesPerCharacter: BagnonFrameSettings
-## Version: 2.12.0
+## Version: 2.12.1
 ## OptionalDeps: Ace3, Bagnon_Forever, Bagnon_Armory, LibItemSearch
 embeds.xml
 localization.xml

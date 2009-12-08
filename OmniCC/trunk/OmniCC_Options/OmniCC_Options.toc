@@ -1,4 +1,4 @@
-## Interface: 30200
+## Interface: 30300
 ## Title: OmniCC Options
 ## Notes: A load on demand option menu for OmniCC
 ## Author: Tuller

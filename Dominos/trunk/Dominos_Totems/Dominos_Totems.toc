@@ -1,4 +1,4 @@
-﻿## Interface: 30200
+## Interface: 30300
 ## Title: Dominos Totems
 ## Notes: Totem bars for Shamans
 ## Author: Tuller

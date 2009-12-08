@@ -1,8 +1,8 @@
-## Interface: 30200
+## Interface: 30300
 ## Title: Combuctor
 ## Author: Tuller
 ## Notes: Pants are a dangerous foe
-## Version: 2.1.2
+## Version: 2.1.3
 ## OptionalDeps: Ace3, Bagnon_Forever
 ## SavedVariables: CombuctorDB2, CombuctorVersion
 embeds.xml

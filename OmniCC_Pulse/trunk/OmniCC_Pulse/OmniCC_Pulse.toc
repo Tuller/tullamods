@@ -1,8 +1,8 @@
-## Interface: 30200
+## Interface: 30300
 ## Title: OmniCC Pulse
 ## Notes: Causes icons to pulse on cooldown completion
 ## Author: Tuller
 ## Dependencies: OmniCC
-## Version: 1.1.1
+## Version: 1.1.2
 ani.xml
 pulse.lua

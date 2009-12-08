@@ -1,4 +1,4 @@
-﻿## Interface: 30200
+## Interface: 30300
 ## Title: Bagnon Armory
 ## Notes: A BagnonDB wrapper for the Armory addon
 ## Author: Tuller, Warmexx
