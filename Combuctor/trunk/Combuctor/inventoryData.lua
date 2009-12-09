@@ -9,7 +9,7 @@ local currentPlayer = UnitName('player')
 --[[ Bank ]]--
 
 function InvData:UpdateBank(event)
-	print('update at bank', (event == 'BANKFRAME_OPENED'))
+--	print('update at bank', (event == 'BANKFRAME_OPENED'))
 	self.atBank = (event == 'BANKFRAME_OPENED')
 end
 
