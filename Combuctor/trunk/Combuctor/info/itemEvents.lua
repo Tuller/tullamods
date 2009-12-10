@@ -256,12 +256,12 @@ function BagEvents:BANKFRAME_OPENED(...)
 		self:UpdateBagSizes()
 	end
 
-	self:SendMessage('BANK_OPENED')
+	self:SendMessage('COMBUCTOR_BANK_OPENED')
 end
 
 function BagEvents:BANKFRAME_CLOSED(...)
 	self.atBank = false
-	self:SendMessage('BANK_CLOSED')
+	self:SendMessage('COMBUCTOR_BANK_CLOSED')
 end
 
 function BagEvents:BAG_UPDATE_COOLDOWN(...)

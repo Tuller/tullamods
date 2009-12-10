@@ -149,6 +149,8 @@ function ItemFrame:UpdateSlot(bag, slot, link)
 end
 
 function ItemFrame:UpdateSlotLock(bag, slot)
+	if not slot then return end
+
 	local item = self.items[ToIndex(bag, slot)]
 	if item then
 		item:UpdateLocked()
