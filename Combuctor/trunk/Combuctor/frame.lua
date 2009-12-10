@@ -630,7 +630,7 @@ function InventoryFrame:OnHide()
 	FrameEvents:Unregister(self)
 
 	--it may look stupid, but yes
-	if self:IsBank() and Combuctor:GetModule('InventoryData'):AtBank() then
+	if self:IsBank() and self:AtBank() then
 		CloseBankFrame()
 	end
 
@@ -682,4 +682,8 @@ end
 
 function InventoryFrame:IsBank()
 	return self.isBank
+end
+
+function InventoryFrame:AtBank()
+	return Combuctor.PlayerInfo:AtBank()
 end
