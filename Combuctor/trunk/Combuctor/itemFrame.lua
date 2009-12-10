@@ -8,9 +8,7 @@ Combuctor.ItemFrame = ItemFrame
 
 --local bindings
 local FrameEvents = Combuctor:GetModule('ItemFrameEvents')
-local InvData = Combuctor:GetModule('InventoryData')
-local Item = Combuctor.Item
-
+local ItemSearch = LibStub('LibItemSearch-1.0')
 
 --InvDataity functions
 local function ToIndex(bag, slot)
@@ -44,7 +42,6 @@ end
 function ItemFrame:OnShow()
 	self:UpdateUpdatable()
 	self:Regenerate()
---	self:TriggerLayout()
 end
 
 function ItemFrame:OnHide()
@@ -75,7 +72,6 @@ end
 --[[ Item Updating ]]--
 
 --returns true if the item matches the given filter, false othewise
-local ItemSearch = LibStub('LibItemSearch-1.0')
 function ItemFrame:HasItem(bag, slot, link)
 	--check for the bag
 	local hasBag = false
@@ -93,8 +89,8 @@ function ItemFrame:HasItem(bag, slot, link)
 	local f = self.filter
 	if next(f) then
 		local player = self:GetPlayer()
-		local link = link or InvData:GetItemLink(bag, slot, player)
-		local bagType = InvData:GetBagType(bag, player)
+		local bagType = self:GetBagType(bag)
+		local link = link or self:GetItemLink(bag, slot)
 
 		local name, quality, level, ilvl, type, subType, stackCount, equipLoc
 		if link then
@@ -123,7 +119,7 @@ function ItemFrame:AddItem(bag, slot)
 		item:Update()
 		item:Highlight(self.highlightBag == bag)
 	else
-		local item = Item:Get()
+		local item = Combuctor.ItemSlot:New()
 		item:Set(self, bag, slot)
 		item:Highlight(self.highlightBag == bag)
 
@@ -138,7 +134,7 @@ function ItemFrame:RemoveItem(bag, slot)
 	local item = self.items[index]
 
 	if item then
-		item:Release()
+		item:Free()
 		self.items[index] = nil
 		self.count = self.count - 1
 		return true
@@ -155,7 +151,7 @@ end
 function ItemFrame:UpdateSlotLock(bag, slot)
 	local item = self.items[ToIndex(bag, slot)]
 	if item then
-		item:UpdateLock()
+		item:UpdateLocked()
 	end
 end
 
@@ -181,10 +177,9 @@ function ItemFrame:Regenerate()
 	if not self:IsVisible() then return end
 
 	local changed = false
-	local player = self:GetPlayer()
 
 	for _,bag in pairs(self.bags) do
-		for slot = 1, InvData:GetBagSize(bag, player) do
+		for slot = 1, self:GetBagSize(bag) do
 			if self:UpdateSlot(bag, slot) then
 				changed = true
 			end
@@ -203,7 +198,7 @@ function ItemFrame:RemoveAllItems()
 
 	for i,item in pairs(items) do
 		changed = true
-		item:Release()
+		item:Free()
 		items[i] = nil
 	end
 	self.count = 0
@@ -255,7 +250,7 @@ function ItemFrame:Layout(spacing)
 	local i = 0
 
 	for _,bag in ipairs(self.bags) do
-		for slot = 1, InvData:GetBagSize(bag, player) do
+		for slot = 1, self:GetBagSize(bag) do
 			local item = items[ToIndex(bag, slot)]
 			if item then
 				i = i + 1
@@ -284,15 +279,31 @@ end
 
 --[[ Item Placement ]]--
 
+function ItemFrame:GetBagSize(bag)
+	return Combuctor.BagSlotInfo:GetSize(self:GetPlayer(), bag)
+end
+
+function ItemFrame:GetBagType(bag)
+	return Combuctor.BagSlotInfo:GetBagType(self:GetPlayer(), bag)
+end
+
+function ItemFrame:IsBagCached(bag)
+	return Combuctor.BagSlotInfo:IsCached(self:GetPlayer(), bag)
+end
+
+function ItemFrame:GetItemLink(bag, slot)
+	local link = select(7, Combuctor.ItemSlotInfo:GetItemInfo(self:GetPlayer(), bag, slot))
+	return link
+end
+
 --places the item in the first available slot in the current player's visible bags
 --todo: make smarter
 function ItemFrame:PlaceItem()
 	if CursorHasItem() then
-		local player = self:GetPlayer()
 		for _,bag in ipairs(self.bags) do
 			--this check is basically in case i decide, 'you know what would be awesome? bank and items in the same frame' again
-			if not InvData:IsCachedBag(bag, player) then
-				for slot = 1, GetContainerNumSlots(bag) do
+			if not self:IsBagCached(bag) then
+				for slot = 1, self:GeBagSize(bag) do
 					if not GetContainerItemLink(bag, slot) then
 						PickupContainerItem(bag, slot)
 					end

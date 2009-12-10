@@ -23,7 +23,7 @@ function FrameEvents:OnEnable()
 	self:RegisterMessage('COMBUCTOR_SLOT_ADD', 'UpdateSlot')
 	self:RegisterMessage('COMBUCTOR_SLOT_REMOVE', 'RemoveItem')
 	self:RegisterMessage('COMBUCTOR_SLOT_UPDATE', 'UpdateSlot')
-	self:RegisterMessage('COMBUCTOR_SLOT_UPDATE_LOCK', 'UpdateSlotLock')
+	self:RegisterEvent('ITEM_LOCK_CHANGED', 'UpdateSlotLock')
 
 	self:RegisterMessage('COMBUCTOR_BANK_OPENED', 'UpdateBankFrames')
 	self:RegisterMessage('COMBUCTOR_BANK_CLOSED', 'UpdateBankFrames')

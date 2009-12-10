@@ -5,8 +5,9 @@
 	<Script file="localization\localization.zhCN.lua"/>
 	<Script file="localization\localization.ruRU.lua"/>
 	<Script file="Combuctor.lua"/>
-	<Script file="inventoryData.lua"/>
-	<Script file="events.lua"/>
+
+	<Include file="info\load.xml"/>
+
 	<Script file="sets.lua"/>
 	<Script file="item.lua"/>
 	<Script file="itemFrameEvents.lua"/>

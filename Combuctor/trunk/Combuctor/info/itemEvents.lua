@@ -4,45 +4,45 @@
 
 	Based on SpecialEvents-Bags by Tekkub Stoutwrithe (tekkub@gmail.com)
 
-	COMBUCTOR_SLOT_ADD
+	ITEM_SLOT_ADD
 	args:		bag, slot, link, count, locked, coolingDown
 		called when a new slot becomes available to the player
 
-	COMBUCTOR_SLOT_REMOVE
+	ITEM_SLOT_REMOVE
 	args:		bag, slot
 		called when an item slot is removed from being in use
 
-	COMBUCTOR_SLOT_UPDATE
+	ITEM_SLOT_UPDATE
 	args:		bag, slot, link, count, locked, coolingDown
 		called when an item slot's item or item count changes
 
-	COMBUCTOR_SLOT_UPDATE_LOCK
-		args:		bag, slot, locked
-		called when an item slot is locked or unlocked
-
-	COMBUCTOR_SLOT_UPDATE_COOLDOWN
+	ITEM_SLOT_UPDATE_COOLDOWN
 	args:		bag, slot, coolingDown
 		called when an item's cooldown starts/ends
 
-	COMBUCTOR_BANK_OPENED
+	BANK_OPENED
 	args:		none
-		called when the bank has opened and all of the bagnon events have fired
+		called when the bank has opened and all of the bagnon events have SendMessaged
 
-	COMBUCTOR_BANK_CLOSED
+	BANK_CLOSED
 	args:		none
-		called when the bank is closed and all of the bagnon events have fired
-
-	COMBUCTOR_BAG_TYPE_CHANGED
-	args:		bag, bagType, bagSubType
-		called when a bag is gained/lost or changes from one type to another
+		called when the bank is closed and all of the bagnon events have SendMessaged
+		
+	BAG_UPDATE_TYPE
+	args:	bag, type
+		called when the type of a bag changes (aka, what items you can put in it changes)
 --]]
 
-local BagEvents = Combuctor:NewModule('Events', 'AceEvent-3.0')
-BagEvents.atBank = false
-BagEvents.firstVisit = true
+
+local Combuctor = LibStub('AceAddon-3.0'):GetAddon('Combuctor')
+local BagEvents = {}
+Combuctor.BagEvents = BagEvents 
+
+
+--[[ privates? ]]--
 
 local slots = {}
-local bagSubTypes = {}
+local bagTypes = {}
 
 local function ToIndex(bag, slot)
 	return (bag < 0 and bag*100 - slot) or bag*100 + slot
@@ -50,6 +50,33 @@ end
 
 local function GetBagSize(bag)
 	return (bag == KEYRING_CONTAINER and GetKeyRingSize()) or GetContainerNumSlots(bag)
+end
+
+
+--[[ Startup ]]--
+
+function BagEvents:Load()
+	self.atBank = false
+	self.firstVisit = true
+	
+	self.frame = CreateFrame('Frame')
+	
+	self.RegisterEvent = function(self, event)
+		self.frame:RegisterEvent(event)
+	end
+	
+	self.OnEvent = function(f, event, ...)
+		if self[event] then
+			self[event](self, event, ...)
+		end		
+	end
+	
+	self.SendMessage = function(self, msg, ...)
+		Combuctor:SendMessage(msg, ...)
+	end
+
+	self.frame:SetScript('OnEvent', self.OnEvent)
+	self:RegisterEvent('PLAYER_LOGIN')
 end
 
 
@@ -61,8 +88,7 @@ function BagEvents:AddItem(bag, slot)
 	if not slots[index] then slots[index] = {} end
 
 	local data = slots[index]
-	local link = GetContainerItemLink(bag, slot)
-	local count, locked = select(2, GetContainerItemInfo(bag, slot))
+	local texture, count, locked, quality, readable, lootable, link = GetContainerItemInfo(bag, slot)
 	local start, duration, enable = GetContainerItemCooldown(bag, slot)
 	local onCooldown = (start > 0 and duration > 0 and enable > 0)
 
@@ -93,8 +119,7 @@ function BagEvents:UpdateItem(bag, slot)
 		local prevLink = data[1]
 		local prevCount = data[2]
 
-		local link = GetContainerItemLink(bag, slot)
-		local count, locked = select(2, GetContainerItemInfo(bag, slot))
+		local texture, count, locked, quality, readable, lootable, link = GetContainerItemInfo(bag, slot)
 		local start, duration, enable = GetContainerItemCooldown(bag, slot)
 		local onCooldown = (start > 0 and duration > 0 and enable > 0)
 
@@ -115,24 +140,6 @@ function BagEvents:UpdateItems(bag)
 	end
 end
 
---lock
-function BagEvents:UpdateLock(bag, slot)
-	local data = slots[ToIndex(bag,slot)]
-
-	if data and data[1] then
-		local locked = select(3, GetContainerItemInfo(bag, slot))
-		if data[3] ~= locked then
-			data[3] = locked
-			self:SendMessage('COMBUCTOR_SLOT_UPDATE_LOCK', bag, slot, locked)
-		end
-	end
-end
-
-function BagEvents:UpdateLocks(bag)
-	for slot = 1, GetBagSize(bag) do
-		self:UpdateLock(bag, slot)
-	end
-end
 
 --cooldowns
 function BagEvents:UpdateCooldown(bag, slot)
@@ -173,41 +180,47 @@ function BagEvents:UpdateBagSize(bag)
 end
 
 function BagEvents:UpdateBagType(bag)
-	local link = GetInventoryItemLink('player', ContainerIDToInventoryID(bag))
-	local type, subType
-	if link then
-		type, subType = select(6, GetItemInfo(link))
-	end
+	local _, newType = GetContainerNumFreeSlots(bag)
+	local prevType = bagTypes[bag]
 
-	if subType ~= bagSubTypes[bag] then
-		bagSubTypes[bag] = subType
-		self:SendMessage('COMBUCTOR_BAG_TYPE_CHANGED', bag, type, subType)
+	if newType ~= prevType then
+		bagTypes[bag] = newType
+		self:SendMessage('COMBUCTOR_BAG_UPDATE_TYPE', bag, newType)
 	end
 end
 
-function BagEvents:UpdateBagSizesAndTypes()
+
+function BagEvents:UpdateBagSizes()
 	if self:AtBank() then
-		for bag = 1, GetNumBankSlots() + 4 do
+		for bag = 1, NUM_BAG_SLOTS + GetNumBankSlots() do
 			self:UpdateBagSize(bag)
-			self:UpdateBagType(bag)
 		end
 	else
-		for bag = 1, 4 do
+		for bag = 1, NUM_BAG_SLOTS do
 			self:UpdateBagSize(bag)
-			self:UpdateBagType(bag)
 		end
 	end
 	self:UpdateBagSize(KEYRING_CONTAINER)
+end
+
+function BagEvents:UpdateBagTypes()
+	if self:AtBank() then
+		for bag = 1, NUM_BAG_SLOTS + GetNumBankSlots() do
+			self:UpdateBagType(bag)
+		end
+	else
+		for bag = 1, NUM_BAG_SLOTS do
+			self:UpdateBagType(bag)
+		end
+	end
 end
 
 
 
 --[[ Events ]]--
 
---player login
-function BagEvents:OnEnable()
+function BagEvents:PLAYER_LOGIN(...)
 	self:RegisterEvent('BAG_UPDATE')
-	self:RegisterEvent('ITEM_LOCK_CHANGED')
 	self:RegisterEvent('BAG_UPDATE_COOLDOWN')
 	self:RegisterEvent('PLAYERBANKSLOTS_CHANGED')
 	self:RegisterEvent('BANKFRAME_OPENED')
@@ -221,48 +234,40 @@ function BagEvents:OnEnable()
 end
 
 function BagEvents:BAG_UPDATE(event, bag)
-	self:UpdateBagSizesAndTypes()
+	self:UpdateBagTypes()
+	self:UpdateBagSizes()
 	self:UpdateItems(bag)
 end
 
-function BagEvents:PLAYERBANKSLOTS_CHANGED()
-	self:UpdateBagSizesAndTypes()
-
+function BagEvents:PLAYERBANKSLOTS_CHANGED(...)
+	self:UpdateBagTypes()
+	self:UpdateBagSizes()
 	self:UpdateItems(BANK_CONTAINER)
 end
 
-function BagEvents:BANKFRAME_OPENED()
+function BagEvents:BANKFRAME_OPENED(...)
 	self.atBank = true
 
 	if self.firstVisit then
 		self.firstVisit = nil
+
 		self:UpdateBagSize(BANK_CONTAINER)
-		self:UpdateBagSizesAndTypes()
+		self:UpdateBagTypes()
+		self:UpdateBagSizes()
 	end
 
-	self:SendMessage('COMBUCTOR_BANK_OPENED')
+	self:SendMessage('BANK_OPENED')
 end
 
-function BagEvents:BANKFRAME_CLOSED()
+function BagEvents:BANKFRAME_CLOSED(...)
 	self.atBank = false
-	self:SendMessage('COMBUCTOR_BANK_CLOSED')
+	self:SendMessage('BANK_CLOSED')
 end
 
-function BagEvents:ITEM_LOCK_CHANGED()
-	if self:AtBank() then
-		for bag = -2, GetNumBankSlots() + 4 do
-			self:UpdateLocks(bag)
-		end
-	else
-		for bag = 0, 4 do
-			self:UpdateLocks(bag)
-		end
-		self:UpdateLocks(KEYRING_CONTAINER)
-	end
-end
-
-function BagEvents:BAG_UPDATE_COOLDOWN()
-	for bag = 0, 4 do
+function BagEvents:BAG_UPDATE_COOLDOWN(...)
+	self:UpdateCooldowns(BACKPACK_CONTAINER)
+		
+	for bag = 1, NUM_BAG_SLOTS do
 		self:UpdateCooldowns(bag)
 	end
 end
@@ -272,3 +277,7 @@ end
 function BagEvents:AtBank()
 	return self.atBank
 end
+
+
+--load the thing
+BagEvents:Load()
