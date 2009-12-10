@@ -84,8 +84,7 @@ function BagEvents:AddItem(bag, slot)
 	if not slots[index] then slots[index] = {} end
 
 	local data = slots[index]
-	local link = GetContainerItemLink(bag, slot)
-	local texture, count, locked = GetContainerItemInfo(bag, slot)
+	local texture, count, locked, quality, readable, lootable, link = GetContainerItemInfo(bag, slot)
 	local start, duration, enable = GetContainerItemCooldown(bag, slot)
 	local onCooldown = (start > 0 and duration > 0 and enable > 0)
 
@@ -116,8 +115,7 @@ function BagEvents:UpdateItem(bag, slot)
 		local prevLink = data[1]
 		local prevCount = data[2]
 
-		local link = GetContainerItemLink(bag, slot)
-		local texture, count, locked = GetContainerItemInfo(bag, slot)
+		local texture, count, locked, quality, readable, lootable, link = GetContainerItemInfo(bag, slot)
 		local start, duration, enable = GetContainerItemCooldown(bag, slot)
 		local onCooldown = (start > 0 and duration > 0 and enable > 0)
 
