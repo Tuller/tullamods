@@ -305,7 +305,7 @@ function ItemFrame:PlaceItem()
 		for _,bag in ipairs(self.bags) do
 			--this check is basically in case i decide, 'you know what would be awesome? bank and items in the same frame' again
 			if not self:IsBagCached(bag) then
-				for slot = 1, self:GeBagSize(bag) do
+				for slot = 1, self:GetBagSize(bag) do
 					if not GetContainerItemLink(bag, slot) then
 						PickupContainerItem(bag, slot)
 					end
