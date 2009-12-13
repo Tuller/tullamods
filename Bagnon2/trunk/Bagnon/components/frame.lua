@@ -31,7 +31,9 @@ function Frame:New(frameID)
 
 	f:SetScript('OnShow', f.OnShow)
 	f:SetScript('OnHide', f.OnHide)
-	f:SetFrameID(frameID)
+	f.frameID = frameID
+	f:Rescale()
+	f:UpdateEverything()
 
 	table.insert(UISpecialFrames, f:GetName())
 
@@ -484,7 +486,7 @@ function Frame:PlaceMenuButtons()
 		table.insert(menuButtons, selector)
 	end
 
-	if self:HasBagFrame() then
+	if self:HasBagFrame() and self:HasBagToggle() then
 		local toggle = self:GetBagToggle() or self:CreateBagToggle()
 		table.insert(menuButtons, toggle)
 	end
@@ -659,6 +661,11 @@ end
 
 function Frame:GetBagToggle()
 	return self.bagToggle
+end
+
+--this exists purely so that it can be overridden by guildBank
+function Frame:HasBagToggle()
+	return true
 end
 
 
@@ -862,14 +869,6 @@ end
 --[[
 	Frame Settings Access
 --]]
-
-function Frame:SetFrameID(frameID)
-	if self:GetFrameID() ~= frameID then
-		self.frameID = frameID
-		self:Rescale()
-		self:UpdateEverything()
-	end
-end
 
 function Frame:GetFrameID()
 	return self.frameID
