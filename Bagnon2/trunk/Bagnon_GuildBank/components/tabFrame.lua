@@ -113,7 +113,7 @@ end
 function TabFrame:SetFrameID(frameID)
 	if self:GetFrameID() ~= frameID then
 		self.frameID = frameID
-		self:UpdateShown()
+--	self:UpdateShown()
 	end
 end
 

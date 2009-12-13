@@ -168,7 +168,7 @@ function GuildTab:UpdateEverything()
 end
 
 function GuildTab:Update()
-	QueryGuildBankTab(self:GetID())
+--	QueryGuildBankTab(self:GetID())
 	
 	local name, icon, isViewable, canDeposit, numWithdrawals, remainingWithdrawals = GetGuildBankTabInfo(self:GetID())
 	SetItemButtonTexture(self, icon or [[Interface\PaperDoll\UI-PaperDoll-Slot-Bag]])

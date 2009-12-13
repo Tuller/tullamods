@@ -52,3 +52,19 @@ function Frame:CreateBagFrame()
 	self.bagFrame = f
 	return f
 end
+
+function Frame:HasBagFrame()
+	return true
+end
+
+function Frame:IsBagFrameShown()
+	return true
+end
+
+function Frame:HasBagToggle()
+	return false
+end
+
+function Frame:HasPlayerSelector()
+	return false
+end
