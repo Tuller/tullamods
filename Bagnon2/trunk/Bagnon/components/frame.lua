@@ -15,7 +15,7 @@ Bagnon.Frame = Frame
 --]]
 
 function Frame:New(frameID)
-	local f = self:Bind(CreateFrame('Frame', 'BagnonFrame' .. self:GetNextID(), UIParent))
+	local f = self:Bind(CreateFrame('Frame', 'BagnonFrame' .. frameID, UIParent))
 	f:Hide()
 	f:SetClampedToScreen(true)
 	f:SetMovable(true)
@@ -36,15 +36,6 @@ function Frame:New(frameID)
 	table.insert(UISpecialFrames, f:GetName())
 
 	return f
-end
-
-do
-	local id = 1
-	function Frame:GetNextID()
-		local nextID = id
-		id = id + 1
-		return nextID
-	end
 end
 
 
