@@ -77,9 +77,8 @@ end
 do
 	local id = 0
 	function GuildTab:GetNextID()
-		local nextID = id + 1
-		id = nextID
-		return nextID
+		id = id + 1
+		return id
 	end
 end
 
@@ -116,11 +115,8 @@ function GuildTab:GUILD_BANK_TAB_CHANGE(msg, tabID)
 end
 
 function GuildTab:GUILDBANKBAGSLOTS_CHANGED()
-	if GetCurrentGuildBankTab() == self:GetID() then
-		self:UpdateCount()
-	end
+	self:UpdateCount()
 end
-
 
 --[[ Frame Events ]]--
 
@@ -168,23 +164,17 @@ function GuildTab:UpdateEverything()
 end
 
 function GuildTab:Update()
---	QueryGuildBankTab(self:GetID())
-	
 	local name, icon, isViewable, canDeposit, numWithdrawals, remainingWithdrawals = GetGuildBankTabInfo(self:GetID())
 	SetItemButtonTexture(self, icon or [[Interface\PaperDoll\UI-PaperDoll-Slot-Bag]])
-	self:SetCount(remainingWithdrawals)
-
+	
+	self:UpdateCount(remainingWithdrawals)
+	
 	--color red if the bag can be purchased
 	if not isViewable then
 		SetItemButtonTextureVertexColor(self, 1, 0.1, 0.1)
 	else
 		SetItemButtonTextureVertexColor(self, 1, 1, 1)
 	end
-end
-
-function GuildTab:UpdateCount()
-	local name, icon, isViewable, canDeposit, numWithdrawals, remainingWithdrawals = GetGuildBankTabInfo(self:GetID())
-	self:SetCount(remainingWithdrawals)
 end
 
 function GuildTab:SetCount(count)
@@ -204,7 +194,25 @@ function GuildTab:SetCount(count)
 end
 
 function GuildTab:UpdateChecked()
-	self:SetChecked(self:GetID() == GetCurrentGuildBankTab())
+	self:SetChecked(self:IsCurrentTab())
+end
+
+function GuildTab:UpdateCount(count)
+	--hack, since the amount of withdrawls seems to only be correct when we're looking at the current tab
+	if not self:IsCurrentTab()  then 
+		return 
+	end
+	
+	if not count then
+		local name, icon, isViewable, canDeposit, numWithdrawals, remainingWithdrawals = GetGuildBankTabInfo(self:GetID())
+		count = remainingWithdrawals
+	end
+
+	self:SetCount(count)
+end
+
+function GuildTab:IsCurrentTab()
+	return self:GetID() == GetCurrentGuildBankTab()
 end
 
 

@@ -53,6 +53,12 @@ function Frame:CreateBagFrame()
 	return f
 end
 
+function Frame:CreateMoneyFrame()
+	local f = Bagnon.GuildMoneyFrame:New(self:GetFrameID(), self)
+	self.moneyFrame = f
+	return f
+end
+
 function Frame:HasBagFrame()
 	return true
 end
