@@ -6,9 +6,11 @@
 
 --[[ locals and speed ]]--
 
-local UPDATE_DELAY = 0.1
 local _G = _G
+local UPDATE_DELAY = 0.1
+
 local ActionButton_GetPagedID = ActionButton_GetPagedID
+local ActionButton_IsFlashing = ActionButton_IsFlashing
 local IsUsableAction = IsUsableAction
 local ActionHasRange = ActionHasRange
 local IsActionInRange = IsActionInRange
@@ -16,7 +18,7 @@ local IsActionInRange = IsActionInRange
 
 --[[ The main thing ]]--
 
-local tullaRange = CreateFrame('Frame')
+local tullaRange = CreateFrame('Frame', 'tullaRange', UIParent)
 
 function tullaRange:Load()
 	self.buttonsToUpdate = {}
@@ -31,6 +33,7 @@ function tullaRange:Load()
 
 	self:RegisterEvent('PLAYER_ENTERING_WORLD')
 	self:RegisterEvent('PLAYER_TARGET_CHANGED')
+	self:RegisterEvent('PLAYER_FOCUS_CHANGED')
 
 	self:Hide()
 end
@@ -62,37 +65,51 @@ end
 --[[ Game Events ]]--
 
 function tullaRange:PLAYER_ENTERING_WORLD()
-	self:UpdateTarget()
+	self:ForceUpdateOnNextFrame()
 end
 
 function tullaRange:PLAYER_TARGET_CHANGED()
-	self:UpdateTarget()
+	self:ForceUpdateOnNextFrame()
+end
+
+function tullaRange:PLAYER_FOCUS_CHANGED()
+	self:ForceUpdateOnNextFrame()
 end
 
 
---[[ Update Methods ]]--
+--[[ Actions ]]--
 
 function tullaRange:ForceUpdateOnNextFrame()
 	self.elapsed = UPDATE_DELAY
 end
 
-function tullaRange:UpdateTarget()
-	if self:IsShown() then
-		self:UpdateButtons()
-	end
-	self:UpdateShown()
-end
-
 function tullaRange:UpdateShown()
-	if next(self.buttonsToUpdate) and UnitExists('target') then
+	if next(self.buttonsToUpdate) then
 		self:Show()
 	else
 		self:Hide()
 	end
 end
 
+function tullaRange:UpdateButtons()
+	if not next(self.buttonsToUpdate) then
+		self:Hide()
+		return
+	end
 
---[[ Button Registering ]]--
+	for button in pairs(self.buttonsToUpdate) do
+		self:UpdateButton(button)
+	end
+end
+
+function tullaRange:UpdateButton(button)
+	tullaRange.UpdateButtonUsable(button)
+	tullaRange.UpdateFlash(button, UPDATE_DELAY)
+end
+
+
+
+--[[ Button Hooking ]]--
 
 function tullaRange.RegisterButton(button)
 	button:HookScript('OnShow', tullaRange.OnButtonShow)
@@ -120,33 +137,7 @@ function tullaRange.OnButtonHide(button)
 end
 
 
---[[ Button Updating ]]--
-
-function tullaRange:UpdateButtons()
-	if not next(self.buttonsToUpdate) then
-		self:Hide()
-		return
-	end
-
-	for button in pairs(self.buttonsToUpdate) do
-		self:UpdateButton(button)
-	end
-end
-
-function tullaRange:UpdateButton(button)
-	local newRange = false
-	local id = ActionButton_GetPagedID(button)
-
-	if ActionHasRange(id) and IsActionInRange(id) == 0 then
-		newRange = true
-	end
-
-	if self.redRangeFlag ~= newRange then
-		self.redRangeFlag = newRange
-	end
-
-	tullaRange.UpdateButtonUsable(button)
-end
+--[[ Range Coloring ]]--
 
 function tullaRange.UpdateButtonUsable(button)
 	local id = ActionButton_GetPagedID(button)
@@ -156,25 +147,64 @@ function tullaRange.UpdateButtonUsable(button)
 		if ActionHasRange(id) and IsActionInRange(id) == 0 then
 			local icon = _G[button:GetName() .. 'Icon']
 			local normalTexture = button:GetNormalTexture()
+			local r, g, b = tullaRange.GetOORColor()
 
-			icon:SetVertexColor(0.8, 0.1, 0.1)
-			normalTexture:SetVertexColor(0.8, 0.1, 0.1)
+			icon:SetVertexColor(r, g, b)
+			normalTexture:SetVertexColor(r, g, b)
 			button.redRangeRed = true
 		elseif button.redRangeRed then
 			local icon = _G[button:GetName() .. 'Icon']
 			local normalTexture = button:GetNormalTexture()
+			local r, g, b = tullaRange.GetNormalColor()
 
-			icon:SetVertexColor(1.0, 1.0, 1.0)
-			normalTexture:SetVertexColor(1.0, 1.0, 1.0)
+			icon:SetVertexColor(r, g, b)
+			normalTexture:SetVertexColor(r, g, b)
 			button.redRangeRed = false
 		end
 	elseif notEnoughMana then
 		local icon = _G[button:GetName() .. 'Icon']
 		local normalTexture = button:GetNormalTexture()
+		local r, g, b = tullaRange.GetOOMColor()
 
-		icon:SetVertexColor(0.1, 0.3, 1.0)
-		normalTexture:SetVertexColor(0.1, 0.3, 1.0)
+		icon:SetVertexColor(r, g, b)
+		normalTexture:SetVertexColor(r, g, b)
 	end
+end
+
+function tullaRange.UpdateFlash(button, elapsed)
+	if ActionButton_IsFlashing(button) then
+		local flashtime = button.flashtime
+		flashtime = flashtime - elapsed
+
+		if flashtime <= 0 then
+			local overtime = -flashtime
+			if overtime >= ATTACK_BUTTON_FLASH_TIME then
+				overtime = 0
+			end
+			flashtime = ATTACK_BUTTON_FLASH_TIME - overtime
+
+			local flashTexture = _G[self:GetName() .. 'Flash']
+			if flashTexture:IsShown() then
+				flashTexture:Hide()
+			else
+				flashTexture:Show()
+			end
+		end
+
+		self.flashtime = flashtime
+	end
+end
+
+function tullaRange.GetNormalColor()
+	return 1, 1, 1
+end
+
+function tullaRange.GetOORColor()
+	return 1.0, 0.3, 0.1
+end
+
+function tullaRange.GetOOMColor()
+	return 0.1, 0.3, 1.0
 end
 
 
