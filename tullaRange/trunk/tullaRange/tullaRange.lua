@@ -183,7 +183,7 @@ function tullaRange.UpdateFlash(button, elapsed)
 			end
 			flashtime = ATTACK_BUTTON_FLASH_TIME - overtime
 
-			local flashTexture = _G[self:GetName() .. 'Flash']
+			local flashTexture = _G[button:GetName() .. 'Flash']
 			if flashTexture:IsShown() then
 				flashTexture:Hide()
 			else
@@ -191,7 +191,7 @@ function tullaRange.UpdateFlash(button, elapsed)
 			end
 		end
 
-		self.flashtime = flashtime
+		button.flashtime = flashtime
 	end
 end
 
