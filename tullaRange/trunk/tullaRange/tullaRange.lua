@@ -8,12 +8,13 @@
 
 local _G = _G
 local UPDATE_DELAY = 0.1
+local ATTACK_BUTTON_FLASH_TIME = ATTACK_BUTTON_FLASH_TIME
 
 local ActionButton_GetPagedID = ActionButton_GetPagedID
 local ActionButton_IsFlashing = ActionButton_IsFlashing
-local IsUsableAction = IsUsableAction
 local ActionHasRange = ActionHasRange
 local IsActionInRange = IsActionInRange
+local IsUsableAction = IsUsableAction
 
 
 --[[ The main thing ]]--
@@ -52,35 +53,35 @@ function tullaRange:OnUpdate(elapsed)
 	if self.elapsed < UPDATE_DELAY then
 		self.elapsed = self.elapsed + elapsed
 	else
-		self.elapsed = 0
-		self:UpdateButtons()
+		self:Update()
 	end
 end
 
 function tullaRange:OnHide()
-	self:ForceUpdateOnNextFrame()
+	self.elapsed = 0
 end
 
 
 --[[ Game Events ]]--
 
 function tullaRange:PLAYER_ENTERING_WORLD()
-	self:ForceUpdateOnNextFrame()
+	self:Update()
 end
 
 function tullaRange:PLAYER_TARGET_CHANGED()
-	self:ForceUpdateOnNextFrame()
+	self:Update()
 end
 
 function tullaRange:PLAYER_FOCUS_CHANGED()
-	self:ForceUpdateOnNextFrame()
+	self:Update()
 end
 
 
 --[[ Actions ]]--
 
-function tullaRange:ForceUpdateOnNextFrame()
-	self.elapsed = UPDATE_DELAY
+function tullaRange:Update()
+	self:UpdateButtons(self.elapsed)
+	self.elapsed = 0
 end
 
 function tullaRange:UpdateShown()
@@ -91,20 +92,20 @@ function tullaRange:UpdateShown()
 	end
 end
 
-function tullaRange:UpdateButtons()
+function tullaRange:UpdateButtons(elapsed)
 	if not next(self.buttonsToUpdate) then
 		self:Hide()
 		return
 	end
 
 	for button in pairs(self.buttonsToUpdate) do
-		self:UpdateButton(button)
+		self:UpdateButton(button, elapsed)
 	end
 end
 
-function tullaRange:UpdateButton(button)
+function tullaRange:UpdateButton(button, elapsed)
 	tullaRange.UpdateButtonUsable(button)
-	tullaRange.UpdateFlash(button, UPDATE_DELAY)
+	tullaRange.UpdateFlash(button, elapsed)
 end
 
 
