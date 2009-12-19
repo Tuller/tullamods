@@ -173,8 +173,7 @@ end
 
 function tullaRange.UpdateFlash(button, elapsed)
 	if ActionButton_IsFlashing(button) then
-		local flashtime = button.flashtime
-		flashtime = flashtime - elapsed
+		local flashtime = button.flashtime - elapsed
 
 		if flashtime <= 0 then
 			local overtime = -flashtime
