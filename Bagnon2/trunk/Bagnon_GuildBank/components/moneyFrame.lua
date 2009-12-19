@@ -82,24 +82,27 @@ function MoneyFrame:OnHide()
 	self:UpdateEvents()
 end
 
-function MoneyFrame:OnClick()
+function MoneyFrame:OnClick(button)
 	local cMoney = GetCursorMoney() or 0
 	if cMoney > 0 then
 		self:DepositMoney(cMoney)
-	elseif IsModifierKeyDown()  then
+		return
+	end
+
+	if button == 'LeftButton' and (not IsShiftKeyDown()) then
 		self:ShowDepositDialog()
-	else
+		return
+	end
+
+	if button == 'RightButton' or (button == 'LeftButton' and IsShiftKeyDown())  then
 		self:ShowWithdrawDialog()
+		return
 	end
 end
 
 function MoneyFrame:OnEnter()
 	GameTooltip:SetOwner(self, 'ANCHOR_TOPRIGHT')
-	GameTooltip:SetText('Limits')
-	
-	self:AddMoneyToTooltip('Withdraw', GetGuildBankWithdrawMoney(), GameTooltip)
-
-	GameTooltip:Show()
+	self:UpdateTooltip()
 end
 
 function MoneyFrame:OnLeave()
@@ -116,7 +119,7 @@ function MoneyFrame:OnEvent(event, ...)
 end
 
 
---[[ Update Methods ]]--
+--[[ Actions ]]--
 
 function MoneyFrame:UpdateEverything()
 	self:UpdateEvents()
@@ -136,6 +139,18 @@ function MoneyFrame:UpdateEvents()
 	end
 end
 
+function MoneyFrame:UpdateTooltip()
+	GameTooltip:SetText('Guild Funds')
+	GameTooltip:AddLine('<Left Click> to deposit.', 1, 1, 1)
+
+	local withdrawMoney = GetGuildBankWithdrawMoney()
+	if withdrawMoney > 0 then
+		GameTooltip:AddLine(string.format('<Right Click> to withdraw (%s remaining).', self:GetCurencyText(withdrawMoney)), 1, 1, 1)
+	end
+
+	GameTooltip:Show()
+end
+
 function MoneyFrame:DepositMoney(amount)
 	DepositGuildBankMoney(cMoney)
 	DropCursorMoney()
@@ -143,7 +158,7 @@ end
 
 function MoneyFrame:ShowDepositDialog()
 	PlaySound('igMainMenuOption')
-	
+
 	StaticPopup_Hide('GUILDBANK_WITHDRAW')
 	if StaticPopup_Visible('GUILDBANK_DEPOSIT') then
 		StaticPopup_Hide('GUILDBANK_DEPOSIT')
@@ -154,9 +169,9 @@ end
 
 function MoneyFrame:ShowWithdrawDialog()
 	if GetGuildBankWithdrawMoney() <= 0 then return end
-	
+
 	PlaySound('igMainMenuOption')
-	
+
 	StaticPopup_Hide('GUILDBANK_DEPOSIT')
 	if StaticPopup_Visible('GUILDBANK_WITHDRAW') then
 		StaticPopup_Hide('GUILDBANK_WITHDRAW')
@@ -199,7 +214,7 @@ function MoneyFrame:GetGoldSilverCopper(money)
 	return gold, silver, copper
 end
 
-function MoneyFrame:AddMoneyToTooltip(desc, money, tooltip)
+function MoneyFrame:GetCurrencyText(money)
 	local gold, silver, copper = self:GetGoldSilverCopper(money)
 	local text
 
@@ -223,5 +238,5 @@ function MoneyFrame:AddMoneyToTooltip(desc, money, tooltip)
 		end
 	end
 
-	tooltip:AddDoubleLine(desc, text, 1, 1, 1, 1, 1, 1, 0)
+	return text
 end
