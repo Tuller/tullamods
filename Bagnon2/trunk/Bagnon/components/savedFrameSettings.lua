@@ -539,5 +539,5 @@ function SavedFrameSettings:GetDefaultKeyRingSettings()
 end
 
 function SavedFrameSettings:GetDefaultGuildBankSettings()
-	return GetDefaultInventorySettings()
+	return self:GetDefaultInventorySettings()
 end
