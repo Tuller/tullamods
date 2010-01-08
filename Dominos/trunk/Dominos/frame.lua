@@ -129,6 +129,18 @@ function Frame:LoadButtons()
 	end
 end
 
+function Frame:AddButton(i)
+	--placeholder
+end
+
+function Frame:RemoveButton(i)
+	local b = self.buttons and self.buttons[i]
+	if b and b.Free then
+		b:Free()
+		self.buttons[i] = nil
+	end
+end
+
 function Frame:UpdateButtonCount(numButtons)
 	for i = numButtons + 1, #self.buttons do
 		self:RemoveButton(i)
