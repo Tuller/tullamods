@@ -630,10 +630,15 @@ function Frame:PlaceBagFrame()
 		--the bag frame has to be created here to respond to events
 		local frame = self:GetBagFrame() or self:CreateBagFrame()
 		if self:IsBagFrameShown() then
-			local menuButtons = self:GetMenuButtons()
-
 			frame:ClearAllPoints()
-			frame:SetPoint('TOPLEFT', menuButtons[1], 'BOTTOMLEFT', 0, -4)
+
+			local menuButtons = self:GetMenuButtons()
+			if #menuButtons > 0 then
+				frame:SetPoint('TOPLEFT', menuButtons[1], 'BOTTOMLEFT', 0, -4)
+			else
+				frame:SetPoint('TOPLEFT', self:GetTitleFrame(), 'BOTTOMLEFT', 0, -4)
+			end
+
 			frame:Show()
 
 			return frame:GetWidth(), frame:GetHeight() + 4
@@ -849,10 +854,10 @@ function Frame:PlaceOptionsToggle()
 		toggle:ClearAllPoints()
 		toggle:SetPoint('TOPRIGHT', self, 'TOPRIGHT', -32, -8)
 		toggle:Show()
-		
+
 		return toggle:GetWidth(), toggle:GetHeight()
 	end
-	
+
 	local toggle = self:GetOptionsToggle()
 	if toggle then
 		toggle:Hide()
