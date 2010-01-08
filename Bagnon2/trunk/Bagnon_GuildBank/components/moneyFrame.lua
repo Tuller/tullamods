@@ -143,9 +143,13 @@ function MoneyFrame:UpdateTooltip()
 	GameTooltip:SetText('Guild Funds')
 	GameTooltip:AddLine('<Left Click> to deposit.', 1, 1, 1)
 
-	local withdrawMoney = GetGuildBankWithdrawMoney()
-	if withdrawMoney > 0 then
-		GameTooltip:AddLine(string.format('<Right Click> to withdraw (%s remaining).', self:GetCurencyText(withdrawMoney)), 1, 1, 1)
+	if CanWithdrawGuildBankMoney() then
+		local withdrawMoney = GetGuildBankWithdrawMoney()
+		if withdrawMoney > 0 then
+			GameTooltip:AddLine(string.format('<Right Click> to withdraw (%s remaining).', self:GetCurencyText(withdrawMoney)), 1, 1, 1)
+		else
+			GameTooltip:AddLine('<Right Click> to withdraw.')
+		end
 	end
 
 	GameTooltip:Show()
@@ -168,7 +172,7 @@ function MoneyFrame:ShowDepositDialog()
 end
 
 function MoneyFrame:ShowWithdrawDialog()
-	if GetGuildBankWithdrawMoney() <= 0 then return end
+	if not CanWithdrawGuildBankMoney() then return end
 
 	PlaySound('igMainMenuOption')
 
