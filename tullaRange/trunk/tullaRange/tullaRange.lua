@@ -160,7 +160,7 @@ function tullaRange.UpdateButtonUsable(button)
 
 			icon:SetVertexColor(r, g, b)
 			normalTexture:SetVertexColor(r, g, b)
-			button.redRangeRed = false
+			button.redRangeRed = nil
 		end
 	elseif notEnoughMana then
 		local icon = _G[button:GetName() .. 'Icon']
