@@ -55,3 +55,7 @@ L.ShowMinimapButton = 'Показать иконку на миникарте'
 L.Advanced = 'Дополнительно'
 L.LeftToRight = 'Расположение кнопок с лева на права'
 L.TopToBottom = 'Расположение кнопок с верху в низ'
+
+--totems
+L.ShowTotems = 'Показать тотемы'
+L.ShowTotemRecall = 'Показать пересоздание'
