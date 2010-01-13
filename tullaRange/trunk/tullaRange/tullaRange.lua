@@ -19,7 +19,7 @@ local IsUsableAction = IsUsableAction
 
 --[[ The main thing ]]--
 
-local tullaRange = CreateFrame('Frame', 'tullaRange', UIParent)
+local tullaRange = CreateFrame('Frame', 'tullaRange', UIParent); tullaRange:Hide()
 
 function tullaRange:Load()
 	self.buttonsToUpdate = {}
@@ -35,8 +35,6 @@ function tullaRange:Load()
 	self:RegisterEvent('PLAYER_ENTERING_WORLD')
 	self:RegisterEvent('PLAYER_TARGET_CHANGED')
 	self:RegisterEvent('PLAYER_FOCUS_CHANGED')
-
-	self:Hide()
 end
 
 
@@ -108,6 +106,15 @@ function tullaRange:UpdateButton(button, elapsed)
 	tullaRange.UpdateFlash(button, elapsed)
 end
 
+function tullaRange:UpdateButtonStatus(button)
+	if button:IsVisible() then
+		self.buttonsToUpdate[button] = true
+	else
+		self.buttonsToUpdate[button] = nil
+	end
+	self:UpdateShown()
+end
+
 
 
 --[[ Button Hooking ]]--
@@ -118,15 +125,6 @@ function tullaRange.RegisterButton(button)
 	button:SetScript('OnUpdate', nil)
 
 	tullaRange:UpdateButtonStatus(button)
-end
-
-function tullaRange:UpdateButtonStatus(button)
-	if button:IsVisible() then
-		self.buttonsToUpdate[button] = true
-	else
-		self.buttonsToUpdate[button] = nil
-	end
-	self:UpdateShown()
 end
 
 function tullaRange.OnButtonShow(button)
@@ -143,32 +141,35 @@ end
 function tullaRange.UpdateButtonUsable(button)
 	local id = ActionButton_GetPagedID(button)
 	local isUsable, notEnoughMana = IsUsableAction(id)
-
+	local r, g, b, a
+	
+	--usable
 	if isUsable then
+		--but out of range
 		if ActionHasRange(id) and IsActionInRange(id) == 0 then
-			local icon = _G[button:GetName() .. 'Icon']
-			local normalTexture = button:GetNormalTexture()
-			local r, g, b = tullaRange.GetOORColor()
-
-			icon:SetVertexColor(r, g, b)
-			normalTexture:SetVertexColor(r, g, b)
-			button.redRangeRed = true
+			if not button.redRangeRed then
+				r, g, b, a = tullaRange.GetColor('oor')
+				button.redRangeRed = true
+			end
+		--in rage
 		elseif button.redRangeRed then
-			local icon = _G[button:GetName() .. 'Icon']
-			local normalTexture = button:GetNormalTexture()
-			local r, g, b = tullaRange.GetNormalColor()
-
-			icon:SetVertexColor(r, g, b)
-			normalTexture:SetVertexColor(r, g, b)
+			r, g, b, a = tullaRange.GetColor('normal')
 			button.redRangeRed = nil
 		end
+	--out of mana
 	elseif notEnoughMana then
-		local icon = _G[button:GetName() .. 'Icon']
-		local normalTexture = button:GetNormalTexture()
-		local r, g, b = tullaRange.GetOOMColor()
-
-		icon:SetVertexColor(r, g, b)
-		normalTexture:SetVertexColor(r, g, b)
+		r, g, b, a = tullaRange.GetColor('oom')
+	--unusuable
+	else
+		r, g, b, a = tullaRange.GetColor('unusable')
+	end
+	
+	if r then
+		local icon =  _G[button:GetName() .. 'Icon']
+		icon:SetVertexColor(r, g, b, a)
+		
+		local nt = button:GetNormalTexture()
+		nt:SetVertexColor(r, g, b, a)
 	end
 end
 
@@ -195,18 +196,29 @@ function tullaRange.UpdateFlash(button, elapsed)
 	end
 end
 
-function tullaRange.GetNormalColor()
-	return 1, 1, 1
+--[[ Configuration ]]--
+
+local TULLARANGE_COLORS = {
+	normal = {1, 1, 1, 1},
+	oor = {1, 0.3, 0.1, 1},
+	oom = {0.1, 0.3, 1, 1},
+	unusable = {0.4, 0.4, 0.4, 1}
+}
+
+function tullaRange.SetColor(index, r, g, b, a)
+	local color = TULLARANGE_COLORS[index]
+	color[1] = r
+	color[2] = g
+	color[3] = b
+	color[4] = a
+
+	self:Update()
 end
 
-function tullaRange.GetOORColor()
-	return 1.0, 0.3, 0.1
+function tullaRange.GetColor(index)
+	local color = TULLARANGE_COLORS[index]
+	return color[1], color[2], color[3], color[4]
 end
-
-function tullaRange.GetOOMColor()
-	return 0.1, 0.3, 1.0
-end
-
 
 --[[ Load The Thing ]]--
 
