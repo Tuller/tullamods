@@ -59,6 +59,13 @@ function tullaRange:PLAYER_LOGIN()
 		self:LoadDefaults()
 	end
 
+	--add options loader
+	local f = CreateFrame('Frame', nil, InterfaceOptionsFrame)
+	f:SetScript('OnShow', function(self)
+		self:SetScript('OnShow', nil)
+		LoadAddOn('tullaRange_Config')
+	end)
+
 	self.colors = TULLARANGE_COLORS
 	self.buttonsToUpdate = {}
 
