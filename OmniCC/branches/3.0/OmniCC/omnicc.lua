@@ -6,13 +6,14 @@
 
 --[[ constants & local bindings ]]--
 
+local PADDING = 2
 local ICON_SIZE = 36 --the normal size for an icon (don't change this)
 local TEXT_FONT = STANDARD_TEXT_FONT --what font to use
 local FONT_SIZE = 18 --the base font size to use at a scale of 1
-local MIN_SCALE = 0.5 --the minimum scale we want to show cooldown counts at, anything below this will be hidden
+local MIN_SCALE = 0.8 --the minimum scale we want to show cooldown counts at, anything below this will be hidden
 local MIN_DURATION = 3 --the minimum duration to show cooldown text for
 local DAY, HOUR, MINUTE = 86400, 3600, 60
-local UPDATE_DELAY = 0.05 --minimum time between timer updates
+local UPDATE_DELAY = 0.02 --minimum time between timer updates
 
 --omg speed
 local format = string.format
@@ -25,13 +26,17 @@ local min = math.min
 
 local function formatTime(s)
 	if s >= DAY then
-		return format('%dd', floor(s/DAY + 0.5))
+		return GRAY_FONT_COLOR_CODE .. format('%dd', floor(s/DAY + 0.5)) .. FONT_COLOR_CODE_CLOSE
 	elseif s >= HOUR then
-		return format('%dh', floor(s/HOUR + 0.5))
+		return NORMAL_FONT_COLOR_CODE .. format('%dh', floor(s/HOUR + 0.5)) .. FONT_COLOR_CODE_CLOSE
 	elseif s >= MINUTE then
-		return format('%dm', floor(s/MINUTE + 0.5))
+		return YELLOW_FONT_COLOR_CODE .. format('%dm', floor(s/MINUTE + 0.5)) .. FONT_COLOR_CODE_CLOSE
+	elseif floor(s + 0.5) > 10 then
+		return YELLOW_FONT_COLOR_CODE .. floor(s + 0.5) .. FONT_COLOR_CODE_CLOSE
+	elseif s >= 3 then
+		return RED_FONT_COLOR_CODE .. floor(s + 0.5) .. FONT_COLOR_CODE_CLOSE
 	end
-	return floor(s + 0.5)
+	return GREEN_FONT_COLOR_CODE .. format('%.1f', s) .. FONT_COLOR_CODE_CLOSE
 end
 
 local Timer = CreateFrame('Frame'); Timer:Hide()
@@ -92,7 +97,22 @@ function Timer:Stop()
 end
 
 function Timer:UpdateDisplay()
-	self.text:SetText(formatTime(self:GetRemainingTime()))
+	local rScale = self:GetEffectiveScale() / UIParent:GetEffectiveScale()
+	local iconScale = floor(self:GetWidth() - PADDING + 0.5) / ICON_SIZE --icon sizes seem to vary a little bit, so this takes care of making them round to whole numbers
+	local text = self.text
+
+	if (iconScale*rScale) < MIN_SCALE or iconScale <= 0 then
+		text:Hide()
+	else
+		local fontSize = FONT_SIZE * iconScale
+		if not(text.fontSize and text.fontSize == fontSize) then
+			text:SetFont(TEXT_FONT, fontSize, 'OUTLINE')
+			text.fontSize = fontSize
+		end
+
+		text:SetText(formatTime(self:GetRemainingTime()))
+		text:Show()
+	end
 end
 
 function Timer:GetRemainingTime()
