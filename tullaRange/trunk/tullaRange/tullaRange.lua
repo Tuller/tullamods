@@ -175,7 +175,7 @@ function tullaRange.UpdateButtonUsable(button)
 				button.redRangeRed = true
 			end
 		--in rage
-		elseif button.redRangeRed then
+		else
 			r, g, b = tullaRange:GetColor('normal')
 			button.redRangeRed = nil
 		end
