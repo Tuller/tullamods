@@ -15,6 +15,7 @@ local ActionButton_IsFlashing = ActionButton_IsFlashing
 local ActionHasRange = ActionHasRange
 local IsActionInRange = IsActionInRange
 local IsUsableAction = IsUsableAction
+local HasAction = HasAction
 
 
 --[[ The main thing ]]--
@@ -25,6 +26,7 @@ function tullaRange:Load()
 	self:SetScript('OnUpdate', self.OnUpdate)
 	self:SetScript('OnHide', self.OnHide)
 	self:SetScript('OnEvent', self.OnEvent)
+	self.elapsed = 0
 
 	self:RegisterEvent('PLAYER_LOGIN')
 end
@@ -58,6 +60,7 @@ function tullaRange:PLAYER_LOGIN()
 	if not TULLARANGE_COLORS then
 		self:LoadDefaults()
 	end
+	self.colors = TULLARANGE_COLORS
 
 	--add options loader
 	local f = CreateFrame('Frame', nil, InterfaceOptionsFrame)
@@ -66,28 +69,11 @@ function tullaRange:PLAYER_LOGIN()
 		LoadAddOn('tullaRange_Config')
 	end)
 
-	self.colors = TULLARANGE_COLORS
 	self.buttonsToUpdate = {}
 
 	hooksecurefunc('ActionButton_OnUpdate', self.RegisterButton)
-	hooksecurefunc('ActionButton_UpdateUsable', self.UpdateButtonUsable)
-	hooksecurefunc('ActionButton_Update', self.UpdateButtonUsable)
-
-	self:RegisterEvent('PLAYER_ENTERING_WORLD')
-	self:RegisterEvent('PLAYER_TARGET_CHANGED')
-	self:RegisterEvent('PLAYER_FOCUS_CHANGED')
-end
-
-function tullaRange:PLAYER_ENTERING_WORLD()
-	self:Update()
-end
-
-function tullaRange:PLAYER_TARGET_CHANGED()
-	self:Update()
-end
-
-function tullaRange:PLAYER_FOCUS_CHANGED()
-	self:Update()
+	hooksecurefunc('ActionButton_UpdateUsable', self.OnUpdateButtonUsable)
+	hooksecurefunc('ActionButton_Update', self.OnButtonUpdate)
 end
 
 
@@ -100,8 +86,7 @@ end
 
 function tullaRange:ForceColorUpdate()
 	for button in pairs(self.buttonsToUpdate) do
-		button.redRangeRed = nil
-		tullaRange.UpdateButtonUsable(button)
+		tullaRange.OnUpdateButtonUsable(button)
 	end
 end
 
@@ -130,10 +115,11 @@ function tullaRange:UpdateButton(button, elapsed)
 end
 
 function tullaRange:UpdateButtonStatus(button)
-	if button:IsVisible() then
-		self.buttonsToUpdate[button] = true
-	else
+	local action = ActionButton_GetPagedID(button)
+	if not(button:IsVisible() and action and HasAction(action) and ActionHasRange(action)) then
 		self.buttonsToUpdate[button] = nil
+	else
+		self.buttonsToUpdate[button] = true
 	end
 	self:UpdateShown()
 end
@@ -158,33 +144,46 @@ function tullaRange.OnButtonHide(button)
 	tullaRange:UpdateButtonStatus(button)
 end
 
+function tullaRange.OnUpdateButtonUsable(button)
+	button.tullaRangeColor = nil
+	tullaRange.UpdateButtonUsable(button)
+end
+
+function tullaRange.OnButtonUpdate(button)
+	 tullaRange:UpdateButtonStatus(button)
+end
+
 
 --[[ Range Coloring ]]--
 
 function tullaRange.UpdateButtonUsable(button)
-	local id = ActionButton_GetPagedID(button)
-	local isUsable, notEnoughMana = IsUsableAction(id)
-	local r, g, b, a
+	local action = ActionButton_GetPagedID(button)
+	local isUsable, notEnoughMana = IsUsableAction(action)
 
 	--usable
 	if isUsable then
 		--but out of range
-		if ActionHasRange(id) and IsActionInRange(id) == 0 then
-			if not button.redRangeRed then
-				r, g, b = tullaRange:GetColor('oor')
-				button.redRangeRed = true
-			end
-		--in rage
+		if IsActionInRange(action) == 0 then
+			tullaRange.SetButtonColor(button, 'oor')
+		--in range
 		else
-			r, g, b = tullaRange:GetColor('normal')
-			button.redRangeRed = nil
+			tullaRange.SetButtonColor(button, 'normal')
 		end
 	--out of mana
 	elseif notEnoughMana then
-		r, g, b = tullaRange:GetColor('oom')
+		tullaRange.SetButtonColor(button, 'oom')
+	--unusable
+	else
+		button.tullaRangeColor = 'unusuable'
 	end
+end
 
-	if r then
+function tullaRange.SetButtonColor(button, colorType)
+	if button.tullaRangeColor ~= colorType then
+		button.tullaRangeColor = colorType
+
+		local r, g, b = tullaRange:GetColor(colorType)
+
 		local icon =  _G[button:GetName() .. 'Icon']
 		icon:SetVertexColor(r, g, b)
 
