@@ -13,6 +13,8 @@ You can change the looks of the action buttons in Dominos using an addon called 
 
 Ever want the entire button to become red when the skill associated it is out of range?  Look no further than [http://www.wowinterface.com/downloads/info4166-RedRange.html RedRange].  [http://www.wowinterface.com/downloads/info13334-RangeColors.html#info RangeColors] has been suggested as a nice alternative.
 
+Recently, I wrote [http://www.wowinterface.com/downloads/info15636-tullaRange.html tullaRange], which is intended to perform the same functions as the above addons, but with a focus on minimizing CPU usage.
+
 
 ==== Cooldown Count ====
 
