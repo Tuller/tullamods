@@ -51,3 +51,16 @@ L.OneBag = '完整背包'
 L.ShowKeyring = '显示钥匙链'
 L.StickyBars = '粘附动作条'
 L.ShowMinimapButton = '显示小地图按钮'
+L.Advanced = '高级'
+L.LeftToRight = '按钮从左至右排列'
+L.TopToBottom = '按钮从上至下排列'
+
+L.ALT_KEY_TEXT = 'ALT'
+L.AltShift = 'ALT-' .. SHIFT_KEY_TEXT
+L.CtrlShift = CTRL_KEY_TEXT .. '-' .. SHIFT_KEY_TEXT
+L.CtrlAlt = CTRL_KEY_TEXT .. '-ALT'
+L.CtrlAltShift = CTRL_KEY_TEXT .. '-ALT-' .. SHIFT_KEY_TEXT
+
+--totems
+L.ShowTotems = '显示图腾'
+L.ShowTotemRecall = '显示回收'
