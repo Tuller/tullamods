@@ -326,8 +326,6 @@ local function IsWardrobeLoaded()
 end
 
 local function findEquipmentSetByName(search)
-	print('find set')
-
 	local startsWithSearch = '^' .. search
 	local partialMatch = nil
 
@@ -346,7 +344,6 @@ local function findEquipmentSetByName(search)
 
 	-- Wardrobe Support
 	if Wardrobe then
-		print('test')
 		for i, outfit in ipairs( Wardrobe.CurrentConfig.Outfit) do
 			local setName = outfit.OutfitName
 			local lSetName = setName:lower()
