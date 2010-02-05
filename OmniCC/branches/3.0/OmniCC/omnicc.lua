@@ -13,7 +13,7 @@ local FONT_SIZE = 18 --the base font size to use at a scale of 1
 local MIN_SCALE = 0.8 --the minimum scale we want to show cooldown counts at, anything below this will be hidden
 local MIN_DURATION = 3 --the minimum duration to show cooldown text for
 local DAY, HOUR, MINUTE = 86400, 3600, 60
-local UPDATE_DELAY = 0.02 --minimum time between timer updates
+local UPDATE_DELAY = 0.01 --minimum time between timer updates
 
 --omg speed
 local format = string.format
@@ -52,7 +52,6 @@ function Timer:New(parent)
 	local text = t:CreateFontString(nil, 'OVERLAY')
 	text:SetPoint('CENTER', 0, 1)
 	text:SetFont(TEXT_FONT, FONT_SIZE, 'OUTLINE')
-	text:SetTextColor(1, 0.9, 0)
 	t.text = text
 
 	return t
@@ -82,18 +81,18 @@ function Timer:Start(cooldown, start, duration)
 	timer:Show()
 end
 
+function Timer:Stop()
+	self.start = 0
+	self.duration = 0
+	self:Hide()
+end
+
 function Timer:Update()
 	if self:GetRemainingTime() > 0 then
 		self:UpdateDisplay()
 	else
 		self:Stop()
 	end
-end
-
-function Timer:Stop()
-	self.start = 0
-	self.duration = 0
-	self:Hide()
 end
 
 function Timer:UpdateDisplay()
