@@ -45,6 +45,7 @@ end
 
 function DTB:PLAYER_REGEN_ENABLED()
 	self:LoadTotemBars()
+	self:UnregisterEvent('PLAYER_REGEN_ENABLED')
 end
 
 function DTB:LoadTotemBars()
