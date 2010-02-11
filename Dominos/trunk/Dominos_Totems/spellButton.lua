@@ -196,10 +196,13 @@ function SpellButton:UpdateCooldown()
 	if not self:IsVisible() then return end
 
 	local spell = self:GetSpell()
+	local cooldown = _G[self:GetName() .. 'Cooldown']
+
 	if spell and IsSpellKnown(spell) then
-		CooldownFrame_SetTimer(_G[self:GetName() .. 'Cooldown'], GetSpellCooldown(spell))
+		local start, duration, enable = GetSpellCooldown(spell)
+		CooldownFrame_SetTimer(cooldown, start, duration, enable)
 	else
-		_G[self:GetName() .. 'Cooldown']:Hide()
+		cooldown:Hide()
 	end
 end
 
