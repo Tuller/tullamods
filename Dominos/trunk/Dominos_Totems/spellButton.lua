@@ -195,11 +195,11 @@ end
 function SpellButton:UpdateCooldown()
 	if not self:IsVisible() then return end
 
-	local spell = self:GetSpell()
+	local spellName, spellID = self:GetSpell()
 	local cooldown = _G[self:GetName() .. 'Cooldown']
 
-	if spell and IsSpellKnown(spell) then
-		local start, duration, enable = GetSpellCooldown(spell)
+	if spellID and IsSpellKnown(spellID) then
+		local start, duration, enable = GetSpellCooldown(spellID)
 		CooldownFrame_SetTimer(cooldown, start, duration, enable)
 	else
 		cooldown:Hide()
@@ -306,6 +306,7 @@ end
 
 function SpellButton:SetSpell(id)
 	self:SetAttribute('spell', getProperSpellName(id))
+	self.spellID = id
 
 	if self:IsVisible() then
 		self:UpdateSpell()
@@ -314,7 +315,7 @@ function SpellButton:SetSpell(id)
 end
 
 function SpellButton:GetSpell()
-	return self:GetAttribute('spell')
+	return self:GetAttribute('spell'), self.spellID
 end
 
 function SpellButton:GetSpellInfo()
