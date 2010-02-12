@@ -36,7 +36,7 @@ function DTB:Unload()
 end
 
 function DTB:UPDATE_MULTI_CAST_ACTIONBAR()
-	if IsPlayerInCombat() then
+	if not InCombatLockdown() then
 		self:LoadTotemBars()
 	else
 		self:RegisterEvent('PLAYER_REGEN_ENABLED')
