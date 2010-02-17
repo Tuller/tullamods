@@ -17,8 +17,6 @@ local MAX_TOTEMS = MAX_TOTEMS --fire, earth, water, air
 local RECALL_SPELL = TOTEM_MULTI_CAST_RECALL_SPELLS[1]
 local START_ACTION_ID = 132 --actionID start of the totembar
 local SUMMON_SPELLS = TOTEM_MULTI_CAST_SUMMON_SPELLS
-local TOTEM_PRIORITIES = TOTEM_PRIORITIES
-
 
 --[[ Module ]]--
 
