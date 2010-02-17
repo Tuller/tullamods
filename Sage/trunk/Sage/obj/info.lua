@@ -321,6 +321,7 @@ function InfoBar:GetRaidGroup()
 			end
 		end
 	end
+	return 0
 end
 
 function InfoBar:UpdateLevel()
