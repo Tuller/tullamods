@@ -57,7 +57,7 @@ do
 
 	OmniCC.OnFinishCooldown = function(self, timer)
 		local parent = timer:GetParent()
-		if parent:IsVisible() then
+		if parent and parent:IsVisible() then
 			shines[parent]:Start()
 		end
 	end
