@@ -10,6 +10,10 @@ Bagnon.ItemSlot = ItemSlot
 
 local ItemSearch = LibStub('LibItemSearch-1.0')
 
+local function hasBlizzQuestHighlight() 
+	return GetContainerItemQuestInfo and true or false 
+end
+
 --[[
 	The item widget
 --]]
@@ -40,6 +44,8 @@ function ItemSlot:Create()
 	item:Hide()
 
 	--add a quality border texture
+	item.questBorder = _G[item:GetName() .. 'IconQuestTexture']
+
 	local border = item:CreateTexture(nil, 'OVERLAY')
 	border:SetWidth(67)
 	border:SetHeight(67)
@@ -171,6 +177,14 @@ end
 
 function ItemSlot:ITEM_SLOT_COLOR_UPDATE(msg, type, r, g, b)
 	self:Update()
+end
+
+function ItemSlot:QUEST_ACCEPTED()
+	self:UpdateBorder()
+end
+
+function ItemSlot:UNIT_QUEST_LOG_CHANGED()
+	self:UpdateBorder()
 end
 
 function ItemSlot:HandleEvent(msg, ...)
@@ -340,27 +354,66 @@ function ItemSlot:IsLocked()
 end
 
 --colors the item border based on the quality of the item.  hides it for common/poor items
-function ItemSlot:SetBorderQuality(quality)
-	local border = self.border
+if hasBlizzQuestHighlight() then
+	function ItemSlot:SetBorderQuality(quality)
+		local border = self.border
+		local qBorder = self.questBorder
 
-	if self:HighlightingItemsByQuality() then
-		if self:GetItem() and quality and quality > 1 then
-			local r, g, b = GetItemQualityColor(quality)
-			border:SetVertexColor(r, g, b, self:GetHighlightAlpha())
-			border:Show()
-			return
+		if self:HighlightingQuestItems() then
+			local isQuestItem, isQuestStarter = self:IsQuestItem()
+			if isQuestItem then
+				qBorder:SetTexture(TEXTURE_ITEM_QUEST_BORDER)
+				qBorder:SetAlpha(self:GetHighlightAlpha())
+				qBorder:Show()
+				border:Hide()
+				return
+			end
+
+			if isQuestStarter then
+				qBorder:SetTexture(TEXTURE_ITEM_QUEST_BANG)
+				qBorder:SetAlpha(self:GetHighlightAlpha())
+				qBorder:Show()
+				border:Hide()
+				return
+			end
 		end
-	end
 
-	if self:HighlightingQuestItems() then
-		if self:IsQuestItem() then
-			border:SetVertexColor(1, 1, 0, self:GetHighlightAlpha())
-			border:Show()
-			return
+		if self:HighlightingItemsByQuality() then
+			if self:GetItem() and quality and quality > 1 then
+				local r, g, b = GetItemQualityColor(quality)
+				border:SetVertexColor(r, g, b, self:GetHighlightAlpha())
+				border:Show()
+				qBorder:Hide()
+				return
+			end
 		end
-	end
 
-	border:Hide()
+		qBorder:Hide()
+		border:Hide()
+	end
+else
+	function ItemSlot:SetBorderQuality(quality)
+		local border = self.border
+
+		if self:HighlightingItemsByQuality() then
+			if self:GetItem() and quality and quality > 1 then
+				local r, g, b = GetItemQualityColor(quality)
+				border:SetVertexColor(r, g, b, self:GetHighlightAlpha())
+				border:Show()
+				return
+			end
+		end
+
+		if self:HighlightingQuestItems() then
+			if self:IsQuestItem() then
+				border:SetVertexColor(1, 1, 0, self:GetHighlightAlpha())
+				border:Show()
+				return
+			end
+		end
+
+		border:Hide()
+	end
 end
 
 function ItemSlot:UpdateBorder()
@@ -504,14 +557,33 @@ function ItemSlot:GetHighlightAlpha()
 	return Bagnon.Settings:GetHighlightOpacity()
 end
 
+--returns true if the item is a quest item or not
+--in 3.3, includes a second return to determine if the item is a quest starter for a quest the player lacks
 local QUEST_ITEM_SEARCH = string.format('t:%s|%s', select(12, GetAuctionItemClasses()), 'quest')
-function ItemSlot:IsQuestItem()
-	local itemLink = self:GetItem()
-	if not itemLink then
-		return false
-	end
 
-	return ItemSearch:Find(itemLink, QUEST_ITEM_SEARCH)
+if hasBlizzQuestHighlight() then
+	function ItemSlot:IsQuestItem()
+		local itemLink = self:GetItem()
+		if not itemLink then
+			return false, false
+		end
+
+		if self:IsCached() then
+			return ItemSearch:Find(itemLink, QUEST_ITEM_SEARCH), false
+		else
+			local isQuestItem, questID, isActive = GetContainerItemQuestInfo(self:GetBag(), self:GetID())
+			return isQuestItem, (questID and not isActive)
+		end
+	end
+else
+	function ItemSlot:IsQuestItem()
+		local itemLink = self:GetItem()
+		if not itemLink then
+			return false
+		end
+
+		return ItemSearch:Find(itemLink, QUEST_ITEM_SEARCH)
+	end
 end
 
 
@@ -529,7 +601,7 @@ function ItemSlot:IsTradeBagSlot()
 	return Bagnon.BagSlotInfo:IsTradeBag(self:GetPlayer(), self:GetBag())
 end
 
-function ItemSlot:GetTradeSlotColor()	
+function ItemSlot:GetTradeSlotColor()
 	return Bagnon.Settings:GetItemSlotColor('trade')
 end
 
