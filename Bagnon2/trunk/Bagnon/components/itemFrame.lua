@@ -8,6 +8,10 @@ local ItemFrame = Bagnon.Classy:New('Frame')
 ItemFrame:Hide()
 Bagnon.ItemFrame = ItemFrame
 
+local function hasBlizzQuestHighlight() 
+	return GetContainerItemQuestInfo and true or false 
+end
+
 
 --[[ Extreme Constants! ]]--
 
@@ -123,6 +127,16 @@ function ItemFrame:ITEM_FRAME_BAG_BREAK_UPDATE(msg, frameID, enable)
 	end
 end
 
+function ItemFrame:UNIT_QUEST_LOG_CHANGED(event, unit)
+	if unit == 'player' then
+		self:HandleGlobalItemEvent(event)
+	end
+end
+
+function ItemFrame:QUEST_ACCEPTED(event)
+	self:HandleGlobalItemEvent(event)
+end
+
 function ItemFrame:HandleGlobalItemEvent(msg, ...)
 	for i, item in self:GetAllItemSlots() do
 		item:HandleEvent(msg, ...)
@@ -182,17 +196,22 @@ function ItemFrame:UpdateEvents()
 	self:UnregisterAllItemEvents()
 	self:UnregisterAllMessages()
 
-	if self:IsVisible() then			
+	if self:IsVisible() then
 		--live item events
 		if not self:IsCached() then
 			self:RegisterEvent('ITEM_LOCK_CHANGED')
+			
+			if hasBlizzQuestHighlight() then
+				self:RegisterEvent('QUEST_ACCEPTED')
+				self:RegisterEvent('UNIT_QUEST_LOG_CHANGED')
+			end
 
 			self:RegisterItemEvent('ITEM_SLOT_ADD')
 			self:RegisterItemEvent('ITEM_SLOT_REMOVE')
 			self:RegisterItemEvent('ITEM_SLOT_UPDATE', 'HandleSpecificItemEvent')
 			self:RegisterItemEvent('ITEM_SLOT_UPDATE_COOLDOWN', 'HandleSpecificItemEvent')
 			self:RegisterItemEvent('BAG_UPDATE_TYPE')
-			
+
 			if self:HasBankBags() then
 				self:RegisterItemEvent('BANK_OPENED')
 				self:RegisterItemEvent('BANK_CLOSED')
@@ -206,7 +225,7 @@ function ItemFrame:UpdateEvents()
 		self:RegisterMessage('ITEM_FRAME_COLUMNS_UPDATE')
 		self:RegisterMessage('SLOT_ORDER_UPDATE')
 		self:RegisterMessage('ITEM_FRAME_BAG_BREAK_UPDATE')
-		
+
 		self:RegisterMessage('TEXT_SEARCH_UPDATE', 'HandleGlobalItemEvent')
 		self:RegisterMessage('BAG_SEARCH_UPDATE', 'HandleGlobalItemEvent')
 		self:RegisterMessage('ITEM_HIGHLIGHT_QUEST_UPDATE', 'HandleGlobalItemEvent')
@@ -293,7 +312,7 @@ end
 --if slots have been added or removed, then request a layout update
 function ItemFrame:ReloadAllItemSlots()
 	local changed = false
-	
+
 	local itemSlots = self.itemSlots
 	for i, itemSlot in pairs(itemSlots) do
 		local used = self:IsBagShown(itemSlot:GetBag()) and (itemSlot:GetID() <= self:GetBagSize(itemSlot:GetBag()))
@@ -303,7 +322,7 @@ function ItemFrame:ReloadAllItemSlots()
 			changed = true
 		end
 	end
-	
+
 	for _, bag in self:GetVisibleBags() do
 		for slot = 1, self:GetBagSize(bag) do
 			local itemSlot = self:GetItemSlot(bag, slot)
@@ -315,7 +334,7 @@ function ItemFrame:ReloadAllItemSlots()
 			end
 		end
 	end
-	
+
 	if changed then
 		self:RequestLayout()
 	end
