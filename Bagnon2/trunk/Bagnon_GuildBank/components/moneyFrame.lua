@@ -48,6 +48,7 @@ function MoneyFrame:AddClickFrame()
 	local f = CreateFrame('Button', self:GetName() .. 'Click', self)
 	f:SetFrameLevel(self:GetFrameLevel() + 3)
 	f:SetAllPoints(self)
+	f:RegisterForClicks('anyUp')
 
 	f:SetScript('OnClick', ClickFrame_OnClick)
 	f:SetScript('OnEnter', ClickFrame_OnEnter)
