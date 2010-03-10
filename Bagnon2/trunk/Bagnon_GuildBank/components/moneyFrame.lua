@@ -147,7 +147,7 @@ function MoneyFrame:UpdateTooltip()
 	if CanWithdrawGuildBankMoney() then
 		local withdrawMoney = GetGuildBankWithdrawMoney()
 		if withdrawMoney > 0 then
-			GameTooltip:AddLine(string.format('<Right Click> to withdraw (%s remaining).', self:GetCurencyText(withdrawMoney)), 1, 1, 1)
+			GameTooltip:AddLine(string.format('<Right Click> to withdraw (%s remaining).', self:GetCurrencyText(withdrawMoney)), 1, 1, 1)
 		else
 			GameTooltip:AddLine('<Right Click> to withdraw.')
 		end
