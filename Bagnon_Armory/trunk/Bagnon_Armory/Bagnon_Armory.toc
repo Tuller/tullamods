@@ -2,7 +2,7 @@
 ## Title: Bagnon Armory
 ## Notes: A BagnonDB wrapper for the Armory addon
 ## Author: Tuller, Warmexx
-## Version: 1.0.4
+## Version: 1.0.5
 ## RequiredDeps: Armory
 ArmoryBagnon.lua
 ui.xml

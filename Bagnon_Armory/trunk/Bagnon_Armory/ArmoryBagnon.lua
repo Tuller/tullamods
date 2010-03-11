@@ -12,10 +12,7 @@ BagnonDB = {addon = 'Armory'};
 --]]
 
 local function CanUseArmory()
-   if ( ArmorySettings and (ArmorySettings.DbVersion or 0) >= 8 ) then
-       return Armory:HasInventory();
-   end
-   return false;
+   return Armory and Armory:HasInventory();
 end
 
 local function ArmorySelect(player)
