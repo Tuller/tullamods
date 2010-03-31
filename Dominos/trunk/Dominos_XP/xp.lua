@@ -271,13 +271,13 @@ function XP:SetTexture(texture)
 end
 
 function XP:UpdateTexture()
-	local texture = LibStub('LibSharedMedia-3.0'):Fetch('statusbar', self.sets.texture)
+	local LSM = LibStub('LibSharedMedia-3.0', true)
+	
+	local texture = (LSM and LSM:Fetch('statusbar', self.sets.texture)) or DEFAULT_STATUSBAR_TEXTURE
 	self.value:SetStatusBarTexture(texture)
-	self.value:SetHorizTile(false)
-	
+	self.value:GetStatusBarTexture():SetHorizTile(false)
 	self.rest:SetStatusBarTexture(texture)
-	self.rest:SetHorizTile(false)
-	
+	self.rest:GetStatusBarTexture():SetHorizTile(false)
 	self.bg:SetTexture(texture)
 end
 
