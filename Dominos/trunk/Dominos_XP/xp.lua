@@ -95,6 +95,7 @@ end
 function XP:Load()
 	local bg = self:CreateTexture(nil, 'BACKGROUND')
 	bg:SetAllPoints(self)
+	bg:SetHorizTile(false)
 	self.bg = bg
 
 	local rest = CreateFrame('StatusBar', nil, self)
@@ -272,7 +273,11 @@ end
 function XP:UpdateTexture()
 	local texture = LibStub('LibSharedMedia-3.0'):Fetch('statusbar', self.sets.texture)
 	self.value:SetStatusBarTexture(texture)
+	self.value:SetHorizTile(false)
+	
 	self.rest:SetStatusBarTexture(texture)
+	self.rest:SetHorizTile(false)
+	
 	self.bg:SetTexture(texture)
 end
 
