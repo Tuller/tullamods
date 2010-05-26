@@ -58,6 +58,22 @@ function Frame:Create(id)
 	f.id = id
 
 	f.header = CreateFrame('Frame', nil, f, 'SecureHandlerStateTemplate')
+	f.header:SetAttribute('_onstate-display', [[
+		local newstate = newstate or 'show'
+		local newAlpha = 1
+	 	if tonumber(newstate) then
+			newAlpha = newstate/100
+		elseif newstate == 'hide' then
+			self:Hide()
+		else
+			self:Show()
+		end
+		
+		if not self:IsUnderMouse() then
+			newAlpha = newAlpha * (self:GetAttribute('frame-fadealpha') or 1)
+		end
+		self:SetAlpha(newAlpha)
+	]])
 	f.header:SetAllPoints(f)
 
 	f.drag = Dominos.DragFrame:New(f)
@@ -77,7 +93,7 @@ end
 function Frame:Free()
 	active[self.id] = nil
 
-	UnregisterStateDriver(self.header, 'visibility', 'show')
+	UnregisterStateDriver(self.header, 'state-display', 'show')
 	FadeManager:Remove(self)
 
 	for i in pairs(self.buttons) do
@@ -313,6 +329,7 @@ function Frame:SetFrameAlpha(alpha)
 	else
 		self.sets.alpha = alpha
 	end
+	self:SetAttribute('frame-alpha', alpha or 1)
 	self:UpdateAlpha()
 end
 
@@ -329,6 +346,7 @@ function Frame:SetFadeAlpha(alpha)
 		self.sets.fadeAlpha = alpha
 	end
 
+	self:SetAttribute('frame-fadealpha', alpha or 1)
 	self:UpdateAlpha()
 	self:UpdateFader()
 end
@@ -371,7 +389,7 @@ function Frame:FrameIsShown()
 end
 
 
---[[ ShowStates ]]--
+--[[ Show states ]]--
 
 function Frame:SetShowStates(states)
 	self.sets.showstates = states
@@ -383,12 +401,12 @@ function Frame:GetShowStates()
 end
 
 function Frame:UpdateShowStates()
-	UnregisterStateDriver(self.header, 'visibility', 'show')
+	UnregisterStateDriver(self.header, 'display', 'show')
 	self.header:Show()
 
 	local showstates = self:GetShowStates()
 	if showstates then
-		RegisterStateDriver(self.header, 'visibility', showstates .. 'show;hide')
+		RegisterStateDriver(self.header, 'display', showstates)
 	end
 end
 
