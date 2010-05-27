@@ -663,6 +663,7 @@ do
 		set:SetScript('OnClick', function(self)
 			local text = editBox:GetText()
 			self:GetParent().owner:SetShowStates(text ~= '' and text or nil)
+			editBox:SetText(self:GetParent().owner:GetShowStates() or '')
 		end)
 		set:SetPoint('BOTTOMRIGHT', -8, 2)
 

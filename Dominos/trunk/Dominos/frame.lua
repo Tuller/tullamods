@@ -92,7 +92,7 @@ end
 function Frame:Free()
 	active[self.id] = nil
 
-	UnregisterStateDriver(self.header, 'state-display', 'show')
+	UnregisterStateDriver(self.header, 'display', 'show')
 	FadeManager:Remove(self)
 
 	for i in pairs(self.buttons) do
@@ -415,22 +415,33 @@ end
 
 --[[ Show states ]]--
 
-function Frame:SetShowStates(states)
+function Frame:SetShowStates(states)	
 	self.sets.showstates = states
 	self:UpdateShowStates()
 end
 
 function Frame:GetShowStates()
-	return self.sets.showstates
+	local states = self.sets.showstates
+
+	--hack to convert [combat] into [combat]show;hide in case a user is using the old style of showstates
+	if states then
+		if states:sub(#states) == ']' then
+			states = states .. 'show;hide'
+			self.sets.showstates = states
+		end
+	end
+
+	return states
 end
 
 function Frame:UpdateShowStates()
-	UnregisterStateDriver(self.header, 'display', 'show')
-	self.header:Show()
-
 	local showstates = self:GetShowStates()
 	if showstates then
 		RegisterStateDriver(self.header, 'display', showstates)
+		self.header:SetAttribute('state-display', SecureCmdOptionParse(showstates))
+	else
+		UnregisterStateDriver(self.header, 'display')
+		self.header:Show()
 	end
 end
 
