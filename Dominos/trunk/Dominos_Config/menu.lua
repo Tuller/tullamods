@@ -364,11 +364,11 @@ end
 --faded opacity
 do
 	local function Slider_OnShow(self)
-		self:SetValue(select(2, self:GetParent().owner:GetFadedAlpha()) * 100)
+		self:SetValue(self:GetParent().owner:GetFadeMultiplier() * 100)
 	end
 
 	local function Slider_UpdateValue(self, value)
-		self:GetParent().owner:SetFadeAlpha(value/100)
+		self:GetParent().owner:SetFadeMultiplier(value/100)
 	end
 
 	function Panel:NewFadeSlider()
