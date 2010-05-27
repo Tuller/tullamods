@@ -350,7 +350,12 @@ function Frame:UpdateAlpha()
 end
 
 function Frame:GetExpectedAlpha()
-	local alpha = self.header:GetAttribute('frame-alpha') or self:GetFrameAlpha()
+	local stateAlpha = self.header:GetAttribute('frame-alpha')
+	if stateAlpha then
+		return stateAlpha
+	end
+
+	local alpha = self:GetFrameAlpha()
 	local fadeMultiplier = self:GetFadeMultiplier()
 	if fadeMultiplier >= 1 or self:IsFocus() then
 		return alpha
