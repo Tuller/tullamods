@@ -43,7 +43,6 @@ local buttons = {VehicleMenuBarLeaveButton, VehicleMenuBarPitchUpButton, Vehicle
 
 function VehicleBar:New()
 	local f = self.super.New(self, 'vehicle', L.TipVehicleBar)
-	f:UpdateStateDriver()
 	f:SkinButtons()
 	f:LoadButtons()
 	f:Layout()
@@ -174,6 +173,6 @@ function VehicleBar:RemoveButton(i)
 	self.buttons[i] = nil
 end
 
-function VehicleBar:UpdateStateDriver()
-	self:SetShowStates('[@vehicle,exists]show;hide')
+function VehicleBar:GetShowStates()
+	return '[@vehicle,exists]show;hide'
 end

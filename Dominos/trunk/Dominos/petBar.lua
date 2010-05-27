@@ -112,13 +112,12 @@ function PetBar:New()
 	local f = self.super.New(self, 'pet')
 	f:LoadButtons()
 	f:Layout()
-	f:UpdateStateDriver()
 
 	return f
 end
 
-function PetBar:UpdateStateDriver()
-	self:SetShowStates('[@pet,exists,nobonusbar:5]show;hide')
+function PetBar:GetShowStates()
+	return '[@pet,exists,nobonusbar:5]show;hide'
 end
 
 function PetBar:GetDefaults()
