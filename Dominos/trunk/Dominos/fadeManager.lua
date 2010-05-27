@@ -64,23 +64,13 @@ do
 			self:Hide()
 		end
 
-
 		self.nextUpdate = self.nextUpdate - elapsed
 		if self.nextUpdate < 0 then
 			self.nextUpdate = self.DELAY
-
 			for f in pairs(watchedFrames) do
-				--check for faded frames that are now in focus
-				if self:IsFocus(f) then
-					--the checking logic is a little weird because floating point values tend to not be exact
-					if abs(f:GetAlpha() - f:GetFadedAlpha()) < 0.01 then
-						Fader:Fade(f, 0.1, f:GetAlpha(), f:GetFrameAlpha())
-					end
-				--check for unfaded frames that are not in focus
-				else
-					if abs(f:GetAlpha() - f:GetFrameAlpha()) < 0.01 then
-						Fader:Fade(f, 0.1, f:GetAlpha(), f:GetFadedAlpha())
-					end
+				local expectedAlpha, currentAlpha = f:GetExpectedAlpha(), f:GetAlpha()
+				if abs(expectedAlpha - currentAlpha) > 0.01 then
+					Fader:Fade(f, 0.1, currentAlpha, expectedAlpha)
 				end
 			end
 		end
@@ -97,36 +87,6 @@ do
 
 	function FadeWatcher:Remove(f)
 		watchedFrames[f] = nil
-	end
-
-	--this code determins if the mouse is over either the frame itself, or any child frames
-if select(4, GetBuildInfo()) == 30200 then
-	function FadeWatcher:IsFocus(f)
-		if MouseIsOver(f, 1, -1, -1, 1) then
-			return GetMouseFocus() == _G['WorldFrame'] or self:IsChildFocus(f:GetChildren())
-		end
-	end
-else
-	function FadeWatcher:IsFocus(f)
-		if f:IsMouseOver(1, -1, -1, 1) then
-			return GetMouseFocus() == _G['WorldFrame'] or self:IsChildFocus(f:GetChildren())
-		end
-	end
-end
-
-	function FadeWatcher:IsChildFocus(...)
-		for i = 1, select('#', ...) do
-			if GetMouseFocus() == select(i, ...) then
-				return true
-			end
-		end
-
-		for i = 1, select('#', ...) do
-			local f = select(i, ...)
-			if f:IsShown() and self:IsChildFocus(f:GetChildren()) then
-				return true
-			end
-		end
 	end
 end
 

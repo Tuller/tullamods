@@ -711,7 +711,7 @@ function Dominos:SetFadeForFrames(...)
 
 	if alpha and alpha >= 0 and alpha <= 1 then
 		for i = 1, numArgs - 1 do
-			self.Frame:ForFrame(select(i, ...), 'SetFadeAlpha', alpha)
+			self.Frame:ForFrame(select(i, ...), 'SetFadeMultiplier', alpha)
 		end
 	end
 end

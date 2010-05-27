@@ -60,19 +60,18 @@ function Frame:Create(id)
 	f.header = CreateFrame('Frame', nil, f, 'SecureHandlerStateTemplate')
 	f.header:SetAttribute('_onstate-display', [[
 		local newstate = newstate or 'show'
-		local newAlpha = 1
-	 	if tonumber(newstate) then
-			newAlpha = newstate/100
-		elseif newstate == 'hide' then
+		if newstate == 'hide' then
+			self:SetAttribute('frame-alpha', nil)
 			self:Hide()
 		else
+			local stateAlpha = tonumber(newstate)
+			if stateAlpha then
+				self:SetAttribute('frame-alpha', stateAlpha/100)
+			else
+				self:SetAttribute('frame-alpha', nil)
+			end
 			self:Show()
 		end
-		
-		if not self:IsUnderMouse() then
-			newAlpha = newAlpha * (self:GetAttribute('frame-fadealpha') or 1)
-		end
-		self:SetAlpha(newAlpha)
 	]])
 	f.header:SetAllPoints(f)
 
@@ -313,15 +312,6 @@ end
 
 --[[ Opacity ]]--
 
-function Frame:UpdateAlpha()
-	local alpha
-	if MouseIsOver(self, 1, -1, -1, 1) then
-		alpha = self:GetFrameAlpha()
-	else
-		alpha = self:GetFadedAlpha()
-	end
-	self:SetAlpha(alpha)
-end
 
 function Frame:SetFrameAlpha(alpha)
 	if alpha == 1 then
@@ -329,7 +319,6 @@ function Frame:SetFrameAlpha(alpha)
 	else
 		self.sets.alpha = alpha
 	end
-	self:SetAttribute('frame-alpha', alpha or 1)
 	self:UpdateAlpha()
 end
 
@@ -338,27 +327,57 @@ function Frame:GetFrameAlpha()
 end
 
 --faded opacity (mouse not over the f)
-function Frame:SetFadeAlpha(alpha)
+function Frame:SetFadeMultiplier(alpha)
 	local alpha = alpha or 1
 	if alpha == 1 then
 		self.sets.fadeAlpha = nil
 	else
 		self.sets.fadeAlpha = alpha
 	end
-
-	self:SetAttribute('frame-fadealpha', alpha or 1)
 	self:UpdateAlpha()
 	self:UpdateFader()
+end
+
+function Frame:GetFadeMultiplier()
+	return self.sets.fadeAlpha or 1
 end
 
 --returns fadedOpacity, fadePercentage
 --fadedOpacity is what opacity the f will be at when faded
 --fadedPercentage is what modifier we use on normal opacity
-function Frame:GetFadedAlpha(alpha)
-	local fadeAlpha = self.sets.fadeAlpha or 1
-	return fadeAlpha * self:GetFrameAlpha(), fadeAlpha
+function Frame:UpdateAlpha()
+	self:SetAlpha(self:GetExpectedAlpha())
 end
 
+function Frame:GetExpectedAlpha()
+	local alpha = self.header:GetAttribute('frame-alpha') or self:GetFrameAlpha()
+	local fadeMultiplier = self:GetFadeMultiplier()
+	if fadeMultiplier >= 1 or self:IsFocus() then
+		return alpha
+	end
+	return alpha * fadeMultiplier
+end
+
+local function isChildFocus(...)
+	for i = 1, select('#', ...) do
+		if GetMouseFocus() == select(i, ...) then
+			return true
+		end
+	end
+	for i = 1, select('#', ...) do
+		local f = select(i, ...)
+		if f:IsShown() and isChildFocus(f:GetChildren()) then
+			return true
+		end
+	end
+	return false
+end
+
+function Frame:IsFocus()
+	if self:IsMouseOver(1, -1, -1, 1) then
+		return GetMouseFocus() == _G['WorldFrame'] or isChildFocus(self:GetChildren())
+	end
+end
 
 --[[ Visibility ]]--
 
@@ -631,11 +650,7 @@ function Frame:UpdateFader()
 	if self.sets.hidden then
 		FadeManager:Remove(self)
 	else
-		if select(2, self:GetFadedAlpha()) == 1 then
-			FadeManager:Remove(self)
-		else
-			FadeManager:Add(self)
-		end
+		FadeManager:Add(self)
 	end
 end
 
