@@ -107,6 +107,13 @@ function Panel:NewCheckButton(name)
 	return b
 end
 
+function Panel:NewSmallCheckButton(name)
+	local b = CreateFrame('CheckButton', self:GetName() .. name, self, 'InterfaceOptionsSmallCheckButtonTemplate')
+	_G[b:GetName() .. 'Text']:SetText(name)
+
+	return b
+end
+
 function Panel:NewSecureCheckButton(name, template)
 	local b = CreateFrame('CheckButton', self:GetName() .. name, self, 'InterfaceOptionsCheckButtonTemplate,' .. template)
 	_G[b:GetName() .. 'Text']:SetText(name)

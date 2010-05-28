@@ -53,6 +53,7 @@ L.ShowMinimapButton = 'Show Minimap Button'
 L.Advanced = 'Advanced'
 L.LeftToRight = 'Layout Buttons From Left to Right'
 L.TopToBottom = 'Layout Buttons From Top to Bottom'
+L.LinkedOpacity = 'Docked bars inherit opacity'
 
 L.ALT_KEY_TEXT = 'ALT'
 L.AltShift = 'ALT-' .. SHIFT_KEY_TEXT

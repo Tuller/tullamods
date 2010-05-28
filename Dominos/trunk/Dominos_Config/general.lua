@@ -69,6 +69,15 @@ stickyBars:SetScript('OnClick', function(self)
 end)
 stickyBars:SetPoint('TOPLEFT', lock, 'BOTTOMLEFT', 0, -24)
 
+local linkedOpacity = Options:NewSmallCheckButton(L.LinkedOpacity)
+linkedOpacity:SetScript('OnShow', function(self)
+	self:SetChecked(Dominos:IsLinkedOpacityEnabled())
+end)
+linkedOpacity:SetScript('OnClick', function(self)
+	Dominos:SetLinkedOpacity(self:GetChecked())
+end)
+linkedOpacity:SetPoint('TOP', stickyBars, 'BOTTOM', 8, -2)
+
 local showMinimapButton = Options:NewCheckButton(L.ShowMinimapButton)
 showMinimapButton:SetScript('OnShow', function(self)
 	self:SetChecked(Dominos:ShowingMinimap())
@@ -76,7 +85,7 @@ end)
 showMinimapButton:SetScript('OnClick', function(self)
 	Dominos:SetShowMinimap(self:GetChecked())
 end)
-showMinimapButton:SetPoint('TOP', stickyBars, 'BOTTOM', 0, -10)
+showMinimapButton:SetPoint('TOP', linkedOpacity, 'BOTTOM', -8, -10)
 
 
 --[[ Action Bar Settings ]]--
