@@ -143,6 +143,7 @@ function Dominos:GetDefaults()
 			possessBar = 1,
 
 			sticky = true,
+			linkedOpacity = true,
 			showMacroText = true,
 			showBindingText = true,
 			showTooltips = true,
@@ -921,6 +922,15 @@ end
 
 function Dominos:Sticky()
 	return self.db.profile.sticky
+end
+
+--linked opacity
+function Dominos:SetLinkedOpacity(enable)
+	self.db.profile.linkedOpacity = enable or false
+end
+
+function Dominos:IsLinkedOpacityEnabled()
+	return self.db.profile.linkedOpacity
 end
 
 

@@ -350,6 +350,13 @@ function Frame:UpdateAlpha()
 end
 
 function Frame:GetExpectedAlpha()
+	if Dominos:IsLinkedOpacityEnabled() then
+		local anchor = (self:GetAnchor())
+		if anchor then
+			return anchor:GetExpectedAlpha()
+		end
+	end
+
 	local stateAlpha = self.header:GetAttribute('frame-alpha')
 	if stateAlpha then
 		return stateAlpha
@@ -378,10 +385,24 @@ local function isChildFocus(...)
 	return false
 end
 
+--TODO: I should probably keep a list of anchored frames
+local function isDockedFrameFocus(frame)
+	for _,f in Frame:GetAll() do
+		if f:GetAnchor() == frame and f:IsFocus() then
+			return true
+		end
+	end
+	return false
+end
+
 function Frame:IsFocus()
 	if self:IsMouseOver(1, -1, -1, 1) then
 		return GetMouseFocus() == _G['WorldFrame'] or isChildFocus(self:GetChildren())
 	end
+	if Dominos:IsLinkedOpacityEnabled() then
+		return isDockedFrameFocus(self)
+	end
+	return false
 end
 
 --[[ Visibility ]]--
