@@ -1,5 +1,5 @@
   * [Main]
-  * Active Projects
+  * Active
     * [Bagnon]
       * [Bagnon#Frequently_Asked_Questions FAQ]
     * [Bagnon_Forever]
@@ -10,8 +10,13 @@
       * [DominosPlugins Plugins]
     * [Ludwig]
     * [OmniCC]
+  * Experiments
+    * Bundles
+    * tullaRange
+    * Tipachu
+  * Limbo
     * [Sage]
-  * Discontinued Projects
+  * Discontinued
     * Bongos
     * [Bongos2]
     * Bongos3
