@@ -57,7 +57,7 @@ do
 
 	FadeWatcher:Hide()
 	FadeWatcher.nextUpdate = 0
-	FadeWatcher.DELAY = 0.1
+	FadeWatcher.DELAY = 0.12
 
 	FadeWatcher:SetScript('OnUpdate', function(self, elapsed)
 		if not next(watchedFrames) then

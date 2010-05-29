@@ -7,28 +7,28 @@
 	Copyright (c) 2008-2009 Jason Greer
 	All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without 
+	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-		* Redistributions of source code must retain the above copyright notice, 
+		* Redistributions of source code must retain the above copyright notice,
 		  this list of conditions and the following disclaimer.
 		* Redistributions in binary form must reproduce the above copyright
-		  notice, this list of conditions and the following disclaimer in the 
+		  notice, this list of conditions and the following disclaimer in the
 		  documentation and/or other materials provided with the distribution.
-		* Neither the name of the author nor the names of its contributors may 
-		  be used to endorse or promote products derived from this software 
+		* Neither the name of the author nor the names of its contributors may
+		  be used to endorse or promote products derived from this software
 		  without specific prior written permission.
 
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
-	LIABLE FORANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+	LIABLE FORANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 --]]
 
@@ -249,13 +249,13 @@ function Frame:Layout()
 			else
 				col = (cols-1) - (i-1) % cols
 			end
-			
+
 			if isTopToBottom then
 				row = ceil(i / cols) - 1
 			else
 				row = rows - ceil(i / cols)
 			end
-			
+
 			b:ClearAllPoints()
 			b:SetPoint('TOPLEFT', w*col + pW, -(h*row + pH))
 		end
@@ -371,8 +371,9 @@ function Frame:GetExpectedAlpha()
 end
 
 local function isChildFocus(...)
+	local focus = GetMouseFocus()
 	for i = 1, select('#', ...) do
-		if GetMouseFocus() == select(i, ...) then
+		if focus == select(i, ...) then
 			return true
 		end
 	end
@@ -385,22 +386,22 @@ local function isChildFocus(...)
 	return false
 end
 
---TODO: I should probably keep a list of anchored frames
-local function isDockedFrameFocus(frame)
-	for _,f in Frame:GetAll() do
-		if f:GetAnchor() == frame and f:IsFocus() then
-			return true
-		end
-	end
-	return false
-end
-
+--returns all frames docked to the given frame
 function Frame:IsFocus()
 	if self:IsMouseOver(1, -1, -1, 1) then
-		return GetMouseFocus() == _G['WorldFrame'] or isChildFocus(self:GetChildren())
+		return (GetMouseFocus() == _G['WorldFrame']) or isChildFocus(self:GetChildren())
 	end
-	if Dominos:IsLinkedOpacityEnabled() then
-		return isDockedFrameFocus(self)
+	return Dominos:IsLinkedOpacityEnabled() and self:IsDockedFocus()
+end
+
+function Frame:IsDockedFocus()
+	local docked = self.docked
+	if docked then
+		for _,f in pairs(docked) do
+			if f:IsFocus()  then
+				return true
+			end
+		end
 	end
 	return false
 end
@@ -436,7 +437,7 @@ end
 
 --[[ Show states ]]--
 
-function Frame:SetShowStates(states)	
+function Frame:SetShowStates(states)
 	self.sets.showstates = states
 	self:UpdateShowStates()
 end
@@ -538,8 +539,48 @@ function Frame:StickToEdge()
 	end
 end
 
-function Frame:Stick()
+function Frame:ClearAnchor()
+	local anchor, point = self:GetAnchor()
+	if anchor and anchor.docked then
+		for i,f in pairs(anchor.docked) do
+			if f == self then
+				tremove(anchor.docked, i)
+				break
+			end
+		end
+		if not next(anchor.docked) then
+			anchor.docked = nil
+		end
+	end
+
 	self.sets.anchor = nil
+	self:UpdateFader()
+end
+
+function Frame:SetAnchor(anchor, point)
+	self:ClearAnchor()
+
+	if anchor.docked then
+		local found = false
+		for i,f in pairs(anchor.docked) do
+			if f == self then
+				found = i
+				break
+			end
+		end
+		if not found then
+			tinsert(anchor.docked, self)
+		end
+	else
+		anchor.docked = {self}
+	end
+
+	self.sets.anchor = anchor.id .. point
+	self:UpdateFader()
+end
+
+function Frame:Stick()
+	self:ClearAnchor()
 
 	--only do sticky code if the alt key is not currently down
 	if Dominos:Sticky() and not IsAltKeyDown() then
@@ -548,7 +589,7 @@ function Frame:Stick()
 			if f ~= self then
 				local point = FlyPaper.Stick(self, f, self.stickyTolerance)
 				if point then
-					self.sets.anchor = f.id .. point
+					self:SetAnchor(f, point)
 					break
 				end
 			end
@@ -565,14 +606,14 @@ end
 
 function Frame:Reanchor()
 	local f, point = self:GetAnchor()
-
 	if not(f and FlyPaper.StickToPoint(self, f, point)) then
-		self.sets.anchor = nil
-
+		self:ClearAnchor()
 		if not self:Reposition() then
 			self:ClearAllPoints()
 			self:SetPoint('CENTER')
 		end
+	else
+		self:SetAnchor(f, point)
 	end
 	self.drag:UpdateColor()
 end

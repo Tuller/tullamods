@@ -143,7 +143,7 @@ function Dominos:GetDefaults()
 			possessBar = 1,
 
 			sticky = true,
-			linkedOpacity = true,
+			linkedOpacity = false,
 			showMacroText = true,
 			showBindingText = true,
 			showTooltips = true,
