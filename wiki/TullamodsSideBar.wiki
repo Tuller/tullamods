@@ -15,7 +15,7 @@
     * tullaRange
     * Tipachu
   * Limbo
-    * [Sage]
+    * Sage
   * Discontinued
     * Bongos
     * [Bongos2]
