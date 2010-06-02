@@ -123,8 +123,16 @@ end
 --]]
 
 local OmniCC = CreateFrame('Frame', 'OmniCC', UIParent); OmniCC:Hide()
+OmniCC:RegisterEvent('PLAYER_ENTERING_WORLD')
 OmniCC.timers = {}
 OmniCC.nextUpdate = 0
+
+OmniCC:SetScript('OnEvent', function(self, event, ...)
+	local a = self[event]
+	if a then
+		a(self, event, ...)
+	end
+end)
 
 OmniCC:SetScript('OnHide', function(self, elapsed)
 	self.nextUpdate = 0
@@ -140,11 +148,24 @@ OmniCC:SetScript('OnUpdate', function(self, elapsed)
 		self.nextUpdate = self.nextUpdate - elapsed
 	else
 		self.nextUpdate = UPDATE_DELAY
-		for timer in pairs(self.timers) do
-			timer:Update()
-		end
+		self:UpdateTimers()
 	end
 end)
+
+
+--[[
+	Events
+--]]
+
+--force update on entering world to handle things like arena resets
+function OmniCC:PLAYER_ENTERING_WORLD()
+	self:UpdateTimers()
+end
+
+
+--[[
+	Actions
+--]]
 
 function OmniCC:Add(timer)
 	self.timers[timer] = true
@@ -163,6 +184,12 @@ function OmniCC:UpdateShown()
 		self:Show()
 	else
 		self:Hide()
+	end
+end
+
+function OmniCC:UpdateTimers()
+	for timer in pairs(self.timers) do
+		timer:Update()
 	end
 end
 
