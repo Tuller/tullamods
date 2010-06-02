@@ -99,6 +99,7 @@ function Frame:Free()
 		self:RemoveButton(i)
 	end
 	self.buttons = nil
+	self.docked = nil
 
 	self:ClearAllPoints()
 	self:SetUserPlaced(nil)

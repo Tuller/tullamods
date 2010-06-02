@@ -150,7 +150,7 @@ end
 --[[ keybound  support ]]--
 
 function PetBar:KEYBOUND_ENABLED()
-	self:SetShowStates(nil)
+	self.header:SetAttribute('state-visibility', 'display')
 
 	for _,button in pairs(self.buttons) do
 		button:Show()
@@ -158,7 +158,7 @@ function PetBar:KEYBOUND_ENABLED()
 end
 
 function PetBar:KEYBOUND_DISABLED()
-	self:UpdateStateDriver()
+	self:UpdateShowStates()
 
 	local petBarShown = PetHasActionBar()
 	for _,button in pairs(self.buttons) do
