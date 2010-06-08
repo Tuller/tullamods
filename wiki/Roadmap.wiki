@@ -2,13 +2,12 @@
 #labels Featured
 
 [Bagnon]:
-  * Do something with saved searches/bookmarks
   * Add in guild bank support
-  * If I don't continue Combuctor, then add in a Blizzard layout style.
-  * Add in more UI polish
+  * Do something with saved searches/bookmarks
 
 [Bagnon_Forever]:
   * Add command line searching using LibItemSearch
+  * Merge changes from BagSync
 
 Combuctor:
   * Rewrite, like I did for Bagnon.
@@ -17,28 +16,23 @@ Combuctor:
   * Add in a few configuration options (scale, etc)
 
 [Dominos]:
-  * Write a totem bar that more closely resembles the 
-  * Clean up the auto fading and show state interfaces.
+  * Clean up wiki, add in a FAQ
+  * Write a totem bar that more closely resembles the stock one.
+  * Clean up the interface for show states
   * Revise wiki, add FAQ
-  * Make a dedicated possess bar.
-  * Make a dedicated vehicle bar.
-  * Make Dominos have a saner layout when switching between 1-120 bars.  This includes adding a slider for numbars/numbuttons
-  * Clean up the auto fading and show state interfaces.
-  * Add in more UI polish
 
 [Ludwig]:
   * Clean up GUI code
 
 [OmniCC]:
   * Rewrite, merge in Shine and Pulse.
+  * Do pros/cons analysis of opt in vs current opt out model.
 
-Sage:
-  * Separate frame folders (core, party, target_target, focus_target, party_targets)
-  * Write wiki on completion of the thing
-  * Add "always show these buffs" and "always show these debuffs" lists
+Move over to GitHub:
+  * I still basically have this crazy idea in my head that if I make it possible for people to easily pull my code, then they'll make changes to it for me :P  Odds are, it won't happen though :P
 
 -----
 Experiments/Random Ideas I Have:
   * Dominos + Perspectives: I want a system where I get to have multiple layouts based on what macro state I'm in.  Basically I only want to show a vehicle bar when in a vehicle, a possess bar when possessing something, and have key bindings setup for each form.
-  * An infinite macro button addon:  I want to write an addon where I can draw as many macro bars as I want using the system I developed for Bongos3.  The scope of this addon should be heavily limited (ie, I expect you to use this addon with the stock interface, or with another actionbar addon).  Should also use the perspective system I intend on developing, for best effect.
-  * A Cooldown Count type addon that works in a similar manner as Button Facade:  This way I can avoid nasty things like requiring the noCooldownCount flag, and allow finer control over how text is displayed on each element (per button group position offsets, etc).
+  * OptInCC: Cooldown count implemented like ButtonFacade.  This won't work on everything, but will allow users to have finer tuned control.
+* Move over to GitHub for development.  I still have this crazy notion in my head 
