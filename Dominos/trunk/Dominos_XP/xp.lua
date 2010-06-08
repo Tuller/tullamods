@@ -123,7 +123,7 @@ end
 function XP:OnClick(button)
 	if button == 'RightButton' and FFF_ReputationWatchBar_OnClick then
 		self:SetAlwaysShowXP(false)
-		FFF_ReputationWatchBar_OnClick(button)		
+		FFF_ReputationWatchBar_OnClick(self, button)		
 	else
 		self:SetAlwaysShowXP(not self.sets.alwaysShowXP)
 		self:OnEnter()
