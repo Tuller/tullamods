@@ -10,3 +10,5 @@ Ludwig is an item link database addon that was originally based on [http://www.w
   * `/lw <name>` - Prints out a list in the chat window of the top 10 items matching `<name>`
   * `/lw --r` - Refreshes the database
   * `/lw --q <itemID>` - Queries the server for the given itemID
+
+[http://github.com/Tuller/Ludwig Ludwig's source code is hosted on GitHub]
