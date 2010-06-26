@@ -559,7 +559,7 @@ end
 
 function Dominos:PrintHelp(cmd)
 	local function PrintCmd(cmd, desc)
-		DEFAULT_CHAT_FRAME:AddMessage(format(' - |cFF33FF99%s|r: %s', cmd, desc))
+		print(format(' - |cFF33FF99%s|r: %s', cmd, desc))
 	end
 
 	self:Print('Commands (/dom, /dominos)')
