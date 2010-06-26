@@ -140,9 +140,6 @@ local function Panel_CreatePopupDialog(panel)
 			_G[this:GetName()..'EditBox']:HighlightText()
 		end,
 		OnHide = function()
-			if ChatFrameEditBox:IsVisible() then
-				ChatFrameEditBox:SetFocus()
-			end
 			_G[this:GetName()..'EditBox']:SetText('')
 		end,
 		timeout = 0, exclusive = 1, hideOnEscape = 1

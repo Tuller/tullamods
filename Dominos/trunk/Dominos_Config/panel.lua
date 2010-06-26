@@ -46,7 +46,7 @@ function Panel:New(name, title, subtitle, icon, parent)
 	local text = f:CreateFontString(nil, 'ARTWORK', 'GameFontNormalLarge')
 	text:SetPoint('TOPLEFT', 16, -16)
 	if icon then
-		text:SetFormattedText('|T%s:%d|t %s', icon, 32, title)
+		text:SetFormattedText('|T%s:%d|t %s', icon, 16, title)
 	else
 		text:SetText(title)
 	end
