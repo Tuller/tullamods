@@ -388,11 +388,20 @@ local function isChildFocus(...)
 end
 
 --returns all frames docked to the given frame
-function Frame:IsFocus()
-	if self:IsMouseOver(1, -1, -1, 1) then
-		return (GetMouseFocus() == _G['WorldFrame']) or isChildFocus(self:GetChildren())
+if Frame.IsMouseOver then
+	function Frame:IsFocus()
+		if self:IsMouseOver(1, -1, -1, 1) then
+			return (GetMouseFocus() == _G['WorldFrame']) or isChildFocus(self:GetChildren())
+		end
+		return Dominos:IsLinkedOpacityEnabled() and self:IsDockedFocus()
 	end
-	return Dominos:IsLinkedOpacityEnabled() and self:IsDockedFocus()
+else
+	function Frame:IsFocus()
+		if MouseIsOver(self, 1, -1, -1, 1) then
+			return (GetMouseFocus() == _G['WorldFrame']) or isChildFocus(self:GetChildren())
+		end
+		return Dominos:IsLinkedOpacityEnabled() and self:IsDockedFocus()
+	end
 end
 
 function Frame:IsDockedFocus()

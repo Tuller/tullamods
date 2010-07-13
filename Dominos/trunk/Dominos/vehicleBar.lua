@@ -174,5 +174,5 @@ function VehicleBar:RemoveButton(i)
 end
 
 function VehicleBar:GetShowStates()
-	return '[@vehicle,exists]show;hide'
+	return '[target=vehicle,exists]show;hide'
 end

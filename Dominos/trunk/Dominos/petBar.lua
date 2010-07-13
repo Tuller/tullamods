@@ -117,7 +117,7 @@ function PetBar:New()
 end
 
 function PetBar:GetShowStates()
-	return '[@pet,exists,nobonusbar:5]show;hide'
+	return '[target=pet,exists,nobonusbar:5]show;hide'
 end
 
 function PetBar:GetDefaults()

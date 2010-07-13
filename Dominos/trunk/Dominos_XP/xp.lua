@@ -95,7 +95,9 @@ end
 function XP:Load()
 	local bg = self:CreateTexture(nil, 'BACKGROUND')
 	bg:SetAllPoints(self)
-	bg:SetHorizTile(false)
+	if bg.SetHorizTile then
+		bg:SetHorizTile(false)
+	end
 	self.bg = bg
 
 	local rest = CreateFrame('StatusBar', nil, self)
@@ -275,9 +277,13 @@ function XP:UpdateTexture()
 	
 	local texture = (LSM and LSM:Fetch('statusbar', self.sets.texture)) or DEFAULT_STATUSBAR_TEXTURE
 	self.value:SetStatusBarTexture(texture)
-	self.value:GetStatusBarTexture():SetHorizTile(false)
+	if self.value:GetStatusBarTexture().SetHorizTile then
+		self.value:GetStatusBarTexture():SetHorizTile(false)
+	end
 	self.rest:SetStatusBarTexture(texture)
-	self.rest:GetStatusBarTexture():SetHorizTile(false)
+	if self.rest:GetStatusBarTexture().SetHorizTile then
+		self.rest:GetStatusBarTexture():SetHorizTile(false)
+	end
 	self.bg:SetTexture(texture)
 end
 
@@ -289,11 +295,21 @@ end
 
 --[[ Text ]]--
 
-function XP:UpdateTextShown()
-	if self:IsMouseOver() or self.sets.alwaysShowText then
-		self.text:Show()
-	else
-		self.text:Hide()
+if XP.IsMouseOver then
+	function XP:UpdateTextShown()
+		if self:IsMouseOver() or self.sets.alwaysShowText then
+			self.text:Show()
+		else
+			self.text:Hide()
+		end
+	end
+else
+	function XP:UpdateTextShown()
+		if MouseIsOver(self) or self.sets.alwaysShowText then
+			self.text:Show()
+		else
+			self.text:Hide()
+		end
 	end
 end
 
