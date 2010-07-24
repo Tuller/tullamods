@@ -12,6 +12,8 @@ elseif locale == 'esES' then
 	Dominos_SHOW_TIME = 'Mostrar tiempo'
 elseif locale == 'ruRU' then
 	Dominos_SHOW_TIME = 'Показать время'
+elseif locale == 'deDE' then
+	Dominos_SHOW_TIME = 'Zeige Zeit
 else
 	Dominos_SHOW_TIME = 'Show Time'
 end
