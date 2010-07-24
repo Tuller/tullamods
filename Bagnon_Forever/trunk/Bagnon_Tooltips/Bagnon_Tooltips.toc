@@ -9,4 +9,5 @@ localization\localization.lua
 localization\localization.tw.lua
 localization\localization.cn.lua
 localization\localization.ru.lua
+localization\localization.de.lua
 tooltips.lua
