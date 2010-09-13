@@ -1,5 +1,3 @@
 #summary Source is now hosted on GitHub
 
 =[http://github.com/tuller Tullamods Project Source Is Now Hosted On GitHub]=
-
-[http://github.com/tuller You can access it here]
