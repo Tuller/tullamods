@@ -1,0 +1,11 @@
+#summary Where to submit issues
+
+=Please use the [https://github.com/ GitHub] issue tracker for posting issues=
+ * [http://github.com/Tuller/Bagnon/issues Bagnon]
+ * [http://github.com/Tuller/Bagnon_Forever/issues Bagnon_Forever]
+ * [http://github.com/Tuller/Combuctor/issues Combuctor]
+ * [http://github.com/Tuller/Dominos/issues Dominos]
+ * [http://github.com/Tuller/Ludwig/issues Ludwig]
+ * [http://github.com/Tuller/OmniCC OmniCC]
+ * [http://github.com/Tuller/tullaCooldownCount/issues tullaCooldownCount]
+ * [http://github.com/Tuller/tullaRange/issues tullaRange]
