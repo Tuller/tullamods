@@ -8,7 +8,6 @@
       * [DominosBasics Basics]
       * [DominosAdvanced Advanced]
       * [DominosPlugins Plugins]
-    * [Ludwig]
     * [OmniCC]
   * Experiments
     * Bundles
@@ -20,6 +19,7 @@
     * Bongos
     * [Bongos2]
     * Bongos3
+    * [Ludwig]
     * [SellFish]
   * [Roadmap Things I May Do]
   * [SubmittingFeedback Contributing]
