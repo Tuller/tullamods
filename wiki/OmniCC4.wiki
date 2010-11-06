@@ -68,3 +68,5 @@ This is an advanced feature of OmniCC.  A group is a set of configuration settin
 
 
 = That's so...magenta!  So how do I create a new group? =
+
+First, open up the OmniCC GUI (you still remember how to do this, right?).
