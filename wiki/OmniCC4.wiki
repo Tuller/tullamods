@@ -1,0 +1,70 @@
+#summary A guide for OmniCC 4 (WIP)
+
+= What is OmniCC?  Some kind of orange juice? =
+
+OmniCC is a cooldown count addon.  That is, OmniCC is an addon that adds text to items/spells/abilities that are on cooldown to indicate when they'll be ready for use, like this:
+
+*<Insert picture of something that omnicc is displaying text on>*
+
+Basically, OmniCC turns your standard analogue cooldown timer into a digital one.  
+
+
+= So, does that mean that OmniCC displays buff durations on my action buttons? =
+
+*No*.  OmniCC only adds text information to cooldown models.  If you want that kind of information, then I suggest installing [http://wow.curse.com/downloads/wow-addons/details/inline-aura.aspx Inline Aura].  It works great with OmniCC.
+
+
+= Is there any limit to what OmniCC will display text on? =
+
+OmniCC works on anything that's visible and has a cooldown model.
+
+*<Insert picture of a cooldown model here>*
+
+By default, OmniCC automatically adjusts its text size based on the size of the object it is displaying text for.
+
+
+= But I don't want OmniCC to show up on everything. =
+
+OmniCC can display text on everything, but I also provide several methods or preventing OmniCC from showing text on stuff.  Two can be altered by the built in configuration interface, and one is something that addon authors can do.
+
+
+= Wait, there's a configuration interface? =
+
+Yes, its available in the interface addons menu.  You can also type /omnicc to bring it up.
+
+*<Insert Picture of the GUI>*
+
+
+= Nice, and you say you can control what stuff OmniCC shows up on using this? =
+
+Yes, via the *Minimum Size slider*, or the *Enable cooldown text* checkbox.
+
+
+= What does the Minimum Size slider do? =
+
+The minimum size slider is used to control how big something must be for OmniCC to display text on it.  The bigger the value, the bigger something must be in order for it to have cooldown text.
+
+
+== Great, but what do the numbers mean? ==
+
+The minimum size slider values translate to how big something is, relative to the size of an action button: 100 is the same size as an action button, 150 would be 1.5 times the size of one, 50 would be half the size.  Here are some other points of interest:
+  * 80 - The size of a pet or class button.
+  * 50 - The size of a buff on the Blizzard target frame.
+
+
+= Nice.  What about that Enable Cooldown Text option? =
+
+That option completely turns on or off cooldown text.
+
+
+= That doesn't sound very useful to me.  Why would you want to install OmniCC, but turn off the one thing OmniCC does? =
+
+Well, its best used with the groups feature of OmniCC.
+
+
+= Groups? What are those? =
+
+This is an advanced feature of OmniCC.  A group is a set of configuration settings.  You can define multiple groups of settings, and then add rules to assign a cooldown to one group or another.  For instance, you could create a group called "Blacklist", disable the Enable Cooldown Text setting for that group, and then assign any cooldown you don't want to display cooldown text for.
+
+
+= That's so...magenta!  So how do I create a new group? =
