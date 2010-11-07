@@ -4,7 +4,7 @@
 
 OmniCC is a cooldown count addon.  That is, OmniCC is an addon that adds text to items/spells/abilities that are on cooldown to indicate when they'll be ready for use, like this:
 
-[http://code.google.com/p/tullamods/svn/images/omnicc/omnicc.png]
+[http://tullamods.googlecode.com/svn/images/omnicc/omnicc.png]
 
 Basically, OmniCC turns your standard analogue cooldown timer into a digital one.  
 
@@ -18,7 +18,8 @@ Basically, OmniCC turns your standard analogue cooldown timer into a digital one
 
 OmniCC works on anything that's visible and has a cooldown model.
 
-*<Insert picture of a cooldown model here>*
+[http://tullamods.googlecode.com/svn/images/omnicc/cooldown_model.png]
+_(A cooldown model)_
 
 By default, OmniCC automatically adjusts its text size based on the size of the object it is displaying text for.
 
@@ -32,7 +33,7 @@ OmniCC can display text on everything, but I also provide several methods or pre
 
 Yes, its available in the interface addons menu.  You can also type /omnicc to bring it up.
 
-*<Insert Picture of the GUI>*
+[http://tullamods.googlecode.com/svn/images/omnicc/omnicc_gui.png]
 
 
 === Nice, and you say you can control what stuff OmniCC shows up on using this? ===
@@ -71,18 +72,20 @@ This is an advanced feature of OmniCC.  A group is a set of configuration settin
 
 First, open up the OmniCC GUI (you still remember how to do this, right?).  Next, click on the groups dropdown in the top right corner, and select *Add Group...*  
 
-*<Insert Screenshot of Open Dropdown, No Waffles>*
+[http://tullamods.googlecode.com/svn/images/omnicc/add_group.png]
 
 From there, you'll be prompted to name your new group.  There's no real restriction on names, other than you cannot create two groups with the same name.
 
-*<Insert Screenshot of Group with Waffles>*
+[http://tullamods.googlecode.com/svn/images/omnicc/enter_group_name.png]
 
 Once you're done, your new group will be selected by the groups dropdown.
 
-*<Insert Screenshot of New Settings>*
+[[http://tullamods.googlecode.com/svn/images/omnicc/added_group.png]
 
 
 === I've created a group, now how do I assign cooldowns to it? ===
+
+[http://tullamods.googlecode.com/svn/images/omnicc/rules_panel.png]
 
 To do that, you need to use the rules editor.  To use the rules editor, open up the OmniCC GUI again, and select the Rules tab.
 
@@ -106,7 +109,7 @@ OmniCC determines which group a cooldown belongs to by checking the name of the 
 
 The easiest way is via the /framestack command.  Type it, hover over a button, and pick out the name that looks closest to what you're expecting.  Typing /framestack again will turn it off.
 
-*<Insert Screenshot Of 
+*<Insert Framestack Screenshot>*
 
 
 === That sounds too complicated for me ===
@@ -121,10 +124,12 @@ Sure.  The options menu is divided into 4 tabs:  *Display*, *Text Style*,*Text P
 
 === Tell me about the Display tab ===
 
+[http://tullamods.googlecode.com/svn/images/omnicc/display_panel.png]
+
 The display tab controls text formatting and filtering.  It includes the following options:
  * Enable Cooldown Text - When checked, OmniCC will display cooldown text on the selected group.  When unchecked, it won't.
  * Automatically scale text to fit within frames - When checked,  OmniCC will automatically adjust the size of cooldown text in order to better fit within a frame.  *<Insert screenshot of on vs | off>*
- * Show cooldown models - This toggles showing cooldown models *<Insert screenshot of on vs | off>*
+ * Show cooldown models - This toggles showing cooldown models [http://tullamods.googlecode.com/svn/images/omnicc/cooldowntext_model.png] [http://tullamods.googlecode.com/svn/images/omnicc/cooldowntext_nomodel.png]
  * Finish effect - This controls which effect to display when a cooldown finishes, if any.  Two finish effects are included with OmniCC:  Pulse, and Shine *<Insert screenshot of Pulse>*, *<Insert screenshot of Shine>*
  * Minimum duration to display a finish effect - This controls how long a cooldown must be (in secionds) in order for a finish effect to be displayed.
  * Minimum duration to display text as MM:SS - This controls at what duration a cooldown will begin to show text in a MM:SS format, if ever. *<Insert screenshot of a cooldown in MM:SS vs MM format>*
@@ -134,6 +139,8 @@ The display tab controls text formatting and filtering.  It includes the followi
 
 
 === Tell me about the Text Style tab ===
+
+[http://tullamods.googlecode.com/svn/images/omnicc/text_style_panel.png]
 
 The text style tab is your main way to control how OmniCC looks.  In it, you can adjust the following:
  * Text font
@@ -149,12 +156,16 @@ OmniCC can use any font registerd with [http://www.wowace.com/addons/libsharedme
 
 === Tell me about the Text Position tab ===
 
+[http://tullamods.googlecode.com/svn/images/omnicc/text_position_panel.png]
+
 The text position tab simply controls where cooldown text is anchored to its parent frame.  Its useful if you want to move text because its covering up some other thing that you want to see (like buff counts).
 
 *<Insert Screenshot of Text at Different Anchor Points>*
 
 
 === Tell me about the Rules tab ===
+
+[http://tullamods.googlecode.com/svn/images/omnicc/rules_panel.png]
 
 I already told you about that.  Go back and read this guide again :P
 
