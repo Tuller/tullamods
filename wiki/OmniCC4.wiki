@@ -131,3 +131,39 @@ The display tab controls text formatting and filtering.  It includes the followi
  * Minimum duration to display tenths of seconds - This controls at what duration a cooldown will begin to include tenths of seconds, if ever. *<Insert screenshot of a cooldown in tenths vs seconds only>*
  * Minimum duration to display text - This controls how long a cooldown must be in order to display text.  I use this setting for filtering out the GCD, mainly.
  * Minimum size to display text - As discussed earlier, this controls how big a cooldown must be to filter out text.  I use this setting to filter out text on small items, mainly.
+
+
+= Tell me about the Text Style tab =
+
+The text style tab is your main way to control how OmniCC looks.  In it, you can adjust the following:
+ * Text font
+ * Text size
+ * Text color, scale, and opacity (on a per duration basis)
+ * Text outline
+
+
+= There does not seem to be many fonts to pick from.  Can I get more? =
+
+OmniCC can use any font registerd with [http://www.wowace.com/addons/libsharedmedia-3-0/ LibSharedMedia]. By installing an addon, like [http://wow.curse.com/downloads/wow-addons/details/sharedmedia.aspx SharedMedia] you can add additional fonts to pick from.
+
+
+= Tell me about the Text Position tab =
+
+The text position tab simply controls where cooldown text is anchored to its parent frame.  Its useful if you want to move text because its covering up some other thing that you want to see (like buff counts).
+
+*<Insert Screenshot of Text at Different Anchor Points>*
+
+
+= Tell me about the Rules tab =
+
+I already told you about that.  Go back and read this guide again :P
+
+
+= Well, is there anything else you can tell me about OmniCC? =
+
+No, that pretty much covers it.  If you're lua handy, you can take a look at the source code at [https://github.com/Tuller/OmniCC GitHub] and code things for me :)  If you have a bug report, please post it either where you found the addon, or on my [https://github.com/Tuller/OmniCC/issues OmniCC issue tracker].
+
+
+= What if I told you I had a dollar and enjoyed making poor financial choices? =
+
+[http://code.google.com/p/tullamods/wiki/Donations Well then, take a look at my donations page]
