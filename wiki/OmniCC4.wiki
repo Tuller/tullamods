@@ -4,7 +4,7 @@
 
 OmniCC is a cooldown count addon.  That is, OmniCC is an addon that adds text to items/spells/abilities that are on cooldown to indicate when they'll be ready for use, like this:
 
-*<Insert picture of something that omnicc is displaying text on>*
+[http://code.google.com/p/tullamods/svn/images/omnicc/omnicc.png]
 
 Basically, OmniCC turns your standard analogue cooldown timer into a digital one.  
 
