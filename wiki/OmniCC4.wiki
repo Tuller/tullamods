@@ -1,6 +1,6 @@
 #summary A guide for OmniCC 4 (WIP)
 
-= What is OmniCC?  Some kind of orange juice? =
+=== What is OmniCC?  Some kind of orange juice? ===
 
 OmniCC is a cooldown count addon.  That is, OmniCC is an addon that adds text to items/spells/abilities that are on cooldown to indicate when they'll be ready for use, like this:
 
@@ -9,12 +9,12 @@ OmniCC is a cooldown count addon.  That is, OmniCC is an addon that adds text to
 Basically, OmniCC turns your standard analogue cooldown timer into a digital one.  
 
 
-= So, does that mean that OmniCC displays buff durations on my action buttons? =
+=== So, does that mean that OmniCC displays buff durations on my action buttons? ===
 
 *No*.  OmniCC only adds text information to cooldown models.  If you want that kind of information, then I suggest installing [http://wow.curse.com/downloads/wow-addons/details/inline-aura.aspx Inline Aura].  It works great with OmniCC.
 
 
-= Is there any limit to what OmniCC will display text on? =
+=== Is there any limit to what OmniCC will display text on? ===
 
 OmniCC works on anything that's visible and has a cooldown model.
 
@@ -23,51 +23,51 @@ OmniCC works on anything that's visible and has a cooldown model.
 By default, OmniCC automatically adjusts its text size based on the size of the object it is displaying text for.
 
 
-= But I don't want OmniCC to show up on everything. =
+=== But I don't want OmniCC to show up on everything. ===
 
 OmniCC can display text on everything, but I also provide several methods or preventing OmniCC from showing text on stuff.  Two can be altered by the built in configuration interface, and one is something that addon authors can do.
 
 
-= Wait, there's a configuration interface? =
+=== Wait, there's a configuration interface? ===
 
 Yes, its available in the interface addons menu.  You can also type /omnicc to bring it up.
 
 *<Insert Picture of the GUI>*
 
 
-= Nice, and you say you can control what stuff OmniCC shows up on using this? =
+=== Nice, and you say you can control what stuff OmniCC shows up on using this? ===
 
 Yes, via the *Minimum Size slider*, or the *Enable cooldown text* checkbox.
 
 
-= What does the Minimum Size slider do? =
+=== What does the Minimum Size slider do? ===
 
 The minimum size slider is used to control how big something must be for OmniCC to display text on it.  The bigger the value, the bigger something must be in order for it to have cooldown text.
 
 
-= Great, but what do the numbers mean? =
+=== Great, but what do the numbers mean? ===
 
 The minimum size slider values translate to how big something is, relative to the size of an action button: 100 is the same size as an action button, 150 would be 1.5 times the size of one, 50 would be half the size.  Here are some other points of interest:
   * 80 - The size of a pet or class button.
   * 50 - The size of a buff on the Blizzard target frame.
 
 
-= Nice.  What about that Enable Cooldown Text option? =
+=== Nice.  What about that Enable Cooldown Text option? ===
 
 That option completely turns on or off cooldown text.
 
 
-= That doesn't sound very useful to me.  Why would you want to install OmniCC, but turn off the one thing OmniCC does? =
+=== That doesn't sound very useful to me.  Why would you want to install OmniCC, but turn off the one thing OmniCC does? ===
 
 Well, its best used with the groups feature of OmniCC.
 
 
-= Groups? What are those? =
+=== Groups? What are those? ===
 
 This is an advanced feature of OmniCC.  A group is a set of configuration settings.  You can define multiple groups of settings, and then add rules to assign a cooldown to one group or another.  For instance, you could create a group called "Blacklist", disable the Enable Cooldown Text setting for that group, and then assign any cooldown you don't want to display cooldown text for.
 
 
-= That's so...magenta!  So how do I create a new group? =
+=== That's so...magenta!  So how do I create a new group? ===
 
 First, open up the OmniCC GUI (you still remember how to do this, right?).  Next, click on the groups dropdown in the top right corner, and select *Add Group...*  
 
@@ -82,44 +82,44 @@ Once you're done, your new group will be selected by the groups dropdown.
 *<Insert Screenshot of New Settings>*
 
 
-= I've created a group, now how do I assign cooldowns to it? =
+=== I've created a group, now how do I assign cooldowns to it? ===
 
 To do that, you need to use the rules editor.  To use the rules editor, open up the OmniCC GUI again, and select the Rules tab.
 
 
-= The rules tab is greyed out and I cannot click on it =
+=== The rules tab is greyed out and I cannot click on it ===
 
 That means you're trying to adjust settings for the Default group.  The default group has no rules:  Its members are any cooldowns that do not belong to any group.
 
 
-= Oh, OK, I've selected another group =
+=== Oh, OK, I've selected another group ===
 
 Next, you simply want to type in the name of a rule, and press the add button to add it to the group's list of rules.
 
 
-= But what is a rule? =
+=== But what is a rule? ===
 
 OmniCC determines which group a cooldown belongs to by checking the name of the cooldown against the list of rules associated with each group.  Group rules are nothing more than either partial (ex, ActionButton), or full names (ex ActionButton1Cooldown) of cooldowns.  The more general the rule, the more items are captured by the rule.  For example, ActionButton will match both PetActionButton1, ActionButton1, and MultiActionButton6, while something like PetActionButton will only match pet actions.
 
 
-= So, how do I figure out the names of things? =
+=== So, how do I figure out the names of things? ===
 
 The easiest way is via the /framestack command.  Type it, hover over a button, and pick out the name that looks closest to what you're expecting.  Typing /framestack again will turn it off.
 
 *<Insert Screenshot Of 
 
 
-= That sounds too complicated for me =
+=== That sounds too complicated for me ===
 
 It is.  Hence why groups are an advanced feature :P  I'm hoping that users help other users here.
 
 
-= There's a bunch of tabs on this configuration menu.  Can you go over each one? =
+=== There's a bunch of tabs on this configuration menu.  Can you go over each one? ===
 
 Sure.  The options menu is divided into 4 tabs:  *Display*, *Text Style*,*Text Position*, and *Rules*
 
 
-= Tell me about the Display tab =
+=== Tell me about the Display tab ===
 
 The display tab controls text formatting and filtering.  It includes the following options:
  * Enable Cooldown Text - When checked, OmniCC will display cooldown text on the selected group.  When unchecked, it won't.
@@ -133,7 +133,7 @@ The display tab controls text formatting and filtering.  It includes the followi
  * Minimum size to display text - As discussed earlier, this controls how big a cooldown must be to filter out text.  I use this setting to filter out text on small items, mainly.
 
 
-= Tell me about the Text Style tab =
+=== Tell me about the Text Style tab ===
 
 The text style tab is your main way to control how OmniCC looks.  In it, you can adjust the following:
  * Text font
@@ -142,28 +142,28 @@ The text style tab is your main way to control how OmniCC looks.  In it, you can
  * Text outline
 
 
-= There does not seem to be many fonts to pick from.  Can I get more? =
+=== There does not seem to be many fonts to pick from.  Can I get more? ===
 
 OmniCC can use any font registerd with [http://www.wowace.com/addons/libsharedmedia-3-0/ LibSharedMedia]. By installing an addon, like [http://wow.curse.com/downloads/wow-addons/details/sharedmedia.aspx SharedMedia] you can add additional fonts to pick from.
 
 
-= Tell me about the Text Position tab =
+=== Tell me about the Text Position tab ===
 
 The text position tab simply controls where cooldown text is anchored to its parent frame.  Its useful if you want to move text because its covering up some other thing that you want to see (like buff counts).
 
 *<Insert Screenshot of Text at Different Anchor Points>*
 
 
-= Tell me about the Rules tab =
+=== Tell me about the Rules tab ===
 
 I already told you about that.  Go back and read this guide again :P
 
 
-= Well, is there anything else you can tell me about OmniCC? =
+=== Well, is there anything else you can tell me about OmniCC? ===
 
 No, that pretty much covers it.  If you're lua handy, you can take a look at the source code at [https://github.com/Tuller/OmniCC GitHub] and code things for me :)  If you have a bug report, please post it either where you found the addon, or on my [https://github.com/Tuller/OmniCC/issues OmniCC issue tracker].
 
 
-= What if I told you I had a dollar and enjoyed making poor financial choices? =
+=== What if I told you I had a dollar and enjoyed making poor financial choices? ===
 
 [http://code.google.com/p/tullamods/wiki/Donations Well then, take a look at my donations page]
