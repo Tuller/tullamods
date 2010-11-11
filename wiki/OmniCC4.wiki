@@ -134,29 +134,29 @@ Sure.  The options menu is divided into 4 tabs:  *Display*, *Text Style*,*Text P
 [http://tullamods.googlecode.com/svn/images/omnicc/display_panel.png]
 
 The display tab controls text formatting and filtering.  It includes the following options:
- * Enable Cooldown Text - When checked, OmniCC will display cooldown text on the selected group.  When unchecked, it won't.
+ * *Enable Cooldown Text* - When checked, OmniCC will display cooldown text on the selected group.  When unchecked, it won't.
 
- * Automatically scale text to fit within frames - When checked,  OmniCC will automatically adjust the size of cooldown text in order to better fit within a frame. 
+ * *Automatically scale text to fit within frames* - When checked,  OmniCC will automatically adjust the size of cooldown text in order to better fit within a frame. 
   [http://tullamods.googlecode.com/svn/images/omnicc/auto_scaling.png]
 
- * Show cooldown models - This toggles showing cooldown models
+ * *Show cooldown models* - This toggles showing cooldown models
   [http://tullamods.googlecode.com/svn/images/omnicc/cooldowntext_model.png
   [http://tullamods.googlecode.com/svn/images/omnicc/cooldowntext_nomodel.png]
 
- * Finish effect - This controls which effect to display when a cooldown finishes, if any.  Two finish effects are included with OmniCC, pulse and shine
+ * *Finish effect* - This controls which effect to display when a cooldown finishes, if any.  Two finish effects are included with OmniCC, pulse and shine
   [http://tullamods.googlecode.com/svn/images/omnicc/pulse.jpg] [http://tullamods.googlecode.com/svn/images/omnicc/shine.jpg] 
  
- * Minimum duration to display a finish effect - This controls how long a cooldown must be (in secionds) in order for a finish effect to be displayed.
+ * *Minimum duration to display a finish effect* - This controls how long a cooldown must be (in secionds) in order for a finish effect to be displayed.
 
- * Minimum duration to display text as MM:SS - This controls at what duration a cooldown will begin to show text in a MM:SS format, if ever
+ * *Minimum duration to display text as MM:SS* - This controls at what duration a cooldown will begin to show text in a MM:SS format, if ever
   [http://tullamods.googlecode.com/svn/images/omnicc/mmss_display.jpg] 
 
- * Minimum duration to display tenths of seconds - This controls at what duration a cooldown will begin to include tenths of seconds, if ever
+ * *Minimum duration to display tenths of seconds* - This controls at what duration a cooldown will begin to include tenths of seconds, if ever
   [http://tullamods.googlecode.com/svn/images/omnicc/tenths_display.jpg]
 
- * Minimum duration to display text - This controls how long a cooldown must be in order to display text.  I use this setting for filtering out the GCD, mainly.
+ * *Minimum duration to display text* - This controls how long a cooldown must be in order to display text.  I use this setting for filtering out the GCD, mainly.
 
- * Minimum size to display text - As discussed earlier, this controls how big a cooldown must be to filter out text.  I use this setting to filter out text on small items, mainly.
+ * *Minimum size to display text* - As discussed earlier, this controls how big a cooldown must be to filter out text.  I use this setting to filter out text on small items, mainly.
 
 
 === Tell me about the Text Style tab ===
