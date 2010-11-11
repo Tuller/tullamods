@@ -1,4 +1,4 @@
-#summary A guide for OmniCC 4 (WIP)
+#summary A guide for OmniCC 4
 
 === What is OmniCC?  Some kind of orange juice? ===
 
