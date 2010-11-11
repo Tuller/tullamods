@@ -13,7 +13,7 @@ Basically, OmniCC turns your standard analogue cooldown timer into a digital one
 
 *No*.  OmniCC only adds text information to cooldown models.  If you want that kind of information, then I suggest installing [http://wow.curse.com/downloads/wow-addons/details/inline-aura.aspx Inline Aura].  It works great with OmniCC.
 
-[http://tullamods.googlecode.com/svn/images/omnicc/inline_aura.png]
+[http://tullamods.googlecode.com/svn/images/omnicc/inline_aura.png] _(Inline Aura working with OmniCC)_
 
 
 === Is there any limit to what OmniCC will display text on? ===
