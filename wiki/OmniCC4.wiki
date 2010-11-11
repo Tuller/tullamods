@@ -82,7 +82,7 @@ From there, you'll be prompted to name your new group.  There's no real restrict
 
 Once you're done, your new group will be selected by the groups dropdown.
 
-[[http://tullamods.googlecode.com/svn/images/omnicc/added_group.png]
+[http://tullamods.googlecode.com/svn/images/omnicc/added_group.png]
 
 
 === I've created a group, now how do I assign cooldowns to it? ===
