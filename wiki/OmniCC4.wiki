@@ -40,7 +40,7 @@ Yes, its available in the interface addons menu.  You can also type /omnicc to b
 
 === Nice, and you say you can control what stuff OmniCC shows up on using this? ===
 
-Yes, via the *Minimum Size slider*, or the *Enable cooldown text* checkbox.
+Yes, via the *Minimum size to display text slider*, or the *Enable cooldown text* checkbox.
 
 
 === What does the Minimum Size slider do? ===
