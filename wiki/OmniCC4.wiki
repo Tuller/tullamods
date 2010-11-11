@@ -111,7 +111,7 @@ OmniCC determines which group a cooldown belongs to by checking the name of the 
 
 The easiest way is via the /framestack command.  Type it, hover over a button, and pick out the name that looks closest to what you're expecting.  Typing /framestack again will turn it off.
 
-*<Insert Framestack Screenshot>*
+[http://tullamods.googlecode.com/svn/images/omnicc/framestack.png] _(Framestack showing the name of a player frame buff)_
 
 
 === That sounds too complicated for me ===
