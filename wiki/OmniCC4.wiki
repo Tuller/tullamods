@@ -114,7 +114,12 @@ The easiest way is via the /framestack command.  Type it, hover over a button, a
 [http://tullamods.googlecode.com/svn/images/omnicc/framestack.png] _(Framestack showing the name of a player frame buff)_
 
 
-=== That sounds too complicated for me ===
+=== What's that table: stuff in the framestack screenshot? ===
+
+That's a nameless frame (In this case, probably the OmniCC timer itself).  Not all frames have names, and OmniCC's group filtering works only on frames with names.  Nameless frames will pull in their cooldown settings from the Default group.
+
+
+=== This all sounds too complicated for me ===
 
 It is.  Hence why groups are an advanced feature :P  I'm hoping that users help other users here.
 
