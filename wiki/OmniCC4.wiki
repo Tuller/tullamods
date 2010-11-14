@@ -176,7 +176,7 @@ The text style tab is your main way to control how OmniCC looks.  In it, you can
 
 === There does not seem to be many fonts to pick from.  Can I get more? ===
 
-OmniCC can use any font registerd with [http://www.wowace.com/addons/libsharedmedia-3-0/ LibSharedMedia]. By installing an addon, like [http://wow.curse.com/downloads/wow-addons/details/sharedmedia.aspx SharedMedia] you can add additional fonts to pick from.
+OmniCC can use any font registered with [http://www.wowace.com/addons/libsharedmedia-3-0/ LibSharedMedia]. By installing an addon like [http://wow.curse.com/downloads/wow-addons/details/sharedmedia.aspx SharedMedia] you can add additional fonts to pick from.
 
 
 === Tell me about the Text Position tab ===
