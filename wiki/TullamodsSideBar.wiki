@@ -8,8 +8,7 @@
       * [DominosBasics Basics]
       * [DominosAdvanced Advanced]
       * [DominosPlugins Plugins]
-    * [OmniCC]
-      * [OmniCC4]
+    * [OmniCC4 OmniCC]
     * tullaCC
     * tullaRange
   * Experiments
