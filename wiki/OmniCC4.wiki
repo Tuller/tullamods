@@ -196,7 +196,31 @@ The text position tab simply controls where cooldown text is anchored to its par
 I already told you about that.  Go back and read this guide again :P
 
 
-=== Well, is there anything else you can tell me about OmniCC? ===
+=== Enough about this GUI stuff.  Tell me about slash commands! ===
+
+Yes.  Slash commands.  As of OmniCC pancakes, I've added some handy slash commands.  You can either type /omnicc or /omcc to use them:
+ * /occ config - Shows the options menu
+ * /occ setengine <animation | classic> - Switches the timer update engine
+ * /occ engine - Displays the current timer update engine
+ * /occ version - Displays the current addon version
+
+
+== Wait, what's that setengine command for? ==
+
+By default, OmniCC 4 uses this thing called the Animation system in order to display timers.  The animation system was added some time ago by Blizzard in order to display smooth animations of things in game in a way that doesn't use a huge amount of CPU time like the old method did (OnUpdate loops).  I take advantage of it in OmniCC in order to display timers with a minimal amount of CPU usage.
+
+
+== You've still not explained what that setengine command is for ==
+
+Well, the reason that the setengine command exists is that my usage of the animation system has this nifty effect of causing WoW to crash for some people.  I'm not exactly sure why at this point.  I ended up writing a second timer engine that did not use the animation system because of it.  While it doesn't cause some people to crash to the desktop, it also performs a bit worse than the animation system version.
+
+
+== So the setengine command is then used to switch between timer engines if you happen to experience crashes when using OmniCC ==
+
+Yes, exactly.  If you use OmniCC and have crash issues, you should run the command /omnicc setengine classic to switch to the old style update engine.  That will resolve any crash issues you may have that are related to the addon.  If you don't have any crash issues, then you don't need to do anything.  OmniCC uses the animation system by default.
+
+
+== Well, is there anything else you can tell me about OmniCC? ==
 
 No, that pretty much covers it.  If you're lua handy, you can take a look at the source code at [https://github.com/Tuller/OmniCC GitHub] and code things for me :)  If you have a bug report, please post it either where you found the addon, or on my [https://github.com/Tuller/OmniCC/issues OmniCC issue tracker].
 
