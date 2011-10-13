@@ -6,6 +6,6 @@
  * [http://github.com/tullamods/Combuctor/issues Combuctor]
  * [http://github.com/tullamods/Dominos/issues Dominos]
  * [http://github.com/tullamods/Ludwig/issues Ludwig]
- * [http://github.com/tullamods/OmniCC OmniCC]
+ * [http://github.com/tullamods/OmniCC/issues OmniCC]
  * [http://github.com/tullamods/tullaCC/issues tullaCooldownCount]
  * [http://github.com/tullamods/tullaRange/issues tullaRange]
