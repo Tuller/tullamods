@@ -1,0 +1,1 @@
+Bagnon Armory is a replacement for [Bagnon\_Forever](Bagnon_Forever.md) that retrieves information from the [Armory](http://www.wowinterface.com/downloads/info7952-Armory.html) addon.

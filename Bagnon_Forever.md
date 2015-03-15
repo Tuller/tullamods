@@ -1,0 +1,1 @@
+An addon that stores inventory information about your characters.  It was originally designed for [Bagnon](Bagnon.md) (hence the name) but is also now used by [Combuctor](Combuctor.md).  The name comes from _[Batman Forever](http://www.imdb.com/find?s=all&q=batman%20forever)_.

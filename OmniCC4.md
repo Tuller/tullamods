@@ -1,0 +1,230 @@
+### What is OmniCC?  Some kind of orange juice? ###
+
+OmniCC is a cooldown count addon.  That is, OmniCC is an addon that adds text to items/spells/abilities that are on cooldown to indicate when they'll be ready for use, like this:
+> ![http://tullamods.googlecode.com/svn/images/omnicc/omnicc.png](http://tullamods.googlecode.com/svn/images/omnicc/omnicc.png)
+> _(OmniCC on Dominos)_
+
+Basically, OmniCC turns your standard analogue cooldown timer into a digital one.
+
+
+### So, does that mean that OmniCC displays buff durations on my action buttons? ###
+
+**No**.  OmniCC only adds text information to cooldown models.  If you want that kind of information, then I suggest installing [Inline Aura](http://wow.curse.com/downloads/wow-addons/details/inline-aura.aspx).  It works great with OmniCC.
+> ![http://tullamods.googlecode.com/svn/images/omnicc/inline_aura.png](http://tullamods.googlecode.com/svn/images/omnicc/inline_aura.png)
+> _(Inline Aura working with OmniCC)_
+
+
+### Is there any limit to what OmniCC will display text on? ###
+
+OmniCC works on anything that's visible and has a cooldown model.
+> ![http://tullamods.googlecode.com/svn/images/omnicc/cooldown_model.png](http://tullamods.googlecode.com/svn/images/omnicc/cooldown_model.png)
+> _(A cooldown model)_
+
+By default, OmniCC automatically adjusts its text size based on the size of the object it is displaying text for.
+
+
+### But I don't want OmniCC to show up on everything. ###
+
+OmniCC can display text on everything, but I also provide several methods or preventing OmniCC from showing text on stuff.  Two can be altered by the built in configuration interface, and one is something that addon authors can do.
+
+
+### Wait, there's a configuration interface? ###
+
+Yes, its available in the interface addons menu.  You can also type /omnicc to bring it up.
+> ![http://tullamods.googlecode.com/svn/images/omnicc/omnicc_gui.png](http://tullamods.googlecode.com/svn/images/omnicc/omnicc_gui.png)
+> _(The OmniCC configuration interface)_
+
+
+### Nice, and you say you can control what stuff OmniCC shows up on using this? ###
+
+Yes, via the **Minimum size to display text slider**, or the **Enable cooldown text** checkbox.
+
+
+### What does the Minimum Size slider do? ###
+
+The minimum size slider is used to control how big something must be for OmniCC to display text on it.  The bigger the value, the bigger something must be in order for it to have cooldown text.
+
+
+### Great, but what do the numbers mean? ###
+
+The minimum size slider values translate to how big something is, relative to the size of an action button: 100 is the same size as an action button, 150 would be 1.5 times the size of one, 50 would be half the size.  Here are some other points of interest:
+  * 80 - The size of a pet or class button.
+  * 50 - The size of a buff on the Blizzard target frame.
+
+
+### Nice.  What about that Enable Cooldown Text option? ###
+
+That option completely turns on or off cooldown text.
+
+
+### That doesn't sound very useful to me.  Why would you want to install OmniCC, but turn off the one thing OmniCC does? ###
+
+Well, its best used with the groups feature of OmniCC.
+
+
+### Groups? What are those? ###
+
+This is an advanced feature of OmniCC.  A group is a set of configuration settings.  You can define multiple groups of settings, and then add rules to assign a cooldown to one group or another.  For instance, you could create a group called "Blacklist", disable the Enable Cooldown Text setting for that group, and then assign any cooldown you don't want to display cooldown text for.
+
+
+### That's so...magenta!  So how do I create a new group? ###
+
+First, open up the OmniCC GUI (you still remember how to do this, right?).  Next, click on the groups dropdown in the top right corner, and select **Add Group...**
+
+> ![http://tullamods.googlecode.com/svn/images/omnicc/add_group.png](http://tullamods.googlecode.com/svn/images/omnicc/add_group.png)
+
+From there, you'll be prompted to name your new group.  There's no real restriction on names, other than you cannot create two groups with the same name.
+
+> ![http://tullamods.googlecode.com/svn/images/omnicc/enter_group_name.png](http://tullamods.googlecode.com/svn/images/omnicc/enter_group_name.png)
+
+Once you're done, your new group will be selected by the groups dropdown.
+
+> ![http://tullamods.googlecode.com/svn/images/omnicc/added_group.png](http://tullamods.googlecode.com/svn/images/omnicc/added_group.png)
+
+
+### I've created a group, now how do I assign cooldowns to it? ###
+
+To do that, you need to use the rules editor.  To use the rules editor, open up the OmniCC GUI again, and select the Rules tab:
+> ![http://tullamods.googlecode.com/svn/images/omnicc/rules_panel.png](http://tullamods.googlecode.com/svn/images/omnicc/rules_panel.png)
+
+
+### The rules tab is greyed out and I cannot click on it ###
+
+That means you're trying to adjust settings for the Default group.  The default group has no rules:  Its members are any cooldowns that do not belong to any group.
+
+
+### Oh, OK, I've selected another group ###
+
+Next, you simply want to type in the name of a rule, and press the add button to add it to the group's list of rules.
+
+
+### But what is a rule? ###
+
+OmniCC determines which group a cooldown belongs to by checking the name of the cooldown against the list of rules associated with each group.  Group rules are nothing more than either partial (ex, ActionButton), or full names (ex ActionButton1Cooldown) of cooldowns.  The more general the rule, the more items are captured by the rule.  For example, ActionButton will match both PetActionButton1, ActionButton1, and MultiActionButton6, while something like PetActionButton will only match pet actions.
+
+
+### So, how do I figure out the names of things? ###
+
+The easiest way is via the /framestack command.  Type it, hover over a button, and pick out the name that looks closest to what you're expecting.  Typing /framestack again will turn it off.
+> ![http://tullamods.googlecode.com/svn/images/omnicc/framestack.png](http://tullamods.googlecode.com/svn/images/omnicc/framestack.png)
+> _(Framestack showing the name of a player frame buff)_
+
+
+### What's that table: stuff in the framestack screenshot? ###
+
+That's a nameless frame (In this case, probably the OmniCC timer itself).  Not all frames have names, and OmniCC's group filtering works only on frames with names.  Nameless frames will pull in their cooldown settings from the Default group.
+
+
+### This all sounds too complicated for me ###
+
+It is.  Hence why groups are an advanced feature :P  I'm hoping that users help other users here.
+
+
+### There's a bunch of tabs on this configuration menu.  Can you go over each one? ###
+
+Sure.  The options menu is divided into 4 tabs:  **Display**, **Text Style**,**Text Position**, and **Rules**
+
+
+### Tell me about the Display tab ###
+
+![http://tullamods.googlecode.com/svn/images/omnicc/display_panel.png](http://tullamods.googlecode.com/svn/images/omnicc/display_panel.png)
+
+The display tab controls text formatting and filtering.  It includes the following options:
+  * **Enable Cooldown Text** - When checked, OmniCC will display cooldown text on the selected group.  When unchecked, it won't.
+
+  * **Automatically scale text to fit within frames** - When checked,  OmniCC will automatically adjust the size of cooldown text in order to better fit within a frame.
+> > ![http://tullamods.googlecode.com/svn/images/omnicc/auto_scaling.png](http://tullamods.googlecode.com/svn/images/omnicc/auto_scaling.png)
+
+  * **Show cooldown models** - This toggles showing cooldown models
+> > ![http://tullamods.googlecode.com/svn/images/omnicc/cooldowntext_model.png](http://tullamods.googlecode.com/svn/images/omnicc/cooldowntext_model.png)
+> > ![http://tullamods.googlecode.com/svn/images/omnicc/cooldowntext_nomodel.png](http://tullamods.googlecode.com/svn/images/omnicc/cooldowntext_nomodel.png)
+> > _(Cooldown models on and off)_
+
+  * **Finish effect** - This controls which effect to display when a cooldown finishes, if any. Two finish effects are included with OmniCC, **Pulse** and **Shine**.
+> > ![http://tullamods.googlecode.com/svn/images/omnicc/pulse.jpg](http://tullamods.googlecode.com/svn/images/omnicc/pulse.jpg)![http://tullamods.googlecode.com/svn/images/omnicc/shine.jpg](http://tullamods.googlecode.com/svn/images/omnicc/shine.jpg)
+> > _(The pulse and shine effects)_
+
+
+> Theoretically, more effects can be written as plugins for OmniCC.  Whether anyone will do that or not remains to be seen.
+
+  * **Minimum duration to display a finish effect** - This controls how long a cooldown must be (in seconds) in order for a finish effect to be displayed.
+
+  * **Minimum duration to display text as MM:SS** - This controls at what duration a cooldown will begin to show text in a MM:SS format, if ever
+> > ![http://tullamods.googlecode.com/svn/images/omnicc/mmss_display.jpg](http://tullamods.googlecode.com/svn/images/omnicc/mmss_display.jpg)
+> > _(Cooldown text in MM:SS format)_
+
+  * **Minimum duration to display tenths of seconds** - This controls at what duration a cooldown will begin to include tenths of seconds, if ever
+> > ![http://tullamods.googlecode.com/svn/images/omnicc/tenths_display.jpg](http://tullamods.googlecode.com/svn/images/omnicc/tenths_display.jpg)
+> > _(Cooldown text showing tenths of seconds)_
+
+  * **Minimum duration to display text** - This controls how long a cooldown must be in order to display text.  I use this setting for filtering out the GCD, mainly.
+
+  * **Minimum size to display text** - As discussed earlier, this controls how big a cooldown must be to filter out text.  I use this setting to filter out text on small items, mainly.
+
+
+### Tell me about the Text Style tab ###
+
+![http://tullamods.googlecode.com/svn/images/omnicc/text_style_panel.png](http://tullamods.googlecode.com/svn/images/omnicc/text_style_panel.png)
+
+The text style tab is your main way to control how OmniCC looks.  In it, you can adjust the following:
+  * Text font
+  * Text size
+  * Text color, scale, and opacity (on a per duration basis)
+  * Text outline
+
+
+### There does not seem to be many fonts to pick from.  Can I get more? ###
+
+OmniCC can use any font registered with [LibSharedMedia](http://www.wowace.com/addons/libsharedmedia-3-0/). By installing an addon like [SharedMedia](http://wow.curse.com/downloads/wow-addons/details/sharedmedia.aspx) you can add additional fonts to pick from.
+
+
+### Tell me about the Text Position tab ###
+
+![http://tullamods.googlecode.com/svn/images/omnicc/text_position_panel.png](http://tullamods.googlecode.com/svn/images/omnicc/text_position_panel.png)
+
+The text position tab simply controls where cooldown text is anchored to its parent frame.  Its useful if you want to move text because its covering up some other thing that you want to see (like buff counts).
+
+
+> ![http://tullamods.googlecode.com/svn/images/omnicc/text_position.png](http://tullamods.googlecode.com/svn/images/omnicc/text_position.png)
+> _(The different text position options)_
+
+
+### Tell me about the Rules tab ###
+
+![http://tullamods.googlecode.com/svn/images/omnicc/rules_panel.png](http://tullamods.googlecode.com/svn/images/omnicc/rules_panel.png)
+
+I already told you about that.  Go back and read this guide again :P
+
+
+### Enough about this GUI stuff.  Tell me about slash commands! ###
+
+Yes.  Slash commands.  As of OmniCC pancakes, I've added some handy slash commands.  You can either type /omnicc or /omcc to use them:
+  * /occ config - Shows the options menu
+  * /occ setengine <animation | classic> - Switches the timer update engine
+  * /occ engine - Displays the current timer update engine
+  * /occ version - Displays the current addon version
+
+
+## Wait, what's that setengine command for? ##
+
+By default, OmniCC 4 uses this thing called the Animation system in order to display timers.  The animation system was added some time ago by Blizzard in order to display smooth animations of things in game in a way that doesn't use a huge amount of CPU time like the old method did (OnUpdate loops).  I take advantage of it in OmniCC in order to display timers with a minimal amount of CPU usage.
+
+
+## You've still not explained what that setengine command is for ##
+
+Well, the reason that the setengine command exists is that my usage of the animation system has this nifty effect of causing WoW to crash for some people.  I'm not exactly sure why at this point.  I ended up writing a second timer engine that did not use the animation system because of it.  While it doesn't cause some people to crash to the desktop, it also performs a bit worse than the animation system version.
+
+
+## So the setengine command is then used to switch between timer engines if you happen to experience crashes when using OmniCC ##
+
+Yes, exactly.  If you use OmniCC and have crash issues, you should run the command /omnicc setengine classic to switch to the old style update engine.  That will resolve any crash issues you may have that are related to the addon.  If you don't have any crash issues, then you don't need to do anything.  OmniCC uses the animation system by default.
+
+
+## Well, is there anything else you can tell me about OmniCC? ##
+
+No, that pretty much covers it.  If you're lua handy, you can take a look at the source code at [GitHub](https://github.com/Tuller/OmniCC) and code things for me :)  If you have a bug report, please post it either where you found the addon, or on my [OmniCC issue tracker](https://github.com/Tuller/OmniCC/issues).
+
+
+### What if I told you I had a dollar and enjoyed making poor financial choices? ###
+
+[Well then, take a look at my donations page](http://code.google.com/p/tullamods/wiki/Donations)

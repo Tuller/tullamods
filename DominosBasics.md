@@ -1,0 +1,100 @@
+You can do a lot of things with Dominos.  The intent of this guide is to give one the tools needed to figure out how to do stuff, rather than explain each and every feature.
+
+
+#### The Main Options Menu ####
+
+
+![![](http://tullamods.googlecode.com/svn/images/optionsMenuThumb.jpg)](http://tullamods.googlecode.com/svn/images/optionsMenu.png)
+
+The options menu is your main hub for configuration in Dominos.  With it you can:
+  * Configure non bar specific settings, like locking action button positions, selfcast settings, hiding and showing macro text
+  * Enter and exit configuration mode
+  * Enter and exit binding mode
+  * Manage profiles
+
+The options menu is located in the addons portion of the Blizzard interface options menu.  Alternatively, you can access it via the slash command _/dominos_.
+
+
+#### Profiles ####
+
+
+![![](http://tullamods.googlecode.com/svn/images/profilesThumb.jpg)](http://tullamods.googlecode.com/svn/images/profiles.jpg)
+
+A profile contains Dominos specific settings.  This does _not_ include key bindings, or what actions are on each bar (To save action button positions, try out the addon Action Bar Saver 2.  Action bar paging settings are saved on a per profile basis, but are also class specific.  By default, Dominos assigns each class a separate profile.
+
+To manage profiles, you need to access the profiles management panel, which is a sub panel of the main options panel for Dominos.  Simply click the + near the Dominos tab in interface options, then click the profiles button.
+
+Four profile operations are implemented: **set**, **save**, **copy**, and **delete**.  Set will change the current active character to the selected profile. This allows the user to have multiple characters set to using the same settings.  Save will create a copy of the user's current profile as a given name, then set the current user to that profile.  Copy will copy all settings from the selected profile to the current profile.  Delete will well, delete a profile.
+
+A final option is only implemented as a slash command, _/dominos reset_.  This command will return your current profile to default settings.
+
+---
+
+
+#### Configuration mode ####
+
+
+![![](http://tullamods.googlecode.com/svn/images/configModeThumb.jpg)](http://tullamods.googlecode.com/svn/images/configMode.jpg)
+
+Configuration mode is where it is possible to move bars around and adjust a bar's settings.
+
+To adjust a bar's settings, enter configuration mode, then right click the desired bar to bring up the bar's right click menu.  **Every Dominos bar has a right click menu for adjusting settings.**  I highly encourage all users to look through the right click menus for each bar to discover all configuration options.
+
+You can access configuration mode via doing any of the following
+  * The _/dominos lock_  or _/dominos config_ slash commands
+  * Clicking the Enter Config Mode... button in the main options menu
+
+To exit configuration mode, just use the same command you used to enter it.
+
+---
+
+
+
+#### Binding Mode ####
+
+
+![http://tullamods.googlecode.com/svn/images/bindingMode.jpg](http://tullamods.googlecode.com/svn/images/bindingMode.jpg)
+
+Bindings mode is where it is possible to set hotkeys for all action bars, the pet bar, and the class bar.
+
+To bind a key, hover over the button and press desired key combination, such as Alt + 1, W, or Mouse Wheel down.  It is possible to bind keys to any mouse button recognized by the game, other than the left and right buttons.  All bindings, except for the action bar, are saved in the same way as the standard binding system does, and respects the same per character option.
+
+You can access bindings mode by doing any of the following:
+  * Typing the _/keybound_ or _/kb_ slash command
+  * Clicking the Bind Keys... button in the main options menu
+
+To exit binding mode, use whichever command you used to enter it.
+
+---
+
+
+#### Slash Commands ####
+
+
+Dominos features a fairly rich set of slash commands. All Dominos commands, with the exception of the binding mode toggle, can start with either /dominos or /dom.  The parameter 'frameList' can be either a single bar id, ex 'menu'; a space separated list of bar ids, ex 'bags pet 1'; a range of bars, ex '1-10'; 'all'; or any combination, ex '1-10 menu bags pet all'
+
+Here's the complete list of commands
+| **Command** | **Action** |
+|:------------|:-----------|
+| /dom | Shows the options menu, if enabled |
+| /dom lock | Toggles configuration mode |
+| /dom scale frameList scale | Sets **frameList**'s scale to **scale**. 1 is normal scale |
+| /dom setalpha frameList opacity | Sets the opacity of barlist. 0 is completely transparent, 1 is completely opaque |
+| /dom fade frameList opacity | Sets the faded opacity of frameList. A bar's faded opacity is what opacity a bar has when not moused over |
+| /dom setcols frameList columns|  Sets the number of columns for frameList |
+| /dom pad frameList padW padH | Sets the padding levels for frameList |
+| /dom space frameList spacing | Sets the spacing between buttons for frameList |
+| /dom show frameList | Shows frameList |
+| /dom hide frameList | Hides frameList |
+| /dom toggle frameList | Toggles frameList |
+| /dom numbars 1-120|  Sets how many action bars to use.  This option will reset your action bar positions |
+| /dom numbuttons 1-120 | Sets the maximum amount of buttons per actionbar.  This option will reset your action bar positions |
+| /dom set profile | Switches to frameList |
+| /dom save profile|  Saves current settings as, and switches to frameList |
+| /dom copy profile | Copies settings from frameList to current profile |
+| /dom delete profile | Deletes frameList |
+| /dom reset | Returns the current profile to default settings |
+| /dom list | Lists all available profiles |
+| /dom version | Prints the current Dominos version |
+| /dom help or ? | Shows a list of slash commands |
+| /keybound or /kb | Toggles binding mode |

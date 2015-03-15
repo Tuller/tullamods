@@ -1,0 +1,13 @@
+#### So what the heck is Dominos? ####
+
+![![](http://tullamods.googlecode.com/svn/images/sampleSetupThumb.jpg)](http://tullamods.googlecode.com/svn/images/sampleSetup.jpg)
+
+Dominos is an action bar addon developed with the following goals in mind:
+  * Reuse as much standard Blizzard action button code as possible.
+  * Contain a relatively minimal feature set
+  * Be easy to use
+  * Be stable
+
+The main action bar, as you know, is that thing at the bottom of the screen that acts as your main interface for accessing your inventory, opening a few panels, making your pet do things, and of course using spells and ability.
+
+What Dominos does is take that interface, split it up into a series of customizable "bars" (a bar for your bags, one for your pet, an experience bar, etc), and add a few more features, like access to all 120 action buttons.

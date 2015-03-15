@@ -1,0 +1,23 @@
+For submitting bug reports and feature requests, I prefer you all to use [Google code issue tracker](http://code.google.com/p/tullamods/issues/list).  If you absolutely refuse to use Google Code, I do read the issues on both WoWInterface and CurseForge.
+
+### How To Submit a Bug Report ###
+
+The following information is absolutely necessary when submitting a bug report:
+  * Addon name
+  * Addon version
+  * What other addons you were running at the time.
+
+Its also really helpful for you to do the following, too:
+  * If you're not running the latest version of the ad don for your game version, then grab the new version and try to reproduce the error.
+  * Try to reproduce the error with all other ad dons disabled.  This is necessary to determine if the issue is due to a conflict with another ad don or not.
+  * Provide a step by step walk through on how to reproduce the error.
+
+### How to Submit a Feature Request ###
+
+More or less, do the same as you would do for submitting an issue request, but make sure you mark it as an enhancement.  Please make sure the feature you're requesting is not already implemented in the latest released version of the ad don before submitting it.
+
+### How To Submit a Patch ###
+
+The best way to have your feature request implemented is to write it yourself :)  I'm definitely more likely to implement something if someone has done the majority of the work for me.
+
+To submit a patch, simply create a new patch request on my Google code tracker, describe what you've done, and attach whatever changes you've made.  From there, I'll review the patch, and most likely implement it.  To make it easier for me, please try and make your changes by altering the trunk.
